@@ -87,7 +87,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	char																		temp		[512]							= {};
 	::gpk::SRSWFileContents														& rswData									= app.RSWData;
 	//sprintf_s(temp, "%s%s%s", ragnaPath, "", "in_sphinx1.rsw");						gpk_necall(::gpk::rswFileLoad(rswData						, ::gpk::view_const_string(temp)), "Error");
-	sprintf_s(temp, "%s%s%s", ragnaPath, "", "aldebaran.rsw");						gpk_necall(::gpk::rswFileLoad(rswData						, ::gpk::view_const_string(temp)), "Error");
+	sprintf_s(temp, "%s%s%s", ragnaPath, "", "aldebaran.rsw");					gpk_necall(::gpk::rswFileLoad(rswData		, ::gpk::view_const_string(temp)), "Error");
 	sprintf_s(temp, "%s%s%s", ragnaPath, "", &rswData.GNDFilename[0]);			gpk_necall(::gpk::gndFileLoad(app.GNDData	, ::gpk::view_const_string(temp)), "Error");
 	app.RSMData.resize(rswData.RSWModels.size());
 	for(uint32_t iRSM = 0; iRSM < (uint32_t)rswData.RSWModels.size(); ++iRSM){

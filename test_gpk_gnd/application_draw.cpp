@@ -107,6 +107,7 @@ static				::gpk::error_t										transformTriangles
 		if(transformedTriangle3D.CulledX({0, (float)targetMetrics.x})) continue;
 		if(transformedTriangle3D.CulledY({0, (float)targetMetrics.y})) continue;
 		gpk_necall(out_transformed.Triangle3dToDraw		.push_back(transformedTriangle3D)	, "Out of memory?");
+
 		::gpk::transform(triangle3DWorld, xWorld);
 		gpk_necall(out_transformed.Triangle3dWorld		.push_back(triangle3DWorld)			, "Out of memory?");
 		gpk_necall(out_transformed.Triangle3dIndices	.push_back(iTriangle)				, "Out of memory?");
