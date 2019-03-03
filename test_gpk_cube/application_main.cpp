@@ -89,7 +89,7 @@ static constexpr const ::gpk::STriangle3D<float>						geometryCube	[12]						=
 	::gpk::error_t																frameworkResult								= ::gpk::updateFramework(applicationInstance.Framework);
 	ree_if(errored(frameworkResult), "Unknown error.");
 	rvi_if(1, frameworkResult == 1, "Framework requested close. Terminating execution.");
-	ree_if(errored(::updateSizeDependentResources	(applicationInstance)), "Cannot update offscreen and this could cause an invalid memory access later on.");
+	ree_if(errored(::updateSizeDependentResources(applicationInstance)), "Cannot update offscreen and this could cause an invalid memory access later on.");
 	//-----------------------------
 	::gpk::STimer																& timer										= applicationInstance.Framework.Timer;
 	::gpk::SDisplay																& mainWindow								= applicationInstance.Framework.MainDisplay;
@@ -124,7 +124,6 @@ struct SCamera {
 						::gpk::SCoord3<float>								Position, Target;
 };
 
-
 					::gpk::error_t										draw										(::SApplication& applicationInstance)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	::gpk::SFramework															& framework									= applicationInstance.Framework;
 	::gpk::SFramework::TOffscreen												& offscreen									= framework.MainDisplayOffscreen->Color;
@@ -144,7 +143,7 @@ struct SCamera {
 	const ::gpk::SCoord3<float>													tilt										= {10, };	// ? cam't remember what is this. Radians? Eulers?
 	const ::gpk::SCoord3<float>													rotation									= {0, (float)frameInfo.FrameNumber / 100, 0};
 
-	::gpk::SCameraNearFar														nearFar										= {0.01f , 1000.0f};
+	::gpk::SNearFar														nearFar										= {0.01f , 1000.0f};
 
 	static constexpr const ::gpk::SCoord3<float>								cameraUp									= {0, 1, 0};	// ? cam't remember what is this. Radians? Eulers?
 	::SCamera																	camera										= {{10, 5, 0}, {}};
@@ -188,8 +187,8 @@ struct SCamera {
 		double																		lightFactor									= geometryCubeNormals[iTriangle].Dot(lightPos);
 		triangle3dColorList[iTriangle]											= ::gpk::RED * lightFactor;
 	}
-	::gpk::array_pod<::gpk::SCoord2<int32_t>>										trianglePixelCoords;
-	::gpk::array_pod<::gpk::SCoord2<int32_t>>										wireframePixelCoords;
+	::gpk::array_pod<::gpk::SCoord2<int32_t>>									trianglePixelCoords;
+	::gpk::array_pod<::gpk::SCoord2<int32_t>>									wireframePixelCoords;
 	::gpk::SCoord3<float> cameraFront = (camera.Target - camera.Position).Normalize();
 	for(uint32_t iTriangle = 0; iTriangle < 12; ++iTriangle) {
 		double																		lightFactor									= geometryCubeNormals[iTriangle].Dot(cameraFront);

@@ -77,7 +77,7 @@
 static				::gpk::error_t										transformTriangles							
 	( const ::gpk::view_array<::gpk::STriangleWeights<uint32_t>>	& vertexIndexList
 	, const ::gpk::view_array<::gpk::SCoord3<float>>				& vertices
-	, const ::gpk::SCameraNearFar									& nearFar
+	, const ::gpk::SNearFar									& nearFar
 	, const ::gpk::SMatrix4<float>									& xWorld
 	, const ::gpk::SMatrix4<float>									& xWV
 	, const ::gpk::SMatrix4<float>									& xProjection
@@ -145,7 +145,7 @@ static				::gpk::error_t										drawTriangles
 	, const ::gpk::view_array<::gpk::SCoord3<float>>				& vertices
 	, const ::gpk::view_array<::gpk::SCoord2<float>>				& uvs
 	, const ::gpk::view_grid	<::gpk::SColorBGRA>					& textureView
-	, const ::gpk::SCameraNearFar									& nearFar
+	, const ::gpk::SNearFar									& nearFar
 	, const ::gpk::SCoord3<float>									& lightDir
 	, ::gpk::SRenderCache											& renderCache
 	, ::gpk::view_grid<uint32_t>									& targetDepthView
@@ -246,7 +246,7 @@ static				::gpk::error_t										drawTriangles
 	xRotation.Identity();
 	::gpk::SMatrix4<float>														xWorld										= {};
 	xWorld.Identity();
-	const ::gpk::SCameraNearFar													& nearFar									= camera.NearFar;
+	const ::gpk::SNearFar													& nearFar									= camera.NearFar;
 	uint32_t																	& pixelsDrawn								= renderCache.PixelsDrawn	= 0;
 	uint32_t																	& pixelsSkipped								= renderCache.PixelsSkipped	= 0;
 	renderCache.WireframePixelCoords.clear();

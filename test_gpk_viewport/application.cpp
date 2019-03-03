@@ -191,7 +191,7 @@ template<typename _tIndex, typename _tValue>
 	//------------------------------------------------
 	::gpk::SFrameInfo														& frameInfo									= framework.FrameInfo;
 	::gme::SViewportScene													& scene										= app.Scene;
-	::gpk::SCameraNearFar													& nearFar									= scene.Camera.NearFar;
+	::gpk::SNearFar													& nearFar									= scene.Camera.NearFar;
 	{
 		::gpk::mutex_guard														lockViewport								(app.LockViewport);
 		scene.Projection.Identity();
