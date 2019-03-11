@@ -4,10 +4,6 @@
 #ifndef APPLICATION_H_098273498237423
 #define APPLICATION_H_098273498237423
 
-//struct SCameraVectors {
-//						::cho::SCoord3<float>							Right, Up, Front;
-//};
-
 struct SApplication {
 						::gpk::SFramework								Framework									;
 
