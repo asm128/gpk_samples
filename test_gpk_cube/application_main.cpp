@@ -3,11 +3,11 @@
 #include "application.h"
 
 #include "gpk_bitmap_target.h"
-#include "gpk_bitmap_file.h"
 #include "gpk_grid_copy.h"
 #include "gpk_grid_scale.h"
 #include "gpk_view_bit.h"
 #include "gpk_matrix.h"
+#include "gpk_png.h"
 
 #include "gpk_app_impl.h"
 
@@ -60,8 +60,8 @@ static constexpr const ::gpk::STriangle3D<float>						geometryCube	[12]						=
 	::gpk::SDisplay																& mainWindow								= framework.MainDisplay;
 	framework.Input.create();
 	error_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?????!?!?!?!?");
-	static constexpr	const char												bmpFileName2	[]							= "Codepage-437-24.bmp";
-	error_if(errored(::gpk::bmpFileLoad((::gpk::view_const_string)bmpFileName2, applicationInstance.TextureFont				)), "Failed to load bitmap from file: %s.", bmpFileName2);
+	static constexpr	const char												bmpFileName2	[]							= "Codepage-437-24.png";
+	error_if(errored(::gpk::pngFileLoad((::gpk::view_const_string)bmpFileName2, applicationInstance.TextureFont				)), "Failed to load bitmap from file: %s.", bmpFileName2);
 	const ::gpk::SCoord2<uint32_t>												& textureFontMetrics						= applicationInstance.TextureFont.View.metrics();
 	applicationInstance.TextureFontMonochrome.resize(textureFontMetrics);
 	for(uint32_t y = 0, yMax = textureFontMetrics.y; y < yMax; ++y)

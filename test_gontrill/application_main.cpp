@@ -3,12 +3,12 @@
 //		Also useful for copy & paste operations in which you need to copy a bunch of variable or function names and you can't afford the time of copying them one by one.
 #include "application.h"
 
-#include "gpk_bitmap_file.h"
 #include "gpk_bitmap_target.h"
 #include "gpk_grid_scale.h"
 #include "gpk_grid_copy.h"
 #include "gpk_view_bit.h"
 #include "gpk_gui_text.h"
+#include "gpk_png.h"
 
 #include "gpk_app_impl.h"
 
@@ -52,10 +52,12 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 }
 
 static				::gpk::error_t										setupSprite									(::gpk::SImageProcessable<::gpk::SColorBGRA>& textureToProcess, ::gpk::SCoord2<int32_t>& textureCenter, const ::gpk::view_const_string& filename)	{ 
-	bool																		failedFromFile								= errored(::gpk::bmpFileLoad(filename, textureToProcess.Original));
+	bool																		failedFromFile								= errored(::gpk::pngFileLoad(filename, textureToProcess.Original));
 	char_t																		filenameBMGCompo	[256]					= {};
 	strcpy_s(filenameBMGCompo, filename.begin());
-	filenameBMGCompo[strlen(filenameBMGCompo) - 1]									= 'g';
+	filenameBMGCompo[strlen(filenameBMGCompo) - 3]							= 'b';
+	filenameBMGCompo[strlen(filenameBMGCompo) - 2]							= 'm';
+	filenameBMGCompo[strlen(filenameBMGCompo) - 1]							= 'g';
 	const ::gpk::view_const_string												filenameBMG									= filenameBMGCompo;
 	if(failedFromFile) {
 		error_printf("Failed to load bitmap from file: %s.", filename);
@@ -71,14 +73,14 @@ static				::gpk::error_t										setupSprite									(::gpk::SImageProcessable<
 
 static				::gpk::error_t										setupSprites								(::SApplication& applicationInstance)											{ 
 	static constexpr	const char*												bmpFileNames	[]							= 
-		{ "Codepage-437-24.bmp"
-		, "ship_0.bmp"
-		, "ship_1.bmp"
-		, "pow_core_0.bmp"
-		, "pow_core_1.bmp"
-		, "crosshair_template.bmp"
-		, "pow_icon_0.bmp"
-		, "enemy_0.bmp"
+		{ "Codepage-437-24.png"
+		, "ship_0.png"
+		, "ship_1.png"
+		, "pow_core_0.png"
+		, "pow_core_1.png"
+		, "crosshair_template.png"
+		, "pow_icon_0.png"
+		, "enemy_0.png"
 		};
 	for(uint32_t iSprite = 0, spriteCount = ::gpk::size(bmpFileNames); iSprite < spriteCount; ++iSprite) {
 		char																		temp	[1024];
