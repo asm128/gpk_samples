@@ -602,7 +602,7 @@ static				::gpk::error_t										spawnPowOfRandomType						(::SGame & gameInsta
 // 0 -------------------------- 6
 //   --------------------------
 //         9    10     11
-static				const ::gpk::array_static<::gpk::SCoord2<int32_t>, 12>		spawnerPositions								=
+static				const ::gpk::array_static<::gpk::SCoord2<int32_t>, 12>		spawnerPositions								= {
 	{ {(int32_t)0 - 8, (int32_t)GAME_SCREEN_SIZE.y / 4 * 1}						// -- Left							
 	, {(int32_t)0 - 8, (int32_t)GAME_SCREEN_SIZE.y / 4 * 2}
 	, {(int32_t)0 - 8, (int32_t)GAME_SCREEN_SIZE.y / 4 * 3}
@@ -618,7 +618,8 @@ static				const ::gpk::array_static<::gpk::SCoord2<int32_t>, 12>		spawnerPositio
 	, {(int32_t)GAME_SCREEN_SIZE.x / 4 * 1	, (int32_t)0 - 8}					// Bottom
 	, {(int32_t)GAME_SCREEN_SIZE.x / 4 * 2	, (int32_t)0 - 8}
 	, {(int32_t)GAME_SCREEN_SIZE.x / 4 * 3	, (int32_t)0 - 8}
-	};
+	}
+};
 
 static				::gpk::error_t												spawnEnemy										(::SGame & gameInstance, int32_t spawnerIndex, const ::gpk::SCoord2<uint32_t> & offscreenMetrics)			{
 	int32_t																				indexToSpawnEnemy								= firstUnused(gameInstance.Enemies.Alive);

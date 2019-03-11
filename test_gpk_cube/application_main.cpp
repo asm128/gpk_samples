@@ -60,17 +60,6 @@ static constexpr const ::gpk::STriangle3D<float>						geometryCube	[12]						=
 	::gpk::SDisplay																& mainWindow								= framework.MainDisplay;
 	framework.Input.create();
 	error_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?????!?!?!?!?");
-	static constexpr	const char												bmpFileName2	[]							= "Codepage-437-24.png";
-	error_if(errored(::gpk::pngFileLoad((::gpk::view_const_string)bmpFileName2, applicationInstance.TextureFont				)), "Failed to load bitmap from file: %s.", bmpFileName2);
-	const ::gpk::SCoord2<uint32_t>												& textureFontMetrics						= applicationInstance.TextureFont.View.metrics();
-	applicationInstance.TextureFontMonochrome.resize(textureFontMetrics);
-	for(uint32_t y = 0, yMax = textureFontMetrics.y; y < yMax; ++y)
-	for(uint32_t x = 0, xMax = textureFontMetrics.x; x < xMax; ++x)
-		applicationInstance.TextureFontMonochrome.View[y * textureFontMetrics.x + x]
-		=	0 != applicationInstance.TextureFont.View[y][x].r
-		||	0 != applicationInstance.TextureFont.View[y][x].g
-		||	0 != applicationInstance.TextureFont.View[y][x].b
-		;
 
 	static constexpr const ::gpk::SCoord3<float>								cubeCenter									= {0.5f, 0.5f, 0.5f};
 	for(uint32_t iTriangle = 0; iTriangle < 12; ++iTriangle) {

@@ -4,6 +4,7 @@
 #include "application.h"
 
 #include "gpk_bitmap_target.h"
+#include "gpk_bmg.h"
 #include "gpk_grid_scale.h"
 #include "gpk_grid_copy.h"
 #include "gpk_view_bit.h"
