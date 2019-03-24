@@ -169,7 +169,7 @@ static				::gpk::error_t										setupSprites								(::SApplication& applicati
 	uint32_t																	lineOffset									= 0;
 	static	const ::gpk::view_const_string										textLine0									= "W: Up, S: Down, A: Left, D: Right";
 	static	const ::gpk::view_const_string										textLine1									= "T: Shoot. Y: Thrust. U: Handbrake.";
-	static	const ::gpk::view_const_string										textLine2									= "Press ESC to exit or P to Pause.";
+	static	const ::gpk::view_const_string										textLine2									= "Press ESC to exit or P to (un)pause.";
 	::gpk::SFramework															& framework									= applicationInstance.Framework;
 	::gpk::view_grid<::gpk::SColorBGRA>											& offscreenView								= framework.MainDisplayOffscreen->Color.View;
 	::gpk::view_grid<::gpk::SColorBGRA>											& fontAtlasView								= applicationInstance.Textures[GAME_TEXTURE_FONT_ATLAS].Processed.View;

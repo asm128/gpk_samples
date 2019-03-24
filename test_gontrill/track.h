@@ -3,6 +3,7 @@
 #ifndef TRACK_H_9283749823
 #define TRACK_H_9283749823
 
+#pragma pack(push, 1)
 enum TRACK_EVENT_TYPE : int32_t
 	{ TRACK_EVENT_TYPE_ENEMY			= 0
 	, TRACK_EVENT_TYPE_SOUND_START
@@ -20,6 +21,7 @@ struct STrackEvent {
 						int32_t										PayloadId							;
 						TRACK_EVENT_TYPE							Type								;
 };
+#pragma pack(pop)
 
 struct STrackEventTable {
 						::gpk::array_pod<float				>		EventTimeStart						;
@@ -37,10 +39,12 @@ struct STrackEventTable {
 	}
 };
 
+#pragma pack(push, 1)
 struct STrackState {
 						float										TimeElapsed;
 						int32_t										LastEvent;
 };
+#pragma pack(pop)
 
 //struct STrack {
 //						float										TimeStart							;
