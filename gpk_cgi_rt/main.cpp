@@ -1,4 +1,5 @@
 #include "gpk_cgi.h"
+#include "gpk_cgi_module.h"
 #include <string>
 
 #include <Windows.h>
@@ -39,10 +40,14 @@ template<size_t _sizeOutput>
 	return ::formatForSize(text, output, (uint32_t)_sizeOutput, pre, post);
 }
 
-::gpk::error_t										genHTMLModuleOutput		(const ::gpk::SCGIFramework & framework, ::gpk::array_pod<char> & output){
-	const ::gpk::SCGIRuntimeValues							& runtimeValues			= framework.RuntimeValues;
-	char													buffer[4096]			= {};
-	output.append(buffer, formatForSize(framework.ModuleName, buffer, ::gpk::size(buffer), "<html>\n<body>\n<h1>bootstrapped module: ", "</h1>\n</body>\n</html>"));
+::gpk::error_t										genHTMLModuleOutput				(const ::gpk::SCGIFramework & framework, ::gpk::array_pod<char> & output){
+	const ::gpk::SCGIRuntimeValues							& runtimeValues					= framework.RuntimeValues;
+	//char													buffer[4096]					= {};
+	::gpk::SCGIModule										module;
+	::std::string											moduleName						= {framework.ModuleName.begin(), framework.ModuleName.size()};
+	::gpk::loadCGIModule(module, {moduleName.data(), (uint32_t)moduleName.size()});
+	module.Render(module.Application, output);
+	//output.append(buffer, formatForSize(framework.ModuleName, buffer, ::gpk::size(buffer), "<html>\n<body>\n<h1>bootstrapped module: ", "</h1>\n</body>\n</html>"));
 	runtimeValues;
 	return 0;
 }
@@ -132,12 +137,13 @@ int WINAPI											WinMain				(HINSTANCE hInstance, HINSTANCE hPrevInstance, L
 	::gpk::SCGIFramework									framework;
 	::gpk::cgiRuntimeValuesLoad(framework);
 	printf("%s\n\n", "Content-Type: text/html"
-		"\nCache-Control: no-store"
+		"\nCache-Control: no-store\n"
 	);
 	
 	::gpk::array_pod<char>									html;
 	::htmlBootstrap(framework, html);
 	html.push_back('\0');
+	OutputDebugStringA(html.begin());
 	printf("%s", html.begin());
 	return 0;
 }
