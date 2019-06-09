@@ -12,6 +12,6 @@ int								main							(int argc, char ** argv)		{
 
 	// -- Load source file.
 	const ::gpk::view_const_string		fileNameSrc						= {argv[1], (uint32_t)-1};	// First parameter is the only parameter, which is the name of the source file to be split.
-	ree_if(::gpk::fileSplit(fileNameSrc), "Failed to split file: %s.", fileNameSrc);
+	ree_if(::gpk::fileSplit(fileNameSrc), "Failed to split file: %s.", fileNameSrc.begin());
 	return 0; 
 }

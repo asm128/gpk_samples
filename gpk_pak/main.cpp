@@ -11,7 +11,7 @@
 int										main						(int argc, char ** argv)	{
 	ree_if(2 > argc, "Usage:\n\t%s [input folder name] [output file name (optional)]", argv[0]);
 
-	char										nameFileDst[512]			= {};	// compose filename
+	char										nameFileDst[1024*2]			= {};	// compose filename
 	if(2 < argc)
 		sprintf_s(nameFileDst, "%s", argv[2]);
 	else
