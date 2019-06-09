@@ -18,10 +18,7 @@ int										main						(int argc, char ** argv)	{
 		sprintf_s(nameFileDst, "%s.gpk", argv[1]);
 
 	const ::gpk::view_const_string				nameFolderSrc				= {argv[1], (uint32_t)strlen(argv[1])};;
-	::gpk::SFolderPackage						folderPackage;
-	gpk_necall(::gpk::folderPack(folderPackage, nameFolderSrc), "Failed to pack folder: %s.", nameFolderSrc.begin());
-	gpk_necall(::gpk::folderToDisk(folderPackage, nameFileDst), "Failed to pack folder: %s.", nameFolderSrc.begin());
-
+	gpk_necall(::gpk::folderPackToDisk(nameFileDst, nameFolderSrc), "Failed to pack folder '%s' to file '%s'.", nameFolderSrc.begin(), nameFileDst);
 	printf("Successfully written '%s'?", nameFileDst);
 	return 0; 
 }
