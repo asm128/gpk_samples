@@ -1,4 +1,7 @@
 #define GPK_CONSOLE_LOG_ENABLED
+#define GPK_ERROR_PRINTF_ENABLED
+#define GPK_WARNING_PRINTF_ENABLED
+#define GPK_INFO_PRINTF_ENABLED
 
 #include "gpk_log.h"
 #include "gpk_storage.h"
@@ -42,7 +45,7 @@ int											main				(int argc, char ** argv)						{
 	}
 
 	{
-		uint32_t			offsetInfo		= 0;
+		uint32_t							offsetInfo		= 0;
 		for(uint32_t iFile = 0; iFile < virtualFolder.Names.size(); ++iFile) {
 			const ::gpk::SRange<uint32_t>		& fileLocation			= *(const ::gpk::SRange<uint32_t>*)&virtualFolder.DataInfo[offsetInfo];
 			offsetInfo						+= sizeof(const ::gpk::SRange<uint32_t>);

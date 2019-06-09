@@ -1,4 +1,7 @@
 #define GPK_CONSOLE_LOG_ENABLED
+#define GPK_ERROR_PRINTF_ENABLED
+#define GPK_WARNING_PRINTF_ENABLED
+#define GPK_INFO_PRINTF_ENABLED
 
 #include "gpk_log.h"
 #include "gpk_storage.h"
