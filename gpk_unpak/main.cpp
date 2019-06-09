@@ -1,46 +1,73 @@
+#define GPK_CONSOLE_LOG_ENABLED
+
 #include "gpk_log.h"
 #include "gpk_storage.h"
 #include "gpk_coord.h"
+#include "gpk_deflate.h"
 
-int main(int argc, char ** argv) { 
+struct SGPKPak {
+	::gpk::array_pod<byte_t>							DataContents	;
+	::gpk::array_pod<byte_t>							DataInfo		;
+	::gpk::array_pod<::gpk::view_array<const char_t>>	Contents		;
+	::gpk::array_pod<::gpk::view_const_string>			Names			;
+};
+
+int											main				(int argc, char ** argv)						{
 	if(2 > argc) {
 		printf("Usage:\n\t%s [input file name] [output folder (optional)]", argv[0]);
 		return -1;
 	}
-	::gpk::array_obj<::gpk::array_pod<char_t>>	listFiles				= {};
-	const char									* nameFileSrc			= argv[1];	
-	if(2 < argc)
-		sprintf_s(nameFileDst, "%s", argv[2]);
-	else
-		sprintf_s(nameFileDst, "%s.gpk", argv[1]);
-	fopen_s();
-	::gpk::array_pod<byte_t>		tableFiles				= {};
-	::gpk::array_pod<byte_t>		contentsPacked			= {};
+	char										nameFileSrc	[4096]		= {};
+	const int32_t								sizeNameSrc				= (int32_t)sprintf_s(nameFileSrc, "%s", argv[1]);	
+
+	char										namePathDst	[4096]		= {};
+	sprintf_s(namePathDst, "%s", argv[2]);
+	if(2 == argc) {
+		sprintf_s(namePathDst, "%s", argv[2]);
+		::gpk::error_t								indexSequence			= ::gpk::rfind_sequence_pod(::gpk::view_array<const char_t>{".gpk"}, ::gpk::view_array<const char_t>{nameFileSrc});
+		if(-1 != indexSequence)
+			namePathDst[indexSequence]				= 0;
+	}
+	SGPKPak										virtualFolder			= {};
 	{
-		const char						* nameFolderSrc			= argv[1];
-		::gpk::pathList({nameFolderSrc, (uint32_t)strlen(nameFolderSrc)}, listFiles, false);
-		::gpk::array_pod<byte_t>		contentsTemp			= {};
-		::gpk::SRange<uint32_t>			fileLocation			= {0, 0};
-		for(uint32_t iFile = 0; iFile < listFiles.size(); ++iFile) {
-			fileLocation.Offset			= fileLocation.Offset + contentsTemp.size();
-			const ::gpk::label				& pathToLoad			= listFiles[iFile];
-			contentsTemp.clear();
-			ree_if(::gpk::fileToMemory(pathToLoad, contentsTemp), "Failed to load file: %s. Out of memory?", pathToLoad.begin());
-			fileLocation.Count			= contentsTemp.size();
-			tableFiles.append((const byte_t*)&fileLocation, sizeof(::gpk::SRange<uint32_t>));
-			uint32_t						pathLen					= pathToLoad.size();
-			tableFiles.append((const byte_t*)&pathLen, sizeof(uint32_t));
-			tableFiles.append(pathToLoad.begin(), pathLen);
-			contentsPacked.append(contentsTemp.begin(), contentsTemp.size());
+		::gpk::array_pod<byte_t>					rawFileInMemory			= {};
+		gpk_necall(::gpk::fileToMemory(nameFileSrc, rawFileInMemory), "Failed to load pak file: %s.", nameFileSrc);
+		const ::gpk::SPackHeader					& header				= *(::gpk::SPackHeader*)&rawFileInMemory[0];
+		virtualFolder.DataInfo		.resize(header.SizeUncompressedTableFiles		);
+		virtualFolder.DataContents	.resize(header.SizeUncompressedContentsPacked	);
+		virtualFolder.Names			.resize(header.TotalFileCount);
+		virtualFolder.Contents		.resize(header.TotalFileCount);
+		gpk_necall(::gpk::arrayInflate({&rawFileInMemory[0] + sizeof(::gpk::SPackHeader)									, header.SizeCompressedTableFiles		}, virtualFolder.DataInfo		), "Failed to uncompress file table.");
+		gpk_necall(::gpk::arrayInflate({&rawFileInMemory[0] + sizeof(::gpk::SPackHeader) + header.SizeCompressedTableFiles	, header.SizeCompressedContentsPacked	}, virtualFolder.DataContents	), "Failed to uncompress file contents.");
+	}
+
+	{
+		uint32_t			offsetInfo		= 0;
+		for(uint32_t iFile = 0; iFile < virtualFolder.Names.size(); ++iFile) {
+			const ::gpk::SRange<uint32_t>		& fileLocation			= *(const ::gpk::SRange<uint32_t>*)&virtualFolder.DataInfo[offsetInfo];
+			offsetInfo						+= sizeof(const ::gpk::SRange<uint32_t>);
+			const uint32_t						lenName					= *(uint32_t*)&virtualFolder.DataInfo		[offsetInfo];
+			offsetInfo						+= sizeof(uint32_t);
+			virtualFolder.Names			[iFile] = {&virtualFolder.DataInfo		[offsetInfo], lenName};
+			offsetInfo						+= lenName;
+
+			virtualFolder.Contents		[iFile] = {&virtualFolder.DataContents	[fileLocation.Offset], fileLocation.Count};
 		}
 	}
-	{
-		FILE							* fp					= 0;
-		fopen_s(&fp, nameFileDst, "wb");
-		ree_if(0 == fp, "Failed to create file: %s.", nameFileDst);
-		fwrite(&listFiles		.size	(), 1, sizeof(uint32_t)			, fp);
-		fwrite(tableFiles		.begin	(), 1, tableFiles		.size()	, fp);
-		fwrite(contentsPacked	.begin	(), 1, contentsPacked	.size()	, fp);
+	for(uint32_t iFile = 0, countFiles = virtualFolder.Names.size(); iFile < countFiles; ++iFile) {
+		info_printf("File found (%u): %s. Size: %u.", iFile, virtualFolder.Names[iFile].begin(), virtualFolder.Contents[iFile].size());
+		char					pathName [4096];
+		sprintf_s(pathName, virtualFolder.Names[iFile].begin());
+		::gpk::error_t			indexSlash = ::gpk::rfind_sequence_pod(::gpk::view_array<const char>{"\\", 1}, ::gpk::view_array<const char>{pathName});
+		if(-1 != indexSlash) {
+			pathName[indexSlash + 1] = 0;
+			::gpk::dirCreate(pathName);
+		}
+
+		FILE	* fp = 0;
+		fopen_s(&fp, virtualFolder.Names[iFile].begin(), "wb");
+		ce_if(0 == fp, "Failed to create file: %s.", virtualFolder.Names[iFile].begin());
+		fwrite(virtualFolder.Contents[iFile].begin(), 1, virtualFolder.Contents[iFile].size(), fp);
 		fclose(fp);
 	}
 	return 0; 
