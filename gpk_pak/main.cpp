@@ -19,6 +19,8 @@ int										main						(int argc, char ** argv)	{
 
 	const ::gpk::view_const_string				nameFolderSrc				= {argv[1], (uint32_t)strlen(argv[1])};;
 	gpk_necall(::gpk::folderPackToDisk(nameFileDst, nameFolderSrc), "Failed to pack folder '%s' to file '%s'.", nameFolderSrc.begin(), nameFileDst);
-	printf("Successfully written '%s'?", nameFileDst);
+	info_printf("Successfully written '%s'?", nameFileDst);
+	for(uint32_t iArg = 3; iArg < argc; ++iArg)
+		info_printf("Unknown parameter: %s.", argv[iArg]);
 	return 0; 
 }

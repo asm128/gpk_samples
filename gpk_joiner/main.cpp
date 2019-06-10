@@ -13,5 +13,7 @@ int							main							(int argc, char ** argv)				{
 	::gpk::error_t					countJoined						= ::gpk::fileJoin(fileNameDst);
 	ree_if(errored(countJoined), "Failed to join file. Disk full? File name: %s.", fileNameDst.begin());
 	info_printf("%u parts joined.", countJoined);
+	for(uint32_t iArg = 2; iArg < argc; ++iArg)
+		info_printf("Unknown parameter: %s.", argv[iArg]);
 	return 0; 
 }
