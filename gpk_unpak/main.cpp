@@ -13,17 +13,17 @@ int										main							(int argc, char ** argv)						{
 	char										nameFileSrc	[4096]				= {};
 	const int32_t								sizeNameSrc						= (int32_t)sprintf_s(nameFileSrc, "%s", argv[1]);	
 	char										namePathDst	[4096]				= {};
-	sprintf_s(namePathDst, "%s", argv[2]);
-	if(2 == argc) {
-		sprintf_s(namePathDst, "%s", argv[1]);
-		::gpk::error_t								indexSequence					= ::gpk::rfind_sequence_pod(::gpk::view_const_string{".gpk"}, ::gpk::view_const_string{nameFileSrc});
+	if(2 < argc)
+		gpk_necall(sprintf_s(namePathDst, "%s", argv[2]), "%s", "Buffer overflow.");
+	else if(2 == argc) {
+		gpk_necall(sprintf_s(namePathDst, "%s", argv[1]), "%s", "Buffer overflow.");
+		const ::gpk::view_const_string				extension						= ".";
+		::gpk::error_t								indexSequence					= ::gpk::rfind_sequence_pod(extension, ::gpk::view_const_string{nameFileSrc});
 		if(-1 != indexSequence) {
-			namePathDst[indexSequence]					= '\\';
-			namePathDst[indexSequence + 1]				= 0;
+			namePathDst[indexSequence]				= '\\';
+			namePathDst[indexSequence + 1]			= 0;
 		}
 	}
-	::gpk::SFolderInMemory						virtualFolder					= {};
-	gpk_necall(::gpk::folderUnpack(virtualFolder, ::gpk::view_const_string{nameFileSrc}), "Failed to unpack file: %s.", nameFileSrc);
-	gpk_necall(::gpk::folderToDisk(virtualFolder, namePathDst), "Failed to write folder to disk. Disk full or insufficient permissions. File name: %s. Destionation Path: %s.", nameFileSrc, namePathDst);
+	gpk_necall(::gpk::folderUnpackToDisk(namePathDst, nameFileSrc), "Failed to unpack file '%s' to folder '%s'.", nameFileSrc, namePathDst);
 	return 0; 
 }
