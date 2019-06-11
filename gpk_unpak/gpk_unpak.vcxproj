@@ -110,7 +110,7 @@
       <SubSystem>Console</SubSystem>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
       <AdditionalDependencies>llc.lib; gpk.lib; zlibvc.lib; </AdditionalDependencies>
-      <AdditionalLibraryDirectories> $(OutDir); </AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir); </AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -129,7 +129,7 @@
       <SubSystem>Console</SubSystem>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
       <AdditionalDependencies>llc.lib; gpk.lib; zlibvc.lib; </AdditionalDependencies>
-      <AdditionalLibraryDirectories> $(OutDir); </AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir); </AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -148,7 +148,7 @@
       <SubSystem>Console</SubSystem>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
       <AdditionalDependencies>llc.lib; gpk.lib; zlibvc.lib; </AdditionalDependencies>
-      <AdditionalLibraryDirectories> $(OutDir); </AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir); </AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -171,7 +171,7 @@
       <SubSystem>Console</SubSystem>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
       <AdditionalDependencies>llc.lib; gpk.lib; zlibvc.lib; </AdditionalDependencies>
-      <AdditionalLibraryDirectories> $(OutDir); </AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir); </AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
