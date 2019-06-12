@@ -21,7 +21,7 @@ int											main						()			{
 		"]";
 	::gpk::SJSONDocument							json;
 	::gpk::SJSONNode								tree;
-	::gpk::jsonParse(json, tree, testJson);
+	gpk_necall(::gpk::jsonParse(json, tree, testJson), "Failed to parse json: '%s'.", testJson);
 	info_printf("%s", "----------------------------");
 	::printNode(tree.Children[0]);
 	info_printf("%s", "----------------------------");
