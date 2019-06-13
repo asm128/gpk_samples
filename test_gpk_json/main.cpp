@@ -15,9 +15,10 @@
 int											main						()			{
 	static const ::gpk::view_const_string			testJson					=
 		"[ { \"NameId\" : \"ASD\", \"Bleh\":[23412, 123, 243234], \"Else\": [{\"Object\": false}, {}],\"Something\" : \"out\" }"
-		", { \"NameId\" : \"654\", \"Bleh\":21354, \"Else\": \"in\"} "
+		", { \"NameId\" : \"654\", \"Bleh\":21354, \"Else\\u1954\": \"in\"} "
 		", { \"NameId\" : true, \"B\\\"leh\": null, \"Else\": false} "
 		", { \"NameId\" : \"true\", \"Bleh\": \"null\", \"Else\": \"false\"} "
+		", { \"NameId\" : .123, \"Bleh\": -456, \"Else\": x759 } "
 		"]";
 	::gpk::SJSONDocument							json;
 	::gpk::SJSONNode								tree;
