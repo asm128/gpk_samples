@@ -20,14 +20,14 @@ int											main						()			{
 		", { \"NameId\" : \"true\", \"Bleh\": \"null\", \"Else\": \"false\"} "
 		", { \"NameId\" : .123, \"Bleh\": -456, \"Else\": x759 } "
 		"]";
-	::gpk::SJSONDocument							json;
-	::gpk::SJSONNode								tree;
-	gpk_necall(::gpk::jsonParse(json, tree, testJson), "Failed to parse json: '%s'.", testJson);
+
+	::gpk::SJSONReader								jsonReader;
+	gpk_necall(::gpk::jsonParse(jsonReader, testJson), "Failed to parse json: '%s'.", testJson.begin());
 	info_printf("%s", "----------------------------");
-	::printNode(tree.Children[0]);
+	::printNode(jsonReader.Tree->Children[0]);
 	info_printf("%s", "----------------------------");
-	for(uint32_t iNode = 0; iNode < json.Object.size(); ++iNode) {
-		const gpk::SJSONType							& node							= json.Object[iNode];
+	for(uint32_t iNode = 0; iNode < jsonReader.Object.size(); ++iNode) {
+		const gpk::SJSONType							& node							= jsonReader.Object[iNode];
 		info_printf("Node type: %u. Node Span: {%u, %u}. Parent index: %u. Object index: %u.", node.Type, node.Span.Begin, node.Span.End, node.ParentIndex, iNode);
 	}
 	return 0;
