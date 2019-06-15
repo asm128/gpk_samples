@@ -5,30 +5,36 @@
 
 #include "gpk_json.h"
 
-::gpk::error_t								printNode					(::gpk::SJSONNode* node)			{
-	info_printf("Node type: %u. Node Span: {%u, %u}. Parent index: %u. Object index: %u.", node->Object->Type, node->Object->Span.Begin, node->Object->Span.End, node->Object->ParentIndex, node->ObjectIndex);
+::gpk::error_t								printNode					(::gpk::SJSONNode* node, const ::gpk::view_const_string& testJson)			{
+	char											bufferFormat [1024]				= {};
+	uint32_t										lenString						= node->Object->Span.End - node->Object->Span.Begin;
+	sprintf_s(bufferFormat, "Node type: %%u. Node Span: {%%u, %%u}. Parent index: %%u. Object index: %%u. Text: %%%u.%us", lenString, lenString);
+	info_printf(bufferFormat, node->Object->Type, node->Object->Span.Begin, node->Object->Span.End, node->Object->ParentIndex, node->ObjectIndex, &testJson[node->Object->Span.Begin]);
 	for(uint32_t iChildren = 0; iChildren < node->Children.size(); ++iChildren)
-		::printNode(node->Children[iChildren]);
+		::printNode(node->Children[iChildren], testJson);
 	return 0;
 }
 
 int											main						()			{
 	static const ::gpk::view_const_string			testJson					=
-		"[ { \"NameId\" : \"ASD\", \"Bleh\":[23412, 123, 243234], \"Else\": [{\"Object\": false}, {}],\"Something\" : \"out\" }"
-		", { \"NameId\" : \"654\", \"Bleh\":21354, \"Else\\u1954\": \"in\"} "
-		", { \"NameId\" : true, \"B\\\"leh\": null, \"Else\": false} "
-		", { \"NameId\" : \"true\", \"Bleh\": \"null\", \"Else\": \"false\"} "
-		", { \"NameId\" : .123, \"Bleh\": -456, \"Else\": x759 } "
-		"]";
-
+		"\n[ { \"NameId\" : \"ASD\", \"Bleh\":[23412, 123, 243234], \"Else\": [{\"Object\": false}, {}],\"Something\" : \"out\" }"
+		"\n, { \"NameId\" : \"654\", \"Bleh\":21354, \"Else\\u1954\": \"in\"} "
+		"\n, { \"NameId\" : true, \"B\\\"leh\": null, \"Else\": false} "
+		"\n, { \"NameId\" : \"true\", \"Bleh\": \"null\", \"Else\": \"false\"} "
+		"\n, { \"NameId\" : .123, \"Bleh\": -456, \"Else\": x759 } "
+		"\n]";
+	info_printf("JSON string: %s.", testJson.begin());
 	::gpk::SJSONReader								jsonReader;
 	gpk_necall(::gpk::jsonParse(jsonReader, testJson), "Failed to parse json: '%s'.", testJson.begin());
 	info_printf("%s", "----------------------------");
-	::printNode(jsonReader.Tree->Children[0]);
+	::printNode(jsonReader.Tree->Children[0], testJson);
 	info_printf("%s", "----------------------------");
 	for(uint32_t iNode = 0; iNode < jsonReader.Object.size(); ++iNode) {
 		const gpk::SJSONType							& node							= jsonReader.Object[iNode];
-		info_printf("Node type: %u. Node Span: {%u, %u}. Parent index: %u. Object index: %u.", node.Type, node.Span.Begin, node.Span.End, node.ParentIndex, iNode);
+		char											bufferFormat [1024]				= {};
+		uint32_t										lenString						= node.Span.End - node.Span.Begin;
+		sprintf_s(bufferFormat, "Node type: %%u. Node Span: {%%u, %%u}. Parent index: %%u. Object index: %%u. Text: %%%u.%us", lenString, lenString);
+		info_printf(bufferFormat, node.Type, node.Span.Begin, node.Span.End, node.ParentIndex, iNode, &testJson[node.Span.Begin]);
 	}
 	return 0;
 }
