@@ -17,11 +17,13 @@
 
 int											main						()			{
 	static const ::gpk::view_const_string			testJson					=
-		"\n[ { \"NameId\" : \"ASD\", \"Bleh\":[23412, 123, 243234], \"Else\": [{\"Object\": false}, {}],\"Something\" : \"out\" }"
+		"\n[ {}, {}, {   }, [  ]  , [], {\"a\":{}, \"b\":[]}"
+		"\n, { \"NameId\" : \"ASD\", \"Bleh\":[234124,123,243234, 321   , 65198], \"Else\": [{\"Object\": false}, {}],\"Something\" : \"out\" }"
 		"\n, { \"NameId\" : \"654\", \"Bleh\":21354, \"Else\\u1954\": \"in\"} "
 		"\n, { \"NameId\" : true, \"B\\\"leh\": null, \"Else\": false} "
-		"\n, { \"NameId\" : \"true\", \"Bleh\": \"null\", \"Else\": \"false\"} "
-		"\n, { \"NameId\" : .123, \"Bleh\": -456, \"Else\": x759 } "
+		"\n, { \"NameId\" : \"true\", \"Bleh\": \"null\", \"Else\": []} "
+		//"\n, { \"NameId\" : \"true\", \"Bleh\": \"null\", \"Else\": \"false\", \"not\" : tres} "
+		"\n, { \"NameId\" : .123, \"Bleh\": -456 , \"Else\": -.759 } "
 		"\n]";
 	info_printf("JSON string: %s.", testJson.begin());
 
@@ -36,7 +38,7 @@ int											main						()			{
 	for(uint32_t iNode = 0; iNode < jsonReader.Object.size(); ++iNode) {
 		const gpk::SJSONType							& node							= jsonReader.Object[iNode];
 		::gpk::view_const_string						view							= jsonReader.View[iNode];
-		char											bufferFormat [1024]				= {};
+		char											bufferFormat [8192]				= {};
 		uint32_t										lenString						= view.size();
 		sprintf_s(bufferFormat, "Node type: %%u (%%s). Node Span: {%%u, %%u}. Parent index: %%u. Object index: %%u. Text: %%%u.%us", lenString, lenString);
 		info_printf(bufferFormat, node.Type, ::gpk::get_value_label(node.Type).begin(), node.Span.Begin, node.Span.End, node.ParentIndex, iNode, view.begin());
