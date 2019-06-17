@@ -47,7 +47,7 @@ int											main						()			{
 	::gpk::ptr_obj<::gpk::SJSONNode>					root							= jsonReader.Tree[0];
 	::gpk::error_t										indexOfFirstObject				= ::gpk::jsonArrayValueGet(*root, 0);
 	const ::gpk::view_const_string						test_key						= "Bleh";
-	::gpk::error_t										indexOfElement					= ::gpk::jsonValueGet(*jsonReader.Tree[indexOfFirstObject], jsonReader.View, "Bleh");
+	::gpk::error_t										indexOfElement					= ::gpk::jsonObjectValueGet(*jsonReader.Tree[indexOfFirstObject], jsonReader.View, "Bleh");
 	if(uint32_t(indexOfElement) < jsonReader.View.size()) {
 		const gpk::SJSONType								& node							= jsonReader.Object	[indexOfElement];	
 		::gpk::view_const_string							view							= jsonReader.View	[indexOfElement-1];	// get the parent in order to retrieve the view with the surrounding in the case of strings "".
