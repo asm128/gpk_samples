@@ -1,0 +1,412 @@
+File name: main.cpp
+File folder: C:\asm128_test\gpk_samples\gpk_joiner
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Mon Jun 10 01:49:47 2019
+File code lines: 10
+File directive lines: 6
+File comment lines: 1
+File blank lines: 3
+File bytes: 887
+
+File name: main.cpp
+File folder: C:\asm128_test\gpk_samples\gpk_pak
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Mon Jun 10 01:50:41 2019
+File code lines: 13
+File directive lines: 5
+File comment lines: 0
+File blank lines: 6
+File bytes: 1037
+
+File name: main.cpp
+File folder: C:\asm128_test\gpk_samples\gpk_splitter
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Tue Jun 11 00:20:41 2019
+File code lines: 10
+File directive lines: 6
+File comment lines: 1
+File blank lines: 3
+File bytes: 870
+
+File name: main.cpp
+File folder: C:\asm128_test\gpk_samples\gpk_unpak
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Mon Jun 10 01:49:51 2019
+File code lines: 20
+File directive lines: 5
+File comment lines: 0
+File blank lines: 5
+File bytes: 1283
+
+File name: main.cpp
+File folder: C:\asm128_test\gpk_samples\test_cgi_module
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Mon May 20 04:14:35 2019
+File code lines: 67
+File directive lines: 5
+File comment lines: 18
+File blank lines: 26
+File bytes: 6113
+
+File name: application.h
+File folder: C:\asm128_test\gpk_samples\test_gontrill
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Sun Mar 10 21:00:19 2019
+File code lines: 77
+File directive lines: 10
+File comment lines: 3
+File blank lines: 29
+File bytes: 4449
+
+File name: application_draw.cpp
+File folder: C:\asm128_test\gpk_samples\test_gontrill
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Sun Mar 10 23:24:54 2019
+File code lines: 280
+File directive lines: 4
+File comment lines: 11
+File blank lines: 62
+File bytes: 24322
+
+File name: application_main.cpp
+File folder: C:\asm128_test\gpk_samples\test_gontrill
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Mon Jun 17 18:10:47 2019
+File code lines: 180
+File directive lines: 9
+File comment lines: 9
+File blank lines: 44
+File bytes: 15964
+
+File name: application_update.cpp
+File folder: C:\asm128_test\gpk_samples\test_gontrill
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Mon Mar 11 04:39:29 2019
+File code lines: 522
+File directive lines: 2
+File comment lines: 18
+File blank lines: 136
+File bytes: 40675
+
+File name: enemy.h
+File folder: C:\asm128_test\gpk_samples\test_gontrill
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Wed May  2 06:31:39 2018
+File code lines: 8
+File directive lines: 5
+File comment lines: 0
+File blank lines: 5
+File bytes: 211
+
+File name: game.h
+File folder: C:\asm128_test\gpk_samples\test_gontrill
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Sun Mar 10 19:55:01 2019
+File code lines: 125
+File directive lines: 9
+File comment lines: 3
+File blank lines: 39
+File bytes: 6321
+
+File name: gontrill_base.h
+File folder: C:\asm128_test\gpk_samples\test_gontrill
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Sun Mar 10 19:50:07 2019
+File code lines: 3
+File directive lines: 4
+File comment lines: 0
+File blank lines: 4
+File bytes: 204
+
+File name: ship.h
+File folder: C:\asm128_test\gpk_samples\test_gontrill
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Sun Mar 10 19:54:05 2019
+File code lines: 35
+File directive lines: 5
+File comment lines: 0
+File blank lines: 14
+File bytes: 1316
+
+File name: spawner.h
+File folder: C:\asm128_test\gpk_samples\test_gontrill
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Sun Mar 10 19:55:31 2019
+File code lines: 81
+File directive lines: 5
+File comment lines: 5
+File blank lines: 6
+File bytes: 5938
+
+File name: track.h
+File folder: C:\asm128_test\gpk_samples\test_gontrill
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Sat Mar 16 21:07:22 2019
+File code lines: 29
+File directive lines: 8
+File comment lines: 4
+File blank lines: 14
+File bytes: 2038
+
+File name: weapon.h
+File folder: C:\asm128_test\gpk_samples\test_gontrill
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Mon Mar 11 00:16:17 2019
+File code lines: 149
+File directive lines: 4
+File comment lines: 1
+File blank lines: 10
+File bytes: 10526
+
+File name: application.h
+File folder: C:\asm128_test\gpk_samples\test_gpk_cube
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Mon Mar 11 03:34:22 2019
+File code lines: 8
+File directive lines: 5
+File comment lines: 0
+File blank lines: 6
+File bytes: 598
+
+File name: application_main.cpp
+File folder: C:\asm128_test\gpk_samples\test_gpk_cube
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Mon Mar 11 04:32:54 2019
+File code lines: 138
+File directive lines: 8
+File comment lines: 15
+File blank lines: 45
+File bytes: 12294
+
+File name: main.cpp
+File folder: C:\asm128_test\gpk_samples\test_gpk_db
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Sun Jun 16 22:46:39 2019
+File code lines: 51
+File directive lines: 5
+File comment lines: 0
+File blank lines: 17
+File bytes: 1535
+
+File name: application.cpp
+File folder: C:\asm128_test\gpk_samples\test_gpk_dialog
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Wed Dec 19 21:48:16 2018
+File code lines: 76
+File directive lines: 6
+File comment lines: 7
+File blank lines: 26
+File bytes: 5172
+
+File name: application.h
+File folder: C:\asm128_test\gpk_samples\test_gpk_dialog
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Tue Dec 18 08:49:39 2018
+File code lines: 13
+File directive lines: 7
+File comment lines: 1
+File blank lines: 11
+File bytes: 863
+
+File name: main.cpp
+File folder: C:\asm128_test\gpk_samples\test_gpk_encoding
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Thu Dec 13 22:06:32 2018
+File code lines: 492
+File directive lines: 7
+File comment lines: 49
+File blank lines: 107
+File bytes: 40038
+
+File name: application.cpp
+File folder: C:\asm128_test\gpk_samples\test_gpk_gnd
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Sun Dec 30 01:11:33 2018
+File code lines: 254
+File directive lines: 7
+File comment lines: 20
+File blank lines: 69
+File bytes: 22212
+
+File name: application.h
+File folder: C:\asm128_test\gpk_samples\test_gpk_gnd
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Tue Dec 25 22:57:01 2018
+File code lines: 28
+File directive lines: 11
+File comment lines: 1
+File blank lines: 14
+File bytes: 1727
+
+File name: application_draw.cpp
+File folder: C:\asm128_test\gpk_samples\test_gpk_gnd
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Sun Mar  3 03:12:27 2019
+File code lines: 229
+File directive lines: 5
+File comment lines: 7
+File blank lines: 48
+File bytes: 16429
+
+File name: application.cpp
+File folder: C:\asm128_test\gpk_samples\test_gpk_gui
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Mon Dec 17 06:50:34 2018
+File code lines: 179
+File directive lines: 6
+File comment lines: 57
+File blank lines: 57
+File bytes: 15682
+
+File name: application.h
+File folder: C:\asm128_test\gpk_samples\test_gpk_gui
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Thu Dec 13 22:06:32 2018
+File code lines: 81
+File directive lines: 6
+File comment lines: 17
+File blank lines: 12
+File bytes: 1626
+
+File name: main.cpp
+File folder: C:\asm128_test\gpk_samples\test_gpk_json
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Tue Jun 18 01:22:04 2019
+File code lines: 50
+File directive lines: 5
+File comment lines: 2
+File blank lines: 12
+File bytes: 4268
+
+File name: application.cpp
+File folder: C:\asm128_test\gpk_samples\test_gpk_lighting
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Tue Dec 25 16:39:15 2018
+File code lines: 234
+File directive lines: 7
+File comment lines: 8
+File blank lines: 63
+File bytes: 16747
+
+File name: application.h
+File folder: C:\asm128_test\gpk_samples\test_gpk_lighting
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Tue Dec 25 05:30:00 2018
+File code lines: 57
+File directive lines: 8
+File comment lines: 1
+File blank lines: 26
+File bytes: 4376
+
+File name: application_draw.cpp
+File folder: C:\asm128_test\gpk_samples\test_gpk_lighting
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Tue Dec 25 16:36:49 2018
+File code lines: 146
+File directive lines: 3
+File comment lines: 12
+File blank lines: 31
+File bytes: 12463
+
+File name: application.cpp
+File folder: C:\asm128_test\gpk_samples\test_gpk_png
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Mon Dec 17 06:10:57 2018
+File code lines: 60
+File directive lines: 5
+File comment lines: 16
+File blank lines: 26
+File bytes: 4804
+
+File name: application.h
+File folder: C:\asm128_test\gpk_samples\test_gpk_png
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Thu Dec 13 22:06:32 2018
+File code lines: 172
+File directive lines: 6
+File comment lines: 16
+File blank lines: 13
+File bytes: 7860
+
+File name: application.cpp
+File folder: C:\asm128_test\gpk_samples\test_gpk_viewport
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Sun Mar  3 03:12:27 2019
+File code lines: 239
+File directive lines: 9
+File comment lines: 11
+File blank lines: 69
+File bytes: 18302
+
+File name: application.h
+File folder: C:\asm128_test\gpk_samples\test_gpk_viewport
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Sun Mar  3 03:12:27 2019
+File code lines: 35
+File directive lines: 10
+File comment lines: 2
+File blank lines: 22
+File bytes: 2241
+
+File name: application.cpp
+File folder: C:\asm128_test\gpk_samples\test_udp_client
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Mon Dec 17 06:10:37 2018
+File code lines: 72
+File directive lines: 5
+File comment lines: 6
+File blank lines: 23
+File bytes: 4481
+
+File name: application.h
+File folder: C:\asm128_test\gpk_samples\test_udp_client
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Wed Nov 28 00:58:28 2018
+File code lines: 10
+File directive lines: 7
+File comment lines: 1
+File blank lines: 10
+File bytes: 740
+
+File name: application.cpp
+File folder: C:\asm128_test\gpk_samples\test_udp_server
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Mon Dec 17 06:10:27 2018
+File code lines: 62
+File directive lines: 4
+File comment lines: 5
+File blank lines: 25
+File bytes: 4013
+
+File name: application.h
+File folder: C:\asm128_test\gpk_samples\test_udp_server
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Wed Sep 19 01:17:45 2018
+File code lines: 9
+File directive lines: 7
+File comment lines: 1
+File blank lines: 10
+File bytes: 712
+
+
+----------------------------- Total Files: 39
+----------------------------- Total Lines: 6022
+
+Comments: 329
+Code: 4304
+Compiler directives: 241
+Blanks: 1148
+Total bytes: 321337
+
+----------------------------- Stats: 
+
+Average lines per file: 154.4102564102564
+Average lines of comments per file: 8.435897435897436
+Average lines of code per file: 110.35897435897436
+Average lines of compiler directives per file: 6.17948717948718
+Average blank lines per file: 29.435897435897434
+
+Comments: 5.463301228827632%
+Code: 71.47127200265693%
+Compiler directives: 4.001992693457323%
+Blanks: 19.06343407505812%
