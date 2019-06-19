@@ -29,6 +29,28 @@ static	int											primalityTest						(uint64_t number)						{
 }
 
 int													main						()			{
+	{
+		const char textTest[] = "a"
+			"bb"
+			"ccc"
+			"dddd"
+			"eeeee"
+			"ffffff"
+			;
+		::gpk::array_pod<byte_t> encoded;
+		::gpk::rleEncode(::gpk::view_const_string(textTest), encoded);
+		encoded.push_back(0);
+		encoded.resize(encoded.size() - 1);
+		info_printf("Encoded: %s", encoded.begin());
+
+		::gpk::array_pod<char_t> decoded;
+		::gpk::rleDecode(encoded, decoded);
+		decoded.push_back(0);
+		encoded.resize(encoded.size() - 1);
+		info_printf("Decoded: %s", decoded.begin());
+		error_if(0 != memcmp(decoded.begin(), textTest, decoded.size()), "RLE test failed.");
+	}
+
 	const ::gpk::view_const_string							testStrings	[]				=
 		{ "0Some string to test 0"
 		//,

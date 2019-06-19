@@ -26,5 +26,7 @@ int										main							(int argc, char ** argv)						{
 	gpk_necall(::gpk::folderUnpackToDisk(namePathDst, nameFileSrc), "Failed to unpack file '%s' to folder '%s'.", nameFileSrc, namePathDst);
 	for(int32_t iArg = 3; iArg < argc; ++iArg)
 		info_printf("Unknown parameter: %s.", argv[iArg]);
+
 	return 0; 
 }
+
