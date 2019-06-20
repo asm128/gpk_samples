@@ -16,11 +16,96 @@
 	return 0;
 }
 
+namespace gpk
+{
+	GDEFINE_ENUM_TYPE(JSON_FORMATTER_TYPE, int8_t);
+	GDEFINE_ENUM_VALUE(JSON_FORMATTER_TYPE, LITERAL	, 0);
+	GDEFINE_ENUM_VALUE(JSON_FORMATTER_TYPE, TOKEN	, 1);
+	GDEFINE_ENUM_VALUE(JSON_FORMATTER_TYPE, COUNT	, 2);
+	GDEFINE_ENUM_VALUE(JSON_FORMATTER_TYPE, UNKNOWN	, -1);
+
+	struct SJSONFormatterType {
+		int32_t												ParentIndex;
+		JSON_FORMATTER_TYPE									Type;
+		::gpk::SSlice<uint32_t>								Span;
+	};
+
+	struct SJSONFormatterState {
+		uint32_t											IndexCurrentChar		= 0;
+		int32_t												IndexCurrentElement		= -1;
+		::gpk::SJSONFormatterType							* CurrentElement		= 0;
+		int32_t												NestLevel				= 0;
+		char												CharCurrent				= 0;
+		bool												Escaping				= false;
+		bool												InsideToken				= false;
+	};
+}
+
+::gpk::error_t								jsonStringFormatParseToken		(::gpk::SJSONFormatterState & work_state, ::gpk::array_pod<::gpk::SJSONFormatterType> & out_types, const ::gpk::view_const_string& in_format)		{ 
+	in_format;
+	switch(work_state.CharCurrent) {
+	default		: break;
+	case '}'	: 
+		out_types[work_state.IndexCurrentElement].Span.End	= work_state.IndexCurrentChar;
+		out_types.push_back({-1, ::gpk::JSON_FORMATTER_TYPE_LITERAL, {work_state.IndexCurrentChar, work_state.IndexCurrentChar}});
+	}
+	return 0; 
+}
+::gpk::error_t								jsonStringFormatParseLiteral	(::gpk::SJSONFormatterState & work_state, ::gpk::array_pod<::gpk::SJSONFormatterType> & out_types, const ::gpk::view_const_string& in_format)		{ 
+	in_format;
+	switch(work_state.CharCurrent) {
+	default		: break;
+	case '{'	: 
+		if(work_state.Escaping)
+			break;
+		out_types[out_types.size() - 1].Span.End	= work_state.IndexCurrentChar;
+		work_state.IndexCurrentElement				= out_types.push_back({-1, ::gpk::JSON_FORMATTER_TYPE_TOKEN, {work_state.IndexCurrentChar, work_state.IndexCurrentChar}});
+		// do work
+		break;
+	case '\\'	: 
+		if(false == work_state.Escaping) {
+			work_state.Escaping							= true;
+			return 0;
+		}
+		break;
+	}
+	work_state.Escaping							= false;
+	return 0; 
+}
+
+::gpk::error_t								jsonStringFormatParseStep		(::gpk::SJSONFormatterState & work_state, ::gpk::array_pod<::gpk::SJSONFormatterType> & out_types, const ::gpk::view_const_string& in_format)		{
+
+	if(work_state.InsideToken)
+		jsonStringFormatParseToken		(work_state, out_types, in_format);
+	else {
+		if(0 == out_types.size()) 
+			work_state.IndexCurrentElement = out_types.push_back({-1, ::gpk::JSON_FORMATTER_TYPE_LITERAL, {work_state.IndexCurrentChar, work_state.IndexCurrentChar}});
+
+		jsonStringFormatParseLiteral	(work_state, out_types, in_format);
+	}
+	return 0;
+}
+
+
+::gpk::error_t								jsonStringFormatParse			(::gpk::SJSONFormatterState & work_state, ::gpk::array_pod<::gpk::SJSONFormatterType> & out_types, const ::gpk::view_const_string& in_format)		{
+
+	for(work_state.IndexCurrentChar = 0; work_state.IndexCurrentChar < in_format.size(); ++work_state.IndexCurrentChar) {
+		work_state.CharCurrent						= in_format[work_state.IndexCurrentChar];
+		gpk_necall(jsonStringFormatParseStep(work_state, out_types, in_format), "Parse step failed.");
+	}
+	return 0;
+}
+
+::gpk::error_t								jsonStringFormat			(const ::gpk::view_const_string& format, const ::gpk::SJSONNode& input, ::gpk::array_pod<char_t>& )			{
+	format, input;
+	return 0;
+}
+
 int											main						()			{
 	static const ::gpk::view_const_string			testJson					= //"[{\"a\":[123 3,32,1156]}]";
 		//"\n[ { \"NameId\" : \"654\", \"Bleh\":21354, \"Else\\u1954\": \"in\"} "
 		"\n[ { \"Bleh\": \"test\" }, {}, {   }, [  ]  , [], {\"a\":{}, \"b\":[123,]}"
-		"\n, { \"NameId\" : \"ASD\" \"\", \"Bleh\" :[234124,123,243234, 321   , 65198], \"Else\": [{\"Object\": false}, {}],\"Something\" : \"out\",}"
+		"\n, { \"NameId\" : \"ASD\", \"Bleh\" :[234124,123,243234, 321   , 65198], \"Else\": [{\"Object\": false}, {}],\"Something\" : \"out\",}"
 		"\n, { \"NameId\" : \"654\", \"Bleh\":21354, \"Else\\u1954\": \"in\"} "
 		"\n, { \"NameId\" : true, \"B\\\"leh\": null, \"Else\": false} "
 		"\n, { \"NameId\" : \"654\", \"Bleh\":21354, \"Else\\u1954\": \"in\"} "
@@ -30,6 +115,16 @@ int											main						()			{
 		"\n, { \"NameId\" : .123, \"Bleh\": -456 , \"Else\": -.759 } "
 		"\n]";
 	info_printf("JSON string (%u characters): %s.", testJson.size(), testJson.begin());
+
+	char in = 'c';
+	switch(in){
+	case 'a': break;
+	case 'b': break;
+	case 'c': break;
+	case 'd': break;
+	}
+	const char			bleh[] = "";
+	info_printf("%s", bleh);
 
 	::gpk::SJSONReader								jsonReader;
 	gpk_necall(::gpk::jsonParse(jsonReader, testJson), "Failed to parse json: '%s'.", testJson.begin());

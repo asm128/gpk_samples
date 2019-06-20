@@ -2,6 +2,7 @@
 #include "gpk_png.h"
 #include "gpk_grid_copy.h"
 #include "gpk_grid_scale.h"
+#include "gpk_encoding.h"
 
 //#define GPK_AVOID_LOCAL_APPLICATION_MODULE_MODEL_EXECUTABLE_RUNTIME
 #include "gpk_app_impl.h"
@@ -32,9 +33,38 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 
 	app.PNGImages.resize(::gpk::size(filenames));
 	::gpk::SPNGData															pngDataCacheForFasterLoad;
-	for(uint32_t iFile = 0; iFile < app.PNGImages.size(); ++iFile)
+	::gpk::array_pod<uint32_t>												sizesUncompressed;
+	::gpk::array_pod<uint32_t>												sizesRLE;
+	::gpk::array_pod<byte_t>												rleBuffer;
+	uint32_t																sizeTotalUncompressed	= 0;
+	uint32_t																sizeTotalRLE			= 0;
+	for(uint32_t iFile = 0; iFile < app.PNGImages.size(); ++iFile) {
 		error_if(errored(::gpk::pngFileLoad(pngDataCacheForFasterLoad, filenames[iFile], app.PNGImages[iFile])), "Failed to load file: %s.", filenames[iFile].begin());
-
+		::gpk::view_array<::gpk::SColorBGRA>	viewToRLE{app.PNGImages[iFile].View.begin(), app.PNGImages[iFile].View.metrics().x * app.PNGImages[iFile].View.metrics().y};
+		sizesUncompressed.push_back(viewToRLE.size());
+		::gpk::rleEncode(viewToRLE, rleBuffer);
+		sizesRLE.push_back(rleBuffer.size());
+		const uint32_t															sizePNGInBytes			= viewToRLE.size() * sizeof(::gpk::SColorBGRA);
+		info_printf("--- RLE compression stats:"
+			"\nsizePNGRLE          : %u" 
+			"\nsizePNGUncompressed : %u" 
+			"\nratio                 : %f" 
+			, rleBuffer.size()
+			, sizePNGInBytes
+			, (float)rleBuffer.size() / sizePNGInBytes
+			);
+		sizeTotalRLE														+= rleBuffer.size();
+		sizeTotalUncompressed												+= sizePNGInBytes;
+		rleBuffer.clear();
+	}
+	info_printf("--- RLE compression stats:"
+		"\nsizeTotalRLE          : %u" 
+		"\nsizeTotalUncompressed : %u" 
+		"\nratio                 : %f" 
+		, sizeTotalRLE          
+		, sizeTotalUncompressed 
+		, (float)sizeTotalRLE / sizeTotalUncompressed
+		);
 	return 0;
 }
 
@@ -52,8 +82,8 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	::gpk::array_pod<uint32_t>												controlsToProcess			= {};
 	::gpk::guiGetProcessableControls(gui, controlsToProcess);
 	for(uint32_t iControl = 0, countControls = controlsToProcess.size(); iControl < countControls; ++iControl) {
-		uint32_t																idControl					= controlsToProcess[iControl];
-		const ::gpk::SControlState												& controlState				= gui.Controls.States[idControl];
+		uint32_t																idControl					= controlsToProcess		[iControl];
+		const ::gpk::SControlState												& controlState				= gui.Controls.States	[idControl];
 		if(controlState.Execute) {
 			info_printf("Executed %u.", idControl);
 			if(idControl == (uint32_t)app.IdExit)
@@ -77,8 +107,10 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 		target->Color.View[y][x].a											= 255;
 	}
 
+
 	for(uint32_t iFile = 0; iFile < app.PNGImages.size(); ++iFile) {
-		::gpk::SCoord2<uint32_t>												position				= {(iFile * 64) % (target->Color.View.metrics().x - 64), (iFile * 64) / (target->Color.View.metrics().x - 64) * 64};
+		const uint32_t															offsetX					= (iFile * 64);
+		::gpk::SCoord2<uint32_t>												position				= {offsetX % (target->Color.View.metrics().x - 64), offsetX / (target->Color.View.metrics().x - 64) * 64};
 		::gpk::grid_copy_blend(target->Color.View, app.PNGImages[iFile].View, position);
 		//::gpk::grid_scale_alpha(target->Color.View, app.PNGImages[iFile].View, position.Cast<int32_t>(), app.PNGImages[iFile].View.metrics().Cast<int32_t>() * (1 + (.01 * iFile)));
 	}
