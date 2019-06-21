@@ -79,7 +79,9 @@ int											main						()			{
 	info_printf(bufferFormat, test_key.begin(), view.begin(), node.Type, ::gpk::get_value_label(node.Type).begin(), node.Span.Begin, node.Span.End, node.ParentIndex, indexOfElement, view.begin());
 
 	::gpk::array_pod<char_t>						formatted;
-	::gpk::jsonStringFormat("This is some text in which I want t replace this: {people.property[properties.indices[9].value].name} with the value of the property found in a JSON tree.", *object, formatted);
+	const ::gpk::view_const_string					format							= "I want to replace this (but not \\{this text}): {people.property.{properties[selection.index].name}} with the value of the property found in a JSON tree.";
+	info_printf("Test format: '%s'.", format.begin());
+	gpk_necall(::gpk::jsonStringFormat(format, *object, formatted), "%s", "Error formatting string from JSON object.");
 
  	return 0;
 }
