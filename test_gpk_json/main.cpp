@@ -79,7 +79,7 @@ int											main						()			{
 	info_printf(bufferFormat, test_key.begin(), view.begin(), node.Type, ::gpk::get_value_label(node.Type).begin(), node.Span.Begin, node.Span.End, node.ParentIndex, indexOfElement, view.begin());
 
 	::gpk::array_pod<char_t>						formatted;
-	::gpk::jsonStringFormat("asdkjasdkj{people.property[9].name}", *object, formatted);
+	::gpk::jsonStringFormat("This is some text in which I want t replace this: {people.property[properties.indices[9].value].name} with the value of the property found in a JSON tree.", *object, formatted);
 
  	return 0;
 }
