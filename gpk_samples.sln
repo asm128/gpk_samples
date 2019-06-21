@@ -138,6 +138,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gpk_splitter", "gpk_splitte
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_gpk_db", "test_gpk_db\test_gpk_db.vcxproj", "{86043CCB-E05C-4989-98F3-4175076211B6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{830AB681-B788-47D4-9767-BA4E0792F682} = {830AB681-B788-47D4-9767-BA4E0792F682}
+		{39953D8D-A830-46BD-917E-1A96C8BDADC6} = {39953D8D-A830-46BD-917E-1A96C8BDADC6}
+		{8FD826F8-3739-44E6-8CC8-997122E53B8D} = {8FD826F8-3739-44E6-8CC8-997122E53B8D}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_gpk_json", "test_gpk_json\test_gpk_json.vcxproj", "{A90A4647-7D44-477C-A55D-D09FF4F1F5E5}"
 	ProjectSection(ProjectDependencies) = postProject
