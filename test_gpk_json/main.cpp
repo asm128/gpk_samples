@@ -93,6 +93,7 @@ int											main						()			{
 		const ::gpk::view_const_string					format							= "I want to replace this (but not \\{this}): People color: {people.property.{properties[selection.index].name}} with the value of the property found in a JSON tree.";
 		info_printf("Test format: '%s'.", format.begin());
 		gpk_necall(::gpk::jsonStringFormat(format, *object, formatted), "%s", "Error formatting string from JSON object.");
+		info_printf("Formatted string after jsonStringFormat(): '%s'.", formatted.begin());
 	}
  	return 0;
 }
