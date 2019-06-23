@@ -10,7 +10,7 @@
 	char											bufferFormat [1024]				= {};
 	uint32_t										lenString						= node->Object->Span.End - node->Object->Span.Begin;
 	sprintf_s(bufferFormat, "Node type: %%u (%%s). Node Span: {%%u, %%u}. Parent index: %%u. Object index: %%u. Text: %%%u.%us", lenString, lenString);
-	info_printf(bufferFormat, node->Object->Type, ::gpk::get_value_label(node->Object->Type).begin(), node->Object->Span.Begin, node->Object->Span.End, node->Object->ParentIndex, node->ObjectIndex, &testJson[node->Object->Span.Begin]);
+//	info_printf(bufferFormat, node->Object->Type, ::gpk::get_value_label(node->Object->Type).begin(), node->Object->Span.Begin, node->Object->Span.End, node->Object->ParentIndex, node->ObjectIndex, &testJson[node->Object->Span.Begin]);
 	for(uint32_t iChildren = 0; iChildren < node->Children.size(); ++iChildren)
 		::printNode(node->Children[iChildren], testJson);
 
@@ -79,14 +79,9 @@
 	::gpk::array_pod<char_t>						formatted;
 	::gpk::SJSONReader								jsonReader;
 	gpk_necall(::gpk::jsonParse(jsonReader, inputJson), "Failed to parse json: '%s'.", inputJson.begin());
-	info_printf("Input json: \n%s.", inputJson.begin());
 	::gpk::ptr_obj<::gpk::SJSONNode>				root						= jsonReader.Tree[0];
 	::printNode(root, inputJson);
 	const ::gpk::error_t							indexOfFirstObject			= ::gpk::jsonArrayValueGet(*root, 0);
-	// ----- Simple test.
-	//const ::gpk::view_const_string					format						= "I want to replace this (but not \\{this}): People name: {people.property.{properties[if(selection.active) selection.index else 0].name}} with the value of the property found in a JSON tree.";
-	//// ----- Heavy test.
-	//const ::gpk::view_const_string					format						= "I want to replace this (but not \\{this}): People name: {name} with the value of the property found in a JSON tree.";
 	info_printf("Test format: '%s'.", format.begin());
 	gpk_necall(::gpk::jsonStringFormat(format, jsonReader, indexOfFirstObject, formatted), "%s", "Error formatting string from JSON object.");
 	info_printf("Formatted string after jsonStringFormat(): '%s'.", formatted.begin());
@@ -95,37 +90,59 @@
 
 int											main						()	{
 	gpk_necall(::testJSONReader(), "%s", "Failed to read JSON!");
-	{
+
+	{ // first-level expression resolution tests.
 		const ::gpk::view_const_string					inputJson					= 
-			"[{\"color\" : \"red\", \"race\" : \"brown\", \"weight\" : 160, \"parent\" : {\"name\" : \"lucas\"}, \"height\" : \"1.56\", \"name\" : \"carlos\"}]";
+			"["
+			"\n\t{\"child_selected\" : 2, \"color\" : \"red\", \"race\" : \"brown\", \"weight\" : 160"
+			"\n\t\t, \"parent\" : {\"name\" : \"lucas\"}"
+			"\n\t\t, \"children\": [\"marta\", \"venus\", \"crystal\"]"
+			"\n\t\t, \"height\" : \"1.56\", \"name\" : \"carlos\""
+			"\n\t},"
+			"\n\t{\"child_selected\" : 2, \"color\" : \"red\", \"race\" : \"brown\", \"weight\" : 160"
+			"\n\t\t, \"parent\" : {\"name\" : \"lucas\"}"
+			"\n\t\t, \"children\": [\"marta\", \"venus\", \"crystal\"]"
+			"\n\t\t, \"height\" : \"1.56\", \"name\" : \"carlos\""
+			"\n\t},"
+			"]";
 		{
-			const ::gpk::view_const_string					format						= "I want to replace this (but not \\{this}): Guy name: {name} with the value of the property found in a JSON tree.";
+			const ::gpk::view_const_string					format						= "I want to replace this (but not \\{this}): Guy name: {name}.";
 			gpk_necall(::testJSONFormatter(format, inputJson), "%s", "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", format.begin(), inputJson.begin());
 			info_printf("Test succeeded:\nInput expression:\n%s\nInput JSON:\n%s", format.begin(), inputJson.begin());
 		}
 		{
-			const ::gpk::view_const_string					format						= "I want to replace this (but not \\{this}): Parent name: {parent.name} with the value of the property found in a JSON tree.";
+			const ::gpk::view_const_string					format						= "I want to replace this (but not \\{this}): Parent name: {parent.name}.";
 			gpk_necall(::testJSONFormatter(format, inputJson), "%s", "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", format.begin(), inputJson.begin());
 			info_printf("Test succeeded:\nInput expression:\n%s\nInput JSON:\n%s", format.begin(), inputJson.begin());
+		}
+		char											bufferFormat	[1024]		= {};
+		for(uint32_t iChild = 0; iChild < 3; ++iChild) {
+			sprintf_s(bufferFormat, "I want to replace this (but not \\{this}): A child of {name}'s name: {children[%u]}.", iChild);
+			gpk_necall(::testJSONFormatter(bufferFormat, inputJson), "%s", "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", bufferFormat, inputJson.begin());
+			info_printf("Test succeeded:\nInput expression:\n%s\nInput JSON:\n%s", bufferFormat, inputJson.begin());
 		}
 	}
-	{
+
+	{ // multilevel expression resolution tests.
 		const ::gpk::view_const_string					inputJson					= 
-			// ----- Simple test.
-			//"[{\"color\" : \"red\", \"race\" : \"brown\", \"weight\" : 160, \"children\" : {\"name\" : \"lucas\"}, \"height\" : \"1.56\", \"name\" : \"carlos\"}]";
-			//// ----- Heavy test.
-			"[	"
-			"\n	{ \"properties\" : [{ \"name\" : \"color\", \"type\" : \"string\"}, { \"name\" : \"age\", \"type\" : \"int\"} ]"
-			"\n	, \"selection\" : {\"index\" : 1 , \"active\" : true }"
-			"\n	, \"people\" : "
-			"\n		{ \"property\" : "
-			"\n			{ \"color\" : \"red\", \"age\" : 25 }"
-			"\n		}"
-			"\n	}"
-			"\n]";
-		const ::gpk::view_const_string					format						= "I want to replace this (but not \\{this}): People age: {people.property.{properties[selection.index].name}} with the value of the property found in a JSON tree.";
-		gpk_necall(::testJSONFormatter(format, inputJson), "%s", "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", format.begin(), inputJson.begin());
-		info_printf("Test succeeded:\nInput expression:\n%s\nInput JSON:\n%s", format.begin(), inputJson.begin());
+			"[{\"child_selected\":2, \"color\" : \"red\", \"race\" : \"brown\", \"weight\" : 160, \"parent\" : {\"name\" : \"lucas\"}, \"children\": [\"marta\", \"venus\", \"crystal\"], \"height\" : \"1.56\", \"name\" : \"carlos\"}]";
+
+		//const ::gpk::view_const_string					inputJson					= 
+		//	// ----- Simple test.
+		//	//"[{\"color\" : \"red\", \"race\" : \"brown\", \"weight\" : 160, \"children\" : {\"name\" : \"lucas\"}, \"height\" : \"1.56\", \"name\" : \"carlos\"}]";
+		//	//// ----- Heavy test.
+		//	"[	"
+		//	"\n	{ \"properties\" : [{ \"name\" : \"color\", \"type\" : \"string\"}, { \"name\" : \"age\", \"type\" : \"int\"} ]"
+		//	"\n	, \"selection\" : {\"index\" : 1 , \"active\" : true }"
+		//	"\n	, \"people\" : "
+		//	"\n		{ \"property\" : "
+		//	"\n			{ \"color\" : \"red\", \"age\" : 25 }"
+		//	"\n		}"
+		//	"\n	}"
+		//	"\n]";
+		//const ::gpk::view_const_string					format						= "I want to replace this (but not \\{this}): People age: {people.property.{properties[selection.index].name}} with the value of the property found in a JSON tree.";
+		//gpk_necall(::testJSONFormatter(format, inputJson), "%s", "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", format.begin(), inputJson.begin());
+		//info_printf("Test succeeded:\nInput expression:\n%s\nInput JSON:\n%s", format.begin(), inputJson.begin());
 	}
 	return 0;
 }
