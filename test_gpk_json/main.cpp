@@ -17,67 +17,100 @@
 	return 0;
 }
 
+::gpk::error_t								testJSONReader				()			{
+	static const ::gpk::view_const_string			testJson					= //"[{\"a\":[123 3,32,1156]}]";
+		//"\n[ { \"NameId\" : \"654\", \"Bleh\":21354, \"Else\\u1954\": \"in\"} "
+		"\n            "
+		"\n[ {\"Bleh\": \"test\" }, {}, {   }, [  ]  , [], {\"a\":{}, \"b\":[123,]}"
+		"\n, {\"NameId\" : \"ASD\", \"Bleh\" :[234124,123,243234, 321   , 65198], \"Else\": [{\"Object\": false}, {}],\"Something\" : \"out\",}"
+		"\n, {\"NameId\" : \"654\", \"Bleh\":21354, \"Else\\u1954\": \"in\"} "
+		"\n, {\"NameId\" : true, \"B\\\"leh\": null, \"Else\": false}		"
+		"\n, {\"NameId\" : \"654\", \"Bleh\":21354, \"Else\\u1954\": \"in\"} "
+		"\n, {\"NameId\" : true, \"B\\\"leh\": null, \"Else\": false} "
+		"\n, {\"NameId\" : \"true\", \"Bleh\": \"null\", \"Else\": []} "
+		//"\n,{ \"NameId\" : 12344, \"Bleh\": \"\" \"\", \"Else\": \"false\", \"not\" : tres} "
+		"\n, { \"NameId\" : .123, \"Bleh\": -456 , \"Else\": -.759 } "
+		"\n]"
+		"\n           "
+		;
+	info_printf("JSON string (%u characters): %s.", testJson.size(), testJson.begin());
 
-int											main						()			{
-	{
-		static const ::gpk::view_const_string			testJson					= //"[{\"a\":[123 3,32,1156]}]";
-			//"\n[ { \"NameId\" : \"654\", \"Bleh\":21354, \"Else\\u1954\": \"in\"} "
-			"\n            "
-			"\n[ {\"Bleh\": \"test\" }, {}, {   }, [  ]  , [], {\"a\":{}, \"b\":[123,]}"
-			"\n, {\"NameId\" : \"ASD\", \"Bleh\" :[234124,123,243234, 321   , 65198], \"Else\": [{\"Object\": false}, {}],\"Something\" : \"out\",}"
-			"\n, {\"NameId\" : \"654\", \"Bleh\":21354, \"Else\\u1954\": \"in\"} "
-			"\n, {\"NameId\" : true, \"B\\\"leh\": null, \"Else\": false}		"
-			"\n, {\"NameId\" : \"654\", \"Bleh\":21354, \"Else\\u1954\": \"in\"} "
-			"\n, {\"NameId\" : true, \"B\\\"leh\": null, \"Else\": false} "
-			"\n, {\"NameId\" : \"true\", \"Bleh\": \"null\", \"Else\": []} "
-			//"\n,{ \"NameId\" : 12344, \"Bleh\": \"\" \"\", \"Else\": \"false\", \"not\" : tres} "
-			"\n, { \"NameId\" : .123, \"Bleh\": -456 , \"Else\": -.759 } "
-			"\n]"
-			"\n           "
-			;
-		info_printf("JSON string (%u characters): %s.", testJson.size(), testJson.begin());
+	const char										bleh[]						= "";
+	info_printf("%s", bleh);
 
-		const char										bleh[]						= "";
-		info_printf("%s", bleh);
+	::gpk::SJSONReader								jsonReader;
+	gpk_necall(::gpk::jsonParse(jsonReader, testJson), "Failed to parse json: '%s'.", testJson.begin());
 
-		::gpk::SJSONReader								jsonReader;
-		gpk_necall(::gpk::jsonParse(jsonReader, testJson), "Failed to parse json: '%s'.", testJson.begin());
+	info_printf("---------------------------- Linear iteration: %u objects.", jsonReader.Object.size());
+	::gpk::array_pod<char_t>						outputJson;
+	::gpk::ptr_obj<::gpk::SJSONNode>				root							= jsonReader.Tree[0];
+	::printNode(root, testJson);
 
-		info_printf("---------------------------- Linear iteration: %u objects.", jsonReader.Object.size());
-		::gpk::array_pod<char_t>						outputJson;
-		::gpk::ptr_obj<::gpk::SJSONNode>				root							= jsonReader.Tree[0];
-		::printNode(root, testJson);
-
-		info_printf("---------------------------- Linear iteration: %u objects.", jsonReader.Object.size());
-		for(uint32_t iNode = 0; iNode < jsonReader.Object.size(); ++iNode) {
-			const gpk::SJSONType							& node							= jsonReader.Object[iNode];
-			if( ::gpk::JSON_TYPE_VALUE	== node.Type
-			 || ::gpk::JSON_TYPE_KEY	== node.Type
-			 )
-				continue;
-			::gpk::view_const_string						view							= jsonReader.View[iNode];
-			char											bufferFormat [8192]				= {};
-			uint32_t										lenString						= view.size();
-			sprintf_s(bufferFormat, "Node type: %%u (%%s). Node Span: {%%u, %%u}. Parent index: %%u. Object index: %%u. Text: %%%u.%us", lenString, lenString);
-			info_printf(bufferFormat, node.Type, ::gpk::get_value_label(node.Type).begin(), node.Span.Begin, node.Span.End, node.ParentIndex, iNode, view.begin());
-		}
-
-		const ::gpk::view_const_string					test_key						= "Bleh";
-		info_printf("---------------------------- Access test. Test key: %s.", test_key.begin());
-		::gpk::error_t									indexOfFirstObject				= ::gpk::jsonArrayValueGet(*root, 0);
-		::gpk::ptr_obj<::gpk::SJSONNode>				object							= jsonReader.Tree[indexOfFirstObject];
-		::gpk::error_t									indexOfElement					= ::gpk::jsonObjectValueGet(*object, jsonReader.View, test_key);
-		gpk_necall((uint32_t)indexOfElement >= jsonReader.View.size(), "Test key '%s' not found: %i.", test_key.begin(), indexOfElement);
-		const gpk::SJSONType							& node							= jsonReader.Object	[indexOfElement];	
-		::gpk::view_const_string						view							= jsonReader.View	[indexOfElement - 1];	// get the parent in order to retrieve the view with the surrounding in the case of strings "".
+	info_printf("---------------------------- Linear iteration: %u objects.", jsonReader.Object.size());
+	for(uint32_t iNode = 0; iNode < jsonReader.Object.size(); ++iNode) {
+		const gpk::SJSONType							& node							= jsonReader.Object[iNode];
+		if( ::gpk::JSON_TYPE_VALUE	== node.Type
+			|| ::gpk::JSON_TYPE_KEY	== node.Type
+			)
+			continue;
+		::gpk::view_const_string						view							= jsonReader.View[iNode];
 		char											bufferFormat [8192]				= {};
 		uint32_t										lenString						= view.size();
-		sprintf_s(bufferFormat, "Found test value {'%%s':%%%u.%us}. Node type: %%u (%%s). Node Span: {%%u, %%u}. Parent index: %%u. Object index: %%u.", lenString, lenString);
-		info_printf(bufferFormat, test_key.begin(), view.begin(), node.Type, ::gpk::get_value_label(node.Type).begin(), node.Span.Begin, node.Span.End, node.ParentIndex, indexOfElement, view.begin());
+		sprintf_s(bufferFormat, "Node type: %%u (%%s). Node Span: {%%u, %%u}. Parent index: %%u. Object index: %%u. Text: %%%u.%us", lenString, lenString);
+		info_printf(bufferFormat, node.Type, ::gpk::get_value_label(node.Type).begin(), node.Span.Begin, node.Span.End, node.ParentIndex, iNode, view.begin());
+	}
+
+	const ::gpk::view_const_string					test_key						= "Bleh";
+	info_printf("---------------------------- Access test. Test key: %s.", test_key.begin());
+	::gpk::error_t									indexOfFirstObject				= ::gpk::jsonArrayValueGet(*root, 0);
+	::gpk::ptr_obj<::gpk::SJSONNode>				object							= jsonReader.Tree[indexOfFirstObject];
+	::gpk::error_t									indexOfElement					= ::gpk::jsonObjectValueGet(*object, jsonReader.View, test_key);
+	gpk_necall((uint32_t)indexOfElement >= jsonReader.View.size(), "Test key '%s' not found: %i.", test_key.begin(), indexOfElement);
+	const gpk::SJSONType							& node							= jsonReader.Object	[indexOfElement];	
+	::gpk::view_const_string						view							= jsonReader.View	[indexOfElement - 1];	// get the parent in order to retrieve the view with the surrounding in the case of strings "".
+	char											bufferFormat [8192]				= {};
+	uint32_t										lenString						= view.size();
+	sprintf_s(bufferFormat, "Found test value {'%%s':%%%u.%us}. Node type: %%u (%%s). Node Span: {%%u, %%u}. Parent index: %%u. Object index: %%u.", lenString, lenString);
+	info_printf(bufferFormat, test_key.begin(), view.begin(), node.Type, ::gpk::get_value_label(node.Type).begin(), node.Span.Begin, node.Span.End, node.ParentIndex, indexOfElement, view.begin());
+	return 0;
+}
+
+::gpk::error_t								testJSONFormatter			(const ::gpk::view_const_string format, const ::gpk::view_const_string inputJson)			{
+	::gpk::array_pod<char_t>						formatted;
+	::gpk::SJSONReader								jsonReader;
+	gpk_necall(::gpk::jsonParse(jsonReader, inputJson), "Failed to parse json: '%s'.", inputJson.begin());
+	info_printf("Input json: \n%s.", inputJson.begin());
+	::gpk::ptr_obj<::gpk::SJSONNode>				root						= jsonReader.Tree[0];
+	::printNode(root, inputJson);
+	const ::gpk::error_t							indexOfFirstObject			= ::gpk::jsonArrayValueGet(*root, 0);
+	// ----- Simple test.
+	//const ::gpk::view_const_string					format						= "I want to replace this (but not \\{this}): People name: {people.property.{properties[if(selection.active) selection.index else 0].name}} with the value of the property found in a JSON tree.";
+	//// ----- Heavy test.
+	//const ::gpk::view_const_string					format						= "I want to replace this (but not \\{this}): People name: {name} with the value of the property found in a JSON tree.";
+	info_printf("Test format: '%s'.", format.begin());
+	gpk_necall(::gpk::jsonStringFormat(format, jsonReader, indexOfFirstObject, formatted), "%s", "Error formatting string from JSON object.");
+	info_printf("Formatted string after jsonStringFormat(): '%s'.", formatted.begin());
+	return 0;
+}
+
+int											main						()	{
+	gpk_necall(::testJSONReader(), "%s", "Failed to read JSON!");
+	{
+		const ::gpk::view_const_string					inputJson					= 
+			"[{\"color\" : \"red\", \"race\" : \"brown\", \"weight\" : 160, \"parent\" : {\"name\" : \"lucas\"}, \"height\" : \"1.56\", \"name\" : \"carlos\"}]";
+		{
+			const ::gpk::view_const_string					format						= "I want to replace this (but not \\{this}): Guy name: {name} with the value of the property found in a JSON tree.";
+			gpk_necall(::testJSONFormatter(format, inputJson), "%s", "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", format.begin(), inputJson.begin());
+			info_printf("Test succeeded:\nInput expression:\n%s\nInput JSON:\n%s", format.begin(), inputJson.begin());
+		}
+		{
+			const ::gpk::view_const_string					format						= "I want to replace this (but not \\{this}): Parent name: {parent.name} with the value of the property found in a JSON tree.";
+			gpk_necall(::testJSONFormatter(format, inputJson), "%s", "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", format.begin(), inputJson.begin());
+			info_printf("Test succeeded:\nInput expression:\n%s\nInput JSON:\n%s", format.begin(), inputJson.begin());
+		}
 	}
 	{
-		::gpk::array_pod<char_t>						formatted;
-		const ::gpk::view_const_string					jsonInput						= 
+		const ::gpk::view_const_string					inputJson					= 
 			// ----- Simple test.
 			//"[{\"color\" : \"red\", \"race\" : \"brown\", \"weight\" : 160, \"children\" : {\"name\" : \"lucas\"}, \"height\" : \"1.56\", \"name\" : \"carlos\"}]";
 			//// ----- Heavy test.
@@ -90,20 +123,9 @@ int											main						()			{
 			"\n		}"
 			"\n	}"
 			"\n]";
-		::gpk::SJSONReader								jsonReader;
-		gpk_necall(::gpk::jsonParse(jsonReader, jsonInput), "Failed to parse json: '%s'.", jsonInput.begin());
-		info_printf("Input json: \n%s.", jsonInput.begin());
-		::gpk::ptr_obj<::gpk::SJSONNode>				root							= jsonReader.Tree[0];
-		::printNode(root, jsonInput);
-		const ::gpk::error_t							indexOfFirstObject				= ::gpk::jsonArrayValueGet(*root, 0);
-		// ----- Simple test.
-		//const ::gpk::view_const_string					format							= "I want to replace this (but not \\{this}): People name: {people.property.{properties[if(selection.active) selection.index else 0].name}} with the value of the property found in a JSON tree.";
-		//// ----- Heavy test.
-		const ::gpk::view_const_string					format							= "I want to replace this (but not \\{this}): People age: {people.property.{properties[selection.index].name}} with the value of the property found in a JSON tree.";
-		//const ::gpk::view_const_string					format							= "I want to replace this (but not \\{this}): People name: {name} with the value of the property found in a JSON tree.";
-		info_printf("Test format: '%s'.", format.begin());
-		gpk_necall(::gpk::jsonStringFormat(format, jsonReader, indexOfFirstObject, formatted), "%s", "Error formatting string from JSON object.");
-		info_printf("Formatted string after jsonStringFormat(): '%s'.", formatted.begin());
+		const ::gpk::view_const_string					format						= "I want to replace this (but not \\{this}): People age: {people.property.{properties[selection.index].name}} with the value of the property found in a JSON tree.";
+		gpk_necall(::testJSONFormatter(format, inputJson), "%s", "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", format.begin(), inputJson.begin());
+		info_printf("Test succeeded:\nInput expression:\n%s\nInput JSON:\n%s", format.begin(), inputJson.begin());
 	}
- 	return 0;
+	return 0;
 }
