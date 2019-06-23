@@ -91,20 +91,20 @@
 int											main						()	{
 	gpk_necall(::testJSONReader(), "%s", "Failed to read JSON!");
 
+	const ::gpk::view_const_string					inputJson					= 
+		"["
+		"\n\t{\"child_selected\" : 2, \"color\" : \"red\", \"race\" : \"brown\", \"weight\" : 160"
+		"\n\t\t, \"parent\" : {\"name\" : \"lucas\"}"
+		"\n\t\t, \"children\": [\"marta\", \"venus\", \"crystal\"]"
+		"\n\t\t, \"height\" : \"1.56\", \"name\" : \"carlos\""
+		"\n\t},"
+		"\n\t{\"child_selected\" : 2, \"color\" : \"red\", \"race\" : \"brown\", \"weight\" : 160"
+		"\n\t\t, \"parent\" : {\"name\" : \"lucas\"}"
+		"\n\t\t, \"children\": [\"marta\", \"venus\", \"crystal\"]"
+		"\n\t\t, \"height\" : \"1.56\", \"name\" : \"carlos\""
+		"\n\t},"
+		"]";
 	{ // first-level expression resolution tests.
-		const ::gpk::view_const_string					inputJson					= 
-			"["
-			"\n\t{\"child_selected\" : 2, \"color\" : \"red\", \"race\" : \"brown\", \"weight\" : 160"
-			"\n\t\t, \"parent\" : {\"name\" : \"lucas\"}"
-			"\n\t\t, \"children\": [\"marta\", \"venus\", \"crystal\"]"
-			"\n\t\t, \"height\" : \"1.56\", \"name\" : \"carlos\""
-			"\n\t},"
-			"\n\t{\"child_selected\" : 2, \"color\" : \"red\", \"race\" : \"brown\", \"weight\" : 160"
-			"\n\t\t, \"parent\" : {\"name\" : \"lucas\"}"
-			"\n\t\t, \"children\": [\"marta\", \"venus\", \"crystal\"]"
-			"\n\t\t, \"height\" : \"1.56\", \"name\" : \"carlos\""
-			"\n\t},"
-			"]";
 		{
 			const ::gpk::view_const_string					format						= "I want to replace this (but not \\{this}): Guy name: {name}.";
 			gpk_necall(::testJSONFormatter(format, inputJson), "%s", "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", format.begin(), inputJson.begin());
@@ -124,9 +124,6 @@ int											main						()	{
 	}
 
 	{ // multilevel expression resolution tests.
-		const ::gpk::view_const_string					inputJson					= 
-			"[{\"child_selected\":2, \"color\" : \"red\", \"race\" : \"brown\", \"weight\" : 160, \"parent\" : {\"name\" : \"lucas\"}, \"children\": [\"marta\", \"venus\", \"crystal\"], \"height\" : \"1.56\", \"name\" : \"carlos\"}]";
-
 		//const ::gpk::view_const_string					inputJson					= 
 		//	// ----- Simple test.
 		//	//"[{\"color\" : \"red\", \"race\" : \"brown\", \"weight\" : 160, \"children\" : {\"name\" : \"lucas\"}, \"height\" : \"1.56\", \"name\" : \"carlos\"}]";
