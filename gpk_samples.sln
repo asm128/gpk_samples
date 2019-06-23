@@ -150,6 +150,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_gpk_json", "test_gpk_j
 		{39953D8D-A830-46BD-917E-1A96C8BDADC6} = {39953D8D-A830-46BD-917E-1A96C8BDADC6}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gpk_build_cl", "gpk_build_cl\gpk_build_cl.vcxproj", "{0FC63421-47CB-4E48-963F-BBC4F1EC0099}"
+	ProjectSection(ProjectDependencies) = postProject
+		{830AB681-B788-47D4-9767-BA4E0792F682} = {830AB681-B788-47D4-9767-BA4E0792F682}
+		{39953D8D-A830-46BD-917E-1A96C8BDADC6} = {39953D8D-A830-46BD-917E-1A96C8BDADC6}
+		{8FD826F8-3739-44E6-8CC8-997122E53B8D} = {8FD826F8-3739-44E6-8CC8-997122E53B8D}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -342,6 +349,14 @@ Global
 		{A90A4647-7D44-477C-A55D-D09FF4F1F5E5}.Release|x64.Build.0 = Release|x64
 		{A90A4647-7D44-477C-A55D-D09FF4F1F5E5}.Release|x86.ActiveCfg = Release|Win32
 		{A90A4647-7D44-477C-A55D-D09FF4F1F5E5}.Release|x86.Build.0 = Release|Win32
+		{0FC63421-47CB-4E48-963F-BBC4F1EC0099}.Debug|x64.ActiveCfg = Debug|x64
+		{0FC63421-47CB-4E48-963F-BBC4F1EC0099}.Debug|x64.Build.0 = Debug|x64
+		{0FC63421-47CB-4E48-963F-BBC4F1EC0099}.Debug|x86.ActiveCfg = Debug|Win32
+		{0FC63421-47CB-4E48-963F-BBC4F1EC0099}.Debug|x86.Build.0 = Debug|Win32
+		{0FC63421-47CB-4E48-963F-BBC4F1EC0099}.Release|x64.ActiveCfg = Release|x64
+		{0FC63421-47CB-4E48-963F-BBC4F1EC0099}.Release|x64.Build.0 = Release|x64
+		{0FC63421-47CB-4E48-963F-BBC4F1EC0099}.Release|x86.ActiveCfg = Release|Win32
+		{0FC63421-47CB-4E48-963F-BBC4F1EC0099}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

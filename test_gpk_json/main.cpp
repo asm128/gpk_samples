@@ -22,16 +22,19 @@ int											main						()			{
 	{
 		static const ::gpk::view_const_string			testJson					= //"[{\"a\":[123 3,32,1156]}]";
 			//"\n[ { \"NameId\" : \"654\", \"Bleh\":21354, \"Else\\u1954\": \"in\"} "
-			"\n[ { \"Bleh\": \"test\" }, {}, {   }, [  ]  , [], {\"a\":{}, \"b\":[123,]}"
-			"\n, { \"NameId\" : \"ASD\", \"Bleh\" :[234124,123,243234, 321   , 65198], \"Else\": [{\"Object\": false}, {}],\"Something\" : \"out\",}"
-			"\n, { \"NameId\" : \"654\", \"Bleh\":21354, \"Else\\u1954\": \"in\"} "
-			"\n, { \"NameId\" : true, \"B\\\"leh\": null, \"Else\": false} "
-			"\n, { \"NameId\" : \"654\", \"Bleh\":21354, \"Else\\u1954\": \"in\"} "
-			"\n, { \"NameId\" : true, \"B\\\"leh\": null, \"Else\": false} "
-			"\n, { \"NameId\" : \"true\", \"Bleh\": \"null\", \"Else\": []} "
-			//"\n, { \"NameId\" : 12344, \"Bleh\": \"\" \"\", \"Else\": \"false\", \"not\" : tres} "
+			"\n            "
+			"\n[ {\"Bleh\": \"test\" }, {}, {   }, [  ]  , [], {\"a\":{}, \"b\":[123,]}"
+			"\n, {\"NameId\" : \"ASD\", \"Bleh\" :[234124,123,243234, 321   , 65198], \"Else\": [{\"Object\": false}, {}],\"Something\" : \"out\",}"
+			"\n, {\"NameId\" : \"654\", \"Bleh\":21354, \"Else\\u1954\": \"in\"} "
+			"\n, {\"NameId\" : true, \"B\\\"leh\": null, \"Else\": false}		"
+			"\n, {\"NameId\" : \"654\", \"Bleh\":21354, \"Else\\u1954\": \"in\"} "
+			"\n, {\"NameId\" : true, \"B\\\"leh\": null, \"Else\": false} "
+			"\n, {\"NameId\" : \"true\", \"Bleh\": \"null\", \"Else\": []} "
+			//"\n,{ \"NameId\" : 12344, \"Bleh\": \"\" \"\", \"Else\": \"false\", \"not\" : tres} "
 			"\n, { \"NameId\" : .123, \"Bleh\": -456 , \"Else\": -.759 } "
-			"\n]";
+			"\n]"
+			"\n           "
+			;
 		info_printf("JSON string (%u characters): %s.", testJson.size(), testJson.begin());
 
 		const char										bleh[]						= "";
@@ -75,9 +78,12 @@ int											main						()			{
 	{
 		::gpk::array_pod<char_t>						formatted;
 		const ::gpk::view_const_string					jsonInput						= 
+			// ----- Simple test.
+			//"[{\"color\" : \"red\", \"race\" : \"brown\", \"weight\" : 160, \"children\" : {\"name\" : \"lucas\"}, \"height\" : \"1.56\", \"name\" : \"carlos\"}]";
+			//// ----- Heavy test.
 			"[	"
 			"\n	{ \"properties\" : [{ \"name\" : \"color\", \"type\" : \"string\"}, { \"name\" : \"age\", \"type\" : \"int\"} ]"
-			"\n	, \"selection\" : 1"
+			"\n	, \"selection\" : {\"index\" : 1 , \"active\" : true }"
 			"\n	, \"people\" : "
 			"\n		{ \"property\" : "
 			"\n			{ \"color\" : \"red\", \"age\" : 25 }"
@@ -86,13 +92,17 @@ int											main						()			{
 			"\n]";
 		::gpk::SJSONReader								jsonReader;
 		gpk_necall(::gpk::jsonParse(jsonReader, jsonInput), "Failed to parse json: '%s'.", jsonInput.begin());
+		info_printf("Input json: \n%s.", jsonInput.begin());
 		::gpk::ptr_obj<::gpk::SJSONNode>				root							= jsonReader.Tree[0];
 		::printNode(root, jsonInput);
 		const ::gpk::error_t							indexOfFirstObject				= ::gpk::jsonArrayValueGet(*root, 0);
-		::gpk::ptr_obj<::gpk::SJSONNode>				object							= jsonReader.Tree[indexOfFirstObject];
-		const ::gpk::view_const_string					format							= "I want to replace this (but not \\{this}): People color: {people.property.{properties[selection.index].name}} with the value of the property found in a JSON tree.";
+		// ----- Simple test.
+		//const ::gpk::view_const_string					format							= "I want to replace this (but not \\{this}): People name: {people.property.{properties[if(selection.active) selection.index else 0].name}} with the value of the property found in a JSON tree.";
+		//// ----- Heavy test.
+		const ::gpk::view_const_string					format							= "I want to replace this (but not \\{this}): People age: {people.property.{properties[selection.index].name}} with the value of the property found in a JSON tree.";
+		//const ::gpk::view_const_string					format							= "I want to replace this (but not \\{this}): People name: {name} with the value of the property found in a JSON tree.";
 		info_printf("Test format: '%s'.", format.begin());
-		gpk_necall(::gpk::jsonStringFormat(format, *object, formatted), "%s", "Error formatting string from JSON object.");
+		gpk_necall(::gpk::jsonStringFormat(format, jsonReader, indexOfFirstObject, formatted), "%s", "Error formatting string from JSON object.");
 		info_printf("Formatted string after jsonStringFormat(): '%s'.", formatted.begin());
 	}
  	return 0;
