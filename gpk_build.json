@@ -1,0 +1,27 @@
+[	{ "exes": 
+		[ "gpk_build_cl"
+		, "gpk_joiner"
+		, "gpk_pak"
+		, "gpk_splitter"
+		, "gpk_unpak"
+		, "test_cgi_module"
+		, "test_encoding"
+		, "test_gontrill"
+		, "test_gpk_cube"
+		, "test_gpk_db"
+		, "test_gpk_dialog"
+		, "test_gpk_encoding"
+		, "test_gpk_gnd"
+		, "test_gpk_gui"
+		, "test_gpk_json"
+		, "test_gpk_lighting"
+		, "test_gpk_png"
+		, "test_gpk_viewport"
+		, "test_udp_client"
+		, "test_udp_server"
+		],
+		"dependencies": ["gpk", "zlib"]
+ 	}
+
+
+]
