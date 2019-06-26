@@ -137,20 +137,19 @@ int											main						()	{
 			"\n		 , \"property\" : "
 			"\n			{ \"color\" : \"red\", \"age\" : 25 }"
 			"\n		},"
-			"\n		],"
-			"\n	},"
-			"\n	{ \"properties\" : [{ \"name\" : \"color\", \"type\" : \"string\"}, { \"name\" : \"age\", \"type\" : \"int\"} ]"
-			"\n	, \"selection\" : {\"index\" : 1 , \"active\" : false }"
-			"\n	, \"people\" : "
-			"\n		[{ \"name\" : \"David\""
+			"\n		{ \"name\" : \"Charles\""
 			"\n		 , \"property\" : "
-			"\n			{ \"color\" : \"red\", \"age\" : 25 }"
+			"\n			{ \"color\" : \"green\", \"age\" : 32 }"
+			"\n		},"
+			"\n		{ \"name\" : \"Charles\""
+			"\n		 , \"property\" : "
+			"\n			{ \"color\" : \"blue\", \"age\" : 132 }"
 			"\n		},"
 			"\n		],"
 			"\n	},"
 			"\n]";
-		const ::gpk::view_const_string					format						= "I want to replace this (but not \\{this}): {people[0].name}'s {properties[selection.index].name}: {people[0].property.{properties[selection.index].name}}.";
-		gpk_necall(::testJSONFormatter(format, inputJsonHard), "%s", "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", format.begin(), inputJsonHard.begin());
+		const ::gpk::view_const_string					format						= "I want to replace this (but not \\{this}): {people[2].name}'s {properties[selection.index].name}: {people[2].property.{properties[selection.index].name}}.";
+		gpk_necall(::testJSONFormatter(format, inputJsonHard), "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", format.begin(), inputJsonHard.begin());
 		info_printf("Test succeeded:\nInput expression:\n%s\nInput JSON:\n%s", format.begin(), inputJsonHard.begin());
 	}
 	return 0;
