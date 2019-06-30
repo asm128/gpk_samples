@@ -11,8 +11,6 @@
 
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 
-			::gpk::error_t											configGetApplicationImageFileNames	();
-
 			::gpk::error_t											cleanup								(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.MainDisplay); }
 			::gpk::error_t											setup								(::gme::SApplication & app)						{
 	::gpk::SFramework														& framework							= app.Framework;
@@ -40,13 +38,9 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	{
 		app.PNGImages.resize(::gpk::size(filenames));
 		::gpk::SPNGData															pngDataCacheForFasterLoad;
-		::gpk::array_pod<char_t>												loadedJSONConfig					= {};
-		::gpk::view_const_string												fileNameJSONConfig					= "gpk_config.json";
 		::gpk::view_const_string												pathPNGSuite						= {};
 		{
-			gpk_necall(::gpk::fileToMemory(fileNameJSONConfig, loadedJSONConfig), "Failed to read config JSON file! File not found? File name: %s.", fileNameJSONConfig.begin());
-			::gpk::SJSONReader														jsonReader							= {};
-			gpk_necall(::gpk::jsonParse(jsonReader, ::gpk::view_const_string{loadedJSONConfig.begin(), loadedJSONConfig.size()}), "Failed to read json! Not a valid json file? File name: %s.", fileNameJSONConfig.begin());
+			const ::gpk::SJSONReader												& jsonReader						= framework.ReaderJSONConfig;
 			const int32_t															indexObjectConfig					= ::gpk::jsonArrayValueGet(*jsonReader.Tree[0], 0);	// Get the first JSON {object} found in the [document]
 			gpk_necall(::gpk::jsonExpressionResolve("assets.pngsuite.path", jsonReader, indexObjectConfig, pathPNGSuite), "Failed to get path of PNG files! Last contents found: %s.", pathPNGSuite.begin());
 			info_printf("Path to PNG test files: %s.", pathPNGSuite.begin());

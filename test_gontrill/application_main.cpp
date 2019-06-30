@@ -75,13 +75,9 @@ static				::gpk::error_t										setupSprite									(::gpk::SImageProcessable<
 }
 
 static				::gpk::error_t										setupSprites								(::SApplication& app)											{ 
-	::gpk::array_pod<char_t>												loadedJSONConfig								= {};
-	::gpk::view_const_string												fileNameJSONConfig								= "gpk_config.json";
 	::gpk::view_const_string												pathPNGSuite									= {};
 	{
-		gpk_necall(::gpk::fileToMemory(fileNameJSONConfig, loadedJSONConfig), "Failed to read config JSON file! File not found? File name: %s.", fileNameJSONConfig.begin());
-		::gpk::SJSONReader														jsonReader										= {};
-		gpk_necall(::gpk::jsonParse(jsonReader, ::gpk::view_const_string{loadedJSONConfig.begin(), loadedJSONConfig.size()}), "Failed to read json! Not a valid json file? File name: %s.", fileNameJSONConfig.begin());
+		const ::gpk::SJSONReader												& jsonReader									= app.Framework.ReaderJSONConfig;
 		const int32_t															indexObjectConfig								= ::gpk::jsonArrayValueGet(*jsonReader.Tree[0], 0);	// Get the first JSON {object} found in the [document]
 		gpk_necall(::gpk::jsonExpressionResolve("assets.images.path", jsonReader, indexObjectConfig, pathPNGSuite), "Failed to get path of image files! Last contents found: %s.", pathPNGSuite.begin());
 		info_printf("Path to PNG test files: %s.", pathPNGSuite.begin());
