@@ -11,7 +11,6 @@
 
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 
-
 			::gpk::error_t											configGetApplicationImageFileNames	();
 
 			::gpk::error_t											cleanup								(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.MainDisplay); }
@@ -66,48 +65,41 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 				error_if(errored(::gpk::pngFileLoad(pngDataCacheForFasterLoad, {fullPathPNG.begin(), fullPathPNG.size()}, app.PNGImages[iFile])), "Failed to load file: %s.", fullPathPNG.begin());
 			}
 		}
-
-		// ---- Test our recently developed RLE algorithm.
-		::gpk::array_pod<uint32_t>												sizesUncompressed;
-		::gpk::array_pod<byte_t>												rleBuffer;
-		::gpk::array_pod<uint32_t>												sizesRLE;
-		uint32_t																sizeTotalUncompressed				= 0;
-		uint32_t																sizeTotalRLE						= 0;
-		for(uint32_t iFile = 0, countFilesToLoad = app.PNGImages.size(); iFile < countFilesToLoad; ++iFile) {
-			::gpk::view_array<::gpk::SColorBGRA>	viewToRLE{app.PNGImages[iFile].View.begin(), app.PNGImages[iFile].View.metrics().x * app.PNGImages[iFile].View.metrics().y};
-			sizesUncompressed.push_back(viewToRLE.size());
-			::gpk::rleEncode(viewToRLE, rleBuffer);
-			sizesRLE.push_back(rleBuffer.size());
-			const uint32_t															sizePNGInBytes			= viewToRLE.size() * sizeof(::gpk::SColorBGRA);
+		{
+			// ---- Test our recently developed RLE algorithm.
+			::gpk::array_pod<uint32_t>												sizesUncompressed;
+			::gpk::array_pod<byte_t>												rleBuffer;
+			::gpk::array_pod<uint32_t>												sizesRLE;
+			uint32_t																sizeTotalUncompressed				= 0;
+			uint32_t																sizeTotalRLE						= 0;
+			for(uint32_t iFile = 0, countFilesToLoad = app.PNGImages.size(); iFile < countFilesToLoad; ++iFile) {
+				::gpk::view_array<::gpk::SColorBGRA>	viewToRLE{app.PNGImages[iFile].View.begin(), app.PNGImages[iFile].View.metrics().x * app.PNGImages[iFile].View.metrics().y};
+				sizesUncompressed.push_back(viewToRLE.size());
+				::gpk::rleEncode(viewToRLE, rleBuffer);
+				sizesRLE.push_back(rleBuffer.size());
+				const uint32_t															sizePNGInBytes			= viewToRLE.size() * sizeof(::gpk::SColorBGRA);
+				info_printf("--- RLE compression stats:"
+					"\nsizePNGRLE          : %u" 
+					"\nsizePNGUncompressed : %u" 
+					"\nratio               : %f" 
+					, rleBuffer.size()
+					, sizePNGInBytes
+					, (float)rleBuffer.size() / sizePNGInBytes
+					);
+				sizeTotalRLE														+= rleBuffer.size();
+				sizeTotalUncompressed												+= sizePNGInBytes;
+				rleBuffer.clear();
+			}
 			info_printf("--- RLE compression stats:"
-				"\nsizePNGRLE          : %u" 
-				"\nsizePNGUncompressed : %u" 
-				"\nratio               : %f" 
-				, rleBuffer.size()
-				, sizePNGInBytes
-				, (float)rleBuffer.size() / sizePNGInBytes
+				"\nsizeTotalRLE          : %u" 
+				"\nsizeTotalUncompressed : %u" 
+				"\nratio                 : %f" 
+				, sizeTotalRLE          
+				, sizeTotalUncompressed 
+				, (float)sizeTotalRLE / sizeTotalUncompressed
 				);
-			sizeTotalRLE														+= rleBuffer.size();
-			sizeTotalUncompressed												+= sizePNGInBytes;
-			rleBuffer.clear();
 		}
-		info_printf("--- RLE compression stats:"
-			"\nsizeTotalRLE          : %u" 
-			"\nsizeTotalUncompressed : %u" 
-			"\nratio                 : %f" 
-			, sizeTotalRLE          
-			, sizeTotalUncompressed 
-			, (float)sizeTotalRLE / sizeTotalUncompressed
-			);
 	}
-
-
-	//for(uint32_t iFile = 0; iFile < app.PNGImages.size(); ++iFile) {
-	//	::gpk::array_pod<char_t>												fullPathPNG				= {};
-	//	::gpk::pathNameCompose(pathPNGSuite, filenames[iFile], fullPathPNG);
-	//	error_if(errored(::gpk::pngFileLoad(pngDataCacheForFasterLoad, {fullPathPNG.begin(), fullPathPNG.size()}, app.PNGImages[iFile])), "Failed to load file: %s.", fullPathPNG.begin());
-	//}
-
 	return 0;
 }
 
