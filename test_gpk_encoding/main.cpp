@@ -56,7 +56,7 @@ int													main						()			{
 		decoded.push_back(0);
 		encoded.resize(encoded.size() - 1);
 		always_printf("RLE Decoded: %s", decoded.begin());
-		error_if(0 != memcmp(decoded.begin(), textTest, decoded.size()), "RLE test failed.");
+		gerror_if(0 != memcmp(decoded.begin(), textTest, decoded.size()), "RLE test failed.");
 	}
 
 	const ::gpk::view_const_string							testStrings	[]				=
@@ -92,13 +92,13 @@ int													main						()			{
 	//			decoded.clear();
 	//			::gpk::ardellEncode(encodingCache, testStrings[iTest]	, iTest, true, encoded);
 	//			::gpk::ardellDecode(encodingCache, encoded				, iTest, true, decoded);
-	//			error_if(memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
+	//			gerror_if(memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
 	//
 	//			encoded64.clear();
 	//			decoded64.clear();
 	//			::gpk::base64Encode({(ubyte_t*)encoded.begin(), encoded.size()}, encoded64);
 	//			::gpk::base64Decode(encoded64, decoded64);
-	//			error_if(memcmp(encoded.begin(), decoded64.begin(), decoded64.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", encoded.begin(), decoded64.begin());
+	//			gerror_if(memcmp(encoded.begin(), decoded64.begin(), decoded64.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", encoded.begin(), decoded64.begin());
 	//			timer.Frame();
 	//			timeTotal											+= timer.LastTimeSeconds;
 	//		}
@@ -115,7 +115,7 @@ int													main						()			{
 				decoded.clear();
 				ce_if(errored(::gpk::ardellEncode(encodingCache, testStrings[iTest]	, (int)::gpk::noise1DBase(iTest), false, encoded)), "%s", "Out of memory?");
 				ce_if(errored(::gpk::ardellDecode(encodingCache, encoded			, (int)::gpk::noise1DBase(iTest), false, decoded)), "%s", "Out of memory?");
-				error_if(0 == decoded.size() || ::memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
+				gerror_if(0 == decoded.size() || ::memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
 				timer.Frame();
 				timeTotal											+= timer.LastTimeSeconds;
 			}
@@ -132,7 +132,7 @@ int													main						()			{
 				decoded.clear();
 				ce_if(errored(::gpk::ardellEncode(encodingCache, testStrings[iTest]	, (int)::gpk::noise1DBase(iTest), true, encoded)), "%s", "Out of memory?");
 				ce_if(errored(::gpk::ardellDecode(encodingCache, encoded			, (int)::gpk::noise1DBase(iTest), true, decoded)), "%s", "Out of memory?");
-				error_if(0 == decoded.size() || ::memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
+				gerror_if(0 == decoded.size() || ::memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
 				timer.Frame();
 				timeTotal											+= timer.LastTimeSeconds;
 			}
@@ -149,7 +149,7 @@ int													main						()			{
 				decoded.clear();
 				ce_if(errored(::gpk::ardellEncode(testStrings[iTest], (int)::gpk::noise1DBase(iTest), false, encoded)), "%s", "Out of memory?");
 				ce_if(errored(::gpk::ardellDecode(encoded			, (int)::gpk::noise1DBase(iTest), false, decoded)), "%s", "Out of memory?");
-				error_if(::memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
+				gerror_if(::memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
 				timer.Frame();
 				timeTotal											+= timer.LastTimeSeconds;
 			}
@@ -166,7 +166,7 @@ int													main						()			{
 				decoded.clear();
 				ce_if(errored(::gpk::ardellEncode(testStrings[iTest], (int)::gpk::noise1DBase(iTest), true, encoded)), "%s", "Out of memory?");
 				ce_if(errored(::gpk::ardellDecode(encoded			, (int)::gpk::noise1DBase(iTest), true, decoded)), "%s", "Out of memory?");
-				error_if(::memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
+				gerror_if(::memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
 				timer.Frame();
 				timeTotal											+= timer.LastTimeSeconds;
 			}
@@ -200,7 +200,7 @@ int													main						()			{
 					continue;
 				}
 				encoded.clear_pointer();
-				error_if(::memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
+				gerror_if(::memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
 				timer.Frame();
 				timeTotal											+= timer.LastTimeSeconds;
 			}
@@ -235,7 +235,7 @@ int													main						()			{
 					continue;
 				}
 				encoded.clear_pointer();
-				error_if(::memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
+				gerror_if(::memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
 				timer.Frame();
 				timeTotal											+= timer.LastTimeSeconds;
 			}
@@ -248,8 +248,8 @@ int													main						()			{
 			double													timeTotal					= 0;
 			for(uint32_t iRound = 0; iRound < rounds; ++iRound)
 				for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {
-					error_if(errored(::test_encrypt_cbc((::gpk::AES_LEVEL)iAESLevel)), "%s", "Algorithm got broken?");
-					error_if(errored(::test_decrypt_cbc((::gpk::AES_LEVEL)iAESLevel)), "%s", "Algorithm got broken?");
+					gerror_if(errored(::test_encrypt_cbc((::gpk::AES_LEVEL)iAESLevel)), "%s", "Algorithm got broken?");
+					gerror_if(errored(::test_decrypt_cbc((::gpk::AES_LEVEL)iAESLevel)), "%s", "Algorithm got broken?");
 					timer.Frame();
 					timeTotal											+= timer.LastTimeSeconds;
 				}
@@ -260,8 +260,8 @@ int													main						()			{
 			double													timeTotal					= 0;
 			for(uint32_t iRound = 0; iRound < rounds; ++iRound)
 				for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {
-					error_if(errored(::test_encrypt_ctr((::gpk::AES_LEVEL)iAESLevel)), "%s", "Algorithm got broken?");
-					error_if(errored(::test_decrypt_ctr((::gpk::AES_LEVEL)iAESLevel)), "%s", "Algorithm got broken?");
+					gerror_if(errored(::test_encrypt_ctr((::gpk::AES_LEVEL)iAESLevel)), "%s", "Algorithm got broken?");
+					gerror_if(errored(::test_decrypt_ctr((::gpk::AES_LEVEL)iAESLevel)), "%s", "Algorithm got broken?");
 					timer.Frame();
 					timeTotal											+= timer.LastTimeSeconds;
 				}
@@ -272,8 +272,8 @@ int													main						()			{
 			double													timeTotal					= 0;
 			for(uint32_t iRound = 0; iRound < rounds; ++iRound)
 				for(uint32_t iTest = 0; iTest < ::gpk::size(testStrings); ++iTest) {
-					error_if(errored(::test_decrypt_ecb((::gpk::AES_LEVEL)iAESLevel)), "%s", "Algorithm got broken?");
-					error_if(errored(::test_encrypt_ecb((::gpk::AES_LEVEL)iAESLevel)), "%s", "Algorithm got broken?");
+					gerror_if(errored(::test_decrypt_ecb((::gpk::AES_LEVEL)iAESLevel)), "%s", "Algorithm got broken?");
+					gerror_if(errored(::test_encrypt_ecb((::gpk::AES_LEVEL)iAESLevel)), "%s", "Algorithm got broken?");
 					timer.Frame();
 					timeTotal											+= timer.LastTimeSeconds;
 				}
@@ -314,7 +314,7 @@ int													main						()			{
 						continue;
 					}
 					encoded.clear_pointer();
-					error_if(::memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
+					gerror_if(::memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
 					timer.Frame();
 					timeTotal											+= timer.LastTimeSeconds;
 				}
@@ -369,7 +369,7 @@ int													main						()			{
 				//	, encoded.begin()
 				//	, decoded.begin()
 				//	);
-				error_if(::memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
+				gerror_if(::memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
 				timer.Frame();
 				timeTotal											+= timer.LastTimeSeconds;
 				always_printf("------ RSA (cacheless)\nTime this step of %u size: %g milliseconds.", testStrings[iTest].size(), timer.LastTimeMicroseconds / 1000.0);
@@ -390,7 +390,7 @@ int													main						()			{
 				const uint32_t											pair						= iRound; //rand() % rsaKeys.size();
 				ce_if(errored(::gpk::rsaEncode(testStrings[iTest]	, rsa_n, rsaKeys[pair].Public	, 0, encoded)), "%s", "Out of memory?");
 				ce_if(errored(::gpk::rsaDecode(encoded				, rsa_n, rsaKeys[pair].Private	, decoded)), "%s", "Out of memory?");
-				error_if(::memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
+				gerror_if(::memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
 				timer.Frame();
 				timeTotal											+= timer.LastTimeSeconds;
 			}
@@ -414,7 +414,7 @@ int													main						()			{
 				//	, encoded.begin()
 				//	, decoded.begin()
 				//	);
-				error_if(::memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
+				gerror_if(::memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
 				timer.Frame();
 				timeTotal											+= timer.LastTimeSeconds;
 			}
@@ -432,7 +432,7 @@ int													main						()			{
 				const int32_t											pair						= 0; //rand() % rsaKeys.size();
 				ce_if(errored(::gpk::gpcEncode(testStrings[iTest]	, rsa_n, rsaKeys[pair].Public	, 0, true, encoded)), "%s", "Out of memory?");
 				ce_if(errored(::gpk::gpcDecode(encoded				, rsa_n, rsaKeys[pair].Private	, true, decoded)), "%s", "Out of memory?");
-				error_if(::memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
+				gerror_if(::memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
 				timer.Frame();
 				timeTotal											+= timer.LastTimeSeconds;
 			}
@@ -450,7 +450,7 @@ int													main						()			{
 				const int32_t											pair						= iRound; //rand() % rsaKeys.size();
 				ce_if(errored(::gpk::gpcEncodeWithHash(testStrings[iTest]	, rsa_n, rsaKeys[pair].Public	, 0, false, encoded)), "%s", "Out of memory?");
 				e_if(errored(::gpk::gpcDecodeWithHash(encoded				, rsa_n, rsaKeys[pair].Private	, false, decoded)), "%s", "Out of memory?");
-				error_if(::memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
+				gerror_if(::memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
 				timer.Frame();
 				timeTotal											+= timer.LastTimeSeconds;
 			}

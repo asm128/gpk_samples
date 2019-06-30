@@ -49,7 +49,7 @@ static				::gpk::error_t										drawShipHealthBar							(::SApplication& appli
 			::gpk::SCoord2<int32_t>														dstOffset								= (gameInstance.Enemies.Position[iEnemy] + vector).Cast<int32_t>() - applicationInstance.TextureCenters[GAME_TEXTURE_ENEMY];
 			//if constexpr((Y_PLUS 1) == -1)
 			//	dstOffset.y *= -1;
-			error_if(errored(::gpk::grid_copy_alpha(viewOffscreen, enemyView, dstOffset, {0xFF, 0, 0xFF, 0xFF})), "I believe this never fails.");
+			gerror_if(errored(::gpk::grid_copy_alpha(viewOffscreen, enemyView, dstOffset, {0xFF, 0, 0xFF, 0xFF})), "I believe this never fails.");
 			{ // Draw ghost light
 				::gpk::SCoord2<float>														centerPowerup							= gameInstance.Enemies.Position[iEnemy] + vector;
 				::gpk::SCoord2<float>														lightCrosshair							= centerPowerup + ::gpk::SCoord2<float>{(float)indexPositionsX[selectedPos], 0.0f};
@@ -63,7 +63,7 @@ static				::gpk::error_t										drawShipHealthBar							(::SApplication& appli
 			continue;
 		const ::gpk::SCoord2<float>													& centerEnemy								= gameInstance.Enemies.Position[iEnemy];
 		const ::SHealthPoints														& enemyHealth								= gameInstance.Enemies.Health[iEnemy];
-		error_if(errored(::gpk::grid_copy_alpha(viewOffscreen, enemyView, centerEnemy.Cast<int32_t>() - applicationInstance.TextureCenters[GAME_TEXTURE_ENEMY], {0xFF, 0, 0xFF, 0xFF})), "I believe this never fails.");
+		gerror_if(errored(::gpk::grid_copy_alpha(viewOffscreen, enemyView, centerEnemy.Cast<int32_t>() - applicationInstance.TextureCenters[GAME_TEXTURE_ENEMY], {0xFF, 0, 0xFF, 0xFF})), "I believe this never fails.");
 		::drawShipHealthBar(applicationInstance, centerEnemy, halfMetricsEnemy, enemyHealth.Health, (int32_t)(halfMetricsEnemy2y	), ::gpk::GREEN);
 		::drawShipHealthBar(applicationInstance, centerEnemy, halfMetricsEnemy, enemyHealth.Shield, (int32_t)(halfMetricsEnemy2y - 2), ::gpk::CYAN );
 	}
@@ -77,7 +77,7 @@ static				::gpk::error_t										drawShipHealthBar							(::SApplication& appli
 		::gpk::SCoord2<int32_t>														halfMetricsShip								= (shipView.metrics() / 2).Cast<int32_t>();
 		int32_t																		halfMetricsShip2y							= halfMetricsShip.y;
 		::gpk::SCoord2<int32_t>														dstOffset									= gameInstance.Ships.Position[iShip].Cast<int32_t>() - applicationInstance.TextureCenters[GAME_TEXTURE_SHIP0 + iShip];
-		error_if(errored(::gpk::grid_copy_alpha(viewOffscreen, shipView, dstOffset, {0xFF, 0, 0xFF, 0xFF})), "I believe this never fails.");
+		gerror_if(errored(::gpk::grid_copy_alpha(viewOffscreen, shipView, dstOffset, {0xFF, 0, 0xFF, 0xFF})), "I believe this never fails.");
 		::drawShipHealthBar(applicationInstance, centerShip, halfMetricsShip, enemyHealth.Health, (int32_t)(halfMetricsShip2y		), ::gpk::GREEN);
 		::drawShipHealthBar(applicationInstance, centerShip, halfMetricsShip, enemyHealth.Shield, (int32_t)(halfMetricsShip2y - 2	), ::gpk::CYAN );
 	}
@@ -227,7 +227,7 @@ static				::gpk::error_t										drawPowerup						(::SApplication& applicationI
 	::gpk::view_grid<::gpk::SColorBGRA>											& viewOffscreen								= framework.MainDisplayOffscreen->Color.View;
 	::gpk::SCoord2<int32_t>														position									= powPosition.Cast<int32_t>();
 	for(uint32_t iTex = 0, textureCount = texturePowerup.size(); iTex < textureCount; ++iTex)
-		error_if(errored(::gpk::grid_copy_alpha(viewOffscreen, texturePowerup[iTex], position - textureCenterPowerup, {0xFF, 0, 0xFF, 0xFF})), "I believe this never fails.");
+		gerror_if(errored(::gpk::grid_copy_alpha(viewOffscreen, texturePowerup[iTex], position - textureCenterPowerup, {0xFF, 0, 0xFF, 0xFF})), "I believe this never fails.");
 	::gpk::SCoord2<int32_t>															centerPowerup								= position;
 	uint32_t																	lightIndex									= (uint32_t)time % (lightPos.size() / 2); 
 	const ::gpk::SCoord2<int32_t>												& selectedLightPos0							= lightPos[lightIndex + 0]
@@ -349,7 +349,7 @@ static				::gpk::error_t										drawCrosshairAligned						(::SApplication& app
 		::gpk::SCoord2<int32_t>														posXHair									= gameInstance.PositionCrosshair[iShip].Cast<int32_t>();
 		if(false == gameInstance.Ships.LineOfFire[iShip]) 
 			::drawCrosshairDiagonal(applicationInstance, beaconTimer, posXHair);
-		error_if(errored(::gpk::grid_copy_alpha(framework.MainDisplayOffscreen->Color.View, applicationInstance.Textures[GAME_TEXTURE_CROSSHAIR].Processed.View, posXHair - applicationInstance.TextureCenters[GAME_TEXTURE_CROSSHAIR], {0xFF, 0, 0xFF, 0xFF})), "I believe this never fails.");
+		gerror_if(errored(::gpk::grid_copy_alpha(framework.MainDisplayOffscreen->Color.View, applicationInstance.Textures[GAME_TEXTURE_CROSSHAIR].Processed.View, posXHair - applicationInstance.TextureCenters[GAME_TEXTURE_CROSSHAIR], {0xFF, 0, 0xFF, 0xFF})), "I believe this never fails.");
 		if(gameInstance.Ships.LineOfFire[iShip]) 
 			::drawCrosshairAligned(applicationInstance, beaconTimer, posXHair);
 	}

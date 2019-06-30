@@ -64,10 +64,10 @@ static				::gpk::error_t										setupSprite									(::gpk::SImageProcessable<
 	const ::gpk::view_const_string												filenameBMG									= filenameBMGCompo;
 	if(failedFromFile) {
 		error_printf("Failed to load bitmap from file: %s.", filename);
-		error_if(errored(::gpk::bmgFileLoad(filenameBMG, textureToProcess.Original)), "Failed to load image from disk: %s.", filenameBMG.begin());
+		gerror_if(errored(::gpk::bmgFileLoad(filenameBMG, textureToProcess.Original)), "Failed to load image from disk: %s.", filenameBMG.begin());
 	} 
 	else {
-		error_if(errored(::gpk::bmgFileWrite(filenameBMG, textureToProcess.Original.View)), "Failed to store file on disk: %s.", filenameBMG.begin());
+		gerror_if(errored(::gpk::bmgFileWrite(filenameBMG, textureToProcess.Original.View)), "Failed to store file on disk: %s.", filenameBMG.begin());
 	}
 	textureCenter															= (textureToProcess.Original.View.metrics() / 2).Cast<int32_t>();
 	textureToProcess.Processed.View											= textureToProcess.Original.View;
@@ -121,7 +121,7 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	//_CrtSetBreakAlloc(120);
 	g_ApplicationInstance													= &applicationInstance;
 	::gpk::SFramework															& framework									= applicationInstance.Framework;
-	error_if(errored(::gpk::mainWindowCreate(framework.MainDisplay, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?????!?!?!?!?");
+	gerror_if(errored(::gpk::mainWindowCreate(framework.MainDisplay, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?????!?!?!?!?");
 	::setupParticles();
 	ree_if	(errored(::updateSizeDependentResources	(applicationInstance)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
 	ree_if	(errored(::setupSprites					(applicationInstance)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
@@ -165,13 +165,13 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 					::gpk::error_t										drawCrosshair								(::SApplication& applicationInstance);	
 					::gpk::error_t										drawCollisions								(::SApplication& applicationInstance);	
 					::gpk::error_t										draw										(::SApplication& applicationInstance)											{	
-	error_if(errored(::drawBackground	(applicationInstance)), "Why??");	// --- Draw stars
-	error_if(errored(::drawPowerups		(applicationInstance)), "Why??");	// --- Draw powerups
-	error_if(errored(::drawShips		(applicationInstance)), "Why??");	// --- Draw ship
-	error_if(errored(::drawCrosshair	(applicationInstance)), "Why??");	// --- Draw crosshair
-	error_if(errored(::drawThrust		(applicationInstance)), "Why??");	// --- Draw propulsion engine
-	error_if(errored(::drawShots		(applicationInstance)), "Why??");	// --- Draw lasers
-	error_if(errored(::drawCollisions	(applicationInstance)), "Why??");	// --- Draw lasers
+	gerror_if(errored(::drawBackground	(applicationInstance)), "Why??");	// --- Draw stars
+	gerror_if(errored(::drawPowerups		(applicationInstance)), "Why??");	// --- Draw powerups
+	gerror_if(errored(::drawShips		(applicationInstance)), "Why??");	// --- Draw ship
+	gerror_if(errored(::drawCrosshair	(applicationInstance)), "Why??");	// --- Draw crosshair
+	gerror_if(errored(::drawThrust		(applicationInstance)), "Why??");	// --- Draw propulsion engine
+	gerror_if(errored(::drawShots		(applicationInstance)), "Why??");	// --- Draw lasers
+	gerror_if(errored(::drawCollisions	(applicationInstance)), "Why??");	// --- Draw lasers
 
 	static constexpr	const ::gpk::SCoord2<int32_t>							sizeCharCell								= {9, 16};
 	uint32_t																	lineOffset									= 0;
@@ -223,14 +223,14 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 					::gpk::error_t										updateParticles								(::SApplication& applicationInstance);
  					::gpk::error_t										updateGUI									(::SApplication& applicationInstance);
 					::gpk::error_t										update										(::SApplication& applicationInstance, bool systemRequestedExit)					{ 
-	retval_info_if(1, systemRequestedExit, "Exiting because the runtime asked for close. We could also ignore this value and just continue execution if we don't want to exit.");
+	retval_ginfo_if(1, systemRequestedExit, "Exiting because the runtime asked for close. We could also ignore this value and just continue execution if we don't want to exit.");
 	::gpk::SFramework															& framework									= applicationInstance.Framework;
 	::gpk::error_t																frameworkResult								= ::gpk::updateFramework(framework);
 	ree_if	(errored(frameworkResult), "Unknown error.");
 	rvi_if	(1, frameworkResult == 1, "Framework requested close. Terminating execution.");
 
 	ree_if	(errored(::updateSizeDependentResources	(applicationInstance)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
-	error_if(errored(::updateInput					(applicationInstance)), "Unknown error.");
+	gerror_if(errored(::updateInput					(applicationInstance)), "Unknown error.");
 	if(applicationInstance.Paused)
 		return 0;
 
@@ -239,12 +239,12 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	applicationInstance.ColorBackground.g									= (uint8_t)(windDirection * (applicationInstance.ColorBackground.b / 3.0));
 	applicationInstance.ColorBackground.r									= (uint8_t)(windDirection * (applicationInstance.ColorBackground.b / 3.0));
 
-	error_if(errored(::removeDeadStuff	(applicationInstance)), "Unknown error.");
-	error_if(errored(::updateParticles	(applicationInstance)), "Unknown error.");
-	error_if(errored(::updateSpawn		(applicationInstance, particleDefinitions)), "Unknown error.");
-	error_if(errored(::updateShips		(applicationInstance)), "Unknown error.");
-	error_if(errored(::updateEnemies	(applicationInstance)), "Unknown error.");
-	error_if(errored(::updateShots		(applicationInstance, particleDefinitions)), "Unknown error.");
-	error_if(errored(::updateGUI		(applicationInstance)), "Unknown error.");
+	gerror_if(errored(::removeDeadStuff	(applicationInstance)), "Unknown error.");
+	gerror_if(errored(::updateParticles	(applicationInstance)), "Unknown error.");
+	gerror_if(errored(::updateSpawn		(applicationInstance, particleDefinitions)), "Unknown error.");
+	gerror_if(errored(::updateShips		(applicationInstance)), "Unknown error.");
+	gerror_if(errored(::updateEnemies	(applicationInstance)), "Unknown error.");
+	gerror_if(errored(::updateShots		(applicationInstance, particleDefinitions)), "Unknown error.");
+	gerror_if(errored(::updateGUI		(applicationInstance)), "Unknown error.");
 	return 0;
 }

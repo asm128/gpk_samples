@@ -59,7 +59,7 @@ static constexpr const ::gpk::STriangle3D<float>						geometryCube	[12]						=
 	::gpk::SFramework															& framework									= applicationInstance.Framework;
 	::gpk::SDisplay																& mainWindow								= framework.MainDisplay;
 	framework.Input.create();
-	error_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?????!?!?!?!?");
+	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?????!?!?!?!?");
 
 	static constexpr const ::gpk::SCoord3<float>								cubeCenter									= {0.5f, 0.5f, 0.5f};
 	for(uint32_t iTriangle = 0; iTriangle < 12; ++iTriangle) {
@@ -74,7 +74,7 @@ static constexpr const ::gpk::STriangle3D<float>						geometryCube	[12]						=
 }
 
 					::gpk::error_t										update										(::SApplication& applicationInstance, bool systemRequestedExit)					{
-	retval_info_if(1, systemRequestedExit, "Exiting because the runtime asked for close. We could also ignore this value and just continue execution if we don't want to exit.");
+	retval_ginfo_if(1, systemRequestedExit, "Exiting because the runtime asked for close. We could also ignore this value and just continue execution if we don't want to exit.");
 	::gpk::error_t																frameworkResult								= ::gpk::updateFramework(applicationInstance.Framework);
 	ree_if(errored(frameworkResult), "Unknown error.");
 	rvi_if(1, frameworkResult == 1, "Framework requested close. Terminating execution.");
@@ -183,12 +183,12 @@ struct SCamera {
 		double																		lightFactor									= geometryCubeNormals[iTriangle].Dot(cameraFront);
 		if(lightFactor > 0)
 			continue;
-		error_if(errored(::gpk::drawTriangle(backBuffer->Color.View, triangle3dColorList[iTriangle], triangle2dList[iTriangle])), "Not sure if these functions could ever fail");
+		gerror_if(errored(::gpk::drawTriangle(backBuffer->Color.View, triangle3dColorList[iTriangle], triangle2dList[iTriangle])), "Not sure if these functions could ever fail");
 		//::gpk::drawLine(offscreen.View, (::gpk::SColorBGRA)::gpk::GREEN, ::gpk::SLine2D<int32_t>{triangle2dList[iTriangle].A, triangle2dList[iTriangle].B});
 		//::gpk::drawLine(offscreen.View, (::gpk::SColorBGRA)::gpk::GREEN, ::gpk::SLine2D<int32_t>{triangle2dList[iTriangle].B, triangle2dList[iTriangle].C});
 		//::gpk::drawLine(offscreen.View, (::gpk::SColorBGRA)::gpk::GREEN, ::gpk::SLine2D<int32_t>{triangle2dList[iTriangle].C, triangle2dList[iTriangle].A});
 		//trianglePixelCoords.clear();
-		//error_if(errored(::gpk::drawTriangle(offscreenMetrics, triangle2dList[iTriangle], trianglePixelCoords)), "Not sure if these functions could ever fail");
+		//gerror_if(errored(::gpk::drawTriangle(offscreenMetrics, triangle2dList[iTriangle], trianglePixelCoords)), "Not sure if these functions could ever fail");
 		//for(uint32_t iCoord = 0; iCoord < trianglePixelCoords.size(); ++iCoord)
 		//	::gpk::drawPixelLight(offscreen.View, trianglePixelCoords[iCoord], (::gpk::SColorBGRA)::gpk::BLUE, 0.05f, 2.5);
 		::gpk::drawLine(offscreenMetrics, ::gpk::SLine2D<int32_t>{triangle2dList[iTriangle].A, triangle2dList[iTriangle].B}, wireframePixelCoords);
