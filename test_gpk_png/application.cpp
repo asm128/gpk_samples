@@ -20,54 +20,85 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	::gpk::SDisplay															& mainWindow						= framework.MainDisplay;
 	framework.Input.create();
 	error_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window. %s.", "why?????!?!?!?!?");
-	::gpk::SGUI																& gui								= *framework.GUI;
-	gui.ColorModeDefault												= ::gpk::GUI_COLOR_MODE_3D;
-	gui.ThemeDefault													= ::gpk::ASCII_COLOR_DARKGREEN * 16 + 7;
-	app.IdExit															= ::gpk::controlCreate(gui);
-	::gpk::SControl															& controlExit						= gui.Controls.Controls[app.IdExit];
-	controlExit.Area													= {{}, {64, 20}};
-	controlExit.Border													= {10, 10, 10, 10};
-	controlExit.Margin													= {1, 1, 1, 1};
-	controlExit.Align													= ::gpk::ALIGN_BOTTOM_RIGHT;
-	::gpk::SControlText														& controlText						= gui.Controls.Text[app.IdExit];
-	controlText.Text													= "Exit";
-	controlText.Align													= ::gpk::ALIGN_CENTER;
-	::gpk::SControlConstraints												& controlConstraints				= gui.Controls.Constraints[app.IdExit];
-	controlConstraints.AttachSizeToControl								= {app.IdExit, -1};
-	::gpk::controlSetParent(gui, app.IdExit, -1);
+	{ // Build the exit button
+		::gpk::SGUI																& gui								= *framework.GUI;
+		gui.ColorModeDefault												= ::gpk::GUI_COLOR_MODE_3D;
+		gui.ThemeDefault													= ::gpk::ASCII_COLOR_DARKGREEN * 16 + 7;
+		app.IdExit															= ::gpk::controlCreate(gui);
+		::gpk::SControl															& controlExit						= gui.Controls.Controls[app.IdExit];
+		controlExit.Area													= {{}, {64, 20}};
+		controlExit.Border													= {10, 10, 10, 10};
+		controlExit.Margin													= {1, 1, 1, 1};
+		controlExit.Align													= ::gpk::ALIGN_BOTTOM_RIGHT;
+		::gpk::SControlText														& controlText						= gui.Controls.Text[app.IdExit];
+		controlText.Text													= "Exit";
+		controlText.Align													= ::gpk::ALIGN_CENTER;
+		::gpk::SControlConstraints												& controlConstraints				= gui.Controls.Constraints[app.IdExit];
+		controlConstraints.AttachSizeToControl								= {app.IdExit, -1};
+		::gpk::controlSetParent(gui, app.IdExit, -1);
+	}
 
-	app.PNGImages.resize(::gpk::size(filenames));
-	::gpk::SPNGData															pngDataCacheForFasterLoad;
-	::gpk::array_pod<uint32_t>												sizesUncompressed;
-	//::gpk::array_pod<uint32_t>												sizesRLE;
-	::gpk::array_pod<byte_t>												rleBuffer;
-	//uint32_t																sizeTotalUncompressed				= 0;
-	//uint32_t																sizeTotalRLE						= 0;
-
-	::gpk::array_pod<char_t>												loadedJSONConfig					= {};
-	::gpk::view_const_string												fileNameJSONConfig					= "gpk_config.json";
-	::gpk::view_const_string												pathPNGSuite						= {};
 	{
-		gpk_necall(::gpk::fileToMemory(fileNameJSONConfig, loadedJSONConfig), "Failed to read config JSON file! File not found? File name: %s.", fileNameJSONConfig.begin());
-		::gpk::SJSONReader														jsonReader							= {};
-		gpk_necall(::gpk::jsonParse(jsonReader, ::gpk::view_const_string{loadedJSONConfig.begin(), loadedJSONConfig.size()}), "Failed to read json! Not a valid json file? File name: %s.", fileNameJSONConfig.begin());
-		const int32_t															indexObjectConfig					= ::gpk::jsonArrayValueGet(*jsonReader.Tree[0], 0);	// Get the first JSON {object} found in the [document]
-		gpk_necall(::gpk::jsonExpressionResolve("assets.pngsuite.path", jsonReader, indexObjectConfig, pathPNGSuite), "Failed to get path of PNG files! Last contents found: %s.", pathPNGSuite.begin());
-		info_printf("Path to PNG test files: %s.", pathPNGSuite.begin());
-		::gpk::view_const_string												fileNamePNG							= {};
-		const int32_t															indexJSONNodeArrayPNGFileNames		= ::gpk::jsonExpressionResolve("application.gpk_test_png.images", jsonReader, indexObjectConfig, fileNamePNG);
-		const uint32_t															countFilesToLoad					= (uint32_t)::gpk::jsonArraySize(*jsonReader.Tree[indexJSONNodeArrayPNGFileNames]);
-		gpk_necall(app.PNGImages.resize(countFilesToLoad), "Failed to resize array for %u PNG files.", countFilesToLoad);
-		::gpk::array_pod<char_t>												expression							= {};
-		::gpk::array_pod<char_t>												fullPathPNG							= {};
-		for(uint32_t iFile = 0; iFile < (uint32_t)countFilesToLoad; ++iFile) {
-			expression.resize(4096);
-			expression.resize(sprintf_s(expression.begin(), expression.size(), "application.gpk_test_png.images[%u]", iFile));
-			::gpk::jsonExpressionResolve({expression.begin(), expression.size()}, jsonReader, indexObjectConfig, fileNamePNG);
-			fullPathPNG.clear();
-			::gpk::pathNameCompose(pathPNGSuite, fileNamePNG, fullPathPNG);
-			error_if(errored(::gpk::pngFileLoad(pngDataCacheForFasterLoad, {fullPathPNG.begin(), fullPathPNG.size()}, app.PNGImages[iFile])), "Failed to load file: %s.", fullPathPNG.begin());
+		app.PNGImages.resize(::gpk::size(filenames));
+		::gpk::SPNGData															pngDataCacheForFasterLoad;
+		::gpk::array_pod<char_t>												loadedJSONConfig					= {};
+		::gpk::view_const_string												fileNameJSONConfig					= "gpk_config.json";
+		::gpk::view_const_string												pathPNGSuite						= {};
+		{
+			gpk_necall(::gpk::fileToMemory(fileNameJSONConfig, loadedJSONConfig), "Failed to read config JSON file! File not found? File name: %s.", fileNameJSONConfig.begin());
+			::gpk::SJSONReader														jsonReader							= {};
+			gpk_necall(::gpk::jsonParse(jsonReader, ::gpk::view_const_string{loadedJSONConfig.begin(), loadedJSONConfig.size()}), "Failed to read json! Not a valid json file? File name: %s.", fileNameJSONConfig.begin());
+			const int32_t															indexObjectConfig					= ::gpk::jsonArrayValueGet(*jsonReader.Tree[0], 0);	// Get the first JSON {object} found in the [document]
+			gpk_necall(::gpk::jsonExpressionResolve("assets.pngsuite.path", jsonReader, indexObjectConfig, pathPNGSuite), "Failed to get path of PNG files! Last contents found: %s.", pathPNGSuite.begin());
+			info_printf("Path to PNG test files: %s.", pathPNGSuite.begin());
+			::gpk::view_const_string												fileNamePNG							= {};
+			const int32_t															indexJSONNodeArrayPNGFileNames		= ::gpk::jsonExpressionResolve("application.gpk_test_png.images", jsonReader, indexObjectConfig, fileNamePNG);
+			const uint32_t															countFilesToLoad					= (uint32_t)::gpk::jsonArraySize(*jsonReader.Tree[indexJSONNodeArrayPNGFileNames]);
+			gpk_necall(app.PNGImages.resize(countFilesToLoad), "Failed to resize array for %u PNG files.", countFilesToLoad);
+			::gpk::array_pod<char_t>												expression							= {};
+			::gpk::array_pod<char_t>												fullPathPNG							= {};
+			char																	subscriptExpression	[64]			= {};
+			for(uint32_t iFile = 0; iFile < countFilesToLoad; ++iFile) {
+				const uint32_t															lenExpression						= sprintf_s(subscriptExpression, "[%u]", iFile);	
+				::gpk::jsonExpressionResolve({subscriptExpression, lenExpression}, jsonReader, indexJSONNodeArrayPNGFileNames, fileNamePNG);
+				fullPathPNG.clear();
+				::gpk::pathNameCompose(pathPNGSuite, fileNamePNG, fullPathPNG);
+				error_if(errored(::gpk::pngFileLoad(pngDataCacheForFasterLoad, {fullPathPNG.begin(), fullPathPNG.size()}, app.PNGImages[iFile])), "Failed to load file: %s.", fullPathPNG.begin());
+			}
 		}
+
+		// ---- Test our recently developed RLE algorithm.
+		::gpk::array_pod<uint32_t>												sizesUncompressed;
+		::gpk::array_pod<byte_t>												rleBuffer;
+		::gpk::array_pod<uint32_t>												sizesRLE;
+		uint32_t																sizeTotalUncompressed				= 0;
+		uint32_t																sizeTotalRLE						= 0;
+		for(uint32_t iFile = 0, countFilesToLoad = app.PNGImages.size(); iFile < countFilesToLoad; ++iFile) {
+			::gpk::view_array<::gpk::SColorBGRA>	viewToRLE{app.PNGImages[iFile].View.begin(), app.PNGImages[iFile].View.metrics().x * app.PNGImages[iFile].View.metrics().y};
+			sizesUncompressed.push_back(viewToRLE.size());
+			::gpk::rleEncode(viewToRLE, rleBuffer);
+			sizesRLE.push_back(rleBuffer.size());
+			const uint32_t															sizePNGInBytes			= viewToRLE.size() * sizeof(::gpk::SColorBGRA);
+			info_printf("--- RLE compression stats:"
+				"\nsizePNGRLE          : %u" 
+				"\nsizePNGUncompressed : %u" 
+				"\nratio               : %f" 
+				, rleBuffer.size()
+				, sizePNGInBytes
+				, (float)rleBuffer.size() / sizePNGInBytes
+				);
+			sizeTotalRLE														+= rleBuffer.size();
+			sizeTotalUncompressed												+= sizePNGInBytes;
+			rleBuffer.clear();
+		}
+		info_printf("--- RLE compression stats:"
+			"\nsizeTotalRLE          : %u" 
+			"\nsizeTotalUncompressed : %u" 
+			"\nratio                 : %f" 
+			, sizeTotalRLE          
+			, sizeTotalUncompressed 
+			, (float)sizeTotalRLE / sizeTotalUncompressed
+			);
 	}
 
 
@@ -75,31 +106,8 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	//	::gpk::array_pod<char_t>												fullPathPNG				= {};
 	//	::gpk::pathNameCompose(pathPNGSuite, filenames[iFile], fullPathPNG);
 	//	error_if(errored(::gpk::pngFileLoad(pngDataCacheForFasterLoad, {fullPathPNG.begin(), fullPathPNG.size()}, app.PNGImages[iFile])), "Failed to load file: %s.", fullPathPNG.begin());
-	//	::gpk::view_array<::gpk::SColorBGRA>	viewToRLE{app.PNGImages[iFile].View.begin(), app.PNGImages[iFile].View.metrics().x * app.PNGImages[iFile].View.metrics().y};
-	//	sizesUncompressed.push_back(viewToRLE.size());
-	//	::gpk::rleEncode(viewToRLE, rleBuffer);
-	//	sizesRLE.push_back(rleBuffer.size());
-	//	const uint32_t															sizePNGInBytes			= viewToRLE.size() * sizeof(::gpk::SColorBGRA);
-	//	info_printf("--- RLE compression stats:"
-	//		"\nsizePNGRLE          : %u" 
-	//		"\nsizePNGUncompressed : %u" 
-	//		"\nratio                 : %f" 
-	//		, rleBuffer.size()
-	//		, sizePNGInBytes
-	//		, (float)rleBuffer.size() / sizePNGInBytes
-	//		);
-	//	sizeTotalRLE														+= rleBuffer.size();
-	//	sizeTotalUncompressed												+= sizePNGInBytes;
-	//	rleBuffer.clear();
 	//}
-	//info_printf("--- RLE compression stats:"
-	//	"\nsizeTotalRLE          : %u" 
-	//	"\nsizeTotalUncompressed : %u" 
-	//	"\nratio                 : %f" 
-	//	, sizeTotalRLE          
-	//	, sizeTotalUncompressed 
-	//	, (float)sizeTotalRLE / sizeTotalUncompressed
-	//	);
+
 	return 0;
 }
 

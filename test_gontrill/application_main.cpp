@@ -91,10 +91,10 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 		::gpk::SPNGData															pngDataCacheForFasterLoad;
 		::gpk::array_pod<char_t>												expression										= {};
 		::gpk::array_pod<char_t>												fullPathPNG										= {};
+		char																	subscriptExpression	[64]						= {};
 		for(uint32_t iFile = 0; iFile < ::gpk::min(countFilesToLoad, (uint32_t)GAME_TEXTURE_COUNT); ++iFile) {
-			expression.resize(4096);
-			expression.resize(sprintf_s(expression.begin(), expression.size(), "application.test_gontrill.images[%u]", iFile));
-			::gpk::jsonExpressionResolve({expression.begin(), expression.size()}, jsonReader, indexObjectConfig, fileNamePNG);
+			const uint32_t															lenExpression									= sprintf_s(subscriptExpression, "[%u]", iFile);	//application.test_gontrill.images[%u]
+			::gpk::jsonExpressionResolve({subscriptExpression, lenExpression}, jsonReader, indexJSONNodeArrayPNGFileNames, fileNamePNG);
 			fullPathPNG.clear();
 			::gpk::pathNameCompose(pathPNGSuite, fileNamePNG, fullPathPNG);
 			::setupSprite(app.Textures[iFile], app.TextureCenters[iFile], {fullPathPNG.begin(), fullPathPNG.size()});
