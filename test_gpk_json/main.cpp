@@ -4,7 +4,7 @@
 #define GPK_INFO_PRINTF_ENABLED
 
 #include "gpk_json.h"
-#include "gpk_json_formatter.h"
+#include "gpk_json_expression.h"
 
 ::gpk::error_t								printNode						(::gpk::SJSONNode* node, const ::gpk::view_const_char& testJson)			{
 	char											bufferFormat [1024]				= {};

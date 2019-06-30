@@ -10,7 +10,7 @@
 #include "gpk_view_bit.h"
 #include "gpk_gui_text.h"
 #include "gpk_png.h"
-#include "gpk_json_formatter.h"
+#include "gpk_json_expression.h"
 #include "gpk_storage.h"
 
 #include "gpk_app_impl.h"

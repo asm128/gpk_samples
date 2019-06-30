@@ -3,7 +3,7 @@
 #include "gpk_grid_copy.h"
 #include "gpk_grid_scale.h"
 #include "gpk_encoding.h"
-#include "gpk_json_formatter.h"
+#include "gpk_json_expression.h"
 #include "gpk_storage.h"
 
 //#define GPK_AVOID_LOCAL_APPLICATION_MODULE_MODEL_EXECUTABLE_RUNTIME
