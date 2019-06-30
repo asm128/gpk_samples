@@ -10,6 +10,8 @@
 #include "gpk_view_bit.h"
 #include "gpk_gui_text.h"
 #include "gpk_png.h"
+#include "gpk_json_formatter.h"
+#include "gpk_storage.h"
 
 #include "gpk_app_impl.h"
 
@@ -72,39 +74,49 @@ static				::gpk::error_t										setupSprite									(::gpk::SImageProcessable<
 	return 0;
 }
 
-static				::gpk::error_t										setupSprites								(::SApplication& applicationInstance)											{ 
-	static constexpr	const char*												bmpFileNames	[]							= 
-		{ "Codepage-437-24.png"
-		, "ship_0.png"
-		, "ship_1.png"
-		, "pow_core_0.png"
-		, "pow_core_1.png"
-		, "crosshair_template.png"
-		, "pow_icon_0.png"
-		, "enemy_0.png"
-		};
-	for(uint32_t iSprite = 0, spriteCount = ::gpk::size(bmpFileNames); iSprite < spriteCount; ++iSprite) {
-		char																		temp	[1024];
-		sprintf_s(temp, "..\\gpk_data\\images\\%s", bmpFileNames[iSprite]);
-		::setupSprite(applicationInstance.Textures[iSprite], applicationInstance.TextureCenters[iSprite], temp);
+static				::gpk::error_t										setupSprites								(::SApplication& app)											{ 
+	::gpk::array_pod<char_t>												loadedJSONConfig								= {};
+	::gpk::view_const_string												fileNameJSONConfig								= "gpk_config.json";
+	::gpk::view_const_string												pathPNGSuite									= {};
+	{
+		gpk_necall(::gpk::fileToMemory(fileNameJSONConfig, loadedJSONConfig), "Failed to read config JSON file! File not found? File name: %s.", fileNameJSONConfig.begin());
+		::gpk::SJSONReader														jsonReader										= {};
+		gpk_necall(::gpk::jsonParse(jsonReader, ::gpk::view_const_string{loadedJSONConfig.begin(), loadedJSONConfig.size()}), "Failed to read json! Not a valid json file? File name: %s.", fileNameJSONConfig.begin());
+		const int32_t															indexObjectConfig								= ::gpk::jsonArrayValueGet(*jsonReader.Tree[0], 0);	// Get the first JSON {object} found in the [document]
+		gpk_necall(::gpk::jsonExpressionResolve("assets.images.path", jsonReader, indexObjectConfig, pathPNGSuite), "Failed to get path of image files! Last contents found: %s.", pathPNGSuite.begin());
+		info_printf("Path to PNG test files: %s.", pathPNGSuite.begin());
+		::gpk::view_const_string												fileNamePNG										= {};
+		const int32_t															indexJSONNodeArrayPNGFileNames					= ::gpk::jsonExpressionResolve("application.test_gontrill.images", jsonReader, indexObjectConfig, fileNamePNG);
+		const uint32_t															countFilesToLoad								= (uint32_t)::gpk::jsonArraySize(*jsonReader.Tree[indexJSONNodeArrayPNGFileNames]);
+		::gpk::SPNGData															pngDataCacheForFasterLoad;
+		::gpk::array_pod<char_t>												expression										= {};
+		::gpk::array_pod<char_t>												fullPathPNG										= {};
+		for(uint32_t iFile = 0; iFile < ::gpk::min(countFilesToLoad, (uint32_t)GAME_TEXTURE_COUNT); ++iFile) {
+			expression.resize(4096);
+			expression.resize(sprintf_s(expression.begin(), expression.size(), "application.test_gontrill.images[%u]", iFile));
+			::gpk::jsonExpressionResolve({expression.begin(), expression.size()}, jsonReader, indexObjectConfig, fileNamePNG);
+			fullPathPNG.clear();
+			::gpk::pathNameCompose(pathPNGSuite, fileNamePNG, fullPathPNG);
+			::setupSprite(app.Textures[iFile], app.TextureCenters[iFile], {fullPathPNG.begin(), fullPathPNG.size()});
+		}
 	}
 
-	const ::gpk::view_grid<::gpk::SColorBGRA>									& fontAtlas									= applicationInstance.Textures[GAME_TEXTURE_FONT_ATLAS].Processed.View;
+	const ::gpk::view_grid<::gpk::SColorBGRA>									& fontAtlas									= app.Textures[GAME_TEXTURE_FONT_ATLAS].Processed.View;
 	const ::gpk::SCoord2<uint32_t>												& textureFontMetrics						= fontAtlas.metrics();
-	applicationInstance.TextureFontMonochrome.resize(textureFontMetrics);
+	app.TextureFontMonochrome.resize(textureFontMetrics);
 	for(uint32_t y = 0, yMax = textureFontMetrics.y; y < yMax; ++y)
 	for(uint32_t x = 0, xMax = textureFontMetrics.x; x < xMax; ++x) {
 		const ::gpk::SColorBGRA														& pixelToTest								= fontAtlas[y][x];
-		applicationInstance.TextureFontMonochrome.View[y * textureFontMetrics.x + x]	
+		app.TextureFontMonochrome.View[y * textureFontMetrics.x + x]	
 		=	0 != pixelToTest.r
 		||	0 != pixelToTest.g
 		||	0 != pixelToTest.b
 		;
 	}
-	applicationInstance.StuffToDraw.TexturesPowerup0.push_back(applicationInstance.Textures[GAME_TEXTURE_POWCORESQUARE		].Processed.View);
-	applicationInstance.StuffToDraw.TexturesPowerup0.push_back(applicationInstance.Textures[GAME_TEXTURE_POWICON			].Processed.View);
-	applicationInstance.StuffToDraw.TexturesPowerup1.push_back(applicationInstance.Textures[GAME_TEXTURE_POWCOREDIAGONAL	].Processed.View);
-	applicationInstance.StuffToDraw.TexturesPowerup1.push_back(applicationInstance.Textures[GAME_TEXTURE_POWICON			].Processed.View);
+	app.StuffToDraw.TexturesPowerup0.push_back(app.Textures[GAME_TEXTURE_POWCORESQUARE		].Processed.View);
+	app.StuffToDraw.TexturesPowerup0.push_back(app.Textures[GAME_TEXTURE_POWICON			].Processed.View);
+	app.StuffToDraw.TexturesPowerup1.push_back(app.Textures[GAME_TEXTURE_POWCOREDIAGONAL	].Processed.View);
+	app.StuffToDraw.TexturesPowerup1.push_back(app.Textures[GAME_TEXTURE_POWICON			].Processed.View);
 	return 0;
 }
 
