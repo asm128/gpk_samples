@@ -3,11 +3,14 @@
 #include "gpk_grid_copy.h"
 #include "gpk_grid_scale.h"
 #include "gpk_encoding.h"
+#include "gpk_json_formatter.h"
+#include "gpk_storage.h"
 
 //#define GPK_AVOID_LOCAL_APPLICATION_MODULE_MODEL_EXECUTABLE_RUNTIME
 #include "gpk_app_impl.h"
 
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
+
 
 			::gpk::error_t											cleanup						(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.MainDisplay); }
 			::gpk::error_t											setup						(::gme::SApplication & app)						{
@@ -38,8 +41,24 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	::gpk::array_pod<byte_t>												rleBuffer;
 	uint32_t																sizeTotalUncompressed	= 0;
 	uint32_t																sizeTotalRLE			= 0;
+
+	::gpk::array_pod<char_t>												loadedJSONConfig		= {};
+	::gpk::view_const_string												fileNameJSONConfig		= "gpk_config.json";
+	::gpk::view_const_string												pathPNGSuite			= {};
+	{
+		gpk_necall(::gpk::fileToMemory(fileNameJSONConfig, loadedJSONConfig), "Failed to read config JSON file! File not found? File name: %s.", fileNameJSONConfig.begin());
+		::gpk::SJSONReader														jsonReader				= {};
+		if(loadedJSONConfig.size())
+			info_printf("last json file character: %c (%u)", loadedJSONConfig[loadedJSONConfig.size() -1], (uint32_t)loadedJSONConfig[loadedJSONConfig.size() -1]);
+		gpk_necall(::gpk::jsonParse(jsonReader, ::gpk::view_const_string{loadedJSONConfig.begin(), loadedJSONConfig.size()}), "Failed to read json! Not a valid json file? File name: %s.", fileNameJSONConfig.begin());
+		gpk_necall(::gpk::jsonExpressionResolve("assets.pngsuite.path", jsonReader, ::gpk::jsonArrayValueGet(*jsonReader.Tree[0], 0), pathPNGSuite), "Failed to get path of PNG files! Last contents found: %s.", pathPNGSuite.begin());
+		info_printf("Path to PNG test files: %s.", pathPNGSuite.begin());
+	}
+
 	for(uint32_t iFile = 0; iFile < app.PNGImages.size(); ++iFile) {
-		error_if(errored(::gpk::pngFileLoad(pngDataCacheForFasterLoad, filenames[iFile], app.PNGImages[iFile])), "Failed to load file: %s.", filenames[iFile].begin());
+		::gpk::array_pod<char_t>												fullPathPNG				= {};
+		::gpk::pathNameCompose(pathPNGSuite, filenames[iFile], fullPathPNG);
+		error_if(errored(::gpk::pngFileLoad(pngDataCacheForFasterLoad, {fullPathPNG.begin(), fullPathPNG.size()}, app.PNGImages[iFile])), "Failed to load file: %s.", fullPathPNG.begin());
 		::gpk::view_array<::gpk::SColorBGRA>	viewToRLE{app.PNGImages[iFile].View.begin(), app.PNGImages[iFile].View.metrics().x * app.PNGImages[iFile].View.metrics().y};
 		sizesUncompressed.push_back(viewToRLE.size());
 		::gpk::rleEncode(viewToRLE, rleBuffer);

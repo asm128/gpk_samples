@@ -1,0 +1,16 @@
+[{	"assets": 
+	{	"images"	: { "path" : "..\\gpk_data\\images"	}
+	,	"sounds"	: { "path" : "..\\gpk_data\\sounds"	}
+	,	"scripts"	: { "path" : "..\\gpk_data\\scripts"	}
+	,	"pngsuite"	: { "path" : "..\\gpk_data\\pngsuite"	}
+	},
+	"udp_server": 
+	{	"ip"		: "192.168.0.2"
+	,	"port"		: "9998"
+	},
+	"udp_client": 
+	{	"ip"		: "192.168.0.2"
+	,	"port"		: ""
+	},
+},
+]
