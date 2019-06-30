@@ -6,16 +6,20 @@
 	,	"html"			: { "path" : "../gpk_data/html"		}
 	,	"javascript"	: { "path" : "../gpk_data/js"		}
 	},
-	"udp_server": 
-	{	"ip"		: "192.168.0.2"
-	,	"port"		: "9998"
-	},
-	"udp_client": 
-	{	"ip"		: "192.168.0.2"
-	,	"port"		: ""
-	},
 	"application": 
-	{	"test_gontrill" : 
+	{	
+		"gpk_cgi_rest": 
+		{	"remote_ip"		: "192.168.0.2"
+		,	"remote_port"	: "9798"
+		},
+		"test_udp_client": 
+		{	"remote_ip"		: "192.168.0.2"
+		,	"remote_port"	: "9898"
+		},
+		"test_udp_server": 
+		{	"remote_port"	: "9898"
+		},
+		"test_gontrill" : 
 		{	"images" :
 			[ "Codepage-437-24.png"
 			, "ship_0.png"

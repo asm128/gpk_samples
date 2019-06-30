@@ -1,5 +1,6 @@
 #include "application.h"
 #include "gpk_bitmap_file.h"
+#include "gpk_parse.h"
 
 //#define GPK_AVOID_LOCAL_APPLICATION_MODULE_MODEL_EXECUTABLE_RUNTIME
 #include "gpk_app_impl.h"
@@ -33,10 +34,32 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	controlConstraints.AttachSizeToText.y								= app.IdExit;
 	controlConstraints.AttachSizeToText.x								= app.IdExit;
 	::gpk::controlSetParent(gui, app.IdExit, -1);
-	::gpk::tcpipInitialize();
+	gpk_necall(::gpk::tcpipInitialize(), "Failed to initialize network subsystem: '%s'.", "Unknown error");
 
 	app.Client.AddressConnect											= {};
-	::gpk::tcpipAddress(9998, 0, ::gpk::TRANSPORT_PROTOCOL_UDP, app.Client.AddressConnect);
+	::gpk::tcpipAddress(9998, 0, ::gpk::TRANSPORT_PROTOCOL_UDP, app.Client.AddressConnect);	// If loading the remote IP from the json fails, we fall back to the local address.
+	{ // attempt to load address from config file.
+		const ::gpk::SJSONReader												& jsonReader						= framework.ReaderJSONConfig;
+		const int32_t															indexObjectConfig					= ::gpk::jsonArrayValueGet(*jsonReader.Tree[0], 0);	// Get the first JSON {object} found in the [document]
+		{ // 
+			::gpk::view_const_string												jsonIP								= {};
+			warn_if(errored(::gpk::jsonExpressionResolve("application.test_udp_client.remote_ip", jsonReader, indexObjectConfig, jsonIP)), "Failed to load config from json! Last contents found: %s.", jsonIP.begin())
+			else {
+				info_printf("Remote IP: %s.", jsonIP.begin());
+				error_if(errored(::gpk::tcpipAddress(jsonIP, {}, app.Client.AddressConnect)), "Failed to read IP address from JSON config file: %s.", jsonIP.begin());	// turn the string into a SIPv4 struct.
+			}
+		}
+		{ // load port from config file
+			::gpk::view_const_string												jsonPort							= {};
+			warn_if(errored(::gpk::jsonExpressionResolve("application.test_udp_client.remote_port"	, jsonReader, indexObjectConfig, jsonPort)), "Failed to load config from json! Last contents found: %s.", jsonPort.begin()) 
+			else {
+				uint64_t																port;
+				::gpk::parseIntegerDecimal(jsonPort, &port);
+				app.Client.AddressConnect.Port										= (uint16_t)port;
+				info_printf("Remote port: %u.", (uint32_t)port);
+			}
+		}
+	}
 	::gpk::clientConnect(app.Client);
 	return 0;
 }

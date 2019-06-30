@@ -1,6 +1,7 @@
 #include "application.h"
 #include "gpk_bitmap_file.h"
 #include "gpk_tcpip.h"
+#include "gpk_parse.h"
 
 //#define GPK_AVOID_LOCAL_APPLICATION_MODULE_MODEL_EXECUTABLE_RUNTIME
 #include "gpk_app_impl.h"
@@ -34,7 +35,18 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	controlConstraints.AttachSizeToText.x								= app.IdExit;
 	::gpk::controlSetParent(gui, app.IdExit, -1);
 	::gpk::tcpipInitialize();
-	::gpk::serverStart(app.Server, 9998);
+	uint64_t																port						= 9998;
+	{ // load port from config file
+		::gpk::view_const_string												jsonPort					= {};
+		const ::gpk::SJSONReader												& jsonReader						= framework.ReaderJSONConfig;
+		const int32_t															indexObjectConfig					= ::gpk::jsonArrayValueGet(*jsonReader.Tree[0], 0);	// Get the first JSON {object} found in the [document]
+		warn_if(errored(::gpk::jsonExpressionResolve("application.test_udp_client.remote_port"	, jsonReader, indexObjectConfig, jsonPort)), "Failed to load config from json! Last contents found: %s.", jsonPort.begin()) 
+		else {
+			::gpk::parseIntegerDecimal(jsonPort, &port);
+			info_printf("Remote port: %u.", (uint32_t)port);
+		}
+	}
+	::gpk::serverStart(app.Server, (uint16_t)port);
 	return 0;
 }
 
