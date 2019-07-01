@@ -85,7 +85,6 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 		const int32_t															indexJSONNodeArrayPNGFileNames					= ::gpk::jsonExpressionResolve("application.test_gontrill.images", jsonReader, indexObjectConfig, fileNamePNG);
 		const uint32_t															countFilesToLoad								= (uint32_t)::gpk::jsonArraySize(*jsonReader.Tree[indexJSONNodeArrayPNGFileNames]);
 		::gpk::SPNGData															pngDataCacheForFasterLoad;
-		::gpk::array_pod<char_t>												expression										= {};
 		::gpk::array_pod<char_t>												fullPathPNG										= {};
 		char																	subscriptExpression	[64]						= {};
 		for(uint32_t iFile = 0; iFile < ::gpk::min(countFilesToLoad, (uint32_t)GAME_TEXTURE_COUNT); ++iFile) {

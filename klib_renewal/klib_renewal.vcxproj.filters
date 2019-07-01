@@ -1,0 +1,258 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Entity">
+      <UniqueIdentifier>{0a9aba59-7204-4612-9287-f8d6286269b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tables">
+      <UniqueIdentifier>{4e709622-a683-43fb-b988-f4bb95e8fbe9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Combat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CombatPoints.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CombatStatus.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CharacterPoints.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Menu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Character.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="draw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="menus.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="credits.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityHelper.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityImpl.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityPoints.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="Item.h">
+      <Filter>Tables</Filter>
+    </ClInclude>
+    <ClInclude Include="Armor.h">
+      <Filter>Tables</Filter>
+    </ClInclude>
+    <ClInclude Include="Weapon.h">
+      <Filter>Tables</Filter>
+    </ClInclude>
+    <ClInclude Include="Vehicle.h">
+      <Filter>Tables</Filter>
+    </ClInclude>
+    <ClInclude Include="StageProp.h">
+      <Filter>Tables</Filter>
+    </ClInclude>
+    <ClInclude Include="Profession.h">
+      <Filter>Tables</Filter>
+    </ClInclude>
+    <ClInclude Include="Facility.h">
+      <Filter>Tables</Filter>
+    </ClInclude>
+    <ClInclude Include="Accessory.h">
+      <Filter>Tables</Filter>
+    </ClInclude>
+    <ClInclude Include="Agent_helper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="drawMenu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CharacterTile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tactical_draw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tactical_gameplay.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Squad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TacticalInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerControl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Tile.h">
+      <Filter>Tables</Filter>
+    </ClInclude>
+    <ClInclude Include="TacticalTile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Enemy.h">
+      <Filter>Tables</Filter>
+    </ClInclude>
+    <ClInclude Include="projects.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="helper_projects.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityDetail.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="klib_grid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="klib_text.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="klib_random_generator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="klib_timer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="klib_ascii_display.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="klib_ascii_target.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="klib_fill.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="klib_ascii_color.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="klib_ascii_reference.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="klib_ascii_screen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="klib_input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="klib_draw_misc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Character.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Combat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Enemy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Combat_grenade.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Combat_potion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="draw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="menus.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shop.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tactical.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tactical_ai.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tactical_init.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tactical_gameplay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="menu_research.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="menu_upgrade.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="menu_factory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="menu_equip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="menu_squad.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="projects.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="menu_control_center.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="player.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="klib_text.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="klib_timer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="klib_ascii_display.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="klib_ascii_target.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="klib_ascii_screen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="klib_input.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
