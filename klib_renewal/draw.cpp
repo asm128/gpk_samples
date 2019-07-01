@@ -8,12 +8,12 @@ using namespace klib;
 void drawIntro(SGame& instanceGame);
 
 void										klib::printMultipageHelp										(char* targetASCII, uint32_t targetWidth, uint32_t targetHeight, uint32_t currentPage, uint32_t pageCount, uint32_t posXOffset)					{
-	static const ::gpk::label						textToShow[3]										= 
+	static const ::gpk::view_const_string			textToShow[3]										= 
 		{	"Page down: Next page."						
 		,	"Page up: Previous page."						
 		,	"Page up: Previous page. Page down: Next page"	
 		};
-	::gpk::label									selectedText;
+	::gpk::view_const_string						selectedText;
 		 if(currentPage == 0)				selectedText	= textToShow[0];	
 	else if(currentPage == (pageCount-1))	selectedText	= textToShow[1];	
 	else									selectedText	= textToShow[2];	
