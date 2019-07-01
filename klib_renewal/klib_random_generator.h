@@ -8,7 +8,7 @@ namespace klib
 #pragma pack(push, 1)
 	struct SRandomGenerator {
 				uint64_t					Seed				= 16381;
-//#if defined(NWOL_MTSUPPORT)
+//#if defined(GPK_MTSUPPORT)
 //				refcount_t					Position			= 0;
 //#else
 				uint32_t					Position			= 0;
@@ -23,8 +23,8 @@ namespace klib
 		}
 
 		inline	double						Next				()																										noexcept	{
-//#if defined(NWOL_MTSUPPORT)
-//			return Value						= ::gpk::noiseNormal1D(nwol_sync_increment(Position), Seed);
+//#if defined(GPK_MTSUPPORT)
+//			return Value						= ::gpk::noiseNormal1D(gpk_sync_increment(Position), Seed);
 //#else
 			return Value						= ::gpk::noiseNormal1D(++Position, Seed);
 //#endif

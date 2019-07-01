@@ -27,11 +27,11 @@ void											initPlayerCharacter								(klib::CCharacter& adventurer, const s
 // After leaving the tavern() we display the score of the player.
 int												main											(int argc, char **argv)											{	
 	argc, argv;
-#if defined(NWOL_DEBUG_ENABLED)
-	int													tmp												= _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF|_CRTDBG_LEAK_CHECK_DF|_CRTDBG_DELAY_FREE_MEM_DF);
-	tmp												= (tmp & 0x0000FFFF) | _CRTDBG_CHECK_EVERY_16_DF;	// Clear the upper 16 bits and OR in the desired freqency
+//#if defined(GPK_DEBUG_ENABLED)
+	int													tmp												= _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF|_CRTDBG_LEAK_CHECK_DF);//|_CRTDBG_DELAY_FREE_MEM_DF);
+//	tmp												= (tmp & 0x0000FFFF) | _CRTDBG_CHECK_EVERY_16_DF;	// Clear the upper 16 bits and OR in the desired freqency
 	_CrtSetDbgFlag(tmp);	// Set the new bits
-#endif
+//#endif
 
 	srand((unsigned int)time(NULL));
 

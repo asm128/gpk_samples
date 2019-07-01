@@ -913,9 +913,9 @@ SGameState																drawTacticalScreen								(SGame& instanceGame, const 
 		}
 		else if(currentPlayer.Control.Type == PLAYER_CONTROL_AI)  {
 			selectedAction = selectAIAction(instanceGame);
-#if !(defined(NWOL_DEBUG_ENABLED))
-			Sleep(70);	
-#endif
+//#if !(defined(GPK_DEBUG_ENABLED))
+//			Sleep(70);	
+//#endif
 		}
 		else if(currentPlayer.Control.Type == PLAYER_CONTROL_REMOTE) 
 			selectedAction = selectRemoteAction(instanceGame);
