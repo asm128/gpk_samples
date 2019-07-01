@@ -46,16 +46,16 @@ namespace klib
 	static constexpr		const SEntityPointsMultiplier		g_MultipliersStageProp		= {{  .25,   .25,   .25}, {  .25,   .25,   .25}, {  .25,   .25, {  .25,   .25,   .25},   .25,   .25}, { .25,   .25,  .25,   .1}, 0.125, 0.85, 1.0};
 	static constexpr		const SEntityPointsMultiplier		g_MultipliersTile			= {{  .25,   .25,   .25}, {  .25,   .25,   .25}, {  .25,   .25, {  .25,   .25,   .25},   .25,   .25}, { .25,   .25,  .25,   .1}, 0.125, 0.85, 1.0};
 
-#define DECLARE_ENTITY(_multipliers, _type, _name)																																									\
-	struct S##_name : public ::klib::SEntity { 																																										\
-		using					::klib::SEntity					::SEntity; 																																			\
-																																																					\
-		inline constexpr										S##_name						(void)													{}																\
-		inline constexpr										S##_name						(const SEntity& other)									: SEntity(other)											{}	\
-																																																						\
-		static inline constexpr	::klib::ENTITY_TYPE				getType							()														{ return _type;												}	\
-		static inline const		::gpk::label&					getName							()														{ static const ::gpk::label name = #_name; return name;	}	\
-		static inline constexpr	::klib::SEntityPointsMultiplier	getMultipliers					()														{ return _multipliers;										}	\
+#define DECLARE_ENTITY(_multipliers, _type, _name)																																											\
+	struct S##_name : public ::klib::SEntity { 																																												\
+		using					::klib::SEntity					::SEntity; 																																					\
+																																																							\
+		inline constexpr										S##_name						(void)													{}																		\
+		inline constexpr										S##_name						(const SEntity& other)									: SEntity(other)													{}	\
+																																																								\
+		static inline constexpr	::klib::ENTITY_TYPE				getType							()														{ return _type;														}	\
+		static inline const		::gpk::view_const_string&		getName							()														{ static const ::gpk::view_const_string name = #_name; return name;	}	\
+		static inline constexpr	::klib::SEntityPointsMultiplier	getMultipliers					()														{ return _multipliers;												}	\
 	};
 
 	DECLARE_ENTITY(g_MultipliersProfession	, ENTITY_TYPE_PROFESSION	, Profession	);

@@ -82,7 +82,7 @@ namespace klib
 	}
 
 	template <size_t _Size> 
-	static inline				bool	getMessageSlow			(char (&message)[_Size], const ::gpk::label& textToPrint, double lastFrameSeconds)		{ return ::klib::getMessageSlow(message, textToPrint.begin(), textToPrint.size(), lastFrameSeconds); }
+	static inline				bool	getMessageSlow			(char (&message)[_Size], const ::gpk::view_const_string& textToPrint, double lastFrameSeconds)		{ return ::klib::getMessageSlow(message, textToPrint.begin(), textToPrint.size(), lastFrameSeconds); }
 
 	int32_t								getLines				(const char* source, int32_t maxLen, ::gpk::array_obj<::std::string>& lines_);
 } // namespace

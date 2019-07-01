@@ -4,15 +4,15 @@ namespace klib {
 
 
 	template <typename _TEntity, size_t _Width, size_t _Depth, size_t _SizeDefinitions, size_t _SizeModifiers> 
-	void								drawEntityDetail					(SWeightedDisplay<_Width, _Depth>& display_, int32_t offsetY, int32_t offsetX, const SEntity& entity, const SEntityRecord<_TEntity> (&definitions)[_SizeDefinitions], const SEntityRecord<_TEntity> (&modifiers)[_SizeModifiers], const ::gpk::label& entityTypeName)	{
+	void								drawEntityDetail					(SWeightedDisplay<_Width, _Depth>& display_, int32_t offsetY, int32_t offsetX, const SEntity& entity, const SEntityRecord<_TEntity> (&definitions)[_SizeDefinitions], const SEntityRecord<_TEntity> (&modifiers)[_SizeModifiers], const ::gpk::view_const_string& entityTypeName)	{
 		::std::string							nameAndLevelText					= "-- " + std::string(entityTypeName.begin()) + ": ";	
 		lineToGridColored(display_.Screen, display_.TextAttributes, COLOR_GREEN , offsetY++, offsetX, ::klib::SCREEN_LEFT, nameAndLevelText.c_str(), (uint32_t)nameAndLevelText.size());
 		nameAndLevelText					= getEntityName(entity, definitions, modifiers) + " Lv. " + std::to_string(entity.Level);	
 		lineToGridColored(display_.Screen, display_.TextAttributes, COLOR_YELLOW, ++offsetY, offsetX, ::klib::SCREEN_LEFT, nameAndLevelText.c_str(), (uint32_t)nameAndLevelText.size());
 
 		const SEntityPoints						entityPoints						= getEntityPoints(entity, definitions, modifiers);
-		static const ::gpk::label				formatPoints						= "%-21.21s: %-10.10s";
-		static const ::gpk::label				formatCoins							= "%-21.21s: %-11.11s";
+		static const ::gpk::view_const_string	formatPoints						= "%-21.21s: %-10.10s";
+		static const ::gpk::view_const_string	formatCoins							= "%-21.21s: %-11.11s";
 		char									formattedGauge[32]					= {};
 		offsetY								+= 2;
 		sprintf_s(formattedGauge, "%i", entityPoints.LifeMax.Health				);	printfToGrid(display_.Screen, offsetY++	, offsetX, ::klib::SCREEN_LEFT, formatPoints.begin()	, "Max Health"				, formattedGauge);

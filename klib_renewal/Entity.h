@@ -1,10 +1,9 @@
 #include "EntityPoints.h"
 
 #include "klib_draw_misc.h"
-#include "gpk_label.h"
 
-#ifndef __ENTITY_H__38924092634721346098170219783096__
-#define __ENTITY_H__38924092634721346098170219783096__
+#ifndef KLIB_ENTITY_H__38924092634721346098170219783096__
+#define KLIB_ENTITY_H__38924092634721346098170219783096__
 
 namespace klib
 {
@@ -129,4 +128,4 @@ namespace klib
 #pragma pack(pop)
 };
 
-#endif //__ENTITY_H__38924092634721346098170219783096__
+#endif // KLIB_ENTITY_H__38924092634721346098170219783096__

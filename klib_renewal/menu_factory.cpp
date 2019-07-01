@@ -86,7 +86,6 @@ SGameState													drawFactoryMenu										(SGame& instanceGame, const SGam
 	static	klib::SMenuItem<SEntityResearch>						menuItems			[MAX_RESEARCH_ITEMS]			= {};
 	uint32_t														researchedCount										= 0;
 	char															composite			[256]							= {};
-	char															precompose			[256]							= {};
 	const char														* labelEntityType									= 0;
 
 #define ADD_RESEARCH_DEFINITIONS(place, type, records)																																	\
@@ -106,25 +105,6 @@ SGameState													drawFactoryMenu										(SGame& instanceGame, const SGam
 		++researchedCount;																																								\
 	}
 
-#define ADD_RESEARCH_MODIFIERS(place, type, records, text)																																\
-	labelEntityType												= ::gpk::get_value_label(type).begin();																				\
-	for(uint32_t i=0, count=place.Modifiers.Count; i<count; ++i) {																														\
-		menuItems[researchedCount].ReturnValue.ResearchIndex		= i;																												\
-		menuItems[researchedCount].ReturnValue.IsModifier			= true;																												\
-		int32_t															priceUnit											= records[place.Modifiers[i].Entity].Points.PriceBuy / 2;	\
-		menuItems[researchedCount].ReturnValue.PriceUnit			= priceUnit;																										\
-		menuItems[researchedCount].ReturnValue.PricePaid			= 0;																												\
-		menuItems[researchedCount].ReturnValue.Entity				= {0, place.Modifiers[i].Entity, 1, -1};																			\
-		sprintf_s(precompose, records[place.Modifiers[i].Entity].Name.c_str(), text);																									\
-		sprintf_s(composite, "%s: %s", labelEntityType, precompose);																													\
-		menuItems[researchedCount].ReturnValue.Name					= composite;																										\
-		sprintf_s(composite, "%-40.40s $%i", menuItems[researchedCount].ReturnValue.Name.c_str(), priceUnit);																			\
-		menuItems[researchedCount].Text								= composite;																										\
-		menuItems[researchedCount].ReturnValue.Type					= type;																												\
-		++researchedCount;																																								\
-	}
-
-
 	ADD_RESEARCH_DEFINITIONS(researchedItems.Profession	, ENTITY_TYPE_PROFESSION	, definitionsProfession	);
 	ADD_RESEARCH_DEFINITIONS(researchedItems.Weapon		, ENTITY_TYPE_WEAPON		, definitionsWeapon		);
 	ADD_RESEARCH_DEFINITIONS(researchedItems.Armor		, ENTITY_TYPE_ARMOR			, definitionsArmor		);
@@ -133,6 +113,24 @@ SGameState													drawFactoryMenu										(SGame& instanceGame, const SGam
 	ADD_RESEARCH_DEFINITIONS(researchedItems.Facility	, ENTITY_TYPE_FACILITY		, definitionsFacility	);
 	ADD_RESEARCH_DEFINITIONS(researchedItems.StageProp	, ENTITY_TYPE_STAGE_PROP	, definitionsStageProp	);
 
+//	char															precompose			[256]							= {};
+//#define ADD_RESEARCH_MODIFIERS(place, type, records, text)																																\
+//	labelEntityType												= ::gpk::get_value_label(type).begin();																				\
+//	for(uint32_t i=0, count=place.Modifiers.Count; i<count; ++i) {																														\
+//		menuItems[researchedCount].ReturnValue.ResearchIndex		= i;																												\
+//		menuItems[researchedCount].ReturnValue.IsModifier			= true;																												\
+//		int32_t															priceUnit											= records[place.Modifiers[i].Entity].Points.PriceBuy / 2;	\
+//		menuItems[researchedCount].ReturnValue.PriceUnit			= priceUnit;																										\
+//		menuItems[researchedCount].ReturnValue.PricePaid			= 0;																												\
+//		menuItems[researchedCount].ReturnValue.Entity				= {0, place.Modifiers[i].Entity, 1, -1};																			\
+//		sprintf_s(precompose, records[place.Modifiers[i].Entity].Name.c_str(), text);																									\
+//		sprintf_s(composite, "%s: %s", labelEntityType, precompose);																													\
+//		menuItems[researchedCount].ReturnValue.Name					= composite;																										\
+//		sprintf_s(composite, "%-40.40s $%i", menuItems[researchedCount].ReturnValue.Name.c_str(), priceUnit);																			\
+//		menuItems[researchedCount].Text								= composite;																										\
+//		menuItems[researchedCount].ReturnValue.Type					= type;																												\
+//		++researchedCount;																																								\
+//	}
 //	ADD_RESEARCH_MODIFIERS(researchedItems.Profession	, ENTITY_TYPE_PROFESSION	, modifiersProfession	, "Rank"				);
 //	ADD_RESEARCH_MODIFIERS(researchedItems.Weapon		, ENTITY_TYPE_WEAPON		, modifiersWeapon		, "Science"				);
 //	ADD_RESEARCH_MODIFIERS(researchedItems.Armor		, ENTITY_TYPE_ARMOR			, modifiersArmor		, "Technology"			);

@@ -1,5 +1,7 @@
 #include "Menu.h"
 
+#include <iostream>
+
 #ifndef __GAMEMENU_H__9273409236492316409183763987234__
 #define __GAMEMENU_H__9273409236492316409183763987234__
 
@@ -27,7 +29,7 @@ _ReturnType													displayMenu								(size_t optionCount, const std::strin
 		
 		// Print menu options
 		for(size_t i=0; i<optionCount; i++)
-			printf("%u: %s.\n", (uint32_t)(i+1), menuItems[i].Text.begin());	
+			printf("%u: %s.\n", (uint32_t)(i+1), menuItems[i].Text.c_str());	
 		
 		// Get user input. 
 		const uint32_t													selectedIndex							= (uint32_t)(::getNumericInput()-1);	//	Convert the input string to a menuitem index.

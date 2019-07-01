@@ -10,6 +10,8 @@
 #include "StageProp.h"
 #include "Item.h"
 
+#include <iostream>
+
 //#include "gref_definition.h"
 
 #include <ctime>

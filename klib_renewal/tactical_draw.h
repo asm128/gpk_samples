@@ -266,8 +266,8 @@ namespace klib
 					target.TextAttributes.Cells	[z][x] |= bSwaps[6] ? COLOR_DARKYELLOW : COLOR_ORANGE; 
 				} 
 				else if(board.Tiles.Entities.Props.Cells[z][x].Definition != -1) { 
-					static const ::gpk::label chestLabel	= "Chest";
-					static const ::gpk::label wallLabel		= "Wall";
+					static const ::gpk::view_const_string chestLabel	= "Chest";
+					static const ::gpk::view_const_string wallLabel		= "Wall";
 					if(chestLabel == definitionsStageProp[board.Tiles.Entities.Props.Cells[z][x].Definition].Name) {
 						target.Screen.Cells[z][x] = ::klib::ascii_cards[DECK_CLUBS];
 						target.TextAttributes.Cells[z][x] |= bSwaps[10] ? COLOR_YELLOW : COLOR_BLACK; 

@@ -80,7 +80,7 @@ static int32_t reinitBuyMenus(SGame& instanceGame) {
 	for(size_t i = 0, itemCount = ::gpk::size(	definitionsWeapon		); i<itemCount; ++i){	int32_t indexElement	=	playerInventory.Weapon		.FindElement({	menuItemsWeapon		[i].ReturnValue.Definition, 0, menuItemsWeapon		[i].ReturnValue.Grade, -1}); ::sprintf_s(preformatted, "x%3.3s: %s", ::std::to_string((indexElement != -1) ?	playerInventory.Weapon		[indexElement].Count : 0).c_str(), namesWeapon			[i].begin() );	menuItemsWeapon		[i].Text = preformatted; }
 	for(size_t i = 0, itemCount = ::gpk::size(	definitionsArmor		); i<itemCount; ++i){	int32_t indexElement	=	playerInventory.Armor		.FindElement({	menuItemsArmor		[i].ReturnValue.Definition, 0, menuItemsArmor		[i].ReturnValue.Grade, -1}); ::sprintf_s(preformatted, "x%3.3s: %s", ::std::to_string((indexElement != -1) ?	playerInventory.Armor		[indexElement].Count : 0).c_str(), namesArmor			[i].begin() );	menuItemsArmor		[i].Text = preformatted; }
 	for(size_t i = 0, itemCount = ::gpk::size(	itemDescriptions		); i<itemCount; ++i){	int32_t indexElement	=	playerInventory.Items		.FindElement({	menuItemsItem		[i].ReturnValue.Definition, 0, menuItemsItem		[i].ReturnValue.Grade, -1}); ::sprintf_s(preformatted, "x%3.3s: %s", ::std::to_string((indexElement != -1) ?	playerInventory.Items		[indexElement].Count : 0).c_str(), namesItem			[i].begin() );	menuItemsItem		[i].Text = preformatted; }
-	for(size_t i = 0, itemCount = ::gpk::size(	enemyDefinitions		); i<itemCount; ++i){	menuItemsAgent[i].Text	=	namesAgent[i]; }
+	for(size_t i = 0, itemCount = ::gpk::size(	enemyDefinitions		); i<itemCount; ++i){	menuItemsAgent[i].Text	=	namesAgent[i].begin(); }
 	return 0;
 }
 

@@ -46,7 +46,7 @@ namespace klib
 	}
 
 	template <size_t _ArraySize, typename _ReturnType>
-								_ReturnType					processInput										(const ::klib::SInput& frameInput, uint32_t targetWidth, uint32_t targetHeight, SDrawMenuState& localPersistentState, bool& bResetMenuStuff, bool& bResetTitle, int32_t lineOffset, const klib::SMenuItem<_ReturnType>(&menuItems)[_ArraySize], uint32_t actualOptionCount, uint32_t pageCount, size_t itemOffset, int32_t exitOffset, int32_t numberCharsAvailable, const _ReturnType& noActionValue, const _ReturnType& exitValue, bool disableEscKeyClose, const ::gpk::label& exitText)	{
+								_ReturnType					processInput										(const ::klib::SInput& frameInput, uint32_t targetWidth, uint32_t targetHeight, SDrawMenuState& localPersistentState, bool& bResetMenuStuff, bool& bResetTitle, int32_t lineOffset, const klib::SMenuItem<_ReturnType>(&menuItems)[_ArraySize], uint32_t actualOptionCount, uint32_t pageCount, size_t itemOffset, int32_t exitOffset, int32_t numberCharsAvailable, const _ReturnType& noActionValue, const _ReturnType& exitValue, bool disableEscKeyClose, const ::gpk::view_const_string& exitText)	{
 		bool														bMouseOverExit										= mouseOver(frameInput.Mouse.Deltas.x, frameInput.Mouse.Deltas.y, exitOffset-4, (int32_t)targetHeight-MENU_ROFFSET-1, (int32_t)exitText.size()+4);
 
 		_ReturnType													resultVal											= noActionValue;
@@ -104,7 +104,7 @@ namespace klib
 	}
 
 	template <size_t _ArraySize, typename _ReturnType>
-	_ReturnType												drawMenu											(char* targetASCII, uint16_t* targetAttributes, uint32_t targetWidth, uint32_t targetHeight, uint32_t optionCount, const std::string& title, const klib::SMenuItem<_ReturnType>(&menuItems)[_ArraySize], const ::klib::SInput& frameInput, const _ReturnType& exitValue, const _ReturnType& noActionValue=-1, uint32_t rowWidth=20, bool disableEscKeyClose=false, const ::gpk::label& exitText="Exit this menu") {
+	_ReturnType												drawMenu											(char* targetASCII, uint16_t* targetAttributes, uint32_t targetWidth, uint32_t targetHeight, uint32_t optionCount, const std::string& title, const klib::SMenuItem<_ReturnType>(&menuItems)[_ArraySize], const ::klib::SInput& frameInput, const _ReturnType& exitValue, const _ReturnType& noActionValue=-1, uint32_t rowWidth=20, bool disableEscKeyClose=false, const ::gpk::view_const_string& exitText="Exit this menu") {
 		drawMenu_globals.Timer.Frame();
 
 		optionCount												= (optionCount < _ArraySize) ? optionCount : _ArraySize; // Fix optionCount to the maximum size of the array if optionCount is higher than the allowed size.
@@ -166,7 +166,7 @@ namespace klib
 		const uint32_t												posXOffset											= 0;
 		for(uint32_t i = 0, count = (localPersistentState.MenuItemAccum < actualOptionCount) ? localPersistentState.MenuItemAccum : actualOptionCount; i < count; ++i) {
 			::sprintf_s(numberKey, "%u", (uint32_t)(i+1));
-			actualOffsetX											= ::klib::printfToRect(targetASCII, targetWidth, targetHeight, lineOffset, posXOffset, ::klib::SCREEN_CENTER, formatString, numberKey, menuItems[itemOffset+i].Text.begin());
+			actualOffsetX											= ::klib::printfToRect(targetASCII, targetWidth, targetHeight, lineOffset, posXOffset, ::klib::SCREEN_CENTER, formatString, numberKey, menuItems[itemOffset+i].Text.c_str());
 			if(localPersistentState.CurrentOption == (int32_t)i)
 				for(uint32_t j = 0; j < rowWidth + 1; ++j)
 					targetAttributes[lineOffset * targetWidth + actualOffsetX + j]	= COLOR_YELLOW << 4;
@@ -219,15 +219,15 @@ namespace klib
 
 	template <typename _ReturnType>
 	struct SMenu {
-		::gpk::label				Title;
+		::gpk::view_const_string	Title;
 		uint32_t					RowWidth;
 		_ReturnType					ValueExit;
 		bool						bDisableEscapeKey;
-		::gpk::label				TextExit;
+		::gpk::view_const_string	TextExit;
 		SDrawMenuState				MenuState;
 
-		constexpr					SMenu				(_ReturnType exitValue, const std::string& title, uint32_t rowWidth=24, bool disableEscapeKey=false, const ::gpk::label& exitText="Exit this menu")
-			: Title				({title.data(), (uint32_t)title.size()})
+		constexpr					SMenu				(_ReturnType exitValue, const ::gpk::view_const_string& title, uint32_t rowWidth=24, bool disableEscapeKey=false, const ::gpk::view_const_string& exitText="Exit this menu")
+			: Title				(title)
 			, RowWidth			(rowWidth)
 			, ValueExit			(exitValue)
 			, bDisableEscapeKey	(disableEscapeKey)
