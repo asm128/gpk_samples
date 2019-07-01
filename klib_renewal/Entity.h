@@ -123,7 +123,7 @@ namespace klib
 
 							SEntityPoints					Points				;
 							SEntityFlags					Flags				;
-							::gpk::label					Name				;
+							::gpk::view_const_string		Name				;//::gpk::label					Name				;
 	};
 
 #pragma pack(pop)
