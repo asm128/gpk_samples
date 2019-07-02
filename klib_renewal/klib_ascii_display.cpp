@@ -56,10 +56,8 @@ static constexpr	const ::gpk::SColorRGBA				g_DefaultPalette	[]							=
 	const ::HANDLE												handleConsoleOut								= ::GetStdHandle(STD_OUTPUT_HANDLE);	// Get console output handle
 
 	::CONSOLE_SCREEN_BUFFER_INFOEX								& csbiInfo										= g_ConsoleInfo.InfoScreenBufferCurrent;
-	csbiInfo.dwSize.X										= (::SHORT)width;
-	csbiInfo.dwSize.Y										= (::SHORT)height;
-	csbiInfo.dwMaximumWindowSize.X							= (::SHORT)width;
-	csbiInfo.dwMaximumWindowSize.Y							= (::SHORT)height;
+	csbiInfo.dwSize											= {(::SHORT)width, (::SHORT)height};
+	csbiInfo.dwMaximumWindowSize							= {(::SHORT)width, (::SHORT)height};
 
 	// We're forced to set up the colors at this point because for some reason the GetConsoleScreenBufferInfoEx() function doesn't return the color table properly,
 	// thus they're all 0 when we call SetConsoleScreenBufferInfoEx() causing all the colors to be reset to COLOR_BLACK.
@@ -153,7 +151,7 @@ static constexpr	const ::gpk::SColorRGBA				g_DefaultPalette	[]							=
 	::SetConsoleScreenBufferInfoEx	(hConsoleOut, &g_ConsoleInfo.InfoScreenBufferOriginal	);
 	::FreeConsole();
 	::fclose(stdout);
-	::FILE*										
+	::FILE *										
 	stream													= 0; ::freopen_s	(&stream, "CONIN$", "r+", stdin);
 	stream													= 0; ::fopen_s		(&stream, "CONOUT$", "w+");
 #elif defined(__ANDROID__)
@@ -192,7 +190,7 @@ static constexpr	const ::gpk::SColorRGBA				g_DefaultPalette	[]							=
 		stream													= 0; ::freopen_s(&stream, "CONIN$", "r+", stdin);
 	}
 
-	SetConsoleTitle("No Workflow Overhead Console");
+	SetConsoleTitle("Vulgar Display of Power v0.00.1");
 	::SetConsoleCtrlHandler(::handlerConsoleRoutine, TRUE);
 	const HANDLE												hConsoleOut										= ::GetStdHandle( STD_OUTPUT_HANDLE );
 	::GetCurrentConsoleFontEx		( hConsoleOut, TRUE	, &g_ConsoleInfo.InfoFontOriginal			);
@@ -207,10 +205,8 @@ static constexpr	const ::gpk::SColorRGBA				g_DefaultPalette	[]							=
 	::SetCurrentConsoleFontEx(hConsoleOut, FALSE, &infoFont);
 
 	::CONSOLE_SCREEN_BUFFER_INFOEX								& csbiInfo										= g_ConsoleInfo.InfoScreenBufferCurrent;
-	csbiInfo.srWindow.Top									= 10;
-	csbiInfo.srWindow.Left									= 10;
-	csbiInfo.srWindow.Right									= 800;
-	csbiInfo.srWindow.Bottom								= 600;
+	csbiInfo.srWindow										= {10, 10, 800, 600};
+
 	::initWindowsConsoleProperties(frontBufferWidth, frontBufferHeight, g_DefaultPalette);
 	g_ConsoleInfo.Created									= true;
 	g_ConsoleInfo.SystemOwned								= createdConsole ? false : true;

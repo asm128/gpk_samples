@@ -143,7 +143,7 @@ int											main						()	{
 			"\n		},"
 			"\n		{ \"name\" : \"Charles\""
 			"\n		 , \"property\" : "
-			"\n			{ \"color\" : \"blue\", \"age\" : 132 }"
+			"\n			{ \"color\" : \"blue\", \"age\" : 95 }"
 			"\n		},"
 			"\n		],"
 			"\n	},"
