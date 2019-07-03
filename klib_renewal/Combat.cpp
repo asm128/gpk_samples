@@ -165,21 +165,15 @@ COMBAT_STATUS klib::applyAttackStatus(CCharacter& target, COMBAT_STATUS weaponSt
 }
 
 int32_t klib::applyArmorReflect(CCharacter& attacker, CCharacter& targetReflecting, int32_t damageDealt, const std::string& sourceName) {
-	//targetReflecting.RecalculateFinalPoints	();
-	//targetReflecting.RecalculateFinalFlags	();
-
-	const SEntityPoints	& targetFinalPoints	= targetReflecting.FinalPoints	;
 	const SEntityFlags	& targetFinalFlags	= targetReflecting.FinalFlags	;
-
-		if( 0 == damageDealt 
-		||	0 == (targetFinalFlags.Effect.Defend & DEFEND_EFFECT_REFLECT) 
-		||	0 >= targetReflecting.Points.LifeCurrent.Shield 
-		||	0 >= attacker.Points.LifeCurrent.Health
-		||	0 >= targetReflecting.Points.LifeCurrent.Health
-		)
+	if( 0 == damageDealt 
+	 ||	0 == (targetFinalFlags.Effect.Defend & DEFEND_EFFECT_REFLECT) 
+	 ||	0 >= targetReflecting.Points.LifeCurrent.Shield 
+	 ||	0 >= attacker.Points.LifeCurrent.Health
+	 ||	0 >= targetReflecting.Points.LifeCurrent.Health
+	 )
 		return 0;
 
-	//printf("\n");
 	const std::string	targetArmorName			= getArmorName	(targetReflecting.CurrentEquip.Armor);
 
 	if(damageDealt > 0)
@@ -240,10 +234,6 @@ SLifePoints applyUnshieldableDamage(CCharacter& attacker, CCharacter& target, co
 }
 
 ::klib::SLifePoints klib::applySuccessfulHit(::klib::CCharacter& attacker, ::klib::CCharacter& target, int32_t damage, bool bAddStatus, ::klib::COMBAT_STATUS grenadeStatus, int32_t statusTurns, const ::std::string& sourceName) {
-	return applySuccessfulHit(attacker, target, damage, getArmorAbsorption(target.CurrentEquip.Armor), bAddStatus, grenadeStatus, statusTurns, sourceName);
-}
-
-::klib::SLifePoints klib::applySuccessfulHit(::klib::CCharacter& attacker, ::klib::CCharacter& target, int32_t damage, int32_t absorptionRate, bool bAddStatus, ::klib::COMBAT_STATUS grenadeStatus, int32_t statusTurns, const ::std::string& sourceName) {
 	SLifePoints finalDamage = klib::applyShieldableDamage(target, damage, sourceName);
 	klib::applyArmorReflect(attacker, target, finalDamage.Shield, sourceName);
 	
@@ -274,14 +264,10 @@ SLifePoints applyUnshieldableDamage(CCharacter& attacker, CCharacter& target, co
 	return finalDamage;
 }
 
-void klib::applySuccessfulWeaponHit(CCharacter& attacker, CCharacter& targetReflecting, int32_t damageDealt, const std::string& sourceName) {
-	applySuccessfulWeaponHit(attacker, targetReflecting, damageDealt, getArmorAbsorption(targetReflecting.CurrentEquip.Armor), sourceName);
-}
 
 void klib::applyWeaponLeechEffects(CCharacter& attacker, CCharacter& targetReflecting, const SLifePoints& finalDamage, const std::string& sourceName) {
 	SEntityPoints	&		attackerPoints			= attacker.FinalPoints;
 	SEntityFlags	&		attackerFlags			= attacker.FinalFlags;
-	ATTACK_EFFECT			attackerWeaponEffect	= attackerFlags.Effect.Attack;
 	applyWeaponLeech(ATTACK_EFFECT_LEECH_HEALTH	, attackerFlags.Effect.Attack, finalDamage.Health	, attackerPoints.LifeMax.Health	, attacker.Points.LifeCurrent.Health	, attacker.Name	, targetReflecting.Name	, sourceName, "Health", "drains", "loses" );
 	applyWeaponLeech(ATTACK_EFFECT_LEECH_MANA	, attackerFlags.Effect.Attack, finalDamage.Mana		, attackerPoints.LifeMax.Mana	, attacker.Points.LifeCurrent.Mana		, attacker.Name	, targetReflecting.Name	, sourceName, "Mana", "drains", "loses" );
 	applyWeaponLeech(ATTACK_EFFECT_LEECH_SHIELD	, attackerFlags.Effect.Attack, finalDamage.Shield	, attackerPoints.LifeMax.Shield	, attacker.Points.LifeCurrent.Shield	, attacker.Name	, targetReflecting.Name	, sourceName, "Shield", "steals", "gives" );
@@ -290,7 +276,7 @@ void klib::applyWeaponLeechEffects(CCharacter& attacker, CCharacter& targetRefle
 	targetReflecting	.Recalculate();
 }
 
-void klib::applySuccessfulWeaponHit(CCharacter& attacker, CCharacter& targetReflecting, int32_t damageDealt, int32_t absorptionRate, const std::string& sourceName) {
+void klib::applySuccessfulWeaponHit(CCharacter& attacker, CCharacter& targetReflecting, int32_t damageDealt, const std::string& sourceName) {
 	if(targetReflecting.FinalFlags.Effect.Defend & DEFEND_EFFECT_BLIND)	{
 		applyAttackStatus(attacker, COMBAT_STATUS_BLIND, 1, getArmorName(targetReflecting.CurrentEquip.Armor));
 	}
@@ -298,9 +284,8 @@ void klib::applySuccessfulWeaponHit(CCharacter& attacker, CCharacter& targetRefl
 	if( 0 == damageDealt )
 		return;
 
-	const	SEntityPoints	&	attackerPoints	= attacker.FinalPoints	;
 	const	SEntityFlags	&	attackerFlags	= attacker.FinalFlags	;
-	const	SLifePoints			finalDamage 	= applySuccessfulHit(attacker, targetReflecting, damageDealt, absorptionRate, attackerFlags.Status.Inflict != COMBAT_STATUS_NONE, attackerFlags.Status.Inflict, 1, sourceName);
+	const	SLifePoints			finalDamage 	= applySuccessfulHit(attacker, targetReflecting, damageDealt, attackerFlags.Status.Inflict != COMBAT_STATUS_NONE, attackerFlags.Status.Inflict, 1, sourceName);
 
 	// Apply combat bonuses from weapon for successful hits.
 	const SEntityPoints attackerWeaponPoints = getWeaponPoints(attacker.CurrentEquip.Weapon);

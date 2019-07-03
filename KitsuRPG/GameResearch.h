@@ -40,7 +40,6 @@ void																		research
 	adventurerMaxEquip.Level													= (adventurerMaxEquip.Level			> 1) ? adventurerMaxEquip.Level			: 1;
 
 	int32_t																			menuItemCount										= 0; 
-	int32_t																			duplicatedSamples									= 0;
 	for( uint32_t i=0, count = equipInventory.Count; i<count; ++i ) {
 		int32_t																			value												= 0;
 		const char																		* stringLeft										= nullptr

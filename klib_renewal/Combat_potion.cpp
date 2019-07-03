@@ -19,8 +19,6 @@ bool									potionRestore						(CCharacter& potionDrinker, const int32_t potion
 	
 	potionDrinker.Recalculate();
 	
-	const SEntityPoints							& finalPoints						= potionDrinker.FinalPoints;
-	
 	printf("The potion restores %u %s to %s! %s now has %u %s.\n", itemEffectValue, pointName.c_str(), potionDrinker.Name.c_str(), potionDrinker.Name.c_str(), currentPoints, pointName.c_str());
 	return true;
 }

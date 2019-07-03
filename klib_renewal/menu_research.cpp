@@ -29,7 +29,7 @@ SGameState drawResearchMenu(SGame& instanceGame, const SGameState& returnState)
 #define GET_AVAILABLE_RESEARCH_FOR_ENTITY(EntityToken_, ProgressiveDefinitions_, ProgressiveModifiers_)							\
 		generateResearchableList(researchableItems.EntityToken_, playerInventory.EntityToken_, researchCompleted.EntityToken_	\
 			, queuedResearch																									\
-			, ProgressiveDefinitions_, ProgressiveModifiers_, researchCompleted.EntityToken_.MaxResearch);						\
+			, ProgressiveDefinitions_, ProgressiveModifiers_);						\
 		for(iAgent=0; iAgent<armySize; ++iAgent)																				\
 		{																														\
 			if( 0 == player.Army[iAgent] )																						\
@@ -41,8 +41,8 @@ SGameState drawResearchMenu(SGame& instanceGame, const SGameState& returnState)
 				, playerAgent.Goods.Inventory.EntityToken_ 																		\
 				, researchCompleted.EntityToken_																				\
 				, queuedResearch																								\
-				, ProgressiveDefinitions_, ProgressiveModifiers_, researchCompleted.EntityToken_.MaxResearch								\
-			);																													\
+				, ProgressiveDefinitions_, ProgressiveModifiers_							\
+				);																													\
 		}																														\
 																																\
 		researchableDefinitions	+= researchableItems.EntityToken_.Definitions.Count;											\
@@ -51,7 +51,7 @@ SGameState drawResearchMenu(SGame& instanceGame, const SGameState& returnState)
 #define GET_AVAILABLE_RESEARCH_FOR_ENTITY_NO_EQUIP(EntityToken_, ProgressiveDefinitions_, ProgressiveModifiers_)				\
 		generateResearchableList(researchableItems.EntityToken_, playerInventory.EntityToken_, researchCompleted.EntityToken_	\
 			, queuedResearch																									\
-			, ProgressiveDefinitions_, ProgressiveModifiers_, researchCompleted.EntityToken_.MaxResearch);						\
+			, ProgressiveDefinitions_, ProgressiveModifiers_);						\
 		for(iAgent=0; iAgent<armySize; ++iAgent)																				\
 		{																														\
 			if( 0 == player.Army[iAgent] )																						\
@@ -62,8 +62,8 @@ SGameState drawResearchMenu(SGame& instanceGame, const SGameState& returnState)
 				, playerAgent.Goods.Inventory.EntityToken_ 																		\
 				, researchCompleted.EntityToken_																				\
 				, queuedResearch																								\
-				, ProgressiveDefinitions_, ProgressiveModifiers_, researchCompleted.EntityToken_.MaxResearch					\
-			);																													\
+				, ProgressiveDefinitions_, ProgressiveModifiers_																\
+				);																												\
 		}																														\
 																																\
 		researchableDefinitions	+= researchableItems.EntityToken_.Definitions.Count;											\
@@ -168,7 +168,7 @@ SGameState drawResearchMenu(SGame& instanceGame, const SGameState& returnState)
 		, {"No action selected", -1}
 		, 55U
 		);
-	if(selectedChoice.ResearchIndex == researchableCount)
+	if(selectedChoice.ResearchIndex == (int32_t)researchableCount)
 		return {GAME_STATE_WELCOME_COMMANDER};
 
 	if(selectedChoice.ResearchIndex == -1)

@@ -344,11 +344,11 @@ namespace klib
 			int32_t messageColor = COLOR_GREEN;
 			int32_t offsetX = 4;
 			if((curLine+=2) >= 0 && (curLine < bbHeight))
-				::klib::printfToRectColored((char_t*)display, width, depth, textAttributes, messageColor, curLine, 0, ::klib::SCREEN_CENTER, "-- %s --", deadCharacter.Name.begin());
+				::klib::printfToRectColored((char_t*)display, width, depth, textAttributes, (uint16_t)messageColor, curLine, 0, ::klib::SCREEN_CENTER, "-- %s --", deadCharacter.Name.begin());
 
 			messageColor = COLOR_DARKGREY;
 			if((curLine+=2) >= 0 && curLine < bbHeight)
-				offsetX = printfToRectColored((char_t*)display, width, depth, textAttributes, messageColor, curLine, 3, ::klib::SCREEN_LEFT, format1
+				offsetX = printfToRectColored((char_t*)display, width, depth, textAttributes, (uint16_t)messageColor, curLine, 3, ::klib::SCREEN_LEFT, format1
 					, bufferDamageDealt			
 					, bufferDamageTaken			
 					, bufferTurnsPlayed			
@@ -358,7 +358,7 @@ namespace klib
 					//, bufferEscapesFailed		
 					);
 			if((curLine+=1) >= 0 && curLine < bbHeight)
-				::klib::printfToRectColored((char_t*)display, width, depth, textAttributes, messageColor, curLine, offsetX, ::klib::SCREEN_LEFT, format2
+				::klib::printfToRectColored((char_t*)display, width, depth, textAttributes, (uint16_t)messageColor, curLine, offsetX, ::klib::SCREEN_LEFT, format2
 					, bufferEnemiesKilled		
 					, bufferAttacksHit			
 					, bufferAttacksMissed		
@@ -368,7 +368,7 @@ namespace klib
 					, bufferGrenadesUsed		
 					);
 			if((curLine+=1) >= 0 && curLine < bbHeight)
-				::klib::printfToRectColored((char_t*)display, width, depth, textAttributes, messageColor, curLine, offsetX, ::klib::SCREEN_LEFT, format3
+				::klib::printfToRectColored((char_t*)display, width, depth, textAttributes, (uint16_t)messageColor, curLine, offsetX, ::klib::SCREEN_LEFT, format3
 					, bufferMoneyEarned			
 					, bufferMoneySpent			
 					);

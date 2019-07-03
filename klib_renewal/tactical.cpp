@@ -542,21 +542,21 @@ int32_t																	initInventoryMenu								(klib::CCharacter& adventurer, 
 	return 0;
 }
 
-int32_t																	drawInventoryMenu								(SGame& instanceGame, SPlayer& player, klib::CCharacter& adventurer, const std::string& menuTitle)								{
+int32_t																	drawInventoryMenu								(SGame& instanceGame, klib::CCharacter& adventurer, const std::string& menuTitle)								{
 	::klib::SMenuItem<int32_t>													itemOptions[MAX_INVENTORY_SLOTS+1]				= {};
 	SGlobalDisplay&																globalDisplay									= instanceGame.GlobalDisplay;
 	SCharacterInventory&														characterInventory								= adventurer.Goods.Inventory;
-	int32_t																		initMenu										= initInventoryMenu(adventurer, itemOptions, false, false);
+	//int32_t																		initMenu										= 
+		initInventoryMenu(adventurer, itemOptions, false, false);
 	return drawMenu(instanceGame.GlobalDisplay.Screen, &globalDisplay.TextAttributes.Cells[0][0], characterInventory.Items.Count, menuTitle, itemOptions, instanceGame.FrameInput, (int32_t)adventurer.Goods.Inventory.Items.Count, -1, 50);
 		
 };
 
 TURN_ACTION																useItems										(SGame& instanceGame, SPlayer& player, klib::CCharacter& user, const std::string& menuTitle, bool bIsAIControlled) {
 	int32_t																		indexInventory									= ~0U;
-	SCharacterInventory															& characterInventory							= user.Goods.Inventory;
 	bool																		bUsedItem										= false;
 	if(!bIsAIControlled)  {
-		indexInventory															= drawInventoryMenu(instanceGame, player, user, menuTitle);
+		indexInventory															= drawInventoryMenu(instanceGame, user, menuTitle);
 		if(indexInventory < (int32_t)user.Goods.Inventory.Items.Count)
 			bUsedItem																= true;
 	}
@@ -724,8 +724,10 @@ void																	updateBullets									(SGame& instanceGame)									{
 						if(bKeepBulleting) {
 							if(tacticalInfo.Board.Tiles.IsTileAvailable(newBulletPos.Cell.x, newBulletPos.Cell.z)) {									  
 								bool																		bAdded1											= tacticalInfo.Board.Shots.Bullet.AddElement(newBullet);
-								if(bAdded1)
-									bool																		bAdded2											= tacticalInfo.Board.Shots.Coords.AddElement(newBulletPos.Cell);
+								if(bAdded1) {
+									//bool																		bAdded2											= 
+									tacticalInfo.Board.Shots.Coords.AddElement(newBulletPos.Cell);
+								}
 							}
 						}
 					}
@@ -751,8 +753,8 @@ void																	updateBullets									(SGame& instanceGame)									{
 					newAOE.Flags.Effect.Attack												= newBullet.Points.Effect;
 					newAOE.Flags.Tech														= newBullet.Points.Tech;
 					newAOE.StatusInflict													= newBullet.Points.StatusInflict;
-					newAOE.Level															= newBullet.Points.Level;
-					newAOE.TurnsLeft														= newBullet.Points.Level;
+					newAOE.Level															= (uint8_t)newBullet.Points.Level;
+					newAOE.TurnsLeft														= (uint8_t)newBullet.Points.Level;
 					tacticalInfo.AddAOE(newAOE);
 					if(::gpk::bit_true(newBullet.Points.Tech.AmmoEffect, AMMO_EFFECT_EXPLOSIVE)) {
 						int32_t y=0;
@@ -796,8 +798,7 @@ void																	updateBullets									(SGame& instanceGame)									{
 									if(proportion <= 1.0)
 										tileGeometry.fHeight[3]	-= (float)(newAOE.RadiusOrHalfSize/2*(1.0-proportion));
 
-									if(false)
-									{
+									if(false) {
 										tileGeometry.fHeight[0] = (float)(int32_t)(tileGeometry.fHeight[0]);
 										tileGeometry.fHeight[1] = (float)(int32_t)(tileGeometry.fHeight[1]);
 										tileGeometry.fHeight[2] = (float)(int32_t)(tileGeometry.fHeight[2]);
@@ -835,8 +836,7 @@ void																	updateBullets									(SGame& instanceGame)									{
 						}
 					}
 				}
-				else if(bImpact) 
-				{
+				else if(bImpact) {
 
 				}
 			}

@@ -64,7 +64,6 @@ namespace klib
 		,	const ::gpk::array_obj		<SEntityResearch>			& queuedResearch
 		,	bool													bIsParallelDefinition		
 		,	bool													bIsParallelModifier		
-		,	const _EntityType										& maxResearch	
 		)
 	{
 		if(entity.Definition && -1 == researchCompleted.Definitions.FindElement(entity.Definition) && (bIsParallelDefinition || entity.Definition <= (researchCompleted.MaxResearch.Definition+1)) ) {
@@ -105,12 +104,11 @@ namespace klib
 		,	const ::gpk::array_obj				<SEntityResearch>		& queuedResearch
 		,	bool													bIsParallelDefinition		
 		,	bool													bIsParallelModifier		
-		,	const _EntityType										& maxResearch	
 		)
 	{
 		for(uint32_t iSlot = 0; iSlot < playerInventory.Count; ++iSlot) {
 			const _EntityType																					& entity				= playerInventory[iSlot].Entity;
-			addIfResearchable( researchableItems, entity, researchCompleted, queuedResearch, bIsParallelDefinition, bIsParallelModifier, maxResearch );
+			addIfResearchable(researchableItems, entity, researchCompleted, queuedResearch, bIsParallelDefinition, bIsParallelModifier);
 		}
 	}
 
@@ -123,11 +121,10 @@ namespace klib
 		,	const ::gpk::array_obj				<SEntityResearch>		& queuedResearch
 		,	bool													bIsParallelDefinition		
 		,	bool													bIsParallelModifier		
-		,	const _EntityType										& maxResearch	
 		)
 	{
-		addIfResearchable		(researchableItems, equippedEntity, researchCompleted, queuedResearch, bIsParallelDefinition, bIsParallelModifier, maxResearch);
-		generateResearchableList(researchableItems, agentInventory, researchCompleted, queuedResearch, bIsParallelDefinition, bIsParallelModifier, maxResearch);
+		addIfResearchable		(researchableItems, equippedEntity, researchCompleted, queuedResearch, bIsParallelDefinition, bIsParallelModifier);
+		generateResearchableList(researchableItems, agentInventory, researchCompleted, queuedResearch, bIsParallelDefinition, bIsParallelModifier);
 	}
 
 
@@ -136,13 +133,12 @@ namespace klib
 		(	klib::SResearchGroup			<_EntityType>			& researchableItems
 		,	const klib::SEntityContainer	<_EntityType, _Size>	& agentInventory
 		,	const klib::SResearchGroup		<_EntityType>			& researchCompleted
-		,	const ::gpk::array_obj				<SEntityResearch>		& queuedResearch
+		,	const ::gpk::array_obj				<SEntityResearch>	& queuedResearch
 		,	bool													bIsParallelDefinition		
 		,	bool													bIsParallelModifier		
-		,	const _EntityType										& maxResearch	
 		)
 	{
-		generateResearchableList(researchableItems, agentInventory, researchCompleted, queuedResearch, bIsParallelDefinition, bIsParallelModifier, maxResearch);
+		generateResearchableList(researchableItems, agentInventory, researchCompleted, queuedResearch, bIsParallelDefinition, bIsParallelModifier);
 	}
 
 } // namespace

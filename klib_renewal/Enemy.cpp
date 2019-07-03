@@ -16,7 +16,6 @@
 template<typename _TEntity, typename _TEntityRecord, size_t _SizeDefinitions, size_t _SizeModifiers>
 void											setupAgentEquip					
 	( _TEntity							& currentEnemyCurrentEquip
-	, klib::SResearchGroup<_TEntity>	& agentCompletedResearch
 	, const _TEntity					& templateAgentCurrentEquip
 	, const _TEntityRecord				(&definitionsTable	)[_SizeDefinitions	]
 	, const _TEntityRecord				(&modifiersTable	)[_SizeModifiers	] 
@@ -26,9 +25,9 @@ void											setupAgentEquip
 	defin											= ( defin <= 2 ) ? (rand() % 3) + 1 : defin + ((rand() % 3) - 1); 
 	modif											= ( modif <= 2 ) ? (rand() % 3) + 1 : modif + ((rand() % 3) - 1); 
 		
-	currentEnemyCurrentEquip.Definition				= ::gpk::max(::gpk::min( defin, (int32_t)::gpk::size( definitionsTable	) - 1), 1);	
-	currentEnemyCurrentEquip.Modifier				= ::gpk::max(::gpk::min( modif, (int32_t)::gpk::size( modifiersTable	) - 1), 1);
-	currentEnemyCurrentEquip.Level					= ::gpk::max(templateAgentCurrentEquip.Level	+ ((rand() % 3) - 2), 1);
+	currentEnemyCurrentEquip.Definition				= (int16_t)::gpk::max(::gpk::min( defin, (int32_t)::gpk::size( definitionsTable	) - 1), 1);	
+	currentEnemyCurrentEquip.Modifier				= (int16_t)::gpk::max(::gpk::min( modif, (int32_t)::gpk::size( modifiersTable	) - 1), 1);
+	currentEnemyCurrentEquip.Level					= (int16_t)::gpk::max(templateAgentCurrentEquip.Level	+ ((rand() % 3) - 2), 1);
 }
 
 void											klib::completeAgentResearch										(::klib::CCharacter& agent)									{
@@ -46,10 +45,10 @@ void											klib::setupAgent												(const CCharacter& adventurer, CChara
 			currentEnemy.Goods.Inventory.Items.AddElement({ 1+int16_t(rand()%(::gpk::size(itemDescriptions)-1)), 1+int16_t(rand()%(::gpk::size(itemModifiers)-1)), int16_t(rand() % ::gpk::size(itemGrades)) });
 
 	currentEnemy.Goods.CompletedResearch			= SCharacterResearch();
-	setupAgentEquip(currentEnemy.CurrentEquip.Profession	, currentEnemy.Goods.CompletedResearch.Profession	, adventurer.CurrentEquip.	Profession		, definitionsProfession	, modifiersProfession	);			
-	setupAgentEquip(currentEnemy.CurrentEquip.Weapon		, currentEnemy.Goods.CompletedResearch.Weapon		, adventurer.CurrentEquip.	Weapon			, definitionsWeapon		, modifiersWeapon		);	
-	setupAgentEquip(currentEnemy.CurrentEquip.Armor			, currentEnemy.Goods.CompletedResearch.Armor		, adventurer.CurrentEquip.	Armor			, definitionsArmor		, modifiersArmor		);	
-	setupAgentEquip(currentEnemy.CurrentEquip.Accessory		, currentEnemy.Goods.CompletedResearch.Accessory	, adventurer.CurrentEquip.	Accessory		, definitionsAccessory	, modifiersAccessory	);	
+	setupAgentEquip(currentEnemy.CurrentEquip.Profession	, adventurer.CurrentEquip.	Profession		, definitionsProfession	, modifiersProfession	);			
+	setupAgentEquip(currentEnemy.CurrentEquip.Weapon		, adventurer.CurrentEquip.	Weapon			, definitionsWeapon		, modifiersWeapon		);	
+	setupAgentEquip(currentEnemy.CurrentEquip.Armor			, adventurer.CurrentEquip.	Armor			, definitionsArmor		, modifiersArmor		);	
+	setupAgentEquip(currentEnemy.CurrentEquip.Accessory		, adventurer.CurrentEquip.	Accessory		, definitionsAccessory	, modifiersAccessory	);	
 	completeAgentResearch(currentEnemy);
 
 	currentEnemy.CurrentEquip.Vehicle				= {0,0,1,-1};	

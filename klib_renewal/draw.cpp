@@ -47,7 +47,6 @@ void										drawStateBackground				( SGame& instanceGame )																				
 	}
 }
 
-SGameState									drawMemorial					(SGame& instanceGame, const SGameState& returnState)																												{ return returnState; }
 void										klib::drawAndPresentGame		(SGame& instanceGame, ::klib::SASCIITarget& target)																													{
 	static ::klib::STimer							frameMeasure;
 	static ::klib::STimer							animTimer;
@@ -209,14 +208,13 @@ void										klib::drawAndPresentGame		(SGame& instanceGame, ::klib::SASCIITarg
 
 void										drawIntro						( SGame& instanceGame ) {
 	drawFireBackground(instanceGame.PostEffectDisplay, instanceGame.FrameTimer.LastTimeSeconds);
-
-	int32_t											displayWidth					= (int32_t)instanceGame.PostEffectDisplay.Width;
 	int32_t											displayDepth					= (int32_t)instanceGame.PostEffectDisplay.Depth;
 
-	static ::std::string							words			[]				= {"Vulgar", "Display", "of", "Power"};
+	static const	::std::string					words			[]				= {"Vulgar", "Display", "of", "Power"};
 	for( uint32_t i=0; i < ::gpk::size(words); ++i) {
 		uint32_t										offsetY							= (uint32_t)((displayDepth >> 1)-(::gpk::size(words) >> 1) + i * 2);
-		uint32_t										offsetX							= printfToGridColored(instanceGame.PostEffectDisplay.Screen, instanceGame.PostEffectDisplay.TextAttributes, COLOR_ORANGE, offsetY, 0, ::klib::SCREEN_CENTER, "%s", words[i].c_str());
+		//uint32_t										offsetX							= 
+			printfToGridColored(instanceGame.PostEffectDisplay.Screen, instanceGame.PostEffectDisplay.TextAttributes, COLOR_ORANGE, offsetY, 0, ::klib::SCREEN_CENTER, "%s", words[i].c_str());
 	}
 }
 

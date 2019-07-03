@@ -6,7 +6,7 @@
 
 using namespace klib;
 
-SGameState														drawSquadSetupMenu									(SGame& instanceGame, const SGameState& returnValue)												{
+SGameState														drawSquadSetupMenu									(SGame& instanceGame)												{
 	drawSquadSlots(instanceGame);
 	SPlayer																& player											= instanceGame.Players[PLAYER_INDEX_USER];
 
@@ -28,13 +28,13 @@ SGameState														drawSquadSetupMenu									(SGame& instanceGame, const S
 	}
 
 	int32_t																result												= drawMenu(instanceGame.GlobalDisplay.Screen, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], player.Squad.Size, "Squad setup", menuItems, instanceGame.FrameInput, (int32_t)::gpk::size(player.Squad.Agents), -1, ::gpk::max(24, maxNameLen+4));
-	if(::gpk::size(player.Squad.Agents) == result)
+	if(::gpk::size(player.Squad.Agents) == (uint32_t)result)
 		return {GAME_STATE_WELCOME_COMMANDER};
 
 	if( result < 0 || result >= (int32_t)::gpk::size(player.Squad.Agents) )
 		return {GAME_STATE_MENU_SQUAD_SETUP};
 
-	player.Selection.PlayerUnit										= result;
+	player.Selection.PlayerUnit										= (int16_t)result;
 
 	if( player.Squad.Agents[result] != -1 && 0 == instanceGame.FrameInput.Keys[VK_LSHIFT] )
 		return {GAME_STATE_MENU_EQUIPMENT};

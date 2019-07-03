@@ -95,6 +95,8 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\..\nwol\nwol; ..\..\nwol\gods; ..\klib_renewal; ..\..\gpk\llc; ..\..\gpk\gpk; </AdditionalIncludeDirectories>
       <AdditionalOptions>/permissive-</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -114,6 +116,8 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\..\nwol\nwol; ..\..\nwol\gods; ..\klib_renewal; ..\..\gpk\llc; ..\..\gpk\gpk; </AdditionalIncludeDirectories>
       <AdditionalOptions>/permissive-</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -135,6 +139,8 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\..\nwol\nwol; ..\..\nwol\gods; ..\klib_renewal; ..\..\gpk\llc; ..\..\gpk\gpk; </AdditionalIncludeDirectories>
       <AdditionalOptions>/permissive-</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -158,6 +164,8 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\..\nwol\nwol; ..\..\nwol\gods; ..\klib_renewal; ..\..\gpk\llc; ..\..\gpk\gpk; </AdditionalIncludeDirectories>
       <AdditionalOptions>/permissive-</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

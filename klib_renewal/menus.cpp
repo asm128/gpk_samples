@@ -20,7 +20,7 @@ CONSOLE_FONT_INFOEX getFontParams()
 	return infoFont;
 }
 
-SGameState processMenuReturn(SGame& instanceGame, const SGameState& returnValue_)
+SGameState processMenuReturn(const SGameState& returnValue_)
 {
 	SGameState returnValue;
 	static bool bSmallFonts = false;
@@ -55,15 +55,14 @@ SGameState processMenuReturn(SGame& instanceGame, const SGameState& returnValue_
 	return returnValue;
 }
 
-SGameState processMenuReturn(SGame& instanceGame, TURN_ACTION returnValue) {
+SGameState processMenuReturn(TURN_ACTION returnValue) {
 	switch(returnValue) { 
 	case TURN_ACTION_CONTINUE:
 	default: return {GAME_STATE_TACTICAL_CONTROL, };
 	}
 }
 
-void handleSubstateChange(SGame& instanceGame, const SGameState& newState, const SGameState& prevState) 
-{
+void handleSubstateChange(SGame& instanceGame, const SGameState& newState) {
 	::klib::clearASCIIBackBuffer(' ', COLOR_WHITE);
 	instanceGame.GlobalDisplay		.Clear();
 	//instanceGame.TacticalDisplay	.Clear();	
@@ -121,7 +120,7 @@ void handleStateChange(SGame& instanceGame, const SGameState& newState, const SG
 		if(newState.Substate == GAME_SUBSTATE_RESET) {
 			instanceGame.StateMessage = "Welcome commander";
 			resetGame(instanceGame);
-			handleSubstateChange(instanceGame, newState, prevState);
+			handleSubstateChange(instanceGame, newState);
 		}
 		else {
 			instanceGame.StateMessage = "Welcome back commander";
@@ -181,11 +180,11 @@ void updateState(SGame& instanceGame, const SGameState& newState)
 	}
 	else if(newState.Substate != instanceGame.State.Substate) {
 		instanceGame.State.Substate	= newState.Substate;
-		handleSubstateChange(instanceGame, instanceGame.State, instanceGame.PreviousState);
+		handleSubstateChange(instanceGame, instanceGame.State);
 	}
 }
 
-SGameState drawSquadSetupMenu	(SGame& instanceGame, const SGameState& returnState);
+SGameState drawSquadSetupMenu	(SGame& instanceGame);
 SGameState drawResearch			(SGame& instanceGame, const SGameState& returnState);
 SGameState drawWelcome			(SGame& instanceGame, const SGameState& returnState);
 SGameState drawBuy				(SGame& instanceGame, const SGameState& returnState);
@@ -208,24 +207,24 @@ void klib::showMenu(SGame& instanceGame) {
 	switch(instanceGame.State.State) {
 	case GAME_STATE_MENU_MAIN			:	
 		if( ::gpk::bit_true(instanceGame.Flags, GAME_FLAGS_STARTED) )
-			newAction = processMenuReturn(instanceGame, drawMenu(globalDisplay.Screen, &globalDisplay.TextAttributes[0][0], menuMainInGame, optionsMainInGame, instanceGame.FrameInput, instanceGame.State));	
+			newAction = processMenuReturn(drawMenu(globalDisplay.Screen, &globalDisplay.TextAttributes[0][0], menuMainInGame, optionsMainInGame, instanceGame.FrameInput, instanceGame.State));	
 		else													
-			newAction = processMenuReturn(instanceGame, drawMenu(globalDisplay.Screen, &globalDisplay.TextAttributes[0][0], menuMain, optionsMain, instanceGame.FrameInput, instanceGame.State));	
+			newAction = processMenuReturn(drawMenu(globalDisplay.Screen, &globalDisplay.TextAttributes[0][0], menuMain, optionsMain, instanceGame.FrameInput, instanceGame.State));	
 
 		break;
 
-	case GAME_STATE_MENU_OPTIONS		:	newAction = processMenuReturn(instanceGame, drawMenu(globalDisplay.Screen, &globalDisplay.TextAttributes.Cells[0][0], menuConfig, optionsConfig, instanceGame.FrameInput, instanceGame.State ));	break;
-	case GAME_STATE_MENU_EQUIPMENT		:	newAction = processMenuReturn(instanceGame, drawEquip(instanceGame, instanceGame.State));	break;
-	case GAME_STATE_MENU_SELL			:	newAction = processMenuReturn(instanceGame, drawMenu(globalDisplay.Screen, &globalDisplay.TextAttributes[0][0], menuSell, optionsSell, instanceGame.FrameInput, instanceGame.State ));	break;
-	case GAME_STATE_MENU_LAN_MISSION	:	//newAction = processMenuReturn(instanceGame, drawLANSetup		(instanceGame, instanceGame.State));	break;
-	case GAME_STATE_START_MISSION		:	newAction = processMenuReturn(instanceGame, drawTacticalScreen	(instanceGame, instanceGame.State));	break;
-	case GAME_STATE_TACTICAL_CONTROL	:	newAction = processMenuReturn(instanceGame, drawTacticalScreen	(instanceGame, instanceGame.State));	break;
-	case GAME_STATE_MENU_SQUAD_SETUP	:	newAction = processMenuReturn(instanceGame, drawSquadSetupMenu	(instanceGame, instanceGame.State));	break;
-	case GAME_STATE_WELCOME_COMMANDER	:	newAction = processMenuReturn(instanceGame, drawWelcome			(instanceGame, instanceGame.State));	break;
-	case GAME_STATE_MENU_RESEARCH		:	newAction = processMenuReturn(instanceGame, drawResearch		(instanceGame, instanceGame.State));	break;
-	case GAME_STATE_MENU_BUY			:	newAction = processMenuReturn(instanceGame, drawBuy				(instanceGame, instanceGame.State));	break;
-	case GAME_STATE_MENU_UPGRADE		:	newAction = processMenuReturn(instanceGame, drawFactory			(instanceGame, instanceGame.State));	break;
-	case GAME_STATE_MENU_FACTORY		:	newAction = processMenuReturn(instanceGame, drawFactory			(instanceGame, instanceGame.State));	break;
+	case GAME_STATE_MENU_OPTIONS		:	newAction = processMenuReturn(drawMenu(globalDisplay.Screen, &globalDisplay.TextAttributes.Cells[0][0], menuConfig, optionsConfig, instanceGame.FrameInput, instanceGame.State ));	break;
+	case GAME_STATE_MENU_EQUIPMENT		:	newAction = processMenuReturn(drawEquip(instanceGame, instanceGame.State));	break;
+	case GAME_STATE_MENU_SELL			:	newAction = processMenuReturn(drawMenu(globalDisplay.Screen, &globalDisplay.TextAttributes[0][0], menuSell, optionsSell, instanceGame.FrameInput, instanceGame.State ));	break;
+	case GAME_STATE_MENU_LAN_MISSION	:	//newAction = processMenuReturn(drawLANSetup		(instanceGame, instanceGame.State));	break;
+	case GAME_STATE_START_MISSION		:	newAction = processMenuReturn(drawTacticalScreen	(instanceGame, instanceGame.State));	break;
+	case GAME_STATE_TACTICAL_CONTROL	:	newAction = processMenuReturn(drawTacticalScreen	(instanceGame, instanceGame.State));	break;
+	case GAME_STATE_MENU_SQUAD_SETUP	:	newAction = processMenuReturn(drawSquadSetupMenu	(instanceGame));	break;
+	case GAME_STATE_WELCOME_COMMANDER	:	newAction = processMenuReturn(drawWelcome			(instanceGame, instanceGame.State));	break;
+	case GAME_STATE_MENU_RESEARCH		:	newAction = processMenuReturn(drawResearch		(instanceGame, instanceGame.State));	break;
+	case GAME_STATE_MENU_BUY			:	newAction = processMenuReturn(drawBuy				(instanceGame, instanceGame.State));	break;
+	case GAME_STATE_MENU_UPGRADE		:	newAction = processMenuReturn(drawFactory			(instanceGame, instanceGame.State));	break;
+	case GAME_STATE_MENU_FACTORY		:	newAction = processMenuReturn(drawFactory			(instanceGame, instanceGame.State));	break;
 	
 	case GAME_STATE_MEMORIAL			:	
 		if(instanceGame.FrameInput.Keys[VK_ESCAPE]) 

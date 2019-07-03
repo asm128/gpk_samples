@@ -179,8 +179,6 @@ SGameState drawBuy(SGame& instanceGame, const SGameState& returnState)
 	}
 	else 
 		return drawBuyMenu(instanceGame, returnState);
-
-	return returnState;
 };
 
 

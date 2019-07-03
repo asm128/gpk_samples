@@ -47,8 +47,6 @@ bool										klib::useGrenade						(const SItem& itemGrenade, CCharacter& throw
 
 	const SEntityPoints								& finalPointsThrower					= thrower	.FinalPoints; 
 	const SEntityPoints								& finalPointsTarget						= target	.FinalPoints;
-	const SEntityFlags								& finalFlagsThrower						= thrower	.FinalFlags;
-	const SEntityFlags								& finalFlagsTarget						= target	.FinalFlags;
 
 	int32_t											itemEffectValue							= int32_t(finalPointsTarget .LifeMax.Health*(0.2f*itemGrade));
 	int32_t											itemEffectValueSelf						= int32_t(finalPointsThrower.LifeMax.Health*(0.2f*itemGrade)) >> 1;
@@ -57,10 +55,6 @@ bool										klib::useGrenade						(const SItem& itemGrenade, CCharacter& throw
 
 	::printf("%s throws %s to %s.\n", thrower.Name.c_str(), ::klib::getItemName(itemGrenade).c_str(), target.Name.c_str());
 	bool											bAddStatus								= false;
-
-	int32_t											targetArmorAbsorption					= ::klib::getArmorAbsorption(target.CurrentEquip.Armor), finalPassthroughDamage = 0, reflectedDamage = 0;
-	DEFEND_EFFECT									attackerArmorEffect						= finalFlagsThrower.Effect.Defend;
-	DEFEND_EFFECT									targetArmorEffect						= finalFlagsTarget.Effect.Defend;
 
 	PROPERTY_TYPE									grenadeProperty							= itemDescription.Property;
 	COMBAT_STATUS									grenadeStatus							= ::getGrenadeStatusFromProperty(grenadeProperty);

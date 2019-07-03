@@ -75,7 +75,8 @@ namespace klib
 	template<typename _tCell, typename... _Args>
 	int32_t											printfToGridColored				( ::gpk::view_grid<_tCell>& display, ::gpk::view_grid<uint16_t>& textAttributes, uint16_t messageColor, int32_t offsetLine, int32_t offsetColumn, ::klib::ALIGN_SCREEN align, const char* format, _Args&&... args ) {
 		char												precookStr[1024]				= {};
-		int32_t												precookLen						= ::sprintf_s(precookStr, format, args...);
+		//int32_t												precookLen						= 
+			::sprintf_s(precookStr, format, args...);
 		int32_t												actualX							= ::klib::lineToGridColored(display, textAttributes, messageColor, offsetLine, offsetColumn, align, precookStr);
 		return actualX;
 	}

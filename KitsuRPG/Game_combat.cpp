@@ -189,7 +189,7 @@ void																	assignDrops					(klib::CCharacter& winner, klib::CCharacter
 
 }
 
-void																	determineOutcome			(klib::CCharacter& adventurer, klib::CCharacter& enemy, int32_t enemyType)								{
+void																	determineOutcome			(klib::CCharacter& adventurer, klib::CCharacter& enemy)								{
 		// Determine the outcome of the battle and give rewards if applicable.
 	if (adventurer.Points.LifeCurrent.Health <= 0) 
 		assignDrops(enemy, adventurer, false);
@@ -215,6 +215,7 @@ enum TURN_OUTCOME
 bool																	useSkills					(::klib::CCharacter& attacker, ::klib::CCharacter& target)												{
 	printf("\n");
 	printf("Skills are not implemented yet.\n");
+	(void)attacker; (void)target;
 	return false;
 }
 
@@ -367,7 +368,7 @@ TURN_OUTCOME															playerTurn					(::klib::CCharacter& adventurer, ::kli
 	return turnOutcome;
 }
 
-TURN_ACTION																resolveAI					(klib::CCharacter& enemy, klib::CCharacter& adventurer)													{
+TURN_ACTION																resolveAI					(klib::CCharacter& enemy)													{
 	TURN_ACTION																	action						= TURN_ACTION_ATTACK;
 	if(enemy.Goods.Inventory.Items.Count)
 		action																	= (rand()%2) ? action : TURN_ACTION_INVENTORY;
@@ -380,7 +381,7 @@ TURN_ACTION																resolveAI					(klib::CCharacter& enemy, klib::CCharac
 TURN_OUTCOME															enemyTurn					(klib::CCharacter& enemy, klib::CCharacter& adventurer)													{
 	TURN_OUTCOME																turnOutcome					= TURN_OUTCOME_CONTINUE;
 	while (turnOutcome == TURN_OUTCOME_CONTINUE) {	// this while() process the input for this turn until the user enters a valid choice and then exits to the outer loop for executing the attack turn.
-		const TURN_ACTION															actionChoice				= (TURN_ACTION)resolveAI(enemy, adventurer);
+		const TURN_ACTION															actionChoice				= (TURN_ACTION)resolveAI(enemy);
 		turnOutcome																= characterTurn(actionChoice, enemy, adventurer, true);
 	}
 	return turnOutcome;
@@ -429,13 +430,13 @@ void																	combat						(::klib::CCharacter& adventurer, int32_t enemyT
 			turnOutcome															= enemyTurn(currentEnemy, adventurer);
 	}
 
-	determineOutcome(adventurer, currentEnemy, enemyType);
+	determineOutcome(adventurer, currentEnemy);
 
 	if(pEnemy)
 		delete(pEnemy);
 }
 
-int32_t																	selectItemsPlayer			(klib::CCharacter& user, klib::CCharacter& target)														{
+int32_t																	selectItemsPlayer			(klib::CCharacter& user)														{
 	int32_t indexInventory = user.Goods.Inventory.Items.Count;	// this initial value exits the menu
 
 	klib::SMenuItem<int32_t>													itemOptions[MAX_INVENTORY_SLOTS+1]	;
@@ -450,7 +451,7 @@ int32_t																	selectItemsPlayer			(klib::CCharacter& user, klib::CChar
 	itemOptions[user.Goods.Inventory.Items.Count].Text						= "Back to combat options";
 	indexInventory															= displayMenu(user.Goods.Inventory.Items.Count+1, "Select an item to use", itemOptions);
 
-	if(indexInventory == user.Goods.Inventory.Items.Count)	// exit option
+	if(indexInventory == (int32_t)user.Goods.Inventory.Items.Count)	// exit option
 		indexInventory															= user.Goods.Inventory.Items.Count;	// Exit menu
 	else if (user.Goods.Inventory.Items[indexInventory].Count <= 0) {
 		printf("You don't have anymore of that. Use something else...\n"); 
@@ -479,7 +480,7 @@ int32_t																	selectItemsPlayer			(klib::CCharacter& user, klib::CChar
 }
 
 
-int32_t																	selectItemsAI				(klib::CCharacter& user, klib::CCharacter& target)														{
+int32_t																	selectItemsAI				(klib::CCharacter& user)														{
 	int32_t																		indexInventory				= (int32_t)(rand() % user.Goods.Inventory.Items.Count);
 
 	const ::klib::SItem															& entityItem				= user.Goods.Inventory.Items[indexInventory].Entity;
@@ -515,12 +516,12 @@ bool																	useItems					(klib::CCharacter& user, klib::CCharacter& tar
 	::std::string																userMessage					= "%s";
 	bool																		bUsedItem					= false;
 	if(!bIsAIControlled) {
-		indexInventory															= selectItemsPlayer(user, target);
+		indexInventory															= selectItemsPlayer(user);
 		if(indexInventory < user.Goods.Inventory.Items.Count)
 			bUsedItem																= true;
 	}
 	else { // not a player so execute choice by AI
-		indexInventory															= selectItemsAI(user, target);
+		indexInventory															= selectItemsAI(user);
 		if(indexInventory < user.Goods.Inventory.Items.Count)
 			bUsedItem																= true;
 	}

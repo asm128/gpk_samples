@@ -15,9 +15,9 @@ namespace klib
 	int32_t					applyArmorReflect							(::klib::CCharacter& attacker	, ::klib::CCharacter& targetReflecting		, int32_t damageDealt																												, const ::std::string& sourceName);
 	void					applyCombatBonus							(::klib::CCharacter& character	, const ::klib::SEntityPoints& combatBonus																																		, const ::std::string& sourceName);
 	void					applyWeaponLeechEffects						(::klib::CCharacter& attacker	, ::klib::CCharacter& targetReflecting		, const ::klib::SLifePoints& finalDamage																							, const ::std::string& sourceName);
-	::klib::SLifePoints		applySuccessfulHit							(::klib::CCharacter& thrower	, ::klib::CCharacter& target				, int32_t damage				, int32_t absorptionRate, bool bAddStatus, ::klib::COMBAT_STATUS grenadeStatus, int32_t statusTurns	, const ::std::string& sourceName);
+	//::klib::SLifePoints		applySuccessfulHit							(::klib::CCharacter& thrower	, ::klib::CCharacter& target				, int32_t damage				, int32_t absorptionRate, bool bAddStatus, ::klib::COMBAT_STATUS grenadeStatus, int32_t statusTurns	, const ::std::string& sourceName);
 	::klib::SLifePoints		applySuccessfulHit							(::klib::CCharacter& thrower	, ::klib::CCharacter& target				, int32_t damage				, bool bAddStatus, ::klib::COMBAT_STATUS grenadeStatus, int32_t statusTurns							, const ::std::string& sourceName);
-	void					applySuccessfulWeaponHit					(::klib::CCharacter& attacker	, ::klib::CCharacter& targetReflecting		, int32_t damageDealt			, int32_t absorptionRate																			, const ::std::string& sourceName);
+	//void					applySuccessfulWeaponHit					(::klib::CCharacter& attacker	, ::klib::CCharacter& targetReflecting		, int32_t damageDealt			, int32_t absorptionRate																			, const ::std::string& sourceName);
 	void					applySuccessfulWeaponHit					(::klib::CCharacter& attacker	, ::klib::CCharacter& targetReflecting		, int32_t damageDealt																												, const ::std::string& sourceName);
 	bool					attack										(::klib::CCharacter& attacker	, ::klib::CCharacter& target);
 	void					applyTurnStatus								(::klib::CCharacter& character);

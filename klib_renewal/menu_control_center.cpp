@@ -58,7 +58,7 @@ int32_t drawList(SGlobalDisplay& display, const ::gpk::array_obj<SListItem<_TRet
 	return 0;
 }
 
-int32_t processEquipAgentInput(SGlobalDisplay& display, const ::klib::SInput& frameInput, const SPlayer& player, uint32_t rowCount, int32_t offsetY, int32_t offsetX) {
+int32_t processEquipAgentInput(const ::klib::SInput& frameInput, const SPlayer& player, uint32_t rowCount, int32_t offsetY, int32_t offsetX) {
 	const int32_t mouseX = frameInput.Mouse.Deltas.x; 
 	const int32_t mouseY = frameInput.Mouse.Deltas.y; 
 	int32_t indexEquip = -1;
@@ -87,11 +87,11 @@ int32_t drawAgentResume(SGlobalDisplay& display, const CCharacter& agent, int32_
 	std::string equipName;
 
 	finalColor = (selectedAgentField == ENTITY_TYPE_CHARACTER) ? (genderColor<<4)|COLOR_DARKGREY : (COLOR_DARKGREY<<4)|genderColor;											
-	columnOffset = printfToGridColored(display.Screen, display.TextAttributes, finalColor, offsetY++, offsetX, ::klib::SCREEN_LEFT, " %c - %-38.38s", ::klib::ascii_gender[agent.Flags.Tech.Gender], agent.Name.c_str());
+	columnOffset = printfToGridColored(display.Screen, display.TextAttributes, (uint16_t)finalColor, offsetY++, offsetX, ::klib::SCREEN_LEFT, " %c - %-38.38s", ::klib::ascii_gender[agent.Flags.Tech.Gender], agent.Name.c_str());
 
 	SListItem<int32_t> equipSlots[4];
 	for(uint32_t i=0; i<::gpk::size(equipSlots); ++i)
-		equipSlots[i].Color = (selectedAgentField == i+1) ? COLOR_GREEN : COLOR_GREEN << 4; 
+		equipSlots[i].Color = (selectedAgentField == (int32_t)i + 1) ? COLOR_GREEN : COLOR_GREEN << 4; 
 
 	equipName = getProfessionName	(agent.CurrentEquip.Profession	);	sprintf_s(formatted, " %-10.10s: %-30.30s", "Job"		, equipName.c_str());	equipSlots[ENTITY_TYPE_PROFESSION	-1].Text = std::string(formatted);
 	equipName = getWeaponName		(agent.CurrentEquip.Weapon		);	sprintf_s(formatted, " %-10.10s: %-30.30s", "Weapon"	, equipName.c_str());	equipSlots[ENTITY_TYPE_WEAPON		-1].Text = std::string(formatted);
@@ -107,7 +107,7 @@ int32_t drawAgentResume(SGlobalDisplay& display, const CCharacter& agent, int32_
 	return 0;
 }
 
-int32_t processSliderInput(const ::klib::SInput& frameInput, int32_t offsetY, int32_t offsetX, int32_t& value, int32_t minValue, int32_t maxValue, int32_t labelMaxLen) {
+int32_t processSliderInput(const ::klib::SInput& frameInput, int32_t offsetY, int32_t offsetX, int32_t& value, int32_t minValue, int32_t maxValue) {
 	int32_t mouseX = frameInput.Mouse.Deltas.x; 
 	int32_t mouseY = frameInput.Mouse.Deltas.y; 
 		 if( mouseOver(mouseX, mouseY, offsetX+11, offsetY, 3) && frameInput.Mouse.Buttons[0]) {if( value > minValue ) --value; }
@@ -131,18 +131,18 @@ void drawBalance(SGlobalDisplay& display, const ::klib::SInput& frameInput, SPla
 	printfToGridColored(display.Screen, display.TextAttributes, COLOR_YELLOW << 4, offsetY, offsetX+14, ::klib::SCREEN_LEFT, "%s", "    Project budgets   ");
 	drawValueSlider		(display	, offsetY+2, offsetX+14, player.Projects.BudgetProduction	.Money	, 10, "Production");
 	drawValueSlider		(display	, offsetY+4, offsetX+14, player.Projects.BudgetResearch		.Money	, 10, "Research");
-	processSliderInput	(frameInput	, offsetY+2, offsetX+14, player.Projects.BudgetProduction	.Money	, 0, 100, 10);
-	processSliderInput	(frameInput	, offsetY+4, offsetX+14, player.Projects.BudgetResearch		.Money	, 0, 100, 10);
+	processSliderInput	(frameInput	, offsetY+2, offsetX+14, player.Projects.BudgetProduction	.Money	, 0, 100);
+	processSliderInput	(frameInput	, offsetY+4, offsetX+14, player.Projects.BudgetResearch		.Money	, 0, 100);
 
 	// Funds/Costs
 	int32_t funds			= player.Money;
 	int32_t cost			= ::klib::missionCost(player, player.Squad, player.Squad.Size);
 	int32_t fundsAfterCost	= funds - cost;
 
-	int32_t productionCost	= (int32_t)(fundsAfterCost* (player.Projects.BudgetProduction	.Money/100.0));
+	int32_t productionCost	= (int32_t)(fundsAfterCost * (player.Projects.BudgetProduction.Money / 100.0));
 	productionCost			= ::gpk::max(0, ::gpk::min(productionCost, player.Projects.CostProduction	));
 
-	int32_t researchCost	= (int32_t)((fundsAfterCost-productionCost)*(player.Projects.BudgetResearch.Money/100.0));
+	int32_t researchCost	= (int32_t)((fundsAfterCost - productionCost) * (player.Projects.BudgetResearch.Money / 100.0));
 	researchCost			= ::gpk::max(0, ::gpk::min(researchCost, player.Projects.CostResearch		));
 
 	char formatted[64];
@@ -154,7 +154,7 @@ void drawBalance(SGlobalDisplay& display, const ::klib::SInput& frameInput, SPla
 	SListItem<int32_t> balanceOptions[5] = {};
 
 	for(uint32_t i=0; i<::gpk::size(balanceOptions); ++i)
-		balanceOptions[i].Color = (selectedIndex == i) ? COLOR_GREEN : COLOR_GREEN << 4; 
+		balanceOptions[i].Color = (selectedIndex == (int32_t)i) ? COLOR_GREEN : COLOR_GREEN << 4; 
 	
 	char preformatted[16];
 	sprintf_s(preformatted, "%i", funds										);	sprintf_s(formatted, " Funds               : %13.13s", preformatted); balanceOptions[0].Text = std::string(formatted); 
@@ -170,8 +170,8 @@ void drawBalance(SGlobalDisplay& display, const ::klib::SInput& frameInput, SPla
 template <typename _TEntity, size_t _DefinitionCount, size_t _ModifierCount>
 int32_t drawEquipDetail
 (	SGlobalDisplay& display
-,	const SPlayer& player
-,	const CCharacter& agent
+//,	const SPlayer& player
+//,	const CCharacter& agent
 ,	int32_t offsetY
 ,	int32_t offsetX
 ,	const ::gpk::label& entityTypeName
@@ -180,13 +180,13 @@ int32_t drawEquipDetail
 ,	const SEntityRecord<_TEntity>(&tableModifiers	)[_ModifierCount]
 )
 {
-	const std::string& entityName = ::getEntityName(entity, tableDefinitions, tableModifiers); 
+	//const std::string& entityName = ::getEntityName(entity, tableDefinitions, tableModifiers); 
 	::drawEntityDetail(display, offsetY, offsetX, entity, tableDefinitions, tableModifiers, entityTypeName);
 	
 	char formattedTitle[32] = {};
 	sprintf_s(formattedTitle, " - %s:", entityTypeName.begin());
 	for(uint32_t i=4, count= (uint32_t)::gpk::size(formattedTitle); i<count; ++i)
-		formattedTitle[i] = tolower(formattedTitle[i]);
+		formattedTitle[i] = (char)::tolower(formattedTitle[i]);
 
 	printfToGridColored(display.Screen, display.TextAttributes, COLOR_YELLOW << 4 | COLOR_BLUE, offsetY, offsetX, ::klib::SCREEN_LEFT, "%-37.37s", formattedTitle);
 
@@ -196,9 +196,9 @@ int32_t drawEquipDetail
 template <typename _TEntity, size_t _Size, size_t _DefinitionCount, size_t _ModifierCount>
 int32_t drawEquipList
 (	SGlobalDisplay& display
-,	const ::klib::SInput& frameInput
-,	const SPlayer& player
-,	const CCharacter& agent
+//,	const ::klib::SInput& frameInput
+//,	const SPlayer& player
+//,	const CCharacter& agent
 ,	int32_t offsetY
 ,	int32_t offsetX
 ,	int32_t selectedRow
@@ -211,14 +211,14 @@ int32_t drawEquipList
 	char formattedTitle[32] = {};
 	sprintf_s(formattedTitle, " - %s:", entityTypeName.begin());
 	for(uint32_t i=4; i<::gpk::size(formattedTitle); ++i)
-		formattedTitle[i] = tolower(formattedTitle[i]);
+		formattedTitle[i] = (char)::tolower(formattedTitle[i]);
 
 	selectedRow &= ~0x80000000;
 	std::string entityName;
 	for(uint32_t iEntity = 0, entityCount = entityContainer.Count; iEntity < entityCount; ++iEntity) 
 	{ 
 		entityName = getEntityName(entityContainer[iEntity].Entity, tableDefinitions, tableModifiers); 
-		uint16_t colorRow = (iEntity == selectedRow) ? COLOR_YELLOW : COLOR_YELLOW << 4;
+		uint16_t colorRow = (iEntity == (uint32_t)selectedRow) ? COLOR_YELLOW : COLOR_YELLOW << 4;
 
 		printfToGridColored(display.Screen, display.TextAttributes, colorRow, offsetY+1+iEntity, offsetX, ::klib::SCREEN_LEFT, "%12.12s %-30.30s", "", entityName.c_str());
 	} 
@@ -228,12 +228,12 @@ int32_t drawEquipList
 
 int32_t drawAgentList
 (	SGlobalDisplay& display
-,	const ::klib::SInput& frameInput
+//,	const ::klib::SInput& frameInput
 ,	const SPlayer& player
 ,	int32_t offsetY
 ,	int32_t offsetX
 ,	int32_t selectedRow
-,	const ::gpk::label& entityTypeName
+//,	const ::gpk::label& entityTypeName
 ,	const ::gpk::array_obj<::gpk::ptr_obj<::klib::CCharacter>>& army
 )
 {
@@ -245,7 +245,7 @@ int32_t drawAgentList
 
 		const CCharacter& agent = *army[iEntity];
 		const std::string& entityName = agent.Name; 
-		uint16_t colorRow = (iEntity == selectedRow) ? COLOR_YELLOW : COLOR_YELLOW << 4;
+		uint16_t colorRow = ((int32_t)iEntity == selectedRow) ? COLOR_YELLOW : COLOR_YELLOW << 4;
 
 		printfToGridColored(display.Screen, display.TextAttributes, colorRow, offsetY+1+actualRowsDisplayed, offsetX, ::klib::SCREEN_LEFT, " %c - %-38.38s", ::klib::ascii_gender[agent.Flags.Tech.Gender], entityName.c_str());
 		colorRow &= 0xF0;
@@ -259,15 +259,15 @@ int32_t drawAgentList
 }
 
 // 
-int32_t drawEquipList(ENTITY_TYPE entityType, SGlobalDisplay& display, const ::klib::SInput& frameInput, const SPlayer& player, const CCharacter& agent, int32_t offsetY, int32_t offsetX, int32_t selectedRow) {
+int32_t drawEquipList(ENTITY_TYPE entityType, SGlobalDisplay& display, const SPlayer& player, int32_t offsetY, int32_t offsetX, int32_t selectedRow) {
 	const ::gpk::label& labelet = ::gpk::get_value_label(entityType);
 
 	switch(entityType) {
-	case ENTITY_TYPE_CHARACTER	:	drawAgentList(display, frameInput, player, offsetY	, offsetX + entityType, selectedRow, labelet, player.Army); break; 
-	case ENTITY_TYPE_PROFESSION	:	drawEquipList(display, frameInput, player, agent	, offsetY + entityType, offsetX, selectedRow, labelet, player.Goods.Inventory.Profession	, definitionsProfession	, modifiersProfession	); break; 
-	case ENTITY_TYPE_WEAPON		:	drawEquipList(display, frameInput, player, agent	, offsetY + entityType, offsetX, selectedRow, labelet, player.Goods.Inventory.Weapon		, definitionsWeapon		, modifiersWeapon		); break; 
-	case ENTITY_TYPE_ARMOR		:	drawEquipList(display, frameInput, player, agent	, offsetY + entityType, offsetX, selectedRow, labelet, player.Goods.Inventory.Armor			, definitionsArmor		, modifiersArmor		); break; 
-	case ENTITY_TYPE_ACCESSORY	:	drawEquipList(display, frameInput, player, agent	, offsetY + entityType, offsetX, selectedRow, labelet, player.Goods.Inventory.Accessory		, definitionsAccessory	, modifiersAccessory	); break; 
+	case ENTITY_TYPE_CHARACTER	:	drawAgentList(display, player, offsetY	, offsetX + entityType, selectedRow, player.Army); break; 
+	case ENTITY_TYPE_PROFESSION	:	drawEquipList(display, offsetY + entityType, offsetX, selectedRow, labelet, player.Goods.Inventory.Profession	, definitionsProfession	, modifiersProfession	); break; 
+	case ENTITY_TYPE_WEAPON		:	drawEquipList(display, offsetY + entityType, offsetX, selectedRow, labelet, player.Goods.Inventory.Weapon		, definitionsWeapon		, modifiersWeapon		); break; 
+	case ENTITY_TYPE_ARMOR		:	drawEquipList(display, offsetY + entityType, offsetX, selectedRow, labelet, player.Goods.Inventory.Armor		, definitionsArmor		, modifiersArmor		); break; 
+	case ENTITY_TYPE_ACCESSORY	:	drawEquipList(display, offsetY + entityType, offsetX, selectedRow, labelet, player.Goods.Inventory.Accessory	, definitionsAccessory	, modifiersAccessory	); break; 
 	case -1:
 	default:
 		break;
@@ -276,12 +276,12 @@ int32_t drawEquipList(ENTITY_TYPE entityType, SGlobalDisplay& display, const ::k
 	return -1;
 }
 
-int32_t processEquipInput(ENTITY_TYPE entityType, SGlobalDisplay& display, const ::klib::SInput& frameInput, const SPlayer& player, int32_t offsetY, int32_t offsetX)
+int32_t processEquipInput(ENTITY_TYPE entityType, const ::klib::SInput& frameInput, const SPlayer& player, int32_t offsetY)
 {
 	int32_t tempRow = -1;
 				
 	switch(entityType) {
-	case ENTITY_TYPE_CHARACTER	:	tempRow = processEquipAgentInput(display, frameInput, player, player.Army.size(), offsetY + entityType, 1); break;
+	case ENTITY_TYPE_CHARACTER	:	tempRow = processEquipAgentInput(frameInput, player, player.Army.size(), offsetY + entityType, 1); break;
 	case ENTITY_TYPE_PROFESSION	:	
 	case ENTITY_TYPE_WEAPON		:	
 	case ENTITY_TYPE_ARMOR		:	
@@ -293,14 +293,14 @@ int32_t processEquipInput(ENTITY_TYPE entityType, SGlobalDisplay& display, const
 	return tempRow;
 }
 
-int32_t drawEquipDetail(ENTITY_TYPE entityType, SGlobalDisplay& display, const SPlayer& player, const CCharacter& agent, int32_t offsetY, int32_t offsetX) {
+int32_t drawEquipDetail(ENTITY_TYPE entityType, SGlobalDisplay& display, const CCharacter& agent, int32_t offsetY, int32_t offsetX) {
 	const ::gpk::label& labelSelectedEquip = ::gpk::get_value_label(entityType);
 	switch(entityType) {						
 	case ENTITY_TYPE_CHARACTER	:	displayDetailedAgentSlot(display, offsetY, offsetX, agent, (COLOR_YELLOW<<4)| COLOR_BLUE );	break;
-	case ENTITY_TYPE_PROFESSION	:	drawEquipDetail(display, player, agent, offsetY, offsetX, labelSelectedEquip, agent.CurrentEquip.Profession	, definitionsProfession	, modifiersProfession	);	break;
-	case ENTITY_TYPE_WEAPON		:	drawEquipDetail(display, player, agent, offsetY, offsetX, labelSelectedEquip, agent.CurrentEquip.Weapon		, definitionsWeapon		, modifiersWeapon		);	break;
-	case ENTITY_TYPE_ARMOR		:	drawEquipDetail(display, player, agent, offsetY, offsetX, labelSelectedEquip, agent.CurrentEquip.Armor		, definitionsArmor		, modifiersArmor		);	break;
-	case ENTITY_TYPE_ACCESSORY	:	drawEquipDetail(display, player, agent, offsetY, offsetX, labelSelectedEquip, agent.CurrentEquip.Accessory	, definitionsAccessory	, modifiersAccessory	);	break;
+	case ENTITY_TYPE_PROFESSION	:	drawEquipDetail(display, offsetY, offsetX, labelSelectedEquip, agent.CurrentEquip.Profession	, definitionsProfession	, modifiersProfession	);	break;
+	case ENTITY_TYPE_WEAPON		:	drawEquipDetail(display, offsetY, offsetX, labelSelectedEquip, agent.CurrentEquip.Weapon		, definitionsWeapon		, modifiersWeapon		);	break;
+	case ENTITY_TYPE_ARMOR		:	drawEquipDetail(display, offsetY, offsetX, labelSelectedEquip, agent.CurrentEquip.Armor		, definitionsArmor		, modifiersArmor		);	break;
+	case ENTITY_TYPE_ACCESSORY	:	drawEquipDetail(display, offsetY, offsetX, labelSelectedEquip, agent.CurrentEquip.Accessory	, definitionsAccessory	, modifiersAccessory	);	break;
 	default:
 		break;
 	}
@@ -312,7 +312,7 @@ bool	equipIfResearchedWeapon		(SGame& instanceGame, int32_t indexAgent, int16_t 
 bool	equipIfResearchedArmor		(SGame& instanceGame, int32_t indexAgent, int16_t selectedChoice);
 bool	equipIfResearchedAccessory	(SGame& instanceGame, int32_t indexAgent, int16_t selectedChoice);
 
-int32_t drawWelcomeGUI(SGame& instanceGame, const SGameState& returnValue) {
+int32_t drawWelcomeGUI(SGame& instanceGame) {
 	SGlobalDisplay& display			= instanceGame.GlobalDisplay;
 	int32_t startY					= TACTICAL_DISPLAY_POSY-2; 
 
@@ -342,9 +342,9 @@ int32_t drawWelcomeGUI(SGame& instanceGame, const SGameState& returnValue) {
 
 		if(selectedEquip != -1 && selectedAgent == iAgent) {
 			ENTITY_TYPE selectedEntityType = (ENTITY_TYPE)selectedEquip;
-			int32_t tempRow = processEquipInput(selectedEntityType, display, instanceGame.FrameInput, player, offsetY, 1);
+			int32_t tempRow = processEquipInput(selectedEntityType, instanceGame.FrameInput, player, offsetY);
 
-			drawEquipDetail(selectedEntityType, display, player, agent, startY, 45+1);										
+			drawEquipDetail(selectedEntityType, display, agent, startY, 45+1);										
 
 			if(tempRow != -1) {
 				selectedRow = tempRow;
@@ -353,10 +353,10 @@ int32_t drawWelcomeGUI(SGame& instanceGame, const SGameState& returnValue) {
 				if(tempRow & 0x80000000) {
 					switch(selectedEntityType) {
 					case ENTITY_TYPE_CHARACTER	:	player.Squad.Agents[iAgent] = int16_t(indexRow); break;
-					case ENTITY_TYPE_PROFESSION	:	equipIfResearchedProfession	(instanceGame, player.Squad.Agents[iAgent], indexRow); break;
-					case ENTITY_TYPE_WEAPON		:	equipIfResearchedWeapon		(instanceGame, player.Squad.Agents[iAgent], indexRow); break;
-					case ENTITY_TYPE_ARMOR		:	equipIfResearchedArmor		(instanceGame, player.Squad.Agents[iAgent], indexRow); break;
-					case ENTITY_TYPE_ACCESSORY	:	equipIfResearchedAccessory	(instanceGame, player.Squad.Agents[iAgent], indexRow); break;
+					case ENTITY_TYPE_PROFESSION	:	equipIfResearchedProfession	(instanceGame, player.Squad.Agents[iAgent], (int16_t)indexRow); break;
+					case ENTITY_TYPE_WEAPON		:	equipIfResearchedWeapon		(instanceGame, player.Squad.Agents[iAgent], (int16_t)indexRow); break;
+					case ENTITY_TYPE_ARMOR		:	equipIfResearchedArmor		(instanceGame, player.Squad.Agents[iAgent], (int16_t)indexRow); break;
+					case ENTITY_TYPE_ACCESSORY	:	equipIfResearchedAccessory	(instanceGame, player.Squad.Agents[iAgent], (int16_t)indexRow); break;
 					default:
 						break;
 					}
@@ -369,10 +369,10 @@ int32_t drawWelcomeGUI(SGame& instanceGame, const SGameState& returnValue) {
 					const ::gpk::label& labelSelectedEquip = ::gpk::get_value_label(selectedEntityType);
 					switch(selectedEntityType) {						
 					case ENTITY_TYPE_CHARACTER	:	if(player.Army[indexRow]) displayDetailedAgentSlot(display, startY, offsetX, *player.Army[indexRow], (COLOR_YELLOW<<4)| COLOR_BLUE);	break;
-					case ENTITY_TYPE_PROFESSION	:	drawEquipDetail(display, player, agent, startY, offsetX, labelSelectedEquip, player.Goods.Inventory.Profession	[indexRow].Entity, definitionsProfession	, modifiersProfession	);	break;
-					case ENTITY_TYPE_WEAPON		:	drawEquipDetail(display, player, agent, startY, offsetX, labelSelectedEquip, player.Goods.Inventory.Weapon		[indexRow].Entity, definitionsWeapon		, modifiersWeapon		);	break;
-					case ENTITY_TYPE_ARMOR		:	drawEquipDetail(display, player, agent, startY, offsetX, labelSelectedEquip, player.Goods.Inventory.Armor		[indexRow].Entity, definitionsArmor			, modifiersArmor		);	break;
-					case ENTITY_TYPE_ACCESSORY	:	drawEquipDetail(display, player, agent, startY, offsetX, labelSelectedEquip, player.Goods.Inventory.Accessory	[indexRow].Entity, definitionsAccessory		, modifiersAccessory	);	break;
+					case ENTITY_TYPE_PROFESSION	:	drawEquipDetail(display, startY, offsetX, labelSelectedEquip, player.Goods.Inventory.Profession	[indexRow].Entity, definitionsProfession	, modifiersProfession	);	break;
+					case ENTITY_TYPE_WEAPON		:	drawEquipDetail(display, startY, offsetX, labelSelectedEquip, player.Goods.Inventory.Weapon		[indexRow].Entity, definitionsWeapon		, modifiersWeapon		);	break;
+					case ENTITY_TYPE_ARMOR		:	drawEquipDetail(display, startY, offsetX, labelSelectedEquip, player.Goods.Inventory.Armor		[indexRow].Entity, definitionsArmor			, modifiersArmor		);	break;
+					case ENTITY_TYPE_ACCESSORY	:	drawEquipDetail(display, startY, offsetX, labelSelectedEquip, player.Goods.Inventory.Accessory	[indexRow].Entity, definitionsAccessory		, modifiersAccessory	);	break;
 					default:
 						break;
 					}
@@ -389,10 +389,8 @@ int32_t drawWelcomeGUI(SGame& instanceGame, const SGameState& returnValue) {
 				continue;
 
 			int32_t offsetY = TACTICAL_DISPLAY_POSY+((agentsDisplayed)*10);
-			CCharacter& agent = *player.Army[player.Squad.Agents[iAgent]];
-
 			if(selectedAgent == iAgent)
-				drawEquipList((ENTITY_TYPE)selectedEquip, display, instanceGame.FrameInput, player, agent, offsetY, 1, selectedRow);
+				drawEquipList((ENTITY_TYPE)selectedEquip, display, player, offsetY, 1, selectedRow);
 
 			++agentsDisplayed;
 		}
@@ -410,7 +408,7 @@ int32_t drawWelcomeGUI(SGame& instanceGame, const SGameState& returnValue) {
 			int32_t rowIndex = indexEquip & ~(0x80000000);
 			if(indexEquip != -1) {
 				if(selectedEquip == -1 && selectedAgent == -1)
-					drawEquipDetail((ENTITY_TYPE)rowIndex, display, player, agent, startY, 45+1);	
+					drawEquipDetail((ENTITY_TYPE)rowIndex, display, agent, startY, 45+1);	
 
 				if(indexEquip & 0x80000000) {
 					selectedEquip	= rowIndex;
@@ -444,7 +442,7 @@ SGameState drawWelcome(SGame& instanceGame, const SGameState& returnValue) {
 	columnOffset				= printfToGridColored(display.Screen, display.TextAttributes, COLOR_GREEN, lineOffset, columnOffset, ::klib::SCREEN_LEFT, "%s", instanceGame.SlowMessage);
 
 	if ( bDonePrinting ) {
-		drawWelcomeGUI(instanceGame, returnValue);
+		drawWelcomeGUI(instanceGame);
 
 		// Menu
 		static const SMenu<SGameState>	menuControlCenter	({GAME_STATE_MENU_MAIN}, "Control Center", 28);
