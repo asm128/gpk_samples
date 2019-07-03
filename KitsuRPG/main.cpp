@@ -26,13 +26,16 @@ void											initPlayerCharacter								(klib::CCharacter& adventurer, const s
 // If the player leaves the tavern() it means the game was requested to close. 
 // After leaving the tavern() we display the score of the player.
 int												main											(int argc, char **argv)											{	
-	argc, argv;
+	(void)argc, (void)argv;
 //#if defined(GPK_DEBUG_ENABLED)
-	int													tmp												= _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF|_CRTDBG_LEAK_CHECK_DF);//|_CRTDBG_DELAY_FREE_MEM_DF);
+#if defined(DEBUG) || defined(_DEBUG)
+	int													tmp												= _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF|_CRTDBG_LEAK_CHECK_DF);
+	(void)tmp;
+#endif
+		//|_CRTDBG_DELAY_FREE_MEM_DF);
 //	tmp												= (tmp & 0x0000FFFF) | _CRTDBG_CHECK_EVERY_16_DF;	// Clear the upper 16 bits and OR in the desired freqency
-	_CrtSetDbgFlag(tmp);	// Set the new bits
+//	_CrtSetDbgFlag(tmp);	// Set the new bits
 //#endif
-
 	srand((unsigned int)time(NULL));
 
 	::klib::initASCIIScreen(132, 60);
