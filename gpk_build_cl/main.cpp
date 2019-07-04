@@ -18,7 +18,7 @@ struct SBuildConfig {
 	::gpk::SJSONReader									TreeConfigOfBuild				= {};
 };
 
-::gpk::error_t										buildSources					(const SBuildConfig & app, const ::gpk::view_array<::gpk::array_pod<char_t>> & listOfSourceFileNames) {
+static	::gpk::error_t								buildSources					(const SBuildConfig & app, const ::gpk::view_array<::gpk::array_pod<char_t>> & listOfSourceFileNames) {
 	(void)app;
 	char													bufferFormat [4096]				= {};
 	for(uint32_t iFile = 0; iFile < listOfSourceFileNames.size(); ++iFile) {
@@ -29,7 +29,7 @@ struct SBuildConfig {
 	return 0;
 }
 
-::gpk::error_t										buildProjects					(const SBuildConfig & app, int32_t indexOfBuildObject, const ::gpk::view_const_string & projectCollection, const ::gpk::view_const_string & extension) {
+static	::gpk::error_t								buildProjects					(const SBuildConfig & app, int32_t indexOfBuildObject, const ::gpk::view_const_string & projectCollection, const ::gpk::view_const_string & extension) {
 	::gpk::SPathContents									treeOfSolution;
 	int32_t													indexLibNode					= ::gpk::jsonObjectValueGet(*app.TreeConfigOfBuild[indexOfBuildObject], app.TreeConfigOfBuild.View, projectCollection);
 	if(-1 == indexLibNode) 
@@ -60,7 +60,7 @@ struct SBuildConfig {
 	return 0;
 }
 
-::gpk::error_t										buildConfig						(const SBuildConfig & app) {
+static	::gpk::error_t								buildConfig						(const SBuildConfig & app) {
 	::gpk::view_const_string								extension						= ".cpp";
 	{
 		int32_t													indexOfBuildObject				= ::gpk::jsonArrayValueGet(*app.TreeConfigOfBuild[0], 0);
@@ -71,12 +71,11 @@ struct SBuildConfig {
 	return 0;
 }
 
-int													main							(int argc, char** argv)			{
-	char													bufferFormat [4096]				= {};
-	ree_if(argc < 2, "USAGE: \n\t%s [path/to/solution]", argv[0]);
+static	int											appMain						(::gpk::view_const_string filenameConfig)			{
 	{ // Build single configuration
+		char													bufferFormat [4096]				= {};
 		SBuildConfig											configBuild						= {};
-		configBuild.FilenameConfig							= {argv[1], (uint32_t)-1};
+		configBuild.FilenameConfig							= filenameConfig;
 		ree_if(::gpk::fileToMemory(configBuild.FilenameConfig, configBuild.JsonConfigOfBuild), "Failed to open build file: '%s'.", configBuild.FilenameConfig.begin());
 		sprintf_s(bufferFormat, "Failed to read configuration file: %%.%us. Path: %%.%us. Contents:\n%%.%us", configBuild.FilenameConfig.size(), configBuild.PathConfig.size(), configBuild.JsonConfigOfBuild.size());
 		ree_if(::gpk::jsonParse(configBuild.TreeConfigOfBuild, {configBuild.JsonConfigOfBuild.begin(), configBuild.JsonConfigOfBuild.size()}), bufferFormat, configBuild.FilenameConfig.begin(), configBuild.PathConfig.begin(), configBuild.JsonConfigOfBuild.begin());
@@ -84,7 +83,13 @@ int													main							(int argc, char** argv)			{
 		info_printf(bufferFormat, configBuild.FilenameConfig.begin(), configBuild.PathConfig.begin(), configBuild.JsonConfigOfBuild.begin());
 		int32_t													indexOfLastSlash				= ::gpk::findLastSlash(configBuild.FilenameConfig);
 		configBuild.PathConfig								= (-1 == indexOfLastSlash) ? "./" : ::gpk::view_const_string{configBuild.FilenameConfig.begin(), (uint32_t)indexOfLastSlash};
-		::buildConfig(configBuild);
+		gpk_necall(::buildConfig(configBuild), bufferFormat, configBuild.FilenameConfig.begin(), configBuild.PathConfig.begin(), configBuild.JsonConfigOfBuild.begin());
 	}
 	return 0;
+}
+
+
+int													main							(int argc, char** argv)			{
+	ree_if(argc < 2, "USAGE: \n\t%s [path/to/solution]", argv[0]);
+	return ::appMain({argv[1], (uint32_t)-1});
 }
