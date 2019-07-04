@@ -20,7 +20,7 @@ struct SBuildConfig {
 	::gpk::SJSONReader									TreeConfigOfBuild				= {};
 };
 
-static	::gpk::error_t								buildSources					(const SBuildConfig & app, const ::gpk::view_array<::gpk::array_pod<char_t>> & listOfSourceFileNames) {
+static	::gpk::error_t								buildSources					(const ::SBuildConfig & app, const ::gpk::view_array<::gpk::array_pod<char_t>> & listOfSourceFileNames) {
 	(void)app;
 	char													bufferFormat [4096]				= {};
 	for(uint32_t iFile = 0; iFile < listOfSourceFileNames.size(); ++iFile) {
@@ -31,7 +31,7 @@ static	::gpk::error_t								buildSources					(const SBuildConfig & app, const :
 	return 0;
 }
 
-static	::gpk::error_t								buildProjects					(const SBuildConfig & app, int32_t indexOfBuildObject, const ::gpk::view_const_string & projectCollection, const ::gpk::view_const_string & extension) {
+static	::gpk::error_t								buildProjects					(const ::SBuildConfig & app, int32_t indexOfBuildObject, const ::gpk::view_const_string & projectCollection, const ::gpk::view_const_string & extension) {
 	::gpk::SPathContents									treeOfSolution;
 	int32_t													indexLibNode					= ::gpk::jsonObjectValueGet(*app.TreeConfigOfBuild[indexOfBuildObject], app.TreeConfigOfBuild.View, projectCollection);
 	if(-1 == indexLibNode) 
@@ -100,7 +100,6 @@ static	int											appMain						(::gpk::view_const_string filenameConfig)			{
 	}
 	return 0;
 }
-
 
 int													main							(int argc, char** argv)			{
 	ree_if(argc < 2, "USAGE: \n\t%s [path/to/solution]", argv[0]);
