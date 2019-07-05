@@ -195,6 +195,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KitsuRPG", "KitsuRPG\KitsuR
 		{8FD826F8-3739-44E6-8CC8-997122E53B8D} = {8FD826F8-3739-44E6-8CC8-997122E53B8D}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_cgi_environ", "test_cgi_environ\test_cgi_environ.vcxproj", "{BB67B6E5-2BEF-4A7A-8A61-0D756B6F4FF5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -435,6 +437,14 @@ Global
 		{C0EE0B86-9A24-490A-B06D-BDC9059FB4CA}.Release|x64.Build.0 = Release|x64
 		{C0EE0B86-9A24-490A-B06D-BDC9059FB4CA}.Release|x86.ActiveCfg = Release|Win32
 		{C0EE0B86-9A24-490A-B06D-BDC9059FB4CA}.Release|x86.Build.0 = Release|Win32
+		{BB67B6E5-2BEF-4A7A-8A61-0D756B6F4FF5}.Debug|x64.ActiveCfg = Debug|x64
+		{BB67B6E5-2BEF-4A7A-8A61-0D756B6F4FF5}.Debug|x64.Build.0 = Debug|x64
+		{BB67B6E5-2BEF-4A7A-8A61-0D756B6F4FF5}.Debug|x86.ActiveCfg = Debug|Win32
+		{BB67B6E5-2BEF-4A7A-8A61-0D756B6F4FF5}.Debug|x86.Build.0 = Debug|Win32
+		{BB67B6E5-2BEF-4A7A-8A61-0D756B6F4FF5}.Release|x64.ActiveCfg = Release|x64
+		{BB67B6E5-2BEF-4A7A-8A61-0D756B6F4FF5}.Release|x64.Build.0 = Release|x64
+		{BB67B6E5-2BEF-4A7A-8A61-0D756B6F4FF5}.Release|x86.ActiveCfg = Release|Win32
+		{BB67B6E5-2BEF-4A7A-8A61-0D756B6F4FF5}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

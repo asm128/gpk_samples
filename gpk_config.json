@@ -8,16 +8,20 @@
 	},
 	"application": 
 	{	
+		"brt": 
+		{	"listen_port"	: "9797"
+		,	"process"		: {"name" : "./test_cgi_environ.exe", "params" : ""}
+		},
 		"gpk_cgi_rest": 
 		{	"remote_ip"		: "192.168.0.2"
-		,	"remote_port"	: "9798"
+		,	"remote_port"	: "9797"
 		},
 		"test_udp_client": 
 		{	"remote_ip"		: "192.168.0.2"
 		,	"remote_port"	: "9898"
 		},
 		"test_udp_server": 
-		{	"remote_port"	: "9898"
+		{	"listen_port"	: "9898"
 		},
 		"test_gontrill" : 
 		{	"images" :

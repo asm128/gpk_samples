@@ -40,7 +40,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 		::gpk::view_const_string												jsonPort					= {};
 		const ::gpk::SJSONReader												& jsonReader						= framework.ReaderJSONConfig;
 		const int32_t															indexObjectConfig					= ::gpk::jsonArrayValueGet(*jsonReader.Tree[0], 0);	// Get the first JSON {object} found in the [document]
-		gwarn_if(errored(::gpk::jsonExpressionResolve("application.test_udp_server.remote_port"	, jsonReader, indexObjectConfig, jsonPort)), "Failed to load config from json! Last contents found: %s.", jsonPort.begin()) 
+		gwarn_if(errored(::gpk::jsonExpressionResolve("application.test_udp_server.listen_port"	, jsonReader, indexObjectConfig, jsonPort)), "Failed to load config from json! Last contents found: %s.", jsonPort.begin()) 
 		else {
 			::gpk::parseIntegerDecimal(jsonPort, &port);
 			info_printf("Remote port: %u.", (uint32_t)port);
