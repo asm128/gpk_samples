@@ -157,12 +157,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gpk_build_cl", "gpk_build_c
 		{8FD826F8-3739-44E6-8CC8-997122E53B8D} = {8FD826F8-3739-44E6-8CC8-997122E53B8D}
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{15E16BDD-7CCF-4AE2-9A92-320E0B92BEB8}"
-	ProjectSection(SolutionItems) = preProject
-		copy_gpk_config.bat = copy_gpk_config.bat
-		gpk_config.json = gpk_config.json
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gpk_cgi_rest", "..\gpk\gpk_cgi_rest\gpk_cgi_rest.vcxproj", "{200F9CC5-F546-4E94-82AF-072648DBF55A}"
 	ProjectSection(ProjectDependencies) = postProject
 		{830AB681-B788-47D4-9767-BA4E0792F682} = {830AB681-B788-47D4-9767-BA4E0792F682}
