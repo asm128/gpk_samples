@@ -109,7 +109,7 @@
 }
 
 
-int main() {
+static ::gpk::error_t								cgiMain				() {
 	::gpk::array_pod<char_t>								output;
 	::generate_output(output);
 	printf("%s", output.begin());
@@ -117,3 +117,17 @@ int main() {
 	return 0;
 }
 
+int													main				(int argc, char** argv, char**envv)	{
+	(void)argc, (void)argv, (void)envv;
+	return ::cgiMain();
+}
+
+int WINAPI											WinMain				
+	(	_In_		HINSTANCE	hInstance
+	,	_In_opt_	HINSTANCE	hPrevInstance
+	,	_In_		LPSTR		lpCmdLine
+	,	_In_		int			nShowCmd
+	) {
+	(void)hInstance, (void)hPrevInstance, (void)lpCmdLine, (void)nShowCmd;
+	return ::cgiMain();
+}
