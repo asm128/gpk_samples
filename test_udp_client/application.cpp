@@ -88,20 +88,30 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 
 	reterr_gerror_if(app.Client.State != ::gpk::UDP_CONNECTION_STATE_IDLE, "Failed to connect to server.")
 	else {
-		::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived!");
-		::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! 2");
-		::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! 3");
-		::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! 4");
+		::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived!", true, true);
+		::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! 2", false, true);
+		::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! 3", true, false);
+		::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! 4", false, false);
 		::gpk::clientUpdate(app.Client);
-		::gpk::sleep(1000);
+		::gpk::sleep(10);
+
+		::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! x1", true, true);
+		::gpk::clientUpdate(app.Client);
+		::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! x2", false, true);
+		::gpk::clientUpdate(app.Client);
+		::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! x3", true, false);
+		::gpk::clientUpdate(app.Client);
+		::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! x4", false, false);
+		::gpk::clientUpdate(app.Client);
+
 	}
 
-	::gpk::SUDPClient															& connectTest				= app.ClientTest1;
-	connectTest.AddressConnect												= app.Client.AddressConnect;
-	::gpk::clientConnect		(connectTest);
-	::gpk::connectionPushData	(connectTest, connectTest.Queue, "Connect test!");
-	::gpk::clientUpdate			(connectTest);
-	::gpk::clientDisconnect		(connectTest);
+	//::gpk::SUDPClient															& connectTest				= app.ClientTest1;
+	//connectTest.AddressConnect												= app.Client.AddressConnect;
+	//::gpk::clientConnect		(connectTest);
+	//::gpk::connectionPushData	(connectTest, connectTest.Queue, "Connect test!");
+	//::gpk::clientUpdate			(connectTest);
+	//::gpk::clientDisconnect		(connectTest);
 
 	//timer.Frame();
 	//warning_printf("Update time: %f.", (float)timer.LastTimeSeconds);

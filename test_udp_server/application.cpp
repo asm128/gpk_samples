@@ -74,9 +74,11 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	{
 		::gpk::mutex_guard														lock						(app.Server.Mutex);
 		for(uint32_t iClient = 0; iClient < app.Server.Clients.size(); ++iClient) {
-			::gpk::mutex_guard														lockRecv					(app.Server.Clients[iClient]->Queue.MutexReceive);
-			for(uint32_t iMessage = 0; iMessage < app.Server.Clients[iClient]->Queue.Received.size(); ++iMessage) {
-				info_printf("Client %i received: %s.", iClient, app.Server.Clients[iClient]->Queue.Received[iMessage]->Payload.begin());
+			::gpk::ptr_nco<::gpk::SUDPConnection>									client						= app.Server.Clients[iClient];
+			::gpk::mutex_guard														lockRecv					(client->Queue.MutexReceive);
+			for(uint32_t iMessage = 0; iMessage < client->Queue.Received.size(); ++iMessage) {
+				::gpk::view_const_byte													viewPayload					= client->Queue.Received[iMessage]->Payload;
+				info_printf("Client %i received: %s.", iClient, viewPayload.begin());
 			}
 			app.Server.Clients[iClient]->Queue.Received.clear();
 		}
