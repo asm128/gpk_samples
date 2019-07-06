@@ -59,6 +59,7 @@ static constexpr const ::gpk::STriangle3D<float>						geometryCube	[12]						=
 	::gpk::SFramework															& framework									= applicationInstance.Framework;
 	::gpk::SDisplay																& mainWindow								= framework.MainDisplay;
 	framework.Input.create();
+	mainWindow.Size														= {640, 480};
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?????!?!?!?!?");
 
 	static constexpr const ::gpk::SCoord3<float>								cubeCenter									= {0.5f, 0.5f, 0.5f};

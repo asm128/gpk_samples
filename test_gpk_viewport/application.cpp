@@ -83,6 +83,7 @@ template<typename _tIndex, typename _tValue>
 	::gpk::SDisplay															& mainWindow								= framework.MainDisplay;
 	app.Framework.GUI													= app.DialogMain.GUI;
 	app.DialogMain.Input												= framework.Input;
+	framework.MainDisplay.Size												= {1280, 720};
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window. %s.", "why?????!?!?!?!?");
 	::gpk::SGUI																& gui										= *framework.GUI;
 	gui.ColorModeDefault												= ::gpk::GUI_COLOR_MODE_3D;
