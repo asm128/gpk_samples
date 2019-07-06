@@ -9,6 +9,7 @@
 #include <string>
 
 #include <Windows.h>
+
 namespace brt
 {
 	struct SProcessHandles {
@@ -86,7 +87,7 @@ static	::gpk::error_t		loadConfig
 	{ // load port from config file
 		::gpk::view_const_string												jsonPort					= {};
 		const int32_t															indexObjectConfig					= ::gpk::jsonArrayValueGet(*jsonReader.Tree[0], 0);	// Get the first JSON {object} found in the [document]
-		const int32_t															indexObjectApp						= ::gpk::jsonExpressionResolve("application.brt", jsonReader, indexObjectConfig, processFileName);
+		const int32_t															indexObjectApp						= ::gpk::jsonExpressionResolve("application.gpk_cgi_interceptor", jsonReader, indexObjectConfig, processFileName);
 		gwarn_if(errored(indexObjectApp), "Failed to find application node (%s) in json configuration file: '%s'", "application.gpk_cgi_interceptor", fileNameJSONConfig.begin())
 		else {
 			gwarn_if(errored(::gpk::jsonExpressionResolve("process.executable_path"			, jsonReader, indexObjectApp, processFileName	)), "Failed to load config from json! Last contents found: %s.", jsonPort.begin()) 
@@ -147,29 +148,6 @@ static	::gpk::error_t		readFromPipe			(const ::brt::SProcess & process, const ::
 	return 0;	// The remaining open handles are cleaned up when this process terminates. To avoid resource leaks in a larger application, close handles explicitly. 
 } 
 
-
-::gpk::error_t										metrics_split			(const ::gpk::view_const_string& input_string, ::gpk::SCoord2<int32_t>& output_metrics)												{
-	uint32_t												iChar					= 0;
-	for(iChar = 0; iChar < input_string.size(); ++iChar) {
-		if('x' == input_string[iChar]) {
-			::gpk::array_pod<char>									sx						= {};
-			::gpk::array_pod<char>									sy						= {};
-			gpk_necall(sy.append((char*)input_string.begin(), iChar), "%s", "");
-			gpk_necall(sx.append((char*)&input_string[iChar + 1], input_string.size() - (iChar + 1)), "%s", "");
-			try {
-				output_metrics.x									= ::std::stoi(::std::string{sy.begin(), sy.size()});
-				output_metrics.y									= ::std::stoi(::std::string{sy.begin(), sy.size()});
-			}
-			catch (...) {
-				output_metrics										= {};
-				return -1;
-			}
-			break;
-		}
-	}
-	return 0;
-}
-
 static	int											cgiBootstrap			(const ::gpk::SCGIRuntimeValues & runtimeValues, ::gpk::array_pod<char> & output)										{
 	::gpk::array_pod<char_t>								environmentBlock		= {};
 	{	// Prepare CGI environment and request content packet to send to the service.
@@ -200,7 +178,6 @@ static	int											cgiBootstrap			(const ::gpk::SCGIRuntimeValues & runtimeVal
 		gpk_safe_closehandle(process.StartInfo.hStdInput	);
 		gpk_safe_closehandle(process.StartInfo.hStdOutput	);
 	}
-	output.append("\r\n<html><head><title>Placeholder response</title></head><body>Placeholder body.</body></html>");
 	return 0;
 }
 
