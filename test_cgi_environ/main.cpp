@@ -97,23 +97,22 @@
 			if(0 == content_body.size())
 				break;
 			content_body.push_back(0);
-			output.append(buffer, sprintf_s(buffer, "\n \"content_body\" : {\"u0\" : %u, \"u1\" : %u, \"u2\" : %u, \"u3\" : %u, \"value\": \n\"%s\" }, "
+			output.append(buffer, sprintf_s(buffer, "\n \"content_body\" : {\"u0\" : %u, \"u1\" : %u, \"u2\" : %u, \"u3\" : %u, \"value\": \n%s }, "
 				, iChar - iOffset, content_body.size(), runtimeValues.Content.Length, runtimeValues.Content.Body.size(), content_body.begin()));
 		}
 	}
-	output.append(buffer, sprintf_s(buffer, "\n \"content_body_\" : {\"u0\" : %u, \"u1\" : %u, \"text\" : \"%s\" }", runtimeValues.Content.Length, runtimeValues.Content.Body.size(), runtimeValues.Content.Body.begin()));
+	output.append(buffer, sprintf_s(buffer, "\n \"content_body_\" : {\"u0\" : %u, \"u1\" : %u, \"text\" : %s }", runtimeValues.Content.Length, runtimeValues.Content.Body.size(), runtimeValues.Content.Body.begin()));
 
 	//output.append(buffer, sprintf_s(buffer, "%s", "<iframe width=\"100%%\" height=\"100%%\" src=\"http://localhost/home.html\"></iframe>\n"));
 	output.append(buffer, sprintf_s(buffer, "\n%s\n", "}]"));
 	return output.size();
 }
 
-
 static ::gpk::error_t								cgiMain				() {
 	::gpk::array_pod<char_t>								output;
 	::generate_output(output);
 	printf("%s", output.begin());
-	::std::putc(0, stdout);
+	//::std::putc(0, stdout);
 	return 0;
 }
 
@@ -129,5 +128,9 @@ int WINAPI											WinMain
 	,	_In_		int			nShowCmd
 	) {
 	(void)hInstance, (void)hPrevInstance, (void)lpCmdLine, (void)nShowCmd;
+	int			argc = __argc;
+	char**		argv = __argv;
+	(void)argc;
+	(void)argv;
 	return ::cgiMain();
 }
