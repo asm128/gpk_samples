@@ -1,5 +1,6 @@
 #include "gpk_cgi_runtime.h"
 #include "gpk_string_helper.h"
+#include "gpk_process.h"
 
 ::gpk::error_t										generate_output(::gpk::array_pod<char_t> & output)					{
 	::gpk::SCGIRuntimeValues								runtimeValues;
@@ -65,11 +66,21 @@
 	output.append(buffer, sprintf_s(buffer, "\n , \"SERVER_SOFTWARE\"		: \"%s\"", runtimeValues.Environment.SERVER_SOFTWARE		.begin()));
 	output.append(buffer, sprintf_s(buffer, "\n , \"WEB_SERVER_API\"		: \"%s\"", runtimeValues.Environment.WEB_SERVER_API			.begin()));
 	output.append(buffer, sprintf_s(buffer, "\n },"));
-																			 
-	//int														argc					= __argc; 
-	//char													** argv					= __argv;
-	//for(int32_t iArg = 0; iArg < argc; ++iArg) 
-	//	output.append(buffer, sprintf_s(buffer, "\n<h1>argv[%u]: %s</h1>", iArg, argv[iArg]));
+	output.append(buffer, sprintf_s(buffer, "\n \"process_environment\" : "));
+	output.append(buffer, sprintf_s(buffer, "\r\n["));
+	::gpk::array_pod<byte_t>								environmentBlock;
+	::gpk::environmentBlockFromEnviron(environmentBlock);
+	::gpk::array_obj<::gpk::TKeyValConstString>				keyVals;
+	::gpk::environmentBlockViews(environmentBlock, keyVals);
+	for(uint32_t iKeyVal = 0; iKeyVal < keyVals.size(); ++iKeyVal) {
+		const ::gpk::TKeyValConstString							& keyval				= keyVals[iKeyVal];
+		output.append(buffer, ::gpk::formatForSize(keyval.Key, buffer, "\n { \"Key\": \"", "\""));
+		if(keyVals.size() - 1 == iKeyVal)
+			output.append(buffer, ::gpk::formatForSize(keyval.Val, buffer, "\n , \"Val\": \"", "\"\n }"));// without the trailing , comma character
+		else
+			output.append(buffer, ::gpk::formatForSize(keyval.Val, buffer, "\n , \"Val\": \"", "\"\n }, "));
+	}
+	output.append(buffer, sprintf_s(buffer, "\n], "));
 	{
 		::gpk::array_pod<char>									content_body			= {};
 		content_body.resize(runtimeValues.Content.Length);
@@ -102,8 +113,6 @@
 		}
 	}
 	output.append(buffer, sprintf_s(buffer, "\n \"content_body_\" : {\"u0\" : %u, \"u1\" : %u, \"text\" : %s }", runtimeValues.Content.Length, runtimeValues.Content.Body.size(), runtimeValues.Content.Body.begin()));
-
-	//output.append(buffer, sprintf_s(buffer, "%s", "<iframe width=\"100%%\" height=\"100%%\" src=\"http://localhost/home.html\"></iframe>\n"));
 	output.append(buffer, sprintf_s(buffer, "\n%s\n", "}]"));
 	return output.size();
 }
@@ -112,7 +121,6 @@ static ::gpk::error_t								cgiMain				() {
 	::gpk::array_pod<char_t>								output;
 	::generate_output(output);
 	printf("%s", output.begin());
-	//::std::putc(0, stdout);
 	return 0;
 }
 
