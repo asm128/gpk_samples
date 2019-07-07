@@ -68,6 +68,7 @@
 	output.append(buffer, sprintf_s(buffer, "\n },"));
 	output.append(buffer, sprintf_s(buffer, "\n \"process_environment\" : "));
 	output.append(buffer, sprintf_s(buffer, "\r\n["));
+
 	::gpk::array_pod<byte_t>								environmentBlock;
 	::gpk::environmentBlockFromEnviron(environmentBlock);
 	::gpk::array_obj<::gpk::TKeyValConstString>				keyVals;
@@ -129,6 +130,7 @@ int													main				(int argc, char** argv, char**envv)	{
 	return ::cgiMain();
 }
 
+#ifdef GPK_WINDOWS
 int WINAPI											WinMain				
 	(	_In_		HINSTANCE	hInstance
 	,	_In_opt_	HINSTANCE	hPrevInstance
@@ -136,9 +138,6 @@ int WINAPI											WinMain
 	,	_In_		int			nShowCmd
 	) {
 	(void)hInstance, (void)hPrevInstance, (void)lpCmdLine, (void)nShowCmd;
-	int			argc = __argc;
-	char**		argv = __argv;
-	(void)argc;
-	(void)argv;
 	return ::cgiMain();
 }
+#endif

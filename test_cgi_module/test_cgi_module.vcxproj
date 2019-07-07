@@ -110,7 +110,7 @@
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>$(OutDir); </AdditionalLibraryDirectories>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
-      <ModuleDefinitionFile>..\..\gpk\gpk\gpk_module_exports.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>..\..\gpk\llc\gpk_module_exports.def</ModuleDefinitionFile>
       <AdditionalDependencies>llc.lib; gpk.lib; zlibvc.lib;  user32.lib; gdi32.lib; shcore.lib; ws2_32.lib; </AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -130,7 +130,7 @@
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>$(OutDir); </AdditionalLibraryDirectories>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
-      <ModuleDefinitionFile>..\..\gpk\gpk\gpk_module_exports.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>..\..\gpk\llc\gpk_module_exports.def</ModuleDefinitionFile>
       <AdditionalDependencies>llc.lib; gpk.lib; zlibvc.lib;  user32.lib; gdi32.lib; shcore.lib; ws2_32.lib; </AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -150,7 +150,7 @@
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>$(OutDir); </AdditionalLibraryDirectories>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
-      <ModuleDefinitionFile>..\..\gpk\gpk\gpk_module_exports.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>..\..\gpk\llc\gpk_module_exports.def</ModuleDefinitionFile>
       <AdditionalDependencies>llc.lib; gpk.lib; zlibvc.lib;  user32.lib; gdi32.lib; shcore.lib; ws2_32.lib; </AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -174,7 +174,7 @@
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>$(OutDir); </AdditionalLibraryDirectories>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
-      <ModuleDefinitionFile>..\..\gpk\gpk\gpk_module_exports.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>..\..\gpk\llc\gpk_module_exports.def</ModuleDefinitionFile>
       <AdditionalDependencies>llc.lib; gpk.lib; zlibvc.lib;  user32.lib; gdi32.lib; shcore.lib; ws2_32.lib; </AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
