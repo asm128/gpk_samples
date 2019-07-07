@@ -73,7 +73,6 @@ static	::gpk::error_t		loadConfig
 (	::gpk::array_pod<char_t>	& szCmdlineApp	
 ,	::gpk::array_pod<char_t>	& szCmdlineFinal
 ) {	// Read from a file and write its contents to the pipe for the child's STDIN. Stop when there is no more data. 
-	uint64_t																port						= 9998;
 	::gpk::view_const_string												processFileName		;
 	::gpk::view_const_string												processMockPath		;
 	::gpk::view_const_string												processParams		;	
