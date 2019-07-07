@@ -17,7 +17,7 @@ namespace klib
 	// while improving the precision of the floating point values by only requiring them to represent a value between 0 and 1 for a very small distance.
 	struct STacticalCoord
 	{
-		::gpk::SCoord3<int32_t>								Cell											;	// Position in tile map.
+		::gpk::SCoord3<int32_t>									Cell											;	// Position in tile map.
 		::gpk::SCoord3<float>									Offset											;	// Position between 0 and 1 relative to the tile.
 
 		bool													operator==										(const STacticalCoord& other)			const	noexcept	{

@@ -3,7 +3,7 @@
 #include <chrono>
 
 #if defined(GPK_WINDOWS)
-#	include <windows.h>
+#	include <Windows.h>
 #else
 #	include <chrono>
 #endif

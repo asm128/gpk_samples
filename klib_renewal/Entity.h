@@ -8,7 +8,6 @@
 namespace klib
 {
 #pragma pack(push, 1)
-
 	struct SEntity {
 							int16_t							Definition			=  0;
 							int16_t							Modifier			=  0;
