@@ -209,6 +209,3 @@ int WINAPI											WinMain
 	(void)hInstance, (void)hPrevInstance, (void)lpCmdLine, (void)nShowCmd;
 	return ::cgiMain();
 }
-
-// 17070035
-// 0810-122-2666
