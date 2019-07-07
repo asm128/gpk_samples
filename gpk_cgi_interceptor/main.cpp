@@ -13,12 +13,12 @@
 namespace brt
 {
 	struct SProcessHandles {
-		HANDLE						ChildStd_IN_Read	= nullptr;
-		HANDLE						ChildStd_IN_Write	= nullptr;
-		HANDLE						ChildStd_OUT_Read	= nullptr;
-		HANDLE						ChildStd_OUT_Write	= nullptr;
-		HANDLE						ChildStd_ERR_Read	= nullptr;
-		HANDLE						ChildStd_ERR_Write	= nullptr;
+		HANDLE						ChildStd_IN_Read		= nullptr;
+		HANDLE						ChildStd_IN_Write		= nullptr;
+		HANDLE						ChildStd_OUT_Read		= nullptr;
+		HANDLE						ChildStd_OUT_Write		= nullptr;
+		HANDLE						ChildStd_ERR_Read		= nullptr;
+		HANDLE						ChildStd_ERR_Write		= nullptr;
 	};
 
 	struct SProcess {
@@ -85,18 +85,13 @@ static	::gpk::error_t		loadConfig
 		ree_if(::gpk::jsonParse(jsonReader, ::gpk::view_const_string{jsonData.begin(), jsonData.size()}), "Failed to read json! Not a valid json file? File name: %s.", fileNameJSONConfig.begin());
 	}
 	{ // load port from config file
-		::gpk::view_const_string												jsonPort					= {};
 		const int32_t															indexObjectConfig					= ::gpk::jsonArrayValueGet(*jsonReader.Tree[0], 0);	// Get the first JSON {object} found in the [document]
 		const int32_t															indexObjectApp						= ::gpk::jsonExpressionResolve("application.gpk_cgi_interceptor", jsonReader, indexObjectConfig, processFileName);
 		gwarn_if(errored(indexObjectApp), "Failed to find application node (%s) in json configuration file: '%s'", "application.gpk_cgi_interceptor", fileNameJSONConfig.begin())
 		else {
-			gwarn_if(errored(::gpk::jsonExpressionResolve("process.executable_path"			, jsonReader, indexObjectApp, processFileName	)), "Failed to load config from json! Last contents found: %s.", jsonPort.begin()) 
-			gwarn_if(errored(::gpk::jsonExpressionResolve("process.command_line_app_name"	, jsonReader, indexObjectApp, processMockPath	)), "Failed to load config from json! Last contents found: %s.", jsonPort.begin()) 
-			gwarn_if(errored(::gpk::jsonExpressionResolve("process.command_line_params"		, jsonReader, indexObjectApp, processParams		)), "Failed to load config from json! Last contents found: %s.", jsonPort.begin()) 
-			else {
-				::gpk::parseIntegerDecimal(jsonPort, &port);
-				info_printf("Port to listen on: %u.", (uint32_t)port);
-			}
+			gwarn_if(errored(::gpk::jsonExpressionResolve("process.executable_path"			, jsonReader, indexObjectApp, processFileName	)), "Failed to load config from json! Last contents found: %s.", processFileName	.begin()) 
+			gwarn_if(errored(::gpk::jsonExpressionResolve("process.command_line_app_name"	, jsonReader, indexObjectApp, processMockPath	)), "Failed to load config from json! Last contents found: %s.", processMockPath	.begin()) 
+			gwarn_if(errored(::gpk::jsonExpressionResolve("process.command_line_params"		, jsonReader, indexObjectApp, processParams		)), "Failed to load config from json! Last contents found: %s.", processParams		.begin()) 
 		}
 	}
 	szCmdlineApp														= processFileName;
