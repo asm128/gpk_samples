@@ -468,6 +468,7 @@ void																					distributeDropsForVictoriousTeam										(SGame& insta
 		for(uint32_t x = 0, width = tacticalInfo.Board.Width; x < width; ++x)
 			totalMapMoney																			+= tacticalInfo.Board.Tiles.Entities.Coins.Cells[z][x];
 
+	char message[256] = {};
 	if(totalWinners == 0) {
 		instanceGame.UserMiss																	= "No winners?";
 		instanceGame.LogMiss();
@@ -486,20 +487,28 @@ void																					distributeDropsForVictoriousTeam										(SGame& insta
 			int16_t currentAgent = winnerPlayer.Squad.Agents[iAgent];
 			if(-1 != currentAgent) {
 				winnerPlayer.Army[currentAgent]->Recalculate();
-				if(winnerPlayer.Army[currentAgent]->FinalPoints.LifeCurrent.Health > 0) {
-					winnerPlayer.Money																		+= winnerPlayer.Army[currentAgent]->FinalPoints.Coins / 2;
-					winnerPlayer.Army[currentAgent]->FinalPoints.Coins										-= winnerPlayer.Army[currentAgent]->FinalPoints.Coins / 2;
-					winnerPlayer.Score.MoneyEarned															+= winnerPlayer.Army[currentAgent]->FinalPoints.Coins;
-				}
-				else {
-					winnerPlayer.Money																		+= winnerPlayer.Army[currentAgent]->FinalPoints.Coins;
-					winnerPlayer.Score.MoneyEarned															+= winnerPlayer.Army[currentAgent]->FinalPoints.Coins;
+				uint32_t																					agentReward				= 0;
+				if(winnerPlayer.Army[currentAgent]->FinalPoints.LifeCurrent.Health > 0) 
+					agentReward																				= winnerPlayer.Army[currentAgent]->Points.Coins / 4 * 3;
+				else 
+					agentReward																				= winnerPlayer.Army[currentAgent]->Points.Coins;
+				if(agentReward) {
+					winnerPlayer.Money																		+= agentReward;
+					winnerPlayer.Score.MoneyEarned															+= agentReward;
+					winnerPlayer.Army[currentAgent]->Points.Coins											-= agentReward;
+					sprintf_s(message, "Money from agent %i: %u.", iAgent, agentReward);
+					instanceGame.UserSuccess																= message;
+					instanceGame.LogSuccess();
 				}
 			}
 		}
 		winnerPlayer.Money																		+= totalMapMoney;
 		winnerPlayer.Score.MoneyEarned															+= totalMapMoney;
 		winnerPlayer.Score.BattlesWon															+= 1;
+
+		sprintf_s(message, "Money from map: %u.", totalMapMoney);
+		instanceGame.UserSuccess																= message;
+		instanceGame.LogSuccess();
 	}
 	else {
 		int32_t																						totalProfession															= 0;
@@ -560,18 +569,26 @@ void																					distributeDropsForVictoriousTeam										(SGame& insta
 			winnerPlayer.Money																	+= reward;
 			totalMapMoney																		-= reward;
 			winnerPlayer.Score.MoneyEarned														+= reward;
+			sprintf_s(message, "Money from map for player %u: %u.", indexWinners[iWinner], reward);
+			instanceGame.UserSuccess																= message;
+			instanceGame.LogSuccess();
+
 			for(uint32_t iAgent = 0; iAgent < ::gpk::size(winnerPlayer.Squad.Agents); ++iAgent) {
 				int16_t currentAgent = winnerPlayer.Squad.Agents[iAgent];
 				if(-1 != currentAgent) {
 					winnerPlayer.Army[currentAgent]->Recalculate();
-					if(winnerPlayer.Army[currentAgent]->FinalPoints.LifeCurrent.Health > 0) {
-						winnerPlayer.Money																		+= winnerPlayer.Army[currentAgent]->FinalPoints.Coins / 2;
-						winnerPlayer.Army[currentAgent]->FinalPoints.Coins										/= winnerPlayer.Army[currentAgent]->FinalPoints.Coins / 2;
-						winnerPlayer.Score.MoneyEarned															+= winnerPlayer.Army[currentAgent]->FinalPoints.Coins;
-					}
-					else {
-						winnerPlayer.Money																		+= winnerPlayer.Army[currentAgent]->FinalPoints.Coins;
-						winnerPlayer.Score.MoneyEarned															+= winnerPlayer.Army[currentAgent]->FinalPoints.Coins;
+					uint32_t																					agentReward				= 0;
+					if(winnerPlayer.Army[currentAgent]->FinalPoints.LifeCurrent.Health > 0) 
+						agentReward																				= winnerPlayer.Army[currentAgent]->Points.Coins / 4 * 3;
+					else 
+						agentReward																				= winnerPlayer.Army[currentAgent]->Points.Coins;
+					if(agentReward) {
+						winnerPlayer.Money																		+= agentReward;
+						winnerPlayer.Score.MoneyEarned															+= agentReward;
+						winnerPlayer.Army[currentAgent]->Points.Coins											-= agentReward;
+						sprintf_s(message, "Money from agent %i for player %u: %u.", iAgent, indexWinners[iWinner], agentReward);
+						instanceGame.UserSuccess																= message;
+						instanceGame.LogSuccess();
 					}
 				}
 			}
@@ -649,7 +666,7 @@ void																					klib::determineOutcome													(SGame& instanceGame
 	}
 
 	char																						message[96]																= {};
-	::sprintf_s(message, "Team %s won the match", ::gpk::get_value_label(teamVictorious).begin());
+	::sprintf_s(message, "Team %s won the match.", ::gpk::get_value_label(teamVictorious).begin());
 
 	instanceGame.ClearMessages();
 	if(teamVictorious == TEAM_TYPE_ALLY) {

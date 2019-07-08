@@ -67,7 +67,7 @@ namespace klib
 	//GDECLARE_OBJ(CCharacter);
 
 	struct SPlayer { // can be AI or human.
-		int32_t													Money						= 1000000;
+		int32_t													Money						= 2500000;
 		SPlayerControl											Control						= SPlayerControl();
 		SPlayerSelection										Selection					= {0, 0, -1, -1, -1};
 		SSquad													Squad						= SSquad();
