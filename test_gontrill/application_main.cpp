@@ -55,20 +55,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 }
 
 static				::gpk::error_t										setupSprite									(::gpk::SImageProcessable<::gpk::SColorBGRA>& textureToProcess, ::gpk::SCoord2<int32_t>& textureCenter, const ::gpk::view_const_string& filename)	{ 
-	bool																		failedFromFile								= errored(::gpk::pngFileLoad(filename, textureToProcess.Original));
-	char_t																		filenameBMGCompo	[256]					= {};
-	strcpy_s(filenameBMGCompo, filename.begin());
-	filenameBMGCompo[strlen(filenameBMGCompo) - 3]							= 'b';
-	filenameBMGCompo[strlen(filenameBMGCompo) - 2]							= 'm';
-	filenameBMGCompo[strlen(filenameBMGCompo) - 1]							= 'g';
-	const ::gpk::view_const_string												filenameBMG									= filenameBMGCompo;
-	if(failedFromFile) {
-		error_printf("Failed to load bitmap from file: %s.", filename);
-		gerror_if(errored(::gpk::bmgFileLoad(filenameBMG, textureToProcess.Original)), "Failed to load image from disk: %s.", filenameBMG.begin());
-	} 
-	else {
-		gerror_if(errored(::gpk::bmgFileWrite(filenameBMG, textureToProcess.Original.View)), "Failed to store file on disk: %s.", filenameBMG.begin());
-	}
+	gpk_necall(::gpk::pngFileLoad(filename, textureToProcess.Original), "%s", "Failed to load sprite image.");
 	textureCenter															= (textureToProcess.Original.View.metrics() / 2).Cast<int32_t>();
 	textureToProcess.Processed.View											= textureToProcess.Original.View;
 	return 0;
