@@ -482,7 +482,23 @@ void																					distributeDropsForVictoriousTeam										(SGame& insta
 		pickupEntities(winnerPlayer.Goods.Inventory.Facility	, tacticalInfo.Drops.Facility	);
 		pickupEntities(winnerPlayer.Goods.Inventory.StageProp	, tacticalInfo.Drops.StageProp	);
 		pickupEntities(winnerPlayer.Goods.Inventory.Items		, tacticalInfo.Drops.Items		);
+		for(uint32_t iAgent = 0; iAgent < ::gpk::size(winnerPlayer.Squad.Agents); ++iAgent) {
+			int16_t currentAgent = winnerPlayer.Squad.Agents[iAgent];
+			if(-1 != currentAgent) {
+				winnerPlayer.Army[currentAgent]->Recalculate();
+				if(winnerPlayer.Army[currentAgent]->FinalPoints.LifeCurrent.Health > 0) {
+					winnerPlayer.Money																		+= winnerPlayer.Army[currentAgent]->FinalPoints.Coins / 2;
+					winnerPlayer.Army[currentAgent]->FinalPoints.Coins										-= winnerPlayer.Army[currentAgent]->FinalPoints.Coins / 2;
+					winnerPlayer.Score.MoneyEarned															+= winnerPlayer.Army[currentAgent]->FinalPoints.Coins;
+				}
+				else {
+					winnerPlayer.Money																		+= winnerPlayer.Army[currentAgent]->FinalPoints.Coins;
+					winnerPlayer.Score.MoneyEarned															+= winnerPlayer.Army[currentAgent]->FinalPoints.Coins;
+				}
+			}
+		}
 		winnerPlayer.Money																		+= totalMapMoney;
+		winnerPlayer.Score.MoneyEarned															+= totalMapMoney;
 		winnerPlayer.Score.BattlesWon															+= 1;
 	}
 	else {
@@ -529,14 +545,14 @@ void																					distributeDropsForVictoriousTeam										(SGame& insta
 			}
 		}
 		// Give the remaining drops to random winners
-		if(	tacticalInfo.Drops.Profession	.Count) pickupEntities(instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[::rand()%totalWinners]]].Goods.Inventory.Profession	, tacticalInfo.Drops.Profession	);
-		if(	tacticalInfo.Drops.Accessory	.Count) pickupEntities(instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[::rand()%totalWinners]]].Goods.Inventory.Accessory	, tacticalInfo.Drops.Accessory	);
-		if(	tacticalInfo.Drops.Armor		.Count) pickupEntities(instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[::rand()%totalWinners]]].Goods.Inventory.Armor		, tacticalInfo.Drops.Armor		);
-		if(	tacticalInfo.Drops.Weapon		.Count) pickupEntities(instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[::rand()%totalWinners]]].Goods.Inventory.Weapon		, tacticalInfo.Drops.Weapon		);
-		if(	tacticalInfo.Drops.Vehicle		.Count) pickupEntities(instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[::rand()%totalWinners]]].Goods.Inventory.Vehicle	, tacticalInfo.Drops.Vehicle	);
-		if(	tacticalInfo.Drops.Facility		.Count) pickupEntities(instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[::rand()%totalWinners]]].Goods.Inventory.Facility	, tacticalInfo.Drops.Facility	);
-		if(	tacticalInfo.Drops.StageProp	.Count) pickupEntities(instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[::rand()%totalWinners]]].Goods.Inventory.StageProp	, tacticalInfo.Drops.StageProp	);
-		if(	tacticalInfo.Drops.Items		.Count) pickupEntities(instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[::rand()%totalWinners]]].Goods.Inventory.Items		, tacticalInfo.Drops.Items		);
+		if(	tacticalInfo.Drops.Profession	.Count) pickupEntities(instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[::rand() % totalWinners]]].Goods.Inventory.Profession	, tacticalInfo.Drops.Profession	);
+		if(	tacticalInfo.Drops.Accessory	.Count) pickupEntities(instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[::rand() % totalWinners]]].Goods.Inventory.Accessory	, tacticalInfo.Drops.Accessory	);
+		if(	tacticalInfo.Drops.Armor		.Count) pickupEntities(instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[::rand() % totalWinners]]].Goods.Inventory.Armor		, tacticalInfo.Drops.Armor		);
+		if(	tacticalInfo.Drops.Weapon		.Count) pickupEntities(instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[::rand() % totalWinners]]].Goods.Inventory.Weapon		, tacticalInfo.Drops.Weapon		);
+		if(	tacticalInfo.Drops.Vehicle		.Count) pickupEntities(instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[::rand() % totalWinners]]].Goods.Inventory.Vehicle		, tacticalInfo.Drops.Vehicle	);
+		if(	tacticalInfo.Drops.Facility		.Count) pickupEntities(instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[::rand() % totalWinners]]].Goods.Inventory.Facility		, tacticalInfo.Drops.Facility	);
+		if(	tacticalInfo.Drops.StageProp	.Count) pickupEntities(instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[::rand() % totalWinners]]].Goods.Inventory.StageProp	, tacticalInfo.Drops.StageProp	);
+		if(	tacticalInfo.Drops.Items		.Count) pickupEntities(instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[::rand() % totalWinners]]].Goods.Inventory.Items		, tacticalInfo.Drops.Items		);
 
 		uint32_t																				reward																	= totalMapMoney / totalWinners;
 		for(uint32_t iWinner=0; iWinner<totalWinners; ++iWinner) {
@@ -544,6 +560,21 @@ void																					distributeDropsForVictoriousTeam										(SGame& insta
 			winnerPlayer.Money																	+= reward;
 			totalMapMoney																		-= reward;
 			winnerPlayer.Score.MoneyEarned														+= reward;
+			for(uint32_t iAgent = 0; iAgent < ::gpk::size(winnerPlayer.Squad.Agents); ++iAgent) {
+				int16_t currentAgent = winnerPlayer.Squad.Agents[iAgent];
+				if(-1 != currentAgent) {
+					winnerPlayer.Army[currentAgent]->Recalculate();
+					if(winnerPlayer.Army[currentAgent]->FinalPoints.LifeCurrent.Health > 0) {
+						winnerPlayer.Money																		+= winnerPlayer.Army[currentAgent]->FinalPoints.Coins / 2;
+						winnerPlayer.Army[currentAgent]->FinalPoints.Coins										/= winnerPlayer.Army[currentAgent]->FinalPoints.Coins / 2;
+						winnerPlayer.Score.MoneyEarned															+= winnerPlayer.Army[currentAgent]->FinalPoints.Coins;
+					}
+					else {
+						winnerPlayer.Money																		+= winnerPlayer.Army[currentAgent]->FinalPoints.Coins;
+						winnerPlayer.Score.MoneyEarned															+= winnerPlayer.Army[currentAgent]->FinalPoints.Coins;
+					}
+				}
+			}
 		}
 		if(totalMapMoney)
 			instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[::rand()%totalWinners]]].Money	+= totalMapMoney;
