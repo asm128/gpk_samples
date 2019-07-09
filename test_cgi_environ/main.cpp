@@ -2,9 +2,7 @@
 #include "gpk_string_helper.h"
 #include "gpk_process.h"
 
-::gpk::error_t										generate_output(::gpk::array_pod<char_t> & output)					{
-	::gpk::SCGIRuntimeValues								runtimeValues;
-	::gpk::cgiRuntimeValuesLoad(runtimeValues);
+::gpk::error_t										generate_output(::gpk::SCGIRuntimeValues & runtimeValues, ::gpk::array_pod<char_t> & output)					{
 	char													buffer[8192]		= {};
 	const ::gpk::array_obj<::gpk::view_const_string>		& keyvalviews		= runtimeValues.QueryStringElements;
 	if(runtimeValues.QueryString.size()) {
@@ -118,16 +116,18 @@
 	return output.size();
 }
 
-static ::gpk::error_t								cgiMain				() {
+static ::gpk::error_t								cgiMain				(int argc, char** argv, char**envv) {
+	(void)(envv);
+	::gpk::SCGIRuntimeValues								runtimeValues;
+	::gpk::cgiRuntimeValuesLoad(runtimeValues, {(const char**)argv, (uint32_t)argc});
 	::gpk::array_pod<char_t>								output;
-	::generate_output(output);
+	::generate_output(runtimeValues, output);
 	printf("%s", output.begin());
 	return 0;
 }
 
 int													main				(int argc, char** argv, char**envv)	{
-	(void)argc, (void)argv, (void)envv;
-	return ::cgiMain();
+	return ::cgiMain(argc, argv, envv);
 }
 
 #ifdef GPK_WINDOWS
@@ -138,6 +138,6 @@ int WINAPI											WinMain
 	,	_In_		int			nShowCmd
 	) {
 	(void)hInstance, (void)hPrevInstance, (void)lpCmdLine, (void)nShowCmd;
-	return ::cgiMain();
+	return ::cgiMain(__argc, __argv, environ);
 }
 #endif

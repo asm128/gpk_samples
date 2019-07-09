@@ -68,7 +68,6 @@ int													main						()			{
 			"e"
 			;
 
-
 		::gpk::array_pod<byte_t> encoded;
 		::gpk::rleEncode(::gpk::view_const_string(textTest), encoded);
 		encoded.push_back(0);
