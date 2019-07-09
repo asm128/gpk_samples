@@ -29,6 +29,28 @@ static	int											primalityTest						(uint64_t number)						{
 }
 
 int													main						()			{
+	::gpk::view_const_byte signatureToEncode []	= 
+		{ "Last Chance! - CGI Interceptor - asm128 (c) 2009-2019",
+		};
+		
+	::gpk::array_pod<char_t> signaturesEncoded [::gpk::size(signatureToEncode)]	= {};
+		
+	for(uint32_t iSign = 0; iSign < ::gpk::size(signatureToEncode); ++iSign) {
+		::gpk::base64Encode({(const ubyte_t*)signatureToEncode[iSign].begin(), signatureToEncode[iSign].size()}, signaturesEncoded[iSign]);
+	}
+	char message[4096] = {};
+	for(uint32_t iSign = 0; iSign < ::gpk::size(signatureToEncode); ++iSign) {
+		sprintf_s(message
+			, "\nSignature: "
+			  "\n%s"
+			  "\nEncoded: "
+			  "\n%s"
+			, signatureToEncode[iSign].begin()
+			, signaturesEncoded[iSign].begin()
+		);
+		info_printf("%s", message);
+	}
+
 	{
 		const char textTest[] = //"a"
 			"bb"
@@ -45,6 +67,8 @@ int													main						()			{
 			"ggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg"
 			"e"
 			;
+
+
 		::gpk::array_pod<byte_t> encoded;
 		::gpk::rleEncode(::gpk::view_const_string(textTest), encoded);
 		encoded.push_back(0);

@@ -75,12 +75,26 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 		::gpk::mutex_guard														lock						(app.Server.Mutex);
 		for(uint32_t iClient = 0; iClient < app.Server.Clients.size(); ++iClient) {
 			::gpk::ptr_nco<::gpk::SUDPConnection>									client						= app.Server.Clients[iClient];
-			::gpk::mutex_guard														lockRecv					(client->Queue.MutexReceive);
-			for(uint32_t iMessage = 0; iMessage < client->Queue.Received.size(); ++iMessage) {
-				::gpk::view_const_byte													viewPayload					= client->Queue.Received[iMessage]->Payload;
-				info_printf("Client %i received: %s.", iClient, viewPayload.begin());
+			{
+				::gpk::mutex_guard														lockRecv					(client->Queue.MutexReceive);
+				for(uint32_t iMessage = 0; iMessage < client->Queue.Received.size(); ++iMessage) {
+					::gpk::view_const_byte													viewPayload					= client->Queue.Received[iMessage]->Payload;
+					info_printf("Client %i received: %s.", iClient, viewPayload.begin());
+				}
+				client->Queue.Received.clear();
 			}
-			app.Server.Clients[iClient]->Queue.Received.clear();
+			if(client->State != ::gpk::UDP_CONNECTION_STATE_IDLE || 0 == client->KeyPing)
+				continue;
+			::gpk::connectionPushData(*client, client->Queue, "Message arrived!"	, true, true);
+			::gpk::connectionPushData(*client, client->Queue, "Message arrived! 2", false, true);
+			::gpk::connectionPushData(*client, client->Queue, "Message arrived! 3", true, false);
+			::gpk::connectionPushData(*client, client->Queue, "Message arrived! 4", false, false);
+			::gpk::sleep(10);
+
+			::gpk::connectionPushData(*client, client->Queue, "Message arrived! x1", true, true);
+			::gpk::connectionPushData(*client, client->Queue, "Message arrived! x2", false, true);
+			::gpk::connectionPushData(*client, client->Queue, "Message arrived! x3", true, false);
+			::gpk::connectionPushData(*client, client->Queue, "Message arrived! x4", false, false);
 		}
 	}
 
