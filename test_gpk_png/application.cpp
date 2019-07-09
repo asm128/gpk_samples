@@ -42,11 +42,10 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 		::gpk::view_const_string												pathPNGSuite						= {};
 		{
 			const ::gpk::SJSONReader												& jsonReader						= framework.ReaderJSONConfig;
-			const int32_t															indexObjectConfig					= ::gpk::jsonArrayValueGet(*jsonReader.Tree[0], 0);	// Get the first JSON {object} found in the [document]
-			gpk_necall(::gpk::jsonExpressionResolve("assets.pngsuite.path", jsonReader, indexObjectConfig, pathPNGSuite), "Failed to get path of PNG files! Last contents found: %s.", pathPNGSuite.begin());
+			gpk_necall(::gpk::jsonExpressionResolve("assets.pngsuite.path", jsonReader, 0, pathPNGSuite), "Failed to get path of PNG files! Last contents found: %s.", pathPNGSuite.begin());
 			info_printf("Path to PNG test files: %s.", pathPNGSuite.begin());
 			::gpk::view_const_string												fileNamePNG							= {};
-			const int32_t															indexJSONNodeArrayPNGFileNames		= ::gpk::jsonExpressionResolve("application.gpk_test_png.images", jsonReader, indexObjectConfig, fileNamePNG);
+			const int32_t															indexJSONNodeArrayPNGFileNames		= ::gpk::jsonExpressionResolve("application.gpk_test_png.images", jsonReader, 0, fileNamePNG);
 			const uint32_t															countFilesToLoad					= (uint32_t)::gpk::jsonArraySize(*jsonReader.Tree[indexJSONNodeArrayPNGFileNames]);
 			gpk_necall(app.PNGImages.resize(countFilesToLoad), "Failed to resize array for %u PNG files.", countFilesToLoad);
 			::gpk::array_pod<char_t>												expression							= {};
