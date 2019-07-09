@@ -71,7 +71,10 @@ namespace klib
 		inline constexpr	int32_t							GetMaxSize			()									const	noexcept	{ return _Size; }
 
 		inline				const SEntitySlot<_EntityType>&	operator[]			(uint32_t index)					const				{ if(index >= Count) { error_printf("Invalid index! Index: %i.", (int32_t)index); }	return Slots[index]; }
-		inline				SEntitySlot<_EntityType>&		operator[]			(uint32_t index)										{ if(index >= Count) { error_printf("Invalid index! Index: %i.", (int32_t)index); }	return Slots[index]; }
+		inline				SEntitySlot<_EntityType>&		operator[]			(uint32_t index)										{ if(index >= Count) { 
+			error_printf("Invalid index! Index: %i.", (int32_t)index); }	
+			return Slots[index]; 
+		}
 
 		// Returns false if the container is full
 		inline				bool							AddElement			(const _EntityType& element)							{ 

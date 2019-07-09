@@ -226,7 +226,7 @@ int32_t												getEnemyCoinsForTerrainFun							(SGame& instanceGame)							
 		}
 	}
 
-	return totalAgents ? maxCoins / totalAgents / 4 : 1;
+	return totalAgents ? maxCoins : 1;	// totalAgents / 4 
 }
 
 void												recalculateAgentsInRangeAndSight					(SGame& instanceGame);
