@@ -2,95 +2,144 @@
 #include "gpk_string_helper.h"
 #include "gpk_process.h"
 
-::gpk::error_t										generate_output(::gpk::SCGIRuntimeValues & runtimeValues, ::gpk::array_pod<char_t> & output)					{
-	char													buffer[8192]		= {};
-	const ::gpk::array_obj<::gpk::view_const_string>		& keyvalviews		= runtimeValues.QueryStringElements;
-	if(runtimeValues.QueryString.size()) {
-		output.append(buffer, sprintf_s(buffer, "\r\n[{ \"queryString\" : { \"length\" : %u, \"data\" : \"%s\", \"values\" : [", runtimeValues.QueryString.size(), runtimeValues.QueryString.begin()));
-		for(uint32_t iKeyVal = 0; iKeyVal < keyvalviews.size(); ++iKeyVal) {
-			const ::gpk::SKeyVal<::gpk::view_const_string, ::gpk::view_const_string>	& keyval		= runtimeValues.QueryStringKeyVals[iKeyVal];
-			output.append(buffer, ::gpk::formatForSize(keyval.Key, buffer, "\n { \"Key\": \"", "\""));
-			if(keyvalviews.size() - 1 == iKeyVal)
-				output.append(buffer, ::gpk::formatForSize(keyval.Val, buffer, "\n , \"Val\": \"", "\"\n }"));// without the trailing , comma character
-			else
-				output.append(buffer, ::gpk::formatForSize(keyval.Val, buffer, "\n , \"Val\": \"", "\"\n }, "));
-		}
-		output.append(buffer, sprintf_s(buffer, "\n] }, "));
-	}
-	else
-		output.append(buffer, sprintf_s(buffer, "\r\n[{"));
+::gpk::view_const_string	cgi_environ	[]		=
+	{	"AUTH_PASSWORD"		
+	,	"AUTH_TYPE"			
+	,	"AUTH_USER"			
+	,	"CERT_COOKIE"		
+	,	"CERT_FLAGS"		
+	,	"CERT_ISSUER"		
+	,	"CERT_KEYSIZE"		
+	,	"CERT_SECRETKEYSIZE"
+	,	"CERT_SERIALNUMBER"	
+	,	"CERT_SERVER_ISSUER"
+	,	"CERT_SERVER_SUBJECT"
+	,	"CERT_SUBJECT"		
+	,	"CF_TEMPLATE_PATH"	
+	,	"CONTENT_LENGTH"	
+	,	"CONTENT_TYPE"		
+	,	"CONTEXT_PATH"		
+	,	"GATEWAY_INTERFACE"	
+	,	"HTTPS"				
+	,	"HTTPS_KEYSIZE"		
+	,	"HTTPS_SECRETKEYSIZE"
+	,	"HTTPS_SERVER_ISSUER"
+	,	"HTTPS_SERVER_SUBJECT"
+	,	"HTTP_ACCEPT"		
+	,	"HTTP_ACCEPT_ENCODING"
+	,	"HTTP_ACCEPT_LANGUAGE"
+	,	"HTTP_CONNECTION"	
+	,	"HTTP_COOKIE"		
+	,	"HTTP_HOST"			
+	,	"HTTP_REFERER"		
+	,	"HTTP_USER_AGENT"	
+	,	"QUERY_STRING"		
+	,	"REMOTE_ADDR"		
+	,	"REMOTE_HOST"		
+	,	"REMOTE_USER"		
+	,	"REQUEST_METHOD"	
+	,	"SCRIPT_NAME"		
+	,	"SERVER_NAME"		
+	,	"SERVER_PORT"		
+	,	"SERVER_PORT_SECURE"
+	,	"SERVER_PROTOCOL"	
+	,	"SERVER_SOFTWARE"	
+	,	"WEB_SERVER_API"	
+	};
 
-	output.append(buffer, sprintf_s(buffer, "\n \"cgi_environment\" : "));
-	output.append(buffer, sprintf_s(buffer, "\n { \"AUTH_PASSWORD\"			: \"%s\"", runtimeValues.Environment.AUTH_PASSWORD			.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"AUTH_TYPE\"				: \"%s\"", runtimeValues.Environment.AUTH_TYPE				.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"AUTH_USER\"				: \"%s\"", runtimeValues.Environment.AUTH_USER				.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"CERT_COOKIE\"			: \"%s\"", runtimeValues.Environment.CERT_COOKIE			.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"CERT_FLAGS\"			: \"%s\"", runtimeValues.Environment.CERT_FLAGS				.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"CERT_ISSUER\"			: \"%s\"", runtimeValues.Environment.CERT_ISSUER			.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"CERT_KEYSIZE\"			: \"%s\"", runtimeValues.Environment.CERT_KEYSIZE			.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"CERT_SECRETKEYSIZE\"	: \"%s\"", runtimeValues.Environment.CERT_SECRETKEYSIZE		.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"CERT_SERIALNUMBER\"		: \"%s\"", runtimeValues.Environment.CERT_SERIALNUMBER		.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"CERT_SERVER_ISSUER\"	: \"%s\"", runtimeValues.Environment.CERT_SERVER_ISSUER		.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"CERT_SERVER_SUBJECT\"	: \"%s\"", runtimeValues.Environment.CERT_SERVER_SUBJECT	.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"CERT_SUBJECT\"			: \"%s\"", runtimeValues.Environment.CERT_SUBJECT			.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"CF_TEMPLATE_PATH\"		: \"%s\"", runtimeValues.Environment.CF_TEMPLATE_PATH		.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"CONTENT_LENGTH\"		: \"%s\"", runtimeValues.Environment.CONTENT_LENGTH			.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"CONTENT_TYPE\"			: \"%s\"", runtimeValues.Environment.CONTENT_TYPE			.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"CONTEXT_PATH\"			: \"%s\"", runtimeValues.Environment.CONTEXT_PATH			.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"GATEWAY_INTERFACE\"		: \"%s\"", runtimeValues.Environment.GATEWAY_INTERFACE		.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"HTTPS\"					: \"%s\"", runtimeValues.Environment.HTTPS					.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"HTTPS_KEYSIZE\"			: \"%s\"", runtimeValues.Environment.HTTPS_KEYSIZE			.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"HTTPS_SECRETKEYSIZE\"	: \"%s\"", runtimeValues.Environment.HTTPS_SECRETKEYSIZE	.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"HTTPS_SERVER_ISSUER\"	: \"%s\"", runtimeValues.Environment.HTTPS_SERVER_ISSUER	.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"HTTPS_SERVER_SUBJECT\"	: \"%s\"", runtimeValues.Environment.HTTPS_SERVER_SUBJECT	.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"HTTP_ACCEPT\"			: \"%s\"", runtimeValues.Environment.HTTP_ACCEPT			.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"HTTP_ACCEPT_ENCODING\"	: \"%s\"", runtimeValues.Environment.HTTP_ACCEPT_ENCODING	.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"HTTP_ACCEPT_LANGUAGE\"	: \"%s\"", runtimeValues.Environment.HTTP_ACCEPT_LANGUAGE	.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"HTTP_CONNECTION\"		: \"%s\"", runtimeValues.Environment.HTTP_CONNECTION		.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"HTTP_COOKIE\"			: \"%s\"", runtimeValues.Environment.HTTP_COOKIE			.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"HTTP_HOST\"				: \"%s\"", runtimeValues.Environment.HTTP_HOST				.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"HTTP_REFERER\"			: \"%s\"", runtimeValues.Environment.HTTP_REFERER			.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"HTTP_USER_AGENT\"		: \"%s\"", runtimeValues.Environment.HTTP_USER_AGENT		.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"QUERY_STRING\"			: \"%s\"", runtimeValues.Environment.QUERY_STRING			.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"REMOTE_ADDR\"			: \"%s\"", runtimeValues.Environment.REMOTE_ADDR			.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"REMOTE_HOST\"			: \"%s\"", runtimeValues.Environment.REMOTE_HOST			.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"REMOTE_USER\"			: \"%s\"", runtimeValues.Environment.REMOTE_USER			.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"REQUEST_METHOD\"		: \"%s\"", runtimeValues.Environment.REQUEST_METHOD			.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"SCRIPT_NAME\"			: \"%s\"", runtimeValues.Environment.SCRIPT_NAME			.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"SERVER_NAME\"			: \"%s\"", runtimeValues.Environment.SERVER_NAME			.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"SERVER_PORT\"			: \"%s\"", runtimeValues.Environment.SERVER_PORT			.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"SERVER_PORT_SECURE\"	: \"%s\"", runtimeValues.Environment.SERVER_PORT_SECURE		.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"SERVER_PROTOCOL\"		: \"%s\"", runtimeValues.Environment.SERVER_PROTOCOL		.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"SERVER_SOFTWARE\"		: \"%s\"", runtimeValues.Environment.SERVER_SOFTWARE		.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n , \"WEB_SERVER_API\"		: \"%s\"", runtimeValues.Environment.WEB_SERVER_API			.begin()));
-	output.append(buffer, sprintf_s(buffer, "\n },"));
-	output.append(buffer, sprintf_s(buffer, "\n \"process_environment\" : "));
-	output.append(buffer, sprintf_s(buffer, "\r\n["));
+static	::gpk::error_t								generate_output_qs				(::gpk::SCGIRuntimeValues & runtimeValues, ::gpk::array_pod<char_t> & output)				{
+	char													buffer[8192]					= {};
+	output.push_back('{');
+	output.append(buffer, sprintf_s(buffer, "\n\"length\" : %u, \"data\" : \"%s\", \"values\" : ", runtimeValues.QueryString.size(), runtimeValues.QueryString.begin()));
+
+	output.push_back('{');
+	for(uint32_t iEnviron = 0; iEnviron < runtimeValues.QueryStringKeyVals.size(); ++iEnviron) {
+		const ::gpk::TKeyValConstString							& keyval						= runtimeValues.QueryStringKeyVals[iEnviron];
+		if(iEnviron > 0)
+			output.push_back(',');
+		::gpk::array_pod<char_t>								key				= keyval.Key;
+		::gpk::array_pod<char_t>								val				= keyval.Val;
+		key.push_back('\0');
+		val.push_back('\0');
+		output.append(buffer, sprintf_s(buffer, "\n\"%s\" : \"%s\"", key.begin(), val.begin()));
+	}
+	output.push_back('}');
+
+	output.push_back('}');
+	return 0;
+}
+
+static	::gpk::error_t								generate_output_cgi_env			(::gpk::array_pod<char_t> & output, ::gpk::view_array<const ::gpk::TKeyValConstString> environViews)					{
+	char													buffer[8192]					= {};
+	output.push_back('{');
+	uint32_t												iComma							= 0;
+	for(uint32_t iCGIEnviron	= 0; iCGIEnviron	< ::gpk::size(cgi_environ)	; ++iCGIEnviron	)
+	for(uint32_t iEnviron		= 0; iEnviron		< environViews.size()		; ++iEnviron	) {
+		const ::gpk::TKeyValConstString							& keyval						= environViews[iEnviron];
+		if(cgi_environ[iCGIEnviron] == keyval.Key) {
+			if(iComma > 0)
+				output.push_back(',');
+			::gpk::array_pod<char_t>								key								= keyval.Key;
+			key.push_back('\0');
+			output.append(buffer, sprintf_s(buffer, "\n\"%s\" : \"%s\"", key.begin(), keyval.Val.begin()));
+			++iComma;
+			break;
+		}
+	}
+	output.push_back('}');
+	return 0;
+}
+
+static	::gpk::error_t								generate_output_process_env		(::gpk::array_pod<char_t> & output, ::gpk::view_array<const ::gpk::TKeyValConstString> environViews)					{
+	char													buffer[8192]					= {};
+	output.push_back('{');
+	for(uint32_t iEnviron = 0; iEnviron < environViews.size(); ++iEnviron) {
+		const ::gpk::TKeyValConstString							& keyval						= environViews[iEnviron];
+		if(iEnviron > 0)
+			output.push_back(',');
+		::gpk::array_pod<char_t>								key								= keyval.Key;
+		key.push_back('\0');
+		output.append(buffer, sprintf_s(buffer, "\n\"%s\" : \"%s\"", key.begin(), keyval.Val.begin()));
+	}
+	output.push_back('}');
+	return 0;
+}
+
+static	::gpk::error_t								generate_output					(::gpk::SCGIRuntimeValues & runtimeValues, ::gpk::array_pod<char_t> & output)					{
+	char													buffer[8192]					= {};
+	output.append(::gpk::view_const_string{"\r\n"});
+	output.push_back('[');
+	output.push_back('{');
+	if(runtimeValues.QueryString.size()) {
+		output.append(::gpk::view_const_string{"\n \"queryString\" : "});
+		::generate_output_qs(runtimeValues, output);
+		output.push_back(',');
+	}
 
 	::gpk::array_pod<byte_t>								environmentBlock;
 	::gpk::environmentBlockFromEnviron(environmentBlock);
-	::gpk::array_obj<::gpk::TKeyValConstString>				keyVals;
-	::gpk::environmentBlockViews(environmentBlock, keyVals);
-	for(uint32_t iKeyVal = 0; iKeyVal < keyVals.size(); ++iKeyVal) {
-		const ::gpk::TKeyValConstString							& keyval				= keyVals[iKeyVal];
-		output.append(buffer, ::gpk::formatForSize(keyval.Key, buffer, "\n { \"Key\": \"", "\""));
-		if(keyVals.size() - 1 == iKeyVal)
-			output.append(buffer, ::gpk::formatForSize(keyval.Val, buffer, "\n , \"Val\": \"", "\"\n }"));// without the trailing , comma character
-		else
-			output.append(buffer, ::gpk::formatForSize(keyval.Val, buffer, "\n , \"Val\": \"", "\"\n }, "));
-	}
-	output.append(buffer, sprintf_s(buffer, "\n], "));
+	::gpk::array_obj<::gpk::TKeyValConstString>				environViews;
+	::gpk::environmentBlockViews(environmentBlock, environViews);
+
+	output.append(::gpk::view_const_string{"\n \"cgi_environment\" : "});
+	::generate_output_cgi_env(output, environViews);
+	output.push_back(',');
+
+	output.append(::gpk::view_const_string{"\n \"process_environment\" : "});
+	::generate_output_process_env(output, environViews);
+	output.push_back(',');
+
 	{
-		::gpk::array_pod<char>									content_body			= {};
+		::gpk::array_pod<char>									content_body				= {};
 		content_body.resize(runtimeValues.Content.Length);
-		uint32_t												iChar					= 0;
-		char													iArg					= 0;
+		uint32_t												iChar						= 0;
+		char													iArg						= 0;
 		while(iChar < runtimeValues.Content.Length) {
-			int														count					= 0;
+			int														count						= 0;
 			//memset(content_body.begin(), 0, content_body.size());
 			content_body.resize(0);
-			uint32_t												iOffset					= iChar;
-			bool													value					= false;
+			uint32_t												iOffset						= iChar;
+			bool													value						= false;
 			while(iChar < runtimeValues.Content.Length && (iArg = runtimeValues.Content.Body[iChar++])) {
 				if(iArg == '\n') {
 					++count;
@@ -116,7 +165,7 @@
 	return output.size();
 }
 
-static ::gpk::error_t								cgiMain				(int argc, char** argv, char**envv) {
+static ::gpk::error_t								cgiMain							(int argc, char** argv, char**envv)		{
 	(void)(envv);
 	::gpk::SCGIRuntimeValues								runtimeValues;
 	::gpk::cgiRuntimeValuesLoad(runtimeValues, {(const char**)argv, (uint32_t)argc});
@@ -126,9 +175,7 @@ static ::gpk::error_t								cgiMain				(int argc, char** argv, char**envv) {
 	return 0;
 }
 
-int													main				(int argc, char** argv, char**envv)	{
-	return ::cgiMain(argc, argv, envv);
-}
+int													main							(int argc, char** argv, char**envv)		{ return ::cgiMain(argc, argv, envv); }
 
 #ifdef GPK_WINDOWS
 int WINAPI											WinMain				
