@@ -5,10 +5,8 @@
 static	::gpk::error_t								generate_output_qs				(::gpk::SCGIRuntimeValues & runtimeValues, ::gpk::array_pod<char_t> & output)				{
 	::gpk::array_pod<char>									buffer							= {};
 	::gpk::view_const_string								querystring;
-	::gpk::array_pod<char_t>								environBlock;
 	::gpk::array_obj<::gpk::TKeyValConstString>				environBlockViews;
-	::gpk::environmentBlockFromEnviron(environBlock);
-	::gpk::environmentBlockViews(environBlock, environBlockViews);
+	::gpk::environmentBlockViews(runtimeValues.EntryPointArgs.EnvironmentBlock, environBlockViews);
 	::gpk::find("QUERY_STRING", environBlockViews, querystring);
 	buffer.resize(querystring.size() + 1024);
 	output.push_back('{');
@@ -74,10 +72,8 @@ static	::gpk::error_t								generate_output					(::gpk::SCGIRuntimeValues & run
 	output.push_back('[');
 	output.push_back('{');
 	{
-		::gpk::array_pod<char_t>								environBlock;
 		::gpk::array_obj<::gpk::TKeyValConstString>				environViews;
-		::gpk::environmentBlockFromEnviron(environBlock);
-		::gpk::environmentBlockViews(environBlock, environViews);
+		::gpk::environmentBlockViews(runtimeValues.EntryPointArgs.EnvironmentBlock, environViews);
 		{
 			::gpk::view_const_string								querystring;
 			::gpk::find("QUERY_STRING", environViews, querystring);
@@ -88,8 +84,6 @@ static	::gpk::error_t								generate_output					(::gpk::SCGIRuntimeValues & run
 			}
 		}
 		{
-			::gpk::array_pod<byte_t>								environmentBlock;
-			::gpk::environmentBlockFromEnviron(environmentBlock);
 			{
 				output.append(::gpk::view_const_string{"\n \"cgi_environment\" : "});
 				::generate_output_cgi_env(output, environViews);
