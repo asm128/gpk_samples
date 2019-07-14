@@ -67,7 +67,7 @@ static	::gpk::error_t								generate_output_process_env		(::gpk::array_pod<char
 	return 0;
 }
 
-static	::gpk::error_t								generate_output					(::gpk::SCGIRuntimeValues & runtimeValues, ::gpk::array_pod<char_t> & output)					{
+		::gpk::error_t								generate_output					(::gpk::SCGIRuntimeValues & runtimeValues, ::gpk::array_pod<char_t> & output)					{
 	output.append(::gpk::view_const_string{"\r\n"});
 	output.push_back('[');
 	output.push_back('{');
