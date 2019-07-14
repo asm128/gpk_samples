@@ -41,7 +41,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 		::gpk::SPNGData															pngDataCacheForFasterLoad;
 		::gpk::view_const_string												pathPNGSuite						= {};
 		{
-			const ::gpk::SJSONReader												& jsonReader						= framework.ReaderJSONConfig;
+			const ::gpk::SJSONReader												& jsonReader						= framework.JSONConfig.Reader;
 			gpk_necall(::gpk::jsonExpressionResolve("assets.pngsuite.path", jsonReader, 0, pathPNGSuite), "Failed to get path of PNG files! Last contents found: %s.", pathPNGSuite.begin());
 			info_printf("Path to PNG test files: %s.", pathPNGSuite.begin());
 			::gpk::view_const_string												fileNamePNG							= {};

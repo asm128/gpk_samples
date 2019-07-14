@@ -39,7 +39,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	app.Client.AddressConnect											= {};
 	::gpk::tcpipAddress(9998, 0, ::gpk::TRANSPORT_PROTOCOL_UDP, app.Client.AddressConnect);	// If loading the remote IP from the json fails, we fall back to the local address.
 	{ // attempt to load address from config file.
-		const ::gpk::SJSONReader												& jsonReader						= framework.ReaderJSONConfig;
+		const ::gpk::SJSONReader												& jsonReader						= framework.JSONConfig.Reader;
 		{ // 
 			::gpk::view_const_string												jsonIP								= {};
 			gwarn_if(errored(::gpk::jsonExpressionResolve("application.test_udp_client.remote_ip", jsonReader, 0, jsonIP)), "Failed to load config from json! Last contents found: %s.", jsonIP.begin())

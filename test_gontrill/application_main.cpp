@@ -63,7 +63,7 @@ static				::gpk::error_t										setupSprite									(::gpk::SImageProcessable<
 static				::gpk::error_t										setupSprites								(::SApplication& app)											{ 
 	::gpk::view_const_string												pathPNGSuite									= {};
 	{
-		const ::gpk::SJSONReader												& jsonReader									= app.Framework.ReaderJSONConfig;
+		const ::gpk::SJSONReader												& jsonReader									= app.Framework.JSONConfig.Reader;
 		gpk_necall(::gpk::jsonExpressionResolve("assets.images.path", jsonReader, 0, pathPNGSuite), "Failed to get path of image files! Last contents found: %s.", pathPNGSuite.begin());
 		info_printf("Path to PNG test files: %s.", pathPNGSuite.begin());
 		::gpk::view_const_string												fileNamePNG										= {};
