@@ -168,15 +168,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\gpk\gpk_config.json = ..\gpk\gpk_config.json
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bigbro", "bigbro\bigbro.vcxproj", "{A0198EE2-B8F9-494E-AB4B-AED97A8245D3}"
-	ProjectSection(ProjectDependencies) = postProject
-		{830AB681-B788-47D4-9767-BA4E0792F682} = {830AB681-B788-47D4-9767-BA4E0792F682}
-		{39953D8D-A830-46BD-917E-1A96C8BDADC6} = {39953D8D-A830-46BD-917E-1A96C8BDADC6}
-		{8FD826F8-3739-44E6-8CC8-997122E53B8D} = {8FD826F8-3739-44E6-8CC8-997122E53B8D}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bigeye", "bigeye\bigeye.vcxproj", "{5B876CEF-2228-4E6A-A4AA-2C49BC37AD73}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -393,22 +384,6 @@ Global
 		{8AB3059B-FA08-4E1D-869A-514DBC1078F4}.Release|x64.Build.0 = Release|x64
 		{8AB3059B-FA08-4E1D-869A-514DBC1078F4}.Release|x86.ActiveCfg = Release|Win32
 		{8AB3059B-FA08-4E1D-869A-514DBC1078F4}.Release|x86.Build.0 = Release|Win32
-		{A0198EE2-B8F9-494E-AB4B-AED97A8245D3}.Debug|x64.ActiveCfg = Debug|x64
-		{A0198EE2-B8F9-494E-AB4B-AED97A8245D3}.Debug|x64.Build.0 = Debug|x64
-		{A0198EE2-B8F9-494E-AB4B-AED97A8245D3}.Debug|x86.ActiveCfg = Debug|Win32
-		{A0198EE2-B8F9-494E-AB4B-AED97A8245D3}.Debug|x86.Build.0 = Debug|Win32
-		{A0198EE2-B8F9-494E-AB4B-AED97A8245D3}.Release|x64.ActiveCfg = Release|x64
-		{A0198EE2-B8F9-494E-AB4B-AED97A8245D3}.Release|x64.Build.0 = Release|x64
-		{A0198EE2-B8F9-494E-AB4B-AED97A8245D3}.Release|x86.ActiveCfg = Release|Win32
-		{A0198EE2-B8F9-494E-AB4B-AED97A8245D3}.Release|x86.Build.0 = Release|Win32
-		{5B876CEF-2228-4E6A-A4AA-2C49BC37AD73}.Debug|x64.ActiveCfg = Debug|x64
-		{5B876CEF-2228-4E6A-A4AA-2C49BC37AD73}.Debug|x64.Build.0 = Debug|x64
-		{5B876CEF-2228-4E6A-A4AA-2C49BC37AD73}.Debug|x86.ActiveCfg = Debug|Win32
-		{5B876CEF-2228-4E6A-A4AA-2C49BC37AD73}.Debug|x86.Build.0 = Debug|Win32
-		{5B876CEF-2228-4E6A-A4AA-2C49BC37AD73}.Release|x64.ActiveCfg = Release|x64
-		{5B876CEF-2228-4E6A-A4AA-2C49BC37AD73}.Release|x64.Build.0 = Release|x64
-		{5B876CEF-2228-4E6A-A4AA-2C49BC37AD73}.Release|x86.ActiveCfg = Release|Win32
-		{5B876CEF-2228-4E6A-A4AA-2C49BC37AD73}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
