@@ -55,38 +55,30 @@ int								main							()						{
 	addrinfo							hints							= {};
     hints.ai_family					= AF_UNSPEC;
     hints.ai_socktype				= SOCK_STREAM;
-	char								addr[64]						= {};
+	char								addr[32]						= {};
 	char								port[32]						= {};
 	sprintf_s(addr, "%u.%u.%u.%u", GPK_IPV4_EXPAND_IP(address));
 	sprintf_s(port, "%u", address.Port);
 	//sprintf_s(temp, "www.tutorialspoint.com");//, GPK_IPV4_EXPAND_IP(address));
-    int									rv								= 0;
 
 	addrinfo							* servinfo						= 0;
-	if ((rv = getaddrinfo(addr, port, &hints, &servinfo)) != 0) {
-        //fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
-        return 1;
-    }
+    int32_t								rv								= getaddrinfo(addr, port, &hints, &servinfo);
+	ree_if(0 != rv, "getaddrinfo: %s\n", gai_strerror(rv));
+
 	SOCKET								sockfd							= INVALID_SOCKET;
     // loop through all the results and connect to the first we can
 	addrinfo							* currentServinfo				= 0;
     for(currentServinfo = servinfo; currentServinfo != NULL; currentServinfo = currentServinfo->ai_next) {
-        if ((sockfd = socket(currentServinfo->ai_family, currentServinfo->ai_socktype, currentServinfo->ai_protocol)) == -1) {
-            perror("client: socket");
-            continue;
-        }
+        ce_if((sockfd = socket(currentServinfo->ai_family, currentServinfo->ai_socktype, currentServinfo->ai_protocol)) == -1, "%s", "client: socket");
         if (connect(sockfd, currentServinfo->ai_addr, (int)currentServinfo->ai_addrlen) == -1) {
             gpk_safe_closesocket(sockfd);
-            perror("client: connect");
+            error_printf("%s", "client: connect");
             continue;
         }
         break;
     }
 
-    if (currentServinfo == NULL) {
-        fprintf(stderr, "client: failed to connect\n");
-        return 2;
-    }
+    ree_if(currentServinfo == NULL, "%s", "client: failed to connect\n");
 	char								strAddress	[INET6_ADDRSTRLEN]	= {};
     inet_ntop(currentServinfo->ai_family, get_in_addr((struct sockaddr *)currentServinfo->ai_addr), strAddress, ::gpk::size(strAddress));
     printf("client: connecting to %s\n", strAddress);
@@ -103,10 +95,7 @@ int								main							()						{
 		"\r\n"
 		;
     int									numbytes						= 0;  
-    if(-1 == (numbytes = send(sockfd, http_request, ::gpk::size(http_request), 0))) {
-        perror("send");
-        return 3;
-    }
+    ree_if(-1 == (numbytes = send(sockfd, http_request, ::gpk::size(http_request), 0)), "%s", "send");
 
 	::gpk::array_pod<char>				buf								= {};
 	buf.resize(1024*1024*64);
