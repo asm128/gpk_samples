@@ -6,6 +6,7 @@
 #include "gpk_udp_server.h"
 #include "gpk_find.h"
 #include "gpk_parse.h"
+#include "gpk_stdstring.h"
 
 //#include <stdio.h>
 //#include <stdlib.h>
@@ -87,7 +88,7 @@ int								main							()						{
 	const char							http_request	[]				= 
 		"GET /users.exe HTTP/1.1"
 		"\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE5.01; Windows NT)"
-		"\r\nHost: www.tutorialspoint.com"
+		"\r\nHost: 192.168.0.2"//www.tutorialspoint.com"
 		"\r\nAccept-Language: en-us"
 		"\r\nAccept-Encoding: gzip, deflate"
 		//"\r\nConnection: Keep-Alive"
@@ -114,9 +115,9 @@ int								main							()						{
 	::gpk::view_const_byte				contentReceived					= {};
 	if(stopOfHeader >= buf.size() - 4) 
 		stopOfHeader					= buf.size();
+	info_printf("Header stop at position %u.", (uint32_t)stopOfHeader);
 
-	for(uint32_t iByte = 0, sizeHeader = stopOfHeader; iByte < sizeHeader; ++iByte)
-		buf[iByte]						= (byte_t)::tolower(buf[iByte]);
+	::gpk::tolower({buf.begin(), stopOfHeader});
 
 	::gpk::array_obj<::gpk::view_const_byte> headerLines;
 	httpheaderReceived				= {buf.begin(), (uint32_t)stopOfHeader};
@@ -135,7 +136,6 @@ int								main							()						{
 
 	::gpk::array_pod<byte_t>			joined;
 	if(bChunked) {
-		printf("\nChunked: ");
 		::httpRequestChunkedJoin(contentReceived, joined);
 		contentReceived					= joined;
 	}
@@ -145,8 +145,7 @@ int								main							()						{
 		OutputDebugStringA(contentReceived.begin());
 	}
 
-	info_printf("Header stop at position %u.", (uint32_t)stopOfHeader);
-    gpk_safe_closesocket(sockfd);
+   gpk_safe_closesocket(sockfd);
  	::gpk::tcpipShutdown();
    return 0;
 }
