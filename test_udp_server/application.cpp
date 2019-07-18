@@ -36,19 +36,16 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	::gpk::controlSetParent(gui, app.IdExit, -1);
 	::gpk::tcpipInitialize();
 	uint64_t																port						= 9998;
+	uint64_t																adapter						= 0;
+	::gpk::view_const_string												jsonPort					= {};
+	const ::gpk::SJSONReader												& jsonReader						= framework.JSONConfig.Reader;
 	{ // load port from config file
-		::gpk::view_const_string												jsonPort					= {};
-		const ::gpk::SJSONReader												& jsonReader						= framework.JSONConfig.Reader;
 		gwarn_if(errored(::gpk::jsonExpressionResolve("application.test_udp_server.listen_port"	, jsonReader, 0, jsonPort)), "Failed to load config from json! Last contents found: %s.", jsonPort.begin()) 
 		else {
 			::gpk::parseIntegerDecimal(jsonPort, &port);
 			info_printf("Remote port: %u.", (uint32_t)port);
 		}
-	}
-	uint64_t																adapter						= 0;
-	{ // load port from config file
-		::gpk::view_const_string												jsonPort					= {};
-		const ::gpk::SJSONReader												& jsonReader						= framework.JSONConfig.Reader;
+		jsonPort															= {};
 		gwarn_if(errored(::gpk::jsonExpressionResolve("application.test_udp_server.adapter"	, jsonReader, 0, jsonPort)), "Failed to load config from json! Last contents found: %s.", jsonPort.begin()) 
 		else {
 			::gpk::parseIntegerDecimal(jsonPort, &adapter);
