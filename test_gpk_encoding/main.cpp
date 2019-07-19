@@ -1,6 +1,6 @@
 #include "gpk_aes.h"
 #include "gpk_rsa.h"
-#include "gpk_encoding.h"
+#include "gpk_base64.h"
 #include "gpk_timer.h"
 #include "gpk_sync.h"
 #include "gpk_noise.h"
