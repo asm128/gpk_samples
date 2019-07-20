@@ -4,6 +4,7 @@
 #include "gpk_timer.h"
 #include "gpk_sync.h"
 #include "gpk_noise.h"
+#include "gpk_encoding.h"
 #include <string>
 
 static ::gpk::error_t								phex						(uint8_t* str, ::gpk::AES_LEVEL level);
@@ -36,7 +37,7 @@ int													main						()			{
 	::gpk::array_pod<char_t> signaturesEncoded [::gpk::size(signatureToEncode)]	= {};
 		
 	for(uint32_t iSign = 0; iSign < ::gpk::size(signatureToEncode); ++iSign) {
-		::gpk::base64Encode({(const ubyte_t*)signatureToEncode[iSign].begin(), signatureToEncode[iSign].size()}, signaturesEncoded[iSign]);
+		::gpk::base64Encode(signatureToEncode[iSign], signaturesEncoded[iSign]);
 	}
 	char message[4096] = {};
 	for(uint32_t iSign = 0; iSign < ::gpk::size(signatureToEncode); ++iSign) {
@@ -197,8 +198,8 @@ int													main						()			{
 	}
 	{
 		double													timeTotal					= 0;
-		::gpk::array_obj<::gpk::array_pod<byte_t>	>			encodedList;
-		::gpk::array_obj<::gpk::array_pod<ubyte_t>	>			decodedList;
+		::gpk::array_obj<::gpk::array_pod<byte_t>>				encodedList;
+		::gpk::array_obj<::gpk::array_pod<byte_t>>				decodedList;
 		encodedList.resize(rounds * ::gpk::size(testStrings));
 		decodedList.resize(rounds * ::gpk::size(testStrings));
 		::gpk::STimer											timer;
@@ -206,7 +207,7 @@ int													main						()			{
 			for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {
 				int32_t													indexBuffer					= iRound * ::gpk::size(testStrings) + iTest;
 				::gpk::array_pod<byte_t>								& encoded					= encodedList[indexBuffer];
-				ce_if(errored(::gpk::base64Encode({(const ubyte_t*)testStrings[iTest].begin(), testStrings[iTest].size()}, encoded)), "%s", "Out of memory?");
+				ce_if(errored(::gpk::base64Encode(testStrings[iTest], encoded)), "%s", "Out of memory?");
 				timer.Frame();
 				timeTotal											+= timer.LastTimeSeconds;
 			}
@@ -216,7 +217,7 @@ int													main						()			{
 			for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {
 				int32_t													indexBuffer					= iRound * ::gpk::size(testStrings) + iTest;
 				::gpk::array_pod<byte_t>								& encoded					= encodedList[indexBuffer];
-				::gpk::array_pod<ubyte_t>								& decoded					= decodedList[indexBuffer];
+				::gpk::array_pod<byte_t>								& decoded					= decodedList[indexBuffer];
 				if errored(::gpk::base64Decode(encoded, decoded)) {
 					error_printf( "%s", "Out of memory?");
 					encoded.clear_pointer();
@@ -317,7 +318,7 @@ int													main						()			{
 				for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {
 					int32_t													indexBuffer					= iRound * ::gpk::size(testStrings) + iTest;
 					::gpk::array_pod<byte_t>								& encoded					= encodedList[indexBuffer];
-					ce_if(errored(::gpk::aesEncode({testStrings[iTest].begin(), testStrings[iTest].size()}, ::gpk::view_array<const ubyte_t>{(const ubyte_t*)"RandomnessAtLargeQuantities1234", 32}, (::gpk::AES_LEVEL)iAESLevel, encoded)), "%s", "Out of memory?");
+					ce_if(errored(::gpk::aesEncode(testStrings[iTest], ::gpk::view_const_byte{"RandomnessAtLargeQuantities1234", 32}, (::gpk::AES_LEVEL)iAESLevel, encoded)), "%s", "Out of memory?");
 					timer.Frame();
 					timeTotal											+= timer.LastTimeSeconds;
 				}
@@ -331,7 +332,7 @@ int													main						()			{
 					int32_t													indexBuffer					= iRound * ::gpk::size(testStrings) + iTest;
 					::gpk::array_pod<byte_t>								& encoded					= encodedList[indexBuffer];
 					::gpk::array_pod<byte_t>								& decoded					= decodedList[indexBuffer];
-					if errored(::gpk::aesDecode(encoded.begin(), encoded.size(), ::gpk::view_array<const ubyte_t>{(const ubyte_t*)"RandomnessAtLargeQuantities1234", 32}, (::gpk::AES_LEVEL)iAESLevel, decoded)) {
+					if errored(::gpk::aesDecode(encoded.begin(), encoded.size(), ::gpk::view_const_byte{"RandomnessAtLargeQuantities1234", 32}, (::gpk::AES_LEVEL)iAESLevel, decoded)) {
 						error_printf("%s", "Out of memory?");
 						encoded.clear_pointer();
 						continue;
