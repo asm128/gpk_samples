@@ -191,7 +191,7 @@ int											main						()	{
 		{
 			const ::gpk::view_const_string					format						= "I want to replace this (but not \\{this}): {people[1].name}'s "
 				"\n{properties[selection.active ? selection.index : 1].name} // this comment should appear here"
-				"\n{people[1].property.{properties[selection.active ? selection.index : 1].name // this comment should appear here"
+				"\n{people[1].property.{properties[selection.active ? selection.index : 1].name // this comment should not appear here"
 				"\n}}."
 				;
 			gpk_necall(::testJSONFormatter(format, inputJsonHardFalse), "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", format.begin(), inputJsonHardFalse.begin());
@@ -241,7 +241,7 @@ int											main						()	{
 		{
 			const ::gpk::view_const_string					format						= "I want to replace this (but not \\{this}): {people[1].name}'s "
 				"\n{properties[selection.active ? selection.index : 1].name} // this comment should appear here"
-				"\n{people[1].property.{properties[selection.active ? selection.index : 1].name // this comment should appear here"
+				"\n{people[1].property.{properties[selection.active ? selection.index : 1].name // this comment should not appear here"
 				"\n}}."
 				;
 			gpk_necall(::testJSONFormatter(format, inputJsonHardTrue), "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", format.begin(), inputJsonHardTrue.begin());
