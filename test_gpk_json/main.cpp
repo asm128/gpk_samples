@@ -65,7 +65,7 @@
 	::gpk::ptr_obj<::gpk::SJSONNode>				object							= jsonReader.Tree[indexOfFirstObject];
 	::gpk::error_t									indexOfElement					= ::gpk::jsonObjectValueGet(*object, jsonReader.View, test_key);
 	gpk_necall((uint32_t)indexOfElement >= jsonReader.View.size(), "Test key '%s' not found: %i.", test_key.begin(), indexOfElement);
-	const gpk::SJSONType							& node							= jsonReader.Object	[indexOfElement];	
+	const gpk::SJSONType							& node							= jsonReader.Object	[indexOfElement];
 	::gpk::view_const_string						view							= jsonReader.View	[indexOfElement - 1];	// get the parent in order to retrieve the view with the surrounding in the case of strings "".
 	char											bufferFormat [8192]				= {};
 	uint32_t										lenString						= view.size();
@@ -80,7 +80,7 @@
 	gpk_necall(::gpk::jsonParse(jsonReader, inputJson), "Failed to parse json: '%s'.", inputJson.begin());
 	::gpk::ptr_obj<::gpk::SJSONNode>				root						= jsonReader.Tree[0];
 	::printNode(root, inputJson);
-	const ::gpk::error_t							indexOfFirstObject			= ::gpk::jsonArrayValueGet(*root, 0);
+	const ::gpk::error_t							indexOfFirstObject			= 0;
 	info_printf("Test format: '%s'.", format.begin());
 	gpk_necall(::gpk::jsonStringFormat(format, jsonReader, indexOfFirstObject, formatted), "%s", "Error formatting string from JSON object.");
 	info_printf("Formatted string after jsonStringFormat(): '%s'.", formatted.begin());
@@ -90,67 +90,228 @@
 int											main						()	{
 	gpk_necall(::testJSONReader(), "%s", "Failed to read JSON!");
 
-	const ::gpk::view_const_string					inputJsonEasy				= 
-		"["
-		"\n\t{\"child_selected\" : {\"index\" : 2, \"active\" : true}, \"color\" : \"red\", \"race\" : \"brown\", \"weight\" : 160"
-		"\n\t\t, \"parent\" : {\"name\" : \"lucas\"}"
-		"\n\t\t, \"children\": [\"marta\", \"venus\", \"crystal\"]"
-		"\n\t\t, \"height\" : \"1.56\", \"name\" : \"carlos\""
-		"\n\t},"
-		"\n\t{\"child_selected\" : {\"index\" : 2, \"active\" : true}, \"color\" : \"red\", \"race\" : \"brown\", \"weight\" : 160"
-		"\n\t\t, \"parent\" : {\"name\" : \"lucas\"}"
-		"\n\t\t, \"children\": [\"marta\", \"venus\", \"crystal\"]"
-		"\n\t\t, \"height\" : \"1.56\", \"name\" : \"carlos\""
-		"\n\t},"
-		"]";
-	{ // first-level expression resolution tests.
-		{
-			const ::gpk::view_const_string					format						= "I want to replace this (but not \\{this}): Guy name: {name}.";
-			gpk_necall(::testJSONFormatter(format, inputJsonEasy), "%s", "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", format.begin(), inputJsonEasy.begin());
-			info_printf("Test succeeded:\nInput expression:\n%s\nInput JSON:\n%s", format.begin(), inputJsonEasy.begin());
-		}
-		{
-			const ::gpk::view_const_string					format						= "I want to replace this (but not \\{this}): Parent name: {parent.name}.";
-			gpk_necall(::testJSONFormatter(format, inputJsonEasy), "%s", "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", format.begin(), inputJsonEasy.begin());
-			info_printf("Test succeeded:\nInput expression:\n%s\nInput JSON:\n%s", format.begin(), inputJsonEasy.begin());
-		}
-		char											bufferFormat	[1024]		= {};
-		for(uint32_t iChild = 0; iChild < 3; ++iChild) {
-			sprintf_s(bufferFormat, "I want to replace this (but not \\{this}): A child of {name}'s name: {children[%u]}.", iChild);
-			gpk_necall(::testJSONFormatter(bufferFormat, inputJsonEasy), "%s", "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", bufferFormat, inputJsonEasy.begin());
-			info_printf("Test succeeded:\nInput expression:\n%s\nInput JSON:\n%s", bufferFormat, inputJsonEasy.begin());
-		}
+	const ::gpk::view_const_string					inputJsonEasy				=
+		"\n{\"child_selected\" : {\"index\" : 2}"
+		"\n\t, \"parent\" : {\"name\" : \"lucas\"}"
+		"\n\t, \"children\": [\"marta\", \"venus\", \"crystal\"]"
+		"\n\t, \"height\" : \"1.56\""
+		"\n\t, \"name\" : \"carlos\""
+		"\n\t, \"color\" : \"red\""
+		"\n\t, \"race\" : \"brown\""
+		"\n\t, \"weight\" : 160"
+		"\n},"
+		;
+
+	::gpk::SJSONReader								jsonReaderEasy;
+	gpk_necall(::gpk::jsonParse(jsonReaderEasy, inputJsonEasy), "Failed to parse json: '%s'.", inputJsonEasy.begin());
+	{
+		const ::gpk::view_const_string					expression						= "name";
+		::gpk::view_const_string						result							= {};
+		const ::gpk::view_const_string					expected						= "carlos";
+		ree_if(errored(gpk::jsonExpressionResolve(expression, jsonReaderEasy, 0U, result)) || result != expected, "Failed to resolve expression. \nExpression: %s. \nExpected: %s. \nResult: %s", expression.begin(), expected.begin(), result.begin());
+		info_printf("Test succeeded. \nExpression: %s. \nExpected: %s. \nResult: %s", expression.begin(), expected.begin(), result.begin());
+	}
+	{
+		const ::gpk::view_const_string					expression						= "height";
+		::gpk::view_const_string						result							= {};
+		const ::gpk::view_const_string					expected						= "1.56";
+		ree_if(errored(gpk::jsonExpressionResolve(expression, jsonReaderEasy, 0U, result)) || result != expected, "Failed to resolve expression. \nExpression: %s. \nExpected: %s. \nResult: %s", expression.begin(), expected.begin(), result.begin());
+		info_printf("Test succeeded. \nExpression: %s. \nExpected: %s. \nResult: %s", expression.begin(), expected.begin(), result.begin());
+	}
+	{
+		const ::gpk::view_const_string					expression						= "parent.name";
+		::gpk::view_const_string						result							= {};
+		const ::gpk::view_const_string					expected						= "lucas";
+		ree_if(errored(gpk::jsonExpressionResolve(expression, jsonReaderEasy, 0U, result)) || result != expected, "Failed to resolve expression. \nExpression: %s. \nExpected: %s. \nResult: %s", expression.begin(), expected.begin(), result.begin());
+		info_printf("Test succeeded. \nExpression: %s. \nExpected: %s. \nResult: %s", expression.begin(), expected.begin(), result.begin());
+	}
+	{
+		const ::gpk::view_const_string					expression						= "child_selected.index";
+		::gpk::view_const_string						result							= {};
+		const ::gpk::view_const_string					expected						= "2";
+		ree_if(errored(gpk::jsonExpressionResolve(expression, jsonReaderEasy, 0U, result)) || result != expected, "Failed to resolve expression. \nExpression: %s. \nExpected: %s. \nResult: %s", expression.begin(), expected.begin(), result.begin());
+		info_printf("Test succeeded. \nExpression: %s. \nExpected: %s. \nResult: %s", expression.begin(), expected.begin(), result.begin());
+	}
+	{
+		const ::gpk::view_const_string					expression						= "children[1]";
+		::gpk::view_const_string						result							= {};
+		const ::gpk::view_const_string					expected						= "venus";
+		ree_if(errored(gpk::jsonExpressionResolve(expression, jsonReaderEasy, 0U, result)) || result != expected, "Failed to resolve expression. \nExpression: %s. \nExpected: %s. \nResult: %s", expression.begin(), expected.begin(), result.begin());
+		info_printf("Test succeeded. \nExpression: %s. \nExpected: %s. \nResult: %s", expression.begin(), expected.begin(), result.begin());
+	}
+	{
+		const ::gpk::view_const_string					expression						= "children[child_selected.index]";
+		::gpk::view_const_string						result							= {};
+		const ::gpk::view_const_string					expected						= "crystal";
+		ree_if(errored(gpk::jsonExpressionResolve(expression, jsonReaderEasy, 0U, result)) || result != expected, "Failed to resolve expression. \nExpression: %s. \nExpected: %s. \nResult: %s", expression.begin(), expected.begin(), result.begin());
+		info_printf("Test succeeded. \nExpression: %s. \nExpected: %s. \nResult: %s", expression.begin(), expected.begin(), result.begin());
 	}
 
-	{ // multilevel expression resolution tests.
+	const ::gpk::view_const_string					inputJsonHardFalse				=
+		"\n	{ \"properties\" : [{ \"name\" : \"age\", \"type\" : \"int\"}, { \"name\" : \"color\", \"type\" : \"string\"}, { \"name\" : \"race\", \"type\" : \"string\"} ]"
+		"\n	, \"selection\" : {\"index\" : 2, \"active\" : false }"
+		"\n	, \"people\" : "
+		"\n		[{ \"name\" : \"David\""
+		"\n		 , \"property\" : "
+		"\n			{ \"color\" : \"green\", \"age\" : 32, \"race\" : \"fat\" }"
+		"\n		},"
+		"\n		{ \"name\" : \"Charles\" // this is another comment"
+		"\n		 , \"property\" : "
+		"\n			{ \"color\" : \"green\", \"age\" : 32, \"race\" : \"thin\" }"
+		"\n		},"
+		"\n		]"
+		"\n	}"
+		;
+	{
+
+		::gpk::SJSONReader								jsonReaderHard;
+		gpk_necall(::gpk::jsonParse(jsonReaderHard, inputJsonHardFalse), "Failed to parse json: '%s'.", inputJsonHardFalse.begin());
 		{
-			const ::gpk::view_const_string					format						= "I want to replace this (but not \\{this}): A child of carlos's name: {children[child_selected.index]}.";
-			gpk_necall(::testJSONFormatter(format, inputJsonEasy), "%s", "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", format.begin(), inputJsonEasy.begin());
-			info_printf("Test succeeded:\nInput expression:\n%s\nInput JSON:\n%s", format.begin(), inputJsonEasy.begin());
+			const ::gpk::view_const_string					expression						= "selection.active";
+			::gpk::view_const_string						result							= {};
+			const ::gpk::view_const_string					expected						= "false";
+			ree_if(errored(gpk::jsonExpressionResolve(expression, jsonReaderHard, 0U, result)) || result != expected, "Failed to resolve expression. \nExpression: %s. \nExpected: %s. \nResult: %s", expression.begin(), expected.begin(), result.begin());
+			info_printf("Test succeeded. \nExpression: %s. \nExpected: %s. \nResult: %s", expression.begin(), expected.begin(), result.begin());
 		}
-		const ::gpk::view_const_string					inputJsonHard					= 
-			"[	"
-			"\n	{ \"properties\" : [{ \"name\" : \"color\", \"type\" : \"string\"}, { \"name\" : \"age\", \"type\" : \"int\"} ]"
-			"\n	, \"selection\" : {\"index\" : 1 , \"active\" : true }"
+
+		{
+			const ::gpk::view_const_string					expression						= "selection.active ? properties[selection.index].name : \"No selection.\"";
+			::gpk::view_const_string						result							= {};
+			const ::gpk::view_const_string					expected						= "No selection.";
+			ree_if(errored(gpk::jsonExpressionResolve(expression, jsonReaderHard, 0U, result)) || result != expected, "Failed to resolve expression. \nExpression: %s. \nExpected: %s. \nResult: %s", expression.begin(), expected.begin(), result.begin());
+			info_printf("Test succeeded. \nExpression: %s. \nExpected: %s. \nResult: %s", expression.begin(), expected.begin(), result.begin());
+		}
+		{
+			const ::gpk::view_const_string					expression						= "people[0].property.{properties[selection.active ? selection.index : 1].name}";
+			::gpk::view_const_string						result							= {};
+			const ::gpk::view_const_string					expected						= "green";
+			ree_if(errored(gpk::jsonExpressionResolve(expression, jsonReaderHard, 0U, result)) || result != expected, "Failed to resolve expression. \nExpression: %s. \nExpected: %s. \nResult: %s", expression.begin(), expected.begin(), result.begin());
+			info_printf("Test succeeded. \nExpression: %s. \nExpected: %s. \nResult: %s", expression.begin(), expected.begin(), result.begin());
+		}
+		{
+			const ::gpk::view_const_string					format						= "I want to replace this (but not \\{this}): {people[1].name}'s "
+				"\n{properties[selection.active ? selection.index : 1].name} // this comment should appear here"
+				"\n{people[1].property.{properties[selection.active ? selection.index : 1].name // this comment should appear here"
+				"\n}}."
+				;
+			gpk_necall(::testJSONFormatter(format, inputJsonHardFalse), "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", format.begin(), inputJsonHardFalse.begin());
+			info_printf("Test succeeded:\nInput expression:\n%s\nInput JSON:\n%s", format.begin(), inputJsonHardFalse.begin());
+		}
+
+	}
+	{
+		const ::gpk::view_const_string					inputJsonHardTrue				=
+			"\n	{ \"properties\" : [{ \"name\" : \"age\", \"type\" : \"int\"}, { \"name\" : \"color\", \"type\" : \"string\"}, { \"name\" : \"race\", \"type\" : \"string\"} ]"
+			"\n	, \"selection\" : {\"index\" : 2, \"active\" : true }"
 			"\n	, \"people\" : "
 			"\n		[{ \"name\" : \"David\""
 			"\n		 , \"property\" : "
-			"\n			{ \"color\" : \"red\", \"age\" : 25 } // this is some test comment"
+			"\n			{ \"color\" : \"green\", \"age\" : 32, \"race\" : \"fat\" }"
 			"\n		},"
 			"\n		{ \"name\" : \"Charles\" // this is another comment"
 			"\n		 , \"property\" : "
-			"\n			{ \"color\" : \"green\", \"age\" : 32 }"
+			"\n			{ \"color\" : \"green\", \"age\" : 32, \"race\" : \"thin\" }"
 			"\n		},"
-			"\n		{ \"name\" : \"Charles\""
-			"\n		 , \"property\" : "
-			"\n			{ \"color\" : \"blue\", \"age\" : 95 }"
-			"\n		},"
-			"\n		],"
-			"\n	},"
-			"\n]";
-		const ::gpk::view_const_string					format						= "I want to replace this (but not \\{this}): {people[2].name}'s {properties[selection.index].name}: {people[2].property.{properties[selection.index].name}}.";
-		gpk_necall(::testJSONFormatter(format, inputJsonHard), "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", format.begin(), inputJsonHard.begin());
-		info_printf("Test succeeded:\nInput expression:\n%s\nInput JSON:\n%s", format.begin(), inputJsonHard.begin());
+			"\n		]"
+			"\n	}"
+			;
+		::gpk::SJSONReader								jsonReaderHard;
+		gpk_necall(::gpk::jsonParse(jsonReaderHard, inputJsonHardTrue), "Failed to parse json: '%s'.", inputJsonHardTrue.begin());
+		{
+			const ::gpk::view_const_string					expression						= "selection.active";
+			::gpk::view_const_string						result							= {};
+			const ::gpk::view_const_string					expected						= "true";
+			ree_if(errored(gpk::jsonExpressionResolve(expression, jsonReaderHard, 0U, result)) || result != expected, "Failed to resolve expression. \nExpression: %s. \nExpected: %s. \nResult: %s", expression.begin(), expected.begin(), result.begin());
+			info_printf("Test succeeded. \nExpression: %s. \nExpected: %s. \nResult: %s", expression.begin(), expected.begin(), result.begin());
+		}
+		{
+			const ::gpk::view_const_string					expression						= "selection.active ? properties[selection.index].name : \"No selection.\"";
+			::gpk::view_const_string						result							= {};
+			const ::gpk::view_const_string					expected						= "race";
+			ree_if(errored(gpk::jsonExpressionResolve(expression, jsonReaderHard, 0U, result)) || result != expected, "Failed to resolve expression. \nExpression: %s. \nExpected: %s. \nResult: %s", expression.begin(), expected.begin(), result.begin());
+			info_printf("Test succeeded. \nExpression: %s. \nExpected: %s. \nResult: %s", expression.begin(), expected.begin(), result.begin());
+		}
+		{
+			const ::gpk::view_const_string					expression						= "people[1].property.{properties[selection.active ? selection.index : 1].name}";
+			::gpk::view_const_string						result							= {};
+			const ::gpk::view_const_string					expected						= "thin";
+			ree_if(errored(gpk::jsonExpressionResolve(expression, jsonReaderHard, 0U, result)) || result != expected, "Failed to resolve expression. \nExpression: %s. \nExpected: %s. \nResult: %s", expression.begin(), expected.begin(), result.begin());
+			info_printf("Test succeeded. \nExpression: %s. \nExpected: %s. \nResult: %s", expression.begin(), expected.begin(), result.begin());
+		}
+		{
+			const ::gpk::view_const_string					format						= "I want to replace this (but not \\{this}): {people[1].name}'s "
+				"\n{properties[selection.active ? selection.index : 1].name} // this comment should appear here"
+				"\n{people[1].property.{properties[selection.active ? selection.index : 1].name // this comment should appear here"
+				"\n}}."
+				;
+			gpk_necall(::testJSONFormatter(format, inputJsonHardTrue), "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", format.begin(), inputJsonHardTrue.begin());
+			info_printf("Test succeeded:\nInput expression:\n%s\nInput JSON:\n%s", format.begin(), inputJsonHardTrue.begin());
+		}
+
 	}
+
+
+	//{ // first-level expression resolution tests.
+	//	{
+	//		const ::gpk::view_const_string					format						= "I want to replace this (but not \\{this}): Guy name: {name}.";
+	//		gpk_necall(::testJSONFormatter(format, inputJsonEasy), "%s", "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", format.begin(), inputJsonEasy.begin());
+	//		info_printf("Test succeeded:\nInput expression:\n%s\nInput JSON:\n%s", format.begin(), inputJsonEasy.begin());
+	//	}
+	//	{
+	//		const ::gpk::view_const_string					format						= "I want to replace this (but not \\{this}): Parent name: {"
+	//			"\nparent.name // we should be able to interpret this as a comment"
+	//			"\n}.";
+	//		gpk_necall(::testJSONFormatter(format, inputJsonEasy), "%s", "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", format.begin(), inputJsonEasy.begin());
+	//		info_printf("Test succeeded:\nInput expression:\n%s\nInput JSON:\n%s", format.begin(), inputJsonEasy.begin());
+	//	}
+	//	char											bufferFormat	[1024]		= {};
+	//	for(uint32_t iChild = 0; iChild < 3; ++iChild) {
+	//		sprintf_s(bufferFormat, "I want to replace this (but not \\{this}): A child of {name}'s name: {children[%u]}.", iChild);
+	//		gpk_necall(::testJSONFormatter(bufferFormat, inputJsonEasy), "%s", "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", bufferFormat, inputJsonEasy.begin());
+	//		info_printf("Test succeeded:\nInput expression:\n%s\nInput JSON:\n%s", bufferFormat, inputJsonEasy.begin());
+	//	}
+	//}
+
+	//{ // multilevel expression resolution tests.
+	//	{
+	//		const ::gpk::view_const_string					format						= "I want to replace this (but not \\{this}): A child of carlos's name: {children[child_selected.index]}.";
+	//		gpk_necall(::testJSONFormatter(format, inputJsonEasy), "%s", "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", format.begin(), inputJsonEasy.begin());
+	//		info_printf("Test succeeded:\nInput expression:\n%s\nInput JSON:\n%s", format.begin(), inputJsonEasy.begin());
+	//	}
+	//	{
+	//		const ::gpk::view_const_string					format						= "I want to replace this (but not \\{this}): {people[2].name}'s "
+	//		"\n{properties[selection.index].name"
+	//		"\n// this comment should not bother us anymore"
+	//		"\n}		// this comment should appear here"
+	//		"\n{people[2].property.{properties[selection.index].name}}.";
+	//		gpk_necall(::testJSONFormatter(format, inputJsonHard), "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", format.begin(), inputJsonHard.begin());
+	//		info_printf("Test succeeded:\nInput expression:\n%s\nInput JSON:\n%s", format.begin(), inputJsonHard.begin());
+	//	}
+	//	{
+	//		const ::gpk::view_const_string					format						= "I want to replace this (but not \\{this}): {people[2].name}'s "
+	//			"\n{selection.active ? properties[selection.index].name : \"No selection.\""
+	//			"\n// this comment should not bother us anymore"
+	//			"\n}		// this comment should appear here"
+	//			"\n{people[2].property.{selection.active ? properties[selection.index].name : \"age\"}}.";
+	//		gpk_necall(::testJSONFormatter(format, inputJsonHard), "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", format.begin(), inputJsonHard.begin());
+	//		info_printf("Test succeeded:\nInput expression:\n%s\nInput JSON:\n%s", format.begin(), inputJsonHard.begin());
+	//	}
+	//	{
+	//		const ::gpk::view_const_string					format						= "I want to replace this (but not \\{this}): \n"
+	//			"{selection.active ? properties[selection.index].name : \"No selection.\"} ";
+	//		gpk_necall(::testJSONFormatter(format, inputJsonHard), "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", format.begin(), inputJsonHard.begin());
+	//		info_printf("Test succeeded:\nInput expression:\n%s\nInput JSON:\n%s", format.begin(), inputJsonHard.begin());
+	//	}
+	//	{
+	//		const ::gpk::view_const_string					format						= "I want to replace this (but not \\{this}): \n"
+	//			"\n{people[2].property.{selection.active ? properties[selection.index].name : \"age\"}} . "
+	//			"\n{selection.active ? properties[selection.index].name : \"No selection.\""
+	//			"\n// this comment should not bother us anymore"
+	//			"\n}		// this comment should appear here"
+	//			;
+	//		gpk_necall(::testJSONFormatter(format, inputJsonHard), "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", format.begin(), inputJsonHard.begin());
+	//		info_printf("Test succeeded:\nInput expression:\n%s\nInput JSON:\n%s", format.begin(), inputJsonHard.begin());
+	//	}
+	//}
 	return 0;
 }
