@@ -49,8 +49,8 @@
 	for(uint32_t iNode = 0; iNode < jsonReader.Object.size(); ++iNode) {
 		const gpk::SJSONType							& node							= jsonReader.Object[iNode];
 		if( ::gpk::JSON_TYPE_VALUE	== node.Type
-			|| ::gpk::JSON_TYPE_KEY	== node.Type
-			)
+		 || ::gpk::JSON_TYPE_KEY	== node.Type
+		 )
 			continue;
 		::gpk::view_const_string						view							= jsonReader.View[iNode];
 		char											bufferFormat [8192]				= {};
@@ -81,7 +81,7 @@ static	::gpk::error_t						testJSONFormatter			(::gpk::SJSONReader & jsonReader,
 	info_printf("Test format:\n%s", format.begin());
 	::gpk::array_pod<char_t>						formatted;
 	gpk_necall(::gpk::jsonStringFormat(format, jsonReader, indexOfFirstObject, formatted), "%s", "Error formatting string from JSON object.");
-	info_printf("Formatted string after jsonStringFormat(): '%s'.", formatted.begin());
+	info_printf("Formatted string after jsonStringFormat():\n%s", formatted.begin());
 	return 0;
 }
 
@@ -104,20 +104,23 @@ int											main						()	{
 	gpk_necall(::testJSONReader(), "%s", "Failed to read JSON!");
 	{
 		const ::gpk::view_const_string					inputJson				=
-			"\n{\t \"child_selected\" : {\"index\" : 2}"
+			"\n{\t \"name\" : \"carlos\""
 			"\n\t, \"parent\" : {\"name\" : \"lucas\"}"
-			"\n\t, \"children\": [\"marta\", \"venus\", \"crystal\"]"
 			"\n\t, \"height\" : \"1.56\""
-			"\n\t, \"name\" : \"carlos\""
-			"\n\t, \"color\" : \"red\""
-			"\n\t, \"race\" : \"brown\""
+			"\n\t, \"color\" : \"brown\""
+			"\n\t, \"race\" : \"red\""
 			"\n\t, \"weight\" : 160"
+			"\n\t, \"children\": [\"marta\", \"venus\", \"crystal\"]"
+			"\n\t, \"child_selected\" : {\"index\" : 2}"
 			"\n}"
 			;
 		::gpk::TKeyValConstString						pairsResultExpression[]			=
 			{ {"carlos"	, "name"}
-			, {"1.56"	, "height"}
 			, {"lucas"	, "parent.name"}
+			, {"1.56"	, "height"}
+			, {"brown"	, "color"}
+			, {"red"	, "race"}
+			, {"160"	, "weight"}
 			, {"2"		, "child_selected.index"}
 			, {"venus"	, "children[1]"}
 			, {"crystal", "children[child_selected.index]"}
@@ -128,15 +131,15 @@ int											main						()	{
 		for(uint32_t iTest = 0; iTest < ::gpk::size(pairsResultExpression); ++iTest)
 			ree_if(errored(testJSONExpression(jsonReaderEasy, pairsResultExpression[iTest].Val, pairsResultExpression[iTest].Key)), "Failed to resolve expression: %s", pairsResultExpression[iTest].Val.begin());
 	}
-	const ::gpk::view_const_string					format						= "I want to replace this (but not \\{this}): {people[1].name}'s "
-		"\n{properties[selection.active ? selection.index : 1].name} // this comment should appear here"
+	const ::gpk::view_const_string					format						=
+		"I want to replace this (but not \\{this}): \n{people[1].name}'s {properties[selection.active ? selection.index : 1].name}: // this comment should appear here"
 		"\n{people[1].property.{properties[selection.active ? selection.index : 1].name // this comment should not appear here"
 		"\n}}."
 		;
 	{
 		const ::gpk::view_const_string					inputJson				=
 			"\n	{ \"properties\" : [{ \"name\" : \"age\", \"type\" : \"int\"}, { \"name\" : \"color\", \"type\" : \"string\"}, { \"name\" : \"race\", \"type\" : \"string\"} ]"
-			"\n	, \"selection\" : {\"index\" : 2, \"active\" : false }"
+			"\n	, \"selection\" : {\"index\" : -1, \"active\" : false }"
 			"\n	, \"people\" : "
 			"\n		[{ \"name\" : \"David\""
 			"\n		 , \"property\" : "
@@ -153,6 +156,7 @@ int											main						()	{
 			{ {"false"			, "selection.active"}
 			, {"No selection."	, "selection.active ? properties[selection.index].name : \"No selection.\""}
 			, {"green"			, "people[1].property.{properties[selection.active ? selection.index : 1].name}"}
+			, {"25"				, "people[0].property.{properties[selection.active ? selection.index : 0].name}"}
 			};
 		info_printf("Input JSON:\n%s", inputJson.begin());
 		::gpk::SJSONReader								jsonReaderHard;
@@ -178,9 +182,10 @@ int											main						()	{
 			"\n	}"
 			;
 		::gpk::TKeyValConstString						pairsResultExpression[]			=
-			{ {"true", "selection.active"}
-			, {"race", "selection.active ? properties[selection.index].name : \"No selection.\""}
-			, {"thin", "people[1].property.{properties[selection.active ? selection.index : 1].name}"}
+			{ {"true"	, "selection.active"}
+			, {"race"	, "selection.active ? properties[selection.index].name : \"No selection.\""}
+			, {"thin"	, "people[1].property.{properties[selection.active ? selection.index : 1].name}"}
+			, {"fat"	, "people[0].property.{properties[selection.active ? selection.index : 0].name}"}
 			};
 		info_printf("Input JSON:\n%s", inputJson.begin());
 		::gpk::SJSONReader								jsonReaderHard;
