@@ -1,5 +1,5 @@
 // Tip: Best viewed with zoom level at 81%.
-// Tip: Hold Left ALT + SHIFT while tapping or holding the arrow keys in order to select multiple columns and write on them at once. 
+// Tip: Hold Left ALT + SHIFT while tapping or holding the arrow keys in order to select multiple columns and write on them at once.
 //		Also useful for copy & paste operations in which you need to copy a bunch of variable or function names and you can't afford the time of copying them one by one.
 #include "application.h"
 
@@ -14,13 +14,13 @@
 
 #include "gpk_app_impl.h"
 
-GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "Gontrill v0.1");	
+GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "Gontrill v0.1");
 
 static ::SApplication::TParticleSystem::TIntegrator::TParticle			particleDefinitions	[::PARTICLE_TYPE_COUNT]	= {};
 
 static				void												setupParticles								()																				{
-	particleDefinitions	[::PARTICLE_TYPE_PROJECTILE		].Position				= 
-	particleDefinitions	[::PARTICLE_TYPE_SHIP_THRUST	].Position				= 
+	particleDefinitions	[::PARTICLE_TYPE_PROJECTILE		].Position				=
+	particleDefinitions	[::PARTICLE_TYPE_SHIP_THRUST	].Position				=
 	particleDefinitions	[::PARTICLE_TYPE_STAR			].Position				= {};
 
 	particleDefinitions	[::PARTICLE_TYPE_PROJECTILE		].SetMass				(1);
@@ -38,7 +38,7 @@ static				void												setupParticles								()																				{
 
 					::SApplication										* g_ApplicationInstance						= 0;
 
-static				::gpk::error_t										updateSizeDependentResources				(::SApplication& applicationInstance)											{ 
+static				::gpk::error_t										updateSizeDependentResources				(::SApplication& applicationInstance)											{
 	//static constexpr	const ::gpk::SCoord2<uint32_t>							GAME_SCREEN_SIZE							= {640, 360};
 	::gpk::updateSizeDependentTarget(applicationInstance.Framework.MainDisplayOffscreen->Color.Texels, applicationInstance.Framework.MainDisplayOffscreen->Color.View, GAME_SCREEN_SIZE);
 	return 0;
@@ -46,21 +46,21 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 
 // --- Cleanup application resources.
 					::gpk::error_t										cleanup										(::SApplication& applicationInstance)											{
-	
+
 	applicationInstance;
 	g_ApplicationInstance													= 0;
 	//error_printf("Error message test. Press F5 to continue if the debugger breaks execution at this point.");
 	return 0;
 }
 
-static				::gpk::error_t										setupSprite									(::gpk::SImageProcessable<::gpk::SColorBGRA>& textureToProcess, ::gpk::SCoord2<int32_t>& textureCenter, const ::gpk::view_const_string& filename)	{ 
+static				::gpk::error_t										setupSprite									(::gpk::SImageProcessable<::gpk::SColorBGRA>& textureToProcess, ::gpk::SCoord2<int32_t>& textureCenter, const ::gpk::view_const_string& filename)	{
 	gpk_necall(::gpk::pngFileLoad(filename, textureToProcess.Original), "%s", "Failed to load sprite image.");
 	textureCenter															= (textureToProcess.Original.View.metrics() / 2).Cast<int32_t>();
 	textureToProcess.Processed.View											= textureToProcess.Original.View;
 	return 0;
 }
 
-static				::gpk::error_t										setupSprites								(::SApplication& app)											{ 
+static				::gpk::error_t										setupSprites								(::SApplication& app)											{
 	::gpk::view_const_string												pathPNGSuite									= {};
 	{
 		const ::gpk::SJSONReader												& jsonReader									= app.Framework.JSONConfig.Reader;
@@ -73,7 +73,7 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 		::gpk::array_pod<char_t>												fullPathPNG										= {};
 		char																	subscriptExpression	[64]						= {};
 		for(uint32_t iFile = 0; iFile < ::gpk::min(countFilesToLoad, (uint32_t)GAME_TEXTURE_COUNT); ++iFile) {
-			const uint32_t															lenExpression									= sprintf_s(subscriptExpression, "[%u]", iFile);	//application.test_gontrill.images[%u]
+			const uint32_t															lenExpression									= sprintf_s(subscriptExpression, "['%u']", iFile);	//application.test_gontrill.images[%u]
 			::gpk::jsonExpressionResolve({subscriptExpression, lenExpression}, jsonReader, indexJSONNodeArrayPNGFileNames, fileNamePNG);
 			fullPathPNG.clear();
 			::gpk::pathNameCompose(pathPNGSuite, fileNamePNG, fullPathPNG);
@@ -87,7 +87,7 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	for(uint32_t y = 0, yMax = textureFontMetrics.y; y < yMax; ++y)
 	for(uint32_t x = 0, xMax = textureFontMetrics.x; x < xMax; ++x) {
 		const ::gpk::SColorBGRA														& pixelToTest								= fontAtlas[y][x];
-		app.TextureFontMonochrome.View[y * textureFontMetrics.x + x]	
+		app.TextureFontMonochrome.View[y * textureFontMetrics.x + x]
 		=	0 != pixelToTest.r
 		||	0 != pixelToTest.g
 		||	0 != pixelToTest.b
@@ -101,7 +101,7 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 }
 
 					::gpk::error_t										mainWindowCreate							(::gpk::SDisplay& mainWindow, HINSTANCE hInstance);
-					::gpk::error_t										setup										(::SApplication& applicationInstance)											{ 
+					::gpk::error_t										setup										(::SApplication& applicationInstance)											{
 	//_CrtSetBreakAlloc(120);
 	g_ApplicationInstance													= &applicationInstance;
 	::gpk::SFramework															& framework									= applicationInstance.Framework;
@@ -112,7 +112,7 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	ree_if	(errored(::setupSprites					(applicationInstance)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
 	::gpk::view_grid<::gpk::SColorBGRA>											& fontAtlasView								= applicationInstance.Textures[GAME_TEXTURE_FONT_ATLAS].Processed.View;
 	const ::gpk::SCoord2<uint32_t>												& fontAtlasMetrics							= fontAtlasView.metrics();
-	for(uint32_t y = 0, yMax = fontAtlasMetrics.y; y < yMax; ++y) 
+	for(uint32_t y = 0, yMax = fontAtlasMetrics.y; y < yMax; ++y)
 	for(uint32_t x = 0, xMax = fontAtlasMetrics.x; x < xMax; ++x) {
 		::gpk::SColorBGRA															& curTexel									= fontAtlasView[y][x];
 		if(curTexel.r == 0x00 && curTexel.g == 0x00 && curTexel.b == 0x00)
@@ -142,14 +142,14 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	return 0;
 }
 
-					::gpk::error_t										drawBackground								(::SApplication& applicationInstance);	
-					::gpk::error_t										drawShots									(::SApplication& applicationInstance);	
-					::gpk::error_t										drawThrust									(::SApplication& applicationInstance);	
-					::gpk::error_t										drawPowerups								(::SApplication& applicationInstance);	
-					::gpk::error_t										drawShips									(::SApplication& applicationInstance);	
-					::gpk::error_t										drawCrosshair								(::SApplication& applicationInstance);	
-					::gpk::error_t										drawCollisions								(::SApplication& applicationInstance);	
-					::gpk::error_t										draw										(::SApplication& applicationInstance)											{	
+					::gpk::error_t										drawBackground								(::SApplication& applicationInstance);
+					::gpk::error_t										drawShots									(::SApplication& applicationInstance);
+					::gpk::error_t										drawThrust									(::SApplication& applicationInstance);
+					::gpk::error_t										drawPowerups								(::SApplication& applicationInstance);
+					::gpk::error_t										drawShips									(::SApplication& applicationInstance);
+					::gpk::error_t										drawCrosshair								(::SApplication& applicationInstance);
+					::gpk::error_t										drawCollisions								(::SApplication& applicationInstance);
+					::gpk::error_t										draw										(::SApplication& applicationInstance)											{
 	gerror_if(errored(::drawBackground	(applicationInstance)), "Why??");	// --- Draw stars
 	gerror_if(errored(::drawPowerups		(applicationInstance)), "Why??");	// --- Draw powerups
 	gerror_if(errored(::drawShips		(applicationInstance)), "Why??");	// --- Draw ship
@@ -167,10 +167,10 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	::gpk::view_grid<::gpk::SColorBGRA>											& offscreenView								= framework.MainDisplayOffscreen->Color.View;
 	::gpk::view_grid<::gpk::SColorBGRA>											& fontAtlasView								= applicationInstance.Textures[GAME_TEXTURE_FONT_ATLAS].Processed.View;
 	const ::gpk::SCoord2<uint32_t>												& offscreenMetrics							= offscreenView.metrics();
-	::gpk::textLineDrawAlignedFixedSizeLit(offscreenView, applicationInstance.TextureFontMonochrome.View, fontAtlasView.metrics(), lineOffset++, offscreenMetrics, sizeCharCell, textLine0, ::gpk::SColorBGRA{0, applicationInstance.Framework.FrameInfo.FrameNumber % 0xFF, 0xFFU, 0xFFU});	
-	::gpk::textLineDrawAlignedFixedSizeLit(offscreenView, applicationInstance.TextureFontMonochrome.View, fontAtlasView.metrics(), lineOffset++, offscreenMetrics, sizeCharCell, textLine1, ::gpk::SColorBGRA{applicationInstance.Framework.FrameInfo.FrameNumber % 0xFFU, 0xFFU, 0, 0xFFU});	
-	::gpk::textLineDrawAlignedFixedSizeRGBA(offscreenView, fontAtlasView, lineOffset = offscreenMetrics.y / 16 - 1, offscreenMetrics, sizeCharCell, textLine2);	
-	::gpk::textLineDrawAlignedFixedSizeLit(offscreenView, applicationInstance.TextureFontMonochrome.View, fontAtlasView.metrics(), --lineOffset, offscreenMetrics, sizeCharCell, weaponProperties[applicationInstance.Game.Ships.Weapon[0].IndexProperties].Name, ::gpk::SColorBGRA{applicationInstance.Framework.FrameInfo.FrameNumber % 0xFFU, 0xFFU, 0, 0xFFU});	
+	::gpk::textLineDrawAlignedFixedSizeLit(offscreenView, applicationInstance.TextureFontMonochrome.View, fontAtlasView.metrics(), lineOffset++, offscreenMetrics, sizeCharCell, textLine0, ::gpk::SColorBGRA{0, applicationInstance.Framework.FrameInfo.FrameNumber % 0xFF, 0xFFU, 0xFFU});
+	::gpk::textLineDrawAlignedFixedSizeLit(offscreenView, applicationInstance.TextureFontMonochrome.View, fontAtlasView.metrics(), lineOffset++, offscreenMetrics, sizeCharCell, textLine1, ::gpk::SColorBGRA{applicationInstance.Framework.FrameInfo.FrameNumber % 0xFFU, 0xFFU, 0, 0xFFU});
+	::gpk::textLineDrawAlignedFixedSizeRGBA(offscreenView, fontAtlasView, lineOffset = offscreenMetrics.y / 16 - 1, offscreenMetrics, sizeCharCell, textLine2);
+	::gpk::textLineDrawAlignedFixedSizeLit(offscreenView, applicationInstance.TextureFontMonochrome.View, fontAtlasView.metrics(), --lineOffset, offscreenMetrics, sizeCharCell, weaponProperties[applicationInstance.Game.Ships.Weapon[0].IndexProperties].Name, ::gpk::SColorBGRA{applicationInstance.Framework.FrameInfo.FrameNumber % 0xFFU, 0xFFU, 0, 0xFFU});
 	if(applicationInstance.Debugging) {
 		::gpk::STimer																& timer										= framework.Timer;
 		::gpk::SDisplay																& mainWindow								= framework.MainDisplay;
@@ -180,21 +180,21 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 			, applicationInstance.ParticleSystemProjectiles	.Instances.size()
 			, applicationInstance.ParticleSystemThrust		.Instances.size()
 			);
-		::gpk::textLineDrawAlignedFixedSizeRGBA(offscreenView, fontAtlasView, --lineOffset, offscreenMetrics, sizeCharCell, {buffer, (uint32_t)lineLen});	
+		::gpk::textLineDrawAlignedFixedSizeRGBA(offscreenView, fontAtlasView, --lineOffset, offscreenMetrics, sizeCharCell, {buffer, (uint32_t)lineLen});
 		lineLen																	= sprintf_s(buffer, "Stars fx count: %u. Debris fx count: %u. Projectiles fx count: %u."
 			, applicationInstance.ParticleSystemStars		.Instances.size()
 			, applicationInstance.ParticleSystemDebris		.Instances.size()
 			, applicationInstance.ParticleSystemProjectiles	.Instances.size()
 			);
-		::gpk::textLineDrawAlignedFixedSizeRGBA(offscreenView, fontAtlasView, --lineOffset, offscreenMetrics, sizeCharCell, {buffer, (uint32_t)lineLen});	
+		::gpk::textLineDrawAlignedFixedSizeRGBA(offscreenView, fontAtlasView, --lineOffset, offscreenMetrics, sizeCharCell, {buffer, (uint32_t)lineLen});
 		lineLen																	= sprintf_s(buffer, "Enemy count: %u. Projectile count: %u. Powerup count: %u."
 			, applicationInstance.Game.CountEnemies
 			, applicationInstance.Game.CountProjectiles
 			, applicationInstance.Game.CountPowerups
 			);
-		::gpk::textLineDrawAlignedFixedSizeRGBA(offscreenView, fontAtlasView, --lineOffset, offscreenMetrics, sizeCharCell, {buffer, (uint32_t)lineLen});	
+		::gpk::textLineDrawAlignedFixedSizeRGBA(offscreenView, fontAtlasView, --lineOffset, offscreenMetrics, sizeCharCell, {buffer, (uint32_t)lineLen});
 		lineLen																	= sprintf_s(buffer, "FPS: %g. Last frame seconds: %g.", 1 / timer.LastTimeSeconds, timer.LastTimeSeconds);
-		::gpk::textLineDrawAlignedFixedSizeRGBA(offscreenView, fontAtlasView, --lineOffset, offscreenMetrics, sizeCharCell, {buffer, (uint32_t)lineLen});	
+		::gpk::textLineDrawAlignedFixedSizeRGBA(offscreenView, fontAtlasView, --lineOffset, offscreenMetrics, sizeCharCell, {buffer, (uint32_t)lineLen});
 	}
 	return 0;
 }
@@ -207,7 +207,7 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 					::gpk::error_t										updateEnemies								(::SApplication& applicationInstance);
 					::gpk::error_t										updateParticles								(::SApplication& applicationInstance);
  					::gpk::error_t										updateGUI									(::SApplication& applicationInstance);
-					::gpk::error_t										update										(::SApplication& applicationInstance, bool systemRequestedExit)					{ 
+					::gpk::error_t										update										(::SApplication& applicationInstance, bool systemRequestedExit)					{
 	retval_ginfo_if(1, systemRequestedExit, "Exiting because the runtime asked for close. We could also ignore this value and just continue execution if we don't want to exit.");
 	::gpk::SFramework															& framework									= applicationInstance.Framework;
 	::gpk::error_t																frameworkResult								= ::gpk::updateFramework(framework);

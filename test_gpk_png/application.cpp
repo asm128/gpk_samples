@@ -52,7 +52,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 			::gpk::array_pod<char_t>												fullPathPNG							= {};
 			char																	subscriptExpression	[64]			= {};
 			for(uint32_t iFile = 0; iFile < countFilesToLoad; ++iFile) {
-				const uint32_t															lenExpression						= sprintf_s(subscriptExpression, "[%u]", iFile);	
+				const uint32_t															lenExpression						= sprintf_s(subscriptExpression, "['%u']", iFile);
 				::gpk::jsonExpressionResolve({subscriptExpression, lenExpression}, jsonReader, indexJSONNodeArrayPNGFileNames, fileNamePNG);
 				fullPathPNG.clear();
 				::gpk::pathNameCompose(pathPNGSuite, fileNamePNG, fullPathPNG);
@@ -73,9 +73,9 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 				sizesRLE.push_back(rleBuffer.size());
 				const uint32_t															sizePNGInBytes			= viewToRLE.size() * sizeof(::gpk::SColorBGRA);
 				info_printf("--- RLE compression stats:"
-					"\nsizePNGRLE          : %u" 
-					"\nsizePNGUncompressed : %u" 
-					"\nratio               : %f" 
+					"\nsizePNGRLE          : %u"
+					"\nsizePNGUncompressed : %u"
+					"\nratio               : %f"
 					, rleBuffer.size()
 					, sizePNGInBytes
 					, (float)rleBuffer.size() / sizePNGInBytes
@@ -85,11 +85,11 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 				rleBuffer.clear();
 			}
 			info_printf("--- RLE compression stats:"
-				"\nsizeTotalRLE          : %u" 
-				"\nsizeTotalUncompressed : %u" 
-				"\nratio                 : %f" 
-				, sizeTotalRLE          
-				, sizeTotalUncompressed 
+				"\nsizeTotalRLE          : %u"
+				"\nsizeTotalUncompressed : %u"
+				"\nratio                 : %f"
+				, sizeTotalRLE
+				, sizeTotalUncompressed
 				, (float)sizeTotalRLE / sizeTotalUncompressed
 				);
 		}
