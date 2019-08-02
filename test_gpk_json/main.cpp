@@ -124,40 +124,38 @@ int											main						()	{
 			"\n}"
 			;
 		::gpk::TKeyValConstString						pairsResultExpression[]			=
-			//{ {"true"	, " alive  ? ('true') : ('false')"			}	//  24
-			{ {"carlos"	, "name"}										// 0
-			, {"lucas"	, "parent.name"}								//  1
-			, {"lucas"	, "'lucas'"}									//  2
-			, {"1.56"	, "height"}										//  3
-			, {"brown"	, "color"}										//  4
-			, {"red"	, "race"}										//  5
-			, {"160"	, "weight"}										//  6
-			, {"2"		, "child_selected.index"}						//  7
-			, {"venus"	, "children[('1')]"}							//  8
-			, {"crystal", "children[(child_selected.index)]"}			//  9
-			, {"carlos"	, "(name)"}										//  10
-			, {"lucas"	, "({'parent'}.name)"}							//  11
-			, {"1.56"	, "(height)"}									//  12
-			, {"brown"	, "(color)"}									//  13
-			, {"red"	, "(race)"}										//  14
-			, {"160"	, "(weight)"}									//  15
-			, {"2"		, "(child_selected.('index'))"}					//  16
-			, {"2"		, "(child_selected.index)"}						//  17
-			, {"venus"	, "(children[('1')])"}							//  18
-			, {"crystal", "(children[(child_selected.index)])"		}	//  19
-			, {"true"	, " alive  ? 'true' : 'false'"				}	//  10
-			, {"true"	, "(alive) ? 'true' : 'false'"				}	//  21
-			, {"false"	, " dead   ? 'true' : 'false'"				}	//  22
-			, {"false"	, "(dead)  ? 'true' : 'false'"				}	//  23
-			, {"true"	, " alive  ? ('true') : ('false')"			}	//  24
-			, {"true"	, "(alive) ? ('true') : ('false')"			}	//  25
-			, {"false"	, " dead   ? ('true') : ('false')"			}	//  26
-			, {"false"	, "(dead)  ? ('true') : ('false')"			}	//  27
-			, {"true"	, " alive  ? ('true') : ('false')"			}	//  28
-			, {"true"	, "(alive  ? (dead ? 'false' : 'true'))"	}	//  29
-			, {"false"	, " dead   ? ('true') : ('false')"			}	//  30
-			, {"false"	, "(dead)  ? ('true') : ('false')"			}	//  31
-			, {"true"	, "(alive  ? dead ? 'false' : 'true' : 'unknown')"	}		// 32
+			//{ {"true"	, " alive  ? ('true') : ('false')"					}	//  24
+			{ {"carlos"	, "name"											}	// 0
+			, {"lucas"	, "parent.name"										}	//  1
+			, {"lucas"	, "'lucas'"											}	//  2
+			, {"1.56"	, "height"											}	//  3
+			, {"brown"	, "color"											}	//  4
+			, {"red"	, "race"											}	//  5
+			, {"160"	, "weight"											}	//  6
+			, {"2"		, "child_selected.index"							}	//  7
+			, {"venus"	, "children[('1')]"									}	//  8
+			, {"crystal", "children[(child_selected.index)]"				}	//  9
+			, {"carlos"	, "(name)"											}	//  10
+			, {"lucas"	, "({'parent'}.name)"								}	//  11
+			, {"1.56"	, "(height)"										}	//  12
+			, {"brown"	, "(color)"											}	//  13
+			, {"red"	, "(race)"											}	//  14
+			, {"160"	, "(weight)"										}	//  15
+			, {"2"		, "(child_selected.('index'))"						}	//  16
+			, {"2"		, "(child_selected.index)"							}	//  17
+			, {"venus"	, "(children[('1')])"								}	//  18
+			, {"crystal", "(children[(child_selected.index)])"				}	//  19
+			, {"true"	, " alive  ? 'true' : 'false'"						}	//  10
+			, {"true"	, "(alive) ? 'true' : 'false'"						}	//  21
+			, {"false"	, " dead   ? 'true' : 'false'"						}	//  22
+			, {"false"	, "(dead)  ? 'true' : 'false'"						}	//  23
+			, {"true"	, " alive  ? ('true') : ('false')"					}	//  24
+			, {"true"	, "(alive) ? ('true') : ('false')"					}	//  25
+			, {"false"	, " dead   ? ('true') : ('false')"					}	//  26
+			, {"false"	, "(dead)  ? ('true') : ('false')"					}	//  27
+			, {"true"	, "(alive  ? (dead ? 'false' : 'true'))"			}	//	28
+			, {"true"	, "(alive  ? dead ? 'false' : 'true' : 'unknown')"	}	//	29
+			, {"true"	, "alive  ? dead ? 'false' : 'true' : 'unknown'"	}	//	30
 			};
 		info_printf("Input JSON:\n%s", inputJson.begin());
 		::gpk::SJSONReader								jsonReaderEasy;
@@ -167,54 +165,32 @@ int											main						()	{
 	}
 	{
 		const ::gpk::view_const_string					inputJson				=
-			"\n{\t \"name\" : \"carlos\""
-			"\n\t, \"parent\" : {\"name\" : \"lucas\"}"
-			"\n\t, \"height\" : \"1.56\""
-			"\n\t, \"color\" : \"brown\""
-			"\n\t, \"race\" : \"red\""
-			"\n\t, \"weight\" : 160"
-			"\n\t, \"alive\" : false"
-			"\n\t, \"dead\" : true"
-			"\n\t, \"children\": [\"marta\", \"venus\", \"crystal\"]"
+			"\n{\t \"name\"           : \"carlos\""
+			"\n\t, \"parent\"         : {\"name\" : \"lucas\"}"
+			"\n\t, \"height\"         : \"1.56\""
+			"\n\t, \"color\"          : \"brown\""
+			"\n\t, \"race\"           : \"red\""
+			"\n\t, \"weight\"         : 160"
+			"\n\t, \"alive\"          : false"
+			"\n\t, \"dead\"           : true"
+			"\n\t, \"children\"       : [\"marta\", \"venus\", \"crystal\"]"
 			"\n\t, \"child_selected\" : {\"index\" : 2}"
 			"\n}"
 			;
 		::gpk::TKeyValConstString						pairsResultExpression[]			=
-			//{ {"unknown"	, "(alive ? dead ? 'false' : 'true' : 'unknown')"	}		// 36
-			{ {"carlos"		, "name"}										// 0
-			, {"lucas"		, "parent.name"}								//  1
-			, {"lucas"		, "'lucas'"}									//  2
-			, {"1.56"		, "height"}										//  3
-			, {"brown"		, "color"}										//  4
-			, {"red"		, "race"}										//  5
-			, {"160"		, "weight"}										//  6
-			, {"2"			, "child_selected.index"}						//  7
-			, {"venus"		, "children[('1')]"}							//  8
-			, {"crystal"	, "children[(child_selected.index)]"}			//  9
-			, {"carlos"		, "(name)"}										//  10
-			, {"lucas"		, "({'parent'}.name)"}							//  11
-			, {"1.56"		, "(height)"}									//  12
-			, {"brown"		, "(color)"}									//  13
-			, {"red"		, "(race)"}										//  14
-			, {"160"		, "(weight)"}									//  15
-			, {"2"			, "(child_selected.('index'))"}					//  16
-			, {"2"			, "(child_selected.index)"}						//  17
-			, {"venus"		, "(children[('1')])"}							//  18
-			, {"crystal"	, "(children[(child_selected.index)])"		}	//  19
-			, {"false"		, " alive  ? 'true' : 'false'"				}	//  10
-			, {"false"		, "(alive) ? 'true' : 'false'"				}	//  21
-			, {"true"		, " dead   ? 'true' : 'false'"				}	//  22
-			, {"true"		, "(dead)  ? 'true' : 'false'"				}	//  23
-			, {"false"		, " alive  ? ('true') : ('false')"			}	//  24
-			, {"false"		, "(alive) ? ('true') : ('false')"			}	//  25
-			, {"true"		, " dead   ? ('true') : ('false')"			}	//  26
-			, {"true"		, "(dead)  ? ('true') : ('false')"			}	//  27
-			, {"false"		, " alive  ? ('true') : ('false')"			}	//  28
-			, {"false"		, "(alive  ? (dead ? 'false' : 'true'))"	}	//  29
-			, {"true"		, " dead   ? ('true') : ('false')"			}	//  30
-			, {"true"		, "(dead)  ? ('true') : ('false')"			}	//  31
-			, {"unknown"	, "alive ? dead ? 'false' : 'true' : 'unknown'"	}		// 32
-			, {"unknown"	, "(alive  ? (dead ? 'false' : 'true') : 'unknown')"	}		// 33
+			{ {"unknown"	, "(alive ? dead ? 'false' : 'true' : 'unknown')"	}		// 36
+			, {"false"		, " alive  ? 'true' : 'false'"							}	//  10
+			, {"false"		, "(alive) ? 'true' : 'false'"							}	//  21
+			, {"true"		, " dead   ? 'true' : 'false'"							}	//  22
+			, {"true"		, "(dead)  ? 'true' : 'false'"							}	//  23
+			, {"false"		, " alive  ? ('true') : ('false')"						}	//  24
+			, {"false"		, "(alive) ? ('true') : ('false')"						}	//  25
+			, {"true"		, " dead   ? ('true') : ('false')"						}	//  26
+			, {"true"		, "(dead)  ? ('true') : ('false')"						}	//  27
+			, {"false"		, " alive  ? ('true') : ('false')"						}	//  28
+			, {"false"		, "(alive  ? (dead ? 'false' : 'true'))"				}	//  29
+			, {"red"		, "alive   ? dead ? 'false' : 'true' : race"			}	// 31
+			, {"unknown"	, "(alive  ? (dead ? 'false' : 'true') : 'unknown')"	}	// 32
 			};
 		info_printf("Input JSON:\n%s", inputJson.begin());
 		::gpk::SJSONReader								jsonReaderEasy;
@@ -229,19 +205,19 @@ int											main						()	{
 		;
 	{
 		const ::gpk::view_const_string					inputJson				=
-			"\n	{ \"properties\" : [{ \"name\" : \"age\", \"type\" : \"int\"}, { \"name\" : \"color\", \"type\" : \"string\"}, { \"name\" : \"race\", \"type\" : \"string\"} ]"
-			"\n	, \"selection\" : {\"index\" : 2, \"active\" : true }"
-			"\n	, \"people\" : "
-			"\n		[{ \"name\" : \"David\""
-			"\n		 , \"property\" : "
-			"\n			{ \"color\" : \"orange\", \"age\" : 16, \"race\" : \"fat\" }"
-			"\n		},"
-			"\n		{ \"name\" : \"Charles\" // this is another comment"
-			"\n		 , \"property\" : "
-			"\n			{ \"color\" : \"green\", \"age\" : 32, \"race\" : \"thin\" }"
-			"\n		},"
-			"\n		]"
-			"\n	}"
+			"\n{ \"properties\" : [{ \"name\" : \"age\", \"type\" : \"int\"}, { \"name\" : \"color\", \"type\" : \"string\"}, { \"name\" : \"race\", \"type\" : \"string\"} ]"
+			"\n, \"selection\" : {\"index\" : 2, \"active\" : true }"
+			"\n, \"people\" : "
+			"\n    [{ \"name\" : \"David\""
+			"\n        , \"property\" : "
+			"\n        { \"color\" : \"orange\", \"age\" : 16, \"race\" : \"fat\" }"
+			"\n    },"
+			"\n    { \"name\" : \"Charles\" // this is another comment"
+			"\n        , \"property\" : "
+			"\n        { \"color\" : \"green\", \"age\" : 32, \"race\" : \"thin\" }"
+			"\n    },"
+			"\n    ]"
+			"\n}"
 			;
 		::gpk::TKeyValConstString						pairsResultExpression[]			=
 			//{ {"race"	, "selection.active ? properties[(selection.index)].name : 'No selection.'"}
@@ -266,19 +242,19 @@ int											main						()	{
 	}
 	{
 		const ::gpk::view_const_string					inputJson				=
-			"\n	{ \"properties\" : [{ \"name\" : \"age\", \"type\" : \"int\"}, { \"name\" : \"color\", \"type\" : \"string\"}, { \"name\" : \"race\", \"type\" : \"string\"} ]"
-			"\n	, \"selection\" : {\"index\" : 0, \"active\" : false }"
-			"\n	, \"people\" : "
-			"\n		[{ \"name\" : \"David\""
-			"\n		 , \"property\" : "
-			"\n			{ \"color\" : \"blue\", \"age\" : 25, \"race\" : \"fat\" }"
-			"\n		},"
-			"\n		{ \"name\" : \"Charles\" // this is another comment"
-			"\n		 , \"property\" : "
-			"\n			{ \"color\" : \"green\", \"age\" : 32, \"race\" : \"thin\" }"
-			"\n		},"
-			"\n		]"
-			"\n	}"
+			"\n{ \"properties\" : [{ \"name\" : \"age\", \"type\" : \"int\"}, { \"name\" : \"color\", \"type\" : \"string\"}, { \"name\" : \"race\", \"type\" : \"string\"} ]"
+			"\n, \"selection\" : {\"index\" : 0, \"active\" : false }"
+			"\n, \"people\" : "
+			"\n    [    { \"name\" : \"David\""
+			"\n         , \"property\" : "
+			"\n    	        { \"color\" : \"blue\", \"age\" : 25, \"race\" : \"fat\" }"
+			"\n         },"
+			"\n        { \"name\" : \"Charles\" // this is another comment"
+			"\n        , \"property\" : "
+			"\n    	       { \"color\" : \"green\", \"age\" : 32, \"race\" : \"thin\" }"
+			"\n        },"
+			"\n    ]"
+			"\n}"
 			;
 		::gpk::TKeyValConstString						pairsResultExpression[]			=
 			{ {"1"			, "(selection.active) ? (selection.index) : ('1')"}
@@ -289,8 +265,6 @@ int											main						()	{
 			, {"green"			, "people['1'].property.(properties[selection.active ? (selection.index) : '1'].name)"}
 			, {"green"			, "people['1'].property.(properties[selection.active ? (selection.index) : ('1')].name)"}
 			, {"green"			, "people['1'].property.(properties[(selection.active) ? selection.index : '1'].name)"}
-			, {"green"			, "people['1'].property.(properties[selection.active ? (selection.index) : '1'].name)"}
-			, {"green"			, "people['1'].property.(properties[selection.active ? (selection.index) : ('1')].name)"}
 			, {"25"				, "people['0'].property.(properties[(selection.active) ? selection.index : '0'].name)"}
 			};
 		info_printf("Input JSON:\n%s", inputJson.begin());
