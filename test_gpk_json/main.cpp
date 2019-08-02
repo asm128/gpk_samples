@@ -108,7 +108,7 @@
 }
 
 int											main						()	{
-	gpk_necall(::testJSONReader(), "%s", "Failed to read JSON!");
+	//gpk_necall(::testJSONReader(), "%s", "Failed to read JSON!");
 	{
 		const ::gpk::view_const_string					inputJson				=
 			"\n{\t \"name\" : \"carlos\""
@@ -124,34 +124,97 @@ int											main						()	{
 			"\n}"
 			;
 		::gpk::TKeyValConstString						pairsResultExpression[]			=
+			//{ {"true"	, " alive  ? ('true') : ('false')"			}	//  24
 			{ {"carlos"	, "name"}										// 0
-			, {"lucas"	, "parent.name"}								// 1
-			, {"lucas"	, "'lucas'"}									// 1
-			, {"1.56"	, "height"}										// 2
-			, {"brown"	, "color"}										// 3
-			, {"red"	, "race"}										// 4
-			, {"160"	, "weight"}										// 5
-			, {"2"		, "child_selected.index"}						// 6
-			, {"venus"	, "children[('1')]"}							// 7
-			, {"crystal", "children[(child_selected.index)]"}			// 8
-			, {"carlos"	, "(name)"}										// 9
-			, {"lucas"	, "({'parent'}.name)"}							// 10
-			, {"1.56"	, "(height)"}									// 11
-			, {"brown"	, "(color)"}									// 12
-			, {"red"	, "(race)"}										// 13
-			, {"160"	, "(weight)"}									// 14
-			, {"2"		, "(child_selected.('index'))"}					// 15
-			, {"2"		, "(child_selected.index)"}						// 15
-			, {"venus"	, "(children[('1')])"}							// 16
-			, {"crystal", "(children[(child_selected.index)])"}			// 17
-			, {"true"	, " alive  ? 'true' : 'false'"		}			// 17
-			, {"true"	, "(alive) ? 'true' : 'false'"		}			// 17
-			, {"false"	, " dead   ? 'true' : 'false'"		}			// 17
-			, {"false"	, "(dead)  ? 'true' : 'false'"		}			// 17
-			, {"true"	, " alive  ? ('true') : ('false')"		}			// 17
-			, {"true"	, "(alive) ? ('true') : ('false')"		}			// 17
-			, {"false"	, " dead   ? ('true') : ('false')"		}			// 17
-			, {"false"	, "(dead)  ? ('true') : ('false')"		}			// 17
+			, {"lucas"	, "parent.name"}								//  1
+			, {"lucas"	, "'lucas'"}									//  2
+			, {"1.56"	, "height"}										//  3
+			, {"brown"	, "color"}										//  4
+			, {"red"	, "race"}										//  5
+			, {"160"	, "weight"}										//  6
+			, {"2"		, "child_selected.index"}						//  7
+			, {"venus"	, "children[('1')]"}							//  8
+			, {"crystal", "children[(child_selected.index)]"}			//  9
+			, {"carlos"	, "(name)"}										//  10
+			, {"lucas"	, "({'parent'}.name)"}							//  11
+			, {"1.56"	, "(height)"}									//  12
+			, {"brown"	, "(color)"}									//  13
+			, {"red"	, "(race)"}										//  14
+			, {"160"	, "(weight)"}									//  15
+			, {"2"		, "(child_selected.('index'))"}					//  16
+			, {"2"		, "(child_selected.index)"}						//  17
+			, {"venus"	, "(children[('1')])"}							//  18
+			, {"crystal", "(children[(child_selected.index)])"		}	//  19
+			, {"true"	, " alive  ? 'true' : 'false'"				}	//  10
+			, {"true"	, "(alive) ? 'true' : 'false'"				}	//  21
+			, {"false"	, " dead   ? 'true' : 'false'"				}	//  22
+			, {"false"	, "(dead)  ? 'true' : 'false'"				}	//  23
+			, {"true"	, " alive  ? ('true') : ('false')"			}	//  24
+			, {"true"	, "(alive) ? ('true') : ('false')"			}	//  25
+			, {"false"	, " dead   ? ('true') : ('false')"			}	//  26
+			, {"false"	, "(dead)  ? ('true') : ('false')"			}	//  27
+			, {"true"	, " alive  ? ('true') : ('false')"			}	//  28
+			, {"true"	, "(alive  ? (dead ? 'false' : 'true'))"	}	//  29
+			, {"false"	, " dead   ? ('true') : ('false')"			}	//  30
+			, {"false"	, "(dead)  ? ('true') : ('false')"			}	//  31
+			, {"true"	, "(alive  ? dead ? 'false' : 'true' : 'unknown')"	}		// 32
+			};
+		info_printf("Input JSON:\n%s", inputJson.begin());
+		::gpk::SJSONReader								jsonReaderEasy;
+		gpk_necall(::gpk::jsonParse(jsonReaderEasy, inputJson), "Failed to parse json: '%s'.", inputJson.begin());
+		for(uint32_t iTest = 0; iTest < ::gpk::size(pairsResultExpression); ++iTest)
+			ree_if(errored(testJSONExpression(jsonReaderEasy, pairsResultExpression[iTest].Val, pairsResultExpression[iTest].Key)), "Failed to resolve expression: %s", pairsResultExpression[iTest].Val.begin());
+	}
+	{
+		const ::gpk::view_const_string					inputJson				=
+			"\n{\t \"name\" : \"carlos\""
+			"\n\t, \"parent\" : {\"name\" : \"lucas\"}"
+			"\n\t, \"height\" : \"1.56\""
+			"\n\t, \"color\" : \"brown\""
+			"\n\t, \"race\" : \"red\""
+			"\n\t, \"weight\" : 160"
+			"\n\t, \"alive\" : false"
+			"\n\t, \"dead\" : true"
+			"\n\t, \"children\": [\"marta\", \"venus\", \"crystal\"]"
+			"\n\t, \"child_selected\" : {\"index\" : 2}"
+			"\n}"
+			;
+		::gpk::TKeyValConstString						pairsResultExpression[]			=
+			//{ {"unknown"	, "(alive ? dead ? 'false' : 'true' : 'unknown')"	}		// 36
+			{ {"carlos"		, "name"}										// 0
+			, {"lucas"		, "parent.name"}								//  1
+			, {"lucas"		, "'lucas'"}									//  2
+			, {"1.56"		, "height"}										//  3
+			, {"brown"		, "color"}										//  4
+			, {"red"		, "race"}										//  5
+			, {"160"		, "weight"}										//  6
+			, {"2"			, "child_selected.index"}						//  7
+			, {"venus"		, "children[('1')]"}							//  8
+			, {"crystal"	, "children[(child_selected.index)]"}			//  9
+			, {"carlos"		, "(name)"}										//  10
+			, {"lucas"		, "({'parent'}.name)"}							//  11
+			, {"1.56"		, "(height)"}									//  12
+			, {"brown"		, "(color)"}									//  13
+			, {"red"		, "(race)"}										//  14
+			, {"160"		, "(weight)"}									//  15
+			, {"2"			, "(child_selected.('index'))"}					//  16
+			, {"2"			, "(child_selected.index)"}						//  17
+			, {"venus"		, "(children[('1')])"}							//  18
+			, {"crystal"	, "(children[(child_selected.index)])"		}	//  19
+			, {"false"		, " alive  ? 'true' : 'false'"				}	//  10
+			, {"false"		, "(alive) ? 'true' : 'false'"				}	//  21
+			, {"true"		, " dead   ? 'true' : 'false'"				}	//  22
+			, {"true"		, "(dead)  ? 'true' : 'false'"				}	//  23
+			, {"false"		, " alive  ? ('true') : ('false')"			}	//  24
+			, {"false"		, "(alive) ? ('true') : ('false')"			}	//  25
+			, {"true"		, " dead   ? ('true') : ('false')"			}	//  26
+			, {"true"		, "(dead)  ? ('true') : ('false')"			}	//  27
+			, {"false"		, " alive  ? ('true') : ('false')"			}	//  28
+			, {"false"		, "(alive  ? (dead ? 'false' : 'true'))"	}	//  29
+			, {"true"		, " dead   ? ('true') : ('false')"			}	//  30
+			, {"true"		, "(dead)  ? ('true') : ('false')"			}	//  31
+			, {"unknown"	, "alive ? dead ? 'false' : 'true' : 'unknown'"	}		// 32
+			, {"unknown"	, "(alive  ? (dead ? 'false' : 'true') : 'unknown')"	}		// 33
 			};
 		info_printf("Input JSON:\n%s", inputJson.begin());
 		::gpk::SJSONReader								jsonReaderEasy;
@@ -181,9 +244,12 @@ int											main						()	{
 			"\n	}"
 			;
 		::gpk::TKeyValConstString						pairsResultExpression[]			=
+			//{ {"race"	, "selection.active ? properties[(selection.index)].name : 'No selection.'"}
+			//{ {"race"	, "selection.active ? properties[selection.index].name : 'No selection.'"}
+			//{ {"is active"	, "selection.active ? 'is active' : 'No selection.'"}
 			{ { "age"	, "properties[('0')].name"}
 			, { "age"	, "properties[selection.active ? '0' : selection.index].name"}
-			, {"race"	, "selection.active ? properties[(selection.index)].name : 'No selection.'"}
+			, {"race"	, "selection.active ? selection.index ? properties[(selection.index)].name : 'No selection.'"}
 			, {"thin"	, "people['1'].property.(properties[selection.active ? (selection.index) : '1'].name)"}
 			, {"fat"	, "people['0'].property.(properties[selection.active ? selection.index : ('0')].name)"}
 			, {"true"	, "selection.active"}
@@ -194,9 +260,8 @@ int											main						()	{
 		info_printf("Input JSON:\n%s", inputJson.begin());
 		::gpk::SJSONReader								jsonReaderHard;
 		gpk_necall(::gpk::jsonParse(jsonReaderHard, inputJson), "Failed to parse json: '%s'.", inputJson.begin());
-		for(uint32_t iTest = 0; iTest < ::gpk::size(pairsResultExpression); ++iTest) {
+		for(uint32_t iTest = 0; iTest < ::gpk::size(pairsResultExpression); ++iTest)
 			ree_if(errored(testJSONExpression(jsonReaderHard, pairsResultExpression[iTest].Val, pairsResultExpression[iTest].Key)), "Failed to resolve expression: %s", pairsResultExpression[iTest].Val.begin());
-		}
 		gpk_necall(::testJSONFormatter(jsonReaderHard, format, inputJson), "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", format.begin(), inputJson.begin());
 	}
 	{
