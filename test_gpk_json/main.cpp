@@ -125,41 +125,46 @@ int											main						()	{
 			"\n}"
 			;
 		::gpk::TKeyValConstString						pairsResultExpression[]			=
-			{ {"0"			, "(!(selection.active))	? (selection.index)	: '0'"	} //  3
-			, {"it's alive!", "!alive ? 'dead!' : \"it's alive!\""					}	// 0
-			, {"2"			, "!selection.active	? ('0') : selection.index"		}	// 1
-			, {"0"			, "(selection.active)	? ('0')	: (selection.index)"	}	// 2
-			, {"carlos"		, "name"												}	// 3
-			, {"1.56"		, "height"												}	// 4
-			, {"brown"		, "color"												}	// 5
-			, {"red"		, "race"												}	// 6
-			, {"160"		, "weight"												}	// 7
-			, {"2"			, "child_selected.index"								}	// 8
-			, {"venus"		, "children[('1')]"										}	// 9
-			, {"crystal"	, "children[(child_selected.index)]"					}	// 10
-			, {"carlos"		, "(name)"												}	// 11
-			, {"lucas"		, "parent.name"											}	// 12
-			, {"lucas"		, "'lucas'"												}	// 13
-			, {"lucas"		, "({'parent'}.name)"									}	// 14
-			, {"1.56"		, "(height)"											}	// 15
-			, {"brown"		, "(color)"												}	// 16
-			, {"red"		, "(race)"												}	// 17
-			, {"160"		, "(weight)"											}	// 18
-			, {"2"			, "(child_selected.('index'))"							}	// 19
-			, {"2"			, "(child_selected.index)"								}	// 20
-			, {"venus"		, "(children[(('1'))])"									}	// 21
-			, {"crystal"	, "(children[((child_selected.index))])"				}	// 22
-			, {"true"		, " alive  ? 'true' : 'false'"							}	// 23
-			, {"true"		, "(alive) ? 'true' : 'false'"							}	// 24
-			, {"false"		, " dead   ? 'true' : 'false'"							}	// 25
-			, {"false"		, "(dead)  ? 'true' : 'false'"							}	// 26
-			, {"true"		, " alive  ? ('true') : ('false')"						}	// 27
-			, {"true"		, "(alive) ? ('true') : ('false')"						}	// 28
-			, {"false"		, " dead   ? ('true') : ('false')"						}	// 29
-			, {"false"		, "(dead)  ? ('true') : ('false')"						}	// 30
-			, {"true"		, "(alive  ? (dead ? 'false' : 'true'))"				}	// 31
-			, {"true"		, "(alive  ? dead ? 'false' : 'true' : 'unknown')"		}	// 32
-			, {"true"		, "alive  ? dead ? 'false' : 'true' : 'unknown'"		}	// 33
+			{ {"true"		, "!'0'"												}	// 0
+			, {"true"		, "!''"													}	// 1
+			, {"false"		, "!' '"												}	// 2
+			, {"true"		, "!'{}'"												}	// 3
+			, {"true"		, "!'[]'"												}	// 4
+			, {"it's alive!", "!alive ? 'dead!' : \"it's alive!\""					}	// 5
+			, {"it's alive!", "!!alive ? \"it's alive!\" : 'dead!'"					}	// 6
+			, {"2"			, "!selection.active	? ('0') : selection.index"		}	// 7
+			, {"0"			, "(selection.active)	? ('0')	: (selection.index)"	}	// 8
+			, {"carlos"		, "name"												}	// 9
+			, {"1.56"		, "height"												}	// 10
+			, {"brown"		, "color"												}	// 11
+			, {"red"		, "race"												}	// 12
+			, {"160"		, "weight"												}	// 13
+			, {"2"			, "child_selected.index"								}	// 14
+			, {"venus"		, "children[('1')]"										}	// 15
+			, {"crystal"	, "children[(child_selected.index)]"					}	// 16
+			, {"carlos"		, "(name)"												}	// 17
+			, {"lucas"		, "parent.name"											}	// 18
+			, {"lucas"		, "'lucas'"												}	// 19
+			, {"lucas"		, "({'parent'}.name)"									}	// 20
+			, {"1.56"		, "(height)"											}	// 21
+			, {"brown"		, "(color)"												}	// 22
+			, {"red"		, "(race)"												}	// 23
+			, {"160"		, "(weight)"											}	// 24
+			, {"2"			, "(child_selected.('index'))"							}	// 25
+			, {"2"			, "(child_selected.index)"								}	// 26
+			, {"venus"		, "(children[(('1'))])"									}	// 27
+			, {"crystal"	, "(children[((child_selected.index))])"				}	// 28
+			, {"true"		, " alive  ? 'true' : 'false'"							}	// 29
+			, {"true"		, "(alive) ? 'true' : 'false'"							}	// 30
+			, {"false"		, " dead   ? 'true' : 'false'"							}	// 31
+			, {"false"		, "(dead)  ? 'true' : 'false'"							}	// 32
+			, {"true"		, " alive  ? ('true') : ('false')"						}	// 33
+			, {"true"		, "!!(!!alive) ? ('true') : ('false')"					}	// 34
+			, {"false"		, " dead   ? ('true') : ('false')"						}	// 35
+			, {"false"		, "(dead)  ? ('true') : ('false')"						}	// 36
+			, {"true"		, "(alive  ? (dead ? 'false' : 'true'))"				}	// 37
+			, {"true"		, "(alive  ? dead ? 'false' : 'true' : 'unknown')"		}	// 38
+			, {"true"		, "alive  ? dead ? 'false' : 'true' : 'unknown'"		}	// 39
 			};
 		info_printf("Input JSON:\n%s", inputJson.begin());
 		::gpk::SJSONReader								jsonReaderEasy;
@@ -191,7 +196,7 @@ int											main						()	{
 			, {"is dead"	, "(alive) ? ('is_alive') : ('is dead')"					}	// 6
 			, {"is dead"	, " dead   ? ('is dead') : ('is_alive')"					}	// 7
 			, {"is dead"	, "(dead)  ? ('is dead') : ('is_alive')"					}	// 8
-			, {"is dead"	, " alive  ? ('is_alive') : ('is dead')"					}	// 9
+			, {"false"		, " alive  ? ('is_alive') : (!'is dead')"					}	// 9
 			, {"is_dead"	, "(alive  ? (dead ? 'is_dead' : 'is alive'))"				}	// 10
 			, {"red"		, "alive   ? dead ? 'is_dead' : 'is_alive' : race"			}	// 11
 			, {"unknown"	, "(alive  ? (dead ? 'is_dead' : 'is_alive') : 'unknown')"	}	// 12
@@ -199,8 +204,10 @@ int											main						()	{
 		info_printf("Input JSON:\n%s", inputJson.begin());
 		::gpk::SJSONReader								jsonReaderEasy;
 		gpk_necall(::gpk::jsonParse(jsonReaderEasy, inputJson), "Failed to parse json: '%s'.", inputJson.begin());
-		for(uint32_t iTest = 0; iTest < ::gpk::size(pairsResultExpression); ++iTest)
+		for(uint32_t iTest = 0; iTest < ::gpk::size(pairsResultExpression); ++iTest) {
+			info_printf("Testing expression %u.", iTest);
 			ree_if(errored(testJSONExpression(jsonReaderEasy, pairsResultExpression[iTest].Val, pairsResultExpression[iTest].Key)), "Failed to resolve expression: %s", pairsResultExpression[iTest].Val.begin());
+		}
 	}
 	const ::gpk::view_const_string					format						=
 		"I want to replace this (but not \\{this}): \n{people['1'].name}'s {properties[selection.active ? selection.index : '1'].name}: // this comment should appear here"
