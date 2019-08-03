@@ -109,106 +109,108 @@
 
 int											main						()	{
 	//gpk_necall(::testJSONReader(), "%s", "Failed to read JSON!");
+	uint32_t										testsSucceeded			= 0;
 	{
 		const ::gpk::view_const_string					inputJson				=
-			"\n{\t \"name\" : \"carlos\""
-			"\n\t, \"parent\" : {\"name\" : \"lucas\"}"
-			"\n\t, \"height\" : \"1.56\""
-			"\n\t, \"color\" : \"brown\""
-			"\n\t, \"race\" : \"red\""
-			"\n\t, \"weight\" : 160"
-			"\n\t, \"alive\" : true"
-			"\n\t, \"dead\" : false"
-			"\n\t, \"children\": [\"marta\", \"venus\", \"crystal\"]"
-			"\n\t, \"child_selected\" : {\"index\" : 2}"
-			"\n, \"selection\" : {\"index\" : 2, \"active\" : true }"
-			"\n}"
-			;
-		::gpk::TKeyValConstString						pairsResultExpression[]			=
-			{ {"true"		, "!'0'"												}	// 0
-			, {"true"		, "!''"													}	// 1
-			, {"false"		, "!' '"												}	// 2
-			, {"true"		, "!'{}'"												}	// 3
-			, {"true"		, "!'[]'"												}	// 4
-			, {"it's alive!", "!alive ? 'dead!' : \"it's alive!\""					}	// 5
-			, {"it's alive!", "!!alive ? \"it's alive!\" : 'dead!'"					}	// 6
-			, {"2"			, "!selection.active	? ('0') : selection.index"		}	// 7
-			, {"0"			, "(selection.active)	? ('0')	: (selection.index)"	}	// 8
-			, {"carlos"		, "name"												}	// 9
-			, {"1.56"		, "height"												}	// 10
-			, {"brown"		, "color"												}	// 11
-			, {"red"		, "race"												}	// 12
-			, {"160"		, "weight"												}	// 13
-			, {"2"			, "child_selected.index"								}	// 14
-			, {"venus"		, "children[('1')]"										}	// 15
-			, {"crystal"	, "children[(child_selected.index)]"					}	// 16
-			, {"carlos"		, "(name)"												}	// 17
-			, {"lucas"		, "parent.name"											}	// 18
-			, {"lucas"		, "'lucas'"												}	// 19
-			, {"lucas"		, "({'parent'}.name)"									}	// 20
-			, {"1.56"		, "(height)"											}	// 21
-			, {"brown"		, "(color)"												}	// 22
-			, {"red"		, "(race)"												}	// 23
-			, {"160"		, "(weight)"											}	// 24
-			, {"2"			, "(child_selected.('index'))"							}	// 25
-			, {"2"			, "(child_selected.index)"								}	// 26
-			, {"venus"		, "(children[(('1'))])"									}	// 27
-			, {"crystal"	, "(children[((child_selected.index))])"				}	// 28
-			, {"true"		, " alive  ? 'true' : 'false'"							}	// 29
-			, {"true"		, "(alive) ? 'true' : 'false'"							}	// 30
-			, {"false"		, " dead   ? 'true' : 'false'"							}	// 31
-			, {"false"		, "(dead)  ? 'true' : 'false'"							}	// 32
-			, {"true"		, " alive  ? ('true') : ('false')"						}	// 33
-			, {"true"		, "!!(!!alive) ? ('true') : ('false')"					}	// 34
-			, {"false"		, " dead   ? ('true') : ('false')"						}	// 35
-			, {"false"		, "(dead)  ? ('true') : ('false')"						}	// 36
-			, {"true"		, "(alive  ? (dead ? 'false' : 'true'))"				}	// 37
-			, {"true"		, "(alive  ? dead ? 'false' : 'true' : 'unknown')"		}	// 38
-			, {"true"		, "alive  ? dead ? 'false' : 'true' : 'unknown'"		}	// 39
-			};
-		info_printf("Input JSON:\n%s", inputJson.begin());
-		::gpk::SJSONReader								jsonReaderEasy;
-		gpk_necall(::gpk::jsonParse(jsonReaderEasy, inputJson), "Failed to parse json: '%s'.", inputJson.begin());
-		for(uint32_t iTest = 0; iTest < ::gpk::size(pairsResultExpression); ++iTest)
-			gerror_if(errored(testJSONExpression(jsonReaderEasy, pairsResultExpression[iTest].Val, pairsResultExpression[iTest].Key)), "Failed to resolve expression: %s", pairsResultExpression[iTest].Val.begin());
-	}
-	{
-		const ::gpk::view_const_string					inputJson				=
-			"\n{\t \"name\"           : \"carlos\""
-			"\n\t, \"parent\"         : {\"name\" : \"lucas\"}"
+			"\n{\t \"name\"           : \"Carlos\""
 			"\n\t, \"height\"         : \"1.56\""
 			"\n\t, \"color\"          : \"brown\""
 			"\n\t, \"race\"           : \"red\""
 			"\n\t, \"weight\"         : 160"
-			"\n\t, \"alive\"          : false"
-			"\n\t, \"dead\"           : true"
-			"\n\t, \"children\"       : [\"marta\", \"venus\", \"crystal\"]"
-			"\n\t, \"child_selected\" : {\"index\" : 2}"
+			"\n\t, \"alive\"          : true"
+			"\n\t, \"married\"        : false"
+			"\n\t, \"children\"       : [\"Rene\", \"Ariel\", \"Jamie\"]"
+			"\n\t, \"selection\"      : { \"index\" : 2, \"name\" : \"children\", \"active\" : false , \"default_property_name_path\" : \"properties['0'].name\" }"
+			"\n\t, \"parents\"        : "
+			"\n\t    [{ \"name\" : \"Alice\""
+			"\n\t        , \"property\" : "
+			"\n\t        { \"color\" : \"orange\", \"age\" : 16, \"race\" : \"fat\" }"
+			"\n\t    },"
+			"\n\t    { \"name\" : \"Bob\" // this is another comment"
+			"\n\t        , \"property\" : "
+			"\n\t        { \"color\" : \"green\", \"age\" : 32, \"race\" : \"thin\" }"
+			"\n\t    }"
+			"\n\t    ]"
+			"\n\t, \"properties\" : [{ \"name\" : \"age\", \"type\" : \"int\"}, { \"name\" : \"color\", \"type\" : \"string\"}, { \"name\" : \"race\", \"type\" : \"string\"} ]"
 			"\n}"
 			;
-		::gpk::TKeyValConstString						pairsResultExpression[]			=
-			{ {"unknown"	, "(alive ? dead ? 'not alive' : 'is alive' : 'unknown')"	}	// 0
-			, {"not alive"	, " alive  ? 'is alive' : 'not alive'"						}	// 1
-			, {"not alive"	, "(alive) ? 'is alive' : 'not alive'"						}	// 2
-			, {"is dead"	, " dead   ? 'is dead' : 'not dead'"						}	// 3
-			, {"is dead"	, "(dead)  ? 'is dead' : 'not dead'"						}	// 4
-			, {"is dead"	, " alive  ? ('is_alive') : ('is dead')"					}	// 5
-			, {"is dead"	, "(alive) ? ('is_alive') : ('is dead')"					}	// 6
-			, {"is dead"	, " dead   ? ('is dead') : ('is_alive')"					}	// 7
-			, {"is dead"	, "(dead)  ? ('is dead') : ('is_alive')"					}	// 8
-			, {"false"		, " alive  ? ('is_alive') : (!'is dead')"					}	// 9
-			, {"is_dead"	, "(alive  ? (dead ? 'is_dead' : 'is alive'))"				}	// 10
-			, {"red"		, "alive   ? dead ? 'is_dead' : 'is_alive' : race"			}	// 11
-			, {"unknown"	, "(alive  ? (dead ? 'is_dead' : 'is_alive') : 'unknown')"	}	// 12
+		::gpk::SJSONReader								jsonReader;
+		::gpk::TKeyValConstString						resultExpression[]		=
+			{ {"it's alive!"	, "(!(!(alive))) ? \"it's alive!\" : 'dead!'"							}	// 0
+			, {"true"			, "alive"																}	// 1
+			, {"it's alive!"	, " alive  ? \"it's alive!\" : 'dead!'"									}	// 2
+			, {"true"			, "(alive)"																}	// 3
+			, {"it's alive!"	, "(alive) ? \"it's alive!\" : 'dead!'"									}	// 4
+			, {"false"			, "!(alive)"															}	// 5
+			, {"false"			, "(!(alive))"															}	// 6
+			, {"true"			, "!(!(alive))"															}	// 7
+			, {"true"			, "(!(!(alive)))"														}	// 8
+			, {"Carlos"			, "name"																}	// 9
+			, {"1.56"			, "height"																}	// 10
+			, {"brown"			, "color"																}	// 11
+			, {"red"			, "race"																}	// 12
+			, {"160"			, "weight"																}	// 13
+			, {"Carlos"			, "(name)"																}	// 14
+			, {"1.56"			, "(height)"															}	// 15
+			, {"brown"			, "(color)"																}	// 16
+			, {"red"			, "(race)"																}	// 17
+			, {"160"			, "(weight)"															}	// 18
+			, {"2"				, "selection.index"														}	// 19
+			, {"2"				, "(selection.('index'))"												}	// 20
+			, {"2"				, "((selection).index)"													}	// 21
+			, {"Not married"	, " married  ? 'true' : 'Not married'"									}	// 22
+			, {"Not married"	, "(married) ? 'true' : 'Not married'"									}	// 23
+			, {"true"			, " alive  ? ('true') : ('false')"										}	// 24
+			, {"true"			, "!!(!!alive) ? ('true') : ('false')"									}	// 25
+			, {"false"			, " married  ? ('true') : ('false')"									}	// 26
+			, {"false"			, "(married) ? ('true') : ('false')"									}	// 27
+			, {"true"			, "(alive  ? (married ? 'false' : 'true') )"							}	// 28
+			, {"true"			, "(alive  ? married ? 'false' : 'true' : 'unknown')"					}	// 29
+			, {"true"			, " alive  ? married ? 'false' : 'true' : 'unknown'"					}	// 30
+			, {"it's alive!"	, "!alive ? 'dead!' : \"it's alive!\""									}	// 31
+			, {"it's alive!"	, "!!(alive) ? \"it's alive!\" : 'dead!'"								}	// 32
+			, {"it's alive!"	, "(!alive) ? 'dead!' : \"it's alive!\""								}	// 33
+			, {"Rene"			, "children[('0')]"														}	// 34
+			, {"Ariel"			, "children[('1')]"														}	// 35
+			, {"Jamie"			, "children[('2')]"														}	// 36
+			, {"Jamie"			, "children[selection.index]"											}	// 37
+			, {"Jamie"			, "children[(selection.('index'))]"										}	// 38
+			, {"Jamie"			, "children[({'selection'}.index)]"										}	// 39
+			, {"Jamie"			, "children[{'selection.index'}]"										}	// 40
+			, {"Alice"			, "parents['0'].name"													}	// 41
+			, {"Bob"			, "parents['1'].name"													}	// 42
+			, {"Alice"			, "'Alice'"																}	// 43
+			, {"Alice"			, "((parents['0']).name)"												}	// 44
+			, {"Bob"			, "((parents['1']).name)"												}	// 45
+			, {"Alice"			, "{\"(parents['0']).name\"}"											}	// 46
+			, {"Bob"			, "{\"(parents['1']).name\"}"											}	// 47
+			, {"2"				, "(selection . ('index'))"												}	// 48
+			, {"2"				, "(selection . index)"													}	// 49
+			, {"Ariel"			, "(children[ ( ( '1') )] )"											}	// 50
+			, {"Jamie"			, "(children[((selection.index)) ])"									}	// 51
+			, {"is alive"		, "(alive ? married ? 'not alive' : 'is alive' : 'unknown')"			}	// 52
+			, {"false"			, "!alive  ? ('is_alive') : (!'is dead')"								}	// 53
+			, {"is alive"		, "(alive  ? (!alive ? 'is_dead' : 'is alive'))"						}	// 54
+			, {"red"			, "married  ? !alive ? 'is_dead' : 'is_alive' : race"					}	// 55
+			, {"unknown"		, "(!alive  ? (alive ? 'is_alive' : 'is_dead') : 'unknown')"			}	// 56
+			, {"true"			, "!'0'"																}	// 57
+			, {"true"			, "!''"																	}	// 58
+			, {"false"			, "!' '"																}	// 59
+			, {"true"			, "!'{}'"																}	// 60
+			, {"true"			, "!'[]'"																}	// 61
+			, {"32"				, "parents['1'].property.{selection.default_property_name_path}"		}	// 62
 			};
-		info_printf("Input JSON:\n%s", inputJson.begin());
-		::gpk::SJSONReader								jsonReaderEasy;
-		gpk_necall(::gpk::jsonParse(jsonReaderEasy, inputJson), "Failed to parse json: '%s'.", inputJson.begin());
-		for(uint32_t iTest = 0; iTest < ::gpk::size(pairsResultExpression); ++iTest) {
-			info_printf("Testing expression %u.", iTest);
-			ree_if(errored(testJSONExpression(jsonReaderEasy, pairsResultExpression[iTest].Val, pairsResultExpression[iTest].Key)), "Failed to resolve expression: %s", pairsResultExpression[iTest].Val.begin());
-		}
+
+			info_printf("Input JSON:\n%s", inputJson.begin());
+			gpk_necall(::gpk::jsonParse(jsonReader, inputJson), "Failed to parse json: '%s'.", inputJson.begin());
+			for(uint32_t iTest = 0; iTest < ::gpk::size(resultExpression); ++iTest) {
+				gerror_if(errored(testJSONExpression(jsonReader, resultExpression[iTest].Val, resultExpression[iTest].Key)), "Failed to resolve expression: %s", resultExpression[iTest].Val.begin())
+				else
+					++testsSucceeded;
+			}
+
 	}
+	::gpk::SJSONReader								jsonReader;
 	const ::gpk::view_const_string					format						=
 		"I want to replace this (but not \\{this}): \n{people['1'].name}'s {properties[selection.active ? selection.index : '1'].name}: // this comment should appear here"
 		"\n{people['1'].property.(properties[selection.active ? selection.index : '1'].name // this comment should not appear here"
@@ -254,16 +256,20 @@ int											main						()	{
 			, {"16"			, "people['0'].property.(properties[!(selection.active)		? (selection.index)	: ('0')				].name)"	} // 20
 			};
 		info_printf("Input JSON:\n%s", inputJson.begin());
-		::gpk::SJSONReader								jsonReaderHard;
-		gpk_necall(::gpk::jsonParse(jsonReaderHard, inputJson), "Failed to parse json: '%s'.", inputJson.begin());
+		jsonReader = {};
+		gpk_necall(::gpk::jsonParse(jsonReader, inputJson), "Failed to parse json: '%s'.", inputJson.begin());
 		for(uint32_t iTest = 0; iTest < ::gpk::size(pairsResultExpression); ++iTest)
-			gerror_if(errored(testJSONExpression(jsonReaderHard, pairsResultExpression[iTest].Val, pairsResultExpression[iTest].Key)), "Failed to resolve expression: %s", pairsResultExpression[iTest].Val.begin());
-		gpk_necall(::testJSONFormatter(jsonReaderHard, format, inputJson), "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", format.begin(), inputJson.begin());
+			gerror_if(errored(testJSONExpression(jsonReader, pairsResultExpression[iTest].Val, pairsResultExpression[iTest].Key)), "Failed to resolve expression: %s", pairsResultExpression[iTest].Val.begin())
+			else
+				++testsSucceeded;
+		gerror_if(::testJSONFormatter(jsonReader, format, inputJson), "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", format.begin(), inputJson.begin())
+		else
+			++testsSucceeded;
 	}
 	{
 		const ::gpk::view_const_string					inputJson				=
 			"\n{ \"properties\" : [{ \"name\" : \"age\", \"type\" : \"int\"}, { \"name\" : \"color\", \"type\" : \"string\"}, { \"name\" : \"race\", \"type\" : \"string\"} ]"
-			"\n, \"selection\" : {\"index\" : 1, \"active\" : false }"
+			"\n, \"selection\" : { \"index\" : 2, \"active\" : false , \"default_property_name_path\" : \"properties[!selection.active ? ('1')	: (selection.index) ].name\" }"
 			"\n, \"people\" : "
 			"\n    [    { \"name\" : \"David\""
 			"\n         , \"property\" : "
@@ -278,174 +284,33 @@ int											main						()	{
 			;
 		::gpk::TKeyValConstString						pairsResultExpression[]			=
 			{ {"1"				, "(selection.active) ? (selection.index) : ('1')"											}	//  0
+			, {"2"				, "(!selection.active) ? (selection.index) : ('1')"											}	//  0
 			, {"No selection."	, "selection.active ? properties[selection.index].name : \"No selection.\""					}	//  1
-			, {"color"			, "selection.active ? \"No selection.\" : properties[selection.index].name"					}	//  2
+			, {"race"			, "selection.active ? \"No selection.\" : properties[selection.index].name"					}	//  2
 			, {"green"			, "people['1'].property.(properties[selection.active ? selection.index : '1'].name)"		}	//  3
 			, {"green"			, "people['1'].property.(properties[selection.active ? (selection.index) : '1'].name)"		}	//  4
 			, {"green"			, "people['1'].property.(properties[selection.active ? (selection.index) : ('1')].name)"	}	//  5
 			, {"green"			, "people['1'].property.(properties[(selection.active) ? selection.index : '1'].name)"		}	//  6
 			, {"25"				, "people['0'].property.(properties[(selection.active) ? selection.index : '0'].name)"		}	//  7
-			, {"1"				, "!selection.active	? selection.index : '1'"											}	//  8
+			, {"2"				, "!selection.active	? selection.index : '1'"											}	//  8
 			, {"1"				, "(!selection.active)	? '1' : selection.index"											}	//  9
 			, {"green"			, "people['1'].property.(properties[!selection.active	? '1'	: selection.index	].name)"}	// 10
 			, {"green"			, "people['1'].property.(properties[!selection.active	? '1'	: (selection.index) ].name)"}	// 11
 			, {"green"			, "people['1'].property.(properties[!selection.active	? ('1')	: (selection.index) ].name)"}	// 12
-			, {"green"			, "people['1'].property.(properties[(!selection.active) ? '1'	: selection.index	].name)"}	// 13
+			, {"green"			, "people['1'].property.{selection.default_property_name_path}"}	// 13
 			, {"blue"			, "people['0'].property.(properties[(!selection.active) ? '1'	: selection.index	].name)"}	// 14
 			};
 		info_printf("Input JSON:\n%s", inputJson.begin());
-		::gpk::SJSONReader								jsonReaderHard;
-		gpk_necall(::gpk::jsonParse(jsonReaderHard, inputJson), "Failed to parse json: '%s'.", inputJson.begin());
+		jsonReader = {};
+		gpk_necall(::gpk::jsonParse(jsonReader, inputJson), "Failed to parse json: '%s'.", inputJson.begin());
 		for(uint32_t iTest = 0; iTest < ::gpk::size(pairsResultExpression); ++iTest)
-			gerror_if(errored(testJSONExpression(jsonReaderHard, pairsResultExpression[iTest].Val, pairsResultExpression[iTest].Key)), "Failed to resolve expression: %s", pairsResultExpression[iTest].Val.begin());
-		//gpk_necall(::testJSONFormatter(jsonReaderHard, format, inputJson), "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", format.begin(), inputJson.begin());
+			gerror_if(errored(testJSONExpression(jsonReader, pairsResultExpression[iTest].Val, pairsResultExpression[iTest].Key)), "Failed to resolve expression: %s", pairsResultExpression[iTest].Val.begin())
+			else
+				++testsSucceeded;
+		gerror_if(::testJSONFormatter(jsonReader, format, inputJson), "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", format.begin(), inputJson.begin())
+		else
+			++testsSucceeded;
 	}
-
+	info_printf("%u tests executed successfully", testsSucceeded);
 	return 0;
 }
-
-// ------------------------
-// JSON 0:
-// { "name"				: "carlos"
-// , "parent"			: {"name" : "lucas"}
-// , "height"			: "1.56"
-// , "color"			: "brown"
-// , "race"				: "red"
-// , "weight"			: 160
-// , "alive"			: true
-// , "dead"				: false
-// , "children"			: ["marta", "venus", "crystal"]
-// , "child_selected"	: {"index" : 2}"
-// }
-//
-//--------------------------
-// Expected:	Expression:
-// "true"		, "alive ? ('true') : ('false')"
-// "carlos"		, "name"
-// "1.56"		, "height"
-// "brown"		, "color"
-// "red"		, "race"
-// "160"		, "weight"
-// "2"			, "child_selected.index"
-// "venus"		, "children[('1')]"
-// "crystal"	, "children[(child_selected.index)]"
-// "carlos"		, "(name)"
-// "lucas"		, "parent.name"
-// "lucas"		, "'lucas'"
-// "lucas"		, "({'parent'}.name)"
-// "1.56"		, "(height)"
-// "brown"		, "(color)"
-// "red"		, "(race)"
-// "160"		, "(weight)"
-// "2"			, "(child_selected.('index'))"
-// "2"			, "(child_selected.index)"
-// "venus"		, "(children[(('1'))])"
-// "crystal"	, "(children[((child_selected.index))])"
-// "true"		, " alive  ? 'true' : 'false'"
-// "true"		, "(alive) ? 'true' : 'false'"
-// "false"		, " dead   ? 'true' : 'false'"
-// "false"		, "(dead)  ? 'true' : 'false'"
-// "true"		, " alive  ? ('true') : ('false')"
-// "true"		, "(alive) ? ('true') : ('false')"
-// "false"		, " dead   ? ('true') : ('false')"
-// "false"		, "(dead)  ? ('true') : ('false')"
-// "true"		, "(alive  ? (dead ? 'false' : 'true'))"
-// "true"		, "(alive  ? dead ? 'false' : 'true' : 'unknown')"
-// "true"		, "alive  ? dead ? 'false' : 'true' : 'unknown'"
-//
-
-// ------------------------
-// JSON 1:
-// { "name"				: "carlos"
-// , "parent"			: {"name" : "lucas"}
-// , "height"			: "1.56"
-// , "color"			: "brown"
-// , "race"				: "red"
-// , "weight"			: 160
-// , "alive"			: false
-// , "dead"				: true
-// , "children"			: ["marta", "venus", "crystal"]
-// , "child_selected"	: {"index" : 2}
-// }
-//
-// Expected:	Expression:
-// "unknown"	, "(alive  ? dead ? 'false' : 'true' : 'unknown')"
-// "false"		, " alive  ? 'true' : 'false'"
-// "false"		, "(alive) ? 'true' : 'false'"
-// "true"		, " dead   ? 'true' : 'false'"
-// "true"		, "(dead)  ? 'true' : 'false'"
-// "false"		, " alive  ? ('true') : ('false')"
-// "false"		, "(alive) ? ('true') : ('false')"
-// "true"		, " dead   ? ('true') : ('false')"
-// "true"		, "(dead)  ? ('true') : ('false')"
-// "false"		, " alive  ? ('true') : ('false')"
-// "false"		, "(alive  ? (dead ? 'false' : 'true'))"
-// "red"		, "alive   ? dead ? 'false' : 'true' : race"
-// "unknown"	, "(alive  ? (dead ? 'false' : 'true') : 'unknown')"
-//
-
-// ------------------------
-// JSON 2:
-// {	"properties":
-// 		[ {"name" : "age"	, "type" : "int"}
-// 		, {"name" : "color"	, "type" : "string"}
-// 		, {"name" : "race"	, "type" : "string"}
-// 		]
-// ,	"selection"	: {"index" : 2, "active" : true}
-// ,	"people"	:
-// 		[	{ "name" : "David"
-// 			, "property" :
-// 				{"color" : "blue", "age" : 16, "race" : "fat"}
-// 			},
-// 			{ "name" : "Charles" // this is another comment
-// 			, "property" :
-// 				{"color" : "green", "age" : 32, "race" : "thin"}
-// 			}
-// 		]
-// }
-//
-// Expected:	Expression:
-// "race"		, "selection.active ? properties[(selection.index)].name : 'No selection.'"
-// "race"		, "selection.active ? properties[selection.index].name : 'No selection.'"
-// "is active"	, "selection.active ? 'is active' : 'No selection.'"
-// "age"		, "properties[('0')].name"
-// "age"		, "properties[selection.active ? '0' : selection.index].name"
-// "race"		, "selection.active ? selection.index ? properties[(selection.index)].name : 'No selection.'"
-// "thin"		, "people['1'].property.(properties[selection.active ? (selection.index) : '1'].name)"
-// "fat"		, "people['0'].property.(properties[selection.active ? selection.index : ('0')].name)"
-// "true"		, "selection.active"
-// "16"			, "people['0'].property.(properties[(selection.active) ? '0' : selection.index].name)"
-// "16"			, "people['0'].property.(properties[((selection.active)) ? '0' : (selection.index)].name)"
-// "16"			, "people['0'].property.(properties[(selection.active) ? ('0') : (selection.index)].name)"
-//
-
-// ------------------------
-// JSON 3:
-// {	"properties":
-// 		[ {"name" : "age"	, "type" : "int"}
-// 		, {"name" : "color"	, "type" : "string"}
-// 		, {"name" : "race"	, "type" : "string"}
-// 		]
-// ,	"selection"	: {"index" : 0, "active" : false}
-// ,	"people"	:
-// 		[	{ "name"	: "David"
-// 			, "property":
-// 				{"color" : "blue", "age" : 25, "race" : "fat"}
-// 			},
-// 			{ "name"	: "Charles" // this is another comment
-// 			, "property":
-// 				{"color" : "green", "age" : 32, "race" : "thin"}
-// 			}
-// 		]
-// }
-//
-// Expected:		Expression:
-// "1"				, "(selection.active) ? (selection.index) : ('1')"
-// "No selection."	, "selection.active ? properties[selection.index].name : \"No selection.\""
-// "age"			, "selection.active ? \"No selection.\" : properties[selection.index].name"
-// "green"			, "people['1'].property.(properties[selection.active ? selection.index : '1'].name)"
-// "green"			, "people['1'].property.(properties[selection.active ? (selection.index) : '1'].name)"
-// "green"			, "people['1'].property.(properties[selection.active ? (selection.index) : ('1')].name)"
-// "green"			, "people['1'].property.(properties[(selection.active) ? selection.index : '1'].name)"
-// "25"				, "people['0'].property.(properties[(selection.active) ? selection.index : '0'].name)"
-//
