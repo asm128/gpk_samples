@@ -136,104 +136,116 @@ int											main						()	{
 			;
 		::gpk::SJSONReader								jsonReader;
 		::gpk::TKeyValConstString						resultExpression[]		=
-			{ {"false"			, "!married ? !alive : 'unknown'"										}	// 2
-			, {"unknown"		, "married ? !alive : 'unknown'"										}	// 0
-			, {"false"			, "married ? 'unknown' : !alive "										}	// 1
+			{ {"false"			, "'false' || 'false'"														}	// 94
+			, {"true"			, "'true'  || 'false'"													}	// 92
+			, {"true"			, "'false' || 'true'"														}	// 93
+			, {"false"			, "!married ? !alive : 'unknown'"										}	// 0
+			, {"unknown"		, "married ? !alive : 'unknown'"										}	// 1
+			, {"false"			, "married ? 'unknown' : !alive "										}	// 2
 			, {"unknown"		, "!married ? 'unknown' : !alive"										}	// 3
-			, {"true"			, "(alive )&&!(married)"												}	// 5
-			, {"false"			, "!(alive )&&!( married)"												}	// 4
-			, {"false"			, "!(alive )&&!(married)"												}	// 5
-			, {"false"			, "!(alive) &&!(married)"												}	// 6
-			, {"false"			, "!(alive) &&!( married)"												}	// 7
-			, {"unknown"		, "married && alive && married ? !alive : 'unknown'"					}	// 0
-			, {"true"			, "(alive && alive) && alive &&!( married)"								}	// 4
-			, {"true"			, "(alive) &&!(married)"												}	// 6
-			, {"true"			, "(alive) &&!( married)"												}	// 7
-			, {"true"			, "(!married) &&!( married)"												}	// 7
-			, {"false"			, "(alive )&&( married)"												}	// 4
-			, {"false"			, "(alive )&&(married)"													}	// 5
-			, {"false"			, "(alive) &&(married)"													}	// 6
-			, {"false"			, "(alive) &&( married)"												}	// 7
-			, {"false"			, "{'alive'}&&( married)"												}	// 8
-			, {"false"			, "{'alive'}&&(married)"												}	// 9
-			, {"false"			, "{'alive'}&&(married)"												}	// 10
-			, {"false"			, "{'alive'} &&( married)"												}	// 11
-			, {"false"			, "(alive )&&{ 'married'}"												}	// 12
-			, {"false"			, "(alive )&&{'married' }"												}	// 13
-			, {"false"			, "(alive) &&{'married' }"												}	// 14
-			, {"false"			, "(alive) &&{ 'married'}"												}	// 15
-			, {"false"			, "alive && married"													}	// 16
-			, {"false"			, "alive &&married"														}	// 17
-			, {"false"			, "alive&&married"														}	// 18
-			, {"false"			, "alive&& married"														}	// 19
-			, {"it's alive!"	, "(!(!(alive))) ? \"it's alive!\" : 'dead!'"							}	// 20
-			, {"true"			, "alive"																}	// 21
-			, {"it's alive!"	, " alive  ? \"it's alive!\" : 'dead!'"									}	// 22
-			, {"true"			, "(alive)"																}	// 23
-			, {"it's alive!"	, "(alive) ? \"it's alive!\" : 'dead!'"									}	// 24
-			, {"false"			, "!(alive)"															}	// 25
-			, {"false"			, "(!(alive))"															}	// 26
-			, {"true"			, "!(!(alive))"															}	// 27
-			, {"true"			, "(!(!(alive)))"														}	// 28
-			, {"Carlos"			, "name"																}	// 29
-			, {"1.56"			, "height"																}	// 30
-			, {"brown"			, "color"																}	// 31
-			, {"red"			, "race"																}	// 32
-			, {"160"			, "weight"																}	// 33
-			, {"Carlos"			, "(name)"																}	// 34
-			, {"1.56"			, "(height)"															}	// 35
-			, {"brown"			, "(color)"																}	// 36
-			, {"red"			, "(race)"																}	// 37
-			, {"160"			, "(weight)"															}	// 38
-			, {"2"				, "selection.index"														}	// 39
-			, {"2"				, "(selection.('index'))"												}	// 40
-			, {"2"				, "((selection).index)"													}	// 41
-			, {"Not married"	, " married  ? 'true' : 'Not married'"									}	// 42
-			, {"Not married"	, "(married) ? 'true' : 'Not married'"									}	// 43
-			, {"true"			, " alive  ? ('true') : ('false')"										}	// 44
-			, {"true"			, "!!(!!alive) ? ('true') : ('false')"									}	// 45
-			, {"false"			, " married  ? ('true') : ('false')"									}	// 46
-			, {"false"			, "(married) ? ('true') : ('false')"									}	// 47
-			, {"true"			, "(alive  ? (married ? 'false' : 'true') )"							}	// 48
-			, {"true"			, "(alive  ? married ? 'false' : 'true' : 'unknown')"					}	// 49
-			, {"true"			, " alive  ? married ? 'false' : 'true' : 'unknown'"					}	// 50
-			, {"it's alive!"	, "!alive? 'dead!' : \"it's alive!\""									}	// 51
-			, {"it's alive!"	, "!!(alive) ? \"it's alive!\" : 'dead!'"								}	// 52
-			, {"it's alive!"	, "(!alive) ? 'dead!' : \"it's alive!\""								}	// 53
-			, {"Rene"			, "children[('0')]"														}	// 54
-			, {"null"			, "children[('1')]"														}	// 55
-			, {"Jamie"			, "children[('2')]"														}	// 56
-			, {"Jamie"			, "children[selection.index]"											}	// 57
-			, {"Jamie"			, "children[(selection.('index'))]"										}	// 58
-			, {"Jamie"			, "children[({'selection'}.index)]"										}	// 59
-			, {"Jamie"			, "children[{'selection.index'}]"										}	// 60
-			, {"Alice"			, "parents['0'].name"													}	// 61
-			, {"Bob"			, "parents['1'].name"													}	// 62
-			, {"Alice"			, "'Alice'"																}	// 63
-			, {"Alice"			, "((parents['0']).name)"												}	// 64
-			, {"Bob"			, "((parents['1']).name)"												}	// 65
-			, {"Alice"			, "{\"(parents['0']).name\"}"											}	// 66
-			, {"Bob"			, "{\"(parents['1']).name\"}"											}	// 67
-			, {"2"				, "(selection . ('index'))"												}	// 68
-			, {"2"				, "(selection . index)"													}	// 69
-			, {"null"			, "(children[ ( ( '1') )] )"											}	// 70
-			, {"Jamie"			, "(children[((selection.index)) ])"									}	// 71
-			, {"is alive"		, "(alive ? married ? 'not alive' : 'is alive' : 'unknown')"			}	// 72
-			, {"false"			, "!alive  ? ('is_alive') : (!'is dead')"								}	// 73
-			, {"is alive"		, "(alive  ? (!alive ? 'is_dead' : 'is alive'))"						}	// 74
-			, {"red"			, "married  ? !alive ? 'is_dead' : 'is_alive' : race"					}	// 75
-			, {"unknown"		, "(!alive  ? (alive ? 'is_alive' : 'is_dead') : 'unknown')"			}	// 76
-			, {"true"			, "!'0'"																}	// 77
-			, {"true"			, "!''"																	}	// 78
-			, {"false"			, "!' '"																}	// 79
-			, {"true"			, "!'{}'"																}	//
-			, {"true"			, "!'[]'"																}	//
-			, {"true"			, "!'0'	&&	!'0'"																}	// 77
-			, {"true"			, "!''	&&	!''"																	}	// 78
-			, {"false"			, "!' '	&&	!' '"																}	// 79
-			, {"true"			, "!'{}'&&	!'{}'"																}	//
-			, {"true"			, "!'[]'&&	!'[]'"																}	//
-			, {"32"				, "parents['1'].property.{selection.default_property_name_path}"		}	//
+			, {"true"			, "(alive )&&!(married)"												}	// 4
+			, {"false"			, "!(alive )&&!( married)"												}	// 5
+			, {"false"			, "!(alive )&&!(married)"												}	// 6
+			, {"false"			, "!(alive) &&!(married)"												}	// 7
+			, {"false"			, "!(alive) &&!( married)"												}	// 8
+			, {"unknown"		, "married && alive && married ? !alive : 'unknown'"					}	// 9
+			, {"true"			, "(alive && alive) && alive &&!( married)"								}	// 10
+			, {"true"			, "(alive) &&!(married)"												}	// 11
+			, {"true"			, "(alive) &&!( married)"												}	// 12
+			, {"true"			, "(!married) &&!( married)"											}	// 13
+			, {"false"			, "(alive )&&( married)"												}	// 14
+			, {"false"			, "(alive )&&(married)"													}	// 15
+			, {"false"			, "(alive) &&(married)"													}	// 16
+			, {"false"			, "(alive) &&( married)"												}	// 17
+			, {"false"			, "{'alive'}&&( married)"												}	// 18
+			, {"false"			, "{'alive'}&&(married)"												}	// 19
+			, {"false"			, "{'alive'}&&(married)"												}	// 20
+			, {"false"			, "{'alive'} &&( married)"												}	// 21
+			, {"false"			, "(alive )&&{ 'married'}"												}	// 22
+			, {"false"			, "(alive )&&{'married' }"												}	// 23
+			, {"false"			, "(alive) &&{'married' }"												}	// 24
+			, {"false"			, "(alive) &&{ 'married'}"												}	// 25
+			, {"false"			, "alive && married"													}	// 26
+			, {"false"			, "alive &&married"														}	// 27
+			, {"false"			, "alive&&married"														}	// 28
+			, {"false"			, "alive&& married"														}	// 29
+			, {"it's alive!"	, "(!(!(alive))) ? \"it's alive!\" : 'dead!'"							}	// 30
+			, {"true"			, "alive"																}	// 31
+			, {"it's alive!"	, " alive  ? \"it's alive!\" : 'dead!'"									}	// 32
+			, {"true"			, "(alive)"																}	// 33
+			, {"it's alive!"	, "(alive) ? \"it's alive!\" : 'dead!'"									}	// 34
+			, {"false"			, "!(alive)"															}	// 35
+			, {"false"			, "(!(alive))"															}	// 36
+			, {"true"			, "!(!(alive))"															}	// 37
+			, {"true"			, "(!(!(alive)))"														}	// 38
+			, {"Carlos"			, "name"																}	// 39
+			, {"1.56"			, "height"																}	// 40
+			, {"brown"			, "color"																}	// 41
+			, {"red"			, "race"																}	// 42
+			, {"160"			, "weight"																}	// 43
+			, {"Carlos"			, "(name)"																}	// 44
+			, {"1.56"			, "(height)"															}	// 45
+			, {"brown"			, "(color)"																}	// 46
+			, {"red"			, "(race)"																}	// 47
+			, {"160"			, "(weight)"															}	// 48
+			, {"2"				, "selection.index"														}	// 49
+			, {"2"				, "(selection.('index'))"												}	// 50
+			, {"2"				, "((selection).index)"													}	// 51
+			, {"Not married"	, " married  ? 'true' : 'Not married'"									}	// 52
+			, {"Not married"	, "(married) ? 'true' : 'Not married'"									}	// 53
+			, {"true"			, " alive  ? ('true') : ('false')"										}	// 54
+			, {"true"			, "!!(!!alive) ? ('true') : ('false')"									}	// 55
+			, {"false"			, " married  ? ('true') : ('false')"									}	// 56
+			, {"false"			, "(married) ? ('true') : ('false')"									}	// 57
+			, {"true"			, "(alive  ? (married ? 'false' : 'true') )"							}	// 58
+			, {"true"			, "(alive  ? married ? 'false' : 'true' : 'unknown')"					}	// 59
+			, {"alive"			, "(!alive || married ? 'dead' : 'alive')"							}	// 59
+			, {"true"			, " alive  ? married ? 'false' : 'true' : 'unknown'"					}	// 60
+			, {"alive"			, "(alive && !married ? 'alive' : 'dead')"							}	// 59
+			, {"it's alive!"	, "!alive? 'dead!' : \"it's alive!\""									}	// 61
+			, {"it's alive!"	, "!!(alive) ? \"it's alive!\" : 'dead!'"								}	// 62
+			, {"it's alive!"	, "(!alive) ? 'dead!' : \"it's alive!\""								}	// 63
+			, {"Rene"			, "children[('0')]"														}	// 64
+			, {"null"			, "children[('1')]"														}	// 65
+			, {"Jamie"			, "children[('2')]"														}	// 66
+			, {"Jamie"			, "children[selection.index]"											}	// 67
+			, {"Jamie"			, "children[(selection.('index'))]"										}	// 68
+			, {"Jamie"			, "children[({'selection'}.index)]"										}	// 69
+			, {"Jamie"			, "children[{'selection.index'}]"										}	// 70
+			, {"Alice"			, "parents['0'].name"													}	// 71
+			, {"Bob"			, "parents['1'].name"													}	// 72
+			, {"Alice"			, "'Alice'"																}	// 73
+			, {"Alice"			, "((parents['0']).name)"												}	// 74
+			, {"Bob"			, "((parents['1']).name)"												}	// 75
+			, {"Alice"			, "{\"(parents['0']).name\"}"											}	// 76
+			, {"Bob"			, "{\"(parents['1']).name\"}"											}	// 77
+			, {"2"				, "(selection . ('index'))"												}	// 78
+			, {"2"				, "(selection . index)"													}	// 79
+			, {"null"			, "(children[ ( ( '1') )] )"											}	// 80
+			, {"Jamie"			, "(children[((selection.index)) ])"									}	// 81
+			, {"is alive"		, "(alive ? married ? 'not alive' : 'is alive' : 'unknown')"			}	// 82
+			, {"false"			, "!alive  ? ('is_alive') : (!'is dead')"								}	// 83
+			, {"is alive"		, "(alive  ? (!alive ? 'is_dead' : 'is alive'))"						}	// 84
+			, {"red"			, "married  ? !alive ? 'is_dead' : 'is_alive' : race"					}	// 85
+			, {"unknown"		, "(!alive  ? (alive ? 'is_alive' : 'is_dead') : 'unknown')"			}	// 86
+			, {"true"			, "!'0'"																}	// 87
+			, {"true"			, "!''"																	}	// 88
+			, {"false"			, "!' '"																}	// 89
+			, {"true"			, "!'{}'"																}	// 90
+			, {"true"			, "!'[]'"																}	// 91
+			, {"true"			, "!'0'	&&	!'0'	 "													}	// 92
+			, {"true"			, "!''	&&	!''"														}	// 93
+			, {"false"			, "!' '	&&	!' '"														}	// 94
+			, {"true"			, "!'{}'&&	!'{}'"														}	// 95
+			, {"true"			, "!'[]'&&	!'[]'"														}	// 96
+			, {"true"			, "!'0'	||	!'0'	 "													}	// 92
+			, {"true"			, "!''	||	!''"														}	// 93
+			, {"false"			, "!' '	||	!' '"														}	// 94
+			, {"true"			, "!'{}'||	!'{}'"														}	// 95
+			, {"true"			, "!'[]'||	!'[]'"														}	// 96
+			, {"true"			, "'true'  || 'true'"														}	// 95
+
+			, {"32"				, "parents['1'].property.{selection.default_property_name_path}"		}	// 97
 			};
 
 			info_printf("Input JSON:\n%s", inputJson.begin());
