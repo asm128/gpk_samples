@@ -7,13 +7,12 @@
 #include "gpk_json_expression.h"
 
 ::gpk::error_t								printNode						(::gpk::SJSONNode* node, const ::gpk::view_const_char& testJson)			{
-	char											bufferFormat [1024]				= {};
-	uint32_t										lenString						= node->Object->Span.End - node->Object->Span.Begin;
-	sprintf_s(bufferFormat, "Node type: %%u (%%s). Node Span: {%%u, %%u}. Parent index: %%u. Object index: %%u. Text: %%%u.%us", lenString, lenString);
-//	info_printf(bufferFormat, node->Object->Type, ::gpk::get_value_label(node->Object->Type).begin(), node->Object->Span.Begin, node->Object->Span.End, node->Object->ParentIndex, node->ObjectIndex, &testJson[node->Object->Span.Begin]);
+	const ::gpk::array_pod<char_t>						viewPrintable					= ::gpk::toString({&testJson[node->Token->Span.Begin], node->Token->Span.End - node->Token->Span.Begin});
+	const ::gpk::view_const_char						viewTokenType					= ::gpk::get_value_label(node->Token->Type);
+	//info_printf("Entering JSON node type: %u (%s). Node Span: {%u, %u}. Parent index: %u. Object index: %u. Text: %s", node->Token->Type, viewTokenType.begin(), node->Token->Span.Begin, node->Token->Span.End, node->Token->ParentIndex, node->ObjectIndex, viewPrintable.begin());
 	for(uint32_t iChildren = 0; iChildren < node->Children.size(); ++iChildren)
 		::printNode(node->Children[iChildren], testJson);
-
+	//info_printf("Exiting JSON node type: %u (%s). Node Span: {%u, %u}. Parent index: %u. Object index: %u. Text: %s", node->Token->Type, viewTokenType.begin(), node->Token->Span.Begin, node->Token->Span.End, node->Token->ParentIndex, node->ObjectIndex, viewPrintable.begin());
 	return 0;
 }
 
@@ -40,14 +39,14 @@
 	::gpk::SJSONReader								jsonReader;
 	gpk_necall(::gpk::jsonParse(jsonReader, testJson), "Failed to parse json: '%s'.", testJson.begin());
 
-	info_printf("---------------------------- Linear iteration: %u objects.", jsonReader.Object.size());
+	info_printf("---------------------------- Linear iteration: %u objects.", jsonReader.Token.size());
 	::gpk::array_pod<char_t>						outputJson;
 	::gpk::ptr_obj<::gpk::SJSONNode>				root							= jsonReader.Tree[0];
 	::printNode(root, testJson);
 
-	info_printf("---------------------------- Linear iteration: %u objects.", jsonReader.Object.size());
-	for(uint32_t iNode = 0; iNode < jsonReader.Object.size(); ++iNode) {
-		const gpk::SJSONToken							& node							= jsonReader.Object[iNode];
+	info_printf("---------------------------- Linear iteration: %u objects.", jsonReader.Token.size());
+	for(uint32_t iNode = 0; iNode < jsonReader.Token.size(); ++iNode) {
+		const gpk::SJSONToken							& node							= jsonReader.Token[iNode];
 		if( ::gpk::JSON_TYPE_VALUE	== node.Type
 		 || ::gpk::JSON_TYPE_KEY	== node.Type
 		 )
@@ -65,7 +64,7 @@
 	::gpk::ptr_obj<::gpk::SJSONNode>				object							= jsonReader.Tree[indexOfFirstObject];
 	::gpk::error_t									indexOfElement					= ::gpk::jsonObjectValueGet(*object, jsonReader.View, test_key);
 	gpk_necall((uint32_t)indexOfElement >= jsonReader.View.size(), "Test key '%s' not found: %i.", test_key.begin(), indexOfElement);
-	const gpk::SJSONToken							& node							= jsonReader.Object	[indexOfElement];
+	const gpk::SJSONToken							& node							= jsonReader.Token	[indexOfElement];
 	::gpk::view_const_string						view							= jsonReader.View	[indexOfElement - 1];	// get the parent in order to retrieve the view with the surrounding in the case of strings "".
 	char											bufferFormat [8192]				= {};
 	uint32_t										lenString						= view.size();
@@ -121,162 +120,184 @@ int											main						()	{
 		"\n\t, \"children\"       : [\"Rene\", null, \"Jamie\"]"
 		"\n\t, \"selection\"      : { \"index\" : 2, \"name\" : \"children\", \"active\" : false , \"default_property_name_path\" : \"properties['0'].name\" }"
 		"\n\t, \"parents\"        : "
-		"\n\t    [{ \"name\" : \"Alice\""
-		"\n\t        , \"property\" : "
-		"\n\t        { \"color\" : \"orange\", \"age\" : 16, \"race\" : \"fat\" }"
+		"\n\t    [{ \"name\"    : \"Alice\""
+		"\n\t    , \"property\" : "
+		"\n\t    { \"color\"    : \"orange\", \"age\" : 16, \"race\" : \"fat\" }"
 		"\n\t    },"
-		"\n\t    { \"name\" : \"Bob\" // this is another comment"
-		"\n\t        , \"property\" : "
-		"\n\t        { \"color\" : \"green\", \"age\" : 32, \"race\" : \"thin\" }"
-		"\n\t    }"
-		"\n\t    ]"
+		"\n\t    { \"name\"     : \"Bob\" // this is another comment"
+		"\n\t    , \"property\" : "
+		"\n\t    { \"color\"    : \"green\", \"age\" : 32, \"race\" : \"thin\" }"
+		"\n\t    }]"
 		"\n\t, \"properties\" : [{ \"name\" : \"age\", \"type\" : \"int\"}, { \"name\" : \"color\", \"type\" : \"string\"}, { \"name\" : \"race\", \"type\" : \"string\"} ]"
 		"\n}"
 		;
 	::gpk::SJSONReader								jsonReader;
 	::gpk::TKeyValConstString						resultExpression[]		=
-		{ {"true"			, "'false' || 'true'"																					}	//   3
-		, {"false"			, "'false' && 'false'"																					}	//   0
-		, {"false"			, "'false' || 'false'"																					}	//   1
-		, {"true"			, "'true'  || 'false'"																					}	//   2
-		, {"false"			, "!married ? !alive : 'unknown'"																		}	//   4
-		, {"unknown"		, "married ? !alive : 'unknown'"																		}	//   5
-		, {"false"			, "married ? 'unknown' : !alive "																		}	//   6
-		, {"unknown"		, "!married ? 'unknown' : !alive"																		}	//   7
-		, {"true"			, "(alive )&&!(married)"																				}	//   8
-		, {"false"			, "!(alive )&&!( married)"																				}	//   9
-		, {"false"			, "!(alive )&&!(married)"																				}	//  10
-		, {"false"			, "!(alive) &&!(married)"																				}	//  11
-		, {"false"			, "!(alive) &&!( married)"																				}	//  12
-		, {"unknown"		, "married && alive && married ? !alive : 'unknown'"													}	//  13
-		, {"true"			, "(alive && alive) && alive &&!( married)"																}	//  14
-		, {"true"			, "(alive) &&!(married)"																				}	//  15
-		, {"true"			, "(alive) &&!( married)"																				}	//  16
-		, {"true"			, "(!married) &&!( married)"																			}	//  17
-		, {"false"			, "(alive )&&( married)"																				}	//  18
-		, {"false"			, "(alive )&&(married)"																					}	//  19
-		, {"false"			, "(alive) &&(married)"																					}	//  20
-		, {"false"			, "(alive) &&( married)"																				}	//  21
-		, {"false"			, "{'alive'}&&( married)"																				}	//  22
-		, {"false"			, "{'alive'}&&(married)"																				}	//  23
-		, {"false"			, "{'alive'}&&(married)"																				}	//  24
-		, {"false"			, "{'alive'} &&( married)"																				}	//  25
-		, {"false"			, "(alive )&&{ 'married'}"																				}	//  26
-		, {"false"			, "(alive )&&{'married' }"																				}	//  27
-		, {"false"			, "(alive) &&{'married' }"																				}	//  28
-		, {"false"			, "(alive) &&{ 'married'}"																				}	//  29
-		, {"false"			, "alive && married"																					}	//  30
-		, {"false"			, "alive &&married"																						}	//  31
-		, {"false"			, "alive&&married"																						}	//  32
-		, {"false"			, "alive&& married"																						}	//  33
-		, {"it's alive!"	, "(!(!(alive))) ? \"it's alive!\" : 'dead!'"															}	//  34
-		, {"true"			, "alive"																								}	//  35
-		, {"it's alive!"	, " alive  ? \"it's alive!\" : 'dead!'"																	}	//  36
-		, {"true"			, "(alive)"																								}	//  37
-		, {"it's alive!"	, "(alive) ? \"it's alive!\" : 'dead!'"																	}	//  38
-		, {"false"			, "!(alive)"																							}	//  39
-		, {"false"			, "(!(alive))"																							}	//  40
-		, {"true"			, "!(!(alive))"																							}	//  41
-		, {"true"			, "(!(!(alive)))"																						}	//  42
-		, {"Carlos"			, "name"																								}	//  43
-		, {"1.56"			, "height"																								}	//  44
-		, {"brown"			, "color"																								}	//  45
-		, {"b"				, "color['0']"																							}	//  45
-		, {"red"			, "race"																								}	//  46
-		, {"160"			, "weight"																								}	//  47
-		, {"Carlos"			, "(name)"																								}	//  48
-		, {"1.56"			, "(height)"																							}	//  49
-		, {"brown"			, "(color)"																								}	//  50
-		, {"red"			, "(race)"																								}	//  51
-		, {"160"			, "(weight)"																							}	//  52
-		, {"2"				, "selection.index"																						}	//  53
-		, {"2"				, "(selection.('index'))"																				}	//  54
-		, {"2"				, "((selection).index)"																					}	//  55
-		, {"Not married"	, " married  ? 'true' : 'Not married'"																	}	//  56
-		, {"Not married"	, "(married) ? 'true' : 'Not married'"																	}	//  57
-		, {"true"			, " alive  ? ('true') : ('false')"																		}	//  58
-		, {"true"			, "!!(!!alive) ? ('true') : ('false')"																	}	//  59
-		, {"false"			, " married  ? ('true') : ('false')"																	}	//  60
-		, {"false"			, "(married) ? ('true') : ('false')"																	}	//  61
-		, {"true"			, "(alive  ? (married ? 'false' : 'true') )"															}	//  62
-		, {"true"			, "(alive  ? married ? 'false' : 'true' : 'unknown')"													}	//  63
-		, {"alive"			, "(!alive || married ? 'dead' : 'alive')"																}	//  64
-		, {"true"			, " alive  ? married ? 'false' : 'true' : 'unknown'"													}	//  65
-		, {"alive"			, "(alive && !married ? 'alive' : 'dead')"																}	//  66
-		, {"it's alive!"	, "!alive? 'dead!' : \"it's alive!\""																	}	//  67
-		, {"it's alive!"	, "!!(alive) ? \"it's alive!\" : 'dead!'"																}	//  68
-		, {"it's alive!"	, "(!alive) ? 'dead!' : \"it's alive!\""																}	//  69
-		, {"Rene"			, "children[('0')]"																						}	//  70
-		, {"null"			, "children[('1')]"																						}	//  71
-		, {"Jamie"			, "children[('2')]"																						}	//  72
-		, {"Jamie"			, "children[selection.index]"																			}	//  73
-		, {"Jamie"			, "children[(selection.('index'))]"																		}	//  74
-		, {"Jamie"			, "children[({'selection'}.index)]"																		}	//  75
-		, {"Jamie"			, "children[{'selection.index'}]"																		}	//  76
-		, {"Alice"			, "parents['0'].name"																					}	//  77
-		, {"Bob"			, "parents['1'].name"																					}	//  78
-		, {"Alice"			, "'Alice'"																								}	//  79
-		, {"Alice"			, "((parents['0']).name)"																				}	//  80
-		, {"Bob"			, "((parents['1']).name)"																				}	//  81
-		, {"Alice"			, "{\"(parents['0']).name\"}"																			}	//  82
-		, {"Bob"			, "{\"(parents['1']).name\"}"																			}	//  83
-		, {"2"				, "(selection . ('index'))"																				}	//  84
-		, {"2"				, "(selection . index)"																					}	//  85
-		, {"null"			, "(children[ ( ( '1') )] )"																			}	//  86
-		, {"Jamie"			, "(children[((selection.index)) ])"																	}	//  87
-		, {"is alive"		, "(alive ? married ? 'not alive' : 'is alive' : 'unknown')"											}	//  88
-		, {"false"			, "!alive  ? ('is_alive') : (!'is dead')"																}	//  89
-		, {"is alive"		, "(alive  ? (!alive ? 'is_dead' : 'is alive'))"														}	//  90
-		, {"red"			, "married  ? !alive ? 'is_dead' : 'is_alive' : race"													}	//  91
-		, {"unknown"		, "(!alive  ? (alive ? 'is_alive' : 'is_dead') : 'unknown')"											}	//  92
-		, {"true"			, "!'0'"																								}	//  93
-		, {"true"			, "!''"																									}	//  94
-		, {"false"			, "!' '"																								}	//  95
-		, {"true"			, "!'{}'"																								}	//  96
-		, {"true"			, "!'[]'"																								}	//  97
-		, {"true"			, "!'0'	&&	!'0'	 "																					}	//  98
-		, {"true"			, "!''	&&	!''"																						}	//  99
-		, {"false"			, "!' '	&&	!' '"																						}	// 100
-		, {"true"			, "!'{}'&&	!'{}'"																						}	// 101
-		, {"true"			, "!'[]'&&	!'[]'"																						}	// 102
-		, {"true"			, "!'0'	||	!'0'	 "																					}	// 103
-		, {"true"			, "!''	||	!''"																						}	// 104
-		, {"false"			, "!' '	||	!' '"																						}	// 105
-		, {"true"			, "!'{}'||	!'{}'"																						}	// 106
-		, {"true"			, "!'[]'||	!'[]'"																						}	// 107
-		, {"true"			, "'true'  || 'true'"																					}	// 108
-		, {"32"				, "parents['1'].property.{selection.default_property_name_path}"										}	// 109
-		, {"0"				, "!selection.active		? ('0') : selection.index"													}	// 110
-		, {"0"				, "!(selection.active)		? ('0') : selection.index"													}	// 111
-		, {"2"				, "(!(selection.active))	? (selection.index)	: '0'"													}	// 112
-		, {"false"			, "selection.active"																					}	// 113
-		, {"false"			, "(selection.active)"																					}	// 114
-		, {"2"				, "(selection.active)	? ('0')	: (selection.index)"													}	// 115
-		, {"race"			, "!selection.active ? properties[selection.index].name : 'No selection.'"								}	// 116
-		, {"No selection."	, "selection.active ? 'is active' : 'No selection.'"													}	// 117
-		, {"age"			, "properties[('0')].name"																				}	// 118
-		, {"2"				, "(!selection.active) ? (selection.index) : ('1')"														}	// 119
-		, {"No selection."	, "selection.active ? properties[selection.index].name : \"No selection.\""								}	// 120
-		, {"race"			, "selection.active ? \"No selection.\" : properties[selection.index].name"								}	// 121
-		, {"green"			, "parents['1'].property.(properties[selection.active ? selection.index : '1'].name)"					}	// 122
-		, {"green"			, "parents['1'].property.(properties[selection.active ? (selection.index) : '1'].name)"					}	// 123
-		, {"thin"			, "parents['1'].property.(properties[!selection.active ? (selection.index) : ('1')].name)"				}	// 124
-		, {"green"			, "parents['1'].property.(properties[(selection.active) ? selection.index : '1'].name)"					}	// 125
-		, {"16"				, "parents['0'].property.(properties[(selection.active) ? selection.index : '0'].name)"					}	// 126
-		, {"2"				, "!selection.active	? selection.index : '1'"														}	// 127
-		, {"1"				, "(!selection.active)	? '1' : selection.index"														}	// 128
-		, {"green"			, "parents['1'].property.(properties[!selection.active		? '1'	: selection.index	].name)"		}	// 129
-		, {"green"			, "parents['1'].property.(properties[!!!selection.active	? '1'	: (selection.index) ].name)"		}	// 130
-		, {"green"			, "parents['1'].property.(properties[!selection.active		? ('1')	: (selection.index) ].name)"		}	// 131
-		, {"32"				, "parents['1'].property.{selection.default_property_name_path}"										}	// 132
-		, {"orange"			, "parents['0'].property.(properties[(!selection.active) ? '1'	: selection.index	].name)"			}	// 133
-		, {"orange"			, "parents['0'].property.(properties[!(selection.active) ? '1'	: selection.index	].name)"			}	// 134
+		{ {"false"			, "'Found'	== children[('1')]																						" }	//   1
+		//, {"false"			, "'Not'	== children[('0')]																						" }	//   0
+		//, {"false"			, "'Here'	== children[('2')]																						" }	//   2
+		//, {"false"			, "'Perro' == 'Perre'																								" }	//   3
+		, {"true"			, "'Rene'	== children[('0')]																						" }	//   4
+		, {"true"			, "'null'	== children[('1')]																						" }	//   5
+		, {"true"			, "'Jamie'	== children[('2')]																						" }	//   6
+		, {"false"			, "alive==married																									" }	//   7
+		, {"false"			, "!alive==!married																									" }	//   8
+		, {"true"			, "(!alive)==(married)																								" }	//   9
+		, {"true"			, "!alive  ==married																								" }	//  10
+		, {"false"			, "(!alive)==(!married)																								" }	//  11
+		, {"true"			, "(alive )==(!married)																								" }	//  12
+		, {"false"			, "!alive  ==!married																								" }	//  13
+		, {"true"			, "!alive  ==married																								" }	//  14
+		, {"false"			, "(alive )=={ 'married'}																							" }	//  15
+		, {"false"			, "'false' == 'true'																								" }	//  16
+		, {"true"			, "'true'  == 'true'																								" }	//  17
+		, {"true"			, "'false' == 'false'																								" }	//  18
+		, {"true"			, "'Perro' == 'Perro'																								" }	//  19
+		, {"false"			, "(alive )&&{ 'married'}																							" }	//  20
+		, {"false"			, "(alive )&&( married)																								" }	//  21
+		, {"true"			, "'false' || 'true'																								" }	//  22
+		, {"false"			, "(alive )&&(married)																								" }	//  23
+		, {"false"			, "(alive) &&(married)																								" }	//  24
+		, {"false"			, "(alive) &&( married)																								" }	//  25
+		, {"false"			, "'false' && 'false'																								" }	//  26
+		, {"false"			, "'false' || 'false'																								" }	//  27
+		, {"true"			, "'true'  || 'false'																								" }	//  28
+		, {"false"			, "!married ? !alive : 'unknown'																					" }	//  29
+		, {"unknown"		, "married ? !alive : 'unknown'																						" }	//  30
+		, {"false"			, "married ? 'unknown' : !alive 																					" }	//  31
+		, {"unknown"		, "!married ? 'unknown' : !alive																					" }	//  32
+		, {"true"			, "(alive )&&!(married)																								" }	//  33
+		, {"false"			, "!(alive )&&!( married)																							" }	//  34
+		, {"false"			, "!(alive )&&!(married)																							" }	//  35
+		, {"false"			, "!(alive) &&!(married)																							" }	//  36
+		, {"false"			, "!(alive) &&!( married)																							" }	//  37
+		, {"unknown"		, "married && alive && married ? !alive : 'unknown'																	" }	//  38
+		, {"true"			, "(alive && alive) && alive &&!( married)																			" }	//  39
+		, {"true"			, "(alive) &&!(married)																								" }	//  40
+		, {"true"			, "(alive) &&!( married)																							" }	//  41
+		, {"true"			, "(!married) &&!( married)																							" }	//  42
+		, {"false"			, "{'alive'}&&( married)																							" }	//  43
+		, {"false"			, "{'alive'}&&(married)																								" }	//  44
+		, {"false"			, "{'alive'}&&(married)																								" }	//  45
+		, {"false"			, "{'alive'} &&( married)																							" }	//  46
+		, {"false"			, "(alive )&&{'married' }																							" }	//  47
+		, {"false"			, "(alive) &&{'married' }																							" }	//  48
+		, {"false"			, "(alive) &&{ 'married'}																							" }	//  49
+		, {"false"			, "alive && married																									" }	//  50
+		, {"false"			, "alive &&married																									" }	//  51
+		, {"false"			, "alive&&married																									" }	//  52
+		, {"false"			, "alive&& married																									" }	//  53
+		, {"it's alive!"	, "(!(!(alive))) ? \"it's alive!\" : 'dead!'																		" }	//  54
+		, {"true"			, "alive																											" }	//  55
+		, {"it's alive!"	, " alive  ? \"it's alive!\" : 'dead!'																				" }	//  56
+		, {"true"			, "(alive)																											" }	//  57
+		, {"it's alive!"	, "(alive) ? \"it's alive!\" : 'dead!'																				" }	//  58
+		, {"false"			, "!(alive)																											" }	//  59
+		, {"false"			, "(!(alive))																										" }	//  60
+		, {"true"			, "!(!(alive))																										" }	//  61
+		, {"true"			, "(!(!(alive)))																									" }	//  62
+		, {"Carlos"			, "name																												" }	//  63
+		, {"1.56"			, "height																											" }	//  64
+		, {"brown"			, "color																											" }	//  65
+		, {"b"				, "color['0']																										" }	//  66
+		, {"red"			, "race																												" }	//  67
+		, {"160"			, "weight																											" }	//  68
+		, {"Carlos"			, "(name)																											" }	//  69
+		, {"1.56"			, "(height)																											" }	//  70
+		, {"brown"			, "(color)																											" }	//  71
+		, {"red"			, "(race)																											" }	//  72
+		, {"160"			, "(weight)																											" }	//  73
+		, {"2"				, "selection.index																									" }	//  74
+		, {"2"				, "(selection.('index'))																							" }	//  75
+		, {"2"				, "((selection).index)																								" }	//  76
+		, {"Not married"	, " married  ? 'true' : 'Not married'																				" }	//  77
+		, {"Not married"	, "(married) ? 'true' : 'Not married'																				" }	//  78
+		, {"true"			, " alive  ? ('true') : ('false')																					" }	//  79
+		, {"true"			, "!!(!!alive) ? ('true') : ('false')																				" }	//  80
+		, {"false"			, " married  ? ('true') : ('false')																					" }	//  81
+		, {"false"			, "(married) ? ('true') : ('false')																					" }	//  82
+		, {"true"			, "(alive  ? (married ? 'false' : 'true') )																			" }	//  83
+		, {"true"			, "(alive  ? married ? 'false' : 'true' : 'unknown')																" }	//  84
+		, {"alive"			, "(!alive || married ? 'dead' : 'alive')																			" }	//  85
+		, {"true"			, " alive  ? married ? 'false' : 'true' : 'unknown'																	" }	//  86
+		, {"alive"			, "(alive && !married ? 'alive' : 'dead')																			" }	//  87
+		, {"it's alive!"	, "!alive? 'dead!' : \"it's alive!\"																				" }	//  88
+		, {"it's alive!"	, "!!(alive) ? \"it's alive!\" : 'dead!'																			" }	//  89
+		, {"it's alive!"	, "(!alive) ? 'dead!' : \"it's alive!\"																				" }	//  90
+		, {"Rene"			, "children[('0')]																									" }	//  91
+		, {"null"			, "children[('1')]																									" }	//  92
+		, {"Jamie"			, "children[('2')]																									" }	//  93
+		, {"Jamie"			, "children[selection.index]																						" }	//  94
+		, {"Jamie"			, "children[(selection.('index'))]																					" }	//  95
+		, {"Jamie"			, "children[({'selection'}.index)]																					" }	//  96
+		, {"Jamie"			, "children[{'selection.index'}]																					" }	//  97
+		, {"Alice"			, "parents['0'].name																								" }	//  98
+		, {"Bob"			, "parents['1'].name																								" }	//  99
+		, {"Alice"			, "'Alice'																											" }	// 100
+		, {"Alice"			, "((parents['0']).name)																							" }	// 101
+		, {"Bob"			, "((parents['1']).name)																							" }	// 102
+		, {"Alice"			, "{\"(parents['0']).name\"}																						" }	// 103
+		, {"Bob"			, "{\"(parents['1']).name\"}																						" }	// 104
+		, {"2"				, "(selection . ('index'))																							" }	// 105
+		, {"2"				, "(selection . index)																								" }	// 106
+		, {"null"			, "(children[ ( ( '1') )] )																							" }	// 107
+		, {"Jamie"			, "(children[((selection.index)) ])																					" }	// 108
+		, {"is alive"		, "(alive ? married ? 'not alive' : 'is alive' : 'unknown')															" }	// 109
+		, {"false"			, "!alive  ? ('is_alive') : (!'is dead')																			" }	// 110
+		, {"is alive"		, "(alive  ? (!alive ? 'is_dead' : 'is alive'))																		" }	// 111
+		, {"red"			, "married  ? !alive ? 'is_dead' : 'is_alive' : race																" }	// 112
+		, {"unknown"		, "(!alive  ? (alive ? 'is_alive' : 'is_dead') : 'unknown')															" }	// 113
+		, {"true"			, "!'0'																												" }	// 114
+		, {"true"			, "!''																												" }	// 115
+		, {"false"			, "!' '																												" }	// 116
+		, {"true"			, "!'{}'																											" }	// 117
+		, {"true"			, "!'[]'																											" }	// 118
+		, {"true"			, "!'0'	&&	!'0'	 																								" }	// 119
+		, {"true"			, "!''	&&	!''																										" }	// 120
+		, {"false"			, "!' '	&&	!' '																									" }	// 121
+		, {"true"			, "!'{}'&&	!'{}'																									" }	// 122
+		, {"true"			, "!'[]'&&	!'[]'																									" }	// 123
+		, {"true"			, "!'0'	||	!'0'	 																								" }	// 124
+		, {"true"			, "!''	||	!''																										" }	// 125
+		, {"false"			, "!' '	||	!' '																									" }	// 126
+		, {"true"			, "!'{}'||	!'{}'																									" }	// 127
+		, {"true"			, "!'[]'||	!'[]'																									" }	// 128
+		, {"true"			, "'true'  || 'true'																								" }	// 129
+		, {"32"				, "parents['1'].property.{selection.default_property_name_path}														" }	// 130
+		, {"0"				, "!selection.active		? ('0') : selection.index																" }	// 131
+		, {"0"				, "!(selection.active)		? ('0') : selection.index																" }	// 132
+		, {"2"				, "(!(selection.active))	? (selection.index)	: '0'																" }	// 133
+		, {"false"			, "selection.active																									" }	// 134
+		, {"false"			, "(selection.active)																								" }	// 135
+		, {"2"				, "(selection.active)	? ('0')	: (selection.index)																	" }	// 136
+		, {"race"			, "!selection.active ? properties[selection.index].name : 'No selection.'											" }	// 137
+		, {"No selection."	, "selection.active ? 'is active' : 'No selection.'																	" }	// 138
+		, {"age"			, "properties[('0')].name																							" }	// 139
+		, {"2"				, "(!selection.active) ? (selection.index) : ('1')																	" }	// 140
+		, {"No selection."	, "selection.active ? properties[selection.index].name : 'No selection.'											" }	// 141
+		, {"race"			, "selection.active ? 'No selection.' : properties[selection.index].name											" }	// 142
+		, {"green"			, "parents['1'].property.(properties[selection.active ? selection.index : '1'].name)								" }	// 143
+		, {"green"			, "parents['1'].property.(properties[selection.active ? (selection.index) : '1'].name)								" }	// 144
+		, {"thin"			, "parents['1'].property.(properties[!selection.active ? (selection.index) : ('1')].name)							" }	// 145
+		, {"green"			, "parents['1'].property.(properties[(selection.active) ? selection.index : '1'].name)								" }	// 146
+		, {"16"				, "parents['0'].property.(properties[(selection.active) ? selection.index : '0'].name)								" }	// 147
+		, {"2"				, "!selection.active	? selection.index : '1'																		" }	// 148
+		, {"1"				, "(!selection.active)	? '1' : selection.index																		" }	// 149
+		, {"green"			, "parents['1'].property.(properties[!selection.active		? '1'	: selection.index	].name)						" }	// 150
+		, {"green"			, "parents['1'].property.(properties[!!!selection.active || married	? '1' : (selection.index)].name)				" }	// 151
+		, {"green"			, "parents['1'].property.(properties[!!!selection.active || married	? '1' : (selection.index)].name)				" }	// 152
+		, {"green"			, "parents['1'].property.(properties[!selection.active		? ('1')	: (selection.index) ].name)						" }	// 153
+		, {"32"				, "parents['1'].property.{selection.default_property_name_path}														" }	// 154
+		, {"orange"			, "parents['0'].property.(properties[(!selection.active) ? '1'	: selection.index	].name)							" }	// 155
+		, {"orange"			, "parents['0'].property.(properties[!(selection.active) ? '1'	: selection.index	].name)							" }	// 156
+		, {"green"			, "parents['1'].property.(properties[!(!!selection.active) && (married || alive) ? '1' : (selection.index)].name)	" }	// 157
+		, {"green"			, "parents['1'].property.(properties[!(!!selection.active) && (alive || married) ? '1' : (selection.index)].name)	" }	// 158
 		};
 
 	info_printf("Input JSON:\n%s", inputJson.begin());
 	gpk_necall(::gpk::jsonParse(jsonReader, inputJson), "Failed to parse json: '%s'.", inputJson.begin());
 	for(uint32_t iTest = 0; iTest < ::gpk::size(resultExpression); ++iTest) {
-		gerror_if(errored(testJSONExpression(jsonReader, resultExpression[iTest].Val, resultExpression[iTest].Key)), "Failed to resolve expression: %s", resultExpression[iTest].Val.begin())
+		gerror_if(::gpk::failed(testJSONExpression(jsonReader, resultExpression[iTest].Val, resultExpression[iTest].Key)), "Failed to resolve expression: %s", ::gpk::toString(resultExpression[iTest].Val).begin())
 		else
 			++testsSucceeded;
 	}
