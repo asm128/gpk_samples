@@ -133,48 +133,54 @@ int											main						()	{
 		;
 	::gpk::SJSONReader								jsonReader;
 	::gpk::TKeyValConstString						resultExpression[]		=
-		{ {"false"			, "'Found'	== children[('1')]																						" }	//   1
-		//, {"false"			, "'Not'	== children[('0')]																						" }	//   0
-		//, {"false"			, "'Here'	== children[('2')]																						" }	//   2
-		//, {"false"			, "'Perro' == 'Perre'																								" }	//   3
-		, {"true"			, "'Rene'	== children[('0')]																						" }	//   4
-		, {"true"			, "'null'	== children[('1')]																						" }	//   5
-		, {"true"			, "'Jamie'	== children[('2')]																						" }	//   6
-		, {"false"			, "alive==married																									" }	//   7
-		, {"false"			, "!alive==!married																									" }	//   8
-		, {"true"			, "(!alive)==(married)																								" }	//   9
-		, {"true"			, "!alive  ==married																								" }	//  10
-		, {"false"			, "(!alive)==(!married)																								" }	//  11
-		, {"true"			, "(alive )==(!married)																								" }	//  12
-		, {"false"			, "!alive  ==!married																								" }	//  13
-		, {"true"			, "!alive  ==married																								" }	//  14
-		, {"false"			, "(alive )=={ 'married'}																							" }	//  15
-		, {"false"			, "'false' == 'true'																								" }	//  16
-		, {"true"			, "'true'  == 'true'																								" }	//  17
-		, {"true"			, "'false' == 'false'																								" }	//  18
-		, {"true"			, "'Perro' == 'Perro'																								" }	//  19
-		, {"false"			, "(alive )&&{ 'married'}																							" }	//  20
-		, {"false"			, "(alive )&&( married)																								" }	//  21
-		, {"true"			, "'false' || 'true'																								" }	//  22
-		, {"false"			, "(alive )&&(married)																								" }	//  23
-		, {"false"			, "(alive) &&(married)																								" }	//  24
-		, {"false"			, "(alive) &&( married)																								" }	//  25
-		, {"false"			, "'false' && 'false'																								" }	//  26
-		, {"false"			, "'false' || 'false'																								" }	//  27
-		, {"true"			, "'true'  || 'false'																								" }	//  28
-		, {"false"			, "!married ? !alive : 'unknown'																					" }	//  29
-		, {"unknown"		, "married ? !alive : 'unknown'																						" }	//  30
-		, {"false"			, "married ? 'unknown' : !alive 																					" }	//  31
-		, {"unknown"		, "!married ? 'unknown' : !alive																					" }	//  32
-		, {"true"			, "(alive )&&!(married)																								" }	//  33
-		, {"false"			, "!(alive )&&!( married)																							" }	//  34
-		, {"false"			, "!(alive )&&!(married)																							" }	//  35
-		, {"false"			, "!(alive) &&!(married)																							" }	//  36
-		, {"false"			, "!(alive) &&!( married)																							" }	//  37
-		, {"unknown"		, "married && alive && married ? !alive : 'unknown'																	" }	//  38
-		, {"true"			, "(alive && alive) && alive &&!( married)																			" }	//  39
-		, {"true"			, "(alive) &&!(married)																								" }	//  40
-		, {"true"			, "(alive) &&!( married)																							" }	//  41
+		{ {"false"			, "'Not'			== children[('0')]																				" }	//   0
+		, {"false"			, "'Found'			== children[('1')]																				" }	//   1
+		, {"false"			, "'Here'			== children[('2')]																				" }	//   2
+		, {"false"			, "'Perro'			== 'Perre'																						" }	//   3
+		, {"true"			, "'null'			== 'false'																						" }	//   3
+		, {"true"			, "'false'			== 'null'																						" }	//   3
+		, {"true"			, "'Rene'			== children['0']																				" }	//   4
+		, {"true"			, "'null'			== children['1']																				" }	//   5
+		, {"true"			, "'false'			== children['1']																				" }	//   5
+		, {"true"			, "children[('1')]	== children['1']																				" }	//   5
+		, {"false"			, "children[('2')]	== children[('1')]																				" }	//   5
+		, {"true"			, "'Jamie'			== children[('2')]																				" }	//   6
+		, {"false"			, "alive			== married																						" }	//   7
+		, {"false"			, "!alive			== !married																						" }	//   8
+		, {"true"			, "(!alive)			==(married)																						" }	//   9
+		, {"true"			, "!alive			==married																						" }	//  10
+		, {"false"			, "(!alive)			==(!married)																					" }	//  11
+		, {"true"			, "(alive )			==(!married)																					" }	//  12
+		, {"false"			, "!alive			==!married																						" }	//  13
+		, {"true"			, "!alive			==married																						" }	//  14
+		, {"false"			, "(alive )			=={ 'married'}																					" }	//  15
+		, {"true"			, "(alive )			==!{ 'married'}																					" }	//  15
+		, {"false"			, "'false'			== 'true'																						" }	//  16
+		, {"true"			, "'true'			== 'true'																						" }	//  17
+		, {"true"			, "'false'			== 'false'																						" }	//  18
+		, {"true"			, "'Perro'			== 'Perro'																						" }	//  19
+		, {"false"			, "(alive )			&&{ 'married'}																					" }	//  20
+		, {"false"			, "(alive )			&&( married)																					" }	//  21
+		, {"true"			, "'false'			|| 'true'																						" }	//  22
+		, {"false"			, "(alive )			&&(married)																						" }	//  23
+		, {"false"			, "(alive)			&&(married)																						" }	//  24
+		, {"false"			, "(alive)			&&( married)																					" }	//  25
+		, {"false"			, "'false'			&& 'false'																						" }	//  26
+		, {"false"			, "'false'			|| 'false'																						" }	//  27
+		, {"true"			, "'true'			|| 'false'																						" }	//  28
+		, {"false"			, "!married			 ? !alive : 'unknown'																			" }	//  29
+		, {"unknown"		, "married			? !alive : 'unknown'																			" }	//  30
+		, {"false"			, "married			? 'unknown' : !alive 																			" }	//  31
+		, {"unknown"		, "!married			 ? 'unknown' : !alive																			" }	//  32
+		, {"true"			, "(alive )			&&!(married)																					" }	//  33
+		, {"false"			, "!(alive )		&&!( married)																					" }	//  34
+		, {"false"			, "!(alive )		&&!(married)																					" }	//  35
+		, {"false"			, "!(alive)			&&!(married)																					" }	//  36
+		, {"false"			, "!(alive)			&&!( married)																					" }	//  37
+		, {"unknown"		, "married			&& alive && married ? !alive : 'unknown'														" }	//  38
+		, {"true"			, "(alive && alive)	&& alive &&!( married)																			" }	//  39
+		, {"true"			, "(alive)			&&!(married)																					" }	//  40
+		, {"true"			, "(alive			)&&!( married)																					" }	//  41
 		, {"true"			, "(!married) &&!( married)																							" }	//  42
 		, {"false"			, "{'alive'}&&( married)																							" }	//  43
 		, {"false"			, "{'alive'}&&(married)																								" }	//  44
