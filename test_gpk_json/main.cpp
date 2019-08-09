@@ -89,7 +89,7 @@
 	,	const ::gpk::view_const_string					expression
 	,	const ::gpk::view_const_string					expected
 	) {
-	info_printf("Testing expression: %s", expression.begin());
+	info_printf("Testing expression: %s", ::gpk::toString(expression).begin());
 	::gpk::view_const_string						result;
 	::gpk::array_pod<char_t>						output;
 	if(-1 == gpk::jsonExpressionResolve(expression, jsonReader, 0U, result) || result != expected) {
@@ -111,10 +111,12 @@ int											main						()	{
 	uint32_t										testsSucceeded			= 0;
 	const ::gpk::view_const_string					inputJson				=
 		"\n{\t \"name\"           : \"Carlos\""
-		"\n\t, \"height\"         : \"1.56\""
+		"\n\t, \"height\"         : 1.60"
 		"\n\t, \"color\"          : \"brown\""
 		"\n\t, \"race\"           : \"red\""
 		"\n\t, \"weight\"         : 160"
+		"\n\t, \"bpm\"            : 160."
+		"\n\t, \"hindsight\"      : 1.600000000"
 		"\n\t, \"alive\"          : true"
 		"\n\t, \"married\"        : false"
 		"\n\t, \"children\"       : [\"Rene\", null, \"Jamie\"]"
@@ -133,12 +135,26 @@ int											main						()	{
 		;
 	::gpk::SJSONReader								jsonReader;
 	::gpk::TKeyValConstString						resultExpression[]		=
-		{ {"false"			, "'Not'			== children[('0')]																				" }	//   0
+		{ {"true"			, "weight			== bpm																						" }	//   0
+		, {"true"			, "height			== hindsight																					" }	//   0
+		, {"true"			, "hindsight		== height																						" }	//   0
+		, {"true"			, "bpm				== weight																						" }	//   0
+		, {"false"			, "height			== weight																					" }	//   0
+		, {"false"			, "hindsight		== bpm																						" }	//   0
+		, {"false"			, "weight			== height																						" }	//   0
+		, {"false"			, "bpm				== hindsight																					" }	//   0
+		, {"false"			, "'Not'			== children[('0')]																				" }	//   0
 		, {"false"			, "'Found'			== children[('1')]																				" }	//   1
 		, {"false"			, "'Here'			== children[('2')]																				" }	//   2
 		, {"false"			, "'Perro'			== 'Perre'																						" }	//   3
 		, {"true"			, "'null'			== 'false'																						" }	//   3
+		, {"true"			, "'null'			== ''																							" }	//   3
 		, {"true"			, "'false'			== 'null'																						" }	//   3
+		, {"true"			, "'false'			== ''																							" }	//   3
+		, {"true"			, "	'false'			== 'null'																						" }	//   3
+		, {"true"			, "	''				== 'null'																						" }	//   3
+		, {"true"			, "	'null'			== 'false'																						" }	//   3
+		, {"true"			, "	''				== 'false'																						" }	//   3
 		, {"true"			, "'Rene'			== children['0']																				" }	//   4
 		, {"true"			, "'null'			== children['1']																				" }	//   5
 		, {"true"			, "'false'			== children['1']																				" }	//   5
@@ -180,7 +196,7 @@ int											main						()	{
 		, {"unknown"		, "married			&& alive && married ? !alive : 'unknown'														" }	//  38
 		, {"true"			, "(alive && alive)	&& alive &&!( married)																			" }	//  39
 		, {"true"			, "(alive)			&&!(married)																					" }	//  40
-		, {"true"			, "(alive			)&&!( married)																					" }	//  41
+		, {"true"			, "(alive)			&&!( married)																					" }	//  41
 		, {"true"			, "(!married) &&!( married)																							" }	//  42
 		, {"false"			, "{'alive'}&&( married)																							" }	//  43
 		, {"false"			, "{'alive'}&&(married)																								" }	//  44
@@ -203,13 +219,13 @@ int											main						()	{
 		, {"true"			, "!(!(alive))																										" }	//  61
 		, {"true"			, "(!(!(alive)))																									" }	//  62
 		, {"Carlos"			, "name																												" }	//  63
-		, {"1.56"			, "height																											" }	//  64
+		, {"1.60"			, "height																											" }	//  64
 		, {"brown"			, "color																											" }	//  65
 		, {"b"				, "color['0']																										" }	//  66
 		, {"red"			, "race																												" }	//  67
 		, {"160"			, "weight																											" }	//  68
 		, {"Carlos"			, "(name)																											" }	//  69
-		, {"1.56"			, "(height)																											" }	//  70
+		, {"1.60"			, "(height)																											" }	//  70
 		, {"brown"			, "(color)																											" }	//  71
 		, {"red"			, "(race)																											" }	//  72
 		, {"160"			, "(weight)																											" }	//  73
@@ -307,6 +323,19 @@ int											main						()	{
 		else
 			++testsSucceeded;
 	}
+
+	//::gpk::SJSONFile	fileCases;
+	//::gpk::jsonFileRead(fileCases, "case.json");
+	//for(uint32_t iCase = 0; iCase < (uint32_t)::gpk::jsonArraySize(*fileCases.Reader[0]); ++iCase) {
+	//	const uint32_t			indexMain		= ::gpk::jsonArrayValueGet(*fileCases.Reader[0], iCase);
+	//	const uint32_t			indexResult		= ::gpk::jsonArrayValueGet(*fileCases.Reader[indexMain], 0);
+	//	const uint32_t			indexScript		= ::gpk::jsonArrayValueGet(*fileCases.Reader[indexMain], 1);
+	//	const ::gpk::SJSONNode	& nodeResult	= *fileCases.Reader[indexResult];
+	//	const ::gpk::SJSONNode	& nodeScript	= *fileCases.Reader[indexScript];
+	//	gerror_if(::gpk::failed(testJSONExpression(jsonReader, fileCases.Reader.View[nodeScript.ObjectIndex], fileCases.Reader.View[nodeResult.ObjectIndex])), "Failed to resolve expression: %s", ::gpk::toString(fileCases.Reader.View[nodeScript.ObjectIndex]).begin())
+	//	else
+	//		++testsSucceeded;
+	//}
 
 	const ::gpk::view_const_string					format						=
 		"I want to replace this (but not \\{this}): \n{parents['1'].name}'s {properties[selection.active ? selection.index : '1'].name}: // this comment should appear here"
