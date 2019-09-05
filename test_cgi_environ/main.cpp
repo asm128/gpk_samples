@@ -139,7 +139,7 @@ static ::gpk::error_t								cgiMain							(int argc, char** argv, char**envv)		
 	(void)(envv);
 	::gpk::SCGIRuntimeValues								runtimeValues;
 	::gpk::cgiRuntimeValuesLoad(runtimeValues, {(const char**)argv, (uint32_t)argc});
-	::gpk::array_pod<char_t>								output;
+	::gpk::array_pod<char_t>								output							= ::gpk::view_const_string{"Content-type: application/json\r\n"};
 	::generate_output(runtimeValues, output);
 	printf("%s", output.begin());
 	return 0;
@@ -148,7 +148,7 @@ static ::gpk::error_t								cgiMain							(int argc, char** argv, char**envv)		
 int													main							(int argc, char** argv, char**envv)		{ return ::cgiMain(argc, argv, envv); }
 
 #ifdef GPK_WINDOWS
-int WINAPI											WinMain				
+int WINAPI											WinMain
 	(	_In_		HINSTANCE	hInstance
 	,	_In_opt_	HINSTANCE	hPrevInstance
 	,	_In_		LPSTR		lpCmdLine
