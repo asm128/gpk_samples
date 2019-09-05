@@ -1,5 +1,4 @@
 #include "gpk_array.h"
-#include "enemy.h"
 
 #ifndef LEVEL_H_2908374982374
 #define LEVEL_H_2908374982374
@@ -14,7 +13,7 @@ struct SSpawnerConfig {
 			SHIP_CLASS									TypeShip;
 };
 
-static	const SSpawnerConfig						spawners[]					= 
+static	const SSpawnerConfig						spawners[]					=
 	{	{"00_00", 0.5f, 10, 10, false, WEAPON_TYPE_INVALID, SHIP_CLASS_INVALID}
 	,	{"00_01", 0.5f, 10, 10, false, WEAPON_TYPE_INVALID, SHIP_CLASS_INVALID}
 	,	{"00_02", 0.5f, 10, 10, false, WEAPON_TYPE_INVALID, SHIP_CLASS_INVALID}
@@ -92,6 +91,6 @@ static	const SSpawnerConfig						spawners[]					=
 	,	{"05_09", 0.5f, 10, 10, false, WEAPON_TYPE_INVALID, SHIP_CLASS_INVALID}
 	,	{"05_10", 0.5f, 10, 10, false, WEAPON_TYPE_INVALID, SHIP_CLASS_INVALID}
 	,	{"05_11", 0.5f, 10, 10, false, WEAPON_TYPE_INVALID, SHIP_CLASS_INVALID}
-	};		  
+	};
 
 #endif // LEVEL_H_2908374982374

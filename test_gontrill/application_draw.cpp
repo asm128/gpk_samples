@@ -1,5 +1,5 @@
 // Tip: Best viewed with zoom level at 81%.
-// Tip: Hold Left ALT + SHIFT while tapping or holding the arrow keys in order to select multiple columns and write on them at once. 
+// Tip: Hold Left ALT + SHIFT while tapping or holding the arrow keys in order to select multiple columns and write on them at once.
 //		Also useful for copy & paste operations in which you need to copy a bunch of variable or function names and you can't afford the time of copying them one by one.
 #include "application.h"
 #include "gpk_grid_copy.h"
@@ -106,9 +106,9 @@ static				::gpk::error_t										drawShipHealthBar							(::SApplication& appli
 		const ::SParticleToDraw														& particleToDraw								= applicationInstance.StuffToDraw.Debris[iRay];
 		const ::gpk::SCoord2<float>													& pointToDraw									= particleToDraw.Position.Cast<float>();
 		if(applicationInstance.ParticleSystemDebris.Instances[particleToDraw.IndexParticleInstance].Binding.Lit) {
-			::gpk::SColorBGRA															finalColor										
-				= (0 == (particleToDraw.IndexParticlePhysics % 3)) ? ::gpk::SColorBGRA(::gpk::YELLOW) 
-				: (0 == (particleToDraw.IndexParticlePhysics % 2)) ? ::gpk::SColorBGRA(::gpk::RED) 
+			::gpk::SColorBGRA															finalColor
+				= (0 == (particleToDraw.IndexParticlePhysics % 3)) ? ::gpk::SColorBGRA(::gpk::YELLOW)
+				: (0 == (particleToDraw.IndexParticlePhysics % 2)) ? ::gpk::SColorBGRA(::gpk::RED)
 				: ::gpk::SColorBGRA(::gpk::ORANGE)
 				;
 			finalColor																*= 1.0f - (particleToDraw.TimeLived);
@@ -118,10 +118,10 @@ static				::gpk::error_t										drawShipHealthBar							(::SApplication& appli
 	return 0;
 }
 
-static				const ::gpk::array_static<::gpk::SColorBGRA, WEAPON_TYPE_COUNT>	weaponTypeColorPalette			= 
+static				const ::gpk::array_static<::gpk::SColorBGRA, WEAPON_TYPE_COUNT>	weaponTypeColorPalette			=
 	{ ::gpk::SColorBGRA{::gpk::WHITE		} // WEAPON_TYPE_ARROW
 	, ::gpk::SColorBGRA{::gpk::LIGHTGRAY	} // WEAPON_TYPE_BULLET
-	, ::gpk::SColorBGRA{::gpk::RED			} // WEAPON_TYPE_LASER				
+	, ::gpk::SColorBGRA{::gpk::RED			} // WEAPON_TYPE_LASER
 	, ::gpk::SColorBGRA{::gpk::LIGHTCYAN	} // WEAPON_TYPE_PLASMA
 	, ::gpk::SColorBGRA{::gpk::LIGHTCYAN	} // WEAPON_TYPE_BUBBLE
 	, ::gpk::SColorBGRA{::gpk::LIGHTYELLOW	} // WEAPON_TYPE_SPARK
@@ -164,14 +164,14 @@ static				const ::gpk::array_static<::gpk::SColorBGRA, WEAPON_TYPE_COUNT>	weapon
 		if(false == applicationInstance.ParticleSystemStars.Instances[starToDraw.IndexParticleInstance].Binding.Lit)
 			continue;
 		::gpk::SCoord2<int32_t>														& particlePosition							= starToDraw.Position;
-		viewOffscreen[(uint32_t)particlePosition.y][(uint32_t)particlePosition.x]	
+		viewOffscreen[(uint32_t)particlePosition.y][(uint32_t)particlePosition.x]
 			= (0 == (starToDraw.IndexParticlePhysics % 7))	? ::gpk::DARKYELLOW	/ 2.0f
-			: (0 == (starToDraw.IndexParticlePhysics % 6))	? ::gpk::GRAY 
+			: (0 == (starToDraw.IndexParticlePhysics % 6))	? ::gpk::GRAY
 			: (0 == (starToDraw.IndexParticlePhysics % 5))	? ::gpk::WHITE
-			: (0 == (starToDraw.IndexParticlePhysics % 4))	? ::gpk::DARKGRAY 
-			: (0 == (starToDraw.IndexParticlePhysics % 3))	? ::gpk::GRAY 
+			: (0 == (starToDraw.IndexParticlePhysics % 4))	? ::gpk::DARKGRAY
+			: (0 == (starToDraw.IndexParticlePhysics % 3))	? ::gpk::GRAY
 			: (0 == (starToDraw.IndexParticlePhysics % 2))	? ::gpk::WHITE
-			: ::gpk::DARKGRAY 
+			: ::gpk::DARKGRAY
 			;
 		float																		maxFactor	= .5f;
 		float																		range		= 3.f;
@@ -191,20 +191,20 @@ static				const ::gpk::array_static<::gpk::SColorBGRA, WEAPON_TYPE_COUNT>	weapon
 		::SApplication::TParticleInstance											& particleInstance							= applicationInstance.ParticleSystemThrust.Instances[thrustToDraw.IndexParticleInstance];
 		if(false == particleInstance.Binding.Lit)
 			continue;
-		::SShipState																& shipState									= (particleInstance.Binding.TypePlayer == PLAYER_TYPE_PLAYER) 
-			? gameInstance.Ships	.States[particleInstance.Binding.OwnerIndex] 
+		::SShipState																& shipState									= (particleInstance.Binding.TypePlayer == PLAYER_TYPE_PLAYER)
+			? gameInstance.Ships	.States[particleInstance.Binding.OwnerIndex]
 			: gameInstance.Enemies	.States[particleInstance.Binding.OwnerIndex]
 			;
 		const int32_t																physicsId									= thrustToDraw.IndexParticlePhysics;
 		const ::gpk::SCoord2<float>													& particlePosition							= applicationInstance.ParticleSystemThrust.Integrator.Particle[physicsId].Position;
 		if(false == ::gpk::in_range(particlePosition, {{}, offscreen.View.metrics().Cast<float>()}))
 			continue;
-		viewOffscreen[(uint32_t)particlePosition.y][(uint32_t)particlePosition.x]	
+		viewOffscreen[(uint32_t)particlePosition.y][(uint32_t)particlePosition.x]
 			= (thrustToDraw.TimeLived > .075)		? (shipState.Thrust ? ::gpk::DARKGRAY	: ::gpk::DARKGRAY	)
 			: (thrustToDraw.TimeLived > .03 )		? (shipState.Thrust ? ::gpk::GRAY		: ::gpk::GRAY 		)
 			: (physicsId % 3)						? (shipState.Thrust ? ::gpk::CYAN		: ::gpk::RED 		)
 			: (physicsId % 2)						? (shipState.Thrust ? ::gpk::WHITE		: ::gpk::ORANGE		)
-			: ::gpk::YELLOW 
+			: ::gpk::YELLOW
 			;
 		float																		maxFactor	= .5f;
 		float																		range		= 3.f;
@@ -215,7 +215,7 @@ static				const ::gpk::array_static<::gpk::SColorBGRA, WEAPON_TYPE_COUNT>	weapon
 	return 0;
 }
 
-static constexpr	const ::gpk::SColorBGRA								powerupFamilyColorPalette []				= 
+static constexpr	const ::gpk::SColorBGRA								powerupFamilyColorPalette []				=
 	{ ::gpk::LIGHTYELLOW
 	, ::gpk::LIGHTGREEN
 	, ::gpk::LIGHTCYAN
@@ -229,7 +229,7 @@ static				::gpk::error_t										drawPowerup						(::SApplication& applicationI
 	for(uint32_t iTex = 0, textureCount = texturePowerup.size(); iTex < textureCount; ++iTex)
 		gerror_if(errored(::gpk::grid_copy_alpha(viewOffscreen, texturePowerup[iTex], position - textureCenterPowerup, {0xFF, 0, 0xFF, 0xFF})), "I believe this never fails.");
 	::gpk::SCoord2<int32_t>															centerPowerup								= position;
-	uint32_t																	lightIndex									= (uint32_t)time % (lightPos.size() / 2); 
+	uint32_t																	lightIndex									= (uint32_t)time % (lightPos.size() / 2);
 	const ::gpk::SCoord2<int32_t>												& selectedLightPos0							= lightPos[lightIndex + 0]
 		,																		& selectedLightPos2							= lightPos[lightIndex + 4]
 		;
@@ -240,24 +240,24 @@ static				::gpk::error_t										drawPowerup						(::SApplication& applicationI
 }
 
 static constexpr	int32_t												PWERUP_HALF_WIDTH							= 6;
-static constexpr	const ::gpk::SCoord2<int32_t>						squarePowerupLightPositions		[8]			= 
-	{ ::gpk::SCoord2<int32_t>{-PWERUP_HALF_WIDTH    , -PWERUP_HALF_WIDTH - 1}	
-	, ::gpk::SCoord2<int32_t>{-PWERUP_HALF_WIDTH - 1, -PWERUP_HALF_WIDTH}		
-	, ::gpk::SCoord2<int32_t>{-PWERUP_HALF_WIDTH - 1,  PWERUP_HALF_WIDTH - 1}	
-	, ::gpk::SCoord2<int32_t>{-PWERUP_HALF_WIDTH    ,  PWERUP_HALF_WIDTH}		
-	, ::gpk::SCoord2<int32_t>{ PWERUP_HALF_WIDTH - 1,  PWERUP_HALF_WIDTH}		
-	, ::gpk::SCoord2<int32_t>{ PWERUP_HALF_WIDTH    ,  PWERUP_HALF_WIDTH - 1}	
-	, ::gpk::SCoord2<int32_t>{ PWERUP_HALF_WIDTH    , -PWERUP_HALF_WIDTH}		
-	, ::gpk::SCoord2<int32_t>{ PWERUP_HALF_WIDTH - 1, -PWERUP_HALF_WIDTH - 1}	
+static constexpr	const ::gpk::SCoord2<int32_t>						squarePowerupLightPositions		[8]			=
+	{ ::gpk::SCoord2<int32_t>{-PWERUP_HALF_WIDTH    , -PWERUP_HALF_WIDTH - 1}
+	, ::gpk::SCoord2<int32_t>{-PWERUP_HALF_WIDTH - 1, -PWERUP_HALF_WIDTH}
+	, ::gpk::SCoord2<int32_t>{-PWERUP_HALF_WIDTH - 1,  PWERUP_HALF_WIDTH - 1}
+	, ::gpk::SCoord2<int32_t>{-PWERUP_HALF_WIDTH    ,  PWERUP_HALF_WIDTH}
+	, ::gpk::SCoord2<int32_t>{ PWERUP_HALF_WIDTH - 1,  PWERUP_HALF_WIDTH}
+	, ::gpk::SCoord2<int32_t>{ PWERUP_HALF_WIDTH    ,  PWERUP_HALF_WIDTH - 1}
+	, ::gpk::SCoord2<int32_t>{ PWERUP_HALF_WIDTH    , -PWERUP_HALF_WIDTH}
+	, ::gpk::SCoord2<int32_t>{ PWERUP_HALF_WIDTH - 1, -PWERUP_HALF_WIDTH - 1}
 	};
 
-static constexpr	const ::gpk::SCoord2<int32_t>						diagonalPowerupLightPositions	[8]			= 
+static constexpr	const ::gpk::SCoord2<int32_t>						diagonalPowerupLightPositions	[8]			=
 	{ ::gpk::SCoord2<int32_t>{-1, -PWERUP_HALF_WIDTH - 1}
 	, ::gpk::SCoord2<int32_t>{ 0, -PWERUP_HALF_WIDTH - 1}
-	, ::gpk::SCoord2<int32_t>{PWERUP_HALF_WIDTH, -1}		
-	, ::gpk::SCoord2<int32_t>{PWERUP_HALF_WIDTH,  0}		
-	, ::gpk::SCoord2<int32_t>{ 0, PWERUP_HALF_WIDTH}		
-	, ::gpk::SCoord2<int32_t>{-1, PWERUP_HALF_WIDTH}		
+	, ::gpk::SCoord2<int32_t>{PWERUP_HALF_WIDTH, -1}
+	, ::gpk::SCoord2<int32_t>{PWERUP_HALF_WIDTH,  0}
+	, ::gpk::SCoord2<int32_t>{ 0, PWERUP_HALF_WIDTH}
+	, ::gpk::SCoord2<int32_t>{-1, PWERUP_HALF_WIDTH}
 	, ::gpk::SCoord2<int32_t>{-PWERUP_HALF_WIDTH - 1,  0}
 	, ::gpk::SCoord2<int32_t>{-PWERUP_HALF_WIDTH - 1, -1}
 	};
@@ -298,7 +298,7 @@ static				::gpk::error_t										drawCrosshairDiagonal						(::SApplication& ap
 	::gpk::SFramework															& framework									= applicationInstance.Framework;
 	::gpk::view_grid<::gpk::SColorBGRA>											& viewOffscreen								= framework.MainDisplayOffscreen->Color.View;
 	int32_t																		halfWidth									= 10 - ((int32_t)beaconTimer % 11);
-	::gpk::SCoord2<int32_t>														lightCrosshair []							= 
+	::gpk::SCoord2<int32_t>														lightCrosshair []							=
 		{ centerCrosshair + ::gpk::SCoord2<int32_t>{ halfWidth,  halfWidth }
 		, centerCrosshair + ::gpk::SCoord2<int32_t>{ halfWidth, -halfWidth - 1 }
 		, centerCrosshair + ::gpk::SCoord2<int32_t>{-halfWidth - 1, -halfWidth - 1 }
@@ -315,7 +315,7 @@ static				::gpk::error_t										drawCrosshairAligned						(::SApplication& app
 	::gpk::SFramework															& framework									= applicationInstance.Framework;
 	::gpk::view_grid<::gpk::SColorBGRA>											& viewOffscreen								= framework.MainDisplayOffscreen->Color.View;
 	const int32_t																halfWidth									= 10 - ((int32_t)beaconTimer % 11);
-	const ::gpk::SCoord2<int32_t>												lightCrosshair []							= 
+	const ::gpk::SCoord2<int32_t>												lightCrosshair []							=
 		{ centerCrosshair + ::gpk::SCoord2<int32_t>{-1, -halfWidth - 1}
 		, centerCrosshair + ::gpk::SCoord2<int32_t>{ 0, -halfWidth - 1}
 		, centerCrosshair + ::gpk::SCoord2<int32_t>{halfWidth, -1}
@@ -325,13 +325,13 @@ static				::gpk::error_t										drawCrosshairAligned						(::SApplication& app
 		, centerCrosshair + ::gpk::SCoord2<int32_t>{-halfWidth - 1,  0}
 		, centerCrosshair + ::gpk::SCoord2<int32_t>{-halfWidth - 1, -1}
 		};
-	
+
 	for(uint32_t iPoint = 0, pointCount = ::gpk::size(lightCrosshair); iPoint < pointCount; ++iPoint) {
 		const ::gpk::SCoord2<int32_t>												& pointToTest								= lightCrosshair[iPoint];
 		::gpk::drawPixelLight(viewOffscreen, pointToTest.Cast<float>()
-			, (0 == (int32_t)beaconTimer % 5) ? ::gpk::SColorBGRA(::gpk::RED			) 
+			, (0 == (int32_t)beaconTimer % 5) ? ::gpk::SColorBGRA(::gpk::RED			)
 			: (0 == (int32_t)beaconTimer % 3) ? ::gpk::SColorBGRA(::gpk::LIGHTGREEN		)
-			: (0 == (int32_t)beaconTimer % 2) ? ::gpk::SColorBGRA(::gpk::LIGHTYELLOW	) 
+			: (0 == (int32_t)beaconTimer % 2) ? ::gpk::SColorBGRA(::gpk::LIGHTYELLOW	)
 			: ::gpk::SColorBGRA(::gpk::LIGHTCYAN)
 			, .2f, 3.0f
 			);
@@ -347,10 +347,10 @@ static				::gpk::error_t										drawCrosshairAligned						(::SApplication& app
 		if(0 == gameInstance.Ships.Alive[iShip])
 			continue;
 		::gpk::SCoord2<int32_t>														posXHair									= gameInstance.PositionCrosshair[iShip].Cast<int32_t>();
-		if(false == gameInstance.Ships.LineOfFire[iShip]) 
+		if(false == gameInstance.Ships.LineOfFire[iShip])
 			::drawCrosshairDiagonal(applicationInstance, beaconTimer, posXHair);
 		gerror_if(errored(::gpk::grid_copy_alpha(framework.MainDisplayOffscreen->Color.View, applicationInstance.Textures[GAME_TEXTURE_CROSSHAIR].Processed.View, posXHair - applicationInstance.TextureCenters[GAME_TEXTURE_CROSSHAIR], {0xFF, 0, 0xFF, 0xFF})), "I believe this never fails.");
-		if(gameInstance.Ships.LineOfFire[iShip]) 
+		if(gameInstance.Ships.LineOfFire[iShip])
 			::drawCrosshairAligned(applicationInstance, beaconTimer, posXHair);
 	}
 	return 0;

@@ -1,17 +1,19 @@
 // Tip: Best viewed with zoom level at 81%.
-// Tip: Hold Left ALT + SHIFT while tapping or holding the arrow keys in order to select multiple columns and write on them at once. 
+// Tip: Hold Left ALT + SHIFT while tapping or holding the arrow keys in order to select multiple columns and write on them at once.
 //		Also useful for copy & paste operations in which you need to copy a bunch of variable or function names and you can't afford the time of copying them one by one.
+#include "weapon.h"
+#include "ship.h"
+
 #include "gpk_coord.h"
 #include "gpk_view_bit.h"
 #include "gpk_array_static.h"
-#include "enemy.h"
 
 #ifndef GAME_H_982374982374
 #define GAME_H_982374982374
 
 #pragma pack(push, 1)
 
-enum PLAYER_TYPE : int8_t 
+enum PLAYER_TYPE : int8_t
 	{ PLAYER_TYPE_PLAYER				= 0
 	, PLAYER_TYPE_ENEMY
 	, PLAYER_TYPE_COUNT
@@ -30,7 +32,7 @@ enum HEALTH_TYPE : int8_t
 
 enum BUFF_TYPE : int8_t
 	{ BUFF_TYPE_POINTS					= 0
-	, BUFF_TYPE_FORCE_FIELD					
+	, BUFF_TYPE_FORCE_FIELD
 	, BUFF_TYPE_FIRE_RATIO
 	, BUFF_TYPE_COUNT
 	, BUFF_TYPE_INVALID					= -1
@@ -79,10 +81,10 @@ static constexpr	const int32_t															MAX_ENEMIES															= 128;
 static constexpr	const int32_t															MAX_PROJECTILES														= 512;
 
 template<size_t _sizeArray>
-struct SArrayElementState : public ::gpk::view_bit<uint64_t> { 
+struct SArrayElementState : public ::gpk::view_bit<uint64_t> {
 public:
 	typedef				uint64_t																TStorage;
-						TStorage																Data				[(_sizeArray / (8 * sizeof(TStorage))) + 1]		= {};	
+						TStorage																Data				[(_sizeArray / (8 * sizeof(TStorage))) + 1]		= {};
 
 																								SArrayElementState													()						: view_bit(Data, _sizeArray) {}
 };
@@ -93,28 +95,28 @@ template<size_t _sizeArray>
 	for(uint32_t iObject = 0; iObject < _sizeArray; ++iObject)
 		if(0 == container[iObject])
 			return iObject;
-	return -1;						
+	return -1;
 }
 
 static constexpr	const uint32_t															MAGIC_NUMBER														= 1397704771;
 
-template<uint32_t _sizeArray>	
-struct SPropertiesPowerup		{ 
+template<uint32_t _sizeArray>
+struct SPropertiesPowerup		{
 						::SArrayElementState						< _sizeArray>				Alive																= {};
 						::gpk::array_static<::gpk::SCoord2<float>	, _sizeArray>				Position															= {};
 						::gpk::array_static<POWERUP_FAMILY			, _sizeArray>				Family																= {};
 						::gpk::array_static<::SPowerup				, _sizeArray>				Type																= {};
 };
 
-template<uint32_t _sizeArray>	
-struct SPropertiesProjectile	{ 
+template<uint32_t _sizeArray>
+struct SPropertiesProjectile	{
 						::SArrayElementState						< _sizeArray>				Alive																= {};
 						::gpk::array_static<::SProjectile			, _sizeArray>				Projectiles															= {};
 						::gpk::array_static<::SHealthPoints			, _sizeArray>				Health																= {};
 };
 
-template<uint32_t _sizeArray>	
-struct SPropertiesEnemy			{ 
+template<uint32_t _sizeArray>
+struct SPropertiesEnemy			{
 						::SArrayElementState						< _sizeArray>				Alive																= {};
 						::gpk::array_static<::SShipState			, _sizeArray>				States																= {};
 						::gpk::array_static<::gpk::SCoord2<float>	, _sizeArray>				Position															= {};
@@ -129,9 +131,9 @@ struct SPropertiesEnemy			{
 						::gpk::array_static<float					, _sizeArray>				TimerPath															= {};
 };
 
-template<uint32_t _sizeArray>	
-struct SPropertiesShip			{ 		
-						::SArrayElementState						< _sizeArray>				Alive																= {};			
+template<uint32_t _sizeArray>
+struct SPropertiesShip			{
+						::SArrayElementState						< _sizeArray>				Alive																= {};
 						::gpk::array_static<::SShipState			, _sizeArray>				States																= {};
 						::gpk::array_static<::SHealthPoints			, _sizeArray>				Health																= {};
 						::gpk::array_static<::SWeapon				, _sizeArray>				Weapon																= {};
@@ -159,7 +161,7 @@ struct SGame {
 
 						double																	GhostTimer															= 0;
 						uint32_t																PathStep															= 0;
-						::gpk::SCoord2<float>													PathEnemy					[10]									= 
+						::gpk::SCoord2<float>													PathEnemy					[10]									=
 							{ { 10.f,  10.f}
 							, {320.f, 180.f}
 							, { 50.f, 200.f}

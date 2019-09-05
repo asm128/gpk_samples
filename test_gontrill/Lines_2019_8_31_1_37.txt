@@ -1,0 +1,132 @@
+File name: application.h
+File folder: C:\asm128_test\gpk_samples\test_gontrill\
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Sun Mar 10 21:00:19 2019
+File code lines: 77
+File directive lines: 10
+File comment lines: 3
+File blank lines: 29
+File bytes: 4449
+
+File name: application_draw.cpp
+File folder: C:\asm128_test\gpk_samples\test_gontrill\
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Sat Aug 24 03:04:21 2019
+File code lines: 280
+File directive lines: 4
+File comment lines: 11
+File blank lines: 62
+File bytes: 24327
+
+File name: application_main.cpp
+File folder: C:\asm128_test\gpk_samples\test_gontrill\
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Fri Aug  2 00:56:17 2019
+File code lines: 173
+File directive lines: 10
+File comment lines: 9
+File blank lines: 43
+File bytes: 16105
+
+File name: application_update.cpp
+File folder: C:\asm128_test\gpk_samples\test_gontrill\
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Tue Aug 27 17:13:10 2019
+File code lines: 522
+File directive lines: 2
+File comment lines: 18
+File blank lines: 137
+File bytes: 40674
+
+File name: enemy.h
+File folder: C:\asm128_test\gpk_samples\test_gontrill\
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Wed May  2 06:31:39 2018
+File code lines: 8
+File directive lines: 5
+File comment lines: 0
+File blank lines: 5
+File bytes: 211
+
+File name: game.h
+File folder: C:\asm128_test\gpk_samples\test_gontrill\
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Sun Mar 10 19:55:01 2019
+File code lines: 125
+File directive lines: 9
+File comment lines: 3
+File blank lines: 39
+File bytes: 6321
+
+File name: gontrill_base.h
+File folder: C:\asm128_test\gpk_samples\test_gontrill\
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Sun Mar 10 19:50:07 2019
+File code lines: 3
+File directive lines: 4
+File comment lines: 0
+File blank lines: 4
+File bytes: 204
+
+File name: ship.h
+File folder: C:\asm128_test\gpk_samples\test_gontrill\
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Sun Mar 10 19:54:05 2019
+File code lines: 35
+File directive lines: 5
+File comment lines: 0
+File blank lines: 14
+File bytes: 1316
+
+File name: spawner.h
+File folder: C:\asm128_test\gpk_samples\test_gontrill\
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Sun Mar 10 19:55:31 2019
+File code lines: 81
+File directive lines: 5
+File comment lines: 5
+File blank lines: 6
+File bytes: 5938
+
+File name: track.h
+File folder: C:\asm128_test\gpk_samples\test_gontrill\
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Sat Mar 16 21:07:22 2019
+File code lines: 29
+File directive lines: 8
+File comment lines: 4
+File blank lines: 14
+File bytes: 2038
+
+File name: weapon.h
+File folder: C:\asm128_test\gpk_samples\test_gontrill\
+File creation date: Tue Jun 18 00:30:14 2019
+File modification date: Mon Mar 11 00:16:17 2019
+File code lines: 149
+File directive lines: 4
+File comment lines: 1
+File blank lines: 10
+File bytes: 10526
+
+
+----------------------------- Total Files: 11
+----------------------------- Total Lines: 1965
+
+Comments: 54
+Code: 1482
+Compiler directives: 66
+Blanks: 363
+Total bytes: 112109
+
+----------------------------- Stats: 
+
+Average lines per file: 178.63636363636363
+Average lines of comments per file: 4.909090909090909
+Average lines of code per file: 134.72727272727272
+Average lines of compiler directives per file: 6.0
+Average blank lines per file: 33.0
+
+Comments: 2.748091603053435%
+Code: 75.41984732824427%
+Compiler directives: 3.3587786259541983%
+Blanks: 18.47328244274809%
