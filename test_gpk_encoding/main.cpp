@@ -1,3 +1,5 @@
+#define GPK_CONSOLE_LOG_ENABLED
+
 #include "gpk_aes.h"
 #include "gpk_rsa.h"
 #include "gpk_base64.h"
@@ -5,6 +7,9 @@
 #include "gpk_sync.h"
 #include "gpk_noise.h"
 #include "gpk_encoding.h"
+#include "gpk_deflate.h"
+#include "gpk_storage.h"
+
 #include <string>
 
 static ::gpk::error_t								phex						(uint8_t* str, ::gpk::AES_LEVEL level);
@@ -30,12 +35,22 @@ static	int											primalityTest						(uint64_t number)						{
 }
 
 int													main						()			{
-	::gpk::view_const_byte signatureToEncode []	= 
+	::gpk::view_const_byte signatureToEncode []	=
 		{ "Last Chance! - CGI Interceptor - asm128 (c) 2009-2019",
 		};
-		
+	{
+		::gpk::array_pod<char_t>								testBytes;
+		::gpk::array_pod<char_t>								loadedBytes;
+		::gpk::view_const_string								fileName					= "test_secure.bin";
+		::gpk::view_const_string								key							= {signatureToEncode->begin(), 32};
+		gpk_necall(::gpk::fileToMemory("klib_renewal.lib", testBytes), "%s", "Failed to open test file.");
+		gerror_if(errored(::gpk::fileFromMemorySecure	(testBytes, fileName, key, true)	), "Failed to save secure file: %s.", ::gpk::toString(fileName).begin());
+		gerror_if(errored(::gpk::fileToMemorySecure		(loadedBytes, fileName, key, true)			), "Failed to read secure file: %s.", ::gpk::toString(fileName).begin());
+		gerror_if(loadedBytes != testBytes, "Test failed: %s - %s.", "", "");//::gpk::toString(loadedBytes).begin(), signatureToEncode[0].begin());
+	}
+	const char  a[ ] = "TGFzdCBDaGFuY2UhIC0gQ0dJIEludGVyY2VwdG9yIC0gYXNtMTI4IChjKSAyMDA5LTIwMTkA";
 	::gpk::array_pod<char_t> signaturesEncoded [::gpk::size(signatureToEncode)]	= {};
-		
+
 	for(uint32_t iSign = 0; iSign < ::gpk::size(signatureToEncode); ++iSign) {
 		::gpk::base64Encode(signatureToEncode[iSign], signaturesEncoded[iSign]);
 	}
@@ -707,3 +722,17 @@ static	::gpk::error_t				test_decrypt_ecb							(::gpk::AES_LEVEL level) {
 }
 
 
+struct SCity {
+	::gpk::view_const_string			City
+		,								CityASCII
+		,								Lat
+		,								Lng
+		,								Country
+		,								Iso2
+		,								Iso3
+		,								AdminName
+		,								Capital
+		,								Population
+		,								Id
+		;
+};
