@@ -85,7 +85,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 		}
 	}
 
-	static bool bSend = true;
+	//static bool bSend = true;
 	reterr_gerror_if(app.Client.State != ::gpk::UDP_CONNECTION_STATE_IDLE, "Failed to connect to server.")
 	else {
 		{
@@ -98,24 +98,24 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 			app.Client.Queue.Received.clear();
 		}
 
-		if(bSend) {
+		//if(bSend) {
 			::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived!", true, true	  , 32);
-			bSend = false;
-		}
-		//::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! 2", false, true , 0);
-		//::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! 3", true, false , 0);
-		//::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! 4", false, false, 0);
+		//	bSend = false;
+		//}
+		::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! 2", false, true , 0);
+		::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! 3", true, false , 0);
+		::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! 4", false, false, 0);
 		::gpk::clientUpdate(app.Client);
-		//::gpk::sleep(100);
-
-		//::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! x1", true, true, 4);
-		//::gpk::clientUpdate(app.Client);
-		//::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! x2", false, true, 4);
-		//::gpk::clientUpdate(app.Client);
-		//::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! x3", true, false, 4);
-		//::gpk::clientUpdate(app.Client);
-		//::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! x4", false, false, 4);
-		//::gpk::clientUpdate(app.Client);
+		::gpk::sleep(10);
+		//
+		::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! x1", true, true, 4);
+		::gpk::clientUpdate(app.Client);
+		::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! x2", false, true, 4);
+		::gpk::clientUpdate(app.Client);
+		::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! x3", true, false, 4);
+		::gpk::clientUpdate(app.Client);
+		::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! x4", false, false, 4);
+		::gpk::clientUpdate(app.Client);
 
 	}
 	//::gpk::sleep(1000);
