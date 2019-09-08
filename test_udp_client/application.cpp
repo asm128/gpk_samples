@@ -40,7 +40,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	::gpk::tcpipAddress(9998, 0, ::gpk::TRANSPORT_PROTOCOL_UDP, app.Client.AddressConnect);	// If loading the remote IP from the json fails, we fall back to the local address.
 	{ // attempt to load address from config file.
 		const ::gpk::SJSONReader												& jsonReader						= framework.JSONConfig.Reader;
-		{ // 
+		{ //
 			::gpk::view_const_string												jsonIP								= {};
 			gwarn_if(errored(::gpk::jsonExpressionResolve("application.test_udp_client.remote_ip", jsonReader, 0, jsonIP)), "Failed to load config from json! Last contents found: %s.", jsonIP.begin())
 			else {
@@ -50,7 +50,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 		}
 		{ // load port from config file
 			::gpk::view_const_string												jsonPort							= {};
-			gwarn_if(errored(::gpk::jsonExpressionResolve("application.test_udp_client.remote_port"	, jsonReader, 0, jsonPort)), "Failed to load config from json! Last contents found: %s.", jsonPort.begin()) 
+			gwarn_if(errored(::gpk::jsonExpressionResolve("application.test_udp_client.remote_port"	, jsonReader, 0, jsonPort)), "Failed to load config from json! Last contents found: %s.", jsonPort.begin())
 			else {
 				uint64_t																port;
 				::gpk::parseIntegerDecimal(jsonPort, &port);
@@ -85,26 +85,40 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 		}
 	}
 
+	static bool bSend = true;
 	reterr_gerror_if(app.Client.State != ::gpk::UDP_CONNECTION_STATE_IDLE, "Failed to connect to server.")
 	else {
-		::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived!", true, true);
-		::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! 2", false, true);
-		::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! 3", true, false);
-		::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! 4", false, false);
-		::gpk::clientUpdate(app.Client);
-		::gpk::sleep(10);
+		{
+			::gpk::mutex_guard														lockRecv					(app.Client.Queue.MutexReceive);
+			for(uint32_t iMessage = 0; iMessage < app.Client.Queue.Received.size(); ++iMessage) {
+				//gpk_necall(app.MessagesToProcess.push_back(client->Queue.Received[iMessage]), "%s", "Out of memory?");
+				::gpk::view_const_byte													viewPayload					= app.Client.Queue.Received[iMessage]->Payload;
+				info_printf("Client received: %s.", viewPayload.begin());
+			}
+			app.Client.Queue.Received.clear();
+		}
 
-		::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! x1", true, true);
+		if(bSend) {
+			::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived!", true, true	  , 32);
+			bSend = false;
+		}
+		//::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! 2", false, true , 0);
+		//::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! 3", true, false , 0);
+		//::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! 4", false, false, 0);
 		::gpk::clientUpdate(app.Client);
-		::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! x2", false, true);
-		::gpk::clientUpdate(app.Client);
-		::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! x3", true, false);
-		::gpk::clientUpdate(app.Client);
-		::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! x4", false, false);
-		::gpk::clientUpdate(app.Client);
+		//::gpk::sleep(100);
+
+		//::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! x1", true, true, 4);
+		//::gpk::clientUpdate(app.Client);
+		//::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! x2", false, true, 4);
+		//::gpk::clientUpdate(app.Client);
+		//::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! x3", true, false, 4);
+		//::gpk::clientUpdate(app.Client);
+		//::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! x4", false, false, 4);
+		//::gpk::clientUpdate(app.Client);
 
 	}
-
+	//::gpk::sleep(1000);
 	//::gpk::SUDPClient															& connectTest				= app.ClientTest1;
 	//connectTest.AddressConnect												= app.Client.AddressConnect;
 	//::gpk::clientConnect		(connectTest);

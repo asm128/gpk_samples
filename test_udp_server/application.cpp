@@ -40,13 +40,13 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	::gpk::view_const_string												jsonPort					= {};
 	const ::gpk::SJSONReader												& jsonReader				= framework.JSONConfig.Reader;
 	{ // load port from config file
-		gwarn_if(errored(::gpk::jsonExpressionResolve("application.test_udp_server.listen_port"	, jsonReader, 0, jsonPort)), "Failed to load config from json! Last contents found: %s.", jsonPort.begin()) 
+		gwarn_if(errored(::gpk::jsonExpressionResolve("application.test_udp_server.listen_port"	, jsonReader, 0, jsonPort)), "Failed to load config from json! Last contents found: %s.", jsonPort.begin())
 		else {
 			::gpk::parseIntegerDecimal(jsonPort, &port);
 			info_printf("Remote port: %u.", (uint32_t)port);
 		}
 		jsonPort															= {};
-		gwarn_if(errored(::gpk::jsonExpressionResolve("application.test_udp_server.adapter"	, jsonReader, 0, jsonPort)), "Failed to load config from json! Last contents found: %s.", jsonPort.begin()) 
+		gwarn_if(errored(::gpk::jsonExpressionResolve("application.test_udp_server.adapter"	, jsonReader, 0, jsonPort)), "Failed to load config from json! Last contents found: %s.", jsonPort.begin())
 		else {
 			::gpk::parseIntegerDecimal(jsonPort, &adapter);
 			info_printf("Adapter: %u.", (uint32_t)adapter);
@@ -68,6 +68,9 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	::gpk::SGUI																& gui						= *framework.GUI;
 	::gpk::array_pod<uint32_t>												controlsToProcess			= {};
 	::gpk::guiGetProcessableControls(gui, controlsToProcess);
+	static	uint32_t														currentMessage;
+	char																	messageToSend	[256]		= {};
+
 	for(uint32_t iControl = 0, countControls = controlsToProcess.size(); iControl < countControls; ++iControl) {
 		uint32_t																idControl					= controlsToProcess[iControl];
 		const ::gpk::SControlState												& controlState				= gui.Controls.States[idControl];
@@ -79,30 +82,36 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	}
 	{
 		::gpk::mutex_guard														lock						(app.Server.Mutex);
-		for(uint32_t iClient = 0; iClient < app.Server.Clients.size(); ++iClient) {
+		for(uint32_t iClient = 0, countClients = app.Server.Clients.size(); iClient < countClients; ++iClient) {
 			::gpk::ptr_nco<::gpk::SUDPConnection>									client						= app.Server.Clients[iClient];
+			if(client->State != ::gpk::UDP_CONNECTION_STATE_IDLE || 0 == client->KeyPing)
+				continue;
 			{
 				::gpk::mutex_guard														lockRecv					(client->Queue.MutexReceive);
 				for(uint32_t iMessage = 0; iMessage < client->Queue.Received.size(); ++iMessage) {
+					if(client->Queue.Received[iMessage]->Command.Type == ::gpk::ENDPOINT_COMMAND_TYPE_RESPONSE)
+						continue;
+					gpk_necall(app.MessagesToProcess.push_back(client->Queue.Received[iMessage]), "%s", "Out of memory?");
 					::gpk::view_const_byte													viewPayload					= client->Queue.Received[iMessage]->Payload;
 					info_printf("Client %i received: %s.", iClient, viewPayload.begin());
+					client->Queue.Received[iMessage] = {};
 				}
-				client->Queue.Received.clear();
 			}
-			if(client->State != ::gpk::UDP_CONNECTION_STATE_IDLE || 0 == client->KeyPing)
-				continue;
-			::gpk::connectionPushData(*client, client->Queue, "Message arrived!"	, true, true);
-			::gpk::connectionPushData(*client, client->Queue, "Message arrived! 2", false, true);
-			::gpk::connectionPushData(*client, client->Queue, "Message arrived! 3", true, false);
-			::gpk::connectionPushData(*client, client->Queue, "Message arrived! 4", false, false);
-			::gpk::sleep(10);
 
-			::gpk::connectionPushData(*client, client->Queue, "Message arrived! x1", true, true);
-			::gpk::connectionPushData(*client, client->Queue, "Message arrived! x2", false, true);
-			::gpk::connectionPushData(*client, client->Queue, "Message arrived! x3", true, false);
-			::gpk::connectionPushData(*client, client->Queue, "Message arrived! x4", false, false);
+			sprintf_s(messageToSend, "Message arrived(true, true    ): %u", currentMessage++); ::gpk::connectionPushData(*client, client->Queue, ::gpk::view_const_string{messageToSend}, true, true	, 10);
+			sprintf_s(messageToSend, "Message arrived(false, true   ): %u", currentMessage++); ::gpk::connectionPushData(*client, client->Queue, ::gpk::view_const_string{messageToSend}, false, true	, 10);
+			sprintf_s(messageToSend, "Message arrived(true, false   ): %u", currentMessage++); ::gpk::connectionPushData(*client, client->Queue, ::gpk::view_const_string{messageToSend}, true, false	, 10);
+			sprintf_s(messageToSend, "Message arrived(false, false  ): %u", currentMessage++); ::gpk::connectionPushData(*client, client->Queue, ::gpk::view_const_string{messageToSend}, false, false	, 10);
+
+			sprintf_s(messageToSend, "Message arrived(true, true	) x: %u", currentMessage++); ::gpk::connectionPushData(*client, client->Queue, ::gpk::view_const_string{messageToSend}, true, true	, 10);
+			sprintf_s(messageToSend, "Message arrived(false, true	) x: %u", currentMessage++); ::gpk::connectionPushData(*client, client->Queue, ::gpk::view_const_string{messageToSend}, false, true	, 10);
+			sprintf_s(messageToSend, "Message arrived(true, false	) x: %u", currentMessage++); ::gpk::connectionPushData(*client, client->Queue, ::gpk::view_const_string{messageToSend}, true, false	, 10);
+			sprintf_s(messageToSend, "Message arrived(false, false	) x: %u", currentMessage++); ::gpk::connectionPushData(*client, client->Queue, ::gpk::view_const_string{messageToSend}, false, false, 10);
 		}
+		::gpk::sleep(10);
 	}
+
+	app.MessagesToProcess.clear();
 
 	//timer.Frame();
 	//warning_printf("Update time: %f.", (float)timer.LastTimeSeconds);
