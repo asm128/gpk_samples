@@ -29,12 +29,12 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 
 	const ::gpk::SCoord2<double>											gridUnit										= {1.0 / tileHeights.metrics().x, 1.0 / tileHeights.metrics().y};
 	const ::gpk::SCoord2<double>											gridMetricsF									= tileHeights.metrics().Cast<double>();
-	for(uint32_t z = 0; z < tileHeights.metrics().y; ++z) 
-	for(uint32_t x = 0; x < tileHeights.metrics().x; ++x) { 
+	for(uint32_t z = 0; z < tileHeights.metrics().y; ++z)
+	for(uint32_t x = 0; x < tileHeights.metrics().x; ++x) {
 		const ::gpk::SCoord2<double>											gridCell										= {x / gridMetricsF.x, z / gridMetricsF.y};
 		const ::gpk::SCoord2<double>											gridCellFar										= gridCell + gridUnit;
-		generated.UVs.push_back({{(float)gridCell.x, (float)gridCell.y}, {(float)gridCell.x			, (float)gridCellFar.y}	, gridCellFar.Cast<float>()					}); 
-		generated.UVs.push_back({{(float)gridCell.x, (float)gridCell.y}, gridCellFar.Cast<float>()	, {(float)gridCellFar.x, (float)gridCell.y}	}); 
+		generated.UVs.push_back({{(float)gridCell.x, (float)gridCell.y}, {(float)gridCell.x			, (float)gridCellFar.y}	, gridCellFar.Cast<float>()					});
+		generated.UVs.push_back({{(float)gridCell.x, (float)gridCell.y}, gridCellFar.Cast<float>()	, {(float)gridCellFar.x, (float)gridCell.y}	});
 	}
 
 	generated;
@@ -59,6 +59,21 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	return 0;
 }
 
+			::gpk::error_t											controlCreate				(::gme::SApplication & app, int32_t & idControl, const ::gpk::SRectangle2D<int16_t> & area, ::gpk::ALIGN align, int32_t idParent, ::gpk::ALIGN alignText, ::gpk::view_const_string text)	{
+	::gpk::SGUI																& gui						= *app.Framework.GUI;
+	idControl															= ::gpk::controlCreate(gui);
+	::gpk::SControl															& control					= gui.Controls.Controls[idControl];
+	control.Area														= area;
+	control.Border														= {10, 10, 10, 10};
+	control.Margin														= {1, 1, 1, 1};
+	control.Align														= align;
+	::gpk::SControlText														& controlText				= gui.Controls.Text[idControl];
+	controlText.Text													= text;
+	controlText.Align													= alignText;
+	gpk_necall(::gpk::controlSetParent(gui, idControl, -1), "Failed to assign parent: %i", idParent);
+	return 0;
+}
+
 			::gpk::error_t											cleanup						(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.MainDisplay); }
 			::gpk::error_t											setup						(::gme::SApplication & app)						{
 	::gpk::SFramework														& framework					= app.Framework;
@@ -70,43 +85,9 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	::gpk::SGUI																& gui						= *framework.GUI;
 	gui.ColorModeDefault												= ::gpk::GUI_COLOR_MODE_3D;
 	gui.ThemeDefault													= ::gpk::ASCII_COLOR_DARKGREEN * 16 + 7;
-	{
-		app.IdExit															= ::gpk::controlCreate(gui);
-		::gpk::SControl															& controlExit								= gui.Controls.Controls[app.IdExit];
-		controlExit.Area													= {{}, {64, 20}};
-		controlExit.Border													= {10, 10, 10, 10};
-		controlExit.Margin													= {1, 1, 1, 1};
-		controlExit.Align													= ::gpk::ALIGN_CENTER_BOTTOM;
-		::gpk::SControlText														& controlText								= gui.Controls.Text[app.IdExit];
-		controlText.Text													= "Exit";
-		controlText.Align													= ::gpk::ALIGN_CENTER;
-		::gpk::controlSetParent(gui, app.IdExit, -1);
-	}
-
-	{
-		app.IdFrameRateUpdate												= ::gpk::controlCreate(gui);
-		::gpk::SControl															& controlExit								= gui.Controls.Controls[app.IdFrameRateUpdate];
-		controlExit.Area													= {{}, {384, 20}};
-		controlExit.Border													= {10, 10, 10, 10};
-		controlExit.Margin													= {1, 1, 1, 1};
-		controlExit.Align													= ::gpk::ALIGN_BOTTOM_LEFT;
-		::gpk::SControlText														& controlText								= gui.Controls.Text[app.IdFrameRateUpdate];
-		controlText.Align													= ::gpk::ALIGN_CENTER;
-		::gpk::controlSetParent(gui, app.IdFrameRateUpdate, -1);
-	}
-
-	{
-		app.IdFrameRateRender												= ::gpk::controlCreate(gui);
-		::gpk::SControl															& controlExit								= gui.Controls.Controls[app.IdFrameRateRender];
-		controlExit.Area													= {{}, {384, 20}};
-		controlExit.Border													= {10, 10, 10, 10};
-		controlExit.Margin													= {1, 1, 1, 1};
-		controlExit.Align													= ::gpk::ALIGN_BOTTOM_RIGHT;
-		::gpk::SControlText														& controlText								= gui.Controls.Text[app.IdFrameRateRender];
-		controlText.Align													= ::gpk::ALIGN_CENTER;
-		::gpk::controlSetParent(gui, app.IdFrameRateRender, -1);
-	}
-
+	gpk_necall(::controlCreate(app, app.IdExit				, {{}, {64, 20}}, ::gpk::ALIGN_CENTER_BOTTOM, -1, ::gpk::ALIGN_CENTER, "Exit"), "Failed to create control: %s", "Exit");
+	gpk_necall(::controlCreate(app, app.IdFrameRateUpdate	, {{}, {384, 20}}, ::gpk::ALIGN_BOTTOM_LEFT, -1, ::gpk::ALIGN_CENTER, ""), "Failed to create control: %s", "Exit");
+	gpk_necall(::controlCreate(app, app.IdFrameRateRender	, {{}, {384, 20}}, ::gpk::ALIGN_BOTTOM_RIGHT, -1, ::gpk::ALIGN_CENTER, ""), "Failed to create control: %s", "Exit");
 	::gpk::ptr_obj<::gpk::SDialogTuner>										tuner						= {};
 	app.NumericTuner													= ::gpk::tunerCreate(app.DialogMain, tuner);
 	tuner->ValueLimits.Min												= 100;
@@ -158,24 +139,24 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 		::STileHeights<float>														& frontTile									= app.TileHeights[y		][x + 1	];
 		::STileHeights<float>														& leftTile									= app.TileHeights[y + 1	][x		];
 		::STileHeights<float>														& flTile									= app.TileHeights[y + 1	][x + 1	];
-		float																		averageHeight								= 
+		float																		averageHeight								=
 			( curTile	.Heights[3]
 			+ frontTile	.Heights[2]
 			+ leftTile	.Heights[1]
 			+ flTile	.Heights[0]
 			) / 4;
 		curTile									.Heights[3]						= averageHeight;
-		frontTile								.Heights[2]						= averageHeight;	
-		leftTile								.Heights[1]						= averageHeight;	
+		frontTile								.Heights[2]						= averageHeight;
+		leftTile								.Heights[1]						= averageHeight;
 		flTile									.Heights[0]						= averageHeight;
 	}
-	
+
 	::gpk::SModelGeometry<float>												& geometryGrid								= app.Grid;
 	::generateModelFromHeights(app.TileHeights.View, geometryGrid);
 	//::gpk::generateGridGeometry(textureGridMetrics, geometryGrid);
-	
+
 	const ::gpk::SCoord3<float>													gridCenter									= {textureGridMetrics.x / 2.0f, 0, textureGridMetrics.y / 2.0f};
-	
+
 	for(uint32_t iTriangle = 0; iTriangle < geometryGrid.Positions.size(); ++iTriangle) {
 		::gpk::STriangle3D<float>													& transformedTriangle						= geometryGrid.Positions	[iTriangle];
 		transformedTriangle.A													-= gridCenter;
@@ -183,12 +164,12 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 		transformedTriangle.C													-= gridCenter;
 	}
 
-	app.GridPivot.Orientation								= {0,0,0,1}; 
+	app.GridPivot.Orientation								= {0,0,0,1};
 
 	::gpk::view_array<::gpk::SCoord3<float>>										positions									= {(::gpk::SCoord3<float>*)geometryGrid.Positions		.begin(), geometryGrid.Positions		.size() * 3};
 	::gpk::view_array<::gpk::SCoord3<float>>										normals										= {(::gpk::SCoord3<float>*)geometryGrid.NormalsVertex	.begin(), geometryGrid.NormalsVertex	.size() * 3};
 	//
-	for(uint32_t iBlend = 0; iBlend < 10; ++iBlend) 
+	for(uint32_t iBlend = 0; iBlend < 10; ++iBlend)
 	for(uint32_t iPosition = 0; iPosition < positions.size(); ++iPosition) {
 		const ::gpk::SCoord3<float>														& curPos									= positions	[iPosition];
 		::gpk::SCoord3<float>															& curNormal									= normals	[iPosition];
@@ -268,7 +249,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	lightDir.RotateY(frameInfo.Microseconds.LastFrame / 1000000.0f);
 	lightDir.Normalize();
 
-	//------------------------------------------------ 
+	//------------------------------------------------
 	app.GridPivot.Scale										= {2.f, 4.f, 2.f};
 	app.GridPivot.Position									= {};
 
@@ -293,7 +274,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 
 	buffer3D.resize(offscreenMetrics, {0, 0, 0, 0}, 0xFFFFFFFF);
 	gui.Controls.Controls[viewport->IdClient].Image						= buffer3D.Color.View;
-	int32_t 																pixelsDrawn0								= drawGrids(app, buffer3D); 
+	int32_t 																pixelsDrawn0								= drawGrids(app, buffer3D);
 	gerror_if(errored(pixelsDrawn0), "??");
 	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>		target;
 	target->resize(app.Framework.MainDisplay.Size, ::gpk::LIGHTGRAY, 0xFFFFFFFFU);

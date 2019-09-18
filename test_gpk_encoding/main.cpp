@@ -22,7 +22,7 @@ static ::gpk::error_t								test_decrypt_ecb			(::gpk::AES_LEVEL level);
 static ::gpk::error_t								test_encrypt_ecb_verbose	(::gpk::AES_LEVEL level);
 
 static	int											primalityTest						(uint64_t number)						{
-	uint64_t												j									= (uint64_t)sqrt((double)number);
+	const uint64_t											j									= (uint64_t)sqrt((double)number);
 	if(0 == (number & 1))
 		return 0;
 	if(number > 1 && number < 9)
@@ -396,6 +396,7 @@ int													main						()			{
 				encoded.clear();
 				decoded.clear();
 				::gpk::STimer											timerEncode;
+				timerEncode.Frame();
 				ce_if(errored(::gpk::rsaEncode(testStrings[iTest]	, rsa_n, rsaKeys[pair].Public	, 0, encoded)), "%s", "Out of memory?");
 				timerEncode.Frame();
 				always_printf("------ RSA (cacheless)\nEncoding time for this step of %u size: %llu microseconds.", testStrings[iTest].size(), timerEncode.LastTimeMicroseconds);
