@@ -42,7 +42,7 @@
 #include "Accessory.h"
 #include "Profession.h"
 
-#include <algorithm>
+#include "gpk_eval.h"
 #include "gpk_noise.h"
 
 #include "klib_random_generator.h"
@@ -64,11 +64,11 @@ void												deployCampaignAgents
 	( SPlayer																				& player
 	, const int8_t																			playerIndex
 	, STacticalSetup																		& tacticalSetup
-	, const ::klib::SGrid<STopologyDetail, STacticalBoard::Width, STacticalBoard::Depth>	& terrainTopology	 
-	, SEntityTiles<STacticalBoard::Width, STacticalBoard::Depth>							& terrainEntities	
+	, const ::klib::SGrid<STopologyDetail, STacticalBoard::Width, STacticalBoard::Depth>	& terrainTopology
+	, SEntityTiles<STacticalBoard::Width, STacticalBoard::Depth>							& terrainEntities
 	)
 {
-	const uint32_t											terrainWidth										= terrainTopology.Width, 
+	const uint32_t											terrainWidth										= terrainTopology.Width,
 															terrainDepth										= terrainTopology.Depth;
 
 	const TEAM_TYPE											teamId												= tacticalSetup.TeamPerPlayer[playerIndex];
@@ -101,13 +101,16 @@ void												deployCampaignAgents
 			agentPosition.x										= 1 + (int32_t)((terrainWidth - 1) * ::gpk::noiseNormal1D(iAgent, seed)	);
 			agentPosition.z										= 1 + (int32_t)((terrainDepth - 1) * ::gpk::noiseNormal1D(iAgent, seed<<8)	);
 		}
-
-		while( terrainTopology			[agentPosition.z][agentPosition.x].Sharp		>=	PARTIAL_COVER_HEIGHT
-			|| terrainTopology			[agentPosition.z][agentPosition.x].Smooth		>=	PARTIAL_COVER_HEIGHT
-			|| (terrainTopology			[agentPosition.z][agentPosition.x].Sharp		
-			  + terrainTopology			[agentPosition.z][agentPosition.x].Smooth)		>=	PARTIAL_COVER_HEIGHT
-			|| terrainEntities.Agents	[agentPosition.z][agentPosition.x].PlayerIndex	!= -1
-			|| terrainEntities.Props	[agentPosition.z][agentPosition.x].Definition	!= -1 
+		bool check0 = true;
+		bool check1 = true;
+		bool check2 = true;
+		bool check3 = true;
+		bool check4 = true;
+		while( check0
+			|| check1
+			|| check2
+			|| check3
+			|| check4
 			)
 		{
 			if(::isRelevantTeam(teamId)) {
@@ -122,6 +125,11 @@ void												deployCampaignAgents
 				agentPosition.x										= 1+(int32_t)((terrainWidth-1) * ::gpk::noiseNormal1D((1+iAgent)*agentPosition.z*(iAgent+agentPosition.x), seed+rangeZ)	);
 				agentPosition.z										= 1+(int32_t)((terrainDepth-1) * ::gpk::noiseNormal1D(((1+iAgent)<<16)*agentPosition.x, seed = (int32_t)time(0))			);
 			}
+			check0						= terrainTopology			[agentPosition.z][agentPosition.x].Sharp		>=	PARTIAL_COVER_HEIGHT																			;
+			check1						= terrainTopology			[agentPosition.z][agentPosition.x].Smooth		>=	PARTIAL_COVER_HEIGHT																			;
+			check2						= (terrainTopology			[agentPosition.z][agentPosition.x].Sharp		+ terrainTopology			[agentPosition.z][agentPosition.x].Smooth)		>=	PARTIAL_COVER_HEIGHT;
+			check3						= terrainEntities.Agents	[agentPosition.z][agentPosition.x].PlayerIndex	!= -1																									;
+			check4						= terrainEntities.Props		[agentPosition.z][agentPosition.x].Definition	!= -1																									;
 		}
 
 		playerAgent.Position								= agentPosition;
@@ -141,28 +149,28 @@ void												generateTopology									( ::klib::SGrid<STopologyDetail, STacti
 	const uint32_t											terrainWidth										= terrainTopology.Width
 		,													terrainDepth										= terrainTopology.Depth
 		;
-	::klib::fillCellsFromNoise(terrainTopology, {- 1,  0}, (int32_t)(seed+ 987+ 1), 200);
-	::klib::fillCellsFromNoise(terrainTopology, {-15,  0}, (int32_t)(seed+7331+ 5), 200);
+	::klib::fillCellsFromNoise(terrainTopology, {- 1,  0}, (int32_t)(seed +  987 + 1), 200);
+	::klib::fillCellsFromNoise(terrainTopology, {-15,  0}, (int32_t)(seed + 7331 + 5), 200);
 
 	STopologyDetail											* cellsHeight										= &terrainTopology	.Cells[0][0];
-	for(uint32_t i=0, count = terrainDepth*terrainWidth; i<count; i++) 
+	for(uint32_t i=0, count = terrainDepth*terrainWidth; i<count; i++)
 		cellsHeight[i].Collision							= cellsHeight[i].Sharp + cellsHeight[i].Smooth;
 }
 //
 void												populateProps
-	( ::klib::SGrid<STopologyDetail, STacticalBoard::Width, STacticalBoard::Depth>	& terrainTopology	 
-	, SEntityTiles<STacticalBoard::Width, STacticalBoard::Depth>					& terrainEntities	
+	( ::klib::SGrid<STopologyDetail, STacticalBoard::Width, STacticalBoard::Depth>	& terrainTopology
+	, SEntityTiles<STacticalBoard::Width, STacticalBoard::Depth>					& terrainEntities
 	, int64_t																		seed
 	, int32_t																		maxCoins
 	)
 {
-	const uint32_t											terrainWidth										= terrainTopology.Width, 
+	const uint32_t											terrainWidth										= terrainTopology.Width,
 															terrainDepth										= terrainTopology.Depth;
 
 	static const ::gpk::label								labelWall											= "Wall";
 	for(uint32_t z=0; z<terrainDepth; ++z)
 		for(uint32_t x=0; x<terrainWidth; ++x) {
-			double													noise[]												= 
+			double													noise[]												=
 				{	::gpk::noiseNormal1D(z*terrainDepth+x, seed)
 				,	::gpk::noiseNormal1D(z*terrainDepth+x, seed*7187)
 				,	::gpk::noiseNormal1D(z*terrainDepth+x, seed*6719)
@@ -171,32 +179,32 @@ void												populateProps
 				,	::gpk::noiseNormal1D(z*terrainDepth+x, seed*8087)
 				,	::gpk::noiseNormal1D(z*terrainDepth+x, seed*8081)
 				,	::gpk::noiseNormal1D(z*terrainDepth+x, seed*9419)
-				,	::gpk::noiseNormal1D(z*terrainDepth+x, seed*9413)			
-				}; 
+				,	::gpk::noiseNormal1D(z*terrainDepth+x, seed*9413)
+				};
 			bool													bReinforced											= noise[3] > .5;
-			if( terrainTopology.Cells[z][x].Sharp	< PARTIAL_COVER_HEIGHT 
-			 && terrainTopology.Cells[z][x].Smooth	< PARTIAL_COVER_HEIGHT 
-			 && (terrainTopology.Cells[z][x].Smooth + terrainTopology.Cells[z][x].Sharp) < PARTIAL_COVER_HEIGHT 
-			 && terrainEntities.Props.Cells[z][x].Definition == -1 
+			if( terrainTopology.Cells[z][x].Sharp	< PARTIAL_COVER_HEIGHT
+			 && terrainTopology.Cells[z][x].Smooth	< PARTIAL_COVER_HEIGHT
+			 && (terrainTopology.Cells[z][x].Smooth + terrainTopology.Cells[z][x].Sharp) < PARTIAL_COVER_HEIGHT
+			 && terrainEntities.Props.Cells[z][x].Definition == -1
 			 && noise[0] > 0.98
-			 ) 
-			{ 
+			 )
+			{
 				int16_t													defCheck											= 1+(int16_t)(rand()%(::gpk::size(definitionsStageProp)-1));
 				terrainEntities.Props.Cells[z][x].Definition		= (int8_t)defCheck;
 				terrainEntities.Props.Cells[z][x].Modifier			= bReinforced ? 1 : 0;
 				terrainEntities.Props.Cells[z][x].Level				= 1;
 				if(definitionsStageProp[defCheck].Name == labelWall) {
-					uint32_t												wallmaxz											= ::std::min(z+3+uint32_t(noise[1]*10), terrainDepth-1);
-					uint32_t												wallmaxx											= ::std::min(x+3+uint32_t(noise[2]*10), terrainWidth-1);
+					uint32_t												wallmaxz											= ::gpk::min(z + 3 + uint32_t(noise[1]*10), terrainDepth-1);
+					uint32_t												wallmaxx											= ::gpk::min(x + 3 + uint32_t(noise[2]*10), terrainWidth-1);
 					for(uint32_t wallz=z; wallz<=wallmaxz; ++wallz)	{	if(noise[5] > 0.95 || ::klib::randNoise(9941) > 0.95)	continue;	terrainEntities.Props.Cells[wallz]		[x]			.Definition = (int8_t)defCheck; terrainEntities.Props.Cells[wallz]		[x]			.Modifier = bReinforced ? 1 : 0; terrainEntities.Props.Cells[wallz]		[x]			.Level = 1; }
 					for(uint32_t wallz=z; wallz<=wallmaxz; ++wallz)	{	if(noise[6] > 0.95 || ::klib::randNoise(9941) > 0.95)	continue;	terrainEntities.Props.Cells[wallz]		[wallmaxx]	.Definition = (int8_t)defCheck; terrainEntities.Props.Cells[wallz]		[wallmaxx]	.Modifier = bReinforced ? 1 : 0; terrainEntities.Props.Cells[wallz]		[wallmaxx]	.Level = 1; }
 					for(uint32_t wallx=x; wallx<=wallmaxx; ++wallx)	{	if(noise[7] > 0.95 || ::klib::randNoise(9941) > 0.95)	continue;	terrainEntities.Props.Cells[z]			[wallx]		.Definition = (int8_t)defCheck; terrainEntities.Props.Cells[z]			[wallx]		.Modifier = bReinforced ? 1 : 0; terrainEntities.Props.Cells[z]			[wallx]		.Level = 1; }
 					for(uint32_t wallx=x; wallx<=wallmaxx; ++wallx)	{	if(noise[8] > 0.95 || ::klib::randNoise(9941) > 0.95)	continue;	terrainEntities.Props.Cells[wallmaxz]	[wallx]		.Definition = (int8_t)defCheck; terrainEntities.Props.Cells[wallmaxz]	[wallx]		.Modifier = bReinforced ? 1 : 0; terrainEntities.Props.Cells[wallmaxz]	[wallx]		.Level = 1; }
 				}
 			}
-			else if(terrainTopology.Cells[z][x].Sharp < PARTIAL_COVER_HEIGHT && terrainTopology.Cells[z][x].Smooth < PARTIAL_COVER_HEIGHT 
-				&& (terrainTopology.Cells[z][x].Smooth+terrainTopology.Cells[z][x].Sharp) < PARTIAL_COVER_HEIGHT 
-				&& terrainEntities.Props.Cells[z][x].Definition == -1 
+			else if(terrainTopology.Cells[z][x].Sharp < PARTIAL_COVER_HEIGHT && terrainTopology.Cells[z][x].Smooth < PARTIAL_COVER_HEIGHT
+				&& (terrainTopology.Cells[z][x].Smooth+terrainTopology.Cells[z][x].Sharp) < PARTIAL_COVER_HEIGHT
+				&& terrainEntities.Props.Cells[z][x].Definition == -1
 				&& noise[2] > 0.95
 			)
 				terrainEntities.Coins.Cells[z][x] = ::rand()%(1+maxCoins);
@@ -226,7 +234,7 @@ int32_t												getEnemyCoinsForTerrainFun							(SGame& instanceGame)							
 		}
 	}
 
-	return totalAgents ? maxCoins : 1;	// totalAgents / 4 
+	return totalAgents ? maxCoins : 1;	// totalAgents / 4
 }
 
 void												recalculateAgentsInRangeAndSight					(SGame& instanceGame);
@@ -348,7 +356,7 @@ bool												initFromTacticalSetup								(SGame& instanceGame, const STactic
 	return true;
 }
 
-static const STacticalSetup							tacticalSetupForCampaign							= 
+static const STacticalSetup							tacticalSetupForCampaign							=
 	{	15731U										//, uint64_t		Seed					= 15731;
 	,	4U											//,	uint32_t		TotalPlayers			= 0;
 	,	2U											//	uint32_t		TotalTeams				= 0;
@@ -401,7 +409,7 @@ bool												initCampaignPlayers									(SGame& instanceGame)											{
 	instanceGame.Players[tacticalSetup.Players[1]].Name	= "Ivan"	;
 	instanceGame.Players[tacticalSetup.Players[2]].Name	= "G0"		;
 	instanceGame.Players[tacticalSetup.Players[3]].Name	= "G1"		;
-	
+
 	// Civilian players
 	for(uint32_t iTacticalPlayer=0, maxPlayers=tacticalSetup.TotalPlayers; iTacticalPlayer<maxPlayers; ++iTacticalPlayer)
 		if(tacticalSetup.Controls[iTacticalPlayer].Type == PLAYER_CONTROL_AI && ::gpk::bit_false(tacticalSetup.Controls[iTacticalPlayer].AIMode, PLAYER_AI_TEAMERS))
@@ -419,7 +427,7 @@ bool												initCampaignPlayers									(SGame& instanceGame)											{
 			continue;
 
 		SPlayer													& playerAI											= instanceGame.Players[tacticalSetup.Players[iPlayer]];
-		if(tacticalSetup.Controls[iPlayer].Type == PLAYER_CONTROL_AI && tacticalSetup.Players[iPlayer] != PLAYER_INDEX_USER) 
+		if(tacticalSetup.Controls[iPlayer].Type == PLAYER_CONTROL_AI && tacticalSetup.Players[iPlayer] != PLAYER_INDEX_USER)
 			playerAI.Army.resize(tacticalSetup.SquadSize[iPlayer]);
 
 		bool													bHeroSet											= true;
@@ -428,10 +436,10 @@ bool												initCampaignPlayers									(SGame& instanceGame)											{
 				playerAI.Squad.Agents[iSquadAgentSlot]				= -1;
 				continue;
 			}
-			else 
+			else
 				playerAI.Squad.Agents[iSquadAgentSlot]				= (int16_t)iSquadAgentSlot;
 
-			//if( 0 == playerAI.Army[playerAI.Squad.Agents[iSquadAgentSlot]] ) 
+			//if( 0 == playerAI.Army[playerAI.Squad.Agents[iSquadAgentSlot]] )
 			//{
 				::gpk::ptr_obj<::klib::CCharacter>										newAgent											;
 				newAgent.create(enemyDefinitions[1+rand()%3]);
@@ -461,9 +469,9 @@ bool												initCampaignPlayers									(SGame& instanceGame)											{
 						agentAI.CurrentEquip.Armor		.Modifier			= (int16_t)::gpk::size(modifiersArmor)-1;
 						agentAI.CurrentEquip.Profession	.Modifier			= (int16_t)::gpk::size(modifiersProfession)-1;
 						agentAI.CurrentEquip.Accessory	.Modifier			= (int16_t)::gpk::size(modifiersAccessory)-1;
-						agentAI.CurrentEquip.Weapon		.Level				= 
-						agentAI.CurrentEquip.Armor		.Level				=  
-						agentAI.CurrentEquip.Profession	.Level				= 
+						agentAI.CurrentEquip.Weapon		.Level				=
+						agentAI.CurrentEquip.Armor		.Level				=
+						agentAI.CurrentEquip.Profession	.Level				=
 						agentAI.CurrentEquip.Accessory	.Level				= 15;
 						agentAI.Recalculate();
 						const SEntityPoints										& finalAgentPoints									= agentAI.FinalPoints;

@@ -24,7 +24,7 @@ SLifePoints klib::applyShieldableDamage(CCharacter& target, int32_t damageDealt,
 	const SEntityPoints	&	targetFinalPoints	= target.FinalPoints	;
 	const SEntityFlags	&	targetFinalFlags	= target.FinalFlags		;
 	const int32_t			targetArmorShield	= targetFinalPoints.LifeMax.Shield;
-	
+
 	// Impenetrable armors always have 60% extra absorption rate.
 	if(targetFinalFlags.Effect.Defend & DEFEND_EFFECT_IMPENETRABLE) {
 		if(target.Points.LifeCurrent.Shield) {
@@ -32,13 +32,13 @@ SLifePoints klib::applyShieldableDamage(CCharacter& target, int32_t damageDealt,
 			printf("%s damage absorption rate for %s is raised to %%%u because of the impenetrable property.\n", targetArmorName.c_str(), sourceName.c_str(), absorptionRate);
 		}
 	}
-	else {	
+	else {
 		// If the armor is not impenetrable, the absorption rate is affected by the shield damage.
 		printf("%s damage absorption rate for %s is %%%u.\n", targetArmorName.c_str(), sourceName.c_str(), absorptionRate);
 		double shieldDivisor = (targetArmorShield > 1) ? targetArmorShield : 1;
 		if(target.Points.LifeCurrent.Shield) {
 			double possibleAbsorptionRate =  absorptionRate*(target.Points.LifeCurrent.Shield/shieldDivisor);
-			absorptionRate	= absorptionRate ? 
+			absorptionRate	= absorptionRate ?
 				((possibleAbsorptionRate > 1) ? (int32_t)possibleAbsorptionRate : 1) : 0;
 		}
 		else
@@ -52,11 +52,11 @@ SLifePoints klib::applyShieldableDamage(CCharacter& target, int32_t damageDealt,
 	int shieldedDamage		= (int)(damageDealt * absorptionFraction);
 	int passthroughDamage	= (int)(damageDealt * ((0.0 > 1.0-absorptionFraction) ? 0.0 : 1.0-absorptionFraction ));
 	int totalDamage			= shieldedDamage+passthroughDamage;
-	
+
 	printf("Shielded damage: %u. Passthrough damage: %u. Expected sum: %u. Actual sum: %u. Absorption ratio: %%%u.\n", shieldedDamage, passthroughDamage, damageDealt, totalDamage, absorptionRate);
 	if( totalDamage < damageDealt )	{// because of the lack of rounding when casting to integer, a difference of one may be found after calculating the health-shield proportion.
 		int errorDamage = damageDealt-totalDamage;
-		
+
 		// if we have no health or the absorption rate is disabled we apply that error to the health. Otherwise apply it to the shield
 		if(0 == absorptionRate || 0 == target.Points.LifeCurrent.Shield) {
 			printf("%u damage error will be applied to the health.\n", errorDamage);
@@ -117,7 +117,7 @@ COMBAT_STATUS klib::applyAttackStatus(CCharacter& target, COMBAT_STATUS weaponSt
 		absorbChance = (absorbChance > 30) ? absorbChance*2 : 60;
 		printf("%s absorb chance of status by %s is modified to %%%u because of the impenetrable property of %s.\n", target.Name.c_str(), sourceName.c_str(), absorbChance, targetArmorName.c_str());
 	}
-	
+
 	for(int i=0, statusCount=target.ActiveBonus.Status.MaxStatus; i<statusCount; i++) {
 		COMBAT_STATUS bitStatus =  (COMBAT_STATUS)(1<<i);
 		if(0 == (bitStatus & weaponStatus) )
@@ -134,7 +134,7 @@ COMBAT_STATUS klib::applyAttackStatus(CCharacter& target, COMBAT_STATUS weaponSt
 			printf("%s absorbs \"%s\" inflicted by %s with %%%u absorb chance.\n", targetArmorName.c_str(), statusLabel.begin(), sourceName.c_str(), absorbChance);
 			continue;
 		}
-		
+
 		addStatus(target.ActiveBonus.Status, bitStatus, turnCount);
 		target.Recalculate();
 		appliedStatus = (COMBAT_STATUS)(appliedStatus|bitStatus);
@@ -155,9 +155,9 @@ COMBAT_STATUS klib::applyAttackStatus(CCharacter& target, COMBAT_STATUS weaponSt
 	const SEntityPoints&	targetFinalPoints		= target.FinalPoints;
 	const int32_t			targetArmorShield		= targetFinalPoints.LifeMax.Shield;
 
-	const double			absorptionRatio			= std::max(0.0, (target.Points.LifeCurrent.Shield/(double)targetArmorShield))/2.0;
+	const double			absorptionRatio			= ::gpk::max(0.0, (target.Points.LifeCurrent.Shield/(double)targetArmorShield))/2.0;
 	int32_t					absorbChance			= 50 + (int32_t)(absorptionRatio*targetArmorAbsorption);
-	absorbChance		= std::min(absorbChance, 100);
+	absorbChance		= ::gpk::min(absorbChance, 100);
 
 	printf("%s status absorb chance after absorption calculation is %%%u.\n", target.Name.c_str(), absorbChance);
 	const COMBAT_STATUS		result					= applyAttackStatus(target, weaponStatus, absorbChance, turnCount, sourceName);
@@ -166,9 +166,9 @@ COMBAT_STATUS klib::applyAttackStatus(CCharacter& target, COMBAT_STATUS weaponSt
 
 int32_t klib::applyArmorReflect(CCharacter& attacker, CCharacter& targetReflecting, int32_t damageDealt, const std::string& sourceName) {
 	const SEntityFlags	& targetFinalFlags	= targetReflecting.FinalFlags	;
-	if( 0 == damageDealt 
-	 ||	0 == (targetFinalFlags.Effect.Defend & DEFEND_EFFECT_REFLECT) 
-	 ||	0 >= targetReflecting.Points.LifeCurrent.Shield 
+	if( 0 == damageDealt
+	 ||	0 == (targetFinalFlags.Effect.Defend & DEFEND_EFFECT_REFLECT)
+	 ||	0 >= targetReflecting.Points.LifeCurrent.Shield
 	 ||	0 >= attacker.Points.LifeCurrent.Health
 	 ||	0 >= targetReflecting.Points.LifeCurrent.Health
 	 )
@@ -199,7 +199,7 @@ int32_t klib::applyArmorReflect(CCharacter& attacker, CCharacter& targetReflecti
 
 void applyWeaponLeech(ATTACK_EFFECT testEffectBit, ATTACK_EFFECT attackerWeaponEffect, int32_t finalPassthroughDamage, int32_t maxPoints, int32_t& currentPoints, const std::string& attackerName, const std::string& targetName, const std::string& attackerWeaponName, const std::string& pointName, const std::string& gainVerb, const std::string& loseVerb ) {
 	if(attackerWeaponEffect & testEffectBit) {
-		int32_t		actualHPGained	= std::min((int32_t)finalPassthroughDamage, std::max(0, maxPoints-std::max(0, currentPoints)));
+		int32_t		actualHPGained	= ::gpk::min((int32_t)finalPassthroughDamage, ::gpk::max(0, maxPoints - ::gpk::max(0, currentPoints)));
 		if(actualHPGained > 0)
 			printf("%s %s %i %s from %s with %s.\n", attackerName.c_str(), gainVerb.c_str(), actualHPGained, pointName.c_str(), targetName.c_str(), attackerWeaponName.c_str());
 		else if(actualHPGained < 0)
@@ -209,13 +209,13 @@ void applyWeaponLeech(ATTACK_EFFECT testEffectBit, ATTACK_EFFECT attackerWeaponE
 }
 
 SLifePoints applyUnshieldableDamage(CCharacter& attacker, CCharacter& target, const SLifePoints& damageDealt) {
-	const SLifePoints maxPossibleDamage = 
-	{	(0 > target.Points.LifeCurrent.Health	) ? 0 : target.Points.LifeCurrent.Health	
-	,	(0 > target.Points.LifeCurrent.Mana		) ? 0 : target.Points.LifeCurrent.Mana		
-	,	(0 > target.Points.LifeCurrent.Shield	) ? 0 : target.Points.LifeCurrent.Shield	
+	const SLifePoints maxPossibleDamage =
+	{	(0 > target.Points.LifeCurrent.Health	) ? 0 : target.Points.LifeCurrent.Health
+	,	(0 > target.Points.LifeCurrent.Mana		) ? 0 : target.Points.LifeCurrent.Mana
+	,	(0 > target.Points.LifeCurrent.Shield	) ? 0 : target.Points.LifeCurrent.Shield
 	};
 
-	const SLifePoints finalDamage = 
+	const SLifePoints finalDamage =
 	{	(	maxPossibleDamage.Health	< damageDealt.Health	) ? maxPossibleDamage.Health	: damageDealt.Health
 	,	(	maxPossibleDamage.Mana		< damageDealt.Mana		) ? maxPossibleDamage.Mana		: damageDealt.Mana
 	,	(	maxPossibleDamage.Shield	< damageDealt.Shield	) ? maxPossibleDamage.Shield	: damageDealt.Shield
@@ -236,7 +236,7 @@ SLifePoints applyUnshieldableDamage(CCharacter& attacker, CCharacter& target, co
 ::klib::SLifePoints klib::applySuccessfulHit(::klib::CCharacter& attacker, ::klib::CCharacter& target, int32_t damage, bool bAddStatus, ::klib::COMBAT_STATUS grenadeStatus, int32_t statusTurns, const ::std::string& sourceName) {
 	SLifePoints finalDamage = klib::applyShieldableDamage(target, damage, sourceName);
 	klib::applyArmorReflect(attacker, target, finalDamage.Shield, sourceName);
-	
+
 	attacker.Recalculate();
 	const SLifePoints& directDamage = attacker.FinalPoints.Attack.DirectDamage;
 	applyUnshieldableDamage(attacker, target, directDamage);
@@ -332,7 +332,7 @@ bool klib::attack(CCharacter& attacker, CCharacter& target) {
 		printf("%s hits %s for: %u.\n", attacker.Name.c_str(), target.Name.c_str(), damageDealt);
 		applySuccessfulWeaponHit(attacker, target, damageDealt, attackerWeaponName);
 	}
-	else 
+	else
 		printf("%s misses the attack!\n", attacker.Name.c_str());
 
 	if(damageDealt) {
@@ -373,15 +373,15 @@ void klib::applyCombatBonus(CCharacter& character, const SEntityPoints& combatBo
 	SLifePoints& lifeCurrent = character.Points.LifeCurrent;
 
 	int finalHPAdded = 0;
-	
-	finalHPAdded = std::min(combatBonus.LifeCurrent.Health	, std::max(0, lifeMax.Health	-lifeCurrent.Health	));	applyTurnBonus(character, lifeCurrent.Health	, lifeMax.Health	, finalHPAdded, character.Name, "Health"	, sourceName);
-	finalHPAdded = std::min(combatBonus.LifeCurrent.Mana	, std::max(0, lifeMax.Mana		-lifeCurrent.Mana	));	applyTurnBonus(character, lifeCurrent.Mana		, lifeMax.Mana		, finalHPAdded, character.Name, "Mana"		, sourceName);
-	finalHPAdded = std::min(combatBonus.LifeCurrent.Shield	, std::max(0, lifeMax.Shield	-lifeCurrent.Shield	));	applyTurnBonus(character, lifeCurrent.Shield	, lifeMax.Shield	, finalHPAdded, character.Name, "Shield"	, sourceName);
+
+	finalHPAdded = ::gpk::min(combatBonus.LifeCurrent.Health	, ::gpk::max(0, lifeMax.Health	-lifeCurrent.Health	));	applyTurnBonus(character, lifeCurrent.Health	, lifeMax.Health	, finalHPAdded, character.Name, "Health"	, sourceName);
+	finalHPAdded = ::gpk::min(combatBonus.LifeCurrent.Mana	, ::gpk::max(0, lifeMax.Mana		-lifeCurrent.Mana	));	applyTurnBonus(character, lifeCurrent.Mana		, lifeMax.Mana		, finalHPAdded, character.Name, "Mana"		, sourceName);
+	finalHPAdded = ::gpk::min(combatBonus.LifeCurrent.Shield	, ::gpk::max(0, lifeMax.Shield	-lifeCurrent.Shield	));	applyTurnBonus(character, lifeCurrent.Shield	, lifeMax.Shield	, finalHPAdded, character.Name, "Shield"	, sourceName);
 
 	if(combatBonus.Coins) {
 		if(combatBonus.Coins > 0)
 			printf("%s gains %u Coins from %s.\n", character.Name.c_str(), combatBonus.Coins, sourceName.c_str());
-		else if(combatBonus.Coins < 0 && character.Points.Coins) 
+		else if(combatBonus.Coins < 0 && character.Points.Coins)
 			printf("%s loses %u Coins from %s.\n", character.Name.c_str(), combatBonus.Coins*-1, sourceName.c_str());
 		character.Points.Coins	+= combatBonus.Coins;
 
@@ -392,10 +392,10 @@ void klib::applyCombatBonus(CCharacter& character, const SEntityPoints& combatBo
 void applyRegenBonus(PASSIVE_EFFECT testEffectBit, PASSIVE_EFFECT characterActiveEffects, int32_t maxPoints, int32_t& characterCurrentPoints, const std::string& pointName, const std::string& armorName) {
 	if((testEffectBit & characterActiveEffects) && (characterCurrentPoints < maxPoints)) {
 		int32_t pointsToAdd		= maxPoints/20;
-		pointsToAdd				= std::max(1, std::min(pointsToAdd, maxPoints-characterCurrentPoints));
+		pointsToAdd				= ::gpk::max(1, ::gpk::min(pointsToAdd, maxPoints-characterCurrentPoints));
 		characterCurrentPoints	+= pointsToAdd;
 		printf("%s regenerates %s by %i.\n", armorName.c_str(), pointName.c_str(), pointsToAdd);
-		//getchar(); 
+		//getchar();
 	}
 }
 
@@ -421,11 +421,11 @@ void klib::applyTurnStatus(CCharacter& character) {
 			continue;
 
 		switch(statusBit) {
-		case COMBAT_STATUS_BLEEDING	:	amount = std::max(1, finalPoints.LifeMax.Health/20); if( amount > 0 ) character.Score.DamageTaken += amount; applyShieldableDamage(character, amount, 0, "bleeding");													; break;	//getchar(); break;
-		case COMBAT_STATUS_POISON	:	amount = std::max(1, finalPoints.LifeMax.Health/20); if( amount > 0 ) character.Score.DamageTaken += amount; applyShieldableDamage(character, amount, 0, "poisoning");													; break;	//getchar(); break;
-		case COMBAT_STATUS_BURN		:	amount = std::max(1, finalPoints.LifeMax.Health/20); if( amount > 0 ) character.Score.DamageTaken += amount; applyShieldableDamage(character, amount, getArmorAbsorption(character.CurrentEquip.Armor), "burning");		; break;	//getchar(); break;
-		case COMBAT_STATUS_FREEZING	:	amount = std::max(1, finalPoints.LifeMax.Health/20); if( amount > 0 ) character.Score.DamageTaken += amount; applyShieldableDamage(character, amount, getArmorAbsorption(character.CurrentEquip.Armor), "freezing");	; break;	//getchar(); break;
-		case COMBAT_STATUS_SHOCK	:	amount = std::max(1, finalPoints.LifeMax.Health/20); if( amount > 0 ) character.Score.DamageTaken += amount; applyShieldableDamage(character, amount, getArmorAbsorption(character.CurrentEquip.Armor), "shocked");		; break;	//getchar(); break;
+		case COMBAT_STATUS_BLEEDING	:	amount = ::gpk::max(1, finalPoints.LifeMax.Health/20); if( amount > 0 ) character.Score.DamageTaken += amount; applyShieldableDamage(character, amount, 0, "bleeding");													; break;	//getchar(); break;
+		case COMBAT_STATUS_POISON	:	amount = ::gpk::max(1, finalPoints.LifeMax.Health/20); if( amount > 0 ) character.Score.DamageTaken += amount; applyShieldableDamage(character, amount, 0, "poisoning");													; break;	//getchar(); break;
+		case COMBAT_STATUS_BURN		:	amount = ::gpk::max(1, finalPoints.LifeMax.Health/20); if( amount > 0 ) character.Score.DamageTaken += amount; applyShieldableDamage(character, amount, getArmorAbsorption(character.CurrentEquip.Armor), "burning");		; break;	//getchar(); break;
+		case COMBAT_STATUS_FREEZING	:	amount = ::gpk::max(1, finalPoints.LifeMax.Health/20); if( amount > 0 ) character.Score.DamageTaken += amount; applyShieldableDamage(character, amount, getArmorAbsorption(character.CurrentEquip.Armor), "freezing");	; break;	//getchar(); break;
+		case COMBAT_STATUS_SHOCK	:	amount = ::gpk::max(1, finalPoints.LifeMax.Health/20); if( amount > 0 ) character.Score.DamageTaken += amount; applyShieldableDamage(character, amount, getArmorAbsorption(character.CurrentEquip.Armor), "shocked");		; break;	//getchar(); break;
 		//case COMBAT_STATUS_STUN	:		break;
 		//case COMBAT_STATUS_BLIND	:	break;
 		}
@@ -469,11 +469,11 @@ void klib::applyEnemyTurnStatus(CCharacter& character) {
 			continue;
 
 		switch(statusBit) {
-		case COMBAT_STATUS_BLEEDING	:	amount = std::max(1, finalPoints.LifeMax.Health/20); if( amount > 0 ) character.Score.DamageTaken += amount; applyShieldableDamage(character, amount, 0, "bleeding");													; break;	//getchar(); break;
-		case COMBAT_STATUS_POISON	:	amount = std::max(1, finalPoints.LifeMax.Health/20); if( amount > 0 ) character.Score.DamageTaken += amount; applyShieldableDamage(character, amount, 0, "poisoning");													; break;	//getchar(); break;
-		case COMBAT_STATUS_BURN		:	amount = std::max(1, finalPoints.LifeMax.Health/20); if( amount > 0 ) character.Score.DamageTaken += amount; applyShieldableDamage(character, amount, getArmorAbsorption(character.CurrentEquip.Armor), "burning");		; break;	//getchar(); break;
-		case COMBAT_STATUS_FREEZING	:	amount = std::max(1, finalPoints.LifeMax.Health/20); if( amount > 0 ) character.Score.DamageTaken += amount; applyShieldableDamage(character, amount, getArmorAbsorption(character.CurrentEquip.Armor), "freezing");	; break;	//getchar(); break;
-		case COMBAT_STATUS_SHOCK	:	amount = std::max(1, finalPoints.LifeMax.Health/20); if( amount > 0 ) character.Score.DamageTaken += amount; applyShieldableDamage(character, amount, getArmorAbsorption(character.CurrentEquip.Armor), "shocked");		; break;	//getchar(); break;
+		case COMBAT_STATUS_BLEEDING	:	amount = ::gpk::max(1, finalPoints.LifeMax.Health/20); if( amount > 0 ) character.Score.DamageTaken += amount; applyShieldableDamage(character, amount, 0, "bleeding");													; break;	//getchar(); break;
+		case COMBAT_STATUS_POISON	:	amount = ::gpk::max(1, finalPoints.LifeMax.Health/20); if( amount > 0 ) character.Score.DamageTaken += amount; applyShieldableDamage(character, amount, 0, "poisoning");													; break;	//getchar(); break;
+		case COMBAT_STATUS_BURN		:	amount = ::gpk::max(1, finalPoints.LifeMax.Health/20); if( amount > 0 ) character.Score.DamageTaken += amount; applyShieldableDamage(character, amount, getArmorAbsorption(character.CurrentEquip.Armor), "burning");		; break;	//getchar(); break;
+		case COMBAT_STATUS_FREEZING	:	amount = ::gpk::max(1, finalPoints.LifeMax.Health/20); if( amount > 0 ) character.Score.DamageTaken += amount; applyShieldableDamage(character, amount, getArmorAbsorption(character.CurrentEquip.Armor), "freezing");	; break;	//getchar(); break;
+		case COMBAT_STATUS_SHOCK	:	amount = ::gpk::max(1, finalPoints.LifeMax.Health/20); if( amount > 0 ) character.Score.DamageTaken += amount; applyShieldableDamage(character, amount, getArmorAbsorption(character.CurrentEquip.Armor), "shocked");		; break;	//getchar(); break;
 		//case COMBAT_STATUS_STUN	:		break;
 		//case COMBAT_STATUS_BLIND	:	break;
 		}
@@ -512,7 +512,7 @@ void klib::applyRoundStatusAndBonusesAndSkipRound(CCharacter& character) {
 	//printf("\n");
 	//applyRoundStatus	(character);																																		if(0 >= character.Points.LifeCurrent.Health)	return;
 	//applyCombatBonus	(character, character.ActiveBonus.Points.Points, "Round Combat Bonus");																				if(0 >= character.Points.LifeCurrent.Health)	return;
-	//applyCombatBonus	(character, getProfessionPoints	(character.CurrentEquip.Profession	), getProfessionName(character.CurrentEquip.Profession));						if(0 >= character.Points.LifeCurrent.Health) return; 
+	//applyCombatBonus	(character, getProfessionPoints	(character.CurrentEquip.Profession	), getProfessionName(character.CurrentEquip.Profession));						if(0 >= character.Points.LifeCurrent.Health) return;
 	//applyCombatBonus	(character, getArmorPoints		(character.CurrentEquip.Armor		), getArmorName		(character.CurrentEquip.Armor));							if(0 >= character.Points.LifeCurrent.Health) return;
 	//applyCombatBonus	(character, getAccessoryPoints	(character.CurrentEquip.Accessory	), getAccessoryName	(character.CurrentEquip.Accessory));						if(0 >= character.Points.LifeCurrent.Health) return;
 	//applyCombatBonus	(character, getVehiclePoints	(character.CurrentEquip.Vehicle		), getVehicleName	(character.CurrentEquip.Vehicle));							if(0 >= character.Points.LifeCurrent.Health) return;

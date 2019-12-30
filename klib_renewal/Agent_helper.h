@@ -68,7 +68,7 @@ namespace klib
 	template <size_t _Width, size_t _Depth>
 	static void								displayStatusEffectsAndTechs	(SWeightedDisplay<_Width, _Depth>& display, int32_t offsetY, int32_t offsetX, CCharacter& character)													{
 		int32_t										iLine							= 0;
-		if(character.Flags.Tech.Gender)	
+		if(character.Flags.Tech.Gender)
 			iLine									+= displayFlag(display, {offsetX, offsetY+iLine}, character.Flags.Tech.Gender, 2	, COLOR_YELLOW, COLOR_GREEN	, "- Gender: %-13.13s");
 		iLine									+= displayEntityTechnology	(display, offsetY+iLine, offsetX, character.FinalFlags.Tech		);
 		iLine									+= displayEntityStatus		(display, offsetY+iLine, offsetX, character.FinalFlags.Status	);
@@ -99,21 +99,21 @@ namespace klib
 		::klib::valueToGrid(display_.TextAttributes, offsetY, offsetX+13, ::klib::SCREEN_LEFT, &color, 1, LINE_SIZE-14);
 		offsetY									+= 2;
 
-		std::string									equipName;	
+		std::string									equipName;
 		equipName	 = getProfessionName	(character.CurrentEquip.Profession	); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, "Class"		, equipName.c_str(), character.CurrentEquip.Profession	.Level);
 		equipName	 = getWeaponName		(character.CurrentEquip.Weapon		); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, "Weapon"		, equipName.c_str(), character.CurrentEquip.Weapon		.Level);
 		equipName	 = getArmorName			(character.CurrentEquip.Armor		); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, "Armor"		, equipName.c_str(), character.CurrentEquip.Armor		.Level);
 		equipName	 = getAccessoryName		(character.CurrentEquip.Accessory	); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, "Accessory"	, equipName.c_str(), character.CurrentEquip.Accessory	.Level);
-			
+
 		::klib::lineToGridColored(display, display_.TextAttributes, COLOR_RED, ++offsetY, offsetX, ::klib::SCREEN_LEFT, "- Final Points:");
 		offsetY									+=2;
-		
+
 		const SEntityPoints							& agentFinalPoints				= character.FinalPoints;
 		char										formattedGauge[32];
 
-		sprintf_s(formattedGauge, "%i/%i"	, std::max(0, character.Points.LifeCurrent.Health	), agentFinalPoints.LifeMax.Health	); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Health"	, formattedGauge);
-		sprintf_s(formattedGauge, "%i/%i"	, std::max(0, character.Points.LifeCurrent.Shield	), agentFinalPoints.LifeMax.Shield	); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Shield"	, formattedGauge);
-		sprintf_s(formattedGauge, "%i/%i"	, std::max(0, character.Points.LifeCurrent.Mana		), agentFinalPoints.LifeMax.Mana	); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Mana"	, formattedGauge);
+		sprintf_s(formattedGauge, "%i/%i"	, ::gpk::max(0, character.Points.LifeCurrent.Health	), agentFinalPoints.LifeMax.Health	); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Health"	, formattedGauge);
+		sprintf_s(formattedGauge, "%i/%i"	, ::gpk::max(0, character.Points.LifeCurrent.Shield	), agentFinalPoints.LifeMax.Shield	); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Shield"	, formattedGauge);
+		sprintf_s(formattedGauge, "%i/%i"	, ::gpk::max(0, character.Points.LifeCurrent.Mana		), agentFinalPoints.LifeMax.Mana	); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Mana"	, formattedGauge);
 
 		sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Attack.Hit						); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Hit Chance"				, formattedGauge);
 		sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Attack.Damage					); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Damage"					, formattedGauge);
@@ -136,7 +136,7 @@ namespace klib
 		valueToGrid(display_.TextAttributes	, offsetY, offsetX+23, ::klib::SCREEN_LEFT, &(color = COLOR_ORANGE), 1, 11);
 		sprintf_s(formattedGauge, "%i"		, agentFinalPoints.CostMaintenance					); printfToGrid(display, ++offsetY, offsetX, ::klib::SCREEN_LEFT, formatAgentCoins, "- Total Cost"			, formattedGauge);
 		valueToGrid(display_.TextAttributes	, offsetY, offsetX+23, ::klib::SCREEN_LEFT, &(color = COLOR_ORANGE), 1, 11);
-	
+
 	}
 
 	template <size_t _Width, size_t _Depth>
@@ -150,7 +150,7 @@ namespace klib
 		printfToGridColored(display, display_.TextAttributes, color, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentTitle, character.Name.c_str());
 		offsetY									+=1;
 
-		std::string									equipName;	
+		std::string									equipName;
 		equipName	= getProfessionName	(character.CurrentEquip.Profession		); printfToGrid(display, offsetY++	, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, equipName.c_str(), character.CurrentEquip.Profession	.Level);
 		equipName	= getWeaponName		(character.CurrentEquip.Weapon			); printfToGrid(display, offsetY++	, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, equipName.c_str(), character.CurrentEquip.Weapon		.Level);
 		equipName	= getArmorName		(character.CurrentEquip.Armor			); printfToGrid(display, offsetY++	, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, equipName.c_str(), character.CurrentEquip.Armor		.Level);
@@ -161,16 +161,16 @@ namespace klib
 
 		const SEntityPoints							& agentFinalPoints				= character.FinalPoints;
 		char										formattedGauge[32];
-		sprintf_s(formattedGauge, "%i/%i"	, std::max(0, character.Points.LifeCurrent.Health	), agentFinalPoints.LifeMax.Health	); printfToGrid(display, offsetY++	, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Health"	, formattedGauge);
-		sprintf_s(formattedGauge, "%i/%i"	, std::max(0, character.Points.LifeCurrent.Shield	), agentFinalPoints.LifeMax.Shield	); printfToGrid(display, offsetY++	, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Shield"	, formattedGauge);
-		sprintf_s(formattedGauge, "%i/%i"	, std::max(0, character.Points.LifeCurrent.Mana		), agentFinalPoints.LifeMax.Mana	); printfToGrid(display, offsetY++	, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Mana"		, formattedGauge);
+		sprintf_s(formattedGauge, "%i/%i"	, ::gpk::max(0, character.Points.LifeCurrent.Health	), agentFinalPoints.LifeMax.Health	); printfToGrid(display, offsetY++	, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Health"	, formattedGauge);
+		sprintf_s(formattedGauge, "%i/%i"	, ::gpk::max(0, character.Points.LifeCurrent.Shield	), agentFinalPoints.LifeMax.Shield	); printfToGrid(display, offsetY++	, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Shield"	, formattedGauge);
+		sprintf_s(formattedGauge, "%i/%i"	, ::gpk::max(0, character.Points.LifeCurrent.Mana		), agentFinalPoints.LifeMax.Mana	); printfToGrid(display, offsetY++	, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Mana"		, formattedGauge);
 		++offsetY;	//
 
 		sprintf_s(formattedGauge, "%i"		, agentFinalPoints.LifeCurrent.Health			); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Health per turn"		, formattedGauge);
 		sprintf_s(formattedGauge, "%i"		, agentFinalPoints.LifeCurrent.Shield			); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Shield per turn"		, formattedGauge);
 		sprintf_s(formattedGauge, "%i"		, agentFinalPoints.LifeCurrent.Mana				); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Mana per turn"			, formattedGauge);
-		++offsetY;	//																		   
-																							   
+		++offsetY;	//
+
 		sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Attack.Hit					); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Hit Chance"				, formattedGauge);
 		sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Attack.Damage				); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Damage"					, formattedGauge);
 		sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Attack.DirectDamage.Health	); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Direct Damage Health"	, formattedGauge);
@@ -178,17 +178,17 @@ namespace klib
 		sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Attack.DirectDamage.Mana		); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Direct Damage Mana"		, formattedGauge);
 		sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Attack.Absorption			); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Absorption"				, formattedGauge);
 		sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Attack.Range					); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Range"					, formattedGauge);
-		++offsetY;	//																		   
-																							   
+		++offsetY;	//
+
 		sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Fitness.Attack				); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Attack Speed"			, formattedGauge);
 		sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Fitness.Movement				); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Movement Speed"			, formattedGauge);
 		sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Fitness.Reflexes				); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Reflexes"				, formattedGauge);
 		sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Fitness.Sight				); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Sight"					, formattedGauge);
 
 		const SEntityPoints							& agentBasePoints				= character.Points;
-		sprintf_s(formattedGauge, "%i"		, agentBasePoints.Coins							); printfToGrid(display, ++offsetY, offsetX, ::klib::SCREEN_LEFT, formatAgentCoins, "- Coins in wallet"	, formattedGauge); valueToGrid(display_.TextAttributes, offsetY, offsetX+23, ::klib::SCREEN_LEFT, &(color = COLOR_ORANGE), 1, 11);	//																				  
-		sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Coins						); printfToGrid(display, ++offsetY, offsetX, ::klib::SCREEN_LEFT, formatAgentCoins, "- Coins per turn"	, formattedGauge); valueToGrid(display_.TextAttributes, offsetY, offsetX+23, ::klib::SCREEN_LEFT, &(color = (agentFinalPoints.Coins >= 0) ? COLOR_ORANGE : COLOR_RED), 1, 11);	//									  
-		sprintf_s(formattedGauge, "%i"		, agentBasePoints.CostMaintenance				); printfToGrid(display, ++offsetY, offsetX, ::klib::SCREEN_LEFT, formatAgentCoins, "- Salary"			, formattedGauge); valueToGrid(display_.TextAttributes, offsetY, offsetX+23, ::klib::SCREEN_LEFT, &(color = COLOR_ORANGE), 1, 11);	//																				  
+		sprintf_s(formattedGauge, "%i"		, agentBasePoints.Coins							); printfToGrid(display, ++offsetY, offsetX, ::klib::SCREEN_LEFT, formatAgentCoins, "- Coins in wallet"	, formattedGauge); valueToGrid(display_.TextAttributes, offsetY, offsetX+23, ::klib::SCREEN_LEFT, &(color = COLOR_ORANGE), 1, 11);	//
+		sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Coins						); printfToGrid(display, ++offsetY, offsetX, ::klib::SCREEN_LEFT, formatAgentCoins, "- Coins per turn"	, formattedGauge); valueToGrid(display_.TextAttributes, offsetY, offsetX+23, ::klib::SCREEN_LEFT, &(color = (agentFinalPoints.Coins >= 0) ? COLOR_ORANGE : COLOR_RED), 1, 11);	//
+		sprintf_s(formattedGauge, "%i"		, agentBasePoints.CostMaintenance				); printfToGrid(display, ++offsetY, offsetX, ::klib::SCREEN_LEFT, formatAgentCoins, "- Salary"			, formattedGauge); valueToGrid(display_.TextAttributes, offsetY, offsetX+23, ::klib::SCREEN_LEFT, &(color = COLOR_ORANGE), 1, 11);	//
 		sprintf_s(formattedGauge, "%i"		, agentFinalPoints.CostMaintenance				); printfToGrid(display, ++offsetY, offsetX, ::klib::SCREEN_LEFT, formatAgentCoins, "- Total Cost"		, formattedGauge); valueToGrid(display_.TextAttributes, offsetY, offsetX+23, ::klib::SCREEN_LEFT, &(color = COLOR_ORANGE), 1, 11);
 	}
 
@@ -196,17 +196,17 @@ namespace klib
 	static void								displayAgentSlot				(SWeightedDisplay<_Width, _Depth>& display_, int32_t offsetY, int32_t offsetX, int32_t agentIndex, CCharacter& character, bool bShort=false, uint16_t color=COLOR_GREEN)	{
 		if( bShort )
 			displayResumedAgentSlot		(display_, offsetY, offsetX, agentIndex, character);
-		else 
+		else
 			displayDetailedAgentSlot	(display_, offsetY, offsetX, character, color);
 	}
 
 	#define MAX_ENTITY_COLUMNS	4
-	template <size_t _Width, size_t _Depth> 
+	template <size_t _Width, size_t _Depth>
 	static void								drawScore						(SWeightedDisplay<_Width, _Depth>& display_, int32_t offsetY, int32_t offsetX, const SCharacterScore& score)																{
 		//char										buffer[128]						= {};
 		char										bufferValues[64]				= {};
 		const char									format[]						= "- %-21.21s: %-12.12s";
-	
+
 		sprintf_s(bufferValues, "%lli", (int64_t)score.MoneyEarned			); printfToGrid(display_.Screen, offsetY++, offsetX, ::klib::SCREEN_LEFT, format, "Money Earned"			, bufferValues);
 		sprintf_s(bufferValues, "%lli", (int64_t)score.MoneySpent			); printfToGrid(display_.Screen, offsetY++, offsetX, ::klib::SCREEN_LEFT, format, "Money Spent"			, bufferValues);
 		sprintf_s(bufferValues, "%lli", (int64_t)score.DamageDealt			); printfToGrid(display_.Screen, offsetY++, offsetX, ::klib::SCREEN_LEFT, format, "Damage Dealt"			, bufferValues);

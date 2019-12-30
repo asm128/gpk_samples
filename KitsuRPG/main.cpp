@@ -23,9 +23,9 @@
 void											initPlayerCharacter								(klib::CCharacter& adventurer, const std::string& name);
 
 // This function seeds the rand() and enters the tavern() after initializing the player.
-// If the player leaves the tavern() it means the game was requested to close. 
+// If the player leaves the tavern() it means the game was requested to close.
 // After leaving the tavern() we display the score of the player.
-int												main											(int argc, char **argv)											{	
+int												main											(int argc, char **argv)											{
 	(void)argc, (void)argv;
 //#if defined(GPK_DEBUG_ENABLED)
 #if defined(DEBUG) || defined(_DEBUG)
@@ -45,12 +45,12 @@ int												main											(int argc, char **argv)											{
 	::std::string											adventurerName;
 	::std::getline(std::cin, adventurerName);
 
-	::klib::CCharacter									* pAdventurer									= new klib::CCharacter(4, 50, 1, 100, {1,4}, {}, {klib::COMBAT_STATUS_NONE, klib::COMBAT_STATUS_STUN}, adventurerName);
+	::klib::CCharacter									* pAdventurer									= new ::klib::CCharacter(4, 50, 1, 100, {1,4}, {}, {klib::COMBAT_STATUS_NONE, klib::COMBAT_STATUS_STUN}, adventurerName);
 	::klib::CCharacter									& adventurer									= *pAdventurer;
 
 	static const ::klib::SMenuItem<int32_t>				playAgainMenu[]									=
-		{	{ 1,	"Yes"	}
-		,	{ 0,	"No"	}
+		{	{ 1, "Yes"	}
+		,	{ 0, "No"	}
 		};
 
 	bool												bPlayAgain										= true;
@@ -96,19 +96,19 @@ void											initPlayerCharacter								(klib::CCharacter& adventurer, const s
 	::klib::SCharacterEquip								& currentEquip									= adventurer.CurrentEquip;
 	adventurer.Goods.CompletedResearch				= klib::SCharacterResearch();
 #if defined(POWER_START)
-	currentEquip.Weapon		.Index					= (int16_t)std::min(3U, size(klib::definitionsWeapon		)-1);
-	currentEquip.Accessory	.Index					= (int16_t)std::min(3U, size(klib::definitionsAccessory		)-1);
-	currentEquip.Armor		.Index					= (int16_t)std::min(3U, size(klib::definitionsArmor			)-1);
-	currentEquip.Profession	.Index					= (int16_t)std::min(3U, size(klib::definitionsProfession	)-1);
-	currentEquip.Vehicle	.Index					= (int16_t)std::min(3U, size(klib::definitionsVehicle		)-1);
-	currentEquip.Facility	.Index					= (int16_t)std::min(3U, size(klib::definitionsFacility	)-1);
+	currentEquip.Weapon		.Index					= (int16_t)::gpk::min(3U, size(klib::definitionsWeapon		)-1);
+	currentEquip.Accessory	.Index					= (int16_t)::gpk::min(3U, size(klib::definitionsAccessory		)-1);
+	currentEquip.Armor		.Index					= (int16_t)::gpk::min(3U, size(klib::definitionsArmor			)-1);
+	currentEquip.Profession	.Index					= (int16_t)::gpk::min(3U, size(klib::definitionsProfession	)-1);
+	currentEquip.Vehicle	.Index					= (int16_t)::gpk::min(3U, size(klib::definitionsVehicle		)-1);
+	currentEquip.Facility	.Index					= (int16_t)::gpk::min(3U, size(klib::definitionsFacility	)-1);
 
-	currentEquip.Weapon		.Modifier				= (int16_t)std::min(3U,	size(klib::modifiersWeapon			)-1);
-	currentEquip.Accessory	.Modifier				= (int16_t)std::min(3U,	size(klib::modifiersAccessory		)-1);
-	currentEquip.Armor		.Modifier				= (int16_t)std::min(3U,	size(klib::modifiersArmor			)-1);
-	currentEquip.Profession	.Modifier				= (int16_t)std::min(3U,	size(klib::modifiersProfession		)-1);
-	currentEquip.Vehicle	.Modifier				= (int16_t)std::min(3U,	size(klib::modifiersVehicle			)-1);
-	currentEquip.Facility	.Modifier				= (int16_t)std::min(3U,	size(klib::modifiersFacility		)-1);
+	currentEquip.Weapon		.Modifier				= (int16_t)::gpk::min(3U,	size(klib::modifiersWeapon			)-1);
+	currentEquip.Accessory	.Modifier				= (int16_t)::gpk::min(3U,	size(klib::modifiersAccessory		)-1);
+	currentEquip.Armor		.Modifier				= (int16_t)::gpk::min(3U,	size(klib::modifiersArmor			)-1);
+	currentEquip.Profession	.Modifier				= (int16_t)::gpk::min(3U,	size(klib::modifiersProfession		)-1);
+	currentEquip.Vehicle	.Modifier				= (int16_t)::gpk::min(3U,	size(klib::modifiersVehicle			)-1);
+	currentEquip.Facility	.Modifier				= (int16_t)::gpk::min(3U,	size(klib::modifiersFacility		)-1);
 
 	currentEquip.Weapon		.Level					= 10;
 	currentEquip.Accessory	.Level					= 10;
@@ -145,7 +145,7 @@ void											initPlayerCharacter								(klib::CCharacter& adventurer, const s
 }
 
 
-int WINAPI										WinMain 
+int WINAPI										WinMain
 	(	_In_		HINSTANCE	/*hInstance		*/
 	,	_In_opt_	HINSTANCE	/*hPrevInstance	*/
 	,	_In_		LPSTR		/*lpCmdLine		*/

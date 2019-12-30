@@ -32,7 +32,7 @@ bool																	escape						(const std::string& escaperName, klib::SCharact
 
 void																	assignDrops					(klib::CCharacter& winner, klib::CCharacter& loser, bool bIsAIControlled)								{
 	printf("%s is dead!\n", loser.Name.c_str());
-	int																			drop						= rand() % (std::max(1,loser.Points.Coins>>2));
+	int																			drop						= rand() % (::gpk::max(1,loser.Points.Coins>>2));
 
 	if(bIsAIControlled)
 		drop																	= loser.Points.Coins-drop;
@@ -40,7 +40,7 @@ void																	assignDrops					(klib::CCharacter& winner, klib::CCharacter
 	printf("\n%s dropped %u coins!!\n", loser.Name.c_str(), drop);
 	winner	.Points.Coins													+= drop;
 	loser	.Points.Coins													-= drop;
-	for(uint32_t i=0; i<loser.Goods.Inventory.Items.Count; i++) 
+	for(uint32_t i=0; i<loser.Goods.Inventory.Items.Count; i++)
 		if( 0 == (rand()%2) ) {
 			const ::klib::SEntitySlot<klib::SItem>										& itemDrop					= loser.Goods.Inventory.Items[i];
 			::std::string																itemDropName				= klib::getItemName(itemDrop.Entity);
@@ -59,10 +59,10 @@ void																	assignDrops					(klib::CCharacter& winner, klib::CCharacter
 		::klib::SWeapon																oldWinnerWeapon				= winner.CurrentEquip.Weapon;
 		winner.Goods.Inventory.Weapon.AddElement(loser.CurrentEquip.Weapon);
 
-		::klib::SWeapon																loserNewWeapon				= 
-			{	1+(rand() %	std::max((int16_t)2, (int16_t)(oldWinnerWeapon.Definition	)	))
-			,	1+(rand() %	std::max((int16_t)2, (int16_t)(oldWinnerWeapon.Modifier		)	))
-			,	1+(rand() % std::max((int16_t)2, (int16_t)(oldWinnerWeapon.Level		)	))
+		::klib::SWeapon																loserNewWeapon				=
+			{	1 + (rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerWeapon.Definition	)	))
+			,	1 + (rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerWeapon.Modifier		)	))
+			,	1 + (rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerWeapon.Level		)	))
 			};
 
 		if(loserNewWeapon.Definition || loserNewWeapon.Modifier || loserNewWeapon.Level > 1)
@@ -79,10 +79,10 @@ void																	assignDrops					(klib::CCharacter& winner, klib::CCharacter
 		::klib::SAccessory															oldWinnerAccessory			= winner.CurrentEquip.Accessory;
 		winner.Goods.Inventory.Accessory.AddElement(loser.CurrentEquip.Accessory);
 
-		::klib::SAccessory															loserNewAccessory			= 
-			{	1+(rand() %	std::max((int16_t)2, (int16_t)(oldWinnerAccessory.Definition	)	))
-			,	1+(rand() %	std::max((int16_t)2, (int16_t)(oldWinnerAccessory.Modifier		)	))
-			,	1+(rand() % std::max((int16_t)2, (int16_t)(oldWinnerAccessory.Level			)	))
+		::klib::SAccessory															loserNewAccessory			=
+			{	1+(rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerAccessory.Definition	)	))
+			,	1+(rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerAccessory.Modifier		)	))
+			,	1+(rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerAccessory.Level			)	))
 			};
 
 		if(loserNewAccessory.Definition || loserNewAccessory.Modifier || loserNewAccessory.Level > 1)
@@ -99,10 +99,10 @@ void																	assignDrops					(klib::CCharacter& winner, klib::CCharacter
 		::klib::SArmor																oldWinnerArmor				= winner.CurrentEquip.Armor;
 		winner.Goods.Inventory.Armor.AddElement(loser.CurrentEquip.Armor);
 
-		::klib::SArmor																loserNewArmor				= 
-			{	1+(rand() %	std::max((int16_t)2, (int16_t)(oldWinnerArmor.Definition	)))
-			,	1+(rand() %	std::max((int16_t)2, (int16_t)(oldWinnerArmor.Modifier		)))
-			,	1+(rand() % std::max((int16_t)2, (int16_t)(oldWinnerArmor.Level			)))
+		::klib::SArmor																loserNewArmor				=
+			{	1+(rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerArmor.Definition	)))
+			,	1+(rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerArmor.Modifier		)))
+			,	1+(rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerArmor.Level			)))
 			};
 
 		if(loserNewArmor.Definition || loserNewArmor.Modifier || loserNewArmor.Level > 1)
@@ -119,10 +119,10 @@ void																	assignDrops					(klib::CCharacter& winner, klib::CCharacter
 		::klib::SVehicle															oldWinnerVehicle			= winner.CurrentEquip.Vehicle;
 		winner.Goods.Inventory.Vehicle.AddElement(loser.CurrentEquip.Vehicle);
 
-		::klib::SVehicle															loserNewVehicle				= 
-			{	1+(rand() %	std::max((int16_t)2, (int16_t)(oldWinnerVehicle.Definition	)))
-			,	1+(rand() %	std::max((int16_t)2, (int16_t)(oldWinnerVehicle.Modifier	)))
-			,	1+(rand() % std::max((int16_t)2, (int16_t)(oldWinnerVehicle.Level		)))
+		::klib::SVehicle															loserNewVehicle				=
+			{	1 + (rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerVehicle.Definition	)))
+			,	1 + (rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerVehicle.Modifier	)))
+			,	1 + (rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerVehicle.Level		)))
 			};
 
 		if(loserNewVehicle.Definition || loserNewVehicle.Modifier || loserNewVehicle.Level > 1)
@@ -139,10 +139,10 @@ void																	assignDrops					(klib::CCharacter& winner, klib::CCharacter
 		klib::SFacility																oldWinnerFacility			= winner.CurrentEquip.Facility;
 		winner.Goods.Inventory.Facility.AddElement(loser.CurrentEquip.Facility);
 
-		klib::SFacility																loserNewFacility			= 
-			{	1+(rand() %	std::max((int16_t)2, (int16_t)(oldWinnerFacility.Definition	)	))
-			,	1+(rand() %	std::max((int16_t)2, (int16_t)(oldWinnerFacility.Modifier	)	))
-			,	1+(rand() % std::max((int16_t)2, (int16_t)(oldWinnerFacility.Level		)	))
+		klib::SFacility																loserNewFacility			=
+			{	1+(rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerFacility.Definition	)	))
+			,	1+(rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerFacility.Modifier		)	))
+			,	1+(rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerFacility.Level		)	))
 			};
 
 		//if(loserNewFacility.Index || loserNewFacility.Modifier || loserNewFacility.Level > 1)
@@ -175,7 +175,7 @@ void																	assignDrops					(klib::CCharacter& winner, klib::CCharacter
 		++winner.CurrentEquip.Profession.Modifier;
 		printf("%s gets promoted to %s!!\n", winner.Name.c_str(), getProfessionName(winner.CurrentEquip.Profession).c_str());
 	}
-		
+
 		//winner.Points.LifeMax.Health += winner.Points.Attack;
 	++winner.CurrentEquip.Profession	.Level;
 	++winner.CurrentEquip.Armor			.Level;
@@ -191,7 +191,7 @@ void																	assignDrops					(klib::CCharacter& winner, klib::CCharacter
 
 void																	determineOutcome			(klib::CCharacter& adventurer, klib::CCharacter& enemy)								{
 		// Determine the outcome of the battle and give rewards if applicable.
-	if (adventurer.Points.LifeCurrent.Health <= 0) 
+	if (adventurer.Points.LifeCurrent.Health <= 0)
 		assignDrops(enemy, adventurer, false);
 	if (enemy.Points.LifeCurrent.Health <= 0)
 		assignDrops(adventurer, enemy, true);
@@ -236,15 +236,15 @@ void																	senseMenu					(::klib::CCharacter& enemy)																		
 		int																			tavernChoice				= displayMenu("You wonder about what to do next..", tavernOptions);
 
 		// Interpret user input.
-			 if( 1 == tavernChoice )	{	displayWeapon					(enemy);									}	// 
-		else if( 2 == tavernChoice )	{	displayAccessory				(enemy);									}	// 
-		else if( 3 == tavernChoice )	{	displayArmor					(enemy);									}	// 
-		else if( 4 == tavernChoice )	{	displayProfession				(enemy);									}	// 
-		else if( 5 == tavernChoice )	{	displayVehicle					(enemy);									}	// 
-		else if( 6 == tavernChoice )	{	displayFacility					(enemy);									}	// 
-		else if( 7 == tavernChoice )	{	displayInventory				(enemy.Goods.Inventory.Items, enemy.Name);	}	// 
+			 if( 1 == tavernChoice )	{	displayWeapon					(enemy);									}	//
+		else if( 2 == tavernChoice )	{	displayAccessory				(enemy);									}	//
+		else if( 3 == tavernChoice )	{	displayArmor					(enemy);									}	//
+		else if( 4 == tavernChoice )	{	displayProfession				(enemy);									}	//
+		else if( 5 == tavernChoice )	{	displayVehicle					(enemy);									}	//
+		else if( 6 == tavernChoice )	{	displayFacility					(enemy);									}	//
+		else if( 7 == tavernChoice )	{	displayInventory				(enemy.Goods.Inventory.Items, enemy.Name);	}	//
 		else if( 8 == tavernChoice )	{	break;	}	// Exit the main loop, which effectively closes the game.
-		else {	
+		else {
 			printf("Option not supported yet.\n");
 		}	// Exit the main loop, which effectively closes the game.
 	}
@@ -257,18 +257,18 @@ TURN_OUTCOME															characterTurn				(TURN_ACTION combatOption, klib::CCh
 		if( !klib::attack(attacker, target) )
 			outcome																	= TURN_OUTCOME_CONTINUE;
 	}
-	else if(TURN_ACTION_INVENTORY == combatOption) { 
+	else if(TURN_ACTION_INVENTORY == combatOption) {
 		if( !useItems(attacker, target, bIsAIControlled) )
 			outcome																	= TURN_OUTCOME_CONTINUE;
 	}	// useItems requires to receive the current enemy as a parameter in order to modify its health if we use a grenade and hit.
-	else if(TURN_ACTION_SKILL == combatOption) { 
+	else if(TURN_ACTION_SKILL == combatOption) {
 		if( !useSkills(attacker, target) )
 			outcome																	= TURN_OUTCOME_CONTINUE;
 	}	// useItems requires to receive the current enemy as a parameter in order to modify its health if we use a grenade and hit.
-	else if(TURN_ACTION_SENSE == combatOption) { 
+	else if(TURN_ACTION_SENSE == combatOption) {
 		senseMenu(target);	// sense applies to target only. You can't "sense yourself".
 		outcome																	= TURN_OUTCOME_CONTINUE;
-	}	// 
+	}	//
 	else if(TURN_ACTION_RUN == combatOption) {
 		if( escape(attacker.Name, attacker.Score) )
 			outcome																	= TURN_OUTCOME_ESCAPE; // Escape: if we succeed we just exit this combat() function, otherwise cancel this loop and execute the enemy turn.
@@ -291,7 +291,7 @@ void																	printStatuses				(const ::klib::CCharacter& character)					
 			continue;
 
 		const ::gpk::label															statusLabel					= ::gpk::get_value_label(statusBit);
-		printf("%s is affected by \"%s\" for the next %u turn(s).\n", character.Name.c_str(), statusLabel.begin(), character.ActiveBonus.Status.TurnsLeft[iStatus]);	
+		printf("%s is affected by \"%s\" for the next %u turn(s).\n", character.Name.c_str(), statusLabel.begin(), character.ActiveBonus.Status.TurnsLeft[iStatus]);
 	}
 }
 
@@ -328,12 +328,12 @@ void																	printBonuses				(const klib::CCharacter& character)								
 
 void																	printCharacterShortInfo		(::klib::CCharacter& character)																			{
 	const ::klib::SEntityPoints													& characterPoints			= character.FinalPoints;
-	printf("\n----------------------- %s is a %s level %u.\nWeapon: %s level %u.\nArmor: %s level %u.\n",  
-		character.Name.c_str(), 
-		::klib::getProfessionName	(character.CurrentEquip.Profession)	.c_str(),	character.CurrentEquip.Profession.Level,	
-		::klib::getWeaponName		(character.CurrentEquip.Weapon)		.c_str(),	character.CurrentEquip.Weapon.Level,	
+	printf("\n----------------------- %s is a %s level %u.\nWeapon: %s level %u.\nArmor: %s level %u.\n",
+		character.Name.c_str(),
+		::klib::getProfessionName	(character.CurrentEquip.Profession)	.c_str(),	character.CurrentEquip.Profession.Level,
+		::klib::getWeaponName		(character.CurrentEquip.Weapon)		.c_str(),	character.CurrentEquip.Weapon.Level,
 		::klib::getArmorName		(character.CurrentEquip.Armor )		.c_str(),	character.CurrentEquip.Armor.Level);
-		
+
 	printf("-------------- Max points:\n");
 	characterPoints.LifeMax.Print();
 	printf("-------------- Current points:\n");
@@ -357,7 +357,7 @@ TURN_OUTCOME															playerTurn					(::klib::CCharacter& adventurer, ::kli
 		printCharacterShortInfo	(adventurer);
 		printStatuses			(adventurer);
 		printBonuses			(adventurer);
-		
+
 		printCharacterShortInfo	(currentEnemy);
 		printStatuses			(currentEnemy);
 		printBonuses			(currentEnemy);
@@ -454,7 +454,7 @@ int32_t																	selectItemsPlayer			(klib::CCharacter& user)												
 	if(indexInventory == (int32_t)user.Goods.Inventory.Items.Count)	// exit option
 		indexInventory															= user.Goods.Inventory.Items.Count;	// Exit menu
 	else if (user.Goods.Inventory.Items[indexInventory].Count <= 0) {
-		printf("You don't have anymore of that. Use something else...\n"); 
+		printf("You don't have anymore of that. Use something else...\n");
 		indexInventory															= user.Goods.Inventory.Items.Count;
 	}
 	else {
@@ -462,7 +462,7 @@ int32_t																	selectItemsPlayer			(klib::CCharacter& user)												
 		const ::klib::SItem															& entityItem		= user.Goods.Inventory.Items[indexInventory].Entity;
 		const ::klib::CItem															& itemDescription	= ::klib::itemDescriptions[entityItem.Definition];
 		const ::klib::SEntityPoints													& userFinalPoints	= user.FinalPoints;
-		if( ::klib::ITEM_TYPE_POTION == itemDescription.Type 
+		if( ::klib::ITEM_TYPE_POTION == itemDescription.Type
 			&&  (	(::klib::PROPERTY_TYPE_HEALTH	== itemDescription.Property && user.Points.LifeCurrent.Health	>= (userFinalPoints.LifeMax.Health	))
 				||	(::klib::PROPERTY_TYPE_SHIELD	== itemDescription.Property && user.Points.LifeCurrent.Shield	>= (userFinalPoints.LifeMax.Shield	))
 				||	(::klib::PROPERTY_TYPE_MANA		== itemDescription.Property && user.Points.LifeCurrent.Mana		>= (userFinalPoints.LifeMax.Mana	))
@@ -487,7 +487,7 @@ int32_t																	selectItemsAI				(klib::CCharacter& user)														{
 	const ::klib::CItem															& itemDescription			= klib::itemDescriptions[entityItem.Definition];
 	const ::klib::SEntityPoints													& userFinalPoints			= user.FinalPoints;
 	// Only use potions if we have less than 60% HP
-	if( ::klib::ITEM_TYPE_POTION == itemDescription.Type 
+	if( ::klib::ITEM_TYPE_POTION == itemDescription.Type
 		&&  (	(::klib::PROPERTY_TYPE_HEALTH	== itemDescription.Property && user.Points.LifeCurrent.Health	> (userFinalPoints.LifeMax.Health	*.60))
 			||	(::klib::PROPERTY_TYPE_SHIELD	== itemDescription.Property && user.Points.LifeCurrent.Shield	> (userFinalPoints.LifeMax.Shield	*.60))
 			||	(::klib::PROPERTY_TYPE_MANA		== itemDescription.Property && user.Points.LifeCurrent.Mana		> (userFinalPoints.LifeMax.Mana		*.60))
@@ -499,7 +499,7 @@ int32_t																	selectItemsAI				(klib::CCharacter& user)														{
 		printf(userMessage.c_str(), itemName.c_str());
 		indexInventory															= user.Goods.Inventory.Items.Count;
 	}
-		
+
 	return indexInventory;
 }
 
@@ -531,7 +531,7 @@ bool																	useItems					(klib::CCharacter& user, klib::CCharacter& tar
 		const ::klib::CItem															& itemDescription			= klib::itemDescriptions[entityItem.Definition];
 		const ::klib::SEntityPoints													& userFinalPoints			= user.FinalPoints;
 		// Only use potions if we have less than 60% HP
-		if( klib::ITEM_TYPE_POTION == itemDescription.Type 
+		if( klib::ITEM_TYPE_POTION == itemDescription.Type
 			&&  (	(klib::PROPERTY_TYPE_HEALTH	== itemDescription.Property && user.Points.LifeCurrent.Health	>= userFinalPoints.LifeMax.Health	)
 				||	(klib::PROPERTY_TYPE_SHIELD	== itemDescription.Property && user.Points.LifeCurrent.Shield	>= userFinalPoints.LifeMax.Shield	)
 				||	(klib::PROPERTY_TYPE_MANA	== itemDescription.Property && user.Points.LifeCurrent.Mana		>= userFinalPoints.LifeMax.Mana		)
@@ -546,6 +546,6 @@ bool																	useItems					(klib::CCharacter& user, klib::CCharacter& tar
 
 	if(bUsedItem)
 		bUsedItem																= klib::executeItem(indexInventory, user, target);
-	
+
 	return bUsedItem;
 }

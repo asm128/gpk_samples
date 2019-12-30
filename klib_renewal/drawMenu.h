@@ -39,9 +39,9 @@ namespace klib
 	template <size_t _FormatLen>
 	static						int32_t						drawExitOption										(char* targetASCII, uint16_t* targetAttributes, uint32_t targetWidth, uint32_t targetHeight, uint32_t posXOffset, ::klib::ALIGN_SCREEN align, const char (&formatString)[_FormatLen], const std::string& exitText, bool bSelected )		{
 		int32_t														offsetY												= (int32_t)targetHeight-MENU_ROFFSET-1;
-		int32_t														actualOffsetX										= ::klib::printfToRect(targetASCII, targetWidth, targetHeight, offsetY, posXOffset, align, formatString, "0", exitText.c_str());	
+		int32_t														actualOffsetX										= ::klib::printfToRect(targetASCII, targetWidth, targetHeight, offsetY, posXOffset, align, formatString, "0", exitText.c_str());
 
-		uint16_t													colorBkg											= bSelected ? COLOR_GREEN << 4 : COLOR_GREEN;  
+		uint16_t													colorBkg											= bSelected ? COLOR_GREEN << 4 : COLOR_GREEN;
 		return ::klib::valueToRect(targetAttributes, targetWidth, targetHeight,  offsetY, actualOffsetX, ::klib::SCREEN_LEFT, &colorBkg, 1, (int32_t)exitText.size()+3);
 	}
 
@@ -50,9 +50,9 @@ namespace klib
 		bool														bMouseOverExit										= mouseOver(frameInput.Mouse.Deltas.x, frameInput.Mouse.Deltas.y, exitOffset-4, (int32_t)targetHeight-MENU_ROFFSET-1, (int32_t)exitText.size()+4);
 
 		_ReturnType													resultVal											= noActionValue;
-		if(localPersistentState.CurrentPage < (pageCount-1) && (frameInput.Keys[VK_NEXT] || frameInput.Keys[VK_RIGHT])) 
+		if(localPersistentState.CurrentPage < (pageCount-1) && (frameInput.Keys[VK_NEXT] || frameInput.Keys[VK_RIGHT]))
 			(bResetMenuStuff = true) && ++localPersistentState.CurrentPage;
-		else if(localPersistentState.CurrentPage > 0 && (frameInput.Keys[VK_PRIOR] || frameInput.Keys[VK_LEFT])) 
+		else if(localPersistentState.CurrentPage > 0 && (frameInput.Keys[VK_PRIOR] || frameInput.Keys[VK_LEFT]))
 			(bResetMenuStuff = true) && --localPersistentState.CurrentPage;
 		else if(frameInput.Keys[VK_DOWN])  {		// Test down and up keys.
 			++localPersistentState.CurrentOption;
@@ -98,7 +98,7 @@ namespace klib
 					break;
 				}
 			}
-		}	
+		}
 
 		return resultVal;
 	}
@@ -109,11 +109,11 @@ namespace klib
 
 		optionCount												= (optionCount < _ArraySize) ? optionCount : _ArraySize; // Fix optionCount to the maximum size of the array if optionCount is higher than the allowed size.
 
-		int32_t														lineOffset											= (int32_t)(targetHeight-MENU_ROFFSET-4-std::min((int32_t)optionCount, 9));
-		const int32_t												clearOffset											= (int32_t)(targetHeight-MENU_ROFFSET-4-9);
+		int32_t														lineOffset											= (int32_t)(targetHeight - MENU_ROFFSET - 4 - ::gpk::min((int32_t)optionCount, 9));
+		const int32_t												clearOffset											= (int32_t)(targetHeight - MENU_ROFFSET - 4 - 9);
 		const int32_t												optionsOffset										= lineOffset;
 
-		std::string													clearString											(::std::max(rowWidth, 128U), ' ');
+		std::string													clearString											(::gpk::max(rowWidth, 128U), ' ');
 		for(int32_t i=-2, count = (int32_t)targetHeight-clearOffset; i<count; ++i)
 			::klib::printfToRectColored(targetASCII, targetWidth, targetHeight, targetAttributes, (COLOR_BLACK<<4) | COLOR_YELLOW, clearOffset+i, 0, ::klib::SCREEN_CENTER, "%s", clearString.c_str()); // clear all lines where we're going to draw
 
@@ -126,10 +126,10 @@ namespace klib
 
 		// Build formatted menu title
 		char														titleFormat		[]									= "-- %s --";
-		char														titleFormatted	[128]								= {}; 
+		char														titleFormatted	[128]								= {};
 		int32_t														titleLength											= (int32_t)sprintf_s(titleFormatted, titleFormat, title.c_str());
 
-		rowWidth												= ::std::max((uint32_t)titleLength, std::max((uint32_t)exitText.size()+3, rowWidth));
+		rowWidth												= ::gpk::max((uint32_t)titleLength, ::gpk::max((uint32_t)exitText.size()+3, rowWidth));
 		const bool													bDonePrinting										= ::klib::getMessageSlow(localPersistentState.SlowTitle, titleFormatted, titleLength, drawMenu_globals.Timer.LastTimeSeconds*4);
 		int32_t														actualOffsetX										= ::klib::lineToRect(targetASCII, targetWidth, targetHeight, lineOffset, 0, ::klib::SCREEN_CENTER, localPersistentState.SlowTitle);		//"-- %s --", title.c_str() );	// Print menu title
 		for(uint32_t i=0; i<rowWidth+1; i++)
@@ -147,7 +147,7 @@ namespace klib
 		sprintf_s(formatString, "%%2.2s: %%-%u.%us", numberCharsAvailable, numberCharsAvailable);
 
 		// Draw options
-		uint32_t													actualOptionCount									= std::min(9U, (uint32_t)(optionCount-(localPersistentState.CurrentPage*9)));
+		uint32_t													actualOptionCount									= ::gpk::min(9U, (uint32_t)(optionCount-(localPersistentState.CurrentPage*9)));
 		const uint32_t											itemOffset											= localPersistentState.CurrentPage*9;
 		if(drawMenu_globals.Accumulator.Value < 0.575 && localPersistentState.MenuItemAccum < actualOptionCount)
 			drawMenu_globals.Accumulator.Value						= 0.575;
@@ -162,7 +162,7 @@ namespace klib
 
 		if( localPersistentState.CurrentOption >= (int32_t)actualOptionCount )
 			localPersistentState.CurrentOption						= actualOptionCount-1;
-		
+
 		const uint32_t												posXOffset											= 0;
 		for(uint32_t i = 0, count = (localPersistentState.MenuItemAccum < actualOptionCount) ? localPersistentState.MenuItemAccum : actualOptionCount; i < count; ++i) {
 			::sprintf_s(numberKey, "%u", (uint32_t)(i+1));
@@ -170,8 +170,8 @@ namespace klib
 			if(localPersistentState.CurrentOption == (int32_t)i)
 				for(uint32_t j = 0; j < rowWidth + 1; ++j)
 					targetAttributes[lineOffset * targetWidth + actualOffsetX + j]	= COLOR_YELLOW << 4;
-			else															  
-				for(uint32_t j = 0; j < rowWidth + 1; ++j)						  
+			else
+				for(uint32_t j = 0; j < rowWidth + 1; ++j)
 					targetAttributes[lineOffset * targetWidth + actualOffsetX + j]	= COLOR_YELLOW;
 
 			++lineOffset;
@@ -183,9 +183,9 @@ namespace klib
 			exitOffset												= ::klib::drawExitOption(targetASCII, targetAttributes, targetWidth, targetHeight, posXOffset, ::klib::SCREEN_CENTER, formatString, exitText.begin(), localPersistentState.CurrentOption == 10);
 
 		// Print page control help if multipage.
-		if(multipage) 
+		if(multipage)
 			printMultipageHelp(targetASCII, targetWidth, targetHeight, localPersistentState.CurrentPage, pageCount, posXOffset);
-		
+
 		_ReturnType													resultVal											= noActionValue;
 		bool														bResetMenuStuff										= false;
 		bool														bResetTitle											= false;
@@ -211,7 +211,7 @@ namespace klib
 	inline _ReturnType										drawMenu			(::gpk::view_grid<_tCell> display, uint16_t* targetAttributes, uint32_t optionCount, const std::string& title, const klib::SMenuItem<_ReturnType>(&menuItems)[_ItemCount], const ::klib::SInput& frameInput, _ReturnType exitValue, _ReturnType noActionValue = -1, uint32_t rowWidth=20, bool disableEscapeKey=false, const std::string& exitText="Exit this menu") {
 		return ::klib::drawMenu(display.begin(), targetAttributes, display.metrics().x, display.metrics().y, optionCount, title, menuItems, frameInput, exitValue, noActionValue, rowWidth, disableEscapeKey, {exitText.data(), (uint32_t)exitText.size()});
 	}
-	
+
 	template <typename _tCell, size_t _ItemCount, typename _ReturnType>
 	inline _ReturnType										drawMenu			(::gpk::view_grid<_tCell> display, uint16_t* targetAttributes, const std::string& title, const ::klib::SMenuItem<_ReturnType>(&menuItems)[_ItemCount], const ::klib::SInput& frameInput, _ReturnType exitValue, _ReturnType noActionValue = -1, uint32_t rowWidth=20, bool disableEscapeKey=false, const std::string& exitText="Exit this menu") {
 		return ::klib::drawMenu(display.begin(), targetAttributes, display.metrics().x, display.metrics().y, _ItemCount, title, menuItems, frameInput, exitValue, noActionValue, rowWidth, disableEscapeKey, {exitText.data(), (uint32_t)exitText.size()});

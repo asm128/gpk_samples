@@ -18,11 +18,11 @@ SGameState														drawSquadSetupMenu									(SGame& instanceGame)								
 		char																buffer[128];
 		if(player.Squad.Agents[i] != -1)  {
 			const CCharacter													& playerAgent										= *player.Army[player.Squad.Agents[i]];
-			maxNameLen														= std::max(maxNameLen, sprintf_s(buffer, "Agent #%u: %s", i+1, playerAgent.Name.c_str()));
+			maxNameLen														= ::gpk::max(maxNameLen, sprintf_s(buffer, "Agent #%u: %s", i+1, playerAgent.Name.c_str()));
 			menuItems[i].Text												= buffer;
 		}
 		else {
-			maxNameLen														= std::max(maxNameLen, sprintf_s(buffer, "Agent #%u: Empty slot", i+1));
+			maxNameLen														= ::gpk::max(maxNameLen, sprintf_s(buffer, "Agent #%u: Empty slot", i+1));
 			menuItems[i].Text												= buffer;
 		}
 	}

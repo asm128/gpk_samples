@@ -19,18 +19,18 @@ namespace klib
 		int32_t														displayWidth								= (int32_t)display.Width;
 		//int32_t														displayDepth								= (int32_t)display.Depth;
 
-		for(int32_t x=0; x<displayWidth; ++x) 
+		for(int32_t x=0; x<displayWidth; ++x)
 			if(display.DisplayWeights[0][x] == 0)  {
 				if( 0 == (rand()%200) && x % 2) {
-					display.Screen			.Cells[0][x]					= (::gpk::noise1D((uint32_t)(lastTimeSeconds*10000+x), disturbance) > 0.0) ? '.' : (::gpk::noise1D((uint32_t)(lastTimeSeconds*10000-x*x), disturbance) > 0.0) ? 15 : ',';	
+					display.Screen			.Cells[0][x]					= (::gpk::noise1D((uint32_t)(lastTimeSeconds*10000+x), disturbance) > 0.0) ? '.' : (::gpk::noise1D((uint32_t)(lastTimeSeconds*10000-x*x), disturbance) > 0.0) ? 15 : ',';
 					display.DisplayWeights	.Cells[0][x]					= .00001f;
 					display.Speed			.Cells[0][x]					= rand()*.001f;
 					display.SpeedTarget		.Cells[0][x]					= rand()*.001f;
 					display.TextAttributes	.Cells[0][x]					= (::gpk::noise1D((uint32_t)(lastTimeSeconds*10000-x), disturbance) > 0.0) ? COLOR_CYAN:COLOR_WHITE;
 				}
 			}
-	
-		for(uint32_t z=0; z<display.Depth-2; ++z) 
+
+		for(uint32_t z=0; z<display.Depth-2; ++z)
 			for(uint32_t x=0; x<display.Width; ++x) {
 				if(display.DisplayWeights.Cells[z][x] == 0)
 					continue;
@@ -43,7 +43,7 @@ namespace klib
 					display.Speed.Cells	[z][x]								-= (float)((display.Speed.Cells[z][x]*lastTimeSeconds*lastTimeSeconds));//*.1f;
 			}
 
-		for(uint32_t z=0; z<display.Depth-2; ++z) 
+		for(uint32_t z=0; z<display.Depth-2; ++z)
 			for(uint32_t x=0; x<display.Width; ++x) {
 				if(display.DisplayWeights.Cells[z][x] == 0)
 					continue;
@@ -60,7 +60,7 @@ namespace klib
 
 					display.Screen			.Cells[z][x]					= ' ';
 					display.DisplayWeights	.Cells[z][x]					= 0;
-					display.Speed			.Cells[z][x]					= 0; 
+					display.Speed			.Cells[z][x]					= 0;
 					display.SpeedTarget		.Cells[z][x]					= 0;
 					display.TextAttributes	.Cells[z][x]					= COLOR_WHITE;
 				}
@@ -77,7 +77,7 @@ namespace klib
 		uint32_t													lastRow										= bReverse ? displayDepth - 1 : 0;
 		uint64_t													seed										= (uint64_t)(disturbance+lastTimeSeconds*100000*(1+(rand()%100)));
 		uint32_t													randBase									= (uint32_t)(lastTimeSeconds*(disturbance+654)*100000			);
-		for(int32_t x=0; x<displayWidth; ++x) 
+		for(int32_t x=0; x<displayWidth; ++x)
 			if(display.DisplayWeights.Cells[firstRow][x] == 0) {
 				if( 0 == (rand()%4) ) {
 					display.Screen			.Cells[firstRow][x]				=  (::gpk::noise1D(randBase+x, seed+1203) > 0.0) ? '.' :  (::gpk::noise1D(randBase+1+x*x, seed+1235) > 0.0) ? '|' : ',';
@@ -88,12 +88,12 @@ namespace klib
 				}
 			}
 
-		for(uint32_t z = 0, maxZ = display.Depth; z < maxZ; z ++) 
+		for(uint32_t z = 0, maxZ = display.Depth; z < maxZ; z ++)
 			for(uint32_t x=0; x<display.Width; ++x) {
 				if(lastRow == z) {
 					display.Screen			.Cells[lastRow][x]				= ' ';
 					display.DisplayWeights	.Cells[lastRow][x]				= 0;
-					display.Speed			.Cells[lastRow][x]				= 0; 
+					display.Speed			.Cells[lastRow][x]				= 0;
 					display.SpeedTarget		.Cells[lastRow][x]				= 0;
 				}
 				if(display.Screen.Cells[z][x] == ' ')
@@ -107,24 +107,24 @@ namespace klib
 					display.Speed.Cells[z][x] -= (float)(display.Speed.Cells[z][x]*lastTimeSeconds);
 			}
 
-		for(uint32_t z = 0, maxZ = display.Depth; z < maxZ; z ++) 
+		for(uint32_t z = 0, maxZ = display.Depth; z < maxZ; z ++)
 			for(uint32_t x=0; x<display.Width; ++x) {
 				if(display.Screen.Cells[z][x] == ' ')
 					continue;
-			
+
 				if(display.DisplayWeights.Cells[z][x] > 1.0) {
 					int randX = ((::gpk::noise1D(randBase+x+z*display.Width), seed+544) > 0.0) ? rand()%(1+disturbance*2)-disturbance : 0;
 					int32_t xpos = ::gpk::min(::gpk::max(0, (int)x+randX), displayWidth-1);
 					int32_t zpos = bReverse ? z+1 : z-1;
-	
+
 					if((rand()%disappearChanceDivisor) == 0) {
 						display.Screen			.Cells[zpos][xpos] = ' ';
 						display.DisplayWeights	.Cells[zpos][xpos] = 0;
 					}
-					else { 
+					else {
 						if(('|' == display.Screen	.Cells[z][x]) && z < (display.Depth/5*4)) {
 							display.Screen			.Cells[zpos][xpos] = '.';
-							display.TextAttributes	.Cells[zpos][xpos] = ((bReverse) || (::gpk::noiseNormal1D(x, seed<<2) < 0.0)) ? COLOR_DARKGREY : COLOR_YELLOW; 
+							display.TextAttributes	.Cells[zpos][xpos] = ((bReverse) || (::gpk::noiseNormal1D(x, seed<<2) < 0.0)) ? COLOR_DARKGREY : COLOR_YELLOW;
 						}
 						else if( bReverse && z > (display.Depth/5)) {
 							display.Screen			.Cells[zpos][xpos] = '|';
@@ -145,7 +145,7 @@ namespace klib
 
 					display.Screen				.Cells[z][x]	= ' ';
 					display.DisplayWeights		.Cells[z][x]	= 0;
-					display.Speed				.Cells[z][x]	= 0; 
+					display.Speed				.Cells[z][x]	= 0;
 					display.SpeedTarget			.Cells[z][x]	= 0;
 					display.TextAttributes		.Cells[z][x]	= COLOR_WHITE;
 				}
@@ -159,13 +159,13 @@ namespace klib
 
 		uint64_t seed		= (uint64_t)(disturbance+lastTimeSeconds*100000*(1+(rand()%100)));
 		uint32_t randBase	= (uint32_t)(lastTimeSeconds*(disturbance+654)*100000			);
-		for(int32_t x=0; x<displayWidth; ++x) 
-			//if(display.DisplayWeights[displayDepth-1][x] == 0) 
+		for(int32_t x=0; x<displayWidth; ++x)
+			//if(display.DisplayWeights[displayDepth-1][x] == 0)
 			if(	display.Screen.Cells[displayDepth-1][x] != '0' &&
 				display.Screen.Cells[displayDepth-1][x] != 'o' &&
 				display.Screen.Cells[displayDepth-1][x] != '.' &&
 				display.Screen.Cells[displayDepth-1][x] != 'O'
-			) 
+			)
 			{
 				if( rand()%2 ) {
 					display.Screen			.Cells[displayDepth-1][x] = (::gpk::noise1D(randBase+x, seed+1203) > 0.0) ? 'o' : (::gpk::noise1D(randBase+561+x, seed+2135) > 0.0) ? '0' : (::gpk::noise1D(randBase+x+6, seed+103) > 0.0) ? '.' : 'O';
@@ -175,8 +175,8 @@ namespace klib
 					display.TextAttributes	.Cells[displayDepth-1][x] = (rand() % 2)?COLOR_GREEN:COLOR_DARKGREEN;
 				}
 			}
-	
-		for(uint32_t z=1; z<display.Depth; ++z) 
+
+		for(uint32_t z=1; z<display.Depth; ++z)
 			for(uint32_t x=0; x<display.Width; ++x) {
 				if(display.Screen.Cells[z][x] == ' ')
 					continue;
@@ -184,14 +184,14 @@ namespace klib
 				display.DisplayWeights.Cells[z][x] += (float)(lastTimeSeconds*display.Speed.Cells[z][x]);
 
 				if(display.Speed.Cells[z][x] < display.SpeedTarget.Cells[z][x])
-					display.Speed.Cells	[z][x] += (float)((display.Speed.Cells[z][x]*lastTimeSeconds));	
-				else																					
-					display.Speed.Cells	[z][x] -= (float)((display.Speed.Cells[z][x]*lastTimeSeconds));	
+					display.Speed.Cells	[z][x] += (float)((display.Speed.Cells[z][x]*lastTimeSeconds));
+				else
+					display.Speed.Cells	[z][x] -= (float)((display.Speed.Cells[z][x]*lastTimeSeconds));
 
 				display.Speed.Cells[z][x] *= .999f;
 			}
 
-		for(uint32_t z=1; z<display.Depth; ++z) 
+		for(uint32_t z=1; z<display.Depth; ++z)
 			for(uint32_t x=0; x<display.Width; ++x) {
 				if(display.Screen.Cells[z][x] == ' ')
 					continue;
@@ -201,13 +201,13 @@ namespace klib
 					if(1 == z) {
 						display.Screen			.Cells[0][x]	= ' ';
 						display.DisplayWeights	.Cells[0][x]	= 0;
-						display.Speed			.Cells[0][x]	= 0; 
+						display.Speed			.Cells[0][x]	= 0;
 						display.SpeedTarget		.Cells[0][x]	= 0;
 						display.TextAttributes	.Cells[0][x]	= COLOR_WHITE;
 					}
 					else {
 						int32_t xpos = ::gpk::max(::gpk::min((int)x+randX, displayWidth-1), 0);
-					
+
 						if((rand()%10) == 0)  {
 							display.Screen.Cells[z-1][xpos]			= ' ';
 							display.DisplayWeights.Cells[z-1][xpos]	= 0;
@@ -231,7 +231,7 @@ namespace klib
 
 					display.Screen			.Cells[z][x]		= ' ';
 					display.DisplayWeights	.Cells[z][x]		= 0;
-					display.Speed			.Cells[z][x]		= 0; 
+					display.Speed			.Cells[z][x]		= 0;
 					display.SpeedTarget		.Cells[z][x]		= 0;
 					display.TextAttributes	.Cells[z][x]		= COLOR_WHITE;
 				}
@@ -258,7 +258,7 @@ namespace klib
 			if((curLine+=2) >= 0)
 				printfToRect((char_t*)display, width, depth, curLine, 0, ::klib::SCREEN_CENTER, "%s", namesCredits[i].begin());
 
-		maxDifference = std::max(curLine - curDifference, maxDifference);
+		maxDifference = ::gpk::max(curLine - curDifference, maxDifference);
 
 		offset -= lastFrameTime*6.0;
 
@@ -282,7 +282,7 @@ namespace klib
 		const double	bbHeight		= (double)depth;
 
 		for(uint32_t i=0, memorialLines = namesMemorial.size(); i < memorialLines && curLine < bbHeight; ++i) {
-			static const char format1[]		= 
+			static const char format1[]		=
 				"Damage Dealt        : %-8.8s - "
 				"Damage Taken        : %-8.8s - "
 				"Turns Played        : %-6.6s - "
@@ -292,7 +292,7 @@ namespace klib
 				//"Escapes Failed      : %-6.6s - "
 				;
 
-			static const char format2[]		= 
+			static const char format2[]		=
 				"Enemies Killed      : %-8.8s - "
 				"Attacks Hit         : %-8.8s - "
 				"Attacks Missed      : %-6.6s - "
@@ -302,7 +302,7 @@ namespace klib
 				"Grenades Used       : %-6.6s"
 				;
 
-			static const char format3[]		= 
+			static const char format3[]		=
 				"Money Earned        : %-8.8s - "
 				"Money Spent         : %-8.8s"
 				;
@@ -349,28 +349,28 @@ namespace klib
 			messageColor = COLOR_DARKGREY;
 			if((curLine+=2) >= 0 && curLine < bbHeight)
 				offsetX = printfToRectColored((char_t*)display, width, depth, textAttributes, (uint16_t)messageColor, curLine, 3, ::klib::SCREEN_LEFT, format1
-					, bufferDamageDealt			
-					, bufferDamageTaken			
-					, bufferTurnsPlayed			
-					, bufferBattlesWon			
-					, bufferBattlesLost			
-					, bufferEscapesSucceeded	
-					//, bufferEscapesFailed		
+					, bufferDamageDealt
+					, bufferDamageTaken
+					, bufferTurnsPlayed
+					, bufferBattlesWon
+					, bufferBattlesLost
+					, bufferEscapesSucceeded
+					//, bufferEscapesFailed
 					);
 			if((curLine+=1) >= 0 && curLine < bbHeight)
 				::klib::printfToRectColored((char_t*)display, width, depth, textAttributes, (uint16_t)messageColor, curLine, offsetX, ::klib::SCREEN_LEFT, format2
-					, bufferEnemiesKilled		
-					, bufferAttacksHit			
-					, bufferAttacksMissed		
-					, bufferAttacksReceived		
-					, bufferAttacksAvoided		
-					, bufferPotionsUsed			
-					, bufferGrenadesUsed		
+					, bufferEnemiesKilled
+					, bufferAttacksHit
+					, bufferAttacksMissed
+					, bufferAttacksReceived
+					, bufferAttacksAvoided
+					, bufferPotionsUsed
+					, bufferGrenadesUsed
 					);
 			if((curLine+=1) >= 0 && curLine < bbHeight)
 				::klib::printfToRectColored((char_t*)display, width, depth, textAttributes, (uint16_t)messageColor, curLine, offsetX, ::klib::SCREEN_LEFT, format3
-					, bufferMoneyEarned			
-					, bufferMoneySpent			
+					, bufferMoneyEarned
+					, bufferMoneySpent
 					);
 		}
 

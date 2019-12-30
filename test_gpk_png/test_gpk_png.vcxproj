@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{B9842730-D253-4D70-860F-2685BC40C84E}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>gme</RootNamespace>
+    <RootNamespace>test_gpk_png</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

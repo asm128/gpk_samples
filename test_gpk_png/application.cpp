@@ -9,7 +9,7 @@
 //#define GPK_AVOID_LOCAL_APPLICATION_MODULE_MODEL_EXECUTABLE_RUNTIME
 #include "gpk_app_impl.h"
 
-GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
+GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 
 			::gpk::error_t											cleanup								(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.MainDisplay); }
 			::gpk::error_t											setup								(::gme::SApplication & app)						{
@@ -37,7 +37,6 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	}
 
 	{
-		app.PNGImages.resize(::gpk::size(filenames));
 		::gpk::SPNGData															pngDataCacheForFasterLoad;
 		::gpk::view_const_string												pathPNGSuite						= {};
 		{
