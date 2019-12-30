@@ -13,8 +13,6 @@
 
 #include "GameMenu.h"
 
-#include <algorithm>
-
 bool																	useItems					(klib::CCharacter& user, klib::CCharacter& target, bool bIsAIControlled);	// While in combat, displays a list of the available items to use.
 
 bool																	escape						(const std::string& escaperName, klib::SCharacterScore& escaperScore)									{
