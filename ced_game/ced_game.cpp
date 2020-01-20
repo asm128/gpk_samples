@@ -36,7 +36,6 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 		controlConstraints.AttachSizeToControl								= {app.IdExit, -1};
 		::gpk::controlSetParent(gui, app.IdExit, -1);
 	}
-
 	::setupGame(app);
 	return 0;
 }

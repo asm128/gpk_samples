@@ -1,13 +1,25 @@
 #include "ced_game.h"
 
+
+template<typename _tValue>
+static inline								_tValue*			fillArray				(_tValue* targets, const _tValue& value, uint32_t count)																								{
+	for( uint32_t i=0; i < count; ++i )
+		targets[i]														= value;
+
+	return targets;
+}
+
 int													setupStars			(SStars & stars, ::gpk::SCoord2<uint32_t> targetSize)	{
 	if(0 == targetSize.y) return 0;
 	if(0 == targetSize.x) return 0;
 	stars.Speed		.resize(128);
 	stars.Brightness.resize(128);
 	stars.Position	.resize(128);
+	::fillArray(&stars.Speed		[0], 0.0f, stars.Speed		.size());
+	::fillArray(&stars.Brightness	[0], 0.0f, stars.Brightness	.size());
+	::fillArray(&stars.Position		[0],   {}, stars.Position	.size());
 	for(uint32_t iStar = 0; iStar < stars.Brightness.size(); ++iStar) {
-		stars.Speed			[iStar]						= float(1 + (rand() % 16));
+		stars.Speed			[iStar]						= float(16 + (rand() % 64));
 		stars.Brightness	[iStar]						= float(1.0 / 65535 * rand());
 		stars.Position		[iStar].y					= float(rand() % targetSize.y);
 		stars.Position		[iStar].x					= float(rand() % targetSize.x);
@@ -22,6 +34,12 @@ int													modelCreate			(::gme::SApplication & app)	{
 	app.Scene.ModelMatricesGlobal	.resize(indexModel + 7);
 	app.Scene.Models				.resize(indexModel + 7);
 	app.Scene.Entities				.resize(indexModel + 7);
+	::fillArray(&app.Health						[indexModel], 0, app.Health						.size() - indexModel);
+	::fillArray(&app.Scene.ModelMatricesLocal	[indexModel], {}, app.Scene.ModelMatricesLocal	.size() - indexModel);
+	::fillArray(&app.Scene.ModelMatricesGlobal	[indexModel], {}, app.Scene.ModelMatricesGlobal	.size() - indexModel);
+	::fillArray(&app.Scene.Models				[indexModel], {}, app.Scene.Models				.size() - indexModel);
+	::fillArray(&app.Scene.Entities				[indexModel], {}, app.Scene.Entities			.size() - indexModel);
+
 	app.Scene.Models		[indexModel]				= {};
 	app.Scene.Models		[indexModel].Scale			= {1, 1, 1};
 	if(0 == indexModel)
@@ -32,7 +50,7 @@ int													modelCreate			(::gme::SApplication & app)	{
 	for(uint32_t iModel = indexModel + 1; iModel < app.Scene.Models.size(); ++iModel) {
 		::ced::SModel3D											& model			= app.Scene.Models[iModel];
 		model.Scale											= {1, 1, 1};
-		//model.Rotation										= {0, 1, 0};
+		model.Rotation										= {0, 0, 0};
 		model.Position										= {2, 0.5};
 		model.Position.RotateY(::gpk::math_2pi / (app.Scene.Models.size() - 1) * iModel);
 		::ced::SEntity											& entity		= app.Scene.Entities[iModel];
@@ -45,7 +63,7 @@ int													modelCreate			(::gme::SApplication & app)	{
 
 int													setupGame			(::gme::SApplication & app)	{
 	::gpk::SFramework										& framework			= app.Framework;
-	::setupStars(app.Stars, framework.MainDisplayOffscreen->Color.metrics());
+	::setupStars(app.Stars, framework.MainDisplay.Size);
 
 	//::gpk::geometryBuildCube(app.Geometry);
 	//::gpk::geometryBuildGrid(app.Geometry, {2U, 2U}, {1U, 1U});
@@ -71,9 +89,9 @@ int													updateStars			(::SStars & stars, uint32_t yMax, float lastFrameS
 		::gpk::SCoord2<float>									 & starPos			= stars.Position[iStar];
 		float													starSpeed			= stars.Speed[iStar];
 		starPos.y											+= starSpeed * lastFrameSeconds;
-		stars.Brightness[iStar]								= float(1.0 / 65535 * rand());
+		stars.Brightness[iStar]								= float(1.0 / 65535.0 * rand());
 		if(starPos.y >= yMax) {
-			stars.Speed		[iStar]								= float(1 + (rand() % 16));
+			stars.Speed		[iStar]								= float(16 + (rand() % 64));
 			starPos.y											= 0;
 		}
 	}
@@ -146,8 +164,8 @@ int													updateGame				(::gme::SApplication & app)	{
 
 	app.Scene.LightVector										= app.Scene.LightVector.RotateY(lastFrameSeconds * 2);
 	if(framework.MainDisplay.Resized)
-		::setupStars(app.Stars, framework.MainDisplayOffscreen->Color.metrics());
-	::updateStars(app.Stars, framework.MainDisplayOffscreen->Color.metrics().y, (float)lastFrameSeconds);
+		::setupStars(app.Stars, framework.MainDisplay.Size);
+	::updateStars(app.Stars, framework.MainDisplay.Size.y, (float)lastFrameSeconds);
 	app.ShotsPlayer	.Update((float)lastFrameSeconds);
 	app.ShotsEnemy	.Update((float)lastFrameSeconds);
 	app.Debris		.Update((float)lastFrameSeconds);
