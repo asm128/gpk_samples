@@ -48,7 +48,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	::gpk::SMatrix4<float>													& viewportInverse							= transforms.ViewportInverse	;
 	::gpk::SMatrix4<float>													& viewportInverseCentered					= transforms.ViewportInverse	;
 	fieldOfView.FieldOfView(camera.Angle * ::gpk::math_pi, newSize.x / (double)newSize.y, camera.NearFar.Near, camera.NearFar.Far);
-	mviewport.Viewport(newSize, camera.NearFar.Far, camera.NearFar.Near);
+	mviewport.ViewportRH(newSize, camera.NearFar.Far, camera.NearFar.Near);
 	viewportInverse														= mviewport.GetInverse();
 	const ::gpk::SCoord2<int32_t>											screenCenter								= {(int32_t)newSize.x / 2, (int32_t)newSize.y / 2};
 	viewportInverseCentered												= viewportInverse;
