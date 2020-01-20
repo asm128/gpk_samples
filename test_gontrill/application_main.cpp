@@ -151,12 +151,12 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 					::gpk::error_t										drawCollisions								(::SApplication& applicationInstance);
 					::gpk::error_t										draw										(::SApplication& applicationInstance)											{
 	gerror_if(errored(::drawBackground	(applicationInstance)), "Why??");	// --- Draw stars
-	gerror_if(errored(::drawPowerups		(applicationInstance)), "Why??");	// --- Draw powerups
+	gerror_if(errored(::drawPowerups	(applicationInstance)), "Why??");	// --- Draw powerups
 	gerror_if(errored(::drawShips		(applicationInstance)), "Why??");	// --- Draw ship
 	gerror_if(errored(::drawCrosshair	(applicationInstance)), "Why??");	// --- Draw crosshair
 	gerror_if(errored(::drawThrust		(applicationInstance)), "Why??");	// --- Draw propulsion engine
 	gerror_if(errored(::drawShots		(applicationInstance)), "Why??");	// --- Draw lasers
-	gerror_if(errored(::drawCollisions	(applicationInstance)), "Why??");	// --- Draw lasers
+	gerror_if(errored(::drawCollisions	(applicationInstance)), "Why??");	// --- Draw debris particles
 
 	static constexpr	const ::gpk::SCoord2<int32_t>							sizeCharCell								= {9, 16};
 	uint32_t																	lineOffset									= 0;

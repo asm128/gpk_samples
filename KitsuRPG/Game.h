@@ -1,7 +1,7 @@
 #include "Character.h"
 #include "Combat.h"
-#include "GameMenu.h"
 #include "Item.h"
+#include "GameMenu.h"
 
 #ifndef __GAME_H__99823740927349023649827346982734__
 #define __GAME_H__99823740927349023649827346982734__

@@ -88,12 +88,12 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	char																		temp		[512]							= {};
 	::gpk::SRSWFileContents														& rswData									= app.RSWData;
 	//sprintf_s(temp, "%s%s%s", ragnaPath, "", "in_sphinx1.rsw");						gpk_necall(::gpk::rswFileLoad(rswData						, ::gpk::view_const_string(temp)), "Error");
-	sprintf_s(temp, "%s%s%s", ragnaPath, "", "aldebaran.rsw");					gpk_necall(::gpk::rswFileLoad(rswData		, ::gpk::view_const_string(temp)), "Error");
+	sprintf_s(temp, "%s%s%s", ragnaPath, "", "alberta.rsw");					gpk_necall(::gpk::rswFileLoad(rswData		, ::gpk::view_const_string(temp)), "Error");
 	sprintf_s(temp, "%s%s%s", ragnaPath, "", &rswData.GNDFilename[0]);			gpk_necall(::gpk::gndFileLoad(app.GNDData	, ::gpk::view_const_string(temp)), "Error");
 	app.RSMData.resize(rswData.RSWModels.size());
 	for(uint32_t iRSM = 0; iRSM < (uint32_t)rswData.RSWModels.size(); ++iRSM){
 		::gpk::SRSMFileContents														& rsmData									= app.RSMData[iRSM];
-		sprintf_s(temp, "%s%s%s", ragnaPath, "model\\", &rswData.RSWModels[iRSM].Filename[0]);	
+		sprintf_s(temp, "%s%s%s", ragnaPath, "model\\", &rswData.RSWModels[iRSM].Filename[0]);
 		gerror_if(errored(::gpk::rsmFileLoad(rsmData, ::gpk::view_const_string(temp))), "Failed to load file: %s.", temp);
 	}
 	for(uint32_t iLight = 0; iLight < rswData.RSWLights.size(); ++iLight) {
@@ -104,7 +104,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 
 	app.TexturesGND.resize(app.GNDData.TextureNames.size());
 	for(uint32_t iTex = 0; iTex < app.GNDData.TextureNames.size(); ++ iTex) {
-		sprintf_s(temp, "%s%s%s", ragnaPath, "texture\\", &app.GNDData.TextureNames[iTex][0]);	
+		sprintf_s(temp, "%s%s%s", ragnaPath, "texture\\", &app.GNDData.TextureNames[iTex][0]);
 		gerror_if(errored(::gpk::bmpFileLoad(::gpk::view_const_string(temp), app.TexturesGND[iTex])), "Not found? %s.", temp);
 	}
 
@@ -158,9 +158,9 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	app.Scene.Camera.NearFar.Far											= 1000;
 	app.Scene.Camera.NearFar.Near											= 0.001;
 
-	::gpk::SGNDFileContents														& gndData										= app.GNDData;
+	::gpk::SGNDFileContents														& gndData									= app.GNDData;
 		// -- Generate minimap
-	::gpk::SMinMax<float>														heightMinMax									= {};
+	::gpk::SMinMax<float>														heightMinMax								= {};
 	for(uint32_t iTile = 0; iTile < gndData.lstTileGeometryData.size(); ++iTile)
 		if(gndData.lstTileGeometryData[iTile].SkinMapping.SkinIndexTop != -1) {
 			for(uint32_t iHeight = 0; iHeight < 4; ++iHeight) {
@@ -171,11 +171,11 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	::gpk::SImage<::gpk::SColorBGRA>	minimapTemp;
 	minimapTemp.resize(gndData.Metrics.Size);
 
-	::gpk::view_grid<::gpk::SColorBGRA>											& minimapView									= minimapTemp.View;
-	const float																	heightRange										= heightMinMax.Max - heightMinMax.Min;
+	::gpk::view_grid<::gpk::SColorBGRA>											& minimapView								= minimapTemp.View;
+	const float																	heightRange									= heightMinMax.Max - heightMinMax.Min;
 	for(uint32_t y = 0, yMax = minimapView.metrics().y; y < yMax; ++y)
 	for(uint32_t x = 0, xMax = minimapView.metrics().x; x < xMax; ++x) {
-		float																		fAverageHeight									= 0;
+		float																		fAverageHeight								= 0;
 		for(uint32_t iHeight = 0; iHeight < 4; ++iHeight)
 			fAverageHeight															+= tileGeometryView[y][x].fHeight[iHeight] * -1;
 		fAverageHeight															*= .25f;
@@ -198,8 +198,8 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	app.SliderH															= ::gpk::sliderCreate(app.DialogMain, sliderH);
 	sliderH->ValueLimits.Min											= 0;
 	sliderH->ValueLimits.Max											= app.TextureMinimap.View.metrics().x / 2;
-	controlTable.Controls[sliderH->IdGUIControl].Area.Offset			= {128, 128};
-	controlTable.Controls[sliderH->IdGUIControl].Area.Size.x			= 128;
+	controlTable.Controls[sliderH->IdGUIControl].Area.Offset			= {0, 0};
+	controlTable.Controls[sliderH->IdGUIControl].Area.Size.x			= controlTable.Controls[viewport->IdGUIControl].Area.Size.x;
 	controlTable.Controls[sliderH->IdGUIControl].Area.Size.y			= 8;
 	controlTable.Constraints[sliderH->IdGUIControl].DockToControl.Bottom= viewport->IdGUIControl;
 	controlTable.Constraints[sliderH->IdGUIControl].DockToControl.Left	= viewport->IdGUIControl;
@@ -210,10 +210,10 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	sliderV->ValueLimits.Min											= 0;
 	sliderV->ValueLimits.Max											= app.TextureMinimap.View.metrics().y / 2;
 	sliderV->Vertical													= true;
-	controlTable.Controls[sliderV->IdGUIControl].Area.Offset			= {128, 128};
+	controlTable.Controls[sliderV->IdGUIControl].Area.Offset			= {0, 20};
 	controlTable.Controls[sliderV->IdGUIControl].Area.Size.x			= 8;
-	controlTable.Controls[sliderV->IdGUIControl].Area.Size.y			= 128;
-	controlTable.Constraints[sliderV->IdGUIControl].DockToControl.Bottom= viewport->IdGUIControl;
+	controlTable.Controls[sliderV->IdGUIControl].Area.Size.y			= controlTable.Controls[viewport->IdGUIControl].Area.Size.y - 20;
+	controlTable.Constraints[sliderV->IdGUIControl].DockToControl.Top	= viewport->IdGUIControl;
 	controlTable.Constraints[sliderV->IdGUIControl].DockToControl.Right	= viewport->IdGUIControl;
 	::gpk::sliderSetValue(*sliderV, 0);
 	return 0;
@@ -247,8 +247,14 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	//----------------------------------------------
 	::gpk::SFrameInfo															& frameInfo									= framework.FrameInfo;
 	bool																		updateProjection							= false;
-	if(framework.Input->KeyboardCurrent.KeyState[VK_ADD		])	{ updateProjection = true; app.Scene.Camera.Angle += frameInfo.Seconds.LastFrame * .05f; }
-	if(framework.Input->KeyboardCurrent.KeyState[VK_SUBTRACT])	{ updateProjection = true; app.Scene.Camera.Angle -= frameInfo.Seconds.LastFrame * .05f; }
+	if(framework.Input->KeyboardCurrent.KeyState[VK_ADD		])	{ updateProjection = true; app.Scene.Camera.Angle += frameInfo.Seconds.LastFrame; }
+	if(framework.Input->KeyboardCurrent.KeyState[VK_SUBTRACT])	{ updateProjection = true; app.Scene.Camera.Angle -= frameInfo.Seconds.LastFrame; }
+	if(framework.Input->KeyboardCurrent.KeyState['Q'])			{ updateProjection = true; app.Scene.Camera.Points.Position.x += (float)frameInfo.Seconds.LastFrame * 10; }
+	if(framework.Input->KeyboardCurrent.KeyState['E'])			{ updateProjection = true; app.Scene.Camera.Points.Position.x -= (float)frameInfo.Seconds.LastFrame * 10; }
+	if(framework.Input->KeyboardCurrent.KeyState['W'])			{ updateProjection = true; app.Scene.Camera.Points.Position.y += (float)frameInfo.Seconds.LastFrame * 10; }
+	if(framework.Input->KeyboardCurrent.KeyState['S'])			{ updateProjection = true; app.Scene.Camera.Points.Position.y -= (float)frameInfo.Seconds.LastFrame * 10; }
+	if(framework.Input->KeyboardCurrent.KeyState['A'])			{ updateProjection = true; app.Scene.Camera.Points.Position.z += (float)frameInfo.Seconds.LastFrame * 10; }
+	if(framework.Input->KeyboardCurrent.KeyState['D'])			{ updateProjection = true; app.Scene.Camera.Points.Position.z -= (float)frameInfo.Seconds.LastFrame * 10; }
 
 
 	//------------------------------------------------ Camera
@@ -273,7 +279,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 		rswData.RSWLights[iLight].Position.RotateY(frameInfo.Seconds.LastFrame);
 		rswData.RSWLights[iLight].Position										+= halfMapDir;
 	}
-	//------------------------------------------------ 
+	//------------------------------------------------
 	//app.GridPivot.Scale										= {2.f, 4.f, 2.f};
 	app.GridPivot.Scale										= {1, -1, -1};
 	app.GridPivot.Orientation.Normalize();
@@ -299,7 +305,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	return 0;
 }
 
-					::gpk::error_t										drawGND										
+			::gpk::error_t											drawGND
 	( ::gpk::SRenderCache												& renderCache
 	, ::gpk::SSceneTransforms											& transforms
 	, ::gpk::SSceneCamera												& camera
@@ -326,7 +332,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	::gpk::ptr_obj<::gpk::SDialogCheckBox>			checkbox;
 	app.DialogMain.Controls[app.CheckBox].as(checkbox);
 
-	int32_t 																pixelsDrawn0								= drawGND(app.RenderCache, app.Scene.Transforms, app.Scene.Camera, buffer3D, app.GridPivot, app.LightDirection, app.GNDModel, app.RSWData.Light, app.TexturesGND, app.RSWData.RSWLights, checkbox->Checked); 
+	int32_t 																pixelsDrawn0								= drawGND(app.RenderCache, app.Scene.Transforms, app.Scene.Camera, buffer3D, app.GridPivot, app.LightDirection, app.GNDModel, app.RSWData.Light, app.TexturesGND, app.RSWData.RSWLights, checkbox->Checked);
 	gerror_if(errored(pixelsDrawn0), "??");
 	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>		target;
 	target.create();

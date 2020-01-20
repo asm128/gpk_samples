@@ -289,7 +289,7 @@ static				::gpk::error_t										addParticle
 {
 	int32_t																		indexParticleInstance						= ::gpk::addParticle(particleType, particleInstances, particleIntegrator, particleDefinitions[particleType.Type]);
 	ree_if(errored(indexParticleInstance), "Cannot create particle instance.");
-	::gpk::SParticleBinding<_tParticleType>									& newInstance								= particleInstances[indexParticleInstance];
+	::gpk::SParticleBinding<_tParticleType>										& newInstance								= particleInstances[indexParticleInstance];
 	::SApplication::TParticle													& newParticle								= particleIntegrator.Particle[newInstance.IndexParticlePhysics];
 	newParticle.Position													= particlePosition;
 	::gpk::SCoord2<float>														newDirection								= particleDirection;

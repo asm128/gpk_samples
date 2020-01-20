@@ -17,7 +17,6 @@
 	, const ::gpk::SColorFloat								& ambientColor
 	, const ::gpk::view_array<const ::gpk::SLightInfoRSW>	& lights
 	) {	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
-	::gpk::SColorFloat															lightColor									= {0, 0, 0, 1}; //((::gpk::RED * pixelWeights.A) + (::gpk::GREEN * pixelWeights.B) + (::gpk::BLUE * pixelWeights.C));
 	const ::gpk::STriangle3D<float>												& normals									= renderCache.TransformedNormalsVertex[iTriangle];
 	::gpk::STriangle3D<double>													weightedNormals								=
 		{ normals.A.Cast<double>() * pixelWeights.A
@@ -32,13 +31,14 @@
 		, uvs.A.y * pixelWeights.A + uvs.B.y * pixelWeights.B + uvs.C.y * pixelWeights.C
 		};
 	const ::gpk::STriangle3D<double>											weightedPositions							=
-		{ positions.A.Cast<double>() * pixelWeights.A//((::gpk::RED * pixelWeights.A) + (::gpk::GREEN * pixelWeights.B) + (::gpk::BLUE * pixelWeights.C));
+		{ positions.A.Cast<double>() * pixelWeights.A
 		, positions.B.Cast<double>() * pixelWeights.B
 		, positions.C.Cast<double>() * pixelWeights.C
 		};
 
 	const ::gpk::SCoord3<double>												interpolatedPosition						= weightedPositions.A + weightedPositions.B + weightedPositions.C;
 	::gpk::SColorBGRA															interpolatedBGRA;
+	::gpk::SColorFloat															lightColor									= {0, 0, 0, 1}; //((::gpk::RED * pixelWeights.A) + (::gpk::GREEN * pixelWeights.B) + (::gpk::BLUE * pixelWeights.C));
 	if( 0 == textureMetrics.x
 	 ||	0 == textureMetrics.y
 	 ) {
@@ -47,7 +47,7 @@
 			::gpk::SCoord3<float>														rswColor									= rswLight.Color * (1.0 - (rswLight.Position.Cast<double>() - interpolatedPosition).Length() / 10.0);
 			lightColor																+= ::gpk::SColorFloat(rswColor.x, rswColor.y, rswColor.z, 1.0f) / 2.0;
 		}
-		interpolatedBGRA														= directionalColor + lightColor + ambientColor;
+		interpolatedBGRA														= directionalColor + lightColor + (ambientColor / 2.0);
 	}
 	else {
 		const ::gpk::SCoord2<int32_t>												uvcoords									=
@@ -65,7 +65,7 @@
 				lightColor																+= srcTexel * ::gpk::SColorFloat(rswColor.x, rswColor.y, rswColor.z, 1.0f) / 2.0;
 			}
 		}
-		interpolatedBGRA														= srcTexel * directionalColor + lightColor + srcTexel * ambientColor;
+		interpolatedBGRA														= srcTexel * directionalColor + lightColor + srcTexel * (ambientColor / 2.0);
 	}
 	if( targetColorCell == interpolatedBGRA )
 		return 1;
@@ -202,7 +202,7 @@ static				::gpk::error_t										drawTriangles
 	::gpk::SMatrix4<float>														& viewportInverse							= transforms.ViewportInverse	;
 	::gpk::SMatrix4<float>														& viewportInverseCentered					= transforms.ViewportInverse	;
 	fieldOfView.FieldOfView(camera.Angle * ::gpk::math_pi, targetMetrics.x / (double)targetMetrics.y, camera.NearFar.Near, camera.NearFar.Far);
-	mviewport.Viewport(targetMetrics, camera.NearFar.Far, camera.NearFar.Near);
+	mviewport.ViewportRH(targetMetrics, camera.NearFar.Far, camera.NearFar.Near);
 	viewportInverse															= mviewport.GetInverse();
 	const ::gpk::SCoord2<int32_t>												screenCenter								= {(int32_t)targetMetrics.x / 2, (int32_t)targetMetrics.y / 2};
 	viewportInverseCentered													= viewportInverse;
@@ -275,7 +275,7 @@ static				::gpk::error_t										drawTriangles
 		}
 	}
 
-	static constexpr const ::gpk::SColorBGRA									color										= ::gpk::YELLOW;
+	static constexpr	const ::gpk::SColorBGRA									color										= ::gpk::YELLOW;
 	for(uint32_t iPixel = 0, pixCount = renderCache.WireframePixelCoords.size(); iPixel < pixCount; ++iPixel) {
 		const ::gpk::SCoord2<int32_t>												& pixelCoord								= renderCache.WireframePixelCoords[iPixel];
 		if( offscreen[pixelCoord.y][pixelCoord.x] != color ) {

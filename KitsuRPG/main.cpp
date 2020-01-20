@@ -97,8 +97,8 @@ void											initPlayerCharacter								(klib::CCharacter& adventurer, const s
 	adventurer.Goods.CompletedResearch				= klib::SCharacterResearch();
 #if defined(POWER_START)
 	currentEquip.Weapon		.Index					= (int16_t)::gpk::min(3U, size(klib::definitionsWeapon		)-1);
-	currentEquip.Accessory	.Index					= (int16_t)::gpk::min(3U, size(klib::definitionsAccessory		)-1);
-	currentEquip.Armor		.Index					= (int16_t)::gpk::min(3U, size(klib::definitionsArmor			)-1);
+	currentEquip.Accessory	.Index					= (int16_t)::gpk::min(3U, size(klib::definitionsAccessory	)-1);
+	currentEquip.Armor		.Index					= (int16_t)::gpk::min(3U, size(klib::definitionsArmor		)-1);
 	currentEquip.Profession	.Index					= (int16_t)::gpk::min(3U, size(klib::definitionsProfession	)-1);
 	currentEquip.Vehicle	.Index					= (int16_t)::gpk::min(3U, size(klib::definitionsVehicle		)-1);
 	currentEquip.Facility	.Index					= (int16_t)::gpk::min(3U, size(klib::definitionsFacility	)-1);
