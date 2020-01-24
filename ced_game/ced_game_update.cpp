@@ -48,7 +48,7 @@ int													modelCreate			(::gme::SApplication & app)	{
 	else
 		app.Scene.Models		[indexModel].Rotation.z		= (float)(-::gpk::math_pi_2);
 	app.Scene.Entities		[indexModel]				= {-1};
-	const uint32_t												partHealth			= 200;
+	const uint32_t												partHealth			= 1000;
 	app.Health[indexModel]									= partHealth * countParts;
 	for(uint32_t iModel = indexModel + 1; iModel < app.Scene.Models.size(); ++iModel) {
 		::ced::SModel3D											& model			= app.Scene.Models[iModel];
@@ -85,22 +85,6 @@ int													setupGame			(::gme::SApplication & app)	{
 		//app.Scene.Image[y][x] = ::gpk::SColorBGRA{255, 255, 255} * (1./65535.0 * rand());//, {(uint8_t)rand(), (uint8_t)rand(), (uint8_t)rand(), 0xFF};
 	}
 
-	return 0;
-}
-
-
-
-int													updateStars			(::SStars & stars, uint32_t yMax, float lastFrameSeconds)	{
-	for(uint32_t iStar = 0; iStar < stars.Brightness.size(); ++iStar) {
-		::gpk::SCoord2<float>									 & starPos			= stars.Position[iStar];
-		float													starSpeed			= stars.Speed[iStar];
-		starPos.y											+= starSpeed * lastFrameSeconds;
-		stars.Brightness[iStar]								= float(1.0 / 65535.0 * rand());
-		if(starPos.y >= yMax) {
-			stars.Speed		[iStar]								= float(16 + (rand() % 64));
-			starPos.y											= 0;
-		}
-	}
 	return 0;
 }
 
@@ -170,10 +154,11 @@ int													updateGame				(::gme::SApplication & app)	{
 	app.Scene.LightVector										= app.Scene.LightVector.RotateY(lastFrameSeconds * 2);
 	if(framework.MainDisplay.Resized)
 		::setupStars(app.Stars, framework.MainDisplay.Size);
-	::updateStars(app.Stars, framework.MainDisplay.Size.y, (float)lastFrameSeconds);
+
 	app.ShotsPlayer	.Update((float)lastFrameSeconds);
 	app.ShotsEnemy	.Update((float)lastFrameSeconds);
 	app.Debris		.Update((float)lastFrameSeconds);
+	app.Stars		.Update(framework.MainDisplay.Size.y, (float)lastFrameSeconds);
 
 	::ced::SModelTransform									matricesParent;
 	for(uint32_t iShot = 0; iShot < app.ShotsPlayer.Position.size(); ++iShot) {
@@ -197,7 +182,7 @@ int													updateGame				(::gme::SApplication & app)	{
 			if(::intersectRaySphere(shotSegment.A, (shotSegment.B - shotSegment.A).Normalize(), sphereCenter, 1, t, q)
 			 && t < 1
 			) {
-				app.Health[iModel]									-= 500;
+				app.Health[iModel]									-= 100;
 				for(uint32_t i = 0; i < 10; ++i) {
 					::gpk::SCoord3<float>			direction			= {0, 1, 0};
 					direction.RotateX(rand() * (::gpk::math_2pi / 65535));
@@ -234,7 +219,7 @@ int													updateGame				(::gme::SApplication & app)	{
 			if(::intersectRaySphere(shotSegment.A, (shotSegment.B - shotSegment.A).Normalize(), sphereCenter, 1, t, q)
 			 && t < 1
 			) {
-				app.Health[iModel]									-= 500;
+				app.Health[iModel]									-= 100;
 				for(uint32_t i = 0; i < 10; ++i) {
 					::gpk::SCoord3<float>									direction			= {0, 1, 0};
 					direction.RotateX(rand() * (::gpk::math_2pi / 65535));

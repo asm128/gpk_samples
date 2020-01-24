@@ -33,6 +33,7 @@ int								ced::drawLine       	(::gpk::view_grid<::gpk::SColorBGRA> pixels, ::g
 	int32_t								dy						= (int32_t)-abs(line.B.y - line.A.y );
 	int32_t								sy						= (int32_t)line.A.y < line.B.y ? 1 : -1;
 	int32_t								err						= dx + dy;  /* error value e_xy */
+	::ced::setPixel(pixels, {line.A.x, line.A.y}, color);
 	while (true) {   /* loop */
 		if (line.A.x == line.B.x && line.A.y == line.B.y)
 			break;
@@ -87,8 +88,6 @@ int								ced::drawLine       	(::gpk::view_grid<::gpk::SColorBGRA> pixels, ::g
 	return 0;
 }
 
-
-
 // https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
 int								ced::drawLine
 	( ::gpk::view_grid<::gpk::SColorBGRA>			pixels
@@ -105,6 +104,15 @@ int								ced::drawLine
 	double								xDiff					= (line.B.x - line.A.x);
 	double								yDiff					= (line.B.y - line.A.y);
 	bool								yAxis					= yDiff > xDiff;
+	uint32_t							intZ					= uint32_t((0xFFFFFFFFU) * line.A.z);
+	if( line.A.x >= 0 && line.A.x < (int32_t)pixels.metrics().x
+	 && line.A.y >= 0 && line.A.y < (int32_t)pixels.metrics().y
+	) {
+		if( depthBuffer[line.A.y][line.A.x] <= intZ ) {
+			depthBuffer[line.A.y][line.A.x]	= intZ;
+			pixelCoords.push_back({line.A.x, line.A.y});
+		}
+	}
 	while (true) {   /* loop */
 		if (line.A.x == line.B.x && line.A.y == line.B.y)
 			break;
@@ -117,7 +125,7 @@ int								ced::drawLine
 			) {
 				double							factor					= yAxis ? 1.0 / yDiff * line.A.y : 1.0 / xDiff * line.A.x;
 				double							finalZ					= line.B.z * factor - (line.A.z * (1.0 - factor));
-				uint32_t						intZ					= uint32_t((0xFFFFFFFFU) * (finalZ));
+				intZ						= uint32_t((0xFFFFFFFFU) * (finalZ));
 				if(depthBuffer[line.A.y][line.A.x] > intZ)
 					continue;
 
@@ -133,7 +141,7 @@ int								ced::drawLine
 			) {
 				double							factor					= yAxis ? 1.0 / yDiff * line.A.y : 1.0 / xDiff * line.A.x;
 				double							finalZ					= line.B.z * factor - (line.A.z * (1.0 - factor));
-				uint32_t						intZ					= uint32_t((0xFFFFFFFFU) * (finalZ));
+				intZ						= uint32_t((0xFFFFFFFFU) * (finalZ));
 				if(depthBuffer[line.A.y][line.A.x] > intZ)
 					continue;
 

@@ -8,6 +8,20 @@ struct SStars	{
 	::gpk::array_pod<::gpk::SCoord2<float>>		Position			= {};
 	::gpk::array_pod<float>						Speed				= {};
 	::gpk::array_pod<float>						Brightness			= {};
+
+	int											Update				(uint32_t yMax, float lastFrameSeconds)	{
+		for(uint32_t iStar = 0; iStar < Brightness.size(); ++iStar) {
+			::gpk::SCoord2<float>									 & starPos			= Position[iStar];
+			float													starSpeed			= Speed[iStar];
+			starPos.y											+= starSpeed * lastFrameSeconds;
+			Brightness[iStar]									= float(1.0 / 65535.0 * rand());
+			if(starPos.y >= yMax) {
+				Speed		[iStar]								= float(16 + (rand() % 64));
+				starPos.y											= 0;
+			}
+		}
+		return 0;
+	}
 };
 
 struct SDebris	{
