@@ -57,25 +57,31 @@ int													drawDebris			(::gpk::view_grid<::gpk::SColorBGRA> targetPixels, 
 		depthBuffer[pixelCoord.y][pixelCoord.x]				= depth;
 		::gpk::SColorBGRA											starFinalColor	= colorShot * debris.Brightness[iParticle];
 		::ced::setPixel(targetPixels, pixelCoord, starFinalColor);
-		const	int32_t											brightRadius		= 2;
+		const	double											brightRadius		= 3.0;
 		double													brightUnit			= 1.0 / brightRadius;
-		for(int32_t y = -brightRadius; y < brightRadius; ++y)
-		for(int32_t x = -brightRadius; x < brightRadius; ++x) {
+		for(int32_t y = (int32_t)-brightRadius; y < (int32_t)brightRadius; ++y)
+		for(int32_t x = (int32_t)-brightRadius; x < (int32_t)brightRadius; ++x) {
 			::gpk::SCoord2<float>									brightPos			= {(float)x, (float)y};
 			const double											brightDistance		= brightPos.Length();
 			if(brightDistance <= brightRadius) {
-				::gpk::SCoord2<int32_t>									pixelPos			= pixelCoord + (brightPos).Cast<int32_t>();
-				if( pixelPos.y >= 0 && pixelPos.y < (int32_t)targetPixels.metrics().y
-				 && pixelPos.x >= 0 && pixelPos.x < (int32_t)targetPixels.metrics().x
-				 )
-					::ced::setPixel(targetPixels, pixelPos, targetPixels[pixelPos.y][pixelPos.x] + colorShot * debris.Brightness[iParticle] * (1.0-(brightDistance * brightUnit * (1 + (rand() % 3)))));
+				::gpk::SCoord2<int32_t>									blendPos			= pixelCoord + (brightPos).Cast<int32_t>();
+				if( blendPos.y >= 0 && blendPos.y < (int32_t)targetPixels.metrics().y
+				 && blendPos.x >= 0 && blendPos.x < (int32_t)targetPixels.metrics().x
+				 && depth >= depthBuffer[blendPos.y][blendPos.x]
+				) {
+					depthBuffer[blendPos.y][blendPos.x]					= depth;
+					double													finalBrightness					= 1.0-(brightDistance * brightUnit);
+					::gpk::SColorFloat										backgroundColor					= targetPixels[blendPos.y][blendPos.x];
+					::ced::setPixel(targetPixels, blendPos, backgroundColor + starFinalColor * finalBrightness);
+				}
 			}
 		}
+
 	}
 	return 0;
 }
 
-int													drawShots			(::gpk::view_grid<::gpk::SColorBGRA> targetPixels, SShots & shots, const ::gpk::SMatrix4<float> & matrixVPV, ::gpk::SColorBGRA colorShot, ::gpk::view_grid<uint32_t> depthBuffer)	{
+int													drawShots			(::gpk::view_grid<::gpk::SColorBGRA> targetPixels, SShots & shots, const ::gpk::SMatrix4<float> & matrixVPV, ::gpk::SColorFloat colorShot, ::gpk::view_grid<uint32_t> depthBuffer)	{
 	::gpk::array_pod<::gpk::SCoord2<int32_t>>				pixelCoords;
 	for(uint32_t iShot = 0; iShot < shots.Brightness.size(); ++iShot) {
 		::gpk::SCoord3<float>									starPosPrev		= shots.PositionPrev[iShot];
@@ -84,41 +90,40 @@ int													drawShots			(::gpk::view_grid<::gpk::SColorBGRA> targetPixels, S
 		raySegment.A										= matrixVPV.Transform(raySegment.A);
 		raySegment.B										= matrixVPV.Transform(raySegment.B);
 
-		::gpk::SColorBGRA											starFinalColor	= colorShot * shots.Brightness[iShot];
+		::gpk::SColorFloat											starFinalColor	= colorShot * shots.Brightness[iShot];
 		::ced::drawLine(targetPixels,
 			{ {(int32_t)raySegment.A.x, (int32_t)raySegment.A.y}
 			, {(int32_t)raySegment.B.x, (int32_t)raySegment.B.y}
 			}, pixelCoords);
-		pixelCoords.push_back({int32_t(raySegment.A.x), int32_t(raySegment.A.y)});
-		pixelCoords.push_back({int32_t(raySegment.B.x), int32_t(raySegment.B.y)});
 		for(uint32_t iPixelCoord = 0; iPixelCoord < pixelCoords.size(); ++iPixelCoord) {
 			const ::gpk::SCoord2<int32_t>							& pixelCoord		= pixelCoords[iPixelCoord];
 			if( pixelCoord.y < 0 || pixelCoord.y >= (int32_t)targetPixels.metrics().y
 			 || pixelCoord.x < 0 || pixelCoord.x >= (int32_t)targetPixels.metrics().x
 			)
 				continue;
-			if(raySegment.B.z < 0 || raySegment.B.z > 1)
+			uint32_t												depth				= uint32_t((1.0 - raySegment.A.z) * 0xFFFFFFFFU);
+			if(depth <= depthBuffer[pixelCoord.y][pixelCoord.x])
 				continue;
-			uint32_t												depth				= uint32_t((1.0 - raySegment.B.z) * 0xFFFFFFFFU);
-			if(depth < depthBuffer[pixelCoord.y][pixelCoord.x])
-				continue;
-
-			depthBuffer[pixelCoord.y][pixelCoord.x]	= depth;
+			depthBuffer[pixelCoord.y][pixelCoord.x]				= depth;
 
 			::ced::setPixel(targetPixels, pixelCoord, starFinalColor);
 
-			const	int32_t											brightRadius		= 5;
+			const	double											brightRadius		= 7.5;
 			double													brightUnit			= 1.0 / brightRadius;
-			for(int32_t y = -brightRadius; y < brightRadius; ++y)
-			for(int32_t x = -brightRadius; x < brightRadius; ++x) {
+			for(int32_t y = (int32_t)-brightRadius; y < (int32_t)brightRadius; ++y)
+			for(int32_t x = (int32_t)-brightRadius; x < (int32_t)brightRadius; ++x) {
 				::gpk::SCoord2<float>									brightPos			= {(float)x, (float)y};
 				const double											brightDistance		= brightPos.Length();
 				if(brightDistance <= brightRadius) {
-					::gpk::SCoord2<int32_t>									pixelPos			= pixelCoord + (brightPos).Cast<int32_t>();
-					if( pixelPos.y >= 0 && pixelPos.y < (int32_t)targetPixels.metrics().y
-					 && pixelPos.x >= 0 && pixelPos.x < (int32_t)targetPixels.metrics().x
-						) {
-						::ced::setPixel(targetPixels, pixelPos, targetPixels[pixelPos.y][pixelPos.x] + colorShot * shots.Brightness[iShot] * (1.0-(brightDistance * brightUnit)));
+					::gpk::SCoord2<int32_t>									blendPos			= pixelCoord + (brightPos).Cast<int32_t>();
+					if( blendPos.y >= 0 && blendPos.y < (int32_t)targetPixels.metrics().y
+					 && blendPos.x >= 0 && blendPos.x < (int32_t)targetPixels.metrics().x
+					 && depth >= depthBuffer[blendPos.y][blendPos.x]
+					) {
+						depthBuffer[blendPos.y][blendPos.x]					= depth;
+						double													finalBrightness					= 1.0-(brightDistance * brightUnit);
+						::gpk::SColorFloat										backgroundColor					= targetPixels[blendPos.y][blendPos.x];
+						::ced::setPixel(targetPixels, blendPos, backgroundColor + starFinalColor * finalBrightness);
 					}
 				}
 			}
@@ -179,13 +184,15 @@ int													drawGame				(::gme::SApplication & app, ::gpk::ptr_obj<::gpk::SR
 		matrixTransform										= matrixTransform  * matrixTransformParent ;
 		::gpk::array_pod<::gpk::SCoord3<float>>					lightPoints				= {};
 		::gpk::array_pod<::gpk::SColorBGRA>						lightColors				= {};
-		lightPoints.resize(app.ShotsEnemy.Position.size() + app.ShotsPlayer.Position.size() + app.Debris.Position.size() + 2);
-		lightColors.resize(app.ShotsEnemy.Position.size() + app.ShotsPlayer.Position.size() + app.Debris.Position.size() + 2);
+		lightPoints.resize(app.ShotsEnemy.Position.size() + app.ShotsPlayer.Position.size() + app.Debris.Position.size() + 4);
+		lightColors.resize(app.ShotsEnemy.Position.size() + app.ShotsPlayer.Position.size() + app.Debris.Position.size() + 4);
 		lightPoints[0]									= app.Scene.Models[0].Position;
 		lightColors[0]									= {0x80, 0x80, 0x80};
-		lightPoints[1]									= app.Scene.Models[7].Position;
-		lightColors[1]									= {0x80, 0x80, 0x80};
-		uint32_t												iOffset					= 2;
+		for(uint32_t iEnemy = 1; iEnemy < 4; ++iEnemy) {
+			lightPoints[iEnemy]								= app.Scene.Models[7 * iEnemy].Position;
+			lightColors[iEnemy]								= {0x80, 0x80, 0x80};
+		}
+		uint32_t												iOffset					= 4;
 		for(uint32_t iShot = 0; iShot < app.ShotsEnemy.Position.size(); ++iShot) {
 			lightPoints[iOffset + iShot]						= app.ShotsEnemy.Position[iShot];
 			lightColors[iOffset + iShot]						= {0, 0, 0xfF};

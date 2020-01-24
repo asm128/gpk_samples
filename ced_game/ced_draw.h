@@ -17,6 +17,7 @@ namespace ced
 	int								drawCircle			(::gpk::view_grid<::gpk::SColorBGRA> pixels	, ::gpk::SCircle2D		<int32_t>	circle		, ::gpk::SColorBGRA color);
 	int								drawLine			(::gpk::view_grid<::gpk::SColorBGRA> pixels	, ::gpk::SLine2D		<int32_t>	line		, ::gpk::SColorBGRA color);
 	int								drawLine			(::gpk::view_grid<::gpk::SColorBGRA> pixels	, ::gpk::SLine2D		<int32_t>	line		, ::gpk::array_pod<::gpk::SCoord2<int32_t>> & pixelCoords);
+	int								drawLine			(::gpk::view_grid<::gpk::SColorBGRA> pixels	, ::gpk::SLine3D		<int32_t>	line		, ::gpk::array_pod<::gpk::SCoord2<int32_t>> & pixelCoords, ::gpk::view_grid<uint32_t> & depthBuffer);
 	int								drawTriangle		(::gpk::view_grid<::gpk::SColorBGRA> pixels	, ::gpk::STriangle2D	<int32_t>	triangle	, ::gpk::SColorBGRA color);
 	int								drawTriangle		(::gpk::SCoord2<uint32_t> targetSize	, ::gpk::STriangle3D<float>		triangle	, ::gpk::array_pod<::gpk::SCoord2<int32_t>> & pixelCoords, ::gpk::array_pod<::gpk::STriangleWeights<double>> & proportions, ::gpk::view_grid<uint32_t> & depthBuffer);
 	int								drawQuadTriangle

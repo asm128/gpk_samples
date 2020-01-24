@@ -60,6 +60,7 @@ int								ced::drawLine       	(::gpk::view_grid<::gpk::SColorBGRA> pixels, ::g
 	int32_t								dy						= (int32_t)-abs(line.B.y - line.A.y );
 	int32_t								sy						= (int32_t)line.A.y < line.B.y ? 1 : -1;
 	int32_t								err						= dx + dy;  /* error value e_xy */
+	pixelCoords.push_back({line.A.x, line.A.y});
 	while (true) {   /* loop */
 		if (line.A.x == line.B.x && line.A.y == line.B.y)
 			break;
@@ -80,6 +81,65 @@ int								ced::drawLine       	(::gpk::view_grid<::gpk::SColorBGRA> pixels, ::g
 			 && line.A.y >= 0 && line.A.y < (int32_t)pixels.metrics().y
 			)
 				pixelCoords.push_back({line.A.x, line.A.y});
+		}
+
+	}
+	return 0;
+}
+
+
+
+// https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
+int								ced::drawLine
+	( ::gpk::view_grid<::gpk::SColorBGRA>			pixels
+	, ::gpk::SLine3D<int32_t>						line
+	, ::gpk::array_pod<::gpk::SCoord2<int32_t>>		& pixelCoords
+	, ::gpk::view_grid<uint32_t>					& depthBuffer
+	)	{
+	int32_t								dx						= (int32_t)abs(line.B.x - line.A.x);
+	int32_t								sx						= (int32_t)line.A.x < line.B.x ? 1 : -1;
+	int32_t								dy						= (int32_t)-abs(line.B.y - line.A.y );
+	int32_t								sy						= (int32_t)line.A.y < line.B.y ? 1 : -1;
+	int32_t								err						= dx + dy;  /* error value e_xy */
+
+	double								xDiff					= (line.B.x - line.A.x);
+	double								yDiff					= (line.B.y - line.A.y);
+	bool								yAxis					= yDiff > xDiff;
+	while (true) {   /* loop */
+		if (line.A.x == line.B.x && line.A.y == line.B.y)
+			break;
+		int32_t								e2						= 2 * err;
+		if (e2 >= dy) {
+			err								+= dy; /* e_xy+e_x > 0 */
+			line.A.x						+= sx;
+			if( line.A.x >= 0 && line.A.x < (int32_t)pixels.metrics().x
+			 && line.A.y >= 0 && line.A.y < (int32_t)pixels.metrics().y
+			) {
+				double							factor					= yAxis ? 1.0 / yDiff * line.A.y : 1.0 / xDiff * line.A.x;
+				double							finalZ					= line.B.z * factor - (line.A.z * (1.0 - factor));
+				uint32_t						intZ					= uint32_t((0xFFFFFFFFU) * (finalZ));
+				if(depthBuffer[line.A.y][line.A.x] > intZ)
+					continue;
+
+				depthBuffer[line.A.y][line.A.x]	= intZ;
+				pixelCoords.push_back({line.A.x, line.A.y});
+			}
+		}
+		if (e2 <= dx) { /* e_xy+e_y < 0 */
+			err								+= dx;
+			line.A.y						+= sy;
+			if( line.A.x >= 0 && line.A.x < (int32_t)pixels.metrics().x
+			 && line.A.y >= 0 && line.A.y < (int32_t)pixels.metrics().y
+			) {
+				double							factor					= yAxis ? 1.0 / yDiff * line.A.y : 1.0 / xDiff * line.A.x;
+				double							finalZ					= line.B.z * factor - (line.A.z * (1.0 - factor));
+				uint32_t						intZ					= uint32_t((0xFFFFFFFFU) * (finalZ));
+				if(depthBuffer[line.A.y][line.A.x] > intZ)
+					continue;
+
+				depthBuffer[line.A.y][line.A.x]	= intZ;
+				pixelCoords.push_back({line.A.x, line.A.y});
+			}
 		}
 
 	}
@@ -182,19 +242,19 @@ int								ced::drawTriangle
 }
 
 int													ced::drawQuadTriangle
-	( ::gpk::view_grid<::gpk::SColorBGRA>					targetPixels
-	, ::ced::SGeometryQuads								& geometry
-	, int												iTriangle
-	, ::gpk::SMatrix4<float>							& matrixTransform
-	, ::gpk::SMatrix4<float>							& matrixView
-	, ::gpk::SMatrix4<float>							& matrixViewport
-	, ::gpk::SCoord3<float>								& lightVector
-	, ::gpk::array_pod<::gpk::SCoord2<int32_t>>			& pixelCoords
-	, ::gpk::array_pod<::gpk::STriangleWeights<double>>	& pixelVertexWeights
-	, ::gpk::view_grid<::gpk::SColorBGRA>					textureImage
-	, ::gpk::array_pod<::gpk::SCoord3<float>>			& lightPoints
-	, ::gpk::array_pod<::gpk::SColorBGRA>					& lightColors
-	, ::gpk::view_grid<uint32_t>						& depthBuffer
+	( ::gpk::view_grid<::gpk::SColorBGRA>						targetPixels
+	, ::ced::SGeometryQuads										& geometry
+	, int														iTriangle
+	, ::gpk::SMatrix4<float>									& matrixTransform
+	, ::gpk::SMatrix4<float>									& matrixView
+	, ::gpk::SMatrix4<float>									& matrixViewport
+	, ::gpk::SCoord3<float>										& lightVector
+	, ::gpk::array_pod<::gpk::SCoord2<int32_t>>					& pixelCoords
+	, ::gpk::array_pod<::gpk::STriangleWeights<double>>			& pixelVertexWeights
+	, ::gpk::view_grid<::gpk::SColorBGRA>						textureImage
+	, ::gpk::array_pod<::gpk::SCoord3<float>>					& lightPoints
+	, ::gpk::array_pod<::gpk::SColorBGRA>						& lightColors
+	, ::gpk::view_grid<uint32_t>								& depthBuffer
 	) {
 	::gpk::STriangle3D	<float>								triangleWorld		= geometry.Triangles	[iTriangle];
 	::gpk::STriangle3D	<float>								triangle			= geometry.Triangles	[iTriangle];
@@ -247,18 +307,24 @@ int													ced::drawQuadTriangle
 		::ced::setPixel(targetPixels, pixelCoord, texelColor *.5 + fragmentColor);
 		(void)lightVector;
 	}
+	//pixelCoords.clear();
+	//::ced::drawLine(targetPixels, ::gpk::SLine3D<int32_t>{{(int32_t)triangle.A.x, (int32_t)triangle.A.y}, {(int32_t)triangle.B.x, (int32_t)triangle.B.y}}, pixelCoords, depthBuffer);
+	//for(uint32_t iPixelCoord = 0; iPixelCoord < pixelCoords.size(); ++iPixelCoord) {
+	//	::gpk::SCoord2<int32_t>										pixelCoord				= pixelCoords		[iPixelCoord];
+	//	::ced::setPixel(targetPixels, pixelCoord, ::gpk::ORANGE);
+	//}
 	return 0;
 }
 
 int													ced::drawQuadTriangle
-	( ::gpk::view_grid<::gpk::SColorBGRA>	targetPixels
-	, ::ced::SGeometryQuads				& geometry
-	, int								iTriangle
-	, ::gpk::SMatrix4<float>			& matrixTransform
-	, ::gpk::SMatrix4<float>			& matrixView
-	, ::gpk::SMatrix4<float>			& matrixViewport
-	, ::gpk::SCoord3<float>				& lightVector
-	, ::gpk::SColorBGRA						 color
+	( ::gpk::view_grid<::gpk::SColorBGRA>				targetPixels
+	, ::ced::SGeometryQuads								& geometry
+	, int												iTriangle
+	, ::gpk::SMatrix4<float>							& matrixTransform
+	, ::gpk::SMatrix4<float>							& matrixView
+	, ::gpk::SMatrix4<float>							& matrixViewport
+	, ::gpk::SCoord3<float>								& lightVector
+	, ::gpk::SColorBGRA									color
 	, ::gpk::array_pod<::gpk::SCoord2<int32_t>>			& pixelCoords
 	, ::gpk::array_pod<::gpk::STriangleWeights<double>>	& pixelVertexWeights
 	, ::gpk::view_grid<uint32_t>						& depthBuffer

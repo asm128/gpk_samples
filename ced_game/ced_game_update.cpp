@@ -29,11 +29,12 @@ int													setupStars			(SStars & stars, ::gpk::SCoord2<uint32_t> targetSiz
 
 int													modelCreate			(::gme::SApplication & app)	{
 	int32_t													indexModel			= app.Scene.ModelMatricesLocal.size();
-	app.Health						.resize(indexModel + 7);
-	app.Scene.ModelMatricesLocal	.resize(indexModel + 7);
-	app.Scene.ModelMatricesGlobal	.resize(indexModel + 7);
-	app.Scene.Models				.resize(indexModel + 7);
-	app.Scene.Entities				.resize(indexModel + 7);
+	uint32_t												countParts			= 6;
+	app.Health						.resize(indexModel + 1 + countParts);
+	app.Scene.ModelMatricesLocal	.resize(indexModel + 1 + countParts);
+	app.Scene.ModelMatricesGlobal	.resize(indexModel + 1 + countParts);
+	app.Scene.Models				.resize(indexModel + 1 + countParts);
+	app.Scene.Entities				.resize(indexModel + 1 + countParts);
 	::fillArray(&app.Health						[indexModel], 0, app.Health						.size() - indexModel);
 	::fillArray(&app.Scene.ModelMatricesLocal	[indexModel], {}, app.Scene.ModelMatricesLocal	.size() - indexModel);
 	::fillArray(&app.Scene.ModelMatricesGlobal	[indexModel], {}, app.Scene.ModelMatricesGlobal	.size() - indexModel);
@@ -47,15 +48,17 @@ int													modelCreate			(::gme::SApplication & app)	{
 	else
 		app.Scene.Models		[indexModel].Rotation.z		= (float)(-::gpk::math_pi_2);
 	app.Scene.Entities		[indexModel]				= {-1};
+	const uint32_t												partHealth			= 200;
+	app.Health[indexModel]									= partHealth * countParts;
 	for(uint32_t iModel = indexModel + 1; iModel < app.Scene.Models.size(); ++iModel) {
 		::ced::SModel3D											& model			= app.Scene.Models[iModel];
 		model.Scale											= {1, 1, 1};
 		model.Rotation										= {0, 0, 0};
 		model.Position										= {2, 0.5};
-		model.Position.RotateY(::gpk::math_2pi / (app.Scene.Models.size() - 1) * iModel);
+		model.Position.RotateY(::gpk::math_2pi / countParts * iModel);
 		::ced::SEntity											& entity		= app.Scene.Entities[iModel];
 		entity.Parent										= indexModel;
-		app.Health[iModel]									= 1000;
+		app.Health[iModel]									= partHealth;
  		app.Scene.Entities[indexModel].Children.push_back(iModel);
 	}
 	return indexModel;
@@ -72,11 +75,13 @@ int													setupGame			(::gme::SApplication & app)	{
 
 	app.Scene.Models[::modelCreate(app)].Position				= {-30};
 	app.Scene.Models[::modelCreate(app)].Position				= {+30};
+	app.Scene.Models[::modelCreate(app)].Position				= {+35};
+	app.Scene.Models[::modelCreate(app)].Position				= {+25};
 
 	app.Scene.Image.resize(256, 256);
 	for(uint32_t y = 0; y < app.Scene.Image.metrics().y; ++y) // Generate noise color for planet texture
 	for(uint32_t x = 0; x < app.Scene.Image.metrics().x; ++x) {
-		app.Scene.Image[y][x] = {(uint8_t)rand(), (uint8_t)rand(), (uint8_t)rand(), 0xFF};
+		app.Scene.Image[y][x] = ::gpk::SColorBGRA{255, 255, 255} * (1./65535.0 * rand());//, {(uint8_t)rand(), (uint8_t)rand(), (uint8_t)rand(), 0xFF};
 	}
 
 	return 0;
@@ -112,37 +117,36 @@ int													intersectRaySphere		(const ::gpk::SCoord3<float> & p, const ::gp
 	if (discr < 0.0f)	// A negative discriminant corresponds to ray missing sphere
 		return 0;
 
-	t					= (float)(-b - sqrt(discr));	// Ray now found to intersect sphere, compute smallest t value of intersection
+	t													= (float)(-b - sqrt(discr));	// Ray now found to intersect sphere, compute smallest t value of intersection
 	if (t < 0.0f)	// If t is negative, ray started inside sphere so clamp t to zero
-		t					= 0.0f;
+		t													= 0.0f;
 
-	q					= p + d * t;
+	q													= p + d * t;
 	return 1;
 }
 int													updateGame				(::gme::SApplication & app)	{
 	::gpk::SFramework										& framework			= app.Framework;
 	//------------------------------------------- Handle input
 	double													speed				= 10;
-	double													lastFrameSeconds	= framework.Timer.LastTimeSeconds;
+	double													lastFrameSeconds	= ::gpk::min(framework.Timer.LastTimeSeconds, 0.200);
 	app.AnimationTime									+= lastFrameSeconds;
 	app.ShotsPlayer.Delay								+= lastFrameSeconds * 20;
-	app.ShotsEnemy.Delay								+= lastFrameSeconds * 7;
 	::ced::SModel3D											& modelPlayer		= app.Scene.Models[0];
-	::ced::SModel3D											& modelEnemy		= app.Scene.Models[7];
-
-	modelEnemy.Position.z								= (float)(sin(app.AnimationTime) * 20);
-
+	for(uint32_t iEnemy = 7; iEnemy < app.Scene.Models.size(); iEnemy += 7) {
+		app.ShotsEnemy.Delay								+= lastFrameSeconds * 2;
+		::ced::SModel3D											& modelEnemy		= app.Scene.Models[iEnemy];
+		modelEnemy.Position.z								= (float)(sin(app.AnimationTime) * 20 * ((iEnemy % 2) ? -1 : 1) * (1.0 / 14.0 * iEnemy));
+		if(1 < (modelPlayer.Position - modelEnemy.Position).Length()) {
+			::gpk::SCoord3<float>									direction			= modelPlayer.Position - modelEnemy.Position;
+			direction.RotateY(rand() * (1.0 / 65535) * ::gpk::math_pi * .0185 * ((rand() % 2) ? -1 : 1));
+			app.ShotsEnemy.Spawn(modelEnemy.Position, direction.Normalize(), 20);
+		}
+	}
 	if(GetAsyncKeyState(VK_SPACE)) {
 		::gpk::SCoord3<float>									direction			= {1, 0, 0};
 		direction.RotateY(rand() * (1.0 / 65535) * ::gpk::math_pi * .0185 * ((rand() % 2) ? -1 : 1));
 		direction.RotateZ(rand() * (1.0 / 65535) * ::gpk::math_pi * .0185 * ((rand() % 2) ? -1 : 1));
 		app.ShotsPlayer.Spawn(modelPlayer.Position, direction, 200);
-	}
-
-	if(1 < (modelPlayer.Position - modelEnemy.Position).Length()) {
-		::gpk::SCoord3<float>									direction			= modelPlayer.Position - modelEnemy.Position;
-		direction.RotateY(rand() * (1.0 / 65535) * ::gpk::math_pi * .0185 * ((rand() % 2) ? -1 : 1));
-		app.ShotsEnemy.Spawn(modelEnemy.Position, direction.Normalize(), 20);
 	}
 
 	if(GetAsyncKeyState('Q')) app.Scene.Camera.Position.y			-= (float)lastFrameSeconds * (GetAsyncKeyState(VK_SHIFT) ? 8 : 2);
@@ -189,7 +193,7 @@ int													updateGame				(::gme::SApplication & app)	{
 			float													t				= 0;
 			::gpk::SCoord3<float>									q				= {};
 
-			if( intersectRaySphere(shotSegment.A, (shotSegment.B - shotSegment.A).Normalize(), sphereCenter, 1, t, q)
+			if(::intersectRaySphere(shotSegment.A, (shotSegment.B - shotSegment.A).Normalize(), sphereCenter, 1, t, q)
 			 && t < 1
 			) {
 				app.Health[iModel]									-= 500;
@@ -226,7 +230,7 @@ int													updateGame				(::gme::SApplication & app)	{
 			float													t				= 0;
 			::gpk::SCoord3<float>									q				= {};
 
-			if( intersectRaySphere(shotSegment.A, (shotSegment.B - shotSegment.A).Normalize(), sphereCenter, 1, t, q)
+			if(::intersectRaySphere(shotSegment.A, (shotSegment.B - shotSegment.A).Normalize(), sphereCenter, 1, t, q)
 			 && t < 1
 			) {
 				app.Health[iModel]									-= 500;
