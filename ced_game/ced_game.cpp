@@ -75,15 +75,17 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 	//::gpk::STimer															timer;
 	app;
 	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>		target;
-	target.create();
-	target->resize(app.Framework.MainDisplay.Size, {}, 0);
+	target->resize(app.Framework.MainDisplay.Size);
+	//::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>		targetGame;
+	//targetGame->resize(app.Framework.MainDisplay.Size / 2, {}, 0);
 
 	::drawGame(app, target);
 
-	//::gpk::clearTarget(*target);
+	//::gpk::grid_scale(target->Color.View, targetGame->Color.View);
+
 	{
-		::gpk::mutex_guard														lock					(app.LockGUI);
-		::gpk::controlDrawHierarchy(*app.Framework.GUI, 0, target->Color.View);
+		//::gpk::mutex_guard														lock					(app.LockGUI);
+		//::gpk::controlDrawHierarchy(*app.Framework.GUI, 0, target->Color.View);
 	}
 	{
 		::gpk::mutex_guard														lock					(app.LockRender);

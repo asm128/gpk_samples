@@ -292,8 +292,8 @@ int													ced::drawQuadTriangle
 		::gpk::SCoord3<float>										position				= triangleWorld.A * vertexWeights.A;
 		position												+= triangleWorld.B * vertexWeights.B;
 		position												+= triangleWorld.C * vertexWeights.C;
-		::gpk::SColorBGRA												texelColor				= textureImage[(uint32_t)(texCoord.y * imageUnit.y)][(uint32_t)(texCoord.x * imageUnit.x)];
-		::gpk::SColorBGRA												fragmentColor			= {};
+		::gpk::SColorFloat											texelColor				= textureImage[(uint32_t)(texCoord.y * imageUnit.y)][(uint32_t)(texCoord.x * imageUnit.x)];
+		::gpk::SColorFloat											fragmentColor			= {};
 		for(uint32_t iLight = 0; iLight < lightPoints.size(); ++iLight) {
 			::gpk::SCoord3<float>										lightToPoint		= lightPoints[iLight] - position;
 			::gpk::SCoord3<float>										vectorToLight		= lightToPoint;
@@ -302,11 +302,12 @@ int													ced::drawQuadTriangle
 				continue;
 			double														range				= 10;
 			double														invAttenuation		= ::std::max(0.0, 1.0 - (lightToPoint.Length() / range));
-			fragmentColor											= texelColor * lightColors[iLight] * invAttenuation * .5;
+			fragmentColor											+= ::gpk::SColorFloat{texelColor * lightColors[iLight] * invAttenuation * .5};
 		}
 		::ced::setPixel(targetPixels, pixelCoord, texelColor *.5 + fragmentColor);
 		(void)lightVector;
 	}
+
 	//pixelCoords.clear();
 	//::ced::drawLine(targetPixels, ::gpk::SLine3D<int32_t>{{(int32_t)triangle.A.x, (int32_t)triangle.A.y}, {(int32_t)triangle.B.x, (int32_t)triangle.B.y}}, pixelCoords, depthBuffer);
 	//for(uint32_t iPixelCoord = 0; iPixelCoord < pixelCoords.size(); ++iPixelCoord) {

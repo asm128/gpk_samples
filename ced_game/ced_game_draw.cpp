@@ -162,8 +162,10 @@ int													drawGame				(::gme::SApplication & app, ::gpk::ptr_obj<::gpk::SR
 	::gpk::array_pod<::gpk::STriangleWeights<double>>		pixelVertexWeights;
 	::ced::SModelTransform									matrices;
 	::ced::SModelTransform									matricesParent;
-	::gpk::SColorBGRA											colorShotPlayer			= {0x20, 0xfF, 0x40};
-	::gpk::SColorBGRA											colorShotEnemy			= {0x40, 0x20, 0xfF};
+	::gpk::SColorBGRA										colorShotPlayer			= ::gpk::SColorBGRA{0x40, 0xfF, 0x80};// *.2;
+	::gpk::SColorBGRA										colorShotEnemy			= ::gpk::SColorBGRA{0x00, 0x00, 0xfF};// *.2;
+	::gpk::SColorBGRA										colorLightPlayer		= ::gpk::SColorBGRA{0xFF, 0xFF, 0xFF};// *.2;
+	::gpk::SColorBGRA										colorLightEnemy			= ::gpk::SColorBGRA{0xFF, 0xFF, 0xFF};// *.2;
 	for(uint32_t iModel = 0; iModel < app.Scene.Models.size(); ++iModel) {
 		if(app.Health[iModel] <= 0)
 			continue;
@@ -187,20 +189,20 @@ int													drawGame				(::gme::SApplication & app, ::gpk::ptr_obj<::gpk::SR
 		lightPoints.resize(app.ShotsEnemy.Position.size() + app.ShotsPlayer.Position.size() + app.Debris.Position.size() + 4);
 		lightColors.resize(app.ShotsEnemy.Position.size() + app.ShotsPlayer.Position.size() + app.Debris.Position.size() + 4);
 		lightPoints[0]									= app.Scene.Models[0].Position;
-		lightColors[0]									= {0x80, 0x80, 0x80};
+		lightColors[0]									= colorLightPlayer;
 		for(uint32_t iEnemy = 1; iEnemy < 4; ++iEnemy) {
 			lightPoints[iEnemy]								= app.Scene.Models[7 * iEnemy].Position;
-			lightColors[iEnemy]								= {0x80, 0x80, 0x80};
+			lightColors[iEnemy]								= colorLightEnemy;
 		}
 		uint32_t												iOffset					= 4;
 		for(uint32_t iShot = 0; iShot < app.ShotsEnemy.Position.size(); ++iShot) {
 			lightPoints[iOffset + iShot]						= app.ShotsEnemy.Position[iShot];
-			lightColors[iOffset + iShot]						= {0, 0, 0xfF};
+			lightColors[iOffset + iShot]						= colorShotEnemy;
 		}
 		iOffset												+= app.ShotsEnemy.Position.size();
 		for(uint32_t iShot = 0; iShot < app.ShotsPlayer.Position.size(); ++iShot) {
 			lightPoints[iOffset + iShot]						= app.ShotsPlayer.Position[iShot];
-			lightColors[iOffset + iShot]						= {0,0xFF, 0};
+			lightColors[iOffset + iShot]						= colorShotPlayer;
 		}
 		iOffset												+= app.ShotsPlayer.Position.size();
 		for(uint32_t iShot = 0; iShot < app.Debris.Position.size(); ++iShot) {

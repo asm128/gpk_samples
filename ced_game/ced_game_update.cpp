@@ -81,7 +81,8 @@ int													setupGame			(::gme::SApplication & app)	{
 	app.Scene.Image.resize(256, 256);
 	for(uint32_t y = 0; y < app.Scene.Image.metrics().y; ++y) // Generate noise color for planet texture
 	for(uint32_t x = 0; x < app.Scene.Image.metrics().x; ++x) {
-		app.Scene.Image[y][x] = ::gpk::SColorBGRA{255, 255, 255} * (1./65535.0 * rand());//, {(uint8_t)rand(), (uint8_t)rand(), (uint8_t)rand(), 0xFF};
+		app.Scene.Image[y][x]										= {(uint8_t)rand(), (uint8_t)rand(), (uint8_t)rand(), 0xFF};
+		//app.Scene.Image[y][x] = ::gpk::SColorBGRA{255, 255, 255} * (1./65535.0 * rand());//, {(uint8_t)rand(), (uint8_t)rand(), (uint8_t)rand(), 0xFF};
 	}
 
 	return 0;
