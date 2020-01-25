@@ -16,12 +16,12 @@ namespace gme // I'm gonna use a different namespace in order to test a few thin
 {
 
 	struct SScene	{
-		::gpk::SImage<::gpk::SColorBGRA>					Image					= {};
+		::gpk::array_obj<::gpk::SImage<::gpk::SColorBGRA>>	Image					= {};
+		::gpk::array_obj<::ced::SGeometryQuads>				Geometry				= {};
+		::gpk::array_obj<::ced::SEntity>					Entities				= {};
 		::gpk::array_pod<::gpk::SMatrix4<float>>			ModelMatricesLocal		= {};
 		::gpk::array_pod<::gpk::SMatrix4<float>>			ModelMatricesGlobal		= {};
 		::gpk::array_pod<::ced::SModel3D>					Models					= {};
-		::gpk::array_obj<::ced::SEntity>					Entities				= {};
-		::ced::SGeometryQuads								Geometry				= {};
 		::ced::SCamera										Camera					= {};
 		::gpk::SCoord3<float>								LightVector				= {15, 12, 0};
 	};

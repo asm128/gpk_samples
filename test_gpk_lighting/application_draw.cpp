@@ -2,37 +2,37 @@
 #include "gpk_bitmap_target.h"
 #include "gpk_dialog_controls.h"
 
-					::gpk::error_t										drawPixel									
+					::gpk::error_t										drawPixel
 	( ::SRenderCache															& renderCache
 	, ::gpk::SColorBGRA															& targetColorCell
-	, const ::gpk::STriangleWeights<double>										& pixelWeights	
-	, const ::gpk::STriangle2D<float>											& uvGrid
+	, const ::gpk::STriangleWeights<double>										& pixelWeights
+	, const ::gpk::STriangle2<float>											& uvGrid
 	, const ::gpk::view_grid<::gpk::SColorBGRA>									& textureColors
 	, int32_t																	iTriangle
-	, const ::gpk::SCoord3<double>												& lightDir	
+	, const ::gpk::SCoord3<double>												& lightDir
 
 	) {	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	const ::gpk::SColorBGRA														ambientColor								= {0xF, 0xF, 0xF, 0xFF};	//(((::gpk::DARKRED * pixelWeights.A) + (::gpk::DARKGREEN * pixelWeights.B) + (::gpk::DARKBLUE * pixelWeights.C))) * .1;
 	const ::gpk::SColorFloat													interpolatedColor							= {1, 1, 1, 1}; //((::gpk::RED * pixelWeights.A) + (::gpk::GREEN * pixelWeights.B) + (::gpk::BLUE * pixelWeights.C));
-	::gpk::STriangle3D<float>													weightedNormals								= renderCache.TransformedNormalsVertex[iTriangle]; //((::gpk::RED * pixelWeights.A) + (::gpk::GREEN * pixelWeights.B) + (::gpk::BLUE * pixelWeights.C));
+	::gpk::STriangle3<float>													weightedNormals								= renderCache.TransformedNormalsVertex[iTriangle]; //((::gpk::RED * pixelWeights.A) + (::gpk::GREEN * pixelWeights.B) + (::gpk::BLUE * pixelWeights.C));
 	weightedNormals.A														*= pixelWeights.A;
 	weightedNormals.B														*= pixelWeights.B;
 	weightedNormals.C														*= pixelWeights.C;
 	const ::gpk::SCoord3<double>												interpolatedNormal							= (weightedNormals.A + weightedNormals.B + weightedNormals.C).Cast<double>().Normalize();
 	const ::gpk::SColorFloat													finalColor									= interpolatedColor * interpolatedNormal.Dot(lightDir);
 	const ::gpk::SCoord2<uint32_t>												textureMetrics								= textureColors.metrics();
-	
-	::gpk::SCoord2<double>														uv											= 
+
+	::gpk::SCoord2<double>														uv											=
 		{ uvGrid.A.x * pixelWeights.A + uvGrid.B.x * pixelWeights.B + uvGrid.C.x * pixelWeights.C
 		, uvGrid.A.y * pixelWeights.A + uvGrid.B.y * pixelWeights.B + uvGrid.C.y * pixelWeights.C
 		};
 	::gpk::SColorBGRA															interpolatedBGRA;
 	if( 0 == textureMetrics.x
 	 ||	0 == textureMetrics.y
-	 ) 
+	 )
 		interpolatedBGRA													= finalColor + ambientColor;
 	else {
-		const ::gpk::SCoord2<int32_t>														uvcoords									= 
+		const ::gpk::SCoord2<int32_t>														uvcoords									=
 			{ (int32_t)((uint32_t)(uv.x * textureMetrics.x) % textureMetrics.x)
 			, (int32_t)((uint32_t)(uv.y * textureMetrics.y) % textureMetrics.y)
 			};
@@ -43,7 +43,7 @@
 		//interpolatedBGRA														= finalColor + ambientColor;
 		interpolatedBGRA														= ::gpk::SColorFloat(srcTexel) * finalColor + ambientColor;
 	}
-	if( targetColorCell == interpolatedBGRA ) 
+	if( targetColorCell == interpolatedBGRA )
 		return 1;
 
 	targetColorCell															= interpolatedBGRA;
@@ -77,24 +77,24 @@
 		xWorld		.SetTranslation	(applicationInstance.GridPivot.Position, false);
 		::gpk::clear
 			( renderCache.Triangle3dWorld
-			, renderCache.Triangle3dToDraw		
-			, renderCache.Triangle3dIndices		
+			, renderCache.Triangle3dToDraw
+			, renderCache.Triangle3dIndices
 			);
 		const ::gpk::SMatrix4<float>												xWV											= xWorld * viewMatrix;
 		//const ::gpk::SCoord3<float>													& cameraFront								= applicationInstance.Scene.Camera.Vectors.Front;
 		//const ::gpk::SMatrix4<float>												finalTransform								= xWorld * xViewProjection;
 		for(uint32_t iTriangle = 0, triCount = applicationInstance.Grid.Positions.size(); iTriangle < triCount; ++iTriangle) {
-			::gpk::STriangle3D<float>													triangle3DWorld								= applicationInstance.Grid.Positions[iTriangle];
-			::gpk::STriangle3D<float>													transformedTriangle3D						= triangle3DWorld;
+			::gpk::STriangle3<float>													triangle3DWorld								= applicationInstance.Grid.Positions[iTriangle];
+			::gpk::STriangle3<float>													transformedTriangle3D						= triangle3DWorld;
 			::gpk::transform(transformedTriangle3D, xWV);
 			if( transformedTriangle3D.A.z >= fFar
-			 && transformedTriangle3D.B.z >= fFar	
-			 && transformedTriangle3D.C.z >= fFar) 
+			 && transformedTriangle3D.B.z >= fFar
+			 && transformedTriangle3D.C.z >= fFar)
 				continue;
-			if( (transformedTriangle3D.A.z <= fNear) // && transformedTriangle3D.B.z <= (fNear + .01) )  	
-			 || (transformedTriangle3D.B.z <= fNear) // && transformedTriangle3D.C.z <= (fNear + .01) )  	
-			 || (transformedTriangle3D.C.z <= fNear) // && transformedTriangle3D.A.z <= (fNear + .01) )  	
-			 ) 
+			if( (transformedTriangle3D.A.z <= fNear) // && transformedTriangle3D.B.z <= (fNear + .01) )
+			 || (transformedTriangle3D.B.z <= fNear) // && transformedTriangle3D.C.z <= (fNear + .01) )
+			 || (transformedTriangle3D.C.z <= fNear) // && transformedTriangle3D.A.z <= (fNear + .01) )
+			 )
 				continue;
 
 			float																		oldzA										= transformedTriangle3D.A.z;
@@ -126,8 +126,8 @@
 		}
 		gpk_necall(::gpk::resize(renderCache.Triangle3dIndices.size()
 			, renderCache.TransformedNormalsTriangle
-			, renderCache.TransformedNormalsVertex		
-			, renderCache.Triangle3dColorList			
+			, renderCache.TransformedNormalsVertex
+			, renderCache.Triangle3dColorList
 			), "Out of memory?");
 
 		const ::gpk::SCoord3<float>													& lightDir									= applicationInstance.LightDirection;
@@ -136,14 +136,14 @@
 			transformedNormalTri													= xWorld.TransformDirection(applicationInstance.Grid.NormalsTriangle[renderCache.Triangle3dIndices[iTriangle]]).Normalize();
 			const double																lightFactor									= fabs(transformedNormalTri.Dot(lightDir));
 			renderCache.Triangle3dColorList[iTriangle]								= ::gpk::LIGHTGRAY * lightFactor;
-			const ::gpk::STriangle3D<float>												& vertNormalsTriOrig						= applicationInstance.Grid.NormalsVertex[renderCache.Triangle3dIndices[iTriangle]];
-			::gpk::STriangle3D<float>													& vertNormalsTri							= renderCache.TransformedNormalsVertex[iTriangle];
+			const ::gpk::STriangle3<float>												& vertNormalsTriOrig						= applicationInstance.Grid.NormalsVertex[renderCache.Triangle3dIndices[iTriangle]];
+			::gpk::STriangle3<float>													& vertNormalsTri							= renderCache.TransformedNormalsVertex[iTriangle];
 			vertNormalsTri.A														= xWorld.TransformDirection(vertNormalsTriOrig.A).Normalize();
 			vertNormalsTri.B														= xWorld.TransformDirection(vertNormalsTriOrig.B).Normalize();
 			vertNormalsTri.C														= xWorld.TransformDirection(vertNormalsTriOrig.C).Normalize();
 		}
 
-		for(uint32_t iTriangle = 0, triCount = renderCache.Triangle3dIndices.size(); iTriangle < triCount; ++iTriangle) { // 
+		for(uint32_t iTriangle = 0, triCount = renderCache.Triangle3dIndices.size(); iTriangle < triCount; ++iTriangle) { //
 			const double																cameraFactor								= renderCache.TransformedNormalsTriangle[iTriangle].Dot(applicationInstance.Scene.Camera.Vectors.Front);
 			if(cameraFactor > .65)
 				continue;
@@ -157,7 +157,7 @@
 			//if(0 != renderCache.TrianglePixelCoords.size())
 			++renderCache.TrianglesDrawn;
 			const int32_t																iGridTri										= renderCache.Triangle3dIndices[iTriangle];
-			const ::gpk::STriangle2D<float>												& uvGrid										= applicationInstance.Grid.UVs[iGridTri];
+			const ::gpk::STriangle2<float>												& uvGrid										= applicationInstance.Grid.UVs[iGridTri];
 			for(uint32_t iPixel = 0, pixCount = renderCache.TrianglePixelCoords.size(); iPixel < pixCount; ++iPixel) {
 				const ::gpk::SCoord2<int32_t>												& pixelCoord								= renderCache.TrianglePixelCoords	[iPixel];
 				const ::gpk::STriangleWeights<double>										& pixelWeights								= renderCache.TrianglePixelWeights	[iPixel];
@@ -167,15 +167,15 @@
 					++pixelsSkipped;
 			}
 			if(checkbox->Checked) {
-				gerror_if(errored(::gpk::drawLine(offscreenMetrics, ::gpk::SLine3D<float>{renderCache.Triangle3dToDraw[iTriangle].A, renderCache.Triangle3dToDraw[iTriangle].B}, renderCache.WireframePixelCoords)), "Not sure if these functions could ever fail");
-				gerror_if(errored(::gpk::drawLine(offscreenMetrics, ::gpk::SLine3D<float>{renderCache.Triangle3dToDraw[iTriangle].B, renderCache.Triangle3dToDraw[iTriangle].C}, renderCache.WireframePixelCoords)), "Not sure if these functions could ever fail");
-				gerror_if(errored(::gpk::drawLine(offscreenMetrics, ::gpk::SLine3D<float>{renderCache.Triangle3dToDraw[iTriangle].C, renderCache.Triangle3dToDraw[iTriangle].A}, renderCache.WireframePixelCoords)), "Not sure if these functions could ever fail");
+				gerror_if(errored(::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{renderCache.Triangle3dToDraw[iTriangle].A, renderCache.Triangle3dToDraw[iTriangle].B}, renderCache.WireframePixelCoords)), "Not sure if these functions could ever fail");
+				gerror_if(errored(::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{renderCache.Triangle3dToDraw[iTriangle].B, renderCache.Triangle3dToDraw[iTriangle].C}, renderCache.WireframePixelCoords)), "Not sure if these functions could ever fail");
+				gerror_if(errored(::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{renderCache.Triangle3dToDraw[iTriangle].C, renderCache.Triangle3dToDraw[iTriangle].A}, renderCache.WireframePixelCoords)), "Not sure if these functions could ever fail");
 			}
 			// draw normals
-			//gerror_if(errored(::gpk::drawLine(offscreenMetrics, ::gpk::SLine3D<float>{renderCache.Triangle3dToDraw[iTriangle].A, renderCache.Triangle3dToDraw[iTriangle].A + (renderCache.TransformedNormalsTriangle[iTriangle])}, renderCache.WireframePixelCoords)), "Not sure if these functions could ever fail");
-			//gerror_if(errored(::gpk::drawLine(offscreenMetrics, ::gpk::SLine3D<float>{renderCache.Triangle3dToDraw[iTriangle].B, renderCache.Triangle3dToDraw[iTriangle].B + (renderCache.TransformedNormalsTriangle[iTriangle])}, renderCache.WireframePixelCoords)), "Not sure if these functions could ever fail");
-			//gerror_if(errored(::gpk::drawLine(offscreenMetrics, ::gpk::SLine3D<float>{renderCache.Triangle3dToDraw[iTriangle].C, renderCache.Triangle3dToDraw[iTriangle].C + (renderCache.TransformedNormalsTriangle[iTriangle])}, renderCache.WireframePixelCoords)), "Not sure if these functions could ever fail");
-		} 
+			//gerror_if(errored(::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{renderCache.Triangle3dToDraw[iTriangle].A, renderCache.Triangle3dToDraw[iTriangle].A + (renderCache.TransformedNormalsTriangle[iTriangle])}, renderCache.WireframePixelCoords)), "Not sure if these functions could ever fail");
+			//gerror_if(errored(::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{renderCache.Triangle3dToDraw[iTriangle].B, renderCache.Triangle3dToDraw[iTriangle].B + (renderCache.TransformedNormalsTriangle[iTriangle])}, renderCache.WireframePixelCoords)), "Not sure if these functions could ever fail");
+			//gerror_if(errored(::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{renderCache.Triangle3dToDraw[iTriangle].C, renderCache.Triangle3dToDraw[iTriangle].C + (renderCache.TransformedNormalsTriangle[iTriangle])}, renderCache.WireframePixelCoords)), "Not sure if these functions could ever fail");
+		}
 	}
 	static constexpr const ::gpk::SColorBGRA									color										= ::gpk::YELLOW;
 	for(uint32_t iPixel = 0, pixCount = renderCache.WireframePixelCoords.size(); iPixel < pixCount; ++iPixel) {

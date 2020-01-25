@@ -10,7 +10,7 @@
 static				::gpk::error_t										drawShipHealthBar							(::SApplication& applicationInstance, const ::gpk::SCoord2<float> & centerEnemy, const ::gpk::SCoord2<int32_t> & halfMetrics, uint32_t health, int32_t yOffset, const ::gpk::SColorBGRA & finalColor)											{
 	::gpk::SFramework															& framework									= applicationInstance.Framework;
 	::gpk::view_grid<::gpk::SColorBGRA>											& viewOffscreen								= framework.MainDisplayOffscreen->Color.View;
-	::gpk::SLine2D<int32_t>														healthBar									= {};
+	::gpk::SLine2<int32_t>														healthBar									= {};
 	healthBar.A 															= {(int32_t)(centerEnemy.x  + .5f - halfMetrics.x), (int32_t)(centerEnemy.y Y_PLUS yOffset)};
 	healthBar.B																= healthBar.A; //{(int32_t)(centerEnemy.x  + .5f + halfMetrics.x), (int32_t)(centerEnemy.y + yOffset)};
 	healthBar.B.x															+= halfMetrics.x * 2;

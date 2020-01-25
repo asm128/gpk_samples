@@ -42,11 +42,11 @@ struct SRenderCache {
 
 						::gpk::array_pod<::gpk::SColorBGRA>									Triangle3dColorList							= {};
 						::gpk::array_pod<::gpk::SCoord3<float>>								TransformedNormalsTriangle					= {};
-						::gpk::array_pod<::gpk::STriangle3D<float>>							TransformedNormalsVertex					= {};
+						::gpk::array_pod<::gpk::STriangle3<float>>							TransformedNormalsVertex					= {};
 
 						::gpk::array_pod<int32_t>											Triangle3dIndices							= {};
-						::gpk::array_pod<::gpk::STriangle3D<float>>							Triangle3dToDraw							= {};
-						::gpk::array_pod<::gpk::STriangle3D<float>>							Triangle3dWorld								= {};
+						::gpk::array_pod<::gpk::STriangle3<float>>							Triangle3dToDraw							= {};
+						::gpk::array_pod<::gpk::STriangle3<float>>							Triangle3dWorld								= {};
 
 						int32_t																TrianglesDrawn								= 0;
 						int32_t																PixelsDrawn									= 0;

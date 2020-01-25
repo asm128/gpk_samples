@@ -1,5 +1,5 @@
 // Tip: Best viewed with zoom level at 81%.
-// Tip: Hold Left ALT + SHIFT while tapping or holding the arrow keys in order to select multiple columns and write on them at once. 
+// Tip: Hold Left ALT + SHIFT while tapping or holding the arrow keys in order to select multiple columns and write on them at once.
 //		Also useful for copy & paste operations in which you need to copy a bunch of variable or function names and you can't afford the time of copying them one by one.
 #include "gpk_particle.h"
 #include "gpk_framework.h"
@@ -43,7 +43,7 @@ struct SParticleToDraw {
 struct SLaserToDraw {
 						int32_t																						IndexParticlePhysics;
 						int32_t																						IndexParticleInstance;
-						::gpk::SLine2D<float>																		Segment;
+						::gpk::SLine2<float>																		Segment;
 };
 #pragma pack(pop)
 
@@ -60,15 +60,15 @@ struct SStuffToDraw {
 
 enum GAME_TEXTURE : int8_t
 	{ GAME_TEXTURE_FONT_ATLAS		= 0
-	, GAME_TEXTURE_SHIP0			
-	, GAME_TEXTURE_SHIP1		
-	, GAME_TEXTURE_POWCORESQUARE		
-	, GAME_TEXTURE_POWCOREDIAGONAL	
-	, GAME_TEXTURE_CROSSHAIR	
-	, GAME_TEXTURE_POWICON		
-	, GAME_TEXTURE_ENEMY		
-	, GAME_TEXTURE_COUNT	
-	, GAME_TEXTURE_INVALID			= -1	
+	, GAME_TEXTURE_SHIP0
+	, GAME_TEXTURE_SHIP1
+	, GAME_TEXTURE_POWCORESQUARE
+	, GAME_TEXTURE_POWCOREDIAGONAL
+	, GAME_TEXTURE_CROSSHAIR
+	, GAME_TEXTURE_POWICON
+	, GAME_TEXTURE_ENEMY
+	, GAME_TEXTURE_COUNT
+	, GAME_TEXTURE_INVALID			= -1
 	};
 
 struct SEffectsDelay {
@@ -77,7 +77,7 @@ struct SEffectsDelay {
 };
 
 static constexpr	const ::gpk::SCoord2<uint32_t>																GAME_SCREEN_SIZE							= {640, 360};
-			  
+
 struct SLevelState {
 	int32_t							Number;
 	float							Time;

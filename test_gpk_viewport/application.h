@@ -13,7 +13,7 @@
 namespace gme // I'm gonna use a different namespace in order to test a few things about the macros.
 {
 	struct SVertexCache {
-							::gpk::array_pod<::gpk::STriangle3D<float>>							Triangle3dTransformed						= {};
+							::gpk::array_pod<::gpk::STriangle3<float>>							Triangle3dTransformed						= {};
 							::gpk::array_pod<::gpk::SColorBGRA>									Triangle3dColorList							= {};
 	};
 
@@ -48,7 +48,7 @@ namespace gme // I'm gonna use a different namespace in order to test a few thin
 							int32_t																NumericTuner					= -1;
 							int32_t																CheckBox						= -1;
 							int32_t																Viewport						= -1;
-							//::gpk::STriangle3D<float>											CubePositions	[12]			= {};
+							//::gpk::STriangle3<float>											CubePositions	[12]			= {};
 							::gpk::SModelGeometryIndexed<float, uint8_t>						ModelGeometry;
 
 							::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>	Buffer3D;

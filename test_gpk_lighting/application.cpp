@@ -15,8 +15,8 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 		float																		fx											= (float)x;
 		float																		fy											= (float)y;
 		const ::STileHeights<float>													& curTile									= tileHeights[y][x];
-		const ::gpk::STriangle3D<float>												tri1										= {{fx, curTile.Heights[0], fy}, {fx, curTile.Heights[2], fy + 1}, {fx + 1, curTile.Heights[3], fy + 1}};
-		const ::gpk::STriangle3D<float>												tri2										= {{fx, curTile.Heights[0], fy}, {fx + 1, curTile.Heights[3], fy + 1}, {fx + 1, curTile.Heights[1], fy}};
+		const ::gpk::STriangle3<float>												tri1										= {{fx, curTile.Heights[0], fy}, {fx, curTile.Heights[2], fy + 1}, {fx + 1, curTile.Heights[3], fy + 1}};
+		const ::gpk::STriangle3<float>												tri2										= {{fx, curTile.Heights[0], fy}, {fx + 1, curTile.Heights[3], fy + 1}, {fx + 1, curTile.Heights[1], fy}};
 		generated.Positions.push_back(tri1);
 		generated.Positions.push_back(tri2);
 		const ::gpk::SCoord3<float>													normal1										= (tri1.B - tri1.A).Cross(tri1.C - tri1.A);
@@ -158,7 +158,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	const ::gpk::SCoord3<float>													gridCenter									= {textureGridMetrics.x / 2.0f, 0, textureGridMetrics.y / 2.0f};
 
 	for(uint32_t iTriangle = 0; iTriangle < geometryGrid.Positions.size(); ++iTriangle) {
-		::gpk::STriangle3D<float>													& transformedTriangle						= geometryGrid.Positions	[iTriangle];
+		::gpk::STriangle3<float>													& transformedTriangle						= geometryGrid.Positions	[iTriangle];
 		transformedTriangle.A													-= gridCenter;
 		transformedTriangle.B													-= gridCenter;
 		transformedTriangle.C													-= gridCenter;

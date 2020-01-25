@@ -49,14 +49,14 @@
 }
 
 struct SAABBCache {
-						::gpk::SLine2D<float>								RectangleSegments	[4]						= {};
+						::gpk::SLine2<float>								RectangleSegments	[4]						= {};
 						::gpk::SCoord2<float>								CollisionPoints		[4]						= {};
 						bool												Collision			[4]						= {};
 };
 
 template<typename _tCoord>
 static				::gpk::error_t										checkLaserCollision
-	( const ::gpk::SLine2D<_tCoord>				& projectilePath
+	( const ::gpk::SLine2<_tCoord>				& projectilePath
 	, ::SAABBCache								& aabbCache
 	, const ::gpk::SCoord2<_tCoord>				& posXHair
 	, float										halfSizeBox
@@ -92,7 +92,7 @@ static				::gpk::error_t										checkLaserCollision
 }
 
 template <size_t _sizeAlive>
-					::gpk::error_t										updateLineOfFire							(::SApplication & applicationInstance, ::SAABBCache& aabbCache, uint32_t iShip, float halfSizeBox, const ::gpk::SLine2D<float>& projectilePath, const ::gpk::array_static<::gpk::SCoord2<float>, _sizeAlive>& positions, const ::SArrayElementState<_sizeAlive>& alive)	{
+					::gpk::error_t										updateLineOfFire							(::SApplication & applicationInstance, ::SAABBCache& aabbCache, uint32_t iShip, float halfSizeBox, const ::gpk::SLine2<float>& projectilePath, const ::gpk::array_static<::gpk::SCoord2<float>, _sizeAlive>& positions, const ::SArrayElementState<_sizeAlive>& alive)	{
 	::SGame																		& gameInstance								= applicationInstance.Game;
 	for(uint32_t iEnemy = 0; iEnemy < alive.size(); ++iEnemy) {
 		if(0 == alive[iEnemy])
@@ -127,7 +127,7 @@ template <size_t _sizeAlive>
 			continue;
 		::gpk::SCoord2<float>														& shipPosition								= gameInstance.Ships.Position[iShip];
 		::SAABBCache																aabbCache;
-		::gpk::SLine2D<float>														projectilePath								= {shipPosition, shipPosition + ::gpk::SCoord2<float>{10000, }};
+		::gpk::SLine2<float>														projectilePath								= {shipPosition, shipPosition + ::gpk::SCoord2<float>{10000, }};
 		projectilePath.A.y														-= 1;
 		projectilePath.B.y														-= 1;
 		gameInstance.Ships.LineOfFire[iShip]										= false;
@@ -173,7 +173,7 @@ template <size_t _sizeAlive>
 		}
 		::gpk::SCoord2<float>														& shipPosition								= gameInstance.Ships.Position[iShip];
 		::SAABBCache																aabbCache;
-		::gpk::SLine2D<float>														projectilePath								= {shipPosition, shipPosition + ::gpk::SCoord2<float>{10000, }};
+		::gpk::SLine2<float>														projectilePath								= {shipPosition, shipPosition + ::gpk::SCoord2<float>{10000, }};
 		projectilePath.A.y														-= 1;
 		projectilePath.B.y														-= 1;
 		gameInstance.Ships.LineOfFire[iShip]										= false;
@@ -264,7 +264,7 @@ static				::gpk::error_t										integrateParticleVelocity					(::SApplication&
 			typedef	::SApplication::TParticle											TParticle;
 			TParticle																	& particleNext								= particleIntegrator.ParticleNext	[physicsId];
 			TParticle																	& particleCurrent							= particleIntegrator.Particle		[physicsId];
-			const ::SLaserToDraw														laserToDraw									= {physicsId, (int32_t)iParticle, ::gpk::SLine2D<float>{particleCurrent.Position, particleNext.Position}};
+			const ::SLaserToDraw														laserToDraw									= {physicsId, (int32_t)iParticle, ::gpk::SLine2<float>{particleCurrent.Position, particleNext.Position}};
 			applicationInstance.StuffToDraw.ProjectilePaths.push_back(laserToDraw);
 			particleInstance.Binding.TimeLived										+= lastFrameSeconds;
 		}
@@ -471,7 +471,7 @@ static				::gpk::error_t										spawnPowOfRandomType						(::SGame & gameInsta
 	::gpk::array_pod<::SApplication::TParticleInstance>							& particleInstances							= applicationInstance.ParticleSystemProjectiles.Instances;
 	for(uint32_t iProjectilePath = 0, projectilePathCount = applicationInstance.StuffToDraw.ProjectilePaths.size(); iProjectilePath < projectilePathCount; ++iProjectilePath) {
 		const ::SLaserToDraw														& laserToDraw								= applicationInstance.StuffToDraw.ProjectilePaths[iProjectilePath];
-		const ::gpk::SLine2D<float>													& projectilePath							= laserToDraw.Segment;
+		const ::gpk::SLine2<float>													& projectilePath							= laserToDraw.Segment;
 		for(uint32_t iPow = 0; iPow < gameInstance.Powerups.Alive.size(); ++iPow) { // Check powerup
 			if(0 == gameInstance.Powerups.Alive[iPow])
 				continue;
@@ -567,15 +567,15 @@ static				::gpk::error_t										spawnPowOfRandomType						(::SGame & gameInsta
 			if(particleInstance.Binding.OwnerIndex != iShip || particleInstance.Binding.TypePlayer != PLAYER_TYPE_PLAYER)
 				continue;
 			float																		halfSizeBox									= gameInstance.HalfWidthCrosshair;
-			const ::gpk::SLine2D<float>													verticalSegments[]							=
+			const ::gpk::SLine2<float>													verticalSegments[]							=
 				{ {posXHair + ::gpk::SCoord2<float>{ halfSizeBox - 1, halfSizeBox - 1}, posXHair + ::gpk::SCoord2<float>{ halfSizeBox - 1	,-halfSizeBox}}
 				, {posXHair + ::gpk::SCoord2<float>{-halfSizeBox	, halfSizeBox - 1}, posXHair + ::gpk::SCoord2<float>{-halfSizeBox		,-halfSizeBox}}
 				};
-			const ::gpk::SLine2D<float>													& projectilePath							= laserToDraw.Segment;
+			const ::gpk::SLine2<float>													& projectilePath							= laserToDraw.Segment;
 			::gpk::SCoord2<float>														collisions	[::gpk::size(verticalSegments)]	= {};
 			for(uint32_t iSeg = 0; iSeg < ::gpk::size(verticalSegments); ++iSeg) {
 				::gpk::SCoord2<float>														& collision									= collisions		[iSeg];
-				const ::gpk::SLine2D<float>													& segSelected								= verticalSegments	[iSeg];
+				const ::gpk::SLine2<float>													& segSelected								= verticalSegments	[iSeg];
 				if(1 == ::gpk::line_line_intersect(projectilePath, segSelected, collision)) {
 					bool																		bFound										= false;
 					for(uint32_t iS2 = 0; iS2 < iSeg; ++iS2) {

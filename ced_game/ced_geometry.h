@@ -7,15 +7,15 @@
 namespace ced
 {
 	struct SGeometryQuads {
-		::gpk::array_pod<::gpk::STriangle3D	<float>>		Triangles;
+		::gpk::array_pod<::gpk::STriangle3	<float>>		Triangles;
 		::gpk::array_pod<::gpk::SCoord3		<float>>		Normals;
-		::gpk::array_pod<::gpk::STriangle2D	<float>>			TextureCoords;
+		::gpk::array_pod<::gpk::STriangle2	<float>>			TextureCoords;
 	};
 
 	struct SGeometryTriangles {
-		::gpk::array_pod<::gpk::STriangle3D<float>>			Triangles;
-		::gpk::array_pod<::gpk::STriangle3D<float>>			Normals;
-		::gpk::array_pod<::gpk::STriangle2D<float>>			TextureCoords;
+		::gpk::array_pod<::gpk::STriangle3<float>>			Triangles;
+		::gpk::array_pod<::gpk::STriangle3<float>>			Normals;
+		::gpk::array_pod<::gpk::STriangle2<float>>			TextureCoords;
 	};
 
 	int													geometryBuildCube		(SGeometryQuads & geometry);

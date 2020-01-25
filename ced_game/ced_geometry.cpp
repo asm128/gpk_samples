@@ -1,25 +1,47 @@
 #include "ced_geometry.h"
 
 // Vertex coordinates for cube faces
-static constexpr const ::gpk::STriangle3D<int8_t>	geometryCube	[12]						=
-	{ {{1, 0, 0}, {0, 0, 0}, {0, 1, 0}}	// Right	- first
-	, {{1, 0, 0}, {0, 1, 0}, {1, 1, 0}}	// Right	- second
+static constexpr const ::gpk::STriangle3<int8_t>	geometryCube	[12]						=
+	{ {{0, 0, 0}, {0, 1, 0}, {1, 0, 0}}	// Right	- first
+	, {{0, 1, 0}, {1, 1, 0}, {1, 0, 0}}	// Right	- second
 
-	, {{0, 0, 1}, {0, 1, 0}, {0, 0, 0}}	// Back		- first
-	, {{0, 0, 1}, {0, 1, 1}, {0, 1, 0}}	// Back		- second
+	, {{0, 1, 0}, {0, 0, 0}, {0, 0, 1}}	// Back		- first
+	, {{0, 1, 1}, {0, 1, 0}, {0, 0, 1}}	// Back		- second
 
-	, {{1, 0, 0}, {0, 0, 1}, {0, 0, 0}}	// Bottom	- first
-	, {{1, 0, 0}, {1, 0, 1}, {0, 0, 1}}	// Bottom	- second
+	, {{0, 0, 1}, {0, 0, 0}, {1, 0, 0}}	// Bottom	- first
+	, {{1, 0, 1}, {0, 0, 1}, {1, 0, 0}}	// Bottom	- second
 
-	, {{1, 0, 1}, {0, 1, 1}, {0, 0, 1}}	// Left		- first
-	, {{1, 0, 1}, {1, 1, 1}, {0, 1, 1}}	// Left		- second
+	, {{0, 1, 1}, {0, 0, 1}, {1, 0, 1}}	// Left		- first
+	, {{1, 1, 1}, {0, 1, 1}, {1, 0, 1}}	// Left		- second
 
-	, {{1, 0, 1}, {1, 1, 0}, {1, 1, 1}}	// Front	- first
-	, {{1, 0, 1}, {1, 0, 0}, {1, 1, 0}}	// Front	- second
+	, {{1, 1, 0}, {1, 1, 1}, {1, 0, 1}}	// Front	- first
+	, {{1, 0, 0}, {1, 1, 0}, {1, 0, 1}}	// Front	- second
 
-	, {{1, 1, 0}, {0, 1, 1}, {1, 1, 1}}	// Top		- first
-	, {{1, 1, 0}, {0, 1, 0}, {0, 1, 1}}	// Top		- second
+	, {{0, 1, 1}, {1, 1, 1}, {1, 1, 0}}	// Top		- first
+	, {{0, 1, 0}, {0, 1, 1}, {1, 1, 0}}	// Top		- second
 	};
+
+// Vertex coordinates for cube faces
+static constexpr const ::gpk::STriangle2<int8_t>	texCoordCube	[12]						=
+	{ {{0, 1}, {0, 0}, {1, 1}}	// Right	- first
+	, {{0, 0}, {1, 0}, {1, 1}}	// Right	- second
+	//{} //
+	, {{1, 0}, {1, 1}, {0, 1}}	// Back		- first
+	, {{0, 0}, {1, 0}, {0, 1}}	// Back		- second
+	//{} //
+	, {{0, 0}, {1, 0}, {1, 1}}	// Bottom	- first
+	, {{0, 1}, {0, 0}, {1, 1}}	// Bottom	- second
+	//{} //
+	, {{1, 0}, {1, 1}, {0, 1}}	// Left		- second
+	, {{0, 0}, {1, 0}, {0, 1}}	// Left		- first
+	//{} //
+	, {{0, 0}, {1, 0}, {1, 1}}	// Front	- first
+	, {{0, 1}, {0, 0}, {1, 1}}	// Front	- second
+	//{} //
+	, {{1, 1}, {0, 1}, {0, 0}}	// Top		- first
+	, {{1, 0}, {1, 1}, {0, 0}}	// Top		- second
+	};
+
 
 static constexpr const ::gpk::SCoord3<int8_t>		geometryNormals	[6]		=
 	{ { 0, 0, 1} // Right
@@ -33,13 +55,17 @@ static constexpr const ::gpk::SCoord3<int8_t>		geometryNormals	[6]		=
 int													ced::geometryBuildCube	(SGeometryQuads & geometry)	{
 	geometry.Triangles	.resize((uint32_t)::gpk::size(geometryCube));
 	geometry.Normals	.resize((uint32_t)::gpk::size(geometryNormals));
+	geometry.TextureCoords	.resize((uint32_t)::gpk::size(texCoordCube));
 
 	for(uint32_t iTriangle = 0; iTriangle < geometry.Triangles.size(); ++iTriangle) {
-		::gpk::STriangle3D<float>								& newTriangle		= geometry.Triangles[iTriangle];
+		::gpk::STriangle3<float>								& newTriangle		= geometry.Triangles[iTriangle];
 		newTriangle											= geometryCube[iTriangle].Cast<float>();
 		newTriangle.A										-= {.5, .5, .5};
 		newTriangle.B										-= {.5, .5, .5};
 		newTriangle.C										-= {.5, .5, .5};
+
+		::gpk::STriangle2<float>									& newTriangleTex	= geometry.TextureCoords[iTriangle];
+		newTriangleTex											= ::texCoordCube[iTriangle].Cast<float>();
 
 		::gpk::SCoord3<float>									& newNormal			= geometry.Normals[iTriangle / 2];
 		newNormal											= geometryNormals[iTriangle / 2].Cast<float>();
@@ -50,14 +76,22 @@ int													ced::geometryBuildCube	(SGeometryQuads & geometry)	{
 int													ced::geometryBuildGrid	(SGeometryQuads & geometry, ::gpk::SCoord2<uint32_t> gridSize, ::gpk::SCoord2<float> gridCenter)	{
 	for(uint32_t z = 0; z < gridSize.y; ++z)
 	for(uint32_t x = 0; x < gridSize.x; ++x)  {
-		::gpk::SCoord3<double>									coords	[4]			=
+		::gpk::SCoord3<int8_t>									coords	[4]			=
 			{ {0, 0, 0}
 			, {0, 0, 1}
 			, {1, 0, 0}
 			, {1, 0, 1}
 			};
-		::gpk::STriangle3D<float>								triangleA			= {coords[0].Cast<float>(), coords[1].Cast<float>(), coords[2].Cast<float>()};
-		::gpk::STriangle3D<float>								triangleB			= {coords[1].Cast<float>(), coords[3].Cast<float>(), coords[2].Cast<float>()};
+		::gpk::SCoord2<int8_t>									texcoords	[4]			=
+			{ {0, 0}
+			, {0, 1}
+			, {1, 0}
+			, {1, 1}
+			};
+		::gpk::STriangle2<int8_t>								triangleATex		= {texcoords[0], texcoords[1], texcoords[2]};
+		::gpk::STriangle2<int8_t>								triangleBTex		= {texcoords[1], texcoords[3], texcoords[2]};
+		::gpk::STriangle3<float>								triangleA			= {coords[0].Cast<float>(), coords[1].Cast<float>(), coords[2].Cast<float>()};
+		::gpk::STriangle3<float>								triangleB			= {coords[1].Cast<float>(), coords[3].Cast<float>(), coords[2].Cast<float>()};
 		//::gpk::STriangle3<float>								triangleA			= {{1, 0, 0}, {0, 0, 1}, {1, 0, 1}};
 		//::gpk::STriangle3<float>								triangleB			= {{1, 0, 0}, {0, 0, 0}, {0, 0, 1}};
 		triangleA.A											+= {(float)x, 0, (float)z};
@@ -75,6 +109,8 @@ int													ced::geometryBuildGrid	(SGeometryQuads & geometry, ::gpk::SCoord
 		triangleB.C											-= {(float)gridCenter.x, 0, (float)gridCenter.y};
 		geometry.Triangles	.push_back(triangleA);
 		geometry.Triangles	.push_back(triangleB);
+		geometry.TextureCoords	.push_back(triangleATex.Cast<float>());
+		geometry.TextureCoords	.push_back(triangleBTex.Cast<float>());
 		geometry.Normals	.push_back({0, 1, 0});
 	}
 	return 0;
@@ -91,8 +127,8 @@ int													ced::geometryBuildFigure0	(SGeometryQuads & geometry, uint32_t s
 			, {sin(::gpk::math_pi * (z + 1)	/ stacks	) * cos(::gpk::math_2pi * x			/ slices), sin(::gpk::math_pi * (z + 1)	/ stacks) * sin(::gpk::math_2pi * x			/ slices), cos(::gpk::math_pi * x		/slices)}
 			, {sin(::gpk::math_pi * (z + 1)	/ stacks	) * cos(::gpk::math_2pi * (x + 1)	/ slices), sin(::gpk::math_pi * (z + 1)	/ stacks) * sin(::gpk::math_2pi * (x + 1)	/ slices), cos(::gpk::math_pi * (x + 1)	/slices)}
 			};
-		::gpk::STriangle3D<float>								triangleA			= {coords[0].Cast<float>() * radius, coords[1].Cast<float>() * radius, coords[2].Cast<float>() * radius};
-		::gpk::STriangle3D<float>								triangleB			= {coords[1].Cast<float>() * radius, coords[3].Cast<float>() * radius, coords[2].Cast<float>() * radius};
+		::gpk::STriangle3<float>								triangleA			= {coords[0].Cast<float>() * radius, coords[1].Cast<float>() * radius, coords[2].Cast<float>() * radius};
+		::gpk::STriangle3<float>								triangleB			= {coords[1].Cast<float>() * radius, coords[3].Cast<float>() * radius, coords[2].Cast<float>() * radius};
 		triangleA.A											-= gridCenter;
 		triangleA.B											-= gridCenter;
 		triangleA.C											-= gridCenter;
@@ -136,8 +172,8 @@ int													ced::geometryBuildSphere	(SGeometryQuads & geometry, uint32_t st
 			, {sin(::gpk::math_pi * (x + 1)	/slices) * cos(::gpk::math_2pi * (z + 1)	/ stacks), cos(::gpk::math_pi * (x + 1)	/slices), sin(::gpk::math_pi * (x + 1)	/ slices) * sin(::gpk::math_2pi * (z + 1)	/ stacks)}
 			};
 		{
-			::gpk::STriangle3D<float>								triangleA			= {coords[0].Cast<float>() * radius, coords[2].Cast<float>() * radius, coords[1].Cast<float>() * radius};
-			::gpk::STriangle3D<float>								triangleB			= {coords[1].Cast<float>() * radius, coords[2].Cast<float>() * radius, coords[3].Cast<float>() * radius};
+			::gpk::STriangle3<float>								triangleA			= {coords[0].Cast<float>() * radius, coords[2].Cast<float>() * radius, coords[1].Cast<float>() * radius};
+			::gpk::STriangle3<float>								triangleB			= {coords[1].Cast<float>() * radius, coords[2].Cast<float>() * radius, coords[3].Cast<float>() * radius};
 			triangleA.A											-= gridCenter;
 			triangleA.B											-= gridCenter;
 			triangleA.C											-= gridCenter;
@@ -201,8 +237,8 @@ int													ced::geometryBuildSphere	(SGeometryTriangles & geometry, uint32_
 				});
 		}
 		{
-			::gpk::STriangle3D<float>								triangleA			= {(coords[0] * radius).Cast<float>(), (coords[2] * radius).Cast<float>(), (coords[1] * radius).Cast<float>()};
-			::gpk::STriangle3D<float>								triangleB			= {(coords[1] * radius).Cast<float>(), (coords[2] * radius).Cast<float>(), (coords[3] * radius).Cast<float>()};
+			::gpk::STriangle3<float>								triangleA			= {(coords[0] * radius).Cast<float>(), (coords[2] * radius).Cast<float>(), (coords[1] * radius).Cast<float>()};
+			::gpk::STriangle3<float>								triangleB			= {(coords[1] * radius).Cast<float>(), (coords[2] * radius).Cast<float>(), (coords[3] * radius).Cast<float>()};
 			triangleA.A											-= gridCenter;
 			triangleA.B											-= gridCenter;
 			triangleA.C											-= gridCenter;
