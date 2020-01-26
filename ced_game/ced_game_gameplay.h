@@ -1,5 +1,6 @@
 #include "gpk_view_grid.h"
 #include "gpk_array.h"
+#include "gpk_color.h"
 
 #ifndef GPK_DEMO_08_GAME_H_293874239874
 #define GPK_DEMO_08_GAME_H_293874239874
@@ -25,27 +26,53 @@ struct SStars	{
 };
 
 struct SDebris	{
+	::gpk::SColorBGRA							Colors[4]			=
+		{ {0x80, 0xAF, 0xFF, }
+		, {0x40, 0x80, 0xFF, }
+		, {0x20, 0x80, 0xFF, }
+		, {0x00, 0x00, 0xFF, }
+		};
 	::gpk::array_pod<::gpk::SCoord3<float>>		Position			= {};
 	::gpk::array_pod<::gpk::SCoord3<float>>		Direction			= {};
 	::gpk::array_pod<float>						Speed				= {};
 	::gpk::array_pod<float>						Brightness			= {};
 
-	int											Spawn				(const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speed)	{
+	int											Spawn				(const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speed, float brightness)	{
 		Position		.push_back(position);
 		Direction		.push_back(direction);
 		Speed			.push_back(speed);
-		Brightness		.push_back(1);
+		Brightness		.push_back(brightness);
+		return 0;
+	}
+	int											SpawnSpherical			(uint32_t countDebris, const ::gpk::SCoord3<float> & position, float speedDebris, float brightness)	{
+		for(uint32_t iDebris = 0; iDebris < countDebris; ++iDebris) {
+			::gpk::SCoord3<float>									direction				= {0, 1, 0};
+			direction.RotateX(rand() * (::gpk::math_2pi / RAND_MAX));
+			direction.RotateY(rand() * (::gpk::math_2pi / RAND_MAX));
+			direction.RotateZ(rand() * (::gpk::math_2pi / RAND_MAX));
+			direction.Normalize();
+			Spawn(position, direction, speedDebris, brightness);
+		}
 		return 0;
 	}
 	int											Update				(float lastFrameSeconds)	{
 		for(uint32_t iShot = 0; iShot < Position.size(); ++iShot) {
-			Position	[iShot]							+= Direction[iShot] * (Speed[iShot] * lastFrameSeconds);
-			Brightness 	[iShot]							-= lastFrameSeconds;
-			if(Position[iShot].Length() > 50) {
-				Direction	.remove_unordered(iShot);
-				Position	.remove_unordered(iShot);
-				Speed		.remove_unordered(iShot);
-				Brightness	.remove_unordered(iShot);
+			::gpk::SCoord3<float>							& direction						= Direction	[iShot];
+			::gpk::SCoord3<float>							& position						= Position	[iShot];
+			float											& speed							= Speed		[iShot];
+			float											& brightness 					= Brightness[iShot];
+			position									+= direction * (speed * (double)lastFrameSeconds);
+			brightness									-= lastFrameSeconds;
+			speed										-= lastFrameSeconds *  (rand() % 16);
+			if(brightness < 0) {
+				direction									= Direction	[Position.size() - 1];
+				position									= Position	[Position.size() - 1];
+				speed										= Speed		[Position.size() - 1];
+				brightness									= Brightness[Position.size() - 1];
+				Direction	.resize(Direction	.size() - 1);
+				Position	.resize(Position	.size() - 1);
+				Speed		.resize(Speed		.size() - 1);
+				Brightness	.resize(Brightness	.size() - 1);
 			}
 		}
 		return 0;

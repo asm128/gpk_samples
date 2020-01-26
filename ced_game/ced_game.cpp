@@ -75,7 +75,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 	//::gpk::STimer															timer;
 	app;
 	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>		target;
-	target->resize(app.Framework.MainDisplay.Size / 2, {}, (uint32_t)-1);
+	target->resize(app.Framework.MainDisplay.Size, {}, (uint32_t)-1);
 	//::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>		targetGame;
 	//targetGame->resize(app.Framework.MainDisplay.Size / 2, {}, (uint32_t)-1);
 

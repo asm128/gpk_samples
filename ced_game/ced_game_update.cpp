@@ -52,9 +52,9 @@ int													setupGame			(::gme::SApplication & app)	{
 	::setupStars(app.Stars, framework.MainDisplay.Size);
 
 
-	srand((uint32_t)time(0));
+	//srand((uint32_t)time(0));
 
-	app.Scene.Geometry.resize(4);
+	app.Scene.Geometry.resize(5);
 	//::ced::geometryBuildGrid(app.Scene.Geometry[0], {2U, 2U}, {1U, 1U});
 	::ced::geometryBuildSphere(app.Scene.Geometry[0],  12U, 8U, 1, {0, 1});
 	//::ced::geometryBuildCube(app.Scene.Geometry[0]);
@@ -62,11 +62,13 @@ int													setupGame			(::gme::SApplication & app)	{
 	//::ced::geometryBuildSphere(app.Scene.Geometry[1],  4U, 3U, 1, {0, 1});
 	::ced::geometryBuildCube(app.Scene.Geometry[1]);
 	//::ced::geometryBuildGrid(app.Scene.Geometry[1], {2U, 2U}, {1U, 1U});
-	::ced::geometryBuildSphere(app.Scene.Geometry[2],  4U, 4U, 1, {0, 1});
-	::ced::geometryBuildSphere(app.Scene.Geometry[3],  5U, 5U, 1, {0, 1});
+	::ced::geometryBuildSphere(app.Scene.Geometry[2],  3U, 2U, 1, {0, 1});
+	::ced::geometryBuildSphere(app.Scene.Geometry[3],  4U, 2U, 1, {0, 1});
+	::ced::geometryBuildSphere(app.Scene.Geometry[4],  16U, 2U, 1, {0, 1});
 	//::ced::geometryBuildFigure0(app.Geometry, 10U, 10U, 1, {});
 
 	app.Scene.Models[::modelCreate(app)].Position		= {-30};
+	app.Scene.Models[::modelCreate(app)].Position		= {+20};
 	app.Scene.Models[::modelCreate(app)].Position		= {+25};
 	app.Scene.Models[::modelCreate(app)].Position		= {+30};
 	app.Scene.Models[::modelCreate(app)].Position		= {+35};
@@ -78,16 +80,17 @@ int													setupGame			(::gme::SApplication & app)	{
 		, ::gpk::CYAN
 		};
 
-	app.Scene.Image.resize(4);
+	app.Scene.Image.resize(5);
 	for(uint32_t iImage = 0; iImage < app.Scene.Image.size(); ++iImage) {
-		app.Scene.Image[iImage].resize(3, 3);
+		app.Scene.Image[iImage].resize(24, 8);
 		for(uint32_t y = 0; y < app.Scene.Image[iImage].metrics().y; ++y) {// Generate noise color for planet texture
 			//bool yAffect = rand() % 3;
-			bool xAffect = 0 == (y % 2);
+			bool xAffect = (y % 2);
 			::gpk::SColorFloat										lineColor					= baseColor[rand() % ::std::size(baseColor)];
 			//bool zAffect = 0 == y % 2;
-			for(uint32_t x = 0; x < app.Scene.Image[iImage].metrics().x; ++x)
+			for(uint32_t x = 0; x < app.Scene.Image[iImage].metrics().x; ++x) {
 				app.Scene.Image[iImage][y][x] = lineColor * (xAffect ? ::gpk::max(.5, sin(x)) : 1);
+			}
 		}
 		//::ced::bmpFileLoad("../ced_data/cp437_12x12.bmp", app.Scene.Image[iImage]);
 	}
@@ -97,6 +100,28 @@ int													setupGame			(::gme::SApplication & app)	{
 	app.Scene.Camera.Up					= {0, 1, 0};
 
 
+	return 0;
+}
+
+int													handleShotCollision	(const ::gpk::SCoord3<float> & collisionPoint, int32_t & healthParth, int32_t & healthParent, ::SDebris & debris)	{
+	//PlaySoundA((LPCSTR)soundAlias, GetModuleHandle(0), SND_ALIAS_ID | SND_ASYNC);
+	healthParth									-= 100;
+	healthParent								-= 100;
+	float													debrisSpeed					= 50;
+	float													debrisBright				= 1;
+	uint32_t												debrisCount					= 10;
+	if(0 >= healthParth)
+		if(0 >= healthParent) {
+			debrisSpeed					= 10	;
+			debrisCount					= 100	;
+			debrisBright				= 3	;
+		}
+		else {
+			debrisSpeed					= 60	;
+			debrisCount					= 150	;
+			debrisBright				= 2		;
+		}
+	debris.SpawnSpherical(debrisCount, collisionPoint, debrisSpeed, debrisBright);
 	return 0;
 }
 
@@ -135,7 +160,7 @@ int													updateGame				(::gme::SApplication & app)	{
 			continue;
 		::ced::SModel3D											& modelEnemy		= app.Scene.Models[iEnemy];
 		if(-1 == indexParent) {
-			modelEnemy.Position.z								= (float)(sin(app.AnimationTime) * 30) * ((iEnemy % 2) ? -1 : 1);
+			modelEnemy.Position.z								= (float)(sin(app.AnimationTime) * iEnemy * 3) * ((iEnemy % 2) ? -1 : 1);
 		}
 		else {
 			app.Scene.Models[iEnemy].Rotation.y					+= (float)lastFrameSeconds * 1;
@@ -190,6 +215,8 @@ int													updateGame				(::gme::SApplication & app)	{
 	if(GetAsyncKeyState(VK_NUMPAD5)) app.Scene.Models[0].Rotation	= {0, 0, (float)::gpk::math_pi_2};
 
 	modelPlayer.Rotation.y							+= (float)lastFrameSeconds * .5f;
+	for(uint32_t iEnemy = 1; iEnemy < app.Scene.Models.size(); ++iEnemy)
+		app.Scene.Models[iEnemy].Rotation.y					+= (float)lastFrameSeconds * (.1f * iEnemy);
 
 	app.Scene.LightVector										= app.Scene.LightVector.RotateY(lastFrameSeconds * 2);
 	if(framework.MainDisplay.Resized)
@@ -217,22 +244,13 @@ int													updateGame				(::gme::SApplication & app)	{
 			sphereCenter										= matrixTransformParent.Transform(sphereCenter);
 
 			float													t				= 0;
-			::gpk::SCoord3<float>									q				= {};
+			::gpk::SCoord3<float>									collisionPoint				= {};
 
-			if( intersectRaySphere(shotSegment.A, (shotSegment.B - shotSegment.A).Normalize(), sphereCenter, 1, t, q)
+			if( intersectRaySphere(shotSegment.A, (shotSegment.B - shotSegment.A).Normalize(), sphereCenter, 1, t, collisionPoint)
 			 && t < 1
 			) {
 				//PlaySoundA((LPCSTR)SND_ALIAS_SYSTEMHAND, GetModuleHandle(0), SND_ALIAS_ID | SND_ASYNC);
-				app.Health[iModel]									-= 100;
-				app.Health[indexParent]								-= 100;
-				for(uint32_t i = 0; i < 10; ++i) {
-					::gpk::SCoord3<float>			direction			= {0, 1, 0};
-					direction.RotateX(rand() * (::gpk::math_2pi / 65535));
-					direction.RotateY(rand() * (::gpk::math_2pi / 65535));
-					direction.RotateZ(rand() * (::gpk::math_2pi / 65535));
-					direction.Normalize();
-					app.Debris.Spawn(q, direction, 50);
-				}
+				::handleShotCollision(collisionPoint, app.Health[iModel], app.Health[indexParent], app.Debris);
 				app.ShotsPlayer.Remove(iShot);
 				--iShot;
 				break;
@@ -258,22 +276,13 @@ int													updateGame				(::gme::SApplication & app)	{
 			sphereCenter										= matrixTransformParent.Transform(sphereCenter);
 
 			float													t						= 0;
-			::gpk::SCoord3<float>									q						= {};
+			::gpk::SCoord3<float>									collisionPoint						= {};
 
-			if( intersectRaySphere(shotSegment.A, (shotSegment.B - shotSegment.A).Normalize(), sphereCenter, 1, t, q)
+			if( intersectRaySphere(shotSegment.A, (shotSegment.B - shotSegment.A).Normalize(), sphereCenter, 1, t, collisionPoint)
 			 && t < 1
 			) {
 				//PlaySoundA((LPCSTR)SND_ALIAS_SYSTEMEXCLAMATION, GetModuleHandle(0), SND_ALIAS_ID | SND_ASYNC);
-				app.Health[iModel]									-= 100;
-				app.Health[indexParent]								-= 100;
-				for(uint32_t i = 0; i < 10; ++i) {
-					::gpk::SCoord3<float>									direction			= {0, 1, 0};
-					direction.RotateX(rand() * (::gpk::math_2pi / 65535));
-					direction.RotateY(rand() * (::gpk::math_2pi / 65535));
-					direction.RotateZ(rand() * (::gpk::math_2pi / 65535));
-					direction.Normalize();
-					app.Debris.Spawn(q, direction, 50);
-				}
+				::handleShotCollision(collisionPoint, app.Health[iModel], app.Health[indexParent], app.Debris);
 				app.ShotsEnemy.Remove(iShot);
 				--iShot;
 				break;
