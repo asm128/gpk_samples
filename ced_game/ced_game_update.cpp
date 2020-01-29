@@ -1,4 +1,5 @@
 #include "ced_game.h"
+#include "gpk_png.h"
 
 int													setupStars			(SStars & stars, ::gpk::SCoord2<uint32_t> targetSize)	{
 	if(0 == targetSize.y) return 0;
@@ -74,14 +75,21 @@ int													setupGame			(::gme::SApplication & app)	{
 	app.Scene.Models[::modelCreate(app)].Position		= {+35};
 
 	::gpk::SColorFloat										baseColor	[4]	=
-		{ ::gpk::GREEN
+		{ ::gpk::LIGHTGREEN
 		, ::gpk::LIGHTBLUE
 		, ::gpk::LIGHTRED
-		, ::gpk::CYAN
+		, ::gpk::LIGHTCYAN
 		};
 
 	app.Scene.Image.resize(5);
+	for(uint32_t iImage = 0; iImage < app.Scene.Image.size(); ++iImage)
+		::gpk::pngFileLoad("../gpk_data/images/aborto.png", app.Scene.Image[iImage]);
+
+	::gpk::pngFileLoad("../gpk_data/images/provida.png", app.Scene.Image[0]);
+
 	for(uint32_t iImage = 0; iImage < app.Scene.Image.size(); ++iImage) {
+		if(app.Scene.Image[iImage].Texels.size())
+			continue;
 		app.Scene.Image[iImage].resize(24, 8);
 		for(uint32_t y = 0; y < app.Scene.Image[iImage].metrics().y; ++y) {// Generate noise color for planet texture
 			//bool yAffect = rand() % 3;
@@ -92,9 +100,7 @@ int													setupGame			(::gme::SApplication & app)	{
 				app.Scene.Image[iImage][y][x] = lineColor * (xAffect ? ::gpk::max(.5, sin(x)) : 1);
 			}
 		}
-		//::ced::bmpFileLoad("../ced_data/cp437_12x12.bmp", app.Scene.Image[iImage]);
 	}
-
 	app.Scene.Camera.Target				= {};
 	app.Scene.Camera.Position			= {-0.000001f, 100, 0};
 	app.Scene.Camera.Up					= {0, 1, 0};
@@ -165,7 +171,7 @@ int													updateGame				(::gme::SApplication & app)	{
 		else {
 			app.Scene.Models[iEnemy].Rotation.y					+= (float)lastFrameSeconds * 1;
 			matricesParent										= {};
-			app.ShotsEnemy.Delay								+= lastFrameSeconds;
+			app.ShotsEnemy.Delay								+= lastFrameSeconds / 2;
 			const ::ced::SModel3D									& modelParent			= app.Scene.Models[indexParent];
 			matricesParent.Scale	.Scale			(modelParent.Scale, true);
 			matricesParent.Rotation	.Rotation		(modelParent.Rotation);
@@ -192,7 +198,7 @@ int													updateGame				(::gme::SApplication & app)	{
 			matricesParent.Position	.SetTranslation	(modelParent.Position, true);
 			::gpk::SCoord3<float>									positionGlobal			= (matricesParent.Scale * matricesParent.Rotation * matricesParent.Position).Transform(modelEnemy.Position);
 			//positionGlobal.x									+= 1.5;
-			app.ShotsPlayer.Delay								+= lastFrameSeconds * 5;
+			app.ShotsPlayer.Delay								+= lastFrameSeconds * 10;
 			::gpk::SCoord3<float>									direction			= {1, 0, 0};
 			//direction.RotateY(rand() * (1.0 / 65535) * ced::MATH_PI * .0185 * ((rand() % 2) ? -1 : 1));
 			//direction.RotateZ(rand() * (1.0 / 65535) * ced::MATH_PI * .0185 * ((rand() % 2) ? -1 : 1));
@@ -226,8 +232,8 @@ int													updateGame				(::gme::SApplication & app)	{
 	app.Debris		.Update((float)lastFrameSeconds);
 	app.Stars		.Update(framework.MainDisplay.Size.y, (float)lastFrameSeconds);
 
-	for(uint32_t iShot = 0; iShot < app.ShotsPlayer.Position.size(); ++iShot) {
-		const ::gpk::SLine3<float>								shotSegment			= {app.ShotsPlayer.PositionPrev[iShot], app.ShotsPlayer.Position[iShot]};
+	for(uint32_t iShot = 0; iShot < app.ShotsPlayer.Particles.Position.size(); ++iShot) {
+		const ::gpk::SLine3<float>								shotSegment			= {app.ShotsPlayer.PositionPrev[iShot], app.ShotsPlayer.Particles.Position[iShot]};
 		for(uint32_t iModel = 7; iModel < app.Scene.Models.size(); ++iModel) {
 			const int32_t											indexParent				= app.Scene.Entities[iModel].Parent;
 			if(-1 == indexParent)
@@ -258,8 +264,8 @@ int													updateGame				(::gme::SApplication & app)	{
 		}
 	}
 
-	for(uint32_t iShot = 0; iShot < app.ShotsEnemy.Position.size(); ++iShot) {
-		const ::gpk::SLine3<float>								shotSegment				= {app.ShotsEnemy.PositionPrev[iShot], app.ShotsEnemy.Position[iShot]};
+	for(uint32_t iShot = 0; iShot < app.ShotsEnemy.Particles.Position.size(); ++iShot) {
+		const ::gpk::SLine3<float>								shotSegment				= {app.ShotsEnemy.PositionPrev[iShot], app.ShotsEnemy.Particles.Position[iShot]};
 		for(uint32_t iModel = 0; iModel < 7; ++iModel) {
 			const int32_t											indexParent				= app.Scene.Entities[iModel].Parent;
 			if(-1 == indexParent)

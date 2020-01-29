@@ -42,7 +42,7 @@ int													drawDebris			(::gpk::view_grid<::gpk::SColorBGRA> targetPixels, 
 	::gpk::array_pod<::gpk::SCoord2<int32_t>>				pixelCoords;
 	for(uint32_t iParticle = 0; iParticle < debris.Brightness.size(); ++iParticle) {
 		::gpk::SColorBGRA										colorShot			= colors[iParticle % ::std::size(colors)];
-		::gpk::SCoord3<float>									starPos				= debris.Position[iParticle];
+		::gpk::SCoord3<float>									starPos				= debris.Particles.Position[iParticle];
 		starPos												= matrixVPV.Transform(starPos);
 		const ::gpk::SCoord2<int32_t>							pixelCoord		= {(int32_t)starPos.x, (int32_t)starPos.y};
 		if( pixelCoord.y < 0 || pixelCoord.y >= (int32_t)targetPixels.metrics().y
@@ -89,7 +89,7 @@ int													drawShots			(::gpk::view_grid<::gpk::SColorBGRA> targetPixels, S
 	for(uint32_t iShot = 0; iShot < shots.Brightness.size(); ++iShot) {
 		pixelCoords.clear();
 		::gpk::SCoord3<float>									starPosPrev		= shots.PositionPrev[iShot];
-		::gpk::SCoord3<float>									starPos			= shots.Position[iShot];
+		::gpk::SCoord3<float>									starPos			= shots.Particles.Position[iShot];
 		::gpk::SLine3<float>									raySegmentWorld	= {starPosPrev, starPos};
 
 		::gpk::SLine3<float>									raySegment		= raySegmentWorld;
@@ -160,7 +160,7 @@ int													drawGame				(::gme::SApplication & app, ::gpk::ptr_obj<::gpk::SR
 	}
 	{
 		::gpk::SMatrix4<float>									matrixViewport		= {};
-		matrixViewport.ViewportLH(targetPixels.metrics(), 0.01, 1000);
+		matrixViewport.ViewportLH(targetPixels.metrics());
 		matrixViewport										= matrixViewport.GetInverse();
 		matrixViewport._41									+= targetPixels.metrics().x / 2;
 		matrixViewport._42									+= targetPixels.metrics().y / 2;
@@ -196,8 +196,8 @@ int													drawGame				(::gme::SApplication & app, ::gpk::ptr_obj<::gpk::SR
 		matrixTransform										= matrixTransform  * matrixTransformParent ;
 		::gpk::array_pod<::gpk::SCoord3<float>>					lightPoints				= {};
 		::gpk::array_pod<::gpk::SColorBGRA>						lightColors				= {};
-		lightPoints.resize(app.ShotsEnemy.Position.size() + app.ShotsPlayer.Position.size() + app.Debris.Position.size() + 4);
-		lightColors.resize(app.ShotsEnemy.Position.size() + app.ShotsPlayer.Position.size() + app.Debris.Position.size() + 4);
+		lightPoints.resize(app.ShotsEnemy.Particles.Position.size() + app.ShotsPlayer.Particles.Position.size() + app.Debris.Particles.Position.size() + 4);
+		lightColors.resize(app.ShotsEnemy.Particles.Position.size() + app.ShotsPlayer.Particles.Position.size() + app.Debris.Particles.Position.size() + 4);
 		lightPoints[0]									= app.Scene.Models[0].Position;
 		lightColors[0]									= colorLightPlayer;
 		for(uint32_t iEnemy = 1; iEnemy < 4; ++iEnemy) {
@@ -208,20 +208,20 @@ int													drawGame				(::gme::SApplication & app, ::gpk::ptr_obj<::gpk::SR
 			lightColors[iEnemy]								= colorLightEnemy;
 		}
 		uint32_t												iOffset					= 4;
-		for(uint32_t iShot = 0; iShot < app.ShotsEnemy.Position.size(); ++iShot) {
-			lightPoints[iOffset + iShot]						= app.ShotsEnemy.Position[iShot];
+		for(uint32_t iShot = 0; iShot < app.ShotsEnemy.Particles.Position.size(); ++iShot) {
+			lightPoints[iOffset + iShot]						= app.ShotsEnemy.Particles.Position[iShot];
 			lightColors[iOffset + iShot]						= colorShotEnemy;
 		}
-		iOffset												+= app.ShotsEnemy.Position.size();
-		for(uint32_t iShot = 0; iShot < app.ShotsPlayer.Position.size(); ++iShot) {
-			lightPoints[iOffset + iShot]						= app.ShotsPlayer.Position[iShot];
+		iOffset												+= app.ShotsEnemy.Particles.Position.size();
+		for(uint32_t iShot = 0; iShot < app.ShotsPlayer.Particles.Position.size(); ++iShot) {
+			lightPoints[iOffset + iShot]						= app.ShotsPlayer.Particles.Position[iShot];
 			lightColors[iOffset + iShot]						= colorShotPlayer;
 		}
-		iOffset												+= app.ShotsPlayer.Position.size();
-		for(uint32_t iParticle = 0; iParticle < app.Debris.Position.size(); ++iParticle) {
-			lightPoints[iOffset + iParticle]						= app.Debris.Position[iParticle];
-			::gpk::SColorFloat									colorShot					= app.Debris.Colors[iParticle % ::gpk::size(app.Debris.Colors)];
-			lightColors[iOffset + iParticle]						= colorShot * app.Debris.Brightness[iParticle];
+		iOffset												+= app.ShotsPlayer.Particles.Position.size();
+		for(uint32_t iParticle = 0; iParticle < app.Debris.Particles.Position.size(); ++iParticle) {
+			lightPoints[iOffset + iParticle]					= app.Debris.Particles.Position[iParticle];
+			::gpk::SColorFloat										colorShot					= app.Debris.Colors[iParticle % ::gpk::size(app.Debris.Colors)];
+			lightColors[iOffset + iParticle]					= colorShot * app.Debris.Brightness[iParticle];
 		}
 		for(uint32_t iTriangle = 0; iTriangle < app.Scene.Geometry[iModel / 7].Triangles.size(); ++iTriangle) {
 			pixelCoords			.clear();

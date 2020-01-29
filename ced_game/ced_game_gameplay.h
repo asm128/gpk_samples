@@ -25,6 +25,27 @@ struct SStars	{
 	}
 };
 
+struct SParticles3 {
+	::gpk::array_pod<::gpk::SCoord3<float>>		Position			= {};
+	::gpk::array_pod<::gpk::SCoord3<float>>		Direction			= {};
+	::gpk::array_pod<float>						Speed				= {};
+
+	int											IntegrateSpeed		(double lastFrameSeconds)	{
+		for(uint32_t iShot = 0; iShot < Position.size(); ++iShot) {
+			::gpk::SCoord3<float>							& direction						= Direction	[iShot];
+			::gpk::SCoord3<float>							& position						= Position	[iShot];
+			float											& speed							= Speed		[iShot];
+			position									+= direction * speed * lastFrameSeconds;
+		}
+		return 0;
+	}
+	int											Remove				(int32_t iParticle)	{
+		Position	.remove_unordered(iParticle);
+		Direction	.remove_unordered(iParticle);
+		return Speed.remove_unordered(iParticle);
+	}
+};
+
 struct SDebris	{
 	::gpk::SColorBGRA							Colors[4]			=
 		{ {0x80, 0xAF, 0xFF, }
@@ -32,16 +53,14 @@ struct SDebris	{
 		, {0x20, 0x80, 0xFF, }
 		, {0x00, 0x00, 0xFF, }
 		};
-	::gpk::array_pod<::gpk::SCoord3<float>>		Position			= {};
-	::gpk::array_pod<::gpk::SCoord3<float>>		Direction			= {};
-	::gpk::array_pod<float>						Speed				= {};
+	::SParticles3								Particles			= {};
 	::gpk::array_pod<float>						Brightness			= {};
 
 	int											Spawn				(const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speed, float brightness)	{
-		Position		.push_back(position);
-		Direction		.push_back(direction);
-		Speed			.push_back(speed);
-		Brightness		.push_back(brightness);
+		Particles.Position	.push_back(position);
+		Particles.Direction	.push_back(direction);
+		Particles.Speed		.push_back(speed);
+		Brightness			.push_back(brightness);
 		return 0;
 	}
 	int											SpawnSpherical			(uint32_t countDebris, const ::gpk::SCoord3<float> & position, float speedDebris, float brightness)	{
@@ -56,23 +75,15 @@ struct SDebris	{
 		return 0;
 	}
 	int											Update				(float lastFrameSeconds)	{
-		for(uint32_t iShot = 0; iShot < Position.size(); ++iShot) {
-			::gpk::SCoord3<float>							& direction						= Direction	[iShot];
-			::gpk::SCoord3<float>							& position						= Position	[iShot];
-			float											& speed							= Speed		[iShot];
+		Particles.IntegrateSpeed(lastFrameSeconds);
+		for(uint32_t iShot = 0; iShot < Particles.Position.size(); ++iShot) {
+			float											& speed							= Particles.Speed		[iShot];
 			float											& brightness 					= Brightness[iShot];
-			position									+= direction * (speed * (double)lastFrameSeconds);
 			brightness									-= lastFrameSeconds;
 			speed										-= lastFrameSeconds *  (rand() % 16);
 			if(brightness < 0) {
-				direction									= Direction	[Position.size() - 1];
-				position									= Position	[Position.size() - 1];
-				speed										= Speed		[Position.size() - 1];
-				brightness									= Brightness[Position.size() - 1];
-				Direction	.resize(Direction	.size() - 1);
-				Position	.resize(Position	.size() - 1);
-				Speed		.resize(Speed		.size() - 1);
-				Brightness	.resize(Brightness	.size() - 1);
+				Particles.Remove(iShot);
+				Brightness.remove_unordered(iShot);
 			}
 		}
 		return 0;
@@ -82,44 +93,35 @@ struct SDebris	{
 struct SShots	{
 	double										Delay				= 0;
 	::gpk::array_pod<::gpk::SCoord3<float>>		PositionPrev		= {};
-	::gpk::array_pod<::gpk::SCoord3<float>>		Position			= {};
-	::gpk::array_pod<::gpk::SCoord3<float>>		Direction			= {};
-	::gpk::array_pod<float>						Speed				= {};
 	::gpk::array_pod<float>						Brightness			= {};
+	::SParticles3								Particles;
 
 	int											Spawn				(const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speed)	{
 		if(Delay < 1)
 			return 0;
-		PositionPrev	.push_back(position);
-		Position		.push_back(position);
-		Direction		.push_back(direction);
-		Speed			.push_back(speed);
-		Brightness		.push_back(1);
+		PositionPrev		.push_back(position);
+		Particles.Position	.push_back(position);
+		Particles.Direction	.push_back(direction);
+		Particles.Speed		.push_back(speed);
+		Brightness			.push_back(1);
 		Delay										= 0;
 		return 0;
 	}
 
 	int											Update				(float lastFrameSeconds)	{
-		for(uint32_t iShot = 0; iShot < Position.size(); ++iShot) {
-			PositionPrev[iShot]							= Position	[iShot];
-			Position	[iShot]							+= Direction[iShot] * (Speed[iShot] * lastFrameSeconds);
-			if (Position[iShot].Length() > 100)
+		memcpy(PositionPrev.begin(), Particles.Position.begin(), Particles.Position.size() * sizeof(::gpk::SCoord3<float>));
+		Particles.IntegrateSpeed(lastFrameSeconds);
+		for(uint32_t iShot = 0; iShot < Particles.Position.size(); ++iShot) {
+			if (Particles.Position[iShot].Length() > 100)
 				Remove(iShot);
 		}
 		return 0;
 	}
 	int											Remove			(uint32_t iShot) {
-		Direction		[iShot]						= Direction		[Position.size() - 1];
-		PositionPrev	[iShot]						= PositionPrev	[Position.size() - 1];
-		Position		[iShot]						= Position		[Position.size() - 1];
-		Speed			[iShot]						= Speed			[Position.size() - 1];
-		Brightness		[iShot]						= Brightness	[Position.size() - 1];
-		PositionPrev	.resize(PositionPrev	.size() - 1);
-		Position		.resize(Position		.size() - 1);
-		Speed			.resize(Speed			.size() - 1);
-		Brightness		.resize(Brightness		.size() - 1);
-		Direction		.resize(Direction		.size() - 1);
-		return Position.size();
+		Particles.Remove(iShot);
+		PositionPrev	.remove_unordered(iShot);
+		Brightness		.remove_unordered(iShot);
+		return Brightness.size();
 	}
 };
 
