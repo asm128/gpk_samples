@@ -147,7 +147,7 @@ int													setupGame						(SSolarSystem & sunsystem)	{
 			sunsystem.Image[iImage][y][x]		= colors[iImage % ::std::size(colors)];
 		}
 	}
-	sunsystem.Entities.push_back({-1, 0, 0, 0, -1});
+	sunsystem.Entities.push_back({-1, -1, 0, 0, -1});
 	for(uint32_t iPlanet = 0; iPlanet < PLANET_COUNT; ++iPlanet) {
 		const uint32_t											iBodyOrbit					= iPlanet * 2;
 		const uint32_t											iBodyPlanet					= iBodyOrbit + 1;
@@ -188,7 +188,7 @@ int													updateGame						(SSolarSystem & sunsystem, double secondsLastFra
 	if(GetAsyncKeyState('A')) sunsystem.Scene.Camera.Position.RotateY( (GetAsyncKeyState(VK_SHIFT) ? 100 : 2) * secondsLastFrame);
 	if(GetAsyncKeyState('D')) sunsystem.Scene.Camera.Position.RotateY(-(GetAsyncKeyState(VK_SHIFT) ? 100 : 2) * secondsLastFrame);
 
-	sunsystem.SunFire.SpawnSpherical(100, {}, 5, 1, 10);
+	sunsystem.SunFire.SpawnSpherical(2000, {}, 15, 1, 5);
 
 	// Update physics
 	sunsystem.SunFire.Update(secondsLastFrame * 2);
@@ -238,6 +238,8 @@ int													updateGame						(SSolarSystem & sunsystem, double secondsLastFra
 		if(-1 == entity.IndexModel)
 			continue;
 		if(-1 == entity.IndexImage)
+			continue;
+		if(-1 == entity.IndexGeometry)
 			continue;
 
 		matrices.Scale		.Scale			(scene.Pivot[entity.IndexModel].Scale		, true);

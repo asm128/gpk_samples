@@ -82,11 +82,6 @@ int													setupGame			(::gme::SApplication & app)	{
 		};
 
 	app.Scene.Image.resize(5);
-	for(uint32_t iImage = 0; iImage < app.Scene.Image.size(); ++iImage)
-		::gpk::pngFileLoad("../gpk_data/images/aborto.png", app.Scene.Image[iImage]);
-
-	::gpk::pngFileLoad("../gpk_data/images/provida.png", app.Scene.Image[0]);
-
 	for(uint32_t iImage = 0; iImage < app.Scene.Image.size(); ++iImage) {
 		if(app.Scene.Image[iImage].Texels.size())
 			continue;

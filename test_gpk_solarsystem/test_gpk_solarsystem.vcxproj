@@ -182,6 +182,9 @@
     <ClCompile Include="ced_rigidbody.cpp" />
     <ClCompile Include="solarsystem.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="solarsystem.json" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

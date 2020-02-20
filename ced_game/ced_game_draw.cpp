@@ -161,9 +161,6 @@ int													drawGame				(::gme::SApplication & app, ::gpk::ptr_obj<::gpk::SR
 	{
 		::gpk::SMatrix4<float>									matrixViewport		= {};
 		matrixViewport.ViewportLH(targetPixels.metrics());
-		matrixViewport										= matrixViewport.GetInverse();
-		matrixViewport._41									+= targetPixels.metrics().x / 2;
-		matrixViewport._42									+= targetPixels.metrics().y / 2;
 		matrixView											*= matrixViewport;
 	}
 
