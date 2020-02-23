@@ -21,7 +21,7 @@ struct STextOverlay {
 
 	::gpk::SCoord3<float>								CameraTarget			= {0, 0, 0};
 	::gpk::SCoord3<float>								CameraPosition			= {.0001f, 1000.1f, -0.00001f};
-	::gpk::SCoord3<float>								CameraUp				= {0, 1, 0};
+	::gpk::SCoord3<float>								CameraUp				= {0, 0, 1};
 	::gpk::SGeometryQuads								GeometryLetters	[256]	= {};
 	::gpk::SMatrix4<float>								MatrixProjection		= {};
 	::SDrawCache										DrawCache				= {};
@@ -42,9 +42,6 @@ struct SApplication {
 
 				::STextOverlay														TextOverlay					= {};
 				::klib::SGame														Game						= {};
-
-				volatile long long													ThreadSignal				= 0;
-
 
 				uint8_t																MapToDraw[5][32]			=
 					{ {0xDA, 0xC4,  0xC4,  0xC4	,  0xC4	,  0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xBF}

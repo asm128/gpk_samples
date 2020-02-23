@@ -16,10 +16,10 @@
 using namespace klib;
 
 struct SBuyable {
-	int16_t			Definition; 
-	int16_t			Grade; 
-	int32_t			Price; 
-	int32_t			MaintenanceCost; 
+	int16_t			Definition;
+	int16_t			Grade;
+	int32_t			Price;
+	int32_t			MaintenanceCost;
 	std::string		Name;
 } selectedChoice;
 
@@ -57,15 +57,15 @@ static ::gpk::label					namesAgent			[::gpk::size(enemyDefinitions		)] = {};
 
 static int32_t initBuyMenus() {
 	char preformatted[256] = {};
-	for(size_t i = 0, itemCount = ::gpk::size(	definitionsAccessory	); i<itemCount; ++i){ ::sprintf_s(preformatted, "%-28.28s $%8.8s",	definitionsAccessory	[i].Name.begin(), std::to_string(	definitionsAccessory	[i].Points.PriceBuy	).c_str()); 	menuItemsAccessory	[i] = { { (int16_t)i, 1, definitionsAccessory	[i].Points.PriceBuy	, definitionsAccessory	[i].Points.CostMaintenance	, definitionsAccessory	[i].Name.begin()}, ""};	namesAccessory	[i] = preformatted; };	
-	for(size_t i = 0, itemCount = ::gpk::size(	definitionsStageProp	); i<itemCount; ++i){ ::sprintf_s(preformatted, "%-28.28s $%8.8s",	definitionsStageProp	[i].Name.begin(), std::to_string(	definitionsStageProp	[i].Points.PriceBuy	).c_str()); 	menuItemsStageProp	[i] = { { (int16_t)i, 1, definitionsStageProp	[i].Points.PriceBuy	, definitionsStageProp	[i].Points.CostMaintenance	, definitionsStageProp	[i].Name.begin()}, ""};	namesStageProp	[i] = preformatted; };	
-	for(size_t i = 0, itemCount = ::gpk::size(	definitionsFacility		); i<itemCount; ++i){ ::sprintf_s(preformatted, "%-28.28s $%8.8s",	definitionsFacility		[i].Name.begin(), std::to_string(	definitionsFacility		[i].Points.PriceBuy	).c_str()); 	menuItemsFacility	[i] = { { (int16_t)i, 1, definitionsFacility	[i].Points.PriceBuy	, definitionsFacility	[i].Points.CostMaintenance	, definitionsFacility	[i].Name.begin()}, ""};	namesFacility	[i] = preformatted; };	
-	for(size_t i = 0, itemCount = ::gpk::size(	definitionsVehicle		); i<itemCount; ++i){ ::sprintf_s(preformatted, "%-28.28s $%8.8s",	definitionsVehicle		[i].Name.begin(), std::to_string(	definitionsVehicle		[i].Points.PriceBuy	).c_str()); 	menuItemsVehicle	[i] = { { (int16_t)i, 1, definitionsVehicle		[i].Points.PriceBuy	, definitionsVehicle	[i].Points.CostMaintenance	, definitionsVehicle	[i].Name.begin()}, ""};	namesVehicle	[i] = preformatted; };	
-	for(size_t i = 0, itemCount = ::gpk::size(	definitionsProfession	); i<itemCount; ++i){ ::sprintf_s(preformatted, "%-28.28s $%8.8s",	definitionsProfession	[i].Name.begin(), std::to_string(	definitionsProfession	[i].Points.PriceBuy	).c_str()); 	menuItemsProfession	[i] = { { (int16_t)i, 1, definitionsProfession	[i].Points.PriceBuy	, definitionsProfession	[i].Points.CostMaintenance	, definitionsProfession	[i].Name.begin()}, ""};	namesProfession	[i] = preformatted; };	
-	for(size_t i = 0, itemCount = ::gpk::size(	definitionsWeapon		); i<itemCount; ++i){ ::sprintf_s(preformatted, "%-28.28s $%8.8s",	definitionsWeapon		[i].Name.begin(), std::to_string(	definitionsWeapon		[i].Points.PriceBuy	).c_str()); 	menuItemsWeapon		[i] = { { (int16_t)i, 1, definitionsWeapon		[i].Points.PriceBuy	, definitionsWeapon		[i].Points.CostMaintenance	, definitionsWeapon		[i].Name.begin()}, ""};	namesWeapon		[i] = preformatted; };	
-	for(size_t i = 0, itemCount = ::gpk::size(	definitionsArmor		); i<itemCount; ++i){ ::sprintf_s(preformatted, "%-28.28s $%8.8s",	definitionsArmor		[i].Name.begin(), std::to_string(	definitionsArmor		[i].Points.PriceBuy	).c_str()); 	menuItemsArmor		[i] = { { (int16_t)i, 1, definitionsArmor		[i].Points.PriceBuy	, definitionsArmor		[i].Points.CostMaintenance	, definitionsArmor		[i].Name.begin()}, ""};	namesArmor		[i] = preformatted; };	
-	for(size_t i = 0, itemCount = ::gpk::size(	itemDescriptions		); i<itemCount; ++i){ ::sprintf_s(preformatted, "%-28.28s $%8.8s",	itemDescriptions		[i].Name.c_str(), std::to_string(	itemDescriptions		[i].Price			).c_str()); 	menuItemsItem		[i] = { { (int16_t)i, 1, itemDescriptions		[i].Price			, 0													, itemDescriptions		[i].Name}, ""};	namesItem		[i] = preformatted; };	
-	for(size_t i = 0, itemCount = ::gpk::size(	enemyDefinitions		); i<itemCount; ++i){ ::sprintf_s(preformatted, "%-28.28s $%8.8s",	enemyDefinitions		[i].Name.c_str(), std::to_string(	enemyDefinitions		[i].Points.PriceBuy	).c_str()); 	menuItemsAgent		[i] = { { (int16_t)i, 1, enemyDefinitions		[i].Points.PriceBuy	, enemyDefinitions		[i].Points.CostMaintenance	, enemyDefinitions		[i].Name}, ""};	namesAgent		[i] = preformatted; };	
+	for(size_t i = 0, itemCount = ::gpk::size(	definitionsAccessory	); i<itemCount; ++i){ ::sprintf_s(preformatted, "%-28.28s $%8.8s",	definitionsAccessory	[i].Name.begin(), std::to_string(	definitionsAccessory	[i].Points.PriceBuy	).c_str()); 	menuItemsAccessory	[i] = { { (int16_t)i, 1, definitionsAccessory	[i].Points.PriceBuy	, definitionsAccessory	[i].Points.CostMaintenance	, definitionsAccessory	[i].Name.begin()}, ""};	namesAccessory	[i] = preformatted; };
+	for(size_t i = 0, itemCount = ::gpk::size(	definitionsStageProp	); i<itemCount; ++i){ ::sprintf_s(preformatted, "%-28.28s $%8.8s",	definitionsStageProp	[i].Name.begin(), std::to_string(	definitionsStageProp	[i].Points.PriceBuy	).c_str()); 	menuItemsStageProp	[i] = { { (int16_t)i, 1, definitionsStageProp	[i].Points.PriceBuy	, definitionsStageProp	[i].Points.CostMaintenance	, definitionsStageProp	[i].Name.begin()}, ""};	namesStageProp	[i] = preformatted; };
+	for(size_t i = 0, itemCount = ::gpk::size(	definitionsFacility		); i<itemCount; ++i){ ::sprintf_s(preformatted, "%-28.28s $%8.8s",	definitionsFacility		[i].Name.begin(), std::to_string(	definitionsFacility		[i].Points.PriceBuy	).c_str()); 	menuItemsFacility	[i] = { { (int16_t)i, 1, definitionsFacility	[i].Points.PriceBuy	, definitionsFacility	[i].Points.CostMaintenance	, definitionsFacility	[i].Name.begin()}, ""};	namesFacility	[i] = preformatted; };
+	for(size_t i = 0, itemCount = ::gpk::size(	definitionsVehicle		); i<itemCount; ++i){ ::sprintf_s(preformatted, "%-28.28s $%8.8s",	definitionsVehicle		[i].Name.begin(), std::to_string(	definitionsVehicle		[i].Points.PriceBuy	).c_str()); 	menuItemsVehicle	[i] = { { (int16_t)i, 1, definitionsVehicle		[i].Points.PriceBuy	, definitionsVehicle	[i].Points.CostMaintenance	, definitionsVehicle	[i].Name.begin()}, ""};	namesVehicle	[i] = preformatted; };
+	for(size_t i = 0, itemCount = ::gpk::size(	definitionsProfession	); i<itemCount; ++i){ ::sprintf_s(preformatted, "%-28.28s $%8.8s",	definitionsProfession	[i].Name.begin(), std::to_string(	definitionsProfession	[i].Points.PriceBuy	).c_str()); 	menuItemsProfession	[i] = { { (int16_t)i, 1, definitionsProfession	[i].Points.PriceBuy	, definitionsProfession	[i].Points.CostMaintenance	, definitionsProfession	[i].Name.begin()}, ""};	namesProfession	[i] = preformatted; };
+	for(size_t i = 0, itemCount = ::gpk::size(	definitionsWeapon		); i<itemCount; ++i){ ::sprintf_s(preformatted, "%-28.28s $%8.8s",	definitionsWeapon		[i].Name.begin(), std::to_string(	definitionsWeapon		[i].Points.PriceBuy	).c_str()); 	menuItemsWeapon		[i] = { { (int16_t)i, 1, definitionsWeapon		[i].Points.PriceBuy	, definitionsWeapon		[i].Points.CostMaintenance	, definitionsWeapon		[i].Name.begin()}, ""};	namesWeapon		[i] = preformatted; };
+	for(size_t i = 0, itemCount = ::gpk::size(	definitionsArmor		); i<itemCount; ++i){ ::sprintf_s(preformatted, "%-28.28s $%8.8s",	definitionsArmor		[i].Name.begin(), std::to_string(	definitionsArmor		[i].Points.PriceBuy	).c_str()); 	menuItemsArmor		[i] = { { (int16_t)i, 1, definitionsArmor		[i].Points.PriceBuy	, definitionsArmor		[i].Points.CostMaintenance	, definitionsArmor		[i].Name.begin()}, ""};	namesArmor		[i] = preformatted; };
+	for(size_t i = 0, itemCount = ::gpk::size(	itemDescriptions		); i<itemCount; ++i){ ::sprintf_s(preformatted, "%-28.28s $%8.8s",	itemDescriptions		[i].Name.c_str(), std::to_string(	itemDescriptions		[i].Price			).c_str()); 	menuItemsItem		[i] = { { (int16_t)i, 1, itemDescriptions		[i].Price			, 0													, itemDescriptions		[i].Name}, ""};	namesItem		[i] = preformatted; };
+	for(size_t i = 0, itemCount = ::gpk::size(	enemyDefinitions		); i<itemCount; ++i){ ::sprintf_s(preformatted, "%-28.28s $%8.8s",	enemyDefinitions		[i].Name.c_str(), std::to_string(	enemyDefinitions		[i].Points.PriceBuy	).c_str()); 	menuItemsAgent		[i] = { { (int16_t)i, 1, enemyDefinitions		[i].Points.PriceBuy	, enemyDefinitions		[i].Points.CostMaintenance	, enemyDefinitions		[i].Name}, ""};	namesAgent		[i] = preformatted; };
 	return 0;
 }
 
@@ -91,15 +91,15 @@ SGameState drawBuyMenu(SGame& instanceGame, const SGameState& returnState) {
 	static ::klib::SMenuItem<SBuyable> menuItems[MAX_BUY_ITEMS+1] = {};
 	::std::string menuTitle;
 	switch(instanceGame.State.Substate) {
-	case GAME_SUBSTATE_ACCESSORY	:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], menuAccessory	,	menuItemsAccessory		,  instanceGame.FrameInput, {-1});	break;
-	case GAME_SUBSTATE_STAGEPROP	:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], menuStageProp	,	menuItemsStageProp		,  instanceGame.FrameInput, {-1});	break;
-	case GAME_SUBSTATE_FACILITY		:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], menuFacility	,	menuItemsFacility		,  instanceGame.FrameInput, {-1});	break;
-	case GAME_SUBSTATE_VEHICLE		:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], menuVehicle	,	menuItemsVehicle		,  instanceGame.FrameInput, {-1});	break;
-	case GAME_SUBSTATE_PROFESSION	:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], menuProfession	,	menuItemsProfession		,  instanceGame.FrameInput, {-1});	break;
-	case GAME_SUBSTATE_WEAPON		:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], menuWeapon		,	menuItemsWeapon			,  instanceGame.FrameInput, {-1});	break;
-	case GAME_SUBSTATE_ARMOR		:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], menuArmor		,	menuItemsArmor			,  instanceGame.FrameInput, {-1});	break;
-	case GAME_SUBSTATE_ITEM			:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], menuItem		,	menuItemsItem			,  instanceGame.FrameInput, {-1});	break;
-	case GAME_SUBSTATE_CHARACTER	:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], menuAgent		,	menuItemsAgent			,  4, instanceGame.FrameInput, {-1});	break;
+	case GAME_SUBSTATE_ACCESSORY	:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], menuAccessory	,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menuItemsAccessory	},  instanceGame.FrameInput, {-1});	break;
+	case GAME_SUBSTATE_STAGEPROP	:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], menuStageProp	,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menuItemsStageProp	},  instanceGame.FrameInput, {-1});	break;
+	case GAME_SUBSTATE_FACILITY		:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], menuFacility	,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menuItemsFacility	},  instanceGame.FrameInput, {-1});	break;
+	case GAME_SUBSTATE_VEHICLE		:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], menuVehicle	,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menuItemsVehicle		},  instanceGame.FrameInput, {-1});	break;
+	case GAME_SUBSTATE_PROFESSION	:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], menuProfession	,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menuItemsProfession	},  instanceGame.FrameInput, {-1});	break;
+	case GAME_SUBSTATE_WEAPON		:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], menuWeapon		,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menuItemsWeapon		},  instanceGame.FrameInput, {-1});	break;
+	case GAME_SUBSTATE_ARMOR		:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], menuArmor		,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menuItemsArmor		},  instanceGame.FrameInput, {-1});	break;
+	case GAME_SUBSTATE_ITEM			:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], menuItem		,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menuItemsItem		},  instanceGame.FrameInput, {-1});	break;
+	case GAME_SUBSTATE_CHARACTER	:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], menuAgent		,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menuItemsAgent		},  4, instanceGame.FrameInput, {-1});	break;
 	default:
 		break;
 	}
@@ -132,7 +132,7 @@ SGameState drawBuyMenu(SGame& instanceGame, const SGameState& returnState) {
 	case GAME_SUBSTATE_WEAPON		:	if(playerInventory.Weapon		.AddElement({selectedChoice.Definition, 0, selectedChoice.Grade, -1})) 	{ instanceGame.UserSuccess = "You have successfully bought " + selectedChoice.Name + " for " + ::std::to_string(selectedChoice.Price)				+ " Coins."; bSold = true; } break;
 	case GAME_SUBSTATE_ARMOR		:	if(playerInventory.Armor		.AddElement({selectedChoice.Definition, 0, selectedChoice.Grade, -1})) 	{ instanceGame.UserSuccess = "You have successfully bought " + selectedChoice.Name + " for " + ::std::to_string(selectedChoice.Price)				+ " Coins."; bSold = true; } break;
 	case GAME_SUBSTATE_ITEM			:	if(playerInventory.Items		.AddElement({selectedChoice.Definition, 0, selectedChoice.Grade, -1})) 	{ instanceGame.UserSuccess = "You have successfully bought " + selectedChoice.Name + " for " + ::std::to_string(selectedChoice.Price)				+ " Coins."; bSold = true; } break;
-	case GAME_SUBSTATE_CHARACTER	:	
+	case GAME_SUBSTATE_CHARACTER	:
 		newCharacter.create(enemyDefinitions[selectedChoice.Definition]);
 		for(iCharacterInArmy ; iCharacterInArmy < armySize; ++iCharacterInArmy) {
 			if(0 == player.Army[iCharacterInArmy]) {
@@ -142,9 +142,9 @@ SGameState drawBuyMenu(SGame& instanceGame, const SGameState& returnState) {
 			}
 		}
 		if(!bFoundFreeCharacterSlot)
-			player.Army.push_back(newCharacter);	
+			player.Army.push_back(newCharacter);
 		::setupAgent(*newCharacter, *newCharacter);
-		instanceGame.UserSuccess = "You have successfully hired " + selectedChoice.Name + " for " + ::std::to_string(selectedChoice.MaintenanceCost) + " Coins/Mission."; 
+		instanceGame.UserSuccess = "You have successfully hired " + selectedChoice.Name + " for " + ::std::to_string(selectedChoice.MaintenanceCost) + " Coins/Mission.";
 		bSold = true;
 		break;
 	default:
@@ -157,7 +157,7 @@ SGameState drawBuyMenu(SGame& instanceGame, const SGameState& returnState) {
 		player.Score.MoneySpent += selectedChoice.Price;
 	}
 	else {
-		instanceGame.UserError = "There is not enough space in your inventory!"; 
+		instanceGame.UserError = "There is not enough space in your inventory!";
 		instanceGame.LogError();
 	}
 
@@ -169,15 +169,15 @@ SGameState drawBuy(SGame& instanceGame, const SGameState& returnState)
 	static const ::gpk::label textToPrint = "Tell me how much money you have and I will tell you what you'll become.";
 
 	bool bDonePrinting = ::klib::getMessageSlow(instanceGame.SlowMessage, textToPrint.begin(), textToPrint.size(), instanceGame.FrameTimer.LastTimeSeconds*3);
-	memcpy(&instanceGame.PostEffectDisplay.Screen.Cells[instanceGame.PostEffectDisplay.Depth>>1][instanceGame.PostEffectDisplay.Width/2-(strlen(instanceGame.SlowMessage)+1)/2], instanceGame.SlowMessage, strlen(instanceGame.SlowMessage));
-	if ( !bDonePrinting ) 
+	memcpy(&instanceGame.TacticalDisplay.Screen.Cells[instanceGame.TacticalDisplay.Depth>>1][instanceGame.TacticalDisplay.Width/2-(strlen(instanceGame.SlowMessage)+1)/2], instanceGame.SlowMessage, strlen(instanceGame.SlowMessage));
+	if ( !bDonePrinting )
 		return returnState;
 
 	if(GAME_SUBSTATE_MAIN == instanceGame.State.Substate) {
 		static const SMenu<SGameState> menuBuy({GAME_STATE_WELCOME_COMMANDER}, "Order Menu", 26);
-		return drawMenu(instanceGame.GlobalDisplay.Screen, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], menuBuy, optionsBuy, instanceGame.FrameInput, instanceGame.State);
+		return drawMenu(instanceGame.GlobalDisplay.Screen, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], menuBuy, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsBuy}, instanceGame.FrameInput, instanceGame.State);
 	}
-	else 
+	else
 		return drawBuyMenu(instanceGame, returnState);
 };
 

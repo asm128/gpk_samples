@@ -258,38 +258,3 @@ int													draw					(SApplication & app) {
 
 	return 0;
 }
-
-//void												threadDraw				(void * pApp) {
-//	SApplication											& app					= *(SApplication*)pApp;
-//	while(1 != InterlockedCompareExchange64(&app.ThreadSignal, 0, 1)) {
-//		draw(app);
-//		Sleep(1);
-//	}
-//}
-//
-//int	WINAPI											WinMain
-//	(	HINSTANCE	// hInstance
-//	,	HINSTANCE	// hPrevInstance
-//	,	LPSTR		// lpCmdLine
-//	,	INT			// nShowCmd
-//	) {
-//	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_CHECK_ALWAYS_DF);
-//	SApplication										app;
-//	::setup(app);
-//	if(1 == ::update(app))
-//		return -1;
-//	InterlockedIncrement64(&app.ThreadSignal);
-//	InterlockedIncrement64(&app.ThreadSignal);
-//	_beginthread(threadDraw, 0, &app);
-//	while(app.Framework.Running) {
-//		if(1 == ::update(app)) {
-//			break;
-//		}
-//		//::draw(app);
-//	}
-//	InterlockedDecrement64(&app.ThreadSignal);
-//	while(0 != InterlockedCompareExchange64(&app.ThreadSignal, 0, 0))
-//		Sleep(10);
-//	::cleanup(app);
-//	return 0;
-//}

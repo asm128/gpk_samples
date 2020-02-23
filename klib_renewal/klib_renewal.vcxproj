@@ -196,7 +196,6 @@
     <ClInclude Include="Item.h" />
     <ClInclude Include="klib_ascii_display.h" />
     <ClInclude Include="klib_ascii_target.h" />
-    <ClInclude Include="klib_fill.h" />
     <ClInclude Include="klib_grid.h" />
     <ClInclude Include="klib_input.h" />
     <ClInclude Include="klib_draw_misc.h" />
@@ -244,6 +243,7 @@
     <ClCompile Include="menu_squad.cpp" />
     <ClCompile Include="tactical.cpp" />
     <ClCompile Include="tactical_ai.cpp" />
+    <ClCompile Include="tactical_draw.cpp" />
     <ClCompile Include="tactical_gameplay.cpp" />
     <ClCompile Include="tactical_init.cpp" />
     <ClCompile Include="menu_upgrade.cpp" />

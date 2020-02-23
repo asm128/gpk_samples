@@ -36,7 +36,7 @@ static int32_t												getAgentsInRange									(SGame& instanceGame, const :
 
 			//const SEntityPoints	& playerAgentPoints = agent.FinalPoints;
 			const SEntityFlags												& playerAgentFlags									= agent.FinalFlags;
-				
+
 			const ::gpk::SCoord3<int32_t>									& coordAgent										= agent.Position;
 			const ::gpk::SCoord3<float>									distance											= (coordAgent-origin).Cast<float>();
 			if(distance.Length() > range && ::gpk::bit_false(playerAgentFlags.Tech.AttackType, ATTACK_TYPE_RANGED))
@@ -79,7 +79,7 @@ void																					recalculateAgentsInRangeAndSight										(SGame& insta
 	}
 }
 
-// Returns 
+// Returns
 bool																					klib::moveStep															(SGame& instanceGame, SPlayer& player, int8_t playerIndex, int32_t agentIndex, TEAM_TYPE teamId, STacticalBoard& board, ::gpk::SCoord3<int32_t>& agentPosition_) {
 	if(agentPosition_ == player.Squad.TargetPositions[agentIndex])
 		return player.Squad.ActionsLeft[agentIndex].Moves <= 0;	// I added this just in case but currently there is no situation in which this function is called when the agent is in the target position already.
@@ -90,7 +90,7 @@ bool																					klib::moveStep															(SGame& instanceGame, SPla
 	::gpk::SCoord3<int32_t>																		finalPosition															= agentPosition_;
 	int8_t																						movesLeft																= player.Squad.ActionsLeft[agentIndex].Moves;
 
-	// This dice makes random the selection between moving left or moving forward first when both options are available. 
+	// This dice makes random the selection between moving left or moving forward first when both options are available.
 	// Along the epilepsy shock we give to the characters when they get stuck this improves our rudimentary pathfinding for unknown and small obstacles.
 	// (More formally "pathmaking" as we make our way through sometimes by passing through solid objects).
 	if(rand()%2) {
@@ -128,13 +128,13 @@ bool																					klib::moveStep															(SGame& instanceGame, SPla
 	}
 	else {
 		if (movesLeft > 0) {
-			if( player.Squad.TargetPositions[agentIndex].x > finalPosition.x 
+			if( player.Squad.TargetPositions[agentIndex].x > finalPosition.x
 				&&	board.Tiles.IsTileAvailable( finalPosition.x+1, finalPosition.z )
 			) {
 				++finalPosition.x;
 				--movesLeft;
 			}
-			else if( player.Squad.TargetPositions[agentIndex].x < finalPosition.x 
+			else if( player.Squad.TargetPositions[agentIndex].x < finalPosition.x
 				&&	board.Tiles.IsTileAvailable( finalPosition.x-1, finalPosition.z )
 			) {
 				--finalPosition.x;
@@ -143,13 +143,13 @@ bool																					klib::moveStep															(SGame& instanceGame, SPla
 		}
 
 		if (movesLeft > 0) {
-			if( player.Squad.TargetPositions[agentIndex].z > finalPosition.z 
+			if( player.Squad.TargetPositions[agentIndex].z > finalPosition.z
 				&&	board.Tiles.IsTileAvailable( finalPosition.x, finalPosition.z+1 )
 			) {
 				++finalPosition.z;
 				--movesLeft;
 			}
-			else if( player.Squad.TargetPositions[agentIndex].z < finalPosition.z 
+			else if( player.Squad.TargetPositions[agentIndex].z < finalPosition.z
 				&&	board.Tiles.IsTileAvailable( finalPosition.x, finalPosition.z-1 )
 			) {
 				--finalPosition.z;
@@ -158,9 +158,9 @@ bool																					klib::moveStep															(SGame& instanceGame, SPla
 		}
 	}
 
-	player.Squad.ActionsLeft[agentIndex].Moves												= movesLeft; 
+	player.Squad.ActionsLeft[agentIndex].Moves												= movesLeft;
 
-	::klib::SGrid<STileCharacter, STacticalBoard::Width, STacticalBoard::Depth>					& terrainAgents															= board.Tiles.Entities.Agents;
+	::gpk::view_grid<STileCharacter>															terrainAgents															= board.Tiles.Entities.Agents;
 
 	bool																						bArrived																= true;
 	if( initialPosition == finalPosition ) {	// If we didn't move yet is because we're stuck.
@@ -175,9 +175,9 @@ bool																					klib::moveStep															(SGame& instanceGame, SPla
 			else
 				finalPosition.z																			+= rand()%3 - 1;
 		}
-		while( (maxTry > ++tryCount) 
-			&& (finalPosition.x < 0 || finalPosition.x >= terrainAgents.Width)
-			|| (finalPosition.z < 0 || finalPosition.z >= terrainAgents.Depth) 
+		while( (maxTry > ++tryCount)
+			&& (finalPosition.x < 0 || finalPosition.x >= (int32_t)terrainAgents.metrics().x)
+			|| (finalPosition.z < 0 || finalPosition.z >= (int32_t)terrainAgents.metrics().y)
 		);
 	}
 	else {
@@ -199,11 +199,11 @@ bool																					klib::moveStep															(SGame& instanceGame, SPla
 		}
 	}
 
-	if( terrainAgents[initialPosition.z][initialPosition.x].AgentIndex  == agentIndex 
+	if( terrainAgents[initialPosition.z][initialPosition.x].AgentIndex  == agentIndex
 	 && terrainAgents[initialPosition.z][initialPosition.x].PlayerIndex == playerIndex )
 		terrainAgents[initialPosition.z][initialPosition.x]										= {teamId, -1, -1, -1};
-	
-	if( terrainAgents[finalPosition.z][finalPosition.x].AgentIndex  == -1 
+
+	if( terrainAgents[finalPosition.z][finalPosition.x].AgentIndex  == -1
 	 && terrainAgents[finalPosition.z][finalPosition.x].PlayerIndex == -1 )
 		terrainAgents[finalPosition.z][finalPosition.x]											= {teamId, playerIndex, (int8_t)player.Selection.PlayerSquad, (int8_t)agentIndex};
 
@@ -225,7 +225,7 @@ bool																					klib::isTacticalValid													(SGame& instanceGame)
 
 		const SPlayer& currentPlayer = instanceGame.Players[tacticalInfo.Setup.Players[iPlayer]];
 
-		// Only team AI is considered for the victory as oppossed to other AI types like the ones for civilian characters . 
+		// Only team AI is considered for the victory as oppossed to other AI types like the ones for civilian characters .
 		if(currentPlayer.Control.Type == PLAYER_CONTROL_AI && currentPlayer.Control.AIMode != PLAYER_AI_TEAMERS)
 			continue;
 
@@ -291,7 +291,7 @@ uint32_t																				resolveNextPlayer														(SGame& instanceGame)
 			++tacticalInfo.CurrentPlayerPerTeam	[tacticalInfo.CurrentTeam];
 			if(tacticalInfo.CurrentPlayerPerTeam	[tacticalInfo.CurrentTeam] >= (int32_t)tacticalSetup.PlayerCountPerTeam[tacticalInfo.CurrentTeam])
 				tacticalInfo.CurrentPlayerPerTeam	[tacticalInfo.CurrentTeam]								= 0;
-			
+
 			currentPlayerSlot																			= tacticalSetup.PlayersPerTeam[tacticalInfo.CurrentTeam][tacticalInfo.CurrentPlayerPerTeam[tacticalInfo.CurrentTeam]];
 			SPlayer																							& player																= instanceGame.Players[tacticalSetup.Players[currentPlayerSlot]];
 			bCantMove																					= false == player.CanMove();
@@ -300,10 +300,10 @@ uint32_t																				resolveNextPlayer														(SGame& instanceGame)
 					if(player.Squad.Agents[iAgent] == -1)
 						continue;
 					CCharacter																						& agent																	= *player.Army[player.Squad.Agents[iAgent]];
-					if(!agent.IsAlive())	
+					if(!agent.IsAlive())
 						continue;
 					::klib::applyRoundStatusAndBonusesAndSkipRound(agent);
-					if(!agent.IsAlive())	
+					if(!agent.IsAlive())
 						::handleAgentDeath(instanceGame, agent, tacticalInfo.Setup.TeamPerPlayer[currentPlayerSlot]);
 				}
 			}
@@ -313,19 +313,19 @@ uint32_t																				resolveNextPlayer														(SGame& instanceGame)
 		while(bCantMove && (++totalPlayersForThisTeam) < tacticalSetup.PlayerCountPerTeam[tacticalInfo.CurrentTeam] && (playerCountToCheck) < (tacticalSetup.TotalPlayers));
 
 		bNeedSkipCurrentPlayer																	= bCantMove;
-		
+
 		if (bNeedSkipCurrentPlayer) {
 			info_printf("Why skip? - bCantMove ? %s\n", bCantMove ? "true" : "false");
 		}
 	}
 	while(::isTacticalValid(instanceGame) && bNeedSkipCurrentPlayer && (playerCountToCheck) < (tacticalSetup.TotalPlayers));
 
-	if(bNeedSkipCurrentPlayer) 
+	if(bNeedSkipCurrentPlayer)
 		info_printf("Why skip? - bCantMove ? %s\n", bCantMove ? "true" : "false");
 	return currentPlayerSlot;
 }
 
-// Ending the turn resets action and movement counters and executes minimal AI for selecting another unit. 
+// Ending the turn resets action and movement counters and executes minimal AI for selecting another unit.
 // This function changes the value of STacticalInfo::CurrentPlayer.
 void																					klib::endTurn															(SGame& instanceGame)																	{
 	STacticalInfo																				& tacticalInfo															= instanceGame.TacticalInfo;
@@ -348,7 +348,7 @@ void																					klib::endTurn															(SGame& instanceGame)						
 			CCharacter																				& character																= *playerToClear.Army[playerToClear.Squad.Agents[iAgent]];
 			if(0 >= character.Points.LifeCurrent.Health)
 				continue;
-			
+
 			//character.Recalculate();
 			const SEntityPoints																		& agentFinalPoints														= character.FinalPoints;
 			playerToClear.Squad.ActionsLeft[iAgent].Moves										= (int8_t)agentFinalPoints.Fitness.Movement;
@@ -360,16 +360,16 @@ void																					klib::endTurn															(SGame& instanceGame)						
 			::klib::applyTurnStatusAndBonusesAndSkipTurn(character);
 			++character.Score.TurnsPlayed;
 
-			if(!character.IsAlive())	
+			if(!character.IsAlive())
 				::handleAgentDeath(instanceGame, character, tacticalInfo.Setup.TeamPerPlayer[iPlayer]);
 			else if(((int8_t)iPlayer) == tacticalInfo.CurrentPlayer) {
 				::klib::applyRoundStatusAndBonusesAndSkipRound(character);
-				if(!character.IsAlive())	
+				if(!character.IsAlive())
 					::handleAgentDeath(instanceGame, character, tacticalInfo.Setup.TeamPerPlayer[iPlayer]);
 			}
 			else if(tacticalInfo.Setup.TeamPerPlayer[iPlayer] != tacticalInfo.Setup.TeamPerPlayer[tacticalInfo.CurrentPlayer] ) {
 				::klib::applyEnemyTurnStatusAndBonusesAndSkipTurn(character);
-				if(!character.IsAlive())	
+				if(!character.IsAlive())
 					::handleAgentDeath(instanceGame, character, tacticalInfo.Setup.TeamPerPlayer[iPlayer]);
 			}
 		}
@@ -404,7 +404,7 @@ void																					klib::endTurn															(SGame& instanceGame)						
 void																					selectAIDestination														(SGame& instanceGame);
 bool																					klib::updateCurrentPlayer												(SGame& instanceGame)																	{
 	STacticalInfo																				& tacticalInfo															= instanceGame.TacticalInfo;
-	SPlayer																						& currentPlayer															= instanceGame.Players[tacticalInfo.Setup.Players[tacticalInfo.CurrentPlayer]];	// the current player is only valid in this scope. After this code the current player can change 
+	SPlayer																						& currentPlayer															= instanceGame.Players[tacticalInfo.Setup.Players[tacticalInfo.CurrentPlayer]];	// the current player is only valid in this scope. After this code the current player can change
 
 	if( !::fixAgentSelection(currentPlayer) )
 		return false;
@@ -417,7 +417,7 @@ bool																					klib::updateCurrentPlayer												(SGame& instanceGa
 	bool																						bHasArrived																= true;
 	if( currentPlayer.Squad.TargetPositions[currentPlayer.Selection.PlayerUnit] != currentAgentPosition && (0 < currentPlayer.Squad.ActionsLeft[currentPlayer.Selection.PlayerUnit].Moves) ) {
 		bHasArrived																				= ::moveStep(instanceGame, currentPlayer, tacticalInfo.CurrentPlayer, currentPlayer.Selection.PlayerUnit, tacticalInfo.Setup.TeamPerPlayer[tacticalInfo.CurrentPlayer], tacticalInfo.Board, currentAgentPosition);
-		if(bHasArrived) 
+		if(bHasArrived)
 			::gpk::bit_clear(currentPlayer.Squad.AgentStates[currentPlayer.Selection.PlayerUnit], AGENT_STATE_MOVE);
 	}
 
@@ -464,9 +464,9 @@ void																					distributeDropsForVictoriousTeam										(SGame& insta
 	}
 
 	int32_t																						totalMapMoney															= 0;
-	for(uint32_t z = 0, depth = tacticalInfo.Board.Depth; z < depth; ++z)
-		for(uint32_t x = 0, width = tacticalInfo.Board.Width; x < width; ++x)
-			totalMapMoney																			+= tacticalInfo.Board.Tiles.Entities.Coins.Cells[z][x];
+	for(uint32_t z = 0, depth = tacticalInfo.Board.Tiles.Terrain.Geometry.metrics().y; z < depth; ++z)
+	for(uint32_t x = 0, width = tacticalInfo.Board.Tiles.Terrain.Geometry.metrics().x; x < width; ++x)
+		totalMapMoney																			+= tacticalInfo.Board.Tiles.Entities.Coins[z][x];
 
 	char message[256] = {};
 	if(totalWinners == 0) {
@@ -488,9 +488,9 @@ void																					distributeDropsForVictoriousTeam										(SGame& insta
 			if(-1 != currentAgent) {
 				winnerPlayer.Army[currentAgent]->Recalculate();
 				uint32_t																					agentReward				= 0;
-				if(winnerPlayer.Army[currentAgent]->FinalPoints.LifeCurrent.Health > 0) 
+				if(winnerPlayer.Army[currentAgent]->FinalPoints.LifeCurrent.Health > 0)
 					agentReward																				= winnerPlayer.Army[currentAgent]->Points.Coins / 4 * 3;
-				else 
+				else
 					agentReward																				= winnerPlayer.Army[currentAgent]->Points.Coins;
 				if(agentReward) {
 					winnerPlayer.Money																		+= agentReward;
@@ -515,18 +515,18 @@ void																					distributeDropsForVictoriousTeam										(SGame& insta
 		int32_t																						totalAccessory															= 0;
 		int32_t																						totalArmor																= 0;
 		int32_t																						totalWeapon																= 0;
-		int32_t																						totalVehicle															= 0;	
-		int32_t																						totalFacility															= 0;	
+		int32_t																						totalVehicle															= 0;
+		int32_t																						totalFacility															= 0;
 		int32_t																						totalStageProp															= 0;
 		int32_t																						totalItems																= 0;
-		for(uint32_t i = 0; i < tacticalInfo.Drops.Profession	.Count; ++i) totalProfession	+= tacticalInfo.Drops.Profession	[i].Count; 
-		for(uint32_t i = 0; i < tacticalInfo.Drops.Accessory	.Count; ++i) totalAccessory		+= tacticalInfo.Drops.Accessory		[i].Count; 
-		for(uint32_t i = 0; i < tacticalInfo.Drops.Armor		.Count; ++i) totalArmor			+= tacticalInfo.Drops.Armor			[i].Count; 
-		for(uint32_t i = 0; i < tacticalInfo.Drops.Weapon		.Count; ++i) totalWeapon		+= tacticalInfo.Drops.Weapon		[i].Count; 
-		for(uint32_t i = 0; i < tacticalInfo.Drops.Vehicle		.Count; ++i) totalVehicle		+= tacticalInfo.Drops.Vehicle		[i].Count; 
-		for(uint32_t i = 0; i < tacticalInfo.Drops.Facility		.Count; ++i) totalFacility		+= tacticalInfo.Drops.Facility		[i].Count; 
-		for(uint32_t i = 0; i < tacticalInfo.Drops.StageProp	.Count; ++i) totalStageProp		+= tacticalInfo.Drops.StageProp		[i].Count; 
-		for(uint32_t i = 0; i < tacticalInfo.Drops.Items		.Count; ++i) totalItems			+= tacticalInfo.Drops.Items			[i].Count; 
+		for(uint32_t i = 0; i < tacticalInfo.Drops.Profession	.Count; ++i) totalProfession	+= tacticalInfo.Drops.Profession	[i].Count;
+		for(uint32_t i = 0; i < tacticalInfo.Drops.Accessory	.Count; ++i) totalAccessory		+= tacticalInfo.Drops.Accessory		[i].Count;
+		for(uint32_t i = 0; i < tacticalInfo.Drops.Armor		.Count; ++i) totalArmor			+= tacticalInfo.Drops.Armor			[i].Count;
+		for(uint32_t i = 0; i < tacticalInfo.Drops.Weapon		.Count; ++i) totalWeapon		+= tacticalInfo.Drops.Weapon		[i].Count;
+		for(uint32_t i = 0; i < tacticalInfo.Drops.Vehicle		.Count; ++i) totalVehicle		+= tacticalInfo.Drops.Vehicle		[i].Count;
+		for(uint32_t i = 0; i < tacticalInfo.Drops.Facility		.Count; ++i) totalFacility		+= tacticalInfo.Drops.Facility		[i].Count;
+		for(uint32_t i = 0; i < tacticalInfo.Drops.StageProp	.Count; ++i) totalStageProp		+= tacticalInfo.Drops.StageProp		[i].Count;
+		for(uint32_t i = 0; i < tacticalInfo.Drops.Items		.Count; ++i) totalItems			+= tacticalInfo.Drops.Items			[i].Count;
 
 		for(uint32_t iWinner = 0; iWinner < totalWinners; ++iWinner) {
 			SPlayer																						& winnerPlayer															= instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[iWinner]]];
@@ -578,9 +578,9 @@ void																					distributeDropsForVictoriousTeam										(SGame& insta
 				if(-1 != currentAgent) {
 					winnerPlayer.Army[currentAgent]->Recalculate();
 					uint32_t																					agentReward				= 0;
-					if(winnerPlayer.Army[currentAgent]->FinalPoints.LifeCurrent.Health > 0) 
+					if(winnerPlayer.Army[currentAgent]->FinalPoints.LifeCurrent.Health > 0)
 						agentReward																				= winnerPlayer.Army[currentAgent]->Points.Coins / 4 * 3;
-					else 
+					else
 						agentReward																				= winnerPlayer.Army[currentAgent]->Points.Coins;
 					if(agentReward) {
 						winnerPlayer.Money																		+= agentReward;
@@ -682,10 +682,10 @@ void																					klib::determineOutcome													(SGame& instanceGame
 		instanceGame.UserMiss																	= message;
 		instanceGame.LogMiss();
 	}
-	
+
 	if(teamVictorious != TEAM_TYPE_SPECTATOR) // only give rewards if somebody won.
 		::distributeDropsForVictoriousTeam(instanceGame, teamVictorious);
-	
+
 	instanceGame.TacticalInfo.Clear();
 }
 
@@ -733,13 +733,13 @@ void																					klib::handleAgentDeath													(SGame& instanceGame
 	tacticalInfo.Board.Tiles.Entities.Coins[deadTarget.Position.z][deadTarget.Position.x] += deadTarget.Points.Coins;
 	deadTarget.Points.Coins																	= 0;
 
-	::std::string																				ripText																	= deadTarget.Name + " has died."; 
+	::std::string																				ripText																	= deadTarget.Name + " has died.";
 	if(teamId == tacticalInfo.Setup.TeamPerPlayer[PLAYER_INDEX_USER]) {
-		instanceGame.UserMiss																	= ripText; 
+		instanceGame.UserMiss																	= ripText;
 		instanceGame.LogMiss();
 	}
 	else {
-		instanceGame.UserSuccess																= ripText; 
+		instanceGame.UserSuccess																= ripText;
 		instanceGame.LogSuccess();
 	}
 	::recalculateAgentsInRangeAndSight(instanceGame);

@@ -144,7 +144,7 @@ SGameState													drawFactoryMenu										(SGame& instanceGame, const SGam
 		, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0]
 		, (size_t)researchedCount
 		, "Available Production"
-		, menuItems
+		, ::gpk::view_array<const ::klib::SMenuItem<::klib::SEntityResearch>>{menuItems}
 		, instanceGame.FrameInput
 		, {"Exit production menu"	, (int32_t)researchedCount}
 		, {"No action selected"		, -1}
@@ -175,10 +175,10 @@ SGameState													drawFactoryMenu										(SGame& instanceGame, const SGam
 SGameState																		drawFactory							(SGame& instanceGame, const SGameState& returnState)																						{
 	const ::std::string																	textToPrint							= "Factory.";
 	bool																				bDonePrinting						= ::klib::getMessageSlow(instanceGame.SlowMessage, {textToPrint.data(), (uint32_t)textToPrint.size()}, instanceGame.FrameTimer.LastTimeSeconds);
-	memcpy(&instanceGame.PostEffectDisplay.Screen.Cells[instanceGame.PostEffectDisplay.Depth >> 1][instanceGame.PostEffectDisplay.Width / 2 - (strlen(instanceGame.SlowMessage) + 1) / 2], instanceGame.SlowMessage, strlen(instanceGame.SlowMessage));
-	if ( !bDonePrinting ) 
+	memcpy(&instanceGame.TacticalDisplay.Screen.Cells[instanceGame.TacticalDisplay.Depth >> 1][instanceGame.TacticalDisplay.Width / 2 - (strlen(instanceGame.SlowMessage) + 1) / 2], instanceGame.SlowMessage, strlen(instanceGame.SlowMessage));
+	if ( !bDonePrinting )
 		return returnState;
 
-	drawFireBackground(instanceGame.PostEffectDisplay, instanceGame.FrameTimer.LastTimeSeconds);
+	drawFireBackground(instanceGame.TacticalDisplay, instanceGame.FrameTimer.LastTimeSeconds);
 	return drawFactoryMenu(instanceGame, returnState);
 };

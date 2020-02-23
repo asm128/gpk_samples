@@ -45,8 +45,8 @@ namespace klib
 		return ::klib::valueToRect(targetAttributes, targetWidth, targetHeight,  offsetY, actualOffsetX, ::klib::SCREEN_LEFT, &colorBkg, 1, (int32_t)exitText.size()+3);
 	}
 
-	template <size_t _ArraySize, typename _ReturnType>
-								_ReturnType					processInput										(const ::klib::SInput& frameInput, uint32_t targetWidth, uint32_t targetHeight, SDrawMenuState& localPersistentState, bool& bResetMenuStuff, bool& bResetTitle, int32_t lineOffset, const klib::SMenuItem<_ReturnType>(&menuItems)[_ArraySize], uint32_t actualOptionCount, uint32_t pageCount, size_t itemOffset, int32_t exitOffset, int32_t numberCharsAvailable, const _ReturnType& noActionValue, const _ReturnType& exitValue, bool disableEscKeyClose, const ::gpk::view_const_string& exitText)	{
+	template <typename _ReturnType>
+								_ReturnType					processInput										(const ::klib::SInput& frameInput, uint32_t targetWidth, uint32_t targetHeight, SDrawMenuState& localPersistentState, bool& bResetMenuStuff, bool& bResetTitle, int32_t lineOffset, const ::gpk::view_array<const ::klib::SMenuItem<_ReturnType>> & menuItems, uint32_t actualOptionCount, uint32_t pageCount, uint32_t itemOffset, int32_t exitOffset, int32_t numberCharsAvailable, const _ReturnType& noActionValue, const _ReturnType& exitValue, bool disableEscKeyClose, const ::gpk::view_const_string& exitText)	{
 		bool														bMouseOverExit										= mouseOver(frameInput.Mouse.Deltas.x, frameInput.Mouse.Deltas.y, exitOffset-4, (int32_t)targetHeight-MENU_ROFFSET-1, (int32_t)exitText.size()+4);
 
 		_ReturnType													resultVal											= noActionValue;
@@ -86,7 +86,7 @@ namespace klib
 		}
 		else if(frameInput.Keys[VK_RETURN] && localPersistentState.CurrentOption != -1) {	// Test execute keys.
 			bResetMenuStuff											= true;
-			resultVal												= menuItems[localPersistentState.CurrentOption+itemOffset].ReturnValue;
+			resultVal												= menuItems[localPersistentState.CurrentOption + itemOffset].ReturnValue;
 		}
 		else { // look if any of the options was chose from the possible inputs
 			for(uint32_t i=0, count = (uint32_t)actualOptionCount; i < count; i++) {
@@ -94,7 +94,7 @@ namespace klib
 				bool														bMouseOver											= ::klib::mouseOver(frameInput.Mouse.Deltas.x, frameInput.Mouse.Deltas.y, actualOffsetX-2, lineOffset+i, numberCharsAvailable + 2);
 				if(frameInput.Keys['1'+i] || frameInput.Keys[VK_NUMPAD1+i] || (frameInput.Mouse.Buttons[0] && bMouseOver)) {
 					bResetMenuStuff									= true;
-					resultVal										= menuItems[i+itemOffset].ReturnValue;
+					resultVal										= menuItems[i + itemOffset].ReturnValue;
 					break;
 				}
 			}
@@ -103,11 +103,11 @@ namespace klib
 		return resultVal;
 	}
 
-	template <size_t _ArraySize, typename _ReturnType>
-	_ReturnType												drawMenu											(char* targetASCII, uint16_t* targetAttributes, uint32_t targetWidth, uint32_t targetHeight, uint32_t optionCount, const std::string& title, const klib::SMenuItem<_ReturnType>(&menuItems)[_ArraySize], const ::klib::SInput& frameInput, const _ReturnType& exitValue, const _ReturnType& noActionValue=-1, uint32_t rowWidth=20, bool disableEscKeyClose=false, const ::gpk::view_const_string& exitText="Exit this menu") {
+	template <typename _ReturnType>
+	_ReturnType												drawMenu											(char* targetASCII, uint16_t* targetAttributes, uint32_t targetWidth, uint32_t targetHeight, uint32_t optionCount, const std::string& title, const ::gpk::view_array<const ::klib::SMenuItem<_ReturnType>> & menuItems, const ::klib::SInput& frameInput, const _ReturnType& exitValue, const _ReturnType& noActionValue=-1, uint32_t rowWidth=20, bool disableEscKeyClose=false, const ::gpk::view_const_string& exitText="Exit this menu") {
 		drawMenu_globals.Timer.Frame();
 
-		optionCount												= (optionCount < _ArraySize) ? optionCount : _ArraySize; // Fix optionCount to the maximum size of the array if optionCount is higher than the allowed size.
+		optionCount												= (optionCount < menuItems.size()) ? optionCount : menuItems.size(); // Fix optionCount to the maximum size of the array if optionCount is higher than the allowed size.
 
 		int32_t														lineOffset											= (int32_t)(targetHeight - MENU_ROFFSET - 4 - ::gpk::min((int32_t)optionCount, 9));
 		const int32_t												clearOffset											= (int32_t)(targetHeight - MENU_ROFFSET - 4 - 9);
@@ -207,14 +207,14 @@ namespace klib
 		return resultVal;
 	}
 
-	template <typename _tCell, size_t _ItemCount, typename _ReturnType>
-	inline _ReturnType										drawMenu			(::gpk::view_grid<_tCell> display, uint16_t* targetAttributes, uint32_t optionCount, const std::string& title, const klib::SMenuItem<_ReturnType>(&menuItems)[_ItemCount], const ::klib::SInput& frameInput, _ReturnType exitValue, _ReturnType noActionValue = -1, uint32_t rowWidth=20, bool disableEscapeKey=false, const std::string& exitText="Exit this menu") {
+	template <typename _tCell, typename _ReturnType>
+	inline _ReturnType										drawMenu			(::gpk::view_grid<_tCell> display, uint16_t* targetAttributes, uint32_t optionCount, const std::string& title, const ::gpk::view_array<const ::klib::SMenuItem<_ReturnType>> & menuItems, const ::klib::SInput& frameInput, _ReturnType exitValue, _ReturnType noActionValue = -1, uint32_t rowWidth=20, bool disableEscapeKey=false, const std::string& exitText="Exit this menu") {
 		return ::klib::drawMenu(display.begin(), targetAttributes, display.metrics().x, display.metrics().y, optionCount, title, menuItems, frameInput, exitValue, noActionValue, rowWidth, disableEscapeKey, {exitText.data(), (uint32_t)exitText.size()});
 	}
 
-	template <typename _tCell, size_t _ItemCount, typename _ReturnType>
-	inline _ReturnType										drawMenu			(::gpk::view_grid<_tCell> display, uint16_t* targetAttributes, const std::string& title, const ::klib::SMenuItem<_ReturnType>(&menuItems)[_ItemCount], const ::klib::SInput& frameInput, _ReturnType exitValue, _ReturnType noActionValue = -1, uint32_t rowWidth=20, bool disableEscapeKey=false, const std::string& exitText="Exit this menu") {
-		return ::klib::drawMenu(display.begin(), targetAttributes, display.metrics().x, display.metrics().y, _ItemCount, title, menuItems, frameInput, exitValue, noActionValue, rowWidth, disableEscapeKey, {exitText.data(), (uint32_t)exitText.size()});
+	template <typename _tCell, typename _ReturnType>
+	inline _ReturnType										drawMenu			(::gpk::view_grid<_tCell> display, uint16_t* targetAttributes, const std::string& title, const ::gpk::view_array<const ::klib::SMenuItem<_ReturnType>> & menuItems, const ::klib::SInput& frameInput, _ReturnType exitValue, _ReturnType noActionValue = -1, uint32_t rowWidth=20, bool disableEscapeKey=false, const std::string& exitText="Exit this menu") {
+		return ::klib::drawMenu(display.begin(), targetAttributes, display.metrics().x, display.metrics().y, menuItems.size(), title, menuItems, frameInput, exitValue, noActionValue, rowWidth, disableEscapeKey, {exitText.data(), (uint32_t)exitText.size()});
 	}
 
 	template <typename _ReturnType>
@@ -236,13 +236,13 @@ namespace klib
 		{};
 	};
 
-	template <typename _tCell, size_t _ItemCount, typename _ReturnType>
-	_ReturnType drawMenu(::gpk::view_grid<_tCell>& display, uint16_t* targetAttributes, const SMenu<_ReturnType>& menuInstance, const klib::SMenuItem<_ReturnType>(&menuItems)[_ItemCount], const ::klib::SInput& frameInput, _ReturnType noActionValue = -1) {
-		return ::klib::drawMenu(display.begin(), targetAttributes, display.metrics().x, display.metrics().y, (uint32_t)_ItemCount, menuInstance.Title.begin(), menuItems, frameInput, menuInstance.ValueExit, noActionValue, menuInstance.RowWidth, menuInstance.bDisableEscapeKey, menuInstance.TextExit);
+	template <typename _tCell, typename _ReturnType>
+	_ReturnType drawMenu(::gpk::view_grid<_tCell>& display, uint16_t* targetAttributes, const SMenu<_ReturnType>& menuInstance, const ::gpk::view_array<const ::klib::SMenuItem<_ReturnType>> & menuItems, const ::klib::SInput& frameInput, _ReturnType noActionValue = -1) {
+		return ::klib::drawMenu(display.begin(), targetAttributes, display.metrics().x, display.metrics().y, menuItems.size(), menuInstance.Title.begin(), menuItems, frameInput, menuInstance.ValueExit, noActionValue, menuInstance.RowWidth, menuInstance.bDisableEscapeKey, menuInstance.TextExit);
 	}
 
-	template <typename _tCell, size_t _ItemCount, typename _ReturnType>
-	_ReturnType drawMenu(::gpk::view_grid<_tCell>& display, uint16_t* targetAttributes, const SMenu<_ReturnType>& menuInstance, const klib::SMenuItem<_ReturnType>(&menuItems)[_ItemCount], uint32_t optionCount, const ::klib::SInput& frameInput, _ReturnType noActionValue = -1) {
+	template <typename _tCell, typename _ReturnType>
+	_ReturnType drawMenu(::gpk::view_grid<_tCell>& display, uint16_t* targetAttributes, const SMenu<_ReturnType>& menuInstance, const ::gpk::view_array<const ::klib::SMenuItem<_ReturnType>> & menuItems, uint32_t optionCount, const ::klib::SInput& frameInput, _ReturnType noActionValue = -1) {
 		return ::klib::drawMenu(display.begin(), targetAttributes, display.metrics().x, display.metrics().y, optionCount, menuInstance.Title.begin(), menuItems, frameInput, menuInstance.ValueExit, noActionValue, menuInstance.RowWidth, menuInstance.bDisableEscapeKey, menuInstance.TextExit);
 	}
 } // namespace

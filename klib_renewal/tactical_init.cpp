@@ -47,7 +47,6 @@
 
 #include "klib_random_generator.h"
 
-
 using namespace klib;
 
 bool												initCampaignGame									(SGame& instanceGame);
@@ -61,23 +60,23 @@ bool												initTacticalGame									(SGame& instanceGame) {
 //static bool											isEnemyTeam											(TEAM_TYPE teamIdCurrent, TEAM_TYPE teamIdPossibleEnemy) { return isRelevantTeam(teamIdPossibleEnemy) && (teamIdCurrent != teamIdPossibleEnemy); }
 
 void												deployCampaignAgents
-	( SPlayer																				& player
-	, const int8_t																			playerIndex
-	, STacticalSetup																		& tacticalSetup
-	, const ::klib::SGrid<STopologyDetail, STacticalBoard::Width, STacticalBoard::Depth>	& terrainTopology
-	, SEntityTiles<STacticalBoard::Width, STacticalBoard::Depth>							& terrainEntities
+	( SPlayer											& player
+	, const int8_t										playerIndex
+	, STacticalSetup									& tacticalSetup
+	, const ::gpk::view_grid<::klib::STopologyDetail>	terrainTopology
+	, SEntityTiles										& terrainEntities
 	)
 {
-	const uint32_t											terrainWidth										= terrainTopology.Width,
-															terrainDepth										= terrainTopology.Depth;
+	const uint32_t											terrainWidth										= terrainTopology.metrics().x
+		,													terrainDepth										= terrainTopology.metrics().y
+		;
 
 	const TEAM_TYPE											teamId												= tacticalSetup.TeamPerPlayer[playerIndex];
 	const int32_t											squadSize											= tacticalSetup.SquadSize[playerIndex];
 	int64_t													seed												= tacticalSetup.Seed + playerIndex;
 
-	int32_t													rangeX												= terrainWidth / 5;
-	int32_t													rangeZ												= terrainDepth / 5;
-
+	const int32_t											rangeX												= terrainWidth / 5;
+	const int32_t											rangeZ												= terrainDepth / 5;
 
 	for(uint32_t iAgent=0, agentCount = squadSize; iAgent<agentCount; iAgent++)	{
 		if(player.Squad.Agents[iAgent] == -1)
@@ -145,70 +144,70 @@ void												deployCampaignAgents
 	}
 }
 
-void												generateTopology									( ::klib::SGrid<STopologyDetail, STacticalBoard::Width, STacticalBoard::Depth>	& terrainTopology, int64_t seed )		{
-	const uint32_t											terrainWidth										= terrainTopology.Width
-		,													terrainDepth										= terrainTopology.Depth
+void												generateTopology									(::gpk::view_grid<STopologyDetail>	terrainTopology, int64_t seed )		{
+	const uint32_t											terrainWidth										= terrainTopology.metrics().x
+		,													terrainDepth										= terrainTopology.metrics().y
 		;
 	::klib::fillCellsFromNoise(terrainTopology, {- 1,  0}, (int32_t)(seed +  987 + 1), 200);
 	::klib::fillCellsFromNoise(terrainTopology, {-15,  0}, (int32_t)(seed + 7331 + 5), 200);
 
-	STopologyDetail											* cellsHeight										= &terrainTopology	.Cells[0][0];
-	for(uint32_t i=0, count = terrainDepth*terrainWidth; i<count; i++)
+	STopologyDetail											* cellsHeight										= terrainTopology.begin();
+	for(uint32_t i=0, count = terrainTopology.size(); i<count; i++)
 		cellsHeight[i].Collision							= cellsHeight[i].Sharp + cellsHeight[i].Smooth;
 }
 //
 void												populateProps
-	( ::klib::SGrid<STopologyDetail, STacticalBoard::Width, STacticalBoard::Depth>	& terrainTopology
-	, SEntityTiles<STacticalBoard::Width, STacticalBoard::Depth>					& terrainEntities
-	, int64_t																		seed
-	, int32_t																		maxCoins
+	( ::gpk::view_grid<::klib::STopologyDetail>	terrainTopology
+	, SEntityTiles								& terrainEntities
+	, int64_t									seed
+	, int32_t									maxCoins
 	)
 {
-	const uint32_t											terrainWidth										= terrainTopology.Width,
-															terrainDepth										= terrainTopology.Depth;
+	const uint32_t											terrainWidth										= terrainTopology.metrics().x
+		,													terrainDepth										= terrainTopology.metrics().y
+		;
 
 	static const ::gpk::label								labelWall											= "Wall";
 	for(uint32_t z=0; z<terrainDepth; ++z)
-		for(uint32_t x=0; x<terrainWidth; ++x) {
-			double													noise[]												=
-				{	::gpk::noiseNormal1D(z*terrainDepth+x, seed)
-				,	::gpk::noiseNormal1D(z*terrainDepth+x, seed*7187)
-				,	::gpk::noiseNormal1D(z*terrainDepth+x, seed*6719)
-				,	::gpk::noiseNormal1D(z*terrainDepth+x, seed*8443)
-				,	::gpk::noiseNormal1D(z*terrainDepth+x, seed*7883)
-				,	::gpk::noiseNormal1D(z*terrainDepth+x, seed*8087)
-				,	::gpk::noiseNormal1D(z*terrainDepth+x, seed*8081)
-				,	::gpk::noiseNormal1D(z*terrainDepth+x, seed*9419)
-				,	::gpk::noiseNormal1D(z*terrainDepth+x, seed*9413)
-				};
-			bool													bReinforced											= noise[3] > .5;
-			if( terrainTopology.Cells[z][x].Sharp	< PARTIAL_COVER_HEIGHT
-			 && terrainTopology.Cells[z][x].Smooth	< PARTIAL_COVER_HEIGHT
-			 && (terrainTopology.Cells[z][x].Smooth + terrainTopology.Cells[z][x].Sharp) < PARTIAL_COVER_HEIGHT
-			 && terrainEntities.Props.Cells[z][x].Definition == -1
-			 && noise[0] > 0.98
-			 )
-			{
-				int16_t													defCheck											= 1+(int16_t)(rand()%(::gpk::size(definitionsStageProp)-1));
-				terrainEntities.Props.Cells[z][x].Definition		= (int8_t)defCheck;
-				terrainEntities.Props.Cells[z][x].Modifier			= bReinforced ? 1 : 0;
-				terrainEntities.Props.Cells[z][x].Level				= 1;
-				if(definitionsStageProp[defCheck].Name == labelWall) {
-					uint32_t												wallmaxz											= ::gpk::min(z + 3 + uint32_t(noise[1]*10), terrainDepth-1);
-					uint32_t												wallmaxx											= ::gpk::min(x + 3 + uint32_t(noise[2]*10), terrainWidth-1);
-					for(uint32_t wallz=z; wallz<=wallmaxz; ++wallz)	{	if(noise[5] > 0.95 || ::klib::randNoise(9941) > 0.95)	continue;	terrainEntities.Props.Cells[wallz]		[x]			.Definition = (int8_t)defCheck; terrainEntities.Props.Cells[wallz]		[x]			.Modifier = bReinforced ? 1 : 0; terrainEntities.Props.Cells[wallz]		[x]			.Level = 1; }
-					for(uint32_t wallz=z; wallz<=wallmaxz; ++wallz)	{	if(noise[6] > 0.95 || ::klib::randNoise(9941) > 0.95)	continue;	terrainEntities.Props.Cells[wallz]		[wallmaxx]	.Definition = (int8_t)defCheck; terrainEntities.Props.Cells[wallz]		[wallmaxx]	.Modifier = bReinforced ? 1 : 0; terrainEntities.Props.Cells[wallz]		[wallmaxx]	.Level = 1; }
-					for(uint32_t wallx=x; wallx<=wallmaxx; ++wallx)	{	if(noise[7] > 0.95 || ::klib::randNoise(9941) > 0.95)	continue;	terrainEntities.Props.Cells[z]			[wallx]		.Definition = (int8_t)defCheck; terrainEntities.Props.Cells[z]			[wallx]		.Modifier = bReinforced ? 1 : 0; terrainEntities.Props.Cells[z]			[wallx]		.Level = 1; }
-					for(uint32_t wallx=x; wallx<=wallmaxx; ++wallx)	{	if(noise[8] > 0.95 || ::klib::randNoise(9941) > 0.95)	continue;	terrainEntities.Props.Cells[wallmaxz]	[wallx]		.Definition = (int8_t)defCheck; terrainEntities.Props.Cells[wallmaxz]	[wallx]		.Modifier = bReinforced ? 1 : 0; terrainEntities.Props.Cells[wallmaxz]	[wallx]		.Level = 1; }
-				}
+	for(uint32_t x=0; x<terrainWidth; ++x) {
+		double													noise[]												=
+			{	::gpk::noiseNormal1D(z*terrainDepth+x, seed)
+			,	::gpk::noiseNormal1D(z*terrainDepth+x, seed*7187)
+			,	::gpk::noiseNormal1D(z*terrainDepth+x, seed*6719)
+			,	::gpk::noiseNormal1D(z*terrainDepth+x, seed*8443)
+			,	::gpk::noiseNormal1D(z*terrainDepth+x, seed*7883)
+			,	::gpk::noiseNormal1D(z*terrainDepth+x, seed*8087)
+			,	::gpk::noiseNormal1D(z*terrainDepth+x, seed*8081)
+			,	::gpk::noiseNormal1D(z*terrainDepth+x, seed*9419)
+			,	::gpk::noiseNormal1D(z*terrainDepth+x, seed*9413)
+			};
+		bool													bReinforced											= noise[3] > .5;
+		if( terrainTopology	[z][x].Sharp	< PARTIAL_COVER_HEIGHT
+		 && terrainTopology	[z][x].Smooth	< PARTIAL_COVER_HEIGHT
+		 && (terrainTopology[z][x].Smooth + terrainTopology[z][x].Sharp) < PARTIAL_COVER_HEIGHT
+		 && terrainEntities.Props[z][x].Definition	== -1
+		 && noise[0] > 0.98
+		 ) {
+			int16_t													defCheck											= 1+(int16_t)(rand()%(::gpk::size(definitionsStageProp)-1));
+			terrainEntities.Props[z][x].Definition		= (int8_t)defCheck;
+			terrainEntities.Props[z][x].Modifier			= bReinforced ? 1 : 0;
+			terrainEntities.Props[z][x].Level				= 1;
+			if(definitionsStageProp[defCheck].Name == labelWall) {
+				uint32_t												wallmaxz											= ::gpk::min(z + 3 + uint32_t(noise[1]*10), terrainDepth-1);
+				uint32_t												wallmaxx											= ::gpk::min(x + 3 + uint32_t(noise[2]*10), terrainWidth-1);
+				for(uint32_t wallz=z; wallz<=wallmaxz; ++wallz)	{	if(noise[5] > 0.95 || ::klib::randNoise(9941) > 0.95)	continue;	terrainEntities.Props[wallz]	[x]			.Definition = (int8_t)defCheck; terrainEntities.Props[wallz]	[x]			.Modifier = bReinforced ? 1 : 0; terrainEntities.Props[wallz]		[x]			.Level = 1; }
+				for(uint32_t wallz=z; wallz<=wallmaxz; ++wallz)	{	if(noise[6] > 0.95 || ::klib::randNoise(9941) > 0.95)	continue;	terrainEntities.Props[wallz]	[wallmaxx]	.Definition = (int8_t)defCheck; terrainEntities.Props[wallz]	[wallmaxx]	.Modifier = bReinforced ? 1 : 0; terrainEntities.Props[wallz]		[wallmaxx]	.Level = 1; }
+				for(uint32_t wallx=x; wallx<=wallmaxx; ++wallx)	{	if(noise[7] > 0.95 || ::klib::randNoise(9941) > 0.95)	continue;	terrainEntities.Props[z]		[wallx]		.Definition = (int8_t)defCheck; terrainEntities.Props[z]		[wallx]		.Modifier = bReinforced ? 1 : 0; terrainEntities.Props[z]			[wallx]		.Level = 1; }
+				for(uint32_t wallx=x; wallx<=wallmaxx; ++wallx)	{	if(noise[8] > 0.95 || ::klib::randNoise(9941) > 0.95)	continue;	terrainEntities.Props[wallmaxz]	[wallx]		.Definition = (int8_t)defCheck; terrainEntities.Props[wallmaxz]	[wallx]		.Modifier = bReinforced ? 1 : 0; terrainEntities.Props[wallmaxz]	[wallx]		.Level = 1; }
 			}
-			else if(terrainTopology.Cells[z][x].Sharp < PARTIAL_COVER_HEIGHT && terrainTopology.Cells[z][x].Smooth < PARTIAL_COVER_HEIGHT
-				&& (terrainTopology.Cells[z][x].Smooth+terrainTopology.Cells[z][x].Sharp) < PARTIAL_COVER_HEIGHT
-				&& terrainEntities.Props.Cells[z][x].Definition == -1
-				&& noise[2] > 0.95
-			)
-				terrainEntities.Coins.Cells[z][x] = ::rand()%(1+maxCoins);
 		}
+		else if(terrainTopology[z][x].Sharp < PARTIAL_COVER_HEIGHT && terrainTopology[z][x].Smooth < PARTIAL_COVER_HEIGHT
+			&& (terrainTopology[z][x].Smooth + terrainTopology[z][x].Sharp) < PARTIAL_COVER_HEIGHT
+			&& terrainEntities.Props[z][x].Definition == -1
+			&& noise[2] > 0.95
+		)
+			terrainEntities.Coins[z][x]				= ::rand()%(1+maxCoins);
+	}
 }
 
 int32_t												getEnemyCoinsForTerrainFun							(SGame& instanceGame)																	{
@@ -242,15 +241,10 @@ void												recalculateAgentsInRangeAndSight					(SGame& instanceGame);
 void												klib::initTacticalMap								(SGame& instanceGame)																	{
 	STacticalInfo											& tacticalInfo										= instanceGame.TacticalInfo;
 	tacticalInfo.Board.Clear();
+	tacticalInfo.Board.Resize({::klib::GAME_MAP_WIDTH, ::klib::GAME_MAP_DEPTH});
 
-	::klib::SGrid<STopologyDetail
-		, STacticalBoard::Width
-		, STacticalBoard::Depth
-		>													& terrainTopology									= tacticalInfo.Board.Tiles.Terrain.Topology;
-	SEntityTiles
-		< STacticalBoard::Width
-		, STacticalBoard::Depth
-		>													& terrainEntities									= tacticalInfo.Board.Tiles.Entities;
+	::gpk::view_grid<::klib::STopologyDetail>				terrainTopology										= tacticalInfo.Board.Tiles.Terrain.Topology;
+	SEntityTiles											& terrainEntities									= tacticalInfo.Board.Tiles.Entities;
 	int64_t													seed												= tacticalInfo.Setup.Seed;
 
 	int32_t													maxCoins											= ::getEnemyCoinsForTerrainFun(instanceGame);
@@ -499,7 +493,7 @@ bool												initCampaignGame									(SGame& instanceGame)											{
 	tacticalSetup.Seed									= instanceGame.Seed + instanceGame.Players[PLAYER_INDEX_USER].Score.BattlesWon;
 	::initCampaignPlayers(instanceGame);
 	::klib::initTacticalMap(instanceGame);
-	::klib::drawTacticalBoard(instanceGame, tacticalInfo, instanceGame.PostEffectDisplay, PLAYER_INDEX_USER, TEAM_TYPE_CIVILIAN, instanceGame.Players[PLAYER_INDEX_USER].Selection, true);
+	::klib::drawTacticalBoard(instanceGame, tacticalInfo, instanceGame.TacticalDisplay.Screen, instanceGame.TacticalDisplay.TextAttributes, PLAYER_INDEX_USER, TEAM_TYPE_CIVILIAN, instanceGame.Players[PLAYER_INDEX_USER].Selection, true);
 
 	::gpk::bit_set(instanceGame.Flags, klib::GAME_FLAGS_TACTICAL);
 	tacticalInfo.CurrentPlayer							= (int8_t)::resolveNextPlayer(instanceGame);

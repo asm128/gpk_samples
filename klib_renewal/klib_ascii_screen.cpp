@@ -8,7 +8,7 @@ static struct SASCIIDisplayBuffered {
 	bool											bCreated							= false;
 
 													~SASCIIDisplayBuffered						()																		{
-		if( bCreated )	
+		if( bCreated )
 			::klib::shutdownASCIIScreen();
 	}
 }												__g_ASCIIScreen;	// Main instance (Windows applications seem to support only one console per process, as well as many custom smaller systems)

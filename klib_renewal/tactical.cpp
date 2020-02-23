@@ -56,8 +56,9 @@ bool																	handleUserInput									(SGame& instanceGame, const SGameSt
 		int32_t																		tacticalMouseX									= mouseX-tacticalDisplayX;
 		int32_t																		tacticalMouseY									= mouseY-TACTICAL_DISPLAY_POSY;
 
-		bool																		 bInArea										=  tacticalMouseX >= 0 && tacticalMouseX < STacticalBoard::Width
-																																	&& tacticalMouseY >= 0 && tacticalMouseY < STacticalBoard::Depth
+		bool																		 bInArea
+			=  tacticalMouseX >= 0 && tacticalMouseX < (int32_t)tacticalDisplay.Screen.metrics().x
+			&& tacticalMouseY >= 0 && tacticalMouseY < (int32_t)tacticalDisplay.Screen.metrics().y
 			;
 		if(false == bInArea)
 			return false;
@@ -167,19 +168,19 @@ void																	drawTileInfo
 			bDrawText																= true;
 		}
 		else if ( terrainHeight
-			||	0 != tacticalInfo.Board.Tiles.Terrain.Geometry.Cells[boardZ][boardX].fHeight[0]
-			||	0 != tacticalInfo.Board.Tiles.Terrain.Geometry.Cells[boardZ][boardX].fHeight[1]
-			||	0 != tacticalInfo.Board.Tiles.Terrain.Geometry.Cells[boardZ][boardX].fHeight[2]
-			||	0 != tacticalInfo.Board.Tiles.Terrain.Geometry.Cells[boardZ][boardX].fHeight[3]
+			||	0 != tacticalInfo.Board.Tiles.Terrain.Geometry[boardZ][boardX].fHeight[0]
+			||	0 != tacticalInfo.Board.Tiles.Terrain.Geometry[boardZ][boardX].fHeight[1]
+			||	0 != tacticalInfo.Board.Tiles.Terrain.Geometry[boardZ][boardX].fHeight[2]
+			||	0 != tacticalInfo.Board.Tiles.Terrain.Geometry[boardZ][boardX].fHeight[3]
 			)
 		{
 			messageColor															= COLOR_DARKGREY;
 			char																		heightStr[128]									= {};
 			sprintf_s(heightStr, "Tile heights: {%f,%f,%f,%f}"
-				, tacticalInfo.Board.Tiles.Terrain.Geometry.Cells[boardZ][boardX].fHeight[0]
-				, tacticalInfo.Board.Tiles.Terrain.Geometry.Cells[boardZ][boardX].fHeight[1]
-				, tacticalInfo.Board.Tiles.Terrain.Geometry.Cells[boardZ][boardX].fHeight[2]
-				, tacticalInfo.Board.Tiles.Terrain.Geometry.Cells[boardZ][boardX].fHeight[3]
+				, tacticalInfo.Board.Tiles.Terrain.Geometry[boardZ][boardX].fHeight[0]
+				, tacticalInfo.Board.Tiles.Terrain.Geometry[boardZ][boardX].fHeight[1]
+				, tacticalInfo.Board.Tiles.Terrain.Geometry[boardZ][boardX].fHeight[2]
+				, tacticalInfo.Board.Tiles.Terrain.Geometry[boardZ][boardX].fHeight[3]
 			);
 			selectedTile															= heightStr;
 			bDrawText																= true;
@@ -257,8 +258,8 @@ void																	drawPlayerInfo									(SGame& instanceGame)															
 		messageColor															= getPlayerColor(tacticalInfo, currentPlayer, tacticalInfo.CurrentPlayer, PLAYER_INDEX_USER, bDarken);
 		if(currentPlayer.Selection.PlayerUnit != -1 && currentPlayer.Squad.Agents[currentPlayer.Selection.PlayerUnit] != -1) {
 			CCharacter																	& playerAgent									= *currentPlayer.Army[currentPlayer.Squad.Agents[currentPlayer.Selection.PlayerUnit]];
-			displayDetailedAgentSlot(globalDisplay, PLAYER_INFO_POSY, 4, playerAgent, messageColor);
-			displayStatusEffectsAndTechs(globalDisplay, PLAYER_INFO_POSY + 9, 4 + 32, playerAgent);
+			displayDetailedAgentSlot	(globalDisplay.Screen, globalDisplay.TextAttributes, PLAYER_INFO_POSY, 4, playerAgent, messageColor);
+			displayStatusEffectsAndTechs(globalDisplay.Screen, globalDisplay.TextAttributes, PLAYER_INFO_POSY + 9, 4 + 32, playerAgent);
 		}
 
 		selectionText															= "Player name: "	+ ::std::string(currentPlayer.Name.begin());
@@ -329,8 +330,8 @@ void																	drawPlayerInfo									(SGame& instanceGame)															
 		return;
 
 	int32_t																		xOffset											= tacticalDisplayX + tacticalDisplay.Width + 4;
-	displayDetailedAgentSlot(globalDisplay, PLAYER_INFO_POSY, xOffset, targetAgent, messageColor);
-	displayStatusEffectsAndTechs(globalDisplay, PLAYER_INFO_POSY+9, xOffset+32, targetAgent);
+	displayDetailedAgentSlot(globalDisplay.Screen, globalDisplay.TextAttributes, PLAYER_INFO_POSY, xOffset, targetAgent, messageColor);
+	displayStatusEffectsAndTechs(globalDisplay.Screen, globalDisplay.TextAttributes, PLAYER_INFO_POSY+9, xOffset+32, targetAgent);
 	selectionText															= "Target: " + targetAgent.Name;
 	lineToGridColored(globalDisplay.Screen, globalDisplay.TextAttributes, messageColor, 3, tacticalDisplayX+1, ::klib::SCREEN_RIGHT, selectionText.c_str());
 }
@@ -548,7 +549,7 @@ int32_t																	drawInventoryMenu								(SGame& instanceGame, klib::CCh
 	SCharacterInventory&														characterInventory								= adventurer.Goods.Inventory;
 	//int32_t																		initMenu										=
 		initInventoryMenu(adventurer, itemOptions, false, false);
-	return drawMenu(instanceGame.GlobalDisplay.Screen, &globalDisplay.TextAttributes.Cells[0][0], characterInventory.Items.Count, menuTitle, itemOptions, instanceGame.FrameInput, (int32_t)adventurer.Goods.Inventory.Items.Count, -1, 50);
+	return drawMenu(instanceGame.GlobalDisplay.Screen, &globalDisplay.TextAttributes.Cells[0][0], characterInventory.Items.Count, menuTitle, ::gpk::view_array<const ::klib::SMenuItem<int32_t>>{itemOptions}, instanceGame.FrameInput, (int32_t)adventurer.Goods.Inventory.Items.Count, -1, 50);
 
 };
 
@@ -680,8 +681,8 @@ void																	updateBullets									(SGame& instanceGame)									{
 				if(newBulletPos.Offset.y < 0) { newBulletPos.Cell.y	-= 1; newBulletPos.Offset.y += 1.0f; }
 				if(newBulletPos.Offset.z < 0) { newBulletPos.Cell.z	-= 1; newBulletPos.Offset.z += 1.0f; }
 
-				if( newBulletPos.Cell.x >= 0 && newBulletPos.Cell.x < tacticalInfo.Board.Width
-				 && newBulletPos.Cell.z >= 0 && newBulletPos.Cell.z < tacticalInfo.Board.Depth
+				if( newBulletPos.Cell.x >= 0 && newBulletPos.Cell.x < (int32_t)tacticalInfo.Board.Tiles.Terrain.Geometry.metrics().x
+				 && newBulletPos.Cell.z >= 0 && newBulletPos.Cell.z < (int32_t)tacticalInfo.Board.Tiles.Terrain.Geometry.metrics().y
 				)
 				{
 					int32_t																		newx											= newBulletPos.Cell.x;
@@ -759,10 +760,10 @@ void																	updateBullets									(SGame& instanceGame)									{
 					if(::gpk::bit_true(newBullet.Points.Tech.AmmoEffect, AMMO_EFFECT_EXPLOSIVE)) {
 						int32_t y=0;
 						for(int32_t z = (int32_t)(newAOE.Position.Cell.z-newAOE.RadiusOrHalfSize), maxz=int32_t(newAOE.Position.Cell.z+newAOE.RadiusOrHalfSize); z < maxz; ++z) {
-							if(z < 0 || z >= tacticalInfo.Board.Depth)
+							if(z < 0 || z >= (int32_t)tacticalInfo.Board.Tiles.Terrain.Geometry.metrics().y)
 								continue;
 							for(int32_t x = (int32_t)(newAOE.Position.Cell.x-newAOE.RadiusOrHalfSize), maxx=int32_t(newAOE.Position.Cell.x+newAOE.RadiusOrHalfSize); x < maxx; ++x) {
-								if(x < 0 || x >= tacticalInfo.Board.Width)
+								if(x < 0 || x >= (int32_t)tacticalInfo.Board.Tiles.Terrain.Geometry.metrics().x)
 									continue;
 
 								const ::gpk::SCoord3<int32_t>	currentCoord	= {x, y, z};
@@ -874,7 +875,7 @@ SGameState																drawTacticalScreen								(SGame& instanceGame, const 
 
 	STacticalDisplay&	tacticalDisplay	= instanceGame.TacticalDisplay;
 	SPlayer&			currentPlayer	= instanceGame.Players[tacticalInfo.Setup.Players[tacticalInfo.CurrentPlayer]];
-	drawTacticalBoard(instanceGame, tacticalInfo, tacticalDisplay, tacticalInfo.CurrentPlayer, tacticalInfo.Setup.TeamPerPlayer[tacticalInfo.CurrentPlayer], currentPlayer.Selection, true);
+	drawTacticalBoard(instanceGame, tacticalInfo, tacticalDisplay.Screen, tacticalDisplay.TextAttributes, tacticalInfo.CurrentPlayer, tacticalInfo.Setup.TeamPerPlayer[tacticalInfo.CurrentPlayer], currentPlayer.Selection, true);
 
 	SGlobalDisplay&		globalDisplay	= instanceGame.GlobalDisplay;
 	clearGrid(globalDisplay.Screen, ' ');
@@ -899,7 +900,7 @@ SGameState																drawTacticalScreen								(SGame& instanceGame, const 
 			}
  			else if(instanceGame.State.Substate == GAME_SUBSTATE_EQUIPMENT) {
 				menuTitle += " - Equipment";
-				exitState = drawMenu(instanceGame.GlobalDisplay.Screen, &globalDisplay.TextAttributes.Cells[0][0], menuTitle, optionsCombatTurnEquip, instanceGame.FrameInput, {GAME_STATE_TACTICAL_CONTROL, GAME_SUBSTATE_MAIN}, exitState, 10);
+				exitState = drawMenu(instanceGame.GlobalDisplay.Screen, &globalDisplay.TextAttributes.Cells[0][0], menuTitle, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsCombatTurnEquip}, instanceGame.FrameInput, {GAME_STATE_TACTICAL_CONTROL, GAME_SUBSTATE_MAIN}, exitState, 10);
 				selectedAction = TURN_ACTION_CONTINUE;
 			}
 			else {
@@ -908,7 +909,7 @@ SGameState																drawTacticalScreen								(SGame& instanceGame, const 
 					instanceGame.UserError = "Unrecognized game substate!";
 					instanceGame.LogError();
 				}
-				selectedAction = drawMenu(instanceGame.GlobalDisplay.Screen, &globalDisplay.TextAttributes.Cells[0][0], menuTitle, optionsCombatTurn, instanceGame.FrameInput, TURN_ACTION_MENUS, TURN_ACTION_CONTINUE, 10);
+				selectedAction = drawMenu(instanceGame.GlobalDisplay.Screen, &globalDisplay.TextAttributes.Cells[0][0], menuTitle, ::gpk::view_array<const ::klib::SMenuItem<::klib::TURN_ACTION>>{optionsCombatTurn}, instanceGame.FrameInput, TURN_ACTION_MENUS, TURN_ACTION_CONTINUE, 10);
 			}
 		}
 		else if(currentPlayer.Control.Type == PLAYER_CONTROL_AI)  {

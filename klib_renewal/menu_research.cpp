@@ -23,7 +23,7 @@ SGameState drawResearchMenu(SGame& instanceGame, const SGameState& returnState)
 	SCharacterInventory&				playerInventory		= playerCompany.Inventory;
 	klib::SCharacterResearch&			researchCompleted	= playerCompany.CompletedResearch;
 	::gpk::array_obj<SEntityResearch>&	queuedResearch		= player.Projects.QueuedResearch;
-	
+
 	klib::SCharacterResearch		researchableItems	= {};
 
 #define GET_AVAILABLE_RESEARCH_FOR_ENTITY(EntityToken_, ProgressiveDefinitions_, ProgressiveModifiers_)							\
@@ -162,7 +162,7 @@ SGameState drawResearchMenu(SGame& instanceGame, const SGameState& returnState)
 		, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0]
 		, (size_t)researchableCount
 		, "Available Research"
-		, menuItems
+		, ::gpk::view_array<const ::klib::SMenuItem<::klib::SEntityResearch>>{menuItems}
 		, instanceGame.FrameInput
 		, {"Exit research menu", (int32_t)researchableCount}
 		, {"No action selected", -1}
@@ -176,13 +176,13 @@ SGameState drawResearchMenu(SGame& instanceGame, const SGameState& returnState)
 
 	instanceGame.ClearMessages();
 	switch(selectedChoice.Type) {
-	case ENTITY_TYPE_ACCESSORY	: acknowledgeResearch(selectedChoice, player.Projects, instanceGame.UserSuccess); instanceGame.LogSuccess(); break; 
-	case ENTITY_TYPE_STAGE_PROP	: acknowledgeResearch(selectedChoice, player.Projects, instanceGame.UserSuccess); instanceGame.LogSuccess(); break; 
-	case ENTITY_TYPE_FACILITY	: acknowledgeResearch(selectedChoice, player.Projects, instanceGame.UserSuccess); instanceGame.LogSuccess(); break; 
-	case ENTITY_TYPE_VEHICLE	: acknowledgeResearch(selectedChoice, player.Projects, instanceGame.UserSuccess); instanceGame.LogSuccess(); break; 
-	case ENTITY_TYPE_PROFESSION	: acknowledgeResearch(selectedChoice, player.Projects, instanceGame.UserSuccess); instanceGame.LogSuccess(); break; 
-	case ENTITY_TYPE_WEAPON		: acknowledgeResearch(selectedChoice, player.Projects, instanceGame.UserSuccess); instanceGame.LogSuccess(); break; 
-	case ENTITY_TYPE_ARMOR		: acknowledgeResearch(selectedChoice, player.Projects, instanceGame.UserSuccess); instanceGame.LogSuccess(); break; 
+	case ENTITY_TYPE_ACCESSORY	: acknowledgeResearch(selectedChoice, player.Projects, instanceGame.UserSuccess); instanceGame.LogSuccess(); break;
+	case ENTITY_TYPE_STAGE_PROP	: acknowledgeResearch(selectedChoice, player.Projects, instanceGame.UserSuccess); instanceGame.LogSuccess(); break;
+	case ENTITY_TYPE_FACILITY	: acknowledgeResearch(selectedChoice, player.Projects, instanceGame.UserSuccess); instanceGame.LogSuccess(); break;
+	case ENTITY_TYPE_VEHICLE	: acknowledgeResearch(selectedChoice, player.Projects, instanceGame.UserSuccess); instanceGame.LogSuccess(); break;
+	case ENTITY_TYPE_PROFESSION	: acknowledgeResearch(selectedChoice, player.Projects, instanceGame.UserSuccess); instanceGame.LogSuccess(); break;
+	case ENTITY_TYPE_WEAPON		: acknowledgeResearch(selectedChoice, player.Projects, instanceGame.UserSuccess); instanceGame.LogSuccess(); break;
+	case ENTITY_TYPE_ARMOR		: acknowledgeResearch(selectedChoice, player.Projects, instanceGame.UserSuccess); instanceGame.LogSuccess(); break;
 	default:
 		break;
 	}
@@ -195,10 +195,10 @@ SGameState drawResearch(SGame& instanceGame, const SGameState& returnState) {
 	const std::string textToPrint = "Research center.";
 
 	bool bDonePrinting = ::klib::getMessageSlow(instanceGame.SlowMessage, {textToPrint.data(), (uint32_t)textToPrint.size()}, instanceGame.FrameTimer.LastTimeSeconds);
-	memcpy(&instanceGame.PostEffectDisplay.Screen.Cells[instanceGame.PostEffectDisplay.Depth>>1][instanceGame.PostEffectDisplay.Width/2-(strlen(instanceGame.SlowMessage)+1)/2], instanceGame.SlowMessage, strlen(instanceGame.SlowMessage));
-	if ( !bDonePrinting ) 
+	memcpy(&instanceGame.TacticalDisplay.Screen.Cells[instanceGame.TacticalDisplay.Depth>>1][instanceGame.TacticalDisplay.Width/2-(strlen(instanceGame.SlowMessage)+1)/2], instanceGame.SlowMessage, strlen(instanceGame.SlowMessage));
+	if ( !bDonePrinting )
 		return returnState;
 
-	drawBubblesBackground(instanceGame.PostEffectDisplay, instanceGame.FrameTimer.LastTimeSeconds);
+	drawBubblesBackground(instanceGame.TacticalDisplay, instanceGame.FrameTimer.LastTimeSeconds);
 	return drawResearchMenu(instanceGame, returnState);
 };

@@ -59,26 +59,26 @@ static SGameState drawEquipMenu(SGame& instanceGame, const SGameState& returnSta
 
 	char formatted[128] = {};
 	switch(instanceGame.State.Substate) {
-	case GAME_SUBSTATE_ACCESSORY	:	menuTitle += labelAccessory	.begin();	for(iSlot=0, itemCount=playerInventory.Accessory	.Count; iSlot<itemCount; ++iSlot) { sprintf_s(formatted, "x%2.2s - Lv.%3.3s %s", std::to_string(playerInventory.Accessory	[iSlot].Count).c_str(), std::to_string(playerInventory.	Accessory	[iSlot].Entity.Level).c_str(), getAccessoryName		(playerInventory.Accessory	[iSlot].Entity).c_str()); menuItems[iSlot] = { (int32_t)iSlot, formatted }; } selectedChoice = (int16_t)drawMenu(display.Screen, &display.TextAttributes.Cells[0][0], itemCount, menuTitle, menuItems, instanceGame.FrameInput, SHOP_EXIT_VALUE, -1, 50U, false, "Exit this menu");	break;
-	case GAME_SUBSTATE_STAGEPROP	:	menuTitle += labelStageProp	.begin();	for(iSlot=0, itemCount=playerInventory.StageProp	.Count; iSlot<itemCount; ++iSlot) { sprintf_s(formatted, "x%2.2s - Lv.%3.3s %s", std::to_string(playerInventory.StageProp	[iSlot].Count).c_str(), std::to_string(playerInventory.	StageProp	[iSlot].Entity.Level).c_str(), getStagePropName		(playerInventory.StageProp	[iSlot].Entity).c_str()); menuItems[iSlot] = { (int32_t)iSlot, formatted }; } selectedChoice = (int16_t)drawMenu(display.Screen, &display.TextAttributes.Cells[0][0], itemCount, menuTitle, menuItems, instanceGame.FrameInput, SHOP_EXIT_VALUE, -1, 50U, false, "Exit this menu");	break;
-	case GAME_SUBSTATE_FACILITY		:	menuTitle += labelFacility	.begin();	for(iSlot=0, itemCount=playerInventory.Facility		.Count; iSlot<itemCount; ++iSlot) { sprintf_s(formatted, "x%2.2s - Lv.%3.3s %s", std::to_string(playerInventory.Facility	[iSlot].Count).c_str(), std::to_string(playerInventory.	Facility	[iSlot].Entity.Level).c_str(), getFacilityName		(playerInventory.Facility	[iSlot].Entity).c_str()); menuItems[iSlot] = { (int32_t)iSlot, formatted }; } selectedChoice = (int16_t)drawMenu(display.Screen, &display.TextAttributes.Cells[0][0], itemCount, menuTitle, menuItems, instanceGame.FrameInput, SHOP_EXIT_VALUE, -1, 50U, false, "Exit this menu");	break;
-	case GAME_SUBSTATE_VEHICLE		:	menuTitle += labelVehicle	.begin();	for(iSlot=0, itemCount=playerInventory.Vehicle		.Count; iSlot<itemCount; ++iSlot) { sprintf_s(formatted, "x%2.2s - Lv.%3.3s %s", std::to_string(playerInventory.Vehicle		[iSlot].Count).c_str(), std::to_string(playerInventory.	Vehicle		[iSlot].Entity.Level).c_str(), getVehicleName		(playerInventory.Vehicle	[iSlot].Entity).c_str()); menuItems[iSlot] = { (int32_t)iSlot, formatted }; } selectedChoice = (int16_t)drawMenu(display.Screen, &display.TextAttributes.Cells[0][0], itemCount, menuTitle, menuItems, instanceGame.FrameInput, SHOP_EXIT_VALUE, -1, 50U, false, "Exit this menu");	break;
-	case GAME_SUBSTATE_PROFESSION	:	menuTitle += labelJob		.begin();	for(iSlot=0, itemCount=playerInventory.Profession	.Count; iSlot<itemCount; ++iSlot) { sprintf_s(formatted, "x%2.2s - Lv.%3.3s %s", std::to_string(playerInventory.Profession	[iSlot].Count).c_str(), std::to_string(playerInventory.	Profession	[iSlot].Entity.Level).c_str(), getProfessionName	(playerInventory.Profession	[iSlot].Entity).c_str()); menuItems[iSlot] = { (int32_t)iSlot, formatted }; } selectedChoice = (int16_t)drawMenu(display.Screen, &display.TextAttributes.Cells[0][0], itemCount, menuTitle, menuItems, instanceGame.FrameInput, SHOP_EXIT_VALUE, -1, 50U, false, "Exit this menu");	break;
-	case GAME_SUBSTATE_WEAPON		:	menuTitle += labelWeapon	.begin();	for(iSlot=0, itemCount=playerInventory.Weapon		.Count; iSlot<itemCount; ++iSlot) { sprintf_s(formatted, "x%2.2s - Lv.%3.3s %s", std::to_string(playerInventory.Weapon		[iSlot].Count).c_str(), std::to_string(playerInventory.	Weapon		[iSlot].Entity.Level).c_str(), getWeaponName		(playerInventory.Weapon		[iSlot].Entity).c_str()); menuItems[iSlot] = { (int32_t)iSlot, formatted }; } selectedChoice = (int16_t)drawMenu(display.Screen, &display.TextAttributes.Cells[0][0], itemCount, menuTitle, menuItems, instanceGame.FrameInput, SHOP_EXIT_VALUE, -1, 50U, false, "Exit this menu");	break;
-	case GAME_SUBSTATE_ARMOR		:	menuTitle += labelArmor		.begin();	for(iSlot=0, itemCount=playerInventory.Armor		.Count; iSlot<itemCount; ++iSlot) { sprintf_s(formatted, "x%2.2s - Lv.%3.3s %s", std::to_string(playerInventory.Armor		[iSlot].Count).c_str(), std::to_string(playerInventory.	Armor		[iSlot].Entity.Level).c_str(), getArmorName			(playerInventory.Armor		[iSlot].Entity).c_str()); menuItems[iSlot] = { (int32_t)iSlot, formatted }; } selectedChoice = (int16_t)drawMenu(display.Screen, &display.TextAttributes.Cells[0][0], itemCount, menuTitle, menuItems, instanceGame.FrameInput, SHOP_EXIT_VALUE, -1, 50U, false, "Exit this menu");	break;
-	case GAME_SUBSTATE_ITEM			:	menuTitle += labelItem		.begin();	for(iSlot=0, itemCount=playerInventory.Items		.Count; iSlot<itemCount; ++iSlot) { sprintf_s(formatted, "x%2.2s - Lv.%3.3s %s", std::to_string(playerInventory.Items		[iSlot].Count).c_str(), std::to_string(playerInventory.	Items		[iSlot].Entity.Level).c_str(), getItemName			(playerInventory.Items		[iSlot].Entity).c_str()); menuItems[iSlot] = { (int32_t)iSlot, formatted }; } selectedChoice = (int16_t)drawMenu(display.Screen, &display.TextAttributes.Cells[0][0], itemCount, menuTitle, menuItems, instanceGame.FrameInput, SHOP_EXIT_VALUE, -1, 50U, false, "Exit this menu");	break;
-	case GAME_SUBSTATE_CHARACTER	:	
-		for(iCharacter=0, count=player.Army.size(); iCharacter<count; ++iCharacter)	
-		{	
+	case GAME_SUBSTATE_ACCESSORY	:	menuTitle += labelAccessory	.begin();	for(iSlot=0, itemCount=playerInventory.Accessory	.Count; iSlot<itemCount; ++iSlot) { sprintf_s(formatted, "x%2.2s - Lv.%3.3s %s", std::to_string(playerInventory.Accessory	[iSlot].Count).c_str(), std::to_string(playerInventory.	Accessory	[iSlot].Entity.Level).c_str(), getAccessoryName		(playerInventory.Accessory	[iSlot].Entity).c_str()); menuItems[iSlot] = { (int32_t)iSlot, formatted }; } selectedChoice = (int16_t)drawMenu(display.Screen, &display.TextAttributes.Cells[0][0], itemCount, menuTitle, ::gpk::view_array<const ::klib::SMenuItem<int32_t>>{menuItems}, instanceGame.FrameInput, SHOP_EXIT_VALUE, -1, 50U, false, "Exit this menu");	break;
+	case GAME_SUBSTATE_STAGEPROP	:	menuTitle += labelStageProp	.begin();	for(iSlot=0, itemCount=playerInventory.StageProp	.Count; iSlot<itemCount; ++iSlot) { sprintf_s(formatted, "x%2.2s - Lv.%3.3s %s", std::to_string(playerInventory.StageProp	[iSlot].Count).c_str(), std::to_string(playerInventory.	StageProp	[iSlot].Entity.Level).c_str(), getStagePropName		(playerInventory.StageProp	[iSlot].Entity).c_str()); menuItems[iSlot] = { (int32_t)iSlot, formatted }; } selectedChoice = (int16_t)drawMenu(display.Screen, &display.TextAttributes.Cells[0][0], itemCount, menuTitle, ::gpk::view_array<const ::klib::SMenuItem<int32_t>>{menuItems}, instanceGame.FrameInput, SHOP_EXIT_VALUE, -1, 50U, false, "Exit this menu");	break;
+	case GAME_SUBSTATE_FACILITY		:	menuTitle += labelFacility	.begin();	for(iSlot=0, itemCount=playerInventory.Facility		.Count; iSlot<itemCount; ++iSlot) { sprintf_s(formatted, "x%2.2s - Lv.%3.3s %s", std::to_string(playerInventory.Facility	[iSlot].Count).c_str(), std::to_string(playerInventory.	Facility	[iSlot].Entity.Level).c_str(), getFacilityName		(playerInventory.Facility	[iSlot].Entity).c_str()); menuItems[iSlot] = { (int32_t)iSlot, formatted }; } selectedChoice = (int16_t)drawMenu(display.Screen, &display.TextAttributes.Cells[0][0], itemCount, menuTitle, ::gpk::view_array<const ::klib::SMenuItem<int32_t>>{menuItems}, instanceGame.FrameInput, SHOP_EXIT_VALUE, -1, 50U, false, "Exit this menu");	break;
+	case GAME_SUBSTATE_VEHICLE		:	menuTitle += labelVehicle	.begin();	for(iSlot=0, itemCount=playerInventory.Vehicle		.Count; iSlot<itemCount; ++iSlot) { sprintf_s(formatted, "x%2.2s - Lv.%3.3s %s", std::to_string(playerInventory.Vehicle		[iSlot].Count).c_str(), std::to_string(playerInventory.	Vehicle		[iSlot].Entity.Level).c_str(), getVehicleName		(playerInventory.Vehicle	[iSlot].Entity).c_str()); menuItems[iSlot] = { (int32_t)iSlot, formatted }; } selectedChoice = (int16_t)drawMenu(display.Screen, &display.TextAttributes.Cells[0][0], itemCount, menuTitle, ::gpk::view_array<const ::klib::SMenuItem<int32_t>>{menuItems}, instanceGame.FrameInput, SHOP_EXIT_VALUE, -1, 50U, false, "Exit this menu");	break;
+	case GAME_SUBSTATE_PROFESSION	:	menuTitle += labelJob		.begin();	for(iSlot=0, itemCount=playerInventory.Profession	.Count; iSlot<itemCount; ++iSlot) { sprintf_s(formatted, "x%2.2s - Lv.%3.3s %s", std::to_string(playerInventory.Profession	[iSlot].Count).c_str(), std::to_string(playerInventory.	Profession	[iSlot].Entity.Level).c_str(), getProfessionName	(playerInventory.Profession	[iSlot].Entity).c_str()); menuItems[iSlot] = { (int32_t)iSlot, formatted }; } selectedChoice = (int16_t)drawMenu(display.Screen, &display.TextAttributes.Cells[0][0], itemCount, menuTitle, ::gpk::view_array<const ::klib::SMenuItem<int32_t>>{menuItems}, instanceGame.FrameInput, SHOP_EXIT_VALUE, -1, 50U, false, "Exit this menu");	break;
+	case GAME_SUBSTATE_WEAPON		:	menuTitle += labelWeapon	.begin();	for(iSlot=0, itemCount=playerInventory.Weapon		.Count; iSlot<itemCount; ++iSlot) { sprintf_s(formatted, "x%2.2s - Lv.%3.3s %s", std::to_string(playerInventory.Weapon		[iSlot].Count).c_str(), std::to_string(playerInventory.	Weapon		[iSlot].Entity.Level).c_str(), getWeaponName		(playerInventory.Weapon		[iSlot].Entity).c_str()); menuItems[iSlot] = { (int32_t)iSlot, formatted }; } selectedChoice = (int16_t)drawMenu(display.Screen, &display.TextAttributes.Cells[0][0], itemCount, menuTitle, ::gpk::view_array<const ::klib::SMenuItem<int32_t>>{menuItems}, instanceGame.FrameInput, SHOP_EXIT_VALUE, -1, 50U, false, "Exit this menu");	break;
+	case GAME_SUBSTATE_ARMOR		:	menuTitle += labelArmor		.begin();	for(iSlot=0, itemCount=playerInventory.Armor		.Count; iSlot<itemCount; ++iSlot) { sprintf_s(formatted, "x%2.2s - Lv.%3.3s %s", std::to_string(playerInventory.Armor		[iSlot].Count).c_str(), std::to_string(playerInventory.	Armor		[iSlot].Entity.Level).c_str(), getArmorName			(playerInventory.Armor		[iSlot].Entity).c_str()); menuItems[iSlot] = { (int32_t)iSlot, formatted }; } selectedChoice = (int16_t)drawMenu(display.Screen, &display.TextAttributes.Cells[0][0], itemCount, menuTitle, ::gpk::view_array<const ::klib::SMenuItem<int32_t>>{menuItems}, instanceGame.FrameInput, SHOP_EXIT_VALUE, -1, 50U, false, "Exit this menu");	break;
+	case GAME_SUBSTATE_ITEM			:	menuTitle += labelItem		.begin();	for(iSlot=0, itemCount=playerInventory.Items		.Count; iSlot<itemCount; ++iSlot) { sprintf_s(formatted, "x%2.2s - Lv.%3.3s %s", std::to_string(playerInventory.Items		[iSlot].Count).c_str(), std::to_string(playerInventory.	Items		[iSlot].Entity.Level).c_str(), getItemName			(playerInventory.Items		[iSlot].Entity).c_str()); menuItems[iSlot] = { (int32_t)iSlot, formatted }; } selectedChoice = (int16_t)drawMenu(display.Screen, &display.TextAttributes.Cells[0][0], itemCount, menuTitle, ::gpk::view_array<const ::klib::SMenuItem<int32_t>>{menuItems}, instanceGame.FrameInput, SHOP_EXIT_VALUE, -1, 50U, false, "Exit this menu");	break;
+	case GAME_SUBSTATE_CHARACTER	:
+		for(iCharacter=0, count=player.Army.size(); iCharacter<count; ++iCharacter)
+		{
 			if(0 == player.Army[iCharacter])
 				continue;
 
 			if(player.Squad.IsAgentAssigned((int32_t)iCharacter))
 				continue;
 
-			menuItems[itemCount++]	= { (int32_t)iCharacter, {player.Army[iCharacter]->Name.data(), (uint32_t)player.Army[iCharacter]->Name.size()}}; 
+			menuItems[itemCount++]	= { (int32_t)iCharacter, {player.Army[iCharacter]->Name.data(), (uint32_t)player.Army[iCharacter]->Name.size()}};
 		}
-		selectedChoice	= (int16_t)drawMenu(display.Screen, &display.TextAttributes.Cells[0][0], (size_t)itemCount, menuTitle, menuItems, instanceGame.FrameInput, SHOP_EXIT_VALUE, -1, 40U, false, "Exit this menu");
+		selectedChoice	= (int16_t)drawMenu(display.Screen, &display.TextAttributes.Cells[0][0], (size_t)itemCount, menuTitle, ::gpk::view_array<const ::klib::SMenuItem<int32_t>>{menuItems}, instanceGame.FrameInput, SHOP_EXIT_VALUE, -1, 40U, false, "Exit this menu");
 		break;
 	default:
 		break;
@@ -106,10 +106,10 @@ static SGameState drawEquipMenu(SGame& instanceGame, const SGameState& returnSta
 	case GAME_SUBSTATE_WEAPON		:	if(equipIfResearchedWeapon		(instanceGame, player.Squad.Agents[player.Selection.PlayerUnit], selectedChoice)) { retVal = { GAME_STATE_MENU_EQUIPMENT }; }break;
 	case GAME_SUBSTATE_ARMOR		:	if(equipIfResearchedArmor		(instanceGame, player.Squad.Agents[player.Selection.PlayerUnit], selectedChoice)) { retVal = { GAME_STATE_MENU_EQUIPMENT }; }break;
 	case GAME_SUBSTATE_ACCESSORY	:	if(equipIfResearchedAccessory	(instanceGame, player.Squad.Agents[player.Selection.PlayerUnit], selectedChoice)) { retVal = { GAME_STATE_MENU_EQUIPMENT }; }break;
-	case GAME_SUBSTATE_ITEM			:	
+	case GAME_SUBSTATE_ITEM			:
 		playerAgent = player.Army[player.Squad.Agents[player.Selection.PlayerUnit]];
 		itemName = getItemName(playerInventory.Items[selectedChoice].Entity);
-		if( playerAgent->Goods.Inventory.Items.AddElement(playerInventory.Items[selectedChoice].Entity) ) 
+		if( playerAgent->Goods.Inventory.Items.AddElement(playerInventory.Items[selectedChoice].Entity) )
 		{
 			instanceGame.UserSuccess = "You equipped " + itemName + " to " + playerAgent->Name + ".";
 			playerInventory.Items.DecreaseEntity(selectedChoice);
@@ -122,13 +122,13 @@ static SGameState drawEquipMenu(SGame& instanceGame, const SGameState& returnSta
 		}
 		playerAgent->Recalculate();
 		break;
-	case GAME_SUBSTATE_CHARACTER	:	
-		player.Squad.Agents[player.Selection.PlayerUnit] = selectedChoice; 
+	case GAME_SUBSTATE_CHARACTER	:
+		player.Squad.Agents[player.Selection.PlayerUnit] = selectedChoice;
 		::klib::resetCursorString(instanceGame.SlowMessage);
 		player.Army[selectedChoice]->Recalculate();
 		instanceGame.UserSuccess = "You assigned " + player.Army[selectedChoice]->Name + " as Agent #" + std::to_string(player.Selection.PlayerUnit+1) + "";
 		instanceGame.LogSuccess();
-		retVal = { GAME_STATE_MENU_EQUIPMENT }; 
+		retVal = { GAME_STATE_MENU_EQUIPMENT };
 		break;
 	default:
 		break;
@@ -137,35 +137,59 @@ static SGameState drawEquipMenu(SGame& instanceGame, const SGameState& returnSta
 	return retVal;
 }
 
+static void								drawScore						(::gpk::view_grid<char> display, int32_t offsetY, int32_t offsetX, const SCharacterScore& score)																{
+	//char										buffer[128]						= {};
+	char										bufferValues[64]				= {};
+	const char									format[]						= "- %-21.21s: %-12.12s";
 
-SGameState drawEquip(SGame& instanceGame, const SGameState& returnState)
-{
-	SPlayer& player = instanceGame.Players[PLAYER_INDEX_USER];
-	SGlobalDisplay& display = instanceGame.GlobalDisplay;
+	sprintf_s(bufferValues, "%lli", (int64_t)score.MoneyEarned			); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, format, "Money Earned"			, bufferValues);
+	sprintf_s(bufferValues, "%lli", (int64_t)score.MoneySpent			); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, format, "Money Spent"				, bufferValues);
+	sprintf_s(bufferValues, "%lli", (int64_t)score.DamageDealt			); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, format, "Damage Dealt"			, bufferValues);
+	sprintf_s(bufferValues, "%lli", (int64_t)score.DamageTaken			); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, format, "Damage Taken"			, bufferValues);
+	sprintf_s(bufferValues, "%lli", (int64_t)score.TurnsPlayed			); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, format, "Turns Played"			, bufferValues);
+	sprintf_s(bufferValues, "%lli", (int64_t)score.BattlesWon			); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, format, "Battles Won"				, bufferValues);
+	sprintf_s(bufferValues, "%lli", (int64_t)score.BattlesLost			); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, format, "Battles Lost"			, bufferValues);
+	sprintf_s(bufferValues, "%lli", (int64_t)score.EscapesSucceeded		); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, format, "Escapes Succeeded"		, bufferValues);
+	sprintf_s(bufferValues, "%lli", (int64_t)score.EscapesFailed		); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, format, "Escapes Failed"			, bufferValues);
+	sprintf_s(bufferValues, "%lli", (int64_t)score.EnemiesKilled		); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, format, "Enemies Killed"			, bufferValues);
+	sprintf_s(bufferValues, "%lli", (int64_t)score.AttacksHit			); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, format, "Attacks Hit"				, bufferValues);
+	sprintf_s(bufferValues, "%lli", (int64_t)score.AttacksMissed		); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, format, "Attacks Missed"			, bufferValues);
+	sprintf_s(bufferValues, "%lli", (int64_t)score.AttacksReceived		); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, format, "Attacks Received"		, bufferValues);
+	sprintf_s(bufferValues, "%lli", (int64_t)score.AttacksAvoided		); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, format, "Attacks Avoided"			, bufferValues);
+	sprintf_s(bufferValues, "%lli", (int64_t)score.PotionsUsed			); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, format, "Potions Used"			, bufferValues);
+	sprintf_s(bufferValues, "%lli", (int64_t)score.GrenadesUsed			); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, format, "Grenades Used"			, bufferValues);
+	sprintf_s(bufferValues, "%lli", (int64_t)score.CompletedResearch	); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, format, "Completed Research"		, bufferValues);
+	sprintf_s(bufferValues, "%lli", (int64_t)score.CompletedProduction	); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, format, "Completed Productions"	, bufferValues);
+	sprintf_s(bufferValues, "%lli", (int64_t)score.CompletedUpgrade		); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, format, "Completed Upgrades"		, bufferValues);
+}
+
+SGameState drawEquip(SGame& instanceGame, const SGameState& returnState) {
+	SPlayer									& player				= instanceGame.Players[PLAYER_INDEX_USER];
+	::gpk::view_grid<char>					display					= instanceGame.GlobalDisplay.Screen;
+	::gpk::view_grid<uint16_t>				textAttributes			= instanceGame.GlobalDisplay.TextAttributes;
 	//uint16_t color = COLOR_GREEN;
 
-	SGameState actualReturnState = returnState;
-	
-	std::string menuTitle = "Agent Setup";
-	if( player.Selection.PlayerUnit != -1 && player.Squad.Agents[player.Selection.PlayerUnit] != -1) 
+	SGameState								actualReturnState		= returnState;
+	::std::string							menuTitle				= "Agent Setup";
+	if( player.Selection.PlayerUnit != -1 && player.Squad.Agents[player.Selection.PlayerUnit] != -1)
 	{
-		static const int32_t slotWidth		= display.Width / MAX_ENTITY_COLUMNS;
-		static const int32_t slotRowSpace	= 30;// display.Depth / (MAX_AGENT_ROWS);
+		const int32_t							slotWidth				= display.metrics().x / MAX_ENTITY_COLUMNS;
+		const int32_t							slotRowSpace			= 30;// display.Depth / (MAX_AGENT_ROWS);
 		CCharacter& playerAgent = *player.Army[player.Squad.Agents[player.Selection.PlayerUnit]];
 		menuTitle = "Agent #" + std::to_string(player.Selection.PlayerUnit+1) + ": "+ playerAgent.Name + ".";
 
 		int32_t offsetY = TACTICAL_DISPLAY_POSY-4, offsetX;
-		drawEntityDetail(display, offsetY					, offsetX = 3, playerAgent.CurrentEquip.Profession	, definitionsProfession	, modifiersProfession	, labelJob			);
-		drawEntityDetail(display, offsetY					, offsetX+=48, playerAgent.CurrentEquip.Weapon		, definitionsWeapon		, modifiersWeapon		, labelWeapon		);
-		drawEntityDetail(display, offsetY					, offsetX+=48, playerAgent.CurrentEquip.Armor		, definitionsArmor		, modifiersArmor		, labelArmor		);
-		drawEntityDetail(display, offsetY					, offsetX+=48, playerAgent.CurrentEquip.Accessory	, definitionsAccessory	, modifiersAccessory	, labelAccessory	);
+		drawEntityDetail(display, textAttributes, offsetY					, offsetX = 3, playerAgent.CurrentEquip.Profession	, definitionsProfession	, modifiersProfession	, labelJob			);
+		drawEntityDetail(display, textAttributes, offsetY					, offsetX+=48, playerAgent.CurrentEquip.Weapon		, definitionsWeapon		, modifiersWeapon		, labelWeapon		);
+		drawEntityDetail(display, textAttributes, offsetY					, offsetX+=48, playerAgent.CurrentEquip.Armor		, definitionsArmor		, modifiersArmor		, labelArmor		);
+		drawEntityDetail(display, textAttributes, offsetY					, offsetX+=48, playerAgent.CurrentEquip.Accessory	, definitionsAccessory	, modifiersAccessory	, labelAccessory	);
 		//drawEntityDetail(display, offsetY+=slotRowSpace	, offsetX = 3, playerAgent.CurrentEquip.Vehicle		, definitionsVehicle	, modifiersVehicle		, labelVehicle		);
 		//drawEntityDetail(display, offsetY					, offsetX+=48, playerAgent.CurrentEquip.Facility	, definitionsFacility	, modifiersFacility		, labelFacility		);
 		//drawEntityDetail(display, offsetY					, offsetX+=48, playerAgent.CurrentEquip.StageProp	, definitionsStageProp	, modifiersStageProp	, labelStageProp	);
 		//displayAgentSlot(display, offsetY					, offsetX+=48, player.Selection.PlayerUnit+1		, playerAgent, false);
-		displayAgentSlot(display, offsetY+=slotRowSpace		, offsetX = 3, player.Selection.PlayerUnit+1		, playerAgent, false);
-		displayStatusEffectsAndTechs(display, offsetY		, offsetX+=50, playerAgent);
-		drawScore					(display, offsetY		, offsetX = display.Width-40, playerAgent.Score);
+		::klib::displayAgentSlot(display, textAttributes, offsetY+=slotRowSpace		, offsetX = 3, player.Selection.PlayerUnit+1		, playerAgent, false);
+		displayStatusEffectsAndTechs(display, textAttributes, offsetY		, offsetX+=50, playerAgent);
+		drawScore					(display, offsetY		, offsetX = display.metrics().x - 40, playerAgent.Score);
 	}
 	else if(player.Selection.PlayerUnit != -1)
 	{
@@ -173,11 +197,11 @@ SGameState drawEquip(SGame& instanceGame, const SGameState& returnState)
 		menuTitle = "Agent #" + std::to_string(player.Selection.PlayerUnit+1) + ": Open position.";
 	}
 
-	if(GAME_SUBSTATE_MAIN == instanceGame.State.Substate) 
+	if(GAME_SUBSTATE_MAIN == instanceGame.State.Substate)
 	{
-		actualReturnState = drawMenu(instanceGame.GlobalDisplay.Screen, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], menuTitle, optionsEquip, instanceGame.FrameInput, {GAME_STATE_MENU_SQUAD_SETUP}, instanceGame.State, 30);
+		actualReturnState = drawMenu(instanceGame.GlobalDisplay.Screen, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], menuTitle, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsEquip}, instanceGame.FrameInput, {GAME_STATE_MENU_SQUAD_SETUP}, instanceGame.State, 30);
 	}
-	else 
+	else
 	{
 		if( player.Selection.PlayerUnit >= (int16_t)::gpk::size(player.Squad.Agents))
 			player.Selection.PlayerUnit = -1;

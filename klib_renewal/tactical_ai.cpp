@@ -3,14 +3,14 @@
 
 using namespace klib;
 
-//template <size_t _Size> 
+//template <size_t _Size>
 //int32_t getEnemyPlayers();
 
 bool													isRelevantPlayer										(STacticalInfo& tacticalInfo, int32_t currentPlayer, int32_t otherPlayer)			{
 	bool														bResult													= true;
 
 	if( tacticalInfo.CurrentPlayer						== otherPlayer
-	 || tacticalInfo.Setup.Players[otherPlayer]			== -1 
+	 || tacticalInfo.Setup.Players[otherPlayer]			== -1
 	 || !isRelevantTeam(tacticalInfo.Setup.TeamPerPlayer[otherPlayer])
 	 || tacticalInfo.Setup.TeamPerPlayer[otherPlayer]	== tacticalInfo.Setup.TeamPerPlayer[currentPlayer]
 	)
@@ -25,14 +25,14 @@ void													selectAITarget											(SGame& instanceGame)																{
 	SPlayerControl												& playerControl											= currentPlayer.Control;
 
 	if(playerControl.AIMode == PLAYER_AI_ASSISTS)
-		return; 
+		return;
 	else if( (!::gpk::bit_true(playerControl.AIMode, PLAYER_AI_TEAMERS))		// Here we check if the AI has an aggressive flag. If it doesn't just cancel the turn.
-		  && (!::gpk::bit_true(playerControl.AIMode, PLAYER_AI_RIOTERS))	
+		  && (!::gpk::bit_true(playerControl.AIMode, PLAYER_AI_RIOTERS))
 		  && (!::gpk::bit_true(playerControl.AIMode, PLAYER_AI_VIOLENT))
 		  && (!::gpk::bit_true(playerControl.AIMode, PLAYER_AI_REVENGE))
 		)
 	{
-		return; 
+		return;
 	}
 
 	//CCharacter													& playerCharacter										= *currentPlayer.Army[currentPlayer.Squad.Agents[currentPlayer.Selection.PlayerUnit]];
@@ -48,7 +48,7 @@ void													selectAITarget											(SGame& instanceGame)																{
 			currentPlayer.Selection.TargetPlayer					= tacticalInfo.AgentsInTeamSight[playerTeam].Agents[iAgentInSight].Agent.PlayerIndex;
 			currentPlayer.Selection.TargetUnit						= tacticalInfo.AgentsInTeamSight[playerTeam].Agents[iAgentInSight].Agent.AgentIndex;
 			currentPlayer.Selection.TargetSquad						= tacticalInfo.AgentsInTeamSight[playerTeam].Agents[iAgentInSight].Agent.SquadIndex;
-			
+
 			targetPlayerIndex										= tacticalInfo.Setup.Players[currentPlayer.Selection.TargetPlayer];
 			SPlayer														& targetPlayer											= instanceGame.Players[targetPlayerIndex];
 			const CCharacter											& targetAgent											= *targetPlayer.Army[targetPlayer.Squad.Agents[currentPlayer.Selection.TargetUnit]];
@@ -63,11 +63,11 @@ void													selectAITarget											(SGame& instanceGame)																{
 
 void													selectAvailableTile										(const STacticalBoard& tacticalBoard, ::gpk::SCoord3<int32_t>& targetPosition)		{
 	do {
-		targetPosition.x										= (rand()%tacticalBoard.Width);
-		targetPosition.z										= (rand()%tacticalBoard.Depth);
+		targetPosition.x										= (rand() % tacticalBoard.Tiles.Terrain.Geometry.metrics().x);
+		targetPosition.z										= (rand() % tacticalBoard.Tiles.Terrain.Geometry.metrics().y);
 	}
-	while (		((targetPosition.x < 0	|| targetPosition.x >= tacticalBoard.Width)
-			||   (targetPosition.z < 0	|| targetPosition.z >= tacticalBoard.Depth) 
+	while (		((targetPosition.x < 0	|| targetPosition.x >= (int32_t)tacticalBoard.Tiles.Terrain.Geometry.metrics().x)
+			||   (targetPosition.z < 0	|| targetPosition.z >= (int32_t)tacticalBoard.Tiles.Terrain.Geometry.metrics().y)
 		)
 		&&	!tacticalBoard.Tiles.IsTileAvailable(targetPosition.x, targetPosition.z)
 	);
@@ -75,11 +75,11 @@ void													selectAvailableTile										(const STacticalBoard& tacticalBoa
 
 void													getValidCoordForAgentDestination						(::gpk::SCoord3<int32_t>& targetPositionAgent, const STacticalBoard& tacticalBoard)	{
 	do {
-			 if( rand()%2 )	targetPositionAgent.x = (rand()%tacticalBoard.Width);
-		else if( rand()%2 )	targetPositionAgent.z = (rand()%tacticalBoard.Depth);
+			 if( rand()%2 )	targetPositionAgent.x = (rand()%tacticalBoard.Tiles.Terrain.Geometry.metrics().x);
+		else if( rand()%2 )	targetPositionAgent.z = (rand()%tacticalBoard.Tiles.Terrain.Geometry.metrics().y);
 		else {
-			targetPositionAgent.x = (rand()%tacticalBoard.Width);
-			targetPositionAgent.z = (rand()%tacticalBoard.Depth);
+			targetPositionAgent.x = (rand()%tacticalBoard.Tiles.Terrain.Geometry.metrics().x);
+			targetPositionAgent.z = (rand()%tacticalBoard.Tiles.Terrain.Geometry.metrics().y);
 		}
 	}
 	while(!tacticalBoard.Tiles.IsTileAvailable(targetPositionAgent.x, targetPositionAgent.z));
@@ -96,14 +96,14 @@ void													selectAIDestination										(SGame& instanceGame)													
 		selectAvailableTile(tacticalInfo.Board, targetPositionAgent);
 		return;
 	}
-	else if( (!::gpk::bit_true(currentPlayer.Control.AIMode, PLAYER_AI_TEAMERS))	
-		  && (!::gpk::bit_true(currentPlayer.Control.AIMode, PLAYER_AI_RIOTERS))	
+	else if( (!::gpk::bit_true(currentPlayer.Control.AIMode, PLAYER_AI_TEAMERS))
+		  && (!::gpk::bit_true(currentPlayer.Control.AIMode, PLAYER_AI_RIOTERS))
 		  && (!::gpk::bit_true(currentPlayer.Control.AIMode, PLAYER_AI_VIOLENT))
 		  && (!::gpk::bit_true(currentPlayer.Control.AIMode, PLAYER_AI_REVENGE))
 		)
-	{ 
+	{
 		selectAvailableTile(tacticalInfo.Board, targetPositionAgent);
-		return; 
+		return;
 	}
 
 	if(currentPlayer.Selection.TargetPlayer == -1 || tacticalInfo.Setup.Players[currentPlayer.Selection.TargetPlayer] == -1) {
@@ -118,9 +118,9 @@ void													selectAIDestination										(SGame& instanceGame)													
 		return;
 	}
 
-	
+
 	const SEntityFlags											& playerAgentFlags										= currentPlayer.Army[currentPlayer.Squad.Agents[currentPlayer.Selection.PlayerUnit]]->FinalFlags;
-	targetPositionAgent										= playerTarget.Army[playerTarget.Squad.Agents[currentPlayer.Selection.TargetUnit]]->Position; 
+	targetPositionAgent										= playerTarget.Army[playerTarget.Squad.Agents[currentPlayer.Selection.TargetUnit]]->Position;
 	::gpk::SCoord3<int32_t>									vectorToAgent											= targetPositionAgent-currentPlayer.Army[currentPlayer.Squad.Agents[currentPlayer.Selection.PlayerUnit]]->Position;
 	::gpk::SCoord3<float>										vec														= vectorToAgent.Cast<float>();
 	if(::gpk::bit_false(playerAgentFlags.Tech.AttackType, ATTACK_TYPE_MELEE) && vec.Length() <= 18) {
@@ -133,8 +133,8 @@ void													selectAIDestination										(SGame& instanceGame)													
 			if( rand()%2 )	targetPositionAgent.x					+= (rand()%2) ? 1 : -1;
 			else			targetPositionAgent.z					+= (rand()%2) ? 1 : -1;
 		}
-		while( (targetPositionAgent.x < 0 || targetPositionAgent.x >= tacticalInfo.Board.Width)
-			|| (targetPositionAgent.z < 0 || targetPositionAgent.z >= tacticalInfo.Board.Depth) 
+		while( (targetPositionAgent.x < 0 || targetPositionAgent.x >= (int32_t)tacticalInfo.Board.Tiles.Terrain.Geometry.metrics().x)
+			|| (targetPositionAgent.z < 0 || targetPositionAgent.z >= (int32_t)tacticalInfo.Board.Tiles.Terrain.Geometry.metrics().y)
 		);
 	}
 };
@@ -144,21 +144,21 @@ TURN_ACTION												selectAIAction											(SGame& instanceGame)											
 	STacticalInfo												& tacticalInfo											= instanceGame.TacticalInfo;
 	SPlayer														& currentPlayer											= instanceGame.Players[getCurrentPlayerIndex(tacticalInfo)];
 	CCharacter													& currentAgent											= *currentPlayer.Army[currentPlayer.Squad.Agents[currentPlayer.Selection.PlayerUnit]];
-	if(0 < currentPlayer.Squad.ActionsLeft[currentPlayer.Selection.PlayerUnit].Moves 
+	if(0 < currentPlayer.Squad.ActionsLeft[currentPlayer.Selection.PlayerUnit].Moves
 		&& currentPlayer.Squad.TargetPositions[currentPlayer.Selection.PlayerUnit] == currentAgent.Position)
 	{
 		selectAITarget		(instanceGame);
 		selectAIDestination	(instanceGame);
 	}
 	else if(0 >= currentPlayer.Squad.ActionsLeft[currentPlayer.Selection.PlayerUnit].Moves && 0 < currentPlayer.Squad.ActionsLeft[currentPlayer.Selection.PlayerUnit].Actions) {
-		if(currentPlayer.Control.AIMode == PLAYER_AI_ASSISTS)	
-			result													= TURN_ACTION_CANCEL; 
+		if(currentPlayer.Control.AIMode == PLAYER_AI_ASSISTS)
+			result													= TURN_ACTION_CANCEL;
 		else if( (::gpk::bit_false(currentPlayer.Control.AIMode, PLAYER_AI_TEAMERS))		// Here we check if the AI has an aggressive flag. If it doesn't just cancel the turn.
-			  && (::gpk::bit_false(currentPlayer.Control.AIMode, PLAYER_AI_RIOTERS))	
+			  && (::gpk::bit_false(currentPlayer.Control.AIMode, PLAYER_AI_RIOTERS))
 			  && (::gpk::bit_false(currentPlayer.Control.AIMode, PLAYER_AI_VIOLENT))
 			  && (::gpk::bit_false(currentPlayer.Control.AIMode, PLAYER_AI_REVENGE))
 			)
-			result													= TURN_ACTION_CANCEL; 
+			result													= TURN_ACTION_CANCEL;
 		else {
 			selectAITarget(instanceGame);
 			if(currentPlayer.Selection.TargetPlayer != -1 && tacticalInfo.Setup.Players[currentPlayer.Selection.TargetPlayer] != -1) {
@@ -170,7 +170,7 @@ TURN_ACTION												selectAIAction											(SGame& instanceGame)											
 					if(targetCharacter.IsAlive())  {
 						CCharacter													& playerAgent											= *currentPlayer.Army[currentPlayer.Squad.Agents[currentPlayer.Selection.PlayerUnit]];
 
-						const ::gpk::SCoord3<int32_t>								& coordPlayer											= playerAgent.Position; 
+						const ::gpk::SCoord3<int32_t>								& coordPlayer											= playerAgent.Position;
 						const ::gpk::SCoord3<int32_t>								& coordTarget											= targetCharacter.Position;
 						const ::gpk::SCoord3<float>								distance												= (coordTarget-coordPlayer).Cast<float>();
 
@@ -181,7 +181,7 @@ TURN_ACTION												selectAIAction											(SGame& instanceGame)											
 							bool														bInSight												= false;
 							STacticalSetup												& tacticalSetup											= tacticalInfo.Setup;
 
-							for(uint32_t iAgentInSight=0, agentsInSightCount = tacticalInfo.AgentsInTeamSight[tacticalSetup.TeamPerPlayer[tacticalInfo.CurrentPlayer]].Count; 
+							for(uint32_t iAgentInSight=0, agentsInSightCount = tacticalInfo.AgentsInTeamSight[tacticalSetup.TeamPerPlayer[tacticalInfo.CurrentPlayer]].Count;
 								iAgentInSight < agentsInSightCount; ++iAgentInSight
 								)
 							{
@@ -198,7 +198,7 @@ TURN_ACTION												selectAIAction											(SGame& instanceGame)											
 							}
 
 							if(bInSight)
-								result													= TURN_ACTION_ATTACK; 
+								result													= TURN_ACTION_ATTACK;
 							else
 								result													= TURN_ACTION_CANCEL;
 						}
@@ -206,16 +206,16 @@ TURN_ACTION												selectAIAction											(SGame& instanceGame)											
 							double														finalSight												= getFinalSight(playerAgent, playerAgentPoints);
 							double														finalRange												= getFinalRange(playerAgent, playerAgentPoints);
 							if(distance.Length() > finalRange || distance.Length() > finalSight)
-								result													= TURN_ACTION_CANCEL; 
+								result													= TURN_ACTION_CANCEL;
 							else
 								result													= TURN_ACTION_ATTACK;
 						}	// if (ranged)
 					}	// if(targetAgentSelected)
 				}// if(targetPlayerSelected)
 			}
-			else { // 
+			else { //
 				if(0 >= currentPlayer.Squad.ActionsLeft[currentPlayer.Selection.PlayerUnit].Moves)
-					result													= TURN_ACTION_CANCEL; 
+					result													= TURN_ACTION_CANCEL;
 			}
 		}
 	}

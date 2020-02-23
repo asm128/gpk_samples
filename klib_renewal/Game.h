@@ -17,8 +17,8 @@ namespace klib
 		if(::gpk::bit_true(playerAgent.ActiveBonus.Status.Status, COMBAT_STATUS_SHOCK		))	finalSight *= 1.5	;
 		if(::gpk::bit_true(playerAgent.ActiveBonus.Status.Status, COMBAT_STATUS_BURN		))	finalSight *= 1.3	;
 		if(::gpk::bit_true(playerAgent.ActiveBonus.Status.Status, COMBAT_STATUS_RAGE		))	finalSight *= 1.2	;
-		if(::gpk::bit_true(playerAgent.ActiveBonus.Status.Status, COMBAT_STATUS_BERSERK	))	finalSight *= 1.1	;
-		if(::gpk::bit_true(playerAgent.ActiveBonus.Status.Status, COMBAT_STATUS_CHARMED	))	finalSight *= 0.85	;
+		if(::gpk::bit_true(playerAgent.ActiveBonus.Status.Status, COMBAT_STATUS_BERSERK		))	finalSight *= 1.1	;
+		if(::gpk::bit_true(playerAgent.ActiveBonus.Status.Status, COMBAT_STATUS_CHARMED		))	finalSight *= 0.85	;
 		if(::gpk::bit_true(playerAgent.ActiveBonus.Status.Status, COMBAT_STATUS_FROZEN		))	finalSight *= 0.75	;
 		if(::gpk::bit_true(playerAgent.ActiveBonus.Status.Status, COMBAT_STATUS_DRUNK		))	finalSight *= 0.65	;
 		if(::gpk::bit_true(playerAgent.ActiveBonus.Status.Status, COMBAT_STATUS_BLIND		))	finalSight *= 0.3	;
@@ -48,8 +48,8 @@ namespace klib
 			::klib::clearGrid(Screen			, ' ');
 			::klib::clearGrid(TextAttributes	, (uint16_t)COLOR_WHITE);
 			::klib::clearGrid(DisplayWeights	, 0.0f);
-			::klib::clearGrid(Speed			, 0.0f);
-			::klib::clearGrid(SpeedTarget	, 0.0f);
+			::klib::clearGrid(Speed				, 0.0f);
+			::klib::clearGrid(SpeedTarget		, 0.0f);
 		}
 	};
 
@@ -57,8 +57,7 @@ namespace klib
 #define DEFAULT_ASCII_DISPLAY_HEIGHT	83
 #define DEFAULT_ASCII_DISPLAY_WIDTH		((uint32_t)(DEFAULT_ASCII_SCREEN_HEIGHT*2.666666f))
 	typedef	SWeightedDisplay<DEFAULT_ASCII_DISPLAY_WIDTH, DEFAULT_ASCII_DISPLAY_HEIGHT>	SGlobalDisplay		;
-	typedef SWeightedDisplay<STacticalBoard::Width, STacticalBoard::Depth>				STacticalDisplay	;
-	typedef SWeightedDisplay<STacticalBoard::Width, STacticalBoard::Depth>				SPostEffectDisplay	;
+	typedef SWeightedDisplay<GAME_MAP_WIDTH, GAME_MAP_DEPTH>							STacticalDisplay	;
 	typedef ::klib::SGrid<char, SGlobalDisplay::Width, SGlobalDisplay::Depth>			SMenuDisplay		;
 
 	//
@@ -111,7 +110,7 @@ namespace klib
 	GDEFINE_ENUM_VALUE(GAME_CHEAT, UNLIMITD	, 0x2000);	// Nothing gets discounted or removed on use.
 	GDEFINE_ENUM_VALUE(GAME_CHEAT, MAGNATES	, 0x4000);	// Get 1,000,000,000 coins in funds and another 1,000,000,000 to be split between your army.
 	GDEFINE_ENUM_VALUE(GAME_CHEAT, IMWINNER	, 0x8000);	// Win the tactical game.
-	
+
 #define MAX_PLAYER_TYPES 16
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------
@@ -140,7 +139,6 @@ namespace klib
 
 							// Displays.
 							STacticalDisplay						TacticalDisplay					= {};
-							SPostEffectDisplay						PostEffectDisplay				= {};
 							SGlobalDisplay							GlobalDisplay					= {};
 							SMenuDisplay							MenuDisplay						= {};
 
@@ -159,17 +157,16 @@ namespace klib
 							::std::mutex							ServerTimeMutex					= {};
 
 							void									ClearDisplays					()																						{
-			TacticalDisplay		.Clear();	
-			GlobalDisplay		.Clear();	
-			PostEffectDisplay	.Clear();	
+			TacticalDisplay		.Clear();
+			GlobalDisplay		.Clear();
 			clearGrid(MenuDisplay);
 		}
 
 							void									ClearMessages					()
 		{
-			UserError	= 
-			UserMessage	= 
-			UserMiss	= 
+			UserError	=
+			UserMessage	=
+			UserMiss	=
 			UserSuccess	= "";
 		}
 
@@ -188,6 +185,6 @@ namespace klib
 						void									initTacticalMap					(SGame& instanceGame);
 	static inline		PLAYER_INDEX							getCurrentPlayerIndex			(const STacticalInfo& tacticalInfo)														{ return ( tacticalInfo.CurrentPlayer == -1) ? PLAYER_INDEX_INVALID : tacticalInfo.Setup.Players[tacticalInfo.CurrentPlayer]; }
 						uint32_t								missionCost						(SPlayer& player, const SSquad& squadSetup, uint32_t maxAgents=MAX_AGENT_SQUAD_SLOTS);
-} // namespace 
+} // namespace
 
 #endif // __GAME_H__91827309126391263192312312354__

@@ -12,8 +12,8 @@ namespace klib
 {
 #pragma pack(push, 1)
 
-	// This struct holds both the tile coordinate as integers and the floating point vector indicating the position inside the tile. 
-	// This is done this way for simplifying a bunch of operations for which we only need the integer part 
+	// This struct holds both the tile coordinate as integers and the floating point vector indicating the position inside the tile.
+	// This is done this way for simplifying a bunch of operations for which we only need the integer part
 	// while improving the precision of the floating point values by only requiring them to represent a value between 0 and 1 for a very small distance.
 	struct STacticalCoord
 	{
@@ -21,11 +21,11 @@ namespace klib
 		::gpk::SCoord3<float>									Offset											;	// Position between 0 and 1 relative to the tile.
 
 		bool													operator==										(const STacticalCoord& other)			const	noexcept	{
-			return	(Cell.x		== other.Cell.x	) 
-				 && (Cell.y		== other.Cell.y	) 
-				 && (Cell.z		== other.Cell.z	) 
-				 && (Offset.x	== Offset.x		) 
-				 && (Offset.y	== Offset.y		) 
+			return	(Cell.x		== other.Cell.x	)
+				 && (Cell.y		== other.Cell.y	)
+				 && (Cell.z		== other.Cell.z	)
+				 && (Offset.x	== Offset.x		)
+				 && (Offset.y	== Offset.y		)
 				 && (Offset.z	== Offset.z		);
 		}
 	};
@@ -41,15 +41,15 @@ namespace klib
 
 		constexpr bool											operator==										(const SBulletPoints& other)			const	noexcept	{
 			return Tech					== other.Tech
-				&& Effect				== other.Effect 
-				&& StatusInflict		== other.StatusInflict 
-				&& Damage				== other.Damage 
+				&& Effect				== other.Effect
+				&& StatusInflict		== other.StatusInflict
+				&& Damage				== other.Damage
 				&& DirectDamage			== other.DirectDamage
 				&& Level				== other.Level
 			;
 		}
 	};
-	
+
 	struct SAOE
 	{
 		STacticalCoord											Position										;	// AOE Center
@@ -61,14 +61,14 @@ namespace klib
 		uint8_t													TurnsLeft										;
 
 		bool													operator==										(const SAOE& other)						const	noexcept	{
-			const bool													bResult											= 
-				(Position			== other.Position) 
-			 && (RadiusOrHalfSize	== other.RadiusOrHalfSize) 
-			 && (Caster				== other.Caster) 
-			 && (Flags				== other.Flags) 
-			 && (StatusInflict		== other.StatusInflict) 
-			 && (Level				== other.Level) 
-			 && (TurnsLeft			== other.TurnsLeft) 
+			const bool													bResult											=
+				(Position			== other.Position)
+			 && (RadiusOrHalfSize	== other.RadiusOrHalfSize)
+			 && (Caster				== other.Caster)
+			 && (Flags				== other.Flags)
+			 && (StatusInflict		== other.StatusInflict)
+			 && (Level				== other.Level)
+			 && (TurnsLeft			== other.TurnsLeft)
 			;
 
 			return bResult;
@@ -84,13 +84,13 @@ namespace klib
 		SBulletPoints											Points											;
 
 		bool													operator==										(const SBullet& other)					const	noexcept	{
-			const bool													bResult											= 
-				(Position			== other.Position		) 
-			 && (Direction.x		== other.Direction.x	) 
-			 && (Direction.y		== other.Direction.y	) 
-			 && (Direction.z		== other.Direction.z	) 
-			 && (Shooter			== other.Shooter		) 
-			 && (Points				== other.Points) 
+			const bool													bResult											=
+				(Position			== other.Position		)
+			 && (Direction.x		== other.Direction.x	)
+			 && (Direction.y		== other.Direction.y	)
+			 && (Direction.z		== other.Direction.z	)
+			 && (Shooter			== other.Shooter		)
+			 && (Points				== other.Points)
 			;
 
 			return bResult;
@@ -98,7 +98,7 @@ namespace klib
 	};
 #pragma pack(pop)
 #define MAX_MAP_SHOTS 64
-#define MAX_MAP_BULLET_COORDS ((MAX_MAP_SHOTS)*100) 
+#define MAX_MAP_BULLET_COORDS ((MAX_MAP_SHOTS)*100)
 	typedef SEntityContainer<::gpk::SCoord3<int32_t>, MAX_MAP_BULLET_COORDS> SCoordContainerBullet;
 	struct SMapShots
 	{
@@ -107,8 +107,7 @@ namespace klib
 	};
 
 	typedef SEntityContainer<::gpk::SCoord3<int32_t>, MAX_INVENTORY_SLOTS> SCoordContainerEntity;
-	struct SMapInventory
-	{
+	struct SMapInventory {
 		SEntityContainer<SProfession	, MAX_INVENTORY_SLOTS>	Profession										= {};
 		SEntityContainer<SAccessory		, MAX_INVENTORY_SLOTS>	Accessory										= {};
 		SEntityContainer<SArmor			, MAX_INVENTORY_SLOTS>	Armor											= {};
@@ -148,7 +147,7 @@ namespace klib
 			Seed													= 15731;
 			TotalPlayers											= 0;
 			TotalTeams												= 0;
-	
+
 			memset(Players				, -1, sizeof(PLAYER_INDEX	)*::gpk::size(Players				));
 			memset(Controls				,  0, sizeof(SPlayerControl	)*::gpk::size(Controls				));
 			memset(TeamPerPlayer		, -1, sizeof(TEAM_TYPE		)*::gpk::size(TeamPerPlayer			));
@@ -167,30 +166,24 @@ namespace klib
 		SCoordContainerAOE										Coords											= {};
 	};
 
-	template <size_t _Width, size_t _Depth>
-	struct STacticalBoardStatic
-	{
-		static const uint32_t									Width											= (uint32_t)_Width;
-		static const uint32_t									Depth											= (uint32_t)_Depth;
-
+	struct STacticalBoard {
 		SMapShots												Shots											= {};
 		SMapAOE													AreaOfEffect									= {};
-		SGameTiles<_Width, _Depth>								Tiles											= {};
+		SGameTiles												Tiles											= {};
 
-		void													Clear											()															{
+		inline	int32_t											Resize											(::gpk::SCoord2<uint32_t> newSize)	{ return Tiles.Resize(newSize); }
+		void													Clear											()									{
 			Tiles.Clear();
-			Shots													= SMapShots	();
-			AreaOfEffect											= SMapAOE	();
+			Shots													= {};
+			AreaOfEffect											= {};
 		};
 	};
 
-#define GAME_MAP_DEPTH	36
-#define GAME_MAP_WIDTH	(GAME_MAP_DEPTH*2)
-	typedef STacticalBoardStatic<GAME_MAP_WIDTH, GAME_MAP_DEPTH>	STacticalBoard;
+	static constexpr	const uint32_t								GAME_MAP_DEPTH									= 36				;
+	static constexpr	const uint32_t								GAME_MAP_WIDTH									= (GAME_MAP_DEPTH * 2);
 
 	// This structure holds all the data that is only valid once we enter the tactical mode and that is of no use outside of it.
-	struct STacticalInfo
-	{
+	struct STacticalInfo {
 		STacticalSetup											Setup											= STacticalSetup();
 		int8_t													CurrentPlayer									= -1;	// this is an index to the local "Players" member (not SGame::Players!)
 		int8_t													CurrentTeam										= -1;	// this is an index to the local "Players" member (not SGame::Players!)
@@ -199,10 +192,11 @@ namespace klib
 		STacticalBoard											Board											= {};
 		SMapInventory											Drops											= {};
 
+		inline	int32_t											ResizeBoard										(::gpk::SCoord2<uint32_t> newSize)							{ Board.Resize(newSize); }
 		bool													AddBullet										(const SBullet& newBullet)									{
 			if(Board.Shots.Bullet.AddElement(newBullet))
 				Board.Shots.Coords.AddElement(newBullet.Position.Cell);
-			else 
+			else
 				return false;
 
 			return true;
@@ -211,7 +205,7 @@ namespace klib
 		bool													AddAOE											(const SAOE& newAOE)										{
 			if(Board.AreaOfEffect.AOE.AddElement(newAOE))
 				Board.AreaOfEffect.Coords.AddElement(newAOE.Position.Cell);
-			else 
+			else
 				return false;
 
 			return true;
@@ -228,7 +222,7 @@ namespace klib
 		}
 
 		bool													HasDrops										(const ::gpk::SCoord3<int32_t>& coord)	const	noexcept	{
-			return ( (Board.Tiles.Entities.Coins	.Cells[coord.z][coord.x] != 0)				
+			return ( (Board.Tiles.Entities.Coins[coord.z][coord.x] != 0)
 				|| (-1) != Drops.CoordsProfession	.FindElement(coord)
 				|| (-1) != Drops.CoordsWeapon		.FindElement(coord)
 				|| (-1) != Drops.CoordsArmor		.FindElement(coord)

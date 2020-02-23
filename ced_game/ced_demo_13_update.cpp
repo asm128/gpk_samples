@@ -1,7 +1,8 @@
-#include "ced_demo_13.h"
+#include "ced_demo_13_game.h"
 
 #include "gpk_collision.h"
 
+#include <Windows.h>
 #include <mmsystem.h>
 
 static	int											explosionAdd		(::gpk::array_obj<::ssg::SExplosion> & explosions, int32_t indexMesh, uint32_t triangleCount, const ::gpk::SCoord3<float> &collisionPoint, double debrisSpeed) {

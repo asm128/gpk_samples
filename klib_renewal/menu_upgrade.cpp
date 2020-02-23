@@ -16,13 +16,12 @@
 
 using namespace klib;
 
-SGameState drawUpgradeMenu(SGame& instanceGame, const SGameState& returnState)
-{
+SGameState								drawUpgradeMenu(SGame& instanceGame, const SGameState& returnState) {
 	SPlayer										& player				= instanceGame.Players[PLAYER_INDEX_USER];
 	SCharacterGoods								& playerCompany			= player.Goods;
 	SCharacterInventory							& playerInventory		= playerCompany.Inventory;
 	klib::SCharacterResearch					& researchCompleted		= playerCompany.CompletedResearch;
-	
+
 	klib::SCharacterResearch					researchedItems			= {};
 
 #define GET_AVAILABLE_RESEARCH_FOR_ENTITY(EntityToken_, ProgressiveDefinitions_, ProgressiveModifiers_)					\
@@ -153,7 +152,7 @@ SGameState drawUpgradeMenu(SGame& instanceGame, const SGameState& returnState)
 		,	&instanceGame.GlobalDisplay.TextAttributes.Cells[0][0]
 		,	(size_t)researchedCount
 		,	"Available Production"
-		,	menuItems
+		,	::gpk::view_array<const TMenuItem>{menuItems}
 		,	instanceGame.FrameInput
 		,	SEntityResearch{"Exit upgrade menu"	, {(int32_t)researchedCount}}
 		,	SEntityResearch{"No action selected", -1}
@@ -168,15 +167,15 @@ SGameState drawUpgradeMenu(SGame& instanceGame, const SGameState& returnState)
 	instanceGame.ClearMessages();
 
 	switch(selectedChoice.Type) {
-	case ENTITY_TYPE_ACCESSORY	: 
-	case ENTITY_TYPE_STAGE_PROP	: 
-	case ENTITY_TYPE_FACILITY	: 
-	case ENTITY_TYPE_VEHICLE	: 
-	case ENTITY_TYPE_PROFESSION	: 
-	case ENTITY_TYPE_WEAPON		: 
-	case ENTITY_TYPE_ARMOR		: 
-		acknowledgeProduction(selectedChoice, player.Projects, instanceGame.UserSuccess);	
-		instanceGame.LogSuccess(); 
+	case ENTITY_TYPE_ACCESSORY	:
+	case ENTITY_TYPE_STAGE_PROP	:
+	case ENTITY_TYPE_FACILITY	:
+	case ENTITY_TYPE_VEHICLE	:
+	case ENTITY_TYPE_PROFESSION	:
+	case ENTITY_TYPE_WEAPON		:
+	case ENTITY_TYPE_ARMOR		:
+		acknowledgeProduction(selectedChoice, player.Projects, instanceGame.UserSuccess);
+		instanceGame.LogSuccess();
 		break;
 	default:
 		break;
@@ -185,15 +184,13 @@ SGameState drawUpgradeMenu(SGame& instanceGame, const SGameState& returnState)
 	return returnState;
 }
 
-SGameState drawUpgrade(SGame& instanceGame, const SGameState& returnState)
-{
-	static const ::gpk::label textToPrint = "Upgrade.";
-
-	bool bDonePrinting = ::klib::getMessageSlow(instanceGame.SlowMessage, textToPrint.begin(), textToPrint.size(), instanceGame.FrameTimer.LastTimeSeconds);
-	memcpy(&instanceGame.PostEffectDisplay.Screen.Cells[instanceGame.PostEffectDisplay.Depth>>1][instanceGame.PostEffectDisplay.Width/2-(strlen(instanceGame.SlowMessage)+1)/2], instanceGame.SlowMessage, strlen(instanceGame.SlowMessage));
-	if ( !bDonePrinting ) 
+SGameState								drawUpgrade				(SGame& instanceGame, const SGameState& returnState) {
+	static const ::gpk::label					textToPrint				= "Upgrade.";
+	bool										bDonePrinting			= ::klib::getMessageSlow(instanceGame.SlowMessage, textToPrint.begin(), textToPrint.size(), instanceGame.FrameTimer.LastTimeSeconds);
+	memcpy(&instanceGame.TacticalDisplay.Screen.Cells[instanceGame.TacticalDisplay.Depth>>1][instanceGame.TacticalDisplay.Width/2-(strlen(instanceGame.SlowMessage)+1)/2], instanceGame.SlowMessage, strlen(instanceGame.SlowMessage));
+	if ( !bDonePrinting )
 		return returnState;
 
-	drawFireBackground(instanceGame.PostEffectDisplay, instanceGame.FrameTimer.LastTimeSeconds);
+	drawFireBackground(instanceGame.TacticalDisplay, instanceGame.FrameTimer.LastTimeSeconds);
 	return drawUpgradeMenu(instanceGame, returnState);
 }

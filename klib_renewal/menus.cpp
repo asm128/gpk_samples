@@ -28,7 +28,7 @@ SGameState processMenuReturn(const SGameState& returnValue_)
 	static const HANDLE hConsoleOut = ::GetStdHandle( STD_OUTPUT_HANDLE );
 	static CONSOLE_FONT_INFOEX infoFont = ::getFontParams();
 
-	switch(returnValue_.State) { 
+	switch(returnValue_.State) {
 	case GAME_STATE_MENU_MAIN:
 	default: return returnValue_;
 
@@ -51,12 +51,12 @@ SGameState processMenuReturn(const SGameState& returnValue_)
 			break;
 		}
 	}
-	
+
 	return returnValue;
 }
 
 SGameState processMenuReturn(TURN_ACTION returnValue) {
-	switch(returnValue) { 
+	switch(returnValue) {
 	case TURN_ACTION_CONTINUE:
 	default: return {GAME_STATE_TACTICAL_CONTROL, };
 	}
@@ -65,8 +65,8 @@ SGameState processMenuReturn(TURN_ACTION returnValue) {
 void handleSubstateChange(SGame& instanceGame, const SGameState& newState) {
 	::klib::clearASCIIBackBuffer(' ', COLOR_WHITE);
 	instanceGame.GlobalDisplay		.Clear();
-	//instanceGame.TacticalDisplay	.Clear();	
-	//instanceGame.PostEffectDisplay	.Clear();	
+	//instanceGame.TacticalDisplay	.Clear();
+	//instanceGame.PostEffectDisplay	.Clear();
 	::klib::clearGrid(instanceGame.MenuDisplay);
 
 	switch(newState.State) {
@@ -81,9 +81,8 @@ void handleSubstateChange(SGame& instanceGame, const SGameState& newState) {
 	//resetCursorString(instanceGame.SlowMessage);	we shuold leave this out unless it becomes a need. This is because it turns screen transitions into an annoyance.
 }
 
-void drawTacticalMap(SGame& instanceGame, SPostEffectDisplay& target)
-{
-	klib::drawTacticalBoard(instanceGame, instanceGame.TacticalInfo, target, PLAYER_INDEX_USER, TEAM_TYPE_CIVILIAN, instanceGame.Players[PLAYER_INDEX_USER].Selection, false);
+void drawTacticalMap(SGame& instanceGame, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes) {
+	klib::drawTacticalBoard(instanceGame, instanceGame.TacticalInfo, display, textAttributes, PLAYER_INDEX_USER, TEAM_TYPE_CIVILIAN, instanceGame.Players[PLAYER_INDEX_USER].Selection, false);
 }
 
 void handleProductionStep(SGame& instanceGame);
@@ -112,7 +111,7 @@ void handleStateChange(SGame& instanceGame, const SGameState& newState, const SG
 	switch(newState.State)
 	{
 	case GAME_STATE_MENU_MAIN:
-		drawTacticalMap(instanceGame, instanceGame.PostEffectDisplay);
+		drawTacticalMap(instanceGame, instanceGame.TacticalDisplay.Screen, instanceGame.TacticalDisplay.TextAttributes);
 		instanceGame.StateMessage = "Main Menu";
 		break;
 
@@ -130,10 +129,10 @@ void handleStateChange(SGame& instanceGame, const SGameState& newState, const SG
 		break;
 
 	case GAME_STATE_TACTICAL_CONTROL	: instanceGame.StateMessage = "Tactical control"	; break;
-	case GAME_STATE_START_MISSION		: 
+	case GAME_STATE_START_MISSION		:
 		playCost			= ::klib::missionCost(playerUser, playerUser.Squad, playerUser.Squad.Size);
 		playerUser.Money	-= (int32_t)playCost;
-		instanceGame.StateMessage = "Start mission"		; 
+		instanceGame.StateMessage = "Start mission"		;
 		break;
 	case GAME_STATE_MENU_LAN_MISSION	: instanceGame.StateMessage = "LAN mission setup"	; break;
 	case GAME_STATE_MENU_OPTIONS		: instanceGame.StateMessage = "Options"				; break;
@@ -153,13 +152,13 @@ void handleStateChange(SGame& instanceGame, const SGameState& newState, const SG
 		instanceGame.ClearMessages();
 }
 
-void updateState(SGame& instanceGame, const SGameState& newState) 
+void updateState(SGame& instanceGame, const SGameState& newState)
 {
 	if(newState.State == GAME_STATE_START_MISSION && newState.State != instanceGame.State.State)
 	{
 		SPlayer& player = instanceGame.Players[PLAYER_INDEX_USER];
 		int64_t playCost = ::klib::missionCost(player, player.Squad, player.Squad.Size);
-		
+
 		if( player.Money < playCost )
 		{
 			instanceGame.UserError = "You don't have enough money to start a mission with the current squad setup.";
@@ -196,7 +195,7 @@ SGameState drawFactory			(SGame& instanceGame, const SGameState& returnState);
 void klib::showMenu(SGame& instanceGame) {
 
 	SGameState newAction=instanceGame.State;
-	
+
 	static const SMenu<SGameState> menuMain			(  {GAME_STATE_EXIT					},	"Main Menu"		, 20, true, "Exit game");
 	static const SMenu<SGameState> menuMainInGame	(  {GAME_STATE_EXIT					},	"Main Menu"		, 20, true, "Exit game");
 	static const SMenu<SGameState> menuConfig		(  {GAME_STATE_MENU_MAIN			},	"Options"		, 26);
@@ -205,17 +204,17 @@ void klib::showMenu(SGame& instanceGame) {
 	klib::SGlobalDisplay& globalDisplay = instanceGame.GlobalDisplay;
 
 	switch(instanceGame.State.State) {
-	case GAME_STATE_MENU_MAIN			:	
+	case GAME_STATE_MENU_MAIN			:
 		if( ::gpk::bit_true(instanceGame.Flags, GAME_FLAGS_STARTED) )
-			newAction = processMenuReturn(drawMenu(globalDisplay.Screen, &globalDisplay.TextAttributes[0][0], menuMainInGame, optionsMainInGame, instanceGame.FrameInput, instanceGame.State));	
-		else													
-			newAction = processMenuReturn(drawMenu(globalDisplay.Screen, &globalDisplay.TextAttributes[0][0], menuMain, optionsMain, instanceGame.FrameInput, instanceGame.State));	
+			newAction = processMenuReturn(drawMenu(globalDisplay.Screen, &globalDisplay.TextAttributes[0][0], menuMainInGame, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsMainInGame}, instanceGame.FrameInput, instanceGame.State));
+		else
+			newAction = processMenuReturn(drawMenu(globalDisplay.Screen, &globalDisplay.TextAttributes[0][0], menuMain, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsMain}, instanceGame.FrameInput, instanceGame.State));
 
 		break;
 
-	case GAME_STATE_MENU_OPTIONS		:	newAction = processMenuReturn(drawMenu(globalDisplay.Screen, &globalDisplay.TextAttributes.Cells[0][0], menuConfig, optionsConfig, instanceGame.FrameInput, instanceGame.State ));	break;
+	case GAME_STATE_MENU_OPTIONS		:	newAction = processMenuReturn(drawMenu(globalDisplay.Screen, &globalDisplay.TextAttributes.Cells[0][0], menuConfig, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsConfig}, instanceGame.FrameInput, instanceGame.State ));	break;
 	case GAME_STATE_MENU_EQUIPMENT		:	newAction = processMenuReturn(drawEquip(instanceGame, instanceGame.State));	break;
-	case GAME_STATE_MENU_SELL			:	newAction = processMenuReturn(drawMenu(globalDisplay.Screen, &globalDisplay.TextAttributes[0][0], menuSell, optionsSell, instanceGame.FrameInput, instanceGame.State ));	break;
+	case GAME_STATE_MENU_SELL			:	newAction = processMenuReturn(drawMenu(globalDisplay.Screen, &globalDisplay.TextAttributes[0][0], menuSell, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsSell}, instanceGame.FrameInput, instanceGame.State ));	break;
 	case GAME_STATE_MENU_LAN_MISSION	:	//newAction = processMenuReturn(drawLANSetup		(instanceGame, instanceGame.State));	break;
 	case GAME_STATE_START_MISSION		:	newAction = processMenuReturn(drawTacticalScreen	(instanceGame, instanceGame.State));	break;
 	case GAME_STATE_TACTICAL_CONTROL	:	newAction = processMenuReturn(drawTacticalScreen	(instanceGame, instanceGame.State));	break;
@@ -225,28 +224,28 @@ void klib::showMenu(SGame& instanceGame) {
 	case GAME_STATE_MENU_BUY			:	newAction = processMenuReturn(drawBuy				(instanceGame, instanceGame.State));	break;
 	case GAME_STATE_MENU_UPGRADE		:	newAction = processMenuReturn(drawFactory			(instanceGame, instanceGame.State));	break;
 	case GAME_STATE_MENU_FACTORY		:	newAction = processMenuReturn(drawFactory			(instanceGame, instanceGame.State));	break;
-	
-	case GAME_STATE_MEMORIAL			:	
-		if(instanceGame.FrameInput.Keys[VK_ESCAPE]) 
-			newAction={GAME_STATE_WELCOME_COMMANDER}; 
+
+	case GAME_STATE_MEMORIAL			:
+		if(instanceGame.FrameInput.Keys[VK_ESCAPE])
+			newAction={GAME_STATE_WELCOME_COMMANDER};
 
 		break;
 
-	case GAME_STATE_CREDITS				:	
-		if(instanceGame.FrameInput.Keys[VK_ESCAPE]) 
-			newAction={GAME_STATE_MENU_MAIN}; 
+	case GAME_STATE_CREDITS				:
+		if(instanceGame.FrameInput.Keys[VK_ESCAPE])
+			newAction={GAME_STATE_MENU_MAIN};
 
 		break;
-	case GAME_STATE_EXIT				:	
-		instanceGame.StateMessage = "Exiting game...";	
+	case GAME_STATE_EXIT				:
+		instanceGame.StateMessage = "Exiting game...";
 		::gpk::bit_clear(instanceGame.Flags, GAME_FLAGS_RUNNING);
-		newAction = instanceGame.State; 
+		newAction = instanceGame.State;
 		break;
 
 	default:
 		newAction.State = (GAME_STATE)-1;
 		instanceGame.StateMessage = "Unrecognized game state!!";
-	}			
+	}
 
 	updateState(instanceGame, newAction);
 };

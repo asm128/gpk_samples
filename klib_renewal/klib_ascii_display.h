@@ -10,13 +10,12 @@ namespace klib
 						::gpk::SCoord2<uint32_t>						DisplaySizeCurrent	;			// In character units.
 						uint32_t										ColorWidth			;			// The color width in bytes.
 						uint32_t										PaletteSize			;			// The amount of colors that can be stored in the palette. At the time of writing this comment, a maximum of 64k colors is supported.
-						bool											PaletteSet			: 1;		
-						bool											PaletteReset		: 1;		
+						bool											PaletteSet			: 1;
+						bool											PaletteReset		: 1;
 						bool											TitleSet			: 1;
-						bool											Resize				: 1;		
+						bool											Resize				: 1;
 	};
-//
-//					::gpk::error_t									asciiDisplayPresentBGRA				(const ::gpk::view_array<const uint8_t>& characters, const ::gpk::view_array<const uint32_t>& colors);
+
 					::gpk::error_t									asciiDisplayInfo					(SASCIIDisplayInfo& displayInfo);
 					::gpk::error_t									asciiDisplayCreate					(uint32_t frontBufferWidth, uint32_t frontBufferHeight);
 					::gpk::error_t									asciiDisplayDestroy					();

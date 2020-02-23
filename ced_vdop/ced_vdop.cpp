@@ -8,7 +8,7 @@
 #define GPK_AVOID_LOCAL_APPLICATION_MODULE_MODEL_EXECUTABLE_RUNTIME
 #include "gpk_app_impl.h"
 
-GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "PNG Test");
+GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 
 ::gpk::error_t										cleanup							(::SApplication & app)						{
 	::klib::shutdownASCIIScreen();
@@ -38,27 +38,12 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "PNG Test");
 		controlConstraints.AttachSizeToControl								= {app.IdExit, -1};
 		::gpk::controlSetParent(gui, app.IdExit, -1);
 	}
-	//framework.UseDoubleBuffer							= true;
 	srand((uint32_t)time(0));
 
 	const ::gpk::SCoord2<uint32_t>											metricsMap			= app.TextOverlay.MetricsMap;
 	const ::gpk::SCoord2<uint32_t>											metricsLetter		= app.TextOverlay.MetricsLetter;
-	//::gpk::SImage<::gpk::SColorBGRA>										fontImagePre;
-	//::gpk::pngFileLoad(::gpk::view_const_string{"../gpk_data/images/dos_8x8_font_white.png"}, fontImagePre);//Codepage_437_24_12x12.png"}, fontImage);
 	::gpk::SImage<::gpk::SColorBGRA>										fontImage;
 	::gpk::pngFileLoad(::gpk::view_const_string{"../gpk_data/images/Codepage_437_24_12x12.png"}, fontImage);
-	//fontImage.resize(::gpk::SCoord2<uint32_t>{app.TextOverlay.MetricsMap}.InPlaceScale(app.TextOverlay.MetricsLetter));
-	//
-	//for(uint32_t y = 0; y < metricsMap.y; ++y)
-	//for(uint32_t x = 0; x < metricsMap.x; ++x) {
-	//	::gpk::SRectangle2<uint32_t>											dstRect				= {{x * metricsLetter.x, y * metricsLetter.y}, metricsLetter};
-	//	::gpk::SRectangle2<uint32_t>											srcRect				=
-	//		{ {x * metricsLetter.x + 1 + x, y * metricsLetter.y + 1 + y}
-	//		, metricsLetter
-	//		};
-	//	//::gpk::grid_copy_ex(fontImage.View, fontImagePre.View, metricsLetter.Cast<int32_t>(), dstRect.Offset.Cast<int32_t>(), srcRect.Offset.Cast<int32_t>());
-	//	::gpk::grid_copy(fontImage.View, fontImagePre.View, dstRect.Offset, srcRect);
-	//}
 	::gpk::view_grid<::gpk::SGeometryQuads>									viewGeometries		= {app.TextOverlay.GeometryLetters, {16, 16}};
 	const uint32_t															imagePitch			= metricsLetter.x * metricsMap.x;
 
@@ -145,7 +130,7 @@ static	int											drawPixels
 		const ::gpk::SCoord3<float>								position					= ::gpk::triangleWeight(vertexWeights, triangleWorld);
 		double													factorWave					= (::gpk::max(0.0, sin(- timeAnimation * 4 + position.y * .75))) * .6;
 		double													factorWave2					= (::gpk::max(0.0, sin(- timeAnimation + position.x * .0125 + position.z * .125))) * .5;
-		::gpk::setPixel(targetPixels, pixelCoord, targetPixels[pixelCoord.y][pixelCoord.x] * .25 + (texelColor * (lightFactorDirectional * 2) + texelColor * factorWave + texelColor * factorWave2));
+		::gpk::setPixel(targetPixels, pixelCoord, (targetPixels[pixelCoord.Cast<uint32_t>()] * .25) + (texelColor * (lightFactorDirectional * 2) + texelColor * factorWave + texelColor * factorWave2));
 	}
 	return 0;
 }
@@ -168,18 +153,16 @@ int													draw3DCharacter
 	::gpk::SMatrix4<float>									matrixPosition			;
 	::gpk::SMatrix4<float>									matrixRotation			;
 	matrixRotation.Identity();
-	if(asciiCode == 5)
-		matrixRotation.RotationX(-::gpk::math_pi_2);
-	if(asciiCode == 0xB)
-		matrixRotation.RotationX(-::gpk::math_pi_2);
-	if(asciiCode == 0xC)
-		matrixRotation.RotationX(-::gpk::math_pi_2);
-	if(asciiCode == 0xE8)
-		matrixRotation.RotationX(-::gpk::math_pi_2);
 	::gpk::SCoord3<float>									translation				= {};
 	translation.x										= float(position.x * metricsCharacter.x);
 	translation.z										= float(position.z * metricsCharacter.y);
-	matrixPosition	.SetTranslation	({translation.x, 0, translation.z}, true);
+	if(asciiCode == 0x05) { matrixRotation.RotationX(-::gpk::math_pi_2); translation.y += metricsCharacter.y / 2; }
+	if(asciiCode == 0x0B) { matrixRotation.RotationX(-::gpk::math_pi_2); translation.y += metricsCharacter.y / 2; }
+	if(asciiCode == 0x0C) { matrixRotation.RotationX(-::gpk::math_pi_2); translation.y += metricsCharacter.y / 2; }
+	if(asciiCode == 0xE8) { matrixRotation.RotationX(-::gpk::math_pi_2); translation.y += metricsCharacter.y / 2; }
+	if(asciiCode == 0xAB) { matrixRotation.RotationX(-::gpk::math_pi_2); translation.y += metricsCharacter.y / 2; }
+	if(asciiCode == 0xAC) { matrixRotation.RotationX(-::gpk::math_pi_2); translation.y += metricsCharacter.y / 2; }
+	matrixPosition	.SetTranslation	(translation, true);
 	matrixScale		.Scale			({1, 1, 1}, true);
 	::gpk::SMatrix4<float>									matrixTransform										= matrixScale * matrixRotation * matrixPosition;
 	::gpk::SMatrix4<float>									matrixTransformView									= matrixTransform * matrixView;
@@ -203,44 +186,13 @@ int													draw					(SApplication & app) {
 	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>		target;
 	target.create();
 	target->resize(app.Framework.MainDisplay.Size, ::gpk::DARKGREEN, 0xFFFFFFFFU);
-	//for(uint32_t y = 0; y < target->Color.View.metrics().y; ++y)
-	//for(uint32_t x = 0; x < target->Color.View.metrics().x; ++x) {
-	//	target->Color.View[y][x]											= rand();
-	//	target->Color.View[y][x].a											= 255;
-	//}
-
-
-	//s::gpk::view_grid<::gpk::SColorBGRA>						targetPixels			= {app.Framework.DoubleBuffer[InterlockedIncrement64(&app.Framework.CurrentRenderBuffer) % 2].begin(), app.Framework.Window.Size};
-	//s::gpk::view_grid<uint32_t>								depthBuffer				= {app.Framework.DepthBuffer.begin(), app.Framework.Window.Size};
-	::gpk::view_grid<::gpk::SColorBGRA>						targetPixels			= target->Color.View;
-	::gpk::view_grid<uint32_t>								depthBuffer				= target->DepthStencil.View;
-	//::gpk::clearTarget(*target);
-
+	::gpk::view_grid<::gpk::SColorBGRA>						targetPixels			= target->Color;
+	::gpk::view_grid<uint32_t>								depthBuffer				= target->DepthStencil;
 	app.TextOverlay.DrawCache							= {};
-
 
 	app.TextOverlay.LightVector0.Normalize();
 	::gpk::view_grid<::gpk::SGeometryQuads>					viewGeometries		= {app.TextOverlay.GeometryLetters, {16, 16}};
 	uint32_t												colorIndex			= 0;
-
-	//uint32_t												timeHours			= (int)app.Framework.FrameInfo.Seconds.Total / 3600;
-	//uint32_t												timeMinutes			= (int)app.Framework.FrameInfo.Seconds.Total / 60 % 60;
-	//uint32_t												timeSeconds			= (int)app.Framework.FrameInfo.Seconds.Total % 60;
-	//uint32_t												timeCents			= int (app.Framework.FrameInfo.Seconds.Total * 10) % 10;
-	//char													strStage		[17]	= {};
-	//char													strScore		[17]	= {};
-	//char													strTimeHours	[3]	= {};
-	//char													strTimeMinutes	[3]	= {};
-	//char													strTimeSeconds	[3]	= {};
-	//char													strTimeCents	[2]	= {};
-	//memset(&mapToDraw[1][1], 0, mapToDraw.metrics().x - 2);
-	//memset(depthBuffer.begin(), -1, sizeof(uint32_t) * depthBuffer.size());
-	//sprintf_s(strStage		, "Stage:%u", (uint32_t)(0)); memcpy(&mapToDraw[1][1], strStage, strlen(strStage));
-	//sprintf_s(strScore		, "Score:%u", (uint32_t)(0)); memcpy(&mapToDraw[1][mapToDraw.metrics().x - (uint32_t)strlen(strScore) - 1], strScore, strlen(strScore));
-	//sprintf_s(strTimeHours	, "%.2u" , timeHours	); memcpy(&mapToDraw[3][ 6], strTimeHours	, 2);
-	//sprintf_s(strTimeMinutes, "%.2u" , timeMinutes	); memcpy(&mapToDraw[3][ 9], strTimeMinutes	, 2);
-	//sprintf_s(strTimeSeconds, "%.2u" , timeSeconds	); memcpy(&mapToDraw[3][12], strTimeSeconds	, 2);
-	//sprintf_s(strTimeCents	, "%.1u" , timeCents	); memcpy(&mapToDraw[3][15], strTimeCents	, 1);
 
 	::gpk::SMatrix4<float>									matrixView					= {};
 	::gpk::SMatrix4<float>									matrixProjection			= {};
@@ -249,15 +201,6 @@ int													draw					(SApplication & app) {
 	matrixProjection.Identity();
 	matrixViewport	.Identity();
 
-	if(0 > app.Game.TacticalInfo.CurrentPlayer)
-		matrixView.LookAt(app.TextOverlay.CameraPosition, app.TextOverlay.CameraTarget, app.TextOverlay.CameraUp);
-	else {
-		::klib::SPlayer		& player = app.Game.Players[app.Game.TacticalInfo.Setup.Players[app.Game.TacticalInfo.CurrentPlayer]];
-		matrixView.LookAt(app.TextOverlay.CameraPosition, player.Army[player.Squad.Agents[player.Selection.PlayerUnit]]->Position.Cast<float>().Scale(12), app.TextOverlay.CameraUp);
-		for(uint32_t iPlayer = 0; iPlayer < ::gpk::size(app.Game.Players); ++iPlayer) {
-
-		}
-	}
 	matrixProjection.FieldOfView(::gpk::math_pi * .25, targetPixels.metrics().x / (double)targetPixels.metrics().y, 0.01, 5000);
 	matrixViewport.ViewportLH(targetPixels.metrics());
 	matrixView											*= matrixProjection;
@@ -265,30 +208,13 @@ int													draw					(SApplication & app) {
 
 	{
 		::gpk::mutex_guard										lock						(app.LockRender);
-		::gpk::view_grid<char>									mapToDraw			= app.Game.TacticalDisplay.Screen.Cells;
-
-		if(0 > app.Game.TacticalInfo.CurrentPlayer)
-			matrixView.LookAt(app.TextOverlay.CameraPosition, app.TextOverlay.CameraTarget, app.TextOverlay.CameraUp);
-		else {
-			::klib::SPlayer											& player			= app.Game.Players[app.Game.TacticalInfo.Setup.Players[app.Game.TacticalInfo.CurrentPlayer]];
-			::gpk::SCoord3<float>									agentPosition		= player.Army[player.Squad.Agents[player.Selection.PlayerUnit]]->Position.Cast<float>();
-			agentPosition.Scale({1, 1, -1});
-			agentPosition										-= ::gpk::SCoord3<float>{mapToDraw.metrics().x * .5f, 0, mapToDraw.metrics().y * .5f * -1.f};
-			app.TextOverlay.CameraPosition						= agentPosition;
-			agentPosition.Scale(12);
-			app.TextOverlay.CameraPosition						+= {-24, 6, -24};
-			app.TextOverlay.CameraPosition.Scale(12);
-			matrixView.LookAt(app.TextOverlay.CameraPosition, agentPosition, app.TextOverlay.CameraUp);
-			for(uint32_t iPlayer = 0; iPlayer < ::gpk::size(app.Game.Players); ++iPlayer) {
-
-			}
-		}
+		::gpk::view_grid<char>									mapToDraw					= app.Game.GlobalDisplay.Screen.Cells;
+		::gpk::view_grid<uint16_t>								mapColors					= app.Game.GlobalDisplay.TextAttributes.Cells;
+		matrixView.LookAt(app.TextOverlay.CameraPosition, app.TextOverlay.CameraTarget, app.TextOverlay.CameraUp);
 		matrixView											*= matrixProjection;
 		matrixView											*= matrixViewport;
-
 		::gpk::SCoord3<float>									offset			= {};//app.TextOverlay.ControlTranslation;
 		offset												-= ::gpk::SCoord3<float>{mapToDraw.metrics().x * .5f, 0, mapToDraw.metrics().y * .5f * -1.f};
-		::gpk::view_grid<uint16_t>								mapColors		= app.Game.TacticalDisplay.TextAttributes.Cells;
 		for(uint32_t y = 0; y < mapToDraw.metrics().y; ++y)
 		for(uint32_t x = 0; x < mapToDraw.metrics().x; ++x) {
 			const uint8_t											asciiCode			= mapToDraw[y][x];
@@ -306,18 +232,34 @@ int													draw					(SApplication & app) {
 
 	{
 		::gpk::mutex_guard										lock						(app.LockRender);
-		::gpk::view_grid<char>									mapToDraw					= app.Game.PostEffectDisplay.Screen.Cells;
-		::gpk::view_grid<uint16_t>								mapColors					= app.Game.PostEffectDisplay.TextAttributes.Cells;
-		::gpk::SCoord3<float>									offset						= {};//app.TextOverlay.ControlTranslation;
+		::gpk::view_grid<char>									mapToDraw					= app.Game.TacticalDisplay.Screen.Cells;
+		::gpk::view_grid<uint16_t>								mapColors					= app.Game.TacticalDisplay.TextAttributes.Cells;
+
+		if((app.Game.State.State != ::klib::GAME_STATE_START_MISSION && app.Game.State.State != ::klib::GAME_STATE_TACTICAL_CONTROL) || 0 > app.Game.TacticalInfo.CurrentPlayer)
+			matrixView.LookAt(app.TextOverlay.CameraPosition, app.TextOverlay.CameraTarget, app.TextOverlay.CameraUp);
+		else {
+			::klib::SPlayer											& player			= app.Game.Players[app.Game.TacticalInfo.Setup.Players[app.Game.TacticalInfo.CurrentPlayer]];
+			::gpk::SCoord3<float>									agentPosition		= player.Army[player.Squad.Agents[player.Selection.PlayerUnit]]->Position.Cast<float>();
+			agentPosition.Scale({1, 1, -1});
+			agentPosition										-= ::gpk::SCoord3<float>{mapToDraw.metrics().x * .5f, 0, mapToDraw.metrics().y * .5f * -1.f};
+			::gpk::SCoord3<float>									cameraPosition		= agentPosition;
+			agentPosition.Scale(12);
+			cameraPosition										+= {-24, 6, -24};
+			cameraPosition.Scale(12);
+			matrixView.LookAt(cameraPosition, agentPosition, {0, 1, 0});//app.TextOverlay.CameraUp);
+		}
+		matrixView											*= matrixProjection;
+		matrixView											*= matrixViewport;
+
+		::gpk::SCoord3<float>									offset			= {};//app.TextOverlay.ControlTranslation;
 		offset												-= ::gpk::SCoord3<float>{mapToDraw.metrics().x * .5f, 0, mapToDraw.metrics().y * .5f * -1.f};
-	//::gpk::view_grid<uint8_t>								mapToDraw			= app.MapToDraw;
 		for(uint32_t y = 0; y < mapToDraw.metrics().y; ++y)
 		for(uint32_t x = 0; x < mapToDraw.metrics().x; ++x) {
 			const uint8_t											asciiCode			= mapToDraw[y][x];
 			if(0 == asciiCode)
 				continue;
 			const uint16_t											asciiColor			= mapColors[y][x];
-			::gpk::SColorFloat										color				= app.Framework.GUI->Palette[(asciiColor & 0xF0)];//::gpk::COLOR_TABLE[((int)timeAnimation) % ::gpk::size(::gpk::COLOR_TABLE)];
+			::gpk::SColorFloat										color					= app.Framework.GUI->Palette[(asciiColor & 0xF)];//::gpk::COLOR_TABLE[((int)timeAnimation) % ::gpk::size(::gpk::COLOR_TABLE)];
 			::gpk::SCoord3<float>									position			= offset;
 			position.x											+= x;
 			position.z											-= y;
@@ -325,6 +267,7 @@ int													draw					(SApplication & app) {
 			++colorIndex;
 		}
 	}
+
 	{
 		::gpk::mutex_guard														lock					(app.LockGUI);
 		::gpk::controlDrawHierarchy(*app.Framework.GUI, 0, target->Color.View);
