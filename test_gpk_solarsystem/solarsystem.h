@@ -1,6 +1,6 @@
-#include "ced_draw.h"
-#include "ced_model.h"
-#include "ced_rigidbody.h"
+#include "gpk_raster_lh.h"
+#include "gpk_model.h"
+#include "gpk_rigidbody.h"
 #include "ced_particles.h"
 
 #include "gpk_image.h"
@@ -29,10 +29,10 @@ struct SModelPivot {
 
 struct SScene {
 	::gpk::array_pod<::SModelPivot>						Pivot							= {};
-	::gpk::array_obj<::ced::SGeometryTriangles>			Geometry						= {};
+	::gpk::array_obj<::gpk::SGeometryTriangles>			Geometry						= {};
 	::gpk::array_pod<::gpk::SMatrix4<float>>			Transform						= {};
 
-	::ced::SCamera										Camera							= {};
+	::gpk::SCamera										Camera							= {};
 };
 
 struct SEntity {
@@ -43,7 +43,6 @@ struct SEntity {
 	int32_t												IndexBody						;
 	::gpk::array_pod<uint32_t>							IndexChild						;
 };
-
 
 struct SDebris	{
 	::gpk::SColorBGRA							Colors[4]			=
@@ -90,7 +89,7 @@ struct SDebris	{
 
 struct SSolarSystem {
 	::SDebris											SunFire							= {};
-	::ced::SIntegrator3									World							= {};
+	::gpk::SIntegrator3									Bodies							= {};
 	::SScene											Scene							= {};
 	::gpk::array_obj<::SEntity>							Entities						= {};
 	::gpk::array_obj<::gpk::SImage<::gpk::SColorBGRA>>	Image							= {};

@@ -20,7 +20,7 @@ namespace gme // I'm gonna use a different namespace in order to test a few thin
 	struct SCamera {
 							::gpk::SCoord3<float>												Position;
 							::gpk::SCoord3<float>												Target;
-							::gpk::SNearFar												NearFar							= {0.01f , 1000.0f};
+							::gpk::SNearFar														NearFar							= {0.01f , 1000.0f};
 	};
 
 	struct SViewportScene {

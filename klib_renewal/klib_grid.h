@@ -1,4 +1,5 @@
 #include "gpk_view_grid.h"
+#include "gpk_noise.h"
 
 #include "klib_text.h"
 
@@ -42,12 +43,12 @@ namespace klib
 	template<typename _tCell>
 	void																drawGridBorders							( ::gpk::view_grid<_tCell>& grid, const _tCell& value)																												{
 		for(uint32_t z = 0, maxZ = grid.height(); z < maxZ; ++z) {
-			grid[z][0]															= value; 
-			grid[z][grid.width() - 1]											= value; 
+			grid[z][0]															= value;
+			grid[z][grid.width() - 1]											= value;
 		}
 		for(uint32_t x=0, maxX = grid.width() ; x < maxX; ++x) {
-			grid[0][x]															= value; 
-			grid[grid.height() - 1][x]											= value; 
+			grid[0][x]															= value;
+			grid[grid.height() - 1][x]											= value;
 		}
 	}
 
@@ -75,7 +76,7 @@ namespace klib
 	template<typename _tCell, typename... _Args>
 	int32_t											printfToGridColored				( ::gpk::view_grid<_tCell>& display, ::gpk::view_grid<uint16_t>& textAttributes, uint16_t messageColor, int32_t offsetLine, int32_t offsetColumn, ::klib::ALIGN_SCREEN align, const char* format, _Args&&... args ) {
 		char												precookStr[1024]				= {};
-		//int32_t												precookLen						= 
+		//int32_t												precookLen						=
 			::sprintf_s(precookStr, format, args...);
 		int32_t												actualX							= ::klib::lineToGridColored(display, textAttributes, messageColor, offsetLine, offsetColumn, align, precookStr);
 		return actualX;

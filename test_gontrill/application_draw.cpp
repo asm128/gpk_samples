@@ -158,7 +158,7 @@ static				const ::gpk::array_static<::gpk::SColorBGRA, WEAPON_TYPE_COUNT>	weapon
 	::gpk::SFramework															& framework									= applicationInstance.Framework;
 	::gpk::SImage<::gpk::SColorBGRA>											& offscreen									= framework.MainDisplayOffscreen->Color;
 	::gpk::view_grid<::gpk::SColorBGRA>											& viewOffscreen								= offscreen.View;
-	::gpk::drawRectangle(offscreen.View, applicationInstance.ColorBackground, ::gpk::SRectangle2D<uint32_t>{{}, offscreen.View.metrics()});
+	::gpk::drawRectangle(offscreen.View, applicationInstance.ColorBackground, ::gpk::SRectangle2<uint32_t>{{}, offscreen.View.metrics()});
 	for(uint32_t iRay = 0, rayCount = applicationInstance.StuffToDraw.Stars.size(); iRay < rayCount; ++iRay) {
 		::SParticleToDraw															& starToDraw								= applicationInstance.StuffToDraw.Stars[iRay];
 		if(false == applicationInstance.ParticleSystemStars.Instances[starToDraw.IndexParticleInstance].Binding.Lit)

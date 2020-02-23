@@ -15,24 +15,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ced_demo_13.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ced_demo_13_game.h">
+    <ClInclude Include="ced_vdop.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ced_demo_13_draw.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ced_demo_13_setup.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ced_demo_13_update.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ced_demo_13.cpp">
+    <ClCompile Include="ced_vdop.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

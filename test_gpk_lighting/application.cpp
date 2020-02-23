@@ -52,7 +52,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	return 0;
 }
 
-			::gpk::error_t											controlCreate				(::gme::SApplication & app, int32_t & idControl, const ::gpk::SRectangle2D<int16_t> & area, ::gpk::ALIGN align, int32_t idParent, ::gpk::ALIGN alignText, ::gpk::view_const_string text)	{
+			::gpk::error_t											controlCreate				(::gme::SApplication & app, int32_t & idControl, const ::gpk::SRectangle2<int16_t> & area, ::gpk::ALIGN align, int32_t idParent, ::gpk::ALIGN alignText, ::gpk::view_const_string text)	{
 	::gpk::SGUI																& gui						= *app.Framework.GUI;
 	idControl															= ::gpk::controlCreate(gui);
 	::gpk::SControl															& control					= gui.Controls.Controls[idControl];

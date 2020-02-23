@@ -18,7 +18,7 @@ namespace klib
 	GDEFINE_ENUM_VALUE(TILE_SIDE, UP	, 0x20);
 
 #define TILE_SIDE_BOTTOM				TILE_SIDE_DOWN
-#define TILE_SIDE_TOP					TILE_SIDE_UP	
+#define TILE_SIDE_TOP					TILE_SIDE_UP
 
 	struct STileASCIIWalls {
 		char								Vertical					;
@@ -69,10 +69,10 @@ namespace klib
 	struct SStatusColor {
 		int8_t								Bright	;//: 4;
 		int8_t								Dark	;//: 4;
-		
+
 											SStatusColor
-			(	int8_t			bright	= COLOR_WHITE 
-			,	int8_t			dark	= COLOR_BLACK 
+			(	int8_t			bright	= COLOR_WHITE
+			,	int8_t			dark	= COLOR_BLACK
 			)
 			: Bright	(bright	)
 			, Dark	(dark	)
@@ -105,7 +105,7 @@ namespace klib
 		// Poison damage
 		nBitIndex								= ::klib::getBitIndex(COMBAT_STATUS_BLEEDING	, MAX_COMBAT_STATUS_COUNT); statusColors[nBitIndex] = {COLOR_GREEN			, COLOR_RED			};
 		nBitIndex								= ::klib::getBitIndex(COMBAT_STATUS_POISON		, MAX_COMBAT_STATUS_COUNT); statusColors[nBitIndex] = {COLOR_GREEN			, COLOR_DARKGREEN	};
-		
+
 		// Shieldable damage
 		nBitIndex								= ::klib::getBitIndex(COMBAT_STATUS_BURN		, MAX_COMBAT_STATUS_COUNT); statusColors[nBitIndex] = {COLOR_RED			, COLOR_DARKRED		};
 		nBitIndex								= ::klib::getBitIndex(COMBAT_STATUS_FREEZING	, MAX_COMBAT_STATUS_COUNT); statusColors[nBitIndex] = {COLOR_RED			, COLOR_WHITE		};
@@ -117,7 +117,7 @@ namespace klib
 		nBitIndex								= ::klib::getBitIndex(COMBAT_STATUS_DRUNK		, MAX_COMBAT_STATUS_COUNT); statusColors[nBitIndex] = {COLOR_BLUE			, COLOR_GREEN		};
 		nBitIndex								= ::klib::getBitIndex(COMBAT_STATUS_BLIND		, MAX_COMBAT_STATUS_COUNT); statusColors[nBitIndex] = {COLOR_BLUE			, COLOR_WHITE		};
 
-		// 
+		//
 		nBitIndex								= ::klib::getBitIndex(COMBAT_STATUS_RAGE		, MAX_COMBAT_STATUS_COUNT); statusColors[nBitIndex] = {COLOR_ORANGE			, COLOR_GREEN		};
 		nBitIndex								= ::klib::getBitIndex(COMBAT_STATUS_INVISIBLE	, MAX_COMBAT_STATUS_COUNT); statusColors[nBitIndex] = {COLOR_ORANGE			, COLOR_WHITE		};
 
@@ -168,12 +168,12 @@ namespace klib
 							if(false == playerAgent.IsAlive())
 								continue;
 
-							::gpk::SCoord3<int32_t>					coordPlayer				= playerAgent.Position; 
+							::gpk::SCoord3<int32_t>					coordPlayer				= playerAgent.Position;
 							::gpk::SCoord3<float>						distance				= currentTilePos - coordPlayer.Cast<float>();;
 
 							SEntityPoints								playerAgentPoints		= playerAgent.FinalPoints	;
 							SEntityFlags								playerAgentFlags		= playerAgent.FinalFlags	;
-						
+
 							initialSight							= (playerAgentPoints.Fitness.Sight+SIGHT_OFFSET);
 							finalSight								= ::klib::getFinalSight(initialSight, playerAgent);
 
@@ -196,10 +196,10 @@ namespace klib
 
 					bool											bIsAlly						= tacticalInfo.Setup.TeamPerPlayer[indexBoardPlayer] == tacticalInfo.Setup.TeamPerPlayer[cellPlayerIndex];
 					target.Screen.Cells[z][x]					= ::klib::ascii_face[bIsAlly ? FACE_BLACK : FACE_WHITE];
-					//target.Screen.Cells[z][x] = std::to_string(agentIndex+1)[0]; 
+					//target.Screen.Cells[z][x] = std::to_string(agentIndex+1)[0];
 
 
-					bool											bIsSelected					=	(cellPlayerIndex == indexBoardPlayer		&& board.Tiles.Entities.Agents.Cells[z][x].AgentIndex == selection.PlayerUnit) 
+					bool											bIsSelected					=	(cellPlayerIndex == indexBoardPlayer		&& board.Tiles.Entities.Agents.Cells[z][x].AgentIndex == selection.PlayerUnit)
 									||	(cellPlayerIndex == selection.TargetPlayer	&& board.Tiles.Entities.Agents.Cells[z][x].AgentIndex == selection.TargetUnit);
 
 					const SPlayer& boardPlayer	= instanceGame.Players[tacticalInfo.Setup.Players[cellPlayerIndex]];
@@ -228,9 +228,9 @@ namespace klib
 					else if(bSwaps[4] && tacticalInfo.HasDrops(currentCoord))
 						color = COLOR_DARKYELLOW;
 
-					target.TextAttributes.Cells[z][x] |= color; 
+					target.TextAttributes.Cells[z][x] |= color;
 				}
-				else if( board.Shots.Coords.FindElement(currentCoord) != -1) { 
+				else if( board.Shots.Coords.FindElement(currentCoord) != -1) {
 					static const float GAME_EPSILON = 0.000001f;
 					char bulletAscii = '*';
 					uint16_t bulletColor = bSwaps[2] ? COLOR_DARKGREY : COLOR_DARKGREY;
@@ -243,7 +243,7 @@ namespace klib
 						if(::gpk::bit_true(bullet.Points.Tech.ProjectileClass, PROJECTILE_CLASS_ROCKET))
 							bulletAscii = 0x0F; // bigger asterisk
 						else if(::gpk::bit_false(bullet.Points.Tech.ProjectileClass, PROJECTILE_CLASS_SHELL)) {
-							const ::gpk::SCoord2<float> dirVector = {bullet.Direction.x, bullet.Direction.z}; 
+							const ::gpk::SCoord2<float> dirVector = {bullet.Direction.x, bullet.Direction.z};
 							if( ( dirVector.x < (-GAME_EPSILON) && dirVector.y < (-GAME_EPSILON) )
 								|| ( dirVector.x > GAME_EPSILON && dirVector.y > GAME_EPSILON )
 								)
@@ -254,35 +254,35 @@ namespace klib
 								bulletAscii = '/'; // draw the enemy as an ascii character
 							else if( dirVector.x < (-GAME_EPSILON) || dirVector.x > GAME_EPSILON )
 								bulletAscii = '-'; // draw the enemy as an ascii character
-							else 
+							else
 								bulletAscii = '|'; // draw the enemy as an ascii character
 						}
 					}
-					target.Screen.Cells[z][x] = bulletAscii; 
+					target.Screen.Cells[z][x] = bulletAscii;
 					target.TextAttributes.Cells[z][x] |= bulletColor;
-				} 
-				else if( board.Tiles.Entities.Coins	.Cells[z][x] !=  0)	{ 
-					target.Screen.Cells			[z][x] = ::klib::ascii_cards[DECK_DIAMONDS]; 
-					target.TextAttributes.Cells	[z][x] |= bSwaps[6] ? COLOR_DARKYELLOW : COLOR_ORANGE; 
-				} 
-				else if(board.Tiles.Entities.Props.Cells[z][x].Definition != -1) { 
+				}
+				else if( board.Tiles.Entities.Coins	.Cells[z][x] !=  0)	{
+					target.Screen.Cells			[z][x] = ::klib::ascii_cards[DECK_DIAMONDS];
+					target.TextAttributes.Cells	[z][x] |= bSwaps[6] ? COLOR_DARKYELLOW : COLOR_ORANGE;
+				}
+				else if(board.Tiles.Entities.Props.Cells[z][x].Definition != -1) {
 					static const ::gpk::view_const_string chestLabel	= "Chest";
 					static const ::gpk::view_const_string wallLabel		= "Wall";
 					if(chestLabel == definitionsStageProp[board.Tiles.Entities.Props.Cells[z][x].Definition].Name) {
 						target.Screen.Cells[z][x] = ::klib::ascii_cards[DECK_CLUBS];
-						target.TextAttributes.Cells[z][x] |= bSwaps[10] ? COLOR_YELLOW : COLOR_BLACK; 
+						target.TextAttributes.Cells[z][x] |= bSwaps[10] ? COLOR_YELLOW : COLOR_BLACK;
 					}
 					else if(wallLabel == definitionsStageProp[board.Tiles.Entities.Props.Cells[z][x].Definition].Name){
 						target.Screen.Cells[z][x] = ::klib::getASCIIWall(::gpk::view_grid<const STileProp>{board.Tiles.Entities.Props.begin(), board.Tiles.Entities.Props.metrics()}, x, z);
-						target.TextAttributes.Cells[z][x] |= COLOR_BLACK; 
+						target.TextAttributes.Cells[z][x] |= COLOR_BLACK;
 					}
 					else {
 						target.Screen.Cells[z][x] = definitionsStageProp[board.Tiles.Entities.Props	.Cells[z][x].Definition].Name[0];
-						target.TextAttributes.Cells[z][x] |= COLOR_BLACK; 
+						target.TextAttributes.Cells[z][x] |= COLOR_BLACK;
 					}
 					if(board.Tiles.Entities.Props.Cells[z][x].Level == -1)
-						target.TextAttributes.Cells[z][x] |= COLOR_DARKGREY; 
-				} 
+						target.TextAttributes.Cells[z][x] |= COLOR_DARKGREY;
+				}
 				else if(topologyHeight || cornerHeight[0] || cornerHeight[1] || cornerHeight[2] || cornerHeight[3]) {
 					// I suppose this chooses a color depending on the slope between tile corners.
 						 if(cornerHeight[0]	<	cornerHeight[3] && cornerHeight[0]	<	cornerHeight[1] && cornerHeight[0]	<	cornerHeight[2])	{	target.Screen.Cells[z][x] = -80; target.TextAttributes.Cells[z][x] = COLOR_DARKGREEN	<< 4 | COLOR_DARKGREY		; }
@@ -334,16 +334,16 @@ namespace klib
 					//else if(cornerHeight[0]	>	cornerHeight[2])	{	target.Screen.Cells[z][x] = -80; target.TextAttributes.Cells[z][x] = COLOR_DARKGREEN << 4; }
 					//else if(cornerHeight[1]	>	cornerHeight[3])	{	target.Screen.Cells[z][x] = -78; target.TextAttributes.Cells[z][x] = COLOR_DARKGREEN << 4; }
 					//else if(cornerHeight[2]	>	cornerHeight[3])	{	target.Screen.Cells[z][x] = -79; target.TextAttributes.Cells[z][x] = COLOR_DARKGREEN << 4; }
-					else											
-					{	
-						target.Screen.Cells[z][x] = ' '; 
-						target.TextAttributes.Cells[z][x] = COLOR_DARKGREEN << 4; 
+					else
+					{
+						target.Screen.Cells[z][x] = ' ';
+						target.TextAttributes.Cells[z][x] = COLOR_DARKGREEN << 4;
 					}
 				}
 				//else if(topologyHeight)
 				//{
-				//	if(topologyHeight < -FULL_COVER_HEIGHT)	
-				//	{ 
+				//	if(topologyHeight < -FULL_COVER_HEIGHT)
+				//	{
 				//		if(z&1) {
 				//			if(x&1)	{ target.Screen.Cells[z][x] = ascii_water[(bSwaps[4]	) ? 1+(x&1) : 2-(x&1)]; target.TextAttributes.Cells[z][x] = iif(bSwaps[8]	) COLOR_BLUE		| (COLOR_DARKGREEN <<4) : COLOR_DARKBLUE	| (COLOR_DARKGREEN <<4); }
 				//			else	{ target.Screen.Cells[z][x] = ascii_water[(bSwaps[5]	) ? 1+(x&1) : 2-(x&1)]; target.TextAttributes.Cells[z][x] = iif(bSwaps[9]	) COLOR_DARKBLUE	| (COLOR_DARKGREEN <<4) : COLOR_BLUE		| (COLOR_DARKGREEN <<4); }
@@ -352,29 +352,29 @@ namespace klib
 				//			if(x&1)	{ target.Screen.Cells[z][x] = ascii_water[(bSwaps[6]	) ? 2-(x&1) : 1+(x&1)]; target.TextAttributes.Cells[z][x] = iif(bSwaps[2]	) COLOR_DARKBLUE	| (COLOR_DARKGREEN  <<4) : COLOR_BLUE		| (COLOR_DARKGREEN  <<4); }
 				//			else	{ target.Screen.Cells[z][x] = ascii_water[(bSwaps[7]	) ? 2-(x&1) : 1+(x&1)]; target.TextAttributes.Cells[z][x] = iif(bSwaps[3]	) COLOR_BLUE		| (COLOR_DARKGREEN  <<4) : COLOR_DARKBLUE	| (COLOR_DARKGREEN  <<4); }
 				//		}
-				//	} 
-				//	else if(topologyHeight >= FULL_COVER_HEIGHT		)	{ target.Screen.Cells[z][x] = ascii_tones[(topologyHeight == FULL_COVER_HEIGHT		) ? 1 : topologyHeight		-FULL_COVER_HEIGHT		]	; target.TextAttributes.Cells[z][x] = (COLOR_DARKBLUE	) | (COLOR_DARKGREEN	<<4)	; } 
+				//	}
+				//	else if(topologyHeight >= FULL_COVER_HEIGHT		)	{ target.Screen.Cells[z][x] = ascii_tones[(topologyHeight == FULL_COVER_HEIGHT		) ? 1 : topologyHeight		-FULL_COVER_HEIGHT		]	; target.TextAttributes.Cells[z][x] = (COLOR_DARKBLUE	) | (COLOR_DARKGREEN	<<4)	; }
 				//	else if(topologyHeight >= PARTIAL_COVER_HEIGHT	)	{ target.Screen.Cells[z][x] = ascii_tones[(topologyHeight == PARTIAL_COVER_HEIGHT	) ? 1 : topologyHeight		-PARTIAL_COVER_HEIGHT	]	; target.TextAttributes.Cells[z][x] = (COLOR_ORANGE		) | (COLOR_DARKGREEN	<<4)	; }
-				//	else if(topologyHeight > 0						)	{ target.Screen.Cells[z][x] = ascii_tones[1+(topologyHeight)/3]																				; target.TextAttributes.Cells[z][x] = (COLOR_GREEN		) | (COLOR_DARKGREEN	<<4)	; } 
-				//	else if(topologyHeight <= -FULL_COVER_HEIGHT	)	{ target.Screen.Cells[z][x] = ascii_tones[(topologyHeight == -FULL_COVER_HEIGHT		) ? 1 : (topologyHeight*-1)	-FULL_COVER_HEIGHT		]	; target.TextAttributes.Cells[z][x] = (COLOR_DARKGREEN	) | (COLOR_BLACK		<<4)	; } 
+				//	else if(topologyHeight > 0						)	{ target.Screen.Cells[z][x] = ascii_tones[1+(topologyHeight)/3]																				; target.TextAttributes.Cells[z][x] = (COLOR_GREEN		) | (COLOR_DARKGREEN	<<4)	; }
+				//	else if(topologyHeight <= -FULL_COVER_HEIGHT	)	{ target.Screen.Cells[z][x] = ascii_tones[(topologyHeight == -FULL_COVER_HEIGHT		) ? 1 : (topologyHeight*-1)	-FULL_COVER_HEIGHT		]	; target.TextAttributes.Cells[z][x] = (COLOR_DARKGREEN	) | (COLOR_BLACK		<<4)	; }
 				//	else if(topologyHeight <= -PARTIAL_COVER_HEIGHT	)	{ target.Screen.Cells[z][x] = ascii_tones[(topologyHeight == -PARTIAL_COVER_HEIGHT	) ? 1 : (topologyHeight*-1)	-PARTIAL_COVER_HEIGHT	]	; target.TextAttributes.Cells[z][x] = (COLOR_DARKGREEN	) | (COLOR_DARKBLUE		<<4)	; }
-				//	else if(topologyHeight < 0						)	{ target.Screen.Cells[z][x] = ascii_tones[1+(topologyHeight*-1)/3]																			; target.TextAttributes.Cells[z][x] = (COLOR_DARKGREEN	) | (COLOR_DARKGREY			<<4)	; } 
+				//	else if(topologyHeight < 0						)	{ target.Screen.Cells[z][x] = ascii_tones[1+(topologyHeight*-1)/3]																			; target.TextAttributes.Cells[z][x] = (COLOR_DARKGREEN	) | (COLOR_DARKGREY			<<4)	; }
 				//}
-				else { 
-					target.Screen			.Cells[z][x]	= ' '; 
-					target.TextAttributes	.Cells[z][x]	= (COLOR_DARKGREEN << 4); 
+				else {
+					target.Screen			.Cells[z][x]	= ' ';
+					target.TextAttributes	.Cells[z][x]	= (COLOR_DARKGREEN << 4);
 				}
 
 				if(initialSight != finalSight)
 					target.TextAttributes.Cells[z][x]		= (target.TextAttributes.Cells[z][x] & 0xF) | (COLOR_WHITE << 4);
-				
+
 				for(uint32_t iAOE=0, countAOE=board.AreaOfEffect.AOE.Count; iAOE <countAOE; ++iAOE) {
 					const SAOE& aoeInstance = board.AreaOfEffect.AOE[iAOE].Entity;
 					const ::gpk::SCoord3<int32_t>& aoeCell = aoeInstance.Position.Cell;
 					::gpk::SCoord3<float> aoePos = {(float)aoeCell.x, (float)aoeCell.y, (float)aoeCell.z};
 					aoePos += aoeInstance.Position.Offset;
 
-					bool failBVTest = 
+					bool failBVTest =
 						 ( x < (aoePos.x - aoeInstance.RadiusOrHalfSize)
 						|| y < (aoePos.y - aoeInstance.RadiusOrHalfSize)
 						|| z < (aoePos.z - aoeInstance.RadiusOrHalfSize)
@@ -404,7 +404,7 @@ namespace klib
 
 		if( animationAccum.Accumulate(animationTimer.LastTimeSeconds) ) {
 			for(uint32_t i=0; i<maxSwaps; ++i)
-				if(0 == swapCounter%(i+1))	
+				if(0 == swapCounter%(i+1))
 					bSwaps[i]								= !bSwaps[i];
 
 			++swapCounter;
@@ -414,9 +414,9 @@ namespace klib
 
 	template<size_t _Width, size_t _Depth>
 	void									drawTacticalBoard				(SGame& instanceGame, STacticalInfo& tacticalInfo, SWeightedDisplay<_Width, _Depth>& target, int8_t playerIndex, TEAM_TYPE teamId, const SPlayerSelection& selection, bool bFogOfWar)			{
-		char										hiddenTile						= -78;
+		char										hiddenTile						= 0;//-78;
 		memset(&target.Screen.Cells[0][0], hiddenTile, _Width*_Depth);
-				
+
 		uint16_t									gridColor						= COLOR_DARKGREEN << 4;
 		uint64_t									gridColorPacked					= gridColor;
 		gridColorPacked							|= (gridColorPacked << 16) | (gridColorPacked << 32) | (gridColorPacked << 48);

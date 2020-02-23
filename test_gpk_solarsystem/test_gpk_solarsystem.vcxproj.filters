@@ -18,19 +18,10 @@
     <ClInclude Include="application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ced_geometry.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ced_model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ced_particles.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ced_rigidbody.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ced_draw.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="solarsystem.h">
@@ -42,15 +33,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="solarsystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ced_draw.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ced_geometry.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ced_rigidbody.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -168,18 +168,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
-    <ClInclude Include="ced_draw.h" />
-    <ClInclude Include="ced_geometry.h" />
     <ClInclude Include="ced_model.h" />
     <ClInclude Include="ced_particles.h" />
-    <ClInclude Include="ced_rigidbody.h" />
     <ClInclude Include="solarsystem.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="application.cpp" />
-    <ClCompile Include="ced_draw.cpp" />
-    <ClCompile Include="ced_geometry.cpp" />
-    <ClCompile Include="ced_rigidbody.cpp" />
     <ClCompile Include="solarsystem.cpp" />
   </ItemGroup>
   <ItemGroup>
