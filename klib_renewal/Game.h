@@ -30,37 +30,42 @@ namespace klib
 #define SIGHT_OFFSET	1.7
 #define RANGE_OFFSET	1.7
 
-	static inline		double										getFinalSight			(const CCharacter& playerAgent, const SEntityPoints& playerAgentPoints)						{	return getFinalSight(playerAgentPoints.Fitness	.Sight + SIGHT_OFFSET, playerAgent);	}
-	static inline		double										getFinalRange			(const CCharacter& playerAgent, const SEntityPoints& playerAgentPoints)						{	return getFinalSight(playerAgentPoints.Attack	.Range + RANGE_OFFSET, playerAgent);	}
+	static inline		double						getFinalSight			(const CCharacter& playerAgent, const SEntityPoints& playerAgentPoints)						{	return getFinalSight(playerAgentPoints.Fitness	.Sight + SIGHT_OFFSET, playerAgent);	}
+	static inline		double						getFinalRange			(const CCharacter& playerAgent, const SEntityPoints& playerAgentPoints)						{	return getFinalSight(playerAgentPoints.Attack	.Range + RANGE_OFFSET, playerAgent);	}
 
-	template<size_t _Width, size_t _Depth>
+	//template<size_t _Width, size_t _Depth>
 	struct SWeightedDisplay {
-		static constexpr	const uint32_t								Width					= (uint32_t)_Width;
-		static constexpr	const uint32_t								Depth					= (uint32_t)_Depth;
+		//static constexpr	const uint32_t				Width					= (uint32_t)_Width;
+		//static constexpr	const uint32_t				Depth					= (uint32_t)_Depth;
 
-							::klib::SGrid<char		, _Width, _Depth>	Screen					= {};
-							::klib::SGrid<uint16_t	, _Width, _Depth>	TextAttributes			= {};
-							::klib::SGrid<float		, _Width, _Depth>	DisplayWeights			= {};
-							::klib::SGrid<float		, _Width, _Depth>	Speed					= {};
-							::klib::SGrid<float		, _Width, _Depth>	SpeedTarget				= {};
+							::gpk::SImage<char		>	Screen					= {};
+							::gpk::SImage<uint16_t	>	TextAttributes			= {};
+							::gpk::SImage<float	>		DisplayWeights			= {};
+							::gpk::SImage<float	>		Speed					= {};
+							::gpk::SImage<float	>		SpeedTarget				= {};
 
-		inline				void										Clear					()																							{
-			::klib::clearGrid(Screen			, ' ');
-			::klib::clearGrid(TextAttributes	, (uint16_t)COLOR_WHITE);
-			::klib::clearGrid(DisplayWeights	, 0.0f);
-			::klib::clearGrid(Speed				, 0.0f);
-			::klib::clearGrid(SpeedTarget		, 0.0f);
+		inline				::gpk::error_t				Resize					(::gpk::SCoord2<uint32_t> newSize)															{
+			Screen			.resize(newSize, ' ');
+			TextAttributes	.resize(newSize, (uint16_t)COLOR_WHITE);
+			DisplayWeights	.resize(newSize, 0.0f);
+			Speed			.resize(newSize, 0.0f);
+			SpeedTarget		.resize(newSize, 0.0f);
+			return 0;
+		}
+		inline				void						Clear					()																							{
+			::klib::clearGrid(Screen			.View, ' ');
+			::klib::clearGrid(TextAttributes	.View, (uint16_t)COLOR_WHITE);
+			::klib::clearGrid(DisplayWeights	.View, 0.0f);
+			::klib::clearGrid(Speed				.View, 0.0f);
+			::klib::clearGrid(SpeedTarget		.View, 0.0f);
 		}
 	};
 
 
-#define DEFAULT_ASCII_DISPLAY_HEIGHT	83
-#define DEFAULT_ASCII_DISPLAY_WIDTH		((uint32_t)(DEFAULT_ASCII_SCREEN_HEIGHT*2.666666f))
-	typedef	SWeightedDisplay<DEFAULT_ASCII_DISPLAY_WIDTH, DEFAULT_ASCII_DISPLAY_HEIGHT>	SGlobalDisplay		;
-	typedef SWeightedDisplay<GAME_MAP_WIDTH, GAME_MAP_DEPTH>							STacticalDisplay	;
-	typedef ::klib::SGrid<char, SGlobalDisplay::Width, SGlobalDisplay::Depth>			SMenuDisplay		;
+	//typedef	SWeightedDisplay<DEFAULT_ASCII_DISPLAY_WIDTH0, DEFAULT_ASCII_DISPLAY_HEIGHT>	SWeightedDisplay		;
+	//typedef SWeightedDisplay<GAME_MAP_WIDTH, GAME_MAP_DEPTH>							STacticalDisplay	;
+	typedef SWeightedDisplay	STacticalDisplay	;
 
-	//
 	struct SFrameInfo {
 							::klib::SInput								Input			= {};
 							::klib::STimer								Timer			= {};
@@ -139,8 +144,7 @@ namespace klib
 
 							// Displays.
 							STacticalDisplay						TacticalDisplay					= {};
-							SGlobalDisplay							GlobalDisplay					= {};
-							SMenuDisplay							MenuDisplay						= {};
+							SWeightedDisplay							GlobalDisplay					= {};
 
 							// Feedback messages.
 							::std::string							StateMessage					= "";
@@ -159,7 +163,6 @@ namespace klib
 							void									ClearDisplays					()																						{
 			TacticalDisplay		.Clear();
 			GlobalDisplay		.Clear();
-			clearGrid(MenuDisplay);
 		}
 
 							void									ClearMessages					()

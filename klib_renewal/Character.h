@@ -19,9 +19,9 @@ namespace klib
 		SVehicle												Vehicle					= {0,0,1,-1};	// Index, ModifierIndex, Level
 		SFacility												Facility				= {0,0,1,-1};	// Index, ModifierIndex, Level
 		SStageProp												StageProp				= {0,0,1,-1};	// Index, ModifierIndex, Level
-	};																					
+	};
 
-	struct SCharacterResearch {																					
+	struct SCharacterResearch {
 		SResearchGroup<SWeapon		>							Weapon					= {};
 		SResearchGroup<SAccessory	>							Accessory				= {};
 		SResearchGroup<SProfession	>							Profession				= {};
@@ -31,29 +31,28 @@ namespace klib
 		SResearchGroup<SStageProp	>							StageProp				= {};
 	};
 
-#define MAX_INVENTORY_SLOTS 256
 	struct SCharacterInventory {
-		SEntityContainer<SItem		, MAX_INVENTORY_SLOTS>		Items;
-		SEntityContainer<SProfession, MAX_INVENTORY_SLOTS>		Profession;
-		SEntityContainer<SWeapon	, MAX_INVENTORY_SLOTS>		Weapon;
-		SEntityContainer<SArmor		, MAX_INVENTORY_SLOTS>		Armor;
-		SEntityContainer<SAccessory	, MAX_INVENTORY_SLOTS>		Accessory;
-		SEntityContainer<SVehicle	, MAX_INVENTORY_SLOTS>		Vehicle;
-		SEntityContainer<SStageProp	, MAX_INVENTORY_SLOTS>		StageProp;
-		SEntityContainer<SFacility	, MAX_INVENTORY_SLOTS>		Facility;
+		SEntityContainer<SItem		>		Items;
+		SEntityContainer<SProfession>		Profession;
+		SEntityContainer<SWeapon	>		Weapon;
+		SEntityContainer<SArmor		>		Armor;
+		SEntityContainer<SAccessory	>		Accessory;
+		SEntityContainer<SVehicle	>		Vehicle;
+		SEntityContainer<SStageProp	>		StageProp;
+		SEntityContainer<SFacility	>		Facility;
 
 		int32_t													GetCount				(ENTITY_TYPE entityType) const	{
 			int32_t result = 0;
 			switch(entityType) {
-			//case ENTITY_TYPE_CHARACTER	:	return 
-			case ENTITY_TYPE_PROFESSION	: result = Profession	.Count; break;
-			case ENTITY_TYPE_WEAPON		: result = Weapon		.Count; break;
-			case ENTITY_TYPE_ARMOR		: result = Armor		.Count; break;
-			case ENTITY_TYPE_ACCESSORY	: result = Accessory	.Count; break;
-			case ENTITY_TYPE_VEHICLE	: result = Vehicle		.Count; break;
-			case ENTITY_TYPE_FACILITY	: result = Facility		.Count; break;
-			case ENTITY_TYPE_STAGE_PROP	: result = StageProp	.Count; break;
-			case ENTITY_TYPE_ITEM		: result = Items		.Count; break;
+			//case ENTITY_TYPE_CHARACTER	:	return
+			case ENTITY_TYPE_PROFESSION	: result = Profession	.Slots.size(); break;
+			case ENTITY_TYPE_WEAPON		: result = Weapon		.Slots.size(); break;
+			case ENTITY_TYPE_ARMOR		: result = Armor		.Slots.size(); break;
+			case ENTITY_TYPE_ACCESSORY	: result = Accessory	.Slots.size(); break;
+			case ENTITY_TYPE_VEHICLE	: result = Vehicle		.Slots.size(); break;
+			case ENTITY_TYPE_FACILITY	: result = Facility		.Slots.size(); break;
+			case ENTITY_TYPE_STAGE_PROP	: result = StageProp	.Slots.size(); break;
+			case ENTITY_TYPE_ITEM		: result = Items		.Slots.size(); break;
 			default:
 				break;
 			}
@@ -69,20 +68,20 @@ namespace klib
 
 
 	struct SCharacter {
-							SEntityPoints						Points					= {};	
-							SEntityFlags						Flags					= {};	
+							SEntityPoints						Points					= {};
+							SEntityFlags						Flags					= {};
 
-							SEntityPoints						FinalPoints				= {};	
-							SEntityFlags						FinalFlags				= {};	
+							SEntityPoints						FinalPoints				= {};
+							SEntityFlags						FinalFlags				= {};
 							SEntityGauges						Gauges					= {};
 
 							SCharacterTurnBonus					ActiveBonus				= {};
-							SCharacterScore						Score					= {};	
+							SCharacterScore						Score					= {};
 							SCharacterEquip						CurrentEquip			= {};
 							SCharacterGoods						Goods					= {};
 
 																SCharacter				()													= default;
-																SCharacter				(int maxHP, int hitChance, int attack, int coins, SFitnessPoints speed, SEntityEffect characterEffect, SEntityStatus characterStatus ) 
+																SCharacter				(int maxHP, int hitChance, int attack, int coins, SFitnessPoints speed, SEntityEffect characterEffect, SEntityStatus characterStatus )
 			:Points				({{maxHP}, {maxHP}, {hitChance, attack, {}, 0, 0}, speed, coins, coins, coins/10})
 			,Flags				({characterEffect, characterStatus})
 			,Gauges				({{maxHP, maxHP}, {0, 0}, {0, 0}})
@@ -95,11 +94,11 @@ namespace klib
 		inline				bool								CanMove					()								const	noexcept	{ return IsAlive() && !DidLoseTurn();					}
 		inline				bool								IsAlive					()								const	noexcept	{ return Points.LifeCurrent.Health > 0;					}
 							bool								DidLoseTurn				()								const	noexcept	{
-			return ::gpk::bit_true(ActiveBonus.Status.Status, COMBAT_STATUS_SLEEP		) 
-				|| ::gpk::bit_true(ActiveBonus.Status.Status, COMBAT_STATUS_STUN		) 
-				|| ::gpk::bit_true(ActiveBonus.Status.Status, COMBAT_STATUS_SHOCK		) 
-				|| ::gpk::bit_true(ActiveBonus.Status.Status, COMBAT_STATUS_PANIC		) 
-				|| ::gpk::bit_true(ActiveBonus.Status.Status, COMBAT_STATUS_PETRIFY	) 
+			return ::gpk::bit_true(ActiveBonus.Status.Status, COMBAT_STATUS_SLEEP		)
+				|| ::gpk::bit_true(ActiveBonus.Status.Status, COMBAT_STATUS_STUN		)
+				|| ::gpk::bit_true(ActiveBonus.Status.Status, COMBAT_STATUS_SHOCK		)
+				|| ::gpk::bit_true(ActiveBonus.Status.Status, COMBAT_STATUS_PANIC		)
+				|| ::gpk::bit_true(ActiveBonus.Status.Status, COMBAT_STATUS_PETRIFY	)
 				|| ::gpk::bit_true(ActiveBonus.Status.Status, COMBAT_STATUS_FROZEN		)
 				;
 		}
@@ -131,7 +130,7 @@ namespace klib
 
 	class CDeadCharacter {
 	public:
-						SCharacterScore							Score					= {};	
+						SCharacterScore							Score					= {};
 						::gpk::label							Name					= "Unnamed";
 
 		inline													CDeadCharacter			()									= default;
@@ -140,7 +139,7 @@ namespace klib
 			,	Name	(deadCharacter.Name.c_str(), (uint32_t)deadCharacter.Name.size())
 		{}
 	};
-	
+
 	template<typename _TEntity>
 	void														completeAgentResearch	(klib::SResearchGroup<_TEntity>& agentCompletedResearch, const _TEntity& itemToResearch)	{
 		agentCompletedResearch.Definitions	.AddElement(itemToResearch.Definition	);
@@ -149,19 +148,19 @@ namespace klib
 		agentCompletedResearch.MaxResearch.Modifier		= (agentCompletedResearch.MaxResearch.Modifier		> itemToResearch.Modifier	) ? agentCompletedResearch.MaxResearch.Modifier		: itemToResearch.Modifier	;
 	}
 
-	template <typename _EntityType, size_t _MaxSlots, size_t _SizeDefinitions, size_t _SizeModifiers>
+	template <typename _EntityType, size_t _SizeDefinitions, size_t _SizeModifiers>
 	static bool													equipIfResearched
 		( int16_t selectedChoice
-		, CCharacter&								playerAgent
-		, SEntityContainer<_EntityType, _MaxSlots>& playerInventory
-		, _EntityType&								agentEquippedEntity
-		, const SResearchGroup<_EntityType>&		playerCompletedResearch
-		, const SResearchGroup<_EntityType>&		agentCompletedResearch
+		, CCharacter								& playerAgent
+		, SEntityContainer<_EntityType>				& playerInventory
+		, _EntityType								& agentEquippedEntity
+		, const SResearchGroup<_EntityType>			& playerCompletedResearch
+		, const SResearchGroup<_EntityType>			& agentCompletedResearch
 		, const SEntityRecord<_EntityType>			(&entityDefinitions)	[_SizeDefinitions]
 		, const SEntityRecord<_EntityType>			(&entityModifiers)		[_SizeModifiers]
-		, const ::gpk::label&						modifierTypeName
-		, ::std::string&							messageSuccess
-		, ::std::string&							messageError
+		, const ::gpk::label						& modifierTypeName
+		, ::std::string								& messageSuccess
+		, ::std::string								& messageError
 		)
 	{
 		_EntityType			selectedItem	= playerInventory[selectedChoice].Entity;

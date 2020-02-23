@@ -58,9 +58,14 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 		::gpk::geometryBuildGridFromTileList(app.TextOverlay.GeometryLetters[asciiCode], ::gpk::view_grid<::gpk::STile>{tiles.begin(), app.TextOverlay.MetricsLetter}, {}, {1, 6.0f, 1});
 	}
 
-	::klib::initASCIIScreen(klib::SGlobalDisplay::Width, klib::SGlobalDisplay::Depth);
+
+#define DEFAULT_ASCII_DISPLAY_HEIGHT	70
+#define DEFAULT_ASCII_DISPLAY_WIDTH		((uint32_t)(DEFAULT_ASCII_DISPLAY_HEIGHT * 2.666666f))
+	::klib::initASCIIScreen(DEFAULT_ASCII_DISPLAY_WIDTH, DEFAULT_ASCII_DISPLAY_HEIGHT);
 
 	::klib::SGame												& instanceGame		= app.Game;
+	instanceGame.GlobalDisplay	.Resize({DEFAULT_ASCII_DISPLAY_WIDTH, DEFAULT_ASCII_DISPLAY_HEIGHT});
+	instanceGame.TacticalDisplay.Resize({::klib::GAME_MAP_WIDTH, ::klib::GAME_MAP_DEPTH});
 
 	::klib::initGame(instanceGame);
 
@@ -208,8 +213,8 @@ int													draw					(SApplication & app) {
 
 	{
 		::gpk::mutex_guard										lock						(app.LockRender);
-		::gpk::view_grid<char>									mapToDraw					= app.Game.GlobalDisplay.Screen.Cells;
-		::gpk::view_grid<uint16_t>								mapColors					= app.Game.GlobalDisplay.TextAttributes.Cells;
+		::gpk::view_grid<char>									mapToDraw					= app.Game.GlobalDisplay.Screen;
+		::gpk::view_grid<uint16_t>								mapColors					= app.Game.GlobalDisplay.TextAttributes;
 		matrixView.LookAt(app.TextOverlay.CameraPosition, app.TextOverlay.CameraTarget, app.TextOverlay.CameraUp);
 		matrixView											*= matrixProjection;
 		matrixView											*= matrixViewport;
@@ -232,8 +237,8 @@ int													draw					(SApplication & app) {
 
 	{
 		::gpk::mutex_guard										lock						(app.LockRender);
-		::gpk::view_grid<char>									mapToDraw					= app.Game.TacticalDisplay.Screen.Cells;
-		::gpk::view_grid<uint16_t>								mapColors					= app.Game.TacticalDisplay.TextAttributes.Cells;
+		::gpk::view_grid<char>									mapToDraw					= app.Game.TacticalDisplay.Screen;
+		::gpk::view_grid<uint16_t>								mapColors					= app.Game.TacticalDisplay.TextAttributes;
 
 		if((app.Game.State.State != ::klib::GAME_STATE_START_MISSION && app.Game.State.State != ::klib::GAME_STATE_TACTICAL_CONTROL) || 0 > app.Game.TacticalInfo.CurrentPlayer)
 			matrixView.LookAt(app.TextOverlay.CameraPosition, app.TextOverlay.CameraTarget, app.TextOverlay.CameraUp);

@@ -49,9 +49,9 @@ bool																	handleUserInput									(SGame& instanceGame, const SGameSt
 		int32_t																		mouseX											= instanceGame.FrameInput.Mouse.Deltas.x;
 		int32_t																		mouseY											= instanceGame.FrameInput.Mouse.Deltas.y;
 
-		::klib::SGlobalDisplay														& globalDisplay									= instanceGame.GlobalDisplay;
+		::klib::SWeightedDisplay														& globalDisplay									= instanceGame.GlobalDisplay;
 		::klib::STacticalDisplay													& tacticalDisplay								= instanceGame.TacticalDisplay;
-		int32_t																		tacticalDisplayX								= (globalDisplay.Width>>1)	- (tacticalDisplay.Width>>1);
+		int32_t																		tacticalDisplayX								= (globalDisplay.Screen.metrics().x >> 1)	- (tacticalDisplay.Screen.metrics().x >> 1);
 		//int32_t																		tacticalDisplayStop								= TACTICAL_DISPLAY_POSY		+ (tacticalDisplay.Depth);
 		int32_t																		tacticalMouseX									= mouseX-tacticalDisplayX;
 		int32_t																		tacticalMouseY									= mouseY-TACTICAL_DISPLAY_POSY;
@@ -109,7 +109,7 @@ void																	drawTileInfo
 	(	const SGame						& instanceGame
 	,	const ::klib::SInput			& frameInput
 	,	const STacticalInfo				& tacticalInfo
-	,	SGlobalDisplay					& globalDisplay
+	,	SWeightedDisplay					& globalDisplay
 	,	STacticalDisplay				& tacticalDisplay
 	)
 {
@@ -117,17 +117,17 @@ void																	drawTileInfo
 	static	char																messageSlow		[256]							= {'_',};
 	static	uint16_t															messageColor									= COLOR_DARKGREEN;
 
-	int32_t																		tacticalDisplayStop								= TACTICAL_DISPLAY_POSY + (tacticalDisplay.Depth);
+	int32_t																		tacticalDisplayStop								= TACTICAL_DISPLAY_POSY + (tacticalDisplay.Screen.metrics().y);
 
 	bool																		bDrawText										= false;
 	int32_t																		mouseX											= frameInput.Mouse.Deltas.x;
 	int32_t																		mouseY											= frameInput.Mouse.Deltas.y;
-	int32_t																		tacticalDisplayX								= (globalDisplay.Width>>1)	- (tacticalDisplay.Width>>1);
+	int32_t																		tacticalDisplayX								= (globalDisplay.Screen.metrics().x >> 1)	- (tacticalDisplay.Screen.metrics().x >> 1);
 	int32_t																		boardX											= mouseX-tacticalDisplayX;
 	int32_t																		boardZ											= mouseY-TACTICAL_DISPLAY_POSY;
 
 	bool																		bInTacticalMap									= false;
-	if( mouseX >= tacticalDisplayX && mouseX < (int32_t)(tacticalDisplayX+tacticalDisplay.Width)
+	if( mouseX >= tacticalDisplayX && mouseX < (int32_t)(tacticalDisplayX+tacticalDisplay.Screen.metrics().x)
 		 && mouseY >= TACTICAL_DISPLAY_POSY && mouseY < tacticalDisplayStop
 		)
 	{
@@ -213,10 +213,9 @@ void																	drawTileInfo
 	}
 
 	if(bDrawText)
-		::klib::lineToGridColored(globalDisplay.Screen, globalDisplay.TextAttributes, messageColor, tacticalDisplayStop+3, 0, ::klib::SCREEN_CENTER, messageSlow);
+		::klib::lineToGridColored(globalDisplay.Screen, globalDisplay.TextAttributes, messageColor, tacticalDisplayStop + 3, 0, ::klib::SCREEN_CENTER, messageSlow);
 
-	printfToGridColored(globalDisplay.Screen, globalDisplay.TextAttributes, bInTacticalMap ? messageColor : COLOR_DARKGREY, tacticalDisplayStop+3, tacticalDisplayX	+1, ::klib::SCREEN_LEFT, "%i, %i", mouseX-tacticalDisplayX, mouseY-TACTICAL_DISPLAY_POSY);
-
+	::klib::printfToGridColored(globalDisplay.Screen.View, globalDisplay.TextAttributes, bInTacticalMap ? messageColor : COLOR_DARKGREY, tacticalDisplayStop+3, tacticalDisplayX	+1, ::klib::SCREEN_LEFT, "%i, %i", mouseX-tacticalDisplayX, mouseY-TACTICAL_DISPLAY_POSY);
 }
 
 void																	drawPlayerInfo									(SGame& instanceGame)																{
@@ -229,10 +228,10 @@ void																	drawPlayerInfo									(SGame& instanceGame)															
 		bSwap																	= !bSwap;
 		animationAccum.Value													= 0;
 	}
-	SGlobalDisplay																& globalDisplay									= instanceGame.GlobalDisplay;
+	SWeightedDisplay																& globalDisplay									= instanceGame.GlobalDisplay;
 	STacticalDisplay															& tacticalDisplay								= instanceGame.TacticalDisplay;
-	const int32_t																tacticalDisplayStop								= TACTICAL_DISPLAY_POSY		+ (tacticalDisplay.Depth);
-	const int32_t																tacticalDisplayX								= (globalDisplay.Width>>1)	- (tacticalDisplay.Width>>1);
+	const int32_t																tacticalDisplayStop								= TACTICAL_DISPLAY_POSY						+ (tacticalDisplay.Screen.metrics().y);
+	const int32_t																tacticalDisplayX								= (globalDisplay.Screen.metrics().x >> 1)	- (tacticalDisplay.Screen.metrics().x >> 1);
 	const STacticalInfo															& tacticalInfo									= instanceGame.TacticalInfo;
 
 	const PLAYER_INDEX															currentPlayerIndex								= getCurrentPlayerIndex(tacticalInfo);
@@ -259,7 +258,7 @@ void																	drawPlayerInfo									(SGame& instanceGame)															
 		if(currentPlayer.Selection.PlayerUnit != -1 && currentPlayer.Squad.Agents[currentPlayer.Selection.PlayerUnit] != -1) {
 			CCharacter																	& playerAgent									= *currentPlayer.Army[currentPlayer.Squad.Agents[currentPlayer.Selection.PlayerUnit]];
 			displayDetailedAgentSlot	(globalDisplay.Screen, globalDisplay.TextAttributes, PLAYER_INFO_POSY, 4, playerAgent, messageColor);
-			displayStatusEffectsAndTechs(globalDisplay.Screen, globalDisplay.TextAttributes, PLAYER_INFO_POSY + 9, 4 + 32, playerAgent);
+			displayStatusEffectsAndTechs(globalDisplay.Screen, globalDisplay.TextAttributes, PLAYER_INFO_POSY + 36, 4, playerAgent);
 		}
 
 		selectionText															= "Player name: "	+ ::std::string(currentPlayer.Name.begin());
@@ -278,13 +277,13 @@ void																	drawPlayerInfo									(SGame& instanceGame)															
 			selectionText															= "-";
 			if(selectionX-1 >= 0)
 				lineToGridColored(tacticalDisplay.Screen	, tacticalDisplay.TextAttributes	, messageColor, selectionZ, selectionX-1, ::klib::SCREEN_LEFT, selectionText.c_str(), (uint32_t)selectionText.size());
-			if(selectionX+1 < tacticalDisplay.Width)
+			if(selectionX + 1 < (int32_t)tacticalDisplay.Screen.metrics().x)
 				lineToGridColored(tacticalDisplay.Screen	, tacticalDisplay.TextAttributes	, messageColor, selectionZ, selectionX+1, ::klib::SCREEN_LEFT, selectionText.c_str(), (uint32_t)selectionText.size());
 
 			selectionText															= "|";
 			if(selectionZ-1 >= 0)
 				lineToGridColored(tacticalDisplay.Screen	, tacticalDisplay.TextAttributes	, messageColor, selectionZ-1, selectionX, ::klib::SCREEN_LEFT, selectionText.c_str(), (uint32_t)selectionText.size());
-			if(selectionZ+1 < tacticalDisplay.Depth)
+			if(selectionZ+1 < (int32_t)tacticalDisplay.Screen.metrics().y)
 				lineToGridColored(tacticalDisplay.Screen	, tacticalDisplay.TextAttributes	, messageColor, selectionZ+1, selectionX, ::klib::SCREEN_LEFT, selectionText.c_str(), (uint32_t)selectionText.size());
 		}
 	}
@@ -316,22 +315,22 @@ void																	drawPlayerInfo									(SGame& instanceGame)															
 		selectionText															= "-";
 		if(agentX-1 >= 0)
 			lineToGridColored(tacticalDisplay.Screen	, tacticalDisplay.TextAttributes	, messageColor, agentZ, agentX-1, ::klib::SCREEN_LEFT, selectionText.c_str(), (uint32_t)selectionText.size());
-		if(agentX+1 < tacticalDisplay.Width)
+		if(agentX+1 < (int32_t)tacticalDisplay.Screen.metrics().x)
 			lineToGridColored(tacticalDisplay.Screen	, tacticalDisplay.TextAttributes	, messageColor, agentZ, agentX+1, ::klib::SCREEN_LEFT, selectionText.c_str(), (uint32_t)selectionText.size());
 
 		selectionText															= "|";
 		if(agentZ-1 >= 0)
 			lineToGridColored(tacticalDisplay.Screen	, tacticalDisplay.TextAttributes	, messageColor, agentZ-1, agentX, ::klib::SCREEN_LEFT, selectionText.c_str(), (uint32_t)selectionText.size());
-		if(agentZ+1 < tacticalDisplay.Depth)
+		if(agentZ+1 < (int32_t)tacticalDisplay.Screen.metrics().y)
 			lineToGridColored(tacticalDisplay.Screen	, tacticalDisplay.TextAttributes	, messageColor, agentZ+1, agentX, ::klib::SCREEN_LEFT, selectionText.c_str(), (uint32_t)selectionText.size());
 	}
 
 	if( !targetAgent.IsAlive() )
 		return;
 
-	int32_t																		xOffset											= tacticalDisplayX + tacticalDisplay.Width + 4;
-	displayDetailedAgentSlot(globalDisplay.Screen, globalDisplay.TextAttributes, PLAYER_INFO_POSY, xOffset, targetAgent, messageColor);
-	displayStatusEffectsAndTechs(globalDisplay.Screen, globalDisplay.TextAttributes, PLAYER_INFO_POSY+9, xOffset+32, targetAgent);
+	int32_t																		xOffset											= tacticalDisplayX + tacticalDisplay.Screen.metrics().x + 4;
+	displayDetailedAgentSlot	(globalDisplay.Screen, globalDisplay.TextAttributes, PLAYER_INFO_POSY, xOffset, targetAgent, messageColor);
+	displayStatusEffectsAndTechs(globalDisplay.Screen, globalDisplay.TextAttributes, PLAYER_INFO_POSY + 36, xOffset, targetAgent);
 	selectionText															= "Target: " + targetAgent.Name;
 	lineToGridColored(globalDisplay.Screen, globalDisplay.TextAttributes, messageColor, 3, tacticalDisplayX+1, ::klib::SCREEN_RIGHT, selectionText.c_str());
 }
@@ -400,7 +399,7 @@ bool																	shoot											(SGame& instanceGame, int32_t tacticalPlaye
 inline	TURN_ACTION														selectRemoteAction								(SGame& instanceGame)																{ return selectAIAction(instanceGame); }
 		bool															characterTurn									(SGame& instanceGame, TURN_ACTION combatOption)										{
 	STacticalInfo																& tacticalInfo									= instanceGame.TacticalInfo;
-	SGlobalDisplay																& globalDisplay									= instanceGame.GlobalDisplay;
+	SWeightedDisplay																& globalDisplay									= instanceGame.GlobalDisplay;
 	SPlayer																		& currentPlayer									= instanceGame.Players[tacticalInfo.Setup.Players[tacticalInfo.CurrentPlayer]];
 	bool																		bNotCanceled									= true;
 
@@ -457,7 +456,7 @@ inline	TURN_ACTION														selectRemoteAction								(SGame& instanceGame)	
 					::std::string																userType										= "Origin Coords: " + std::string(formatCoords) + ". Current player index: "	+ std::to_string(tacticalInfo.CurrentPlayer)			+ ". Current player unit: "	+ std::to_string(currentPlayer.Selection.PlayerUnit) + ". Current player name: "	+ std::string(currentPlayer.Name.begin());
 
 					static const HANDLE															hConsoleOut										= GetStdHandle( STD_OUTPUT_HANDLE );
-					COORD																		cursorPos										= {0, ((SHORT)globalDisplay.Depth>>1)+7};
+					COORD																		cursorPos										= {0, ((SHORT)globalDisplay.Screen.metrics().y >> 1) + 7};
 					SetConsoleCursorPosition( hConsoleOut, cursorPos );
 					printf("%s.\n%s.\n\n", targetType.c_str(), userType.c_str());
 
@@ -525,8 +524,8 @@ template <size_t _Size1>
 int32_t																	initInventoryMenu								(klib::CCharacter& adventurer, klib::SMenuItem<int32_t> (&itemOptions)[_Size1], bool bPrintPrice=false, bool bSellPrice=true)	{
 	char																		itemOption[128]									= {};
 
-	for(uint32_t i=0; i<adventurer.Goods.Inventory.Items.Count; ++i) {
-		const klib::SItem															& itemEntity									= adventurer.Goods.Inventory.Items[i].Entity;
+	for(uint32_t i=0; i<adventurer.Goods.Inventory.Items.Slots.size(); ++i) {
+		const ::klib::SItem															& itemEntity									= adventurer.Goods.Inventory.Items[i].Entity;
 		std::string																	itemName										= getItemName(itemEntity);
 
 		if(bPrintPrice) {
@@ -544,12 +543,12 @@ int32_t																	initInventoryMenu								(klib::CCharacter& adventurer, 
 }
 
 int32_t																	drawInventoryMenu								(SGame& instanceGame, klib::CCharacter& adventurer, const std::string& menuTitle)								{
-	::klib::SMenuItem<int32_t>													itemOptions[MAX_INVENTORY_SLOTS+1]				= {};
-	SGlobalDisplay&																globalDisplay									= instanceGame.GlobalDisplay;
+	::klib::SMenuItem<int32_t>													itemOptions[4096]								= {};
+	SWeightedDisplay&																globalDisplay									= instanceGame.GlobalDisplay;
 	SCharacterInventory&														characterInventory								= adventurer.Goods.Inventory;
 	//int32_t																		initMenu										=
 		initInventoryMenu(adventurer, itemOptions, false, false);
-	return drawMenu(instanceGame.GlobalDisplay.Screen, &globalDisplay.TextAttributes.Cells[0][0], characterInventory.Items.Count, menuTitle, ::gpk::view_array<const ::klib::SMenuItem<int32_t>>{itemOptions}, instanceGame.FrameInput, (int32_t)adventurer.Goods.Inventory.Items.Count, -1, 50);
+	return drawMenu(instanceGame.GlobalDisplay.Screen.View, globalDisplay.TextAttributes.begin(), characterInventory.Items.Slots.size(), menuTitle, ::gpk::view_array<const ::klib::SMenuItem<int32_t>>{itemOptions}, instanceGame.FrameInput, (int32_t)adventurer.Goods.Inventory.Items.Slots.size(), -1, 50);
 
 };
 
@@ -558,25 +557,25 @@ TURN_ACTION																useItems										(SGame& instanceGame, SPlayer& play
 	bool																		bUsedItem										= false;
 	if(!bIsAIControlled)  {
 		indexInventory															= drawInventoryMenu(instanceGame, user, menuTitle);
-		if(indexInventory < (int32_t)user.Goods.Inventory.Items.Count)
+		if(indexInventory < (int32_t)user.Goods.Inventory.Items.Slots.size())
 			bUsedItem																= true;
 	}
 	else { // not a player so execute choice by AI
 		//indexInventory = selectItemsAI(user, target);
-		indexInventory															= user.Goods.Inventory.Items.Count;
-		if(indexInventory < (int32_t)user.Goods.Inventory.Items.Count)
+		indexInventory															= user.Goods.Inventory.Items.Slots.size();
+		if(indexInventory < (int32_t)user.Goods.Inventory.Items.Slots.size())
 			bUsedItem																= true;
 	}
 
-	if(indexInventory == (int32_t)user.Goods.Inventory.Items.Count)
+	if(indexInventory == (int32_t)user.Goods.Inventory.Items.Slots.size())
 		return TURN_ACTION_MAIN;
 	else if(indexInventory == -1)
 		return TURN_ACTION_CONTINUE;
 
 	if(bUsedItem) {
-		const klib::SItem															& entityItem									= user.Goods.Inventory.Items[indexInventory].Entity;
+		const ::klib::SItem															& entityItem									= user.Goods.Inventory.Items[indexInventory].Entity;
 		const klib::CItem															& itemDescription								= klib::itemDescriptions[entityItem.Definition];
-		const klib::SEntityPoints													& userFinalPoints								= user.FinalPoints;
+		const ::klib::SEntityPoints													& userFinalPoints								= user.FinalPoints;
 		// Only use potions if we have less than 60% HP
 		if( klib::ITEM_TYPE_POTION == itemDescription.Type
 			&&  (	(klib::PROPERTY_TYPE_HEALTH	== itemDescription.Property && user.Points.LifeCurrent.Health	>= userFinalPoints.LifeMax.Health	)
@@ -595,7 +594,7 @@ TURN_ACTION																useItems										(SGame& instanceGame, SPlayer& play
 	}
 
 	if(bUsedItem) {
-		const klib::SItem															& entityItem									= user.Goods.Inventory.Items[indexInventory].Entity;
+		const ::klib::SItem															& entityItem									= user.Goods.Inventory.Items[indexInventory].Entity;
 		const klib::CItem															& itemDescription								= klib::itemDescriptions[entityItem.Definition];
 		if( klib::ITEM_TYPE_POTION == itemDescription.Type )
 			bUsedItem																= klib::executeItem(indexInventory, user, user);
@@ -642,9 +641,14 @@ SGameState																endMission										(SGame& instanceGame)									{
 
 void																	updateBullets									(SGame& instanceGame)									{
 	STacticalInfo																& tacticalInfo									= instanceGame.TacticalInfo;
-
-	for(uint32_t iBullet=0;iBullet<tacticalInfo.Board.Shots.Bullet.Count; ++iBullet) {
-		for(uint32_t iShot=0; iBullet < tacticalInfo.Board.Shots.Bullet.Count && iShot < tacticalInfo.Board.Shots.Bullet[iBullet].Count; ++iShot) {
+	for(uint32_t iBullet=0;iBullet<tacticalInfo.Board.Shots.Bullet.size(); ++iBullet) {
+		for(uint32_t iShot=0; true; ++iShot) {
+			const uint32_t bulletCount = tacticalInfo.Board.Shots.Bullet.size();
+			always_printf("bulletCount is %i. iBullet: %i.", (int32_t)bulletCount, (int32_t)iBullet);
+			if(iBullet >= bulletCount)
+				break;
+			if(iShot >= tacticalInfo.Board.Shots.Bullet[iBullet].Count)
+				break;
 			double																		fSpeed											= 10.0;
 			double																		fActualSpeed									= instanceGame.FrameTimer.LastTimeSeconds*fSpeed;
 			//double fActualSpeed = 1.0*fSpeed;
@@ -860,7 +864,7 @@ SGameState																drawTacticalScreen								(SGame& instanceGame, const 
 	}
 
 	STacticalInfo&		tacticalInfo	= instanceGame.TacticalInfo;
-	if(tacticalInfo.Board.Shots.Bullet.Count <= 0) {
+	if(tacticalInfo.Board.Shots.Bullet.Slots.size() <= 0) {
 		handleUserInput(instanceGame, returnState);
 		if(!updateCurrentPlayer(instanceGame)) {
 			endTurn(instanceGame);
@@ -877,14 +881,14 @@ SGameState																drawTacticalScreen								(SGame& instanceGame, const 
 	SPlayer&			currentPlayer	= instanceGame.Players[tacticalInfo.Setup.Players[tacticalInfo.CurrentPlayer]];
 	drawTacticalBoard(instanceGame, tacticalInfo, tacticalDisplay.Screen, tacticalDisplay.TextAttributes, tacticalInfo.CurrentPlayer, tacticalInfo.Setup.TeamPerPlayer[tacticalInfo.CurrentPlayer], currentPlayer.Selection, true);
 
-	SGlobalDisplay&		globalDisplay	= instanceGame.GlobalDisplay;
-	clearGrid(globalDisplay.Screen, ' ');
+	SWeightedDisplay&		globalDisplay	= instanceGame.GlobalDisplay;
+	clearGrid(globalDisplay.Screen.View, ' ');
 	drawTileInfo(instanceGame, instanceGame.FrameInput, tacticalInfo, globalDisplay, tacticalDisplay);
 	drawPlayerInfo(instanceGame);
 
 	TURN_ACTION			selectedAction	= TURN_ACTION_CONTINUE;
 
-	if(tacticalInfo.Board.Shots.Bullet.Count <= 0) {
+	if(tacticalInfo.Board.Shots.Bullet.Slots.size() <= 0) {
 		// Need to construct menu title
 		std::string menuTitle = "Mission Over";
 		if( currentPlayer.Selection.PlayerUnit != -1 && currentPlayer.Squad.Agents[currentPlayer.Selection.PlayerUnit] != -1 && GAME_SUBSTATE_CHARACTER != instanceGame.State.Substate)
@@ -900,7 +904,7 @@ SGameState																drawTacticalScreen								(SGame& instanceGame, const 
 			}
  			else if(instanceGame.State.Substate == GAME_SUBSTATE_EQUIPMENT) {
 				menuTitle += " - Equipment";
-				exitState = drawMenu(instanceGame.GlobalDisplay.Screen, &globalDisplay.TextAttributes.Cells[0][0], menuTitle, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsCombatTurnEquip}, instanceGame.FrameInput, {GAME_STATE_TACTICAL_CONTROL, GAME_SUBSTATE_MAIN}, exitState, 10);
+				exitState = drawMenu(instanceGame.GlobalDisplay.Screen.View, globalDisplay.TextAttributes.begin(), menuTitle, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsCombatTurnEquip}, instanceGame.FrameInput, {GAME_STATE_TACTICAL_CONTROL, GAME_SUBSTATE_MAIN}, exitState, 10);
 				selectedAction = TURN_ACTION_CONTINUE;
 			}
 			else {
@@ -909,7 +913,7 @@ SGameState																drawTacticalScreen								(SGame& instanceGame, const 
 					instanceGame.UserError = "Unrecognized game substate!";
 					instanceGame.LogError();
 				}
-				selectedAction = drawMenu(instanceGame.GlobalDisplay.Screen, &globalDisplay.TextAttributes.Cells[0][0], menuTitle, ::gpk::view_array<const ::klib::SMenuItem<::klib::TURN_ACTION>>{optionsCombatTurn}, instanceGame.FrameInput, TURN_ACTION_MENUS, TURN_ACTION_CONTINUE, 10);
+				selectedAction = drawMenu(instanceGame.GlobalDisplay.Screen.View, globalDisplay.TextAttributes.begin(), menuTitle, ::gpk::view_array<const ::klib::SMenuItem<::klib::TURN_ACTION>>{optionsCombatTurn}, instanceGame.FrameInput, TURN_ACTION_MENUS, TURN_ACTION_CONTINUE, 10);
 			}
 		}
 		else if(currentPlayer.Control.Type == PLAYER_CONTROL_AI)  {
@@ -958,7 +962,7 @@ SGameState																drawTacticalScreen								(SGame& instanceGame, const 
 		}
 	}
 
-	if( (tacticalInfo.Board.Shots.Bullet.Count <= 0) && bNotCanceled && !movesRemaining)
+	if( (tacticalInfo.Board.Shots.Bullet.Slots.size() <= 0) && bNotCanceled && !movesRemaining)
 		endTurn(instanceGame);
 
 	 // If players have agents still alive we just continue in the tactical screen. Otherwise go back to main screen.

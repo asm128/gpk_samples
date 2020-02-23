@@ -11,14 +11,14 @@ namespace klib
 	template<typename _EntityType>
 	struct SResearchGroup {
 		_EntityType												MaxResearch;
-		SEntityContainer<int16_t, 128>							Definitions;
-		SEntityContainer<int16_t, 128>							Modifiers;
+		SEntityContainer<int16_t>								Definitions;
+		SEntityContainer<int16_t>								Modifiers;
 	};
 
 
 	// Combines two record tables to get the names and combine them as one for display purposes.
-	template<typename _EntityType, size_t _DefinitionCount, size_t _ModifierCount> 
-	::std::string											getEntityName						
+	template<typename _EntityType, size_t _DefinitionCount, size_t _ModifierCount>
+	::std::string											getEntityName
 		( const SEntity						& entity
 		, const SEntityRecord<_EntityType>	(&tableDefinitions	)[_DefinitionCount	]
 		, const SEntityRecord<_EntityType>	(&tableModifiers	)[_ModifierCount	]
@@ -30,11 +30,11 @@ namespace klib
 	}
 
 	// removes an entity from a container and sets it to zero
-	template<typename _EntityType, size_t _DefinitionCount>
-	void													unequipEntity							(SEntityContainer<_EntityType, _DefinitionCount>& container, _EntityType& currentEntity)																	{
+	template<typename _EntityType>
+	void													unequipEntity							(SEntityContainer<_EntityType>& container, _EntityType& currentEntity)																	{
 		if( 0 == currentEntity.Definition && 0 == currentEntity.Modifier && 0 == currentEntity.Level )
-			return; 
-		container.AddElement(currentEntity);	
+			return;
+		container.AddElement(currentEntity);
 		currentEntity											= {0,0,0};
 	}
 

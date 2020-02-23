@@ -186,7 +186,7 @@ bool																					klib::moveStep															(SGame& instanceGame, SPla
 		playerAgent.Points.Coins																+= board.Tiles.Entities.Coins[finalPosition.z][finalPosition.x] >> 1;
 		player.Money																			+= board.Tiles.Entities.Coins[finalPosition.z][finalPosition.x] >> 1;
 		board.Tiles.Entities.Coins[finalPosition.z][finalPosition.x]							= 0;
-		for(uint32_t iAOE=0, countAOE=board.AreaOfEffect.AOE.Count; iAOE <countAOE; ++iAOE) {
+		for(uint32_t iAOE = 0, countAOE = board.AreaOfEffect.AOE.Slots.size(); iAOE < countAOE; ++iAOE) {
 			const SAOE																					& aoeInstance															= board.AreaOfEffect.AOE[iAOE].Entity;
 			const ::gpk::SCoord3<int32_t>																aoeCell																	= aoeInstance.Position.Cell;
 			::gpk::SCoord3<float>																		aoePos																	= aoeCell.Cast<float>();
@@ -384,7 +384,7 @@ void																					klib::endTurn															(SGame& instanceGame)						
 	}
 
 	uint32_t																					iAOE																	= 0;
-	while(iAOE < tacticalInfo.Board.AreaOfEffect.AOE.Count) {
+	while(iAOE < tacticalInfo.Board.AreaOfEffect.AOE.Slots.size()) {
 		SAOE																						& aoeInstance															= tacticalInfo.Board.AreaOfEffect.AOE[iAOE].Entity;
 		if(0 == --aoeInstance.TurnsLeft) {
 			tacticalInfo.Board.AreaOfEffect.Coords.DecreaseEntity(tacticalInfo.Board.AreaOfEffect.Coords.FindElement(aoeInstance.Position.Cell));
@@ -397,7 +397,7 @@ void																					klib::endTurn															(SGame& instanceGame)						
 	tacticalInfo.CurrentPlayer																= (int8_t)resolveNextPlayer(instanceGame);	// Change current player.
 
 	static const HANDLE																			hConsoleOut																= GetStdHandle( STD_OUTPUT_HANDLE );
-	COORD																						cursorPos																= {0, ((SHORT)instanceGame.GlobalDisplay.Depth>>1)+10};
+	COORD																						cursorPos																= {0, ((SHORT)instanceGame.GlobalDisplay.Screen.metrics().y >> 1) + 10};
 	::SetConsoleCursorPosition( hConsoleOut, cursorPos );
 }
 
@@ -434,15 +434,15 @@ bool																					klib::updateCurrentPlayer												(SGame& instanceGa
 	return true;
 }
 
-template<typename _TEntity, size_t _Size>
+template<typename _TEntity>
 void																					pickupEntities
-	(	SEntityContainer<_TEntity, _Size>	& playerEntities
-	,	SEntityContainer<_TEntity, _Size>	& mapEntities
-	,	int32_t								maxCount			= _Size
+	(	SEntityContainer<_TEntity>	& playerEntities
+	,	SEntityContainer<_TEntity>	& mapEntities
+	,	int32_t						maxCount				= 4096
 	)
 {
 	int32_t																						currentCount															= 0;
-	while(mapEntities.Count && currentCount < maxCount) {
+	while(mapEntities.Slots.size() && currentCount < maxCount) {
 		mapEntities[0].Entity.Owner																= -1;
 		playerEntities.AddElement(mapEntities[0].Entity);
 		mapEntities.DecreaseEntity(0);
@@ -519,14 +519,14 @@ void																					distributeDropsForVictoriousTeam										(SGame& insta
 		int32_t																						totalFacility															= 0;
 		int32_t																						totalStageProp															= 0;
 		int32_t																						totalItems																= 0;
-		for(uint32_t i = 0; i < tacticalInfo.Drops.Profession	.Count; ++i) totalProfession	+= tacticalInfo.Drops.Profession	[i].Count;
-		for(uint32_t i = 0; i < tacticalInfo.Drops.Accessory	.Count; ++i) totalAccessory		+= tacticalInfo.Drops.Accessory		[i].Count;
-		for(uint32_t i = 0; i < tacticalInfo.Drops.Armor		.Count; ++i) totalArmor			+= tacticalInfo.Drops.Armor			[i].Count;
-		for(uint32_t i = 0; i < tacticalInfo.Drops.Weapon		.Count; ++i) totalWeapon		+= tacticalInfo.Drops.Weapon		[i].Count;
-		for(uint32_t i = 0; i < tacticalInfo.Drops.Vehicle		.Count; ++i) totalVehicle		+= tacticalInfo.Drops.Vehicle		[i].Count;
-		for(uint32_t i = 0; i < tacticalInfo.Drops.Facility		.Count; ++i) totalFacility		+= tacticalInfo.Drops.Facility		[i].Count;
-		for(uint32_t i = 0; i < tacticalInfo.Drops.StageProp	.Count; ++i) totalStageProp		+= tacticalInfo.Drops.StageProp		[i].Count;
-		for(uint32_t i = 0; i < tacticalInfo.Drops.Items		.Count; ++i) totalItems			+= tacticalInfo.Drops.Items			[i].Count;
+		for(uint32_t i = 0; i < tacticalInfo.Drops.Profession	.Slots.size(); ++i) totalProfession	+= tacticalInfo.Drops.Profession	[i].Count;
+		for(uint32_t i = 0; i < tacticalInfo.Drops.Accessory	.Slots.size(); ++i) totalAccessory		+= tacticalInfo.Drops.Accessory		[i].Count;
+		for(uint32_t i = 0; i < tacticalInfo.Drops.Armor		.Slots.size(); ++i) totalArmor			+= tacticalInfo.Drops.Armor			[i].Count;
+		for(uint32_t i = 0; i < tacticalInfo.Drops.Weapon		.Slots.size(); ++i) totalWeapon		+= tacticalInfo.Drops.Weapon		[i].Count;
+		for(uint32_t i = 0; i < tacticalInfo.Drops.Vehicle		.Slots.size(); ++i) totalVehicle		+= tacticalInfo.Drops.Vehicle		[i].Count;
+		for(uint32_t i = 0; i < tacticalInfo.Drops.Facility		.Slots.size(); ++i) totalFacility		+= tacticalInfo.Drops.Facility		[i].Count;
+		for(uint32_t i = 0; i < tacticalInfo.Drops.StageProp	.Slots.size(); ++i) totalStageProp		+= tacticalInfo.Drops.StageProp		[i].Count;
+		for(uint32_t i = 0; i < tacticalInfo.Drops.Items		.Slots.size(); ++i) totalItems			+= tacticalInfo.Drops.Items			[i].Count;
 
 		for(uint32_t iWinner = 0; iWinner < totalWinners; ++iWinner) {
 			SPlayer																						& winnerPlayer															= instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[iWinner]]];
@@ -554,14 +554,14 @@ void																					distributeDropsForVictoriousTeam										(SGame& insta
 			}
 		}
 		// Give the remaining drops to random winners
-		if(	tacticalInfo.Drops.Profession	.Count) pickupEntities(instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[::rand() % totalWinners]]].Goods.Inventory.Profession	, tacticalInfo.Drops.Profession	);
-		if(	tacticalInfo.Drops.Accessory	.Count) pickupEntities(instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[::rand() % totalWinners]]].Goods.Inventory.Accessory	, tacticalInfo.Drops.Accessory	);
-		if(	tacticalInfo.Drops.Armor		.Count) pickupEntities(instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[::rand() % totalWinners]]].Goods.Inventory.Armor		, tacticalInfo.Drops.Armor		);
-		if(	tacticalInfo.Drops.Weapon		.Count) pickupEntities(instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[::rand() % totalWinners]]].Goods.Inventory.Weapon		, tacticalInfo.Drops.Weapon		);
-		if(	tacticalInfo.Drops.Vehicle		.Count) pickupEntities(instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[::rand() % totalWinners]]].Goods.Inventory.Vehicle		, tacticalInfo.Drops.Vehicle	);
-		if(	tacticalInfo.Drops.Facility		.Count) pickupEntities(instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[::rand() % totalWinners]]].Goods.Inventory.Facility		, tacticalInfo.Drops.Facility	);
-		if(	tacticalInfo.Drops.StageProp	.Count) pickupEntities(instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[::rand() % totalWinners]]].Goods.Inventory.StageProp	, tacticalInfo.Drops.StageProp	);
-		if(	tacticalInfo.Drops.Items		.Count) pickupEntities(instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[::rand() % totalWinners]]].Goods.Inventory.Items		, tacticalInfo.Drops.Items		);
+		if(	tacticalInfo.Drops.Profession	.Slots.size()) pickupEntities(instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[::rand() % totalWinners]]].Goods.Inventory.Profession	, tacticalInfo.Drops.Profession	);
+		if(	tacticalInfo.Drops.Accessory	.Slots.size()) pickupEntities(instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[::rand() % totalWinners]]].Goods.Inventory.Accessory	, tacticalInfo.Drops.Accessory	);
+		if(	tacticalInfo.Drops.Armor		.Slots.size()) pickupEntities(instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[::rand() % totalWinners]]].Goods.Inventory.Armor		, tacticalInfo.Drops.Armor		);
+		if(	tacticalInfo.Drops.Weapon		.Slots.size()) pickupEntities(instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[::rand() % totalWinners]]].Goods.Inventory.Weapon		, tacticalInfo.Drops.Weapon		);
+		if(	tacticalInfo.Drops.Vehicle		.Slots.size()) pickupEntities(instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[::rand() % totalWinners]]].Goods.Inventory.Vehicle		, tacticalInfo.Drops.Vehicle	);
+		if(	tacticalInfo.Drops.Facility		.Slots.size()) pickupEntities(instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[::rand() % totalWinners]]].Goods.Inventory.Facility		, tacticalInfo.Drops.Facility	);
+		if(	tacticalInfo.Drops.StageProp	.Slots.size()) pickupEntities(instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[::rand() % totalWinners]]].Goods.Inventory.StageProp	, tacticalInfo.Drops.StageProp	);
+		if(	tacticalInfo.Drops.Items		.Slots.size()) pickupEntities(instanceGame.Players[tacticalInfo.Setup.Players[indexWinners[::rand() % totalWinners]]].Goods.Inventory.Items		, tacticalInfo.Drops.Items		);
 
 		uint32_t																				reward																	= totalMapMoney / totalWinners;
 		for(uint32_t iWinner=0; iWinner<totalWinners; ++iWinner) {
@@ -689,15 +689,15 @@ void																					klib::determineOutcome													(SGame& instanceGame
 	instanceGame.TacticalInfo.Clear();
 }
 
-template<typename _TEntity, size_t _Size>
+template<typename _TEntity>
 	void																				dropEntities
-	(	SEntityContainer<_TEntity, _Size>	& mapEntities
-	,	SEntityContainer<_TEntity, _Size>	& deadTargetEntities
-	,	SEntityContainer<::gpk::SCoord3<int32_t>, _Size> & entityCoords
+	(	SEntityContainer<_TEntity>					& mapEntities
+	,	SEntityContainer<_TEntity>					& deadTargetEntities
+	,	SEntityContainer<::gpk::SCoord3<int32_t>>	& entityCoords
 	,	const ::gpk::SCoord3<int32_t>&	deadTargetCoords
 	)
 {
-	while(deadTargetEntities.Count) {
+	while(deadTargetEntities.Slots.size()) {
 		if(deadTargetEntities[0].Entity.Definition != -1) {
 			if(mapEntities			.AddElement(deadTargetEntities[0].Entity))
 				entityCoords		.AddElement(deadTargetCoords);

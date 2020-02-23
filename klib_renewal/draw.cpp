@@ -33,6 +33,150 @@ void										blitGrid						(::gpk::view_grid<_TCell> source, int32_t offsetY, u
 	}
 }
 
+	void													drawSnowBackground							(SWeightedDisplay & display, double lastTimeSeconds, uint32_t disturbance = 1 )																							{
+		int32_t														displayWidth								= (int32_t)display.Screen.metrics().x;
+		//int32_t														displayDepth								= (int32_t)display.Depth;
+
+		for(int32_t x=0; x<displayWidth; ++x)
+			if(display.DisplayWeights[0][x] == 0)  {
+				if( 0 == (rand()%200) && x % 2) {
+					display.Screen			[0][x]						= (::gpk::noise1D((uint32_t)(lastTimeSeconds*10000+x), disturbance) > 0.0) ? '.' : (::gpk::noise1D((uint32_t)(lastTimeSeconds*10000-x*x), disturbance) > 0.0) ? 15 : ',';
+					display.DisplayWeights	[0][x]						= .00001f;
+					display.Speed			[0][x]						= rand()*.001f;
+					display.SpeedTarget		[0][x]						= rand()*.001f;
+					display.TextAttributes	[0][x]						= (::gpk::noise1D((uint32_t)(lastTimeSeconds*10000-x), disturbance) > 0.0) ? COLOR_CYAN:COLOR_WHITE;
+				}
+			}
+
+		for(uint32_t z=0; z<display.Screen.metrics().y - 2; ++z)
+		for(uint32_t x=0; x<display.Screen.metrics().x; ++x) {
+			if(display.DisplayWeights[z][x] == 0)
+				continue;
+
+			display.DisplayWeights[z][x]						+= (float)(lastTimeSeconds * display.Speed[z][x]);
+
+			if(display.Speed[z][x] < display.SpeedTarget[z][x])
+				display.Speed[z][x]								+= (float)((display.Speed[z][x]*lastTimeSeconds*lastTimeSeconds));//*.1f;
+			else
+				display.Speed[z][x]								-= (float)((display.Speed[z][x]*lastTimeSeconds*lastTimeSeconds));//*.1f;
+		}
+
+		for(uint32_t z=0; z<display.Screen.metrics().y - 2; ++z)
+		for(uint32_t x=0; x<display.Screen.metrics().x; ++x) {
+			if(display.DisplayWeights[z][x] == 0)
+				continue;
+
+			if(display.DisplayWeights[z][x] > 1.0) {
+				int															randX										= (rand()%2) ? rand()%(1+disturbance*2)-disturbance : 0;
+				int32_t														xpos										= ::gpk::max(::gpk::min((int)x+randX, displayWidth-1), 0);
+				display.Screen			[z+1][xpos]						= display.Screen[z][x];
+				display.Speed			[z+1][xpos]						= display.Speed	[z][x];
+				display.TextAttributes	[z+1][xpos]						= (::gpk::noise1D((uint32_t)(lastTimeSeconds*10000+x), disturbance) > 0.0) ? COLOR_CYAN:COLOR_WHITE;
+				//display.TextAttributes[z+1][xpos]						= display.TextAttributes.Cells	[z][x];
+				display.DisplayWeights	[z+1][xpos]						= 0.0001f;
+				display.SpeedTarget		[z+1][xpos]						= (float)((rand()%5000))*0.001f+0.001f;
+
+				display.Screen			[z][x]							= ' ';
+				display.DisplayWeights	[z][x]							= 0;
+				display.Speed			[z][x]							= 0;
+				display.SpeedTarget		[z][x]							= 0;
+				display.TextAttributes	[z][x]							= COLOR_WHITE;
+			}
+		}
+
+	}
+
+
+	void													klib::drawFireBackground					( SWeightedDisplay& display, double lastTimeSeconds, uint32_t disturbance, uint32_t disappearChanceDivisor, bool bReverse, bool bDontSlowdown)			{
+		uint32_t													displayWidth								= (int32_t)display.Screen.metrics().x;
+		uint32_t													displayDepth								= (int32_t)display.Screen.metrics().y;
+
+		uint32_t													firstRow									= bReverse ? 0 : displayDepth - 1;
+		uint32_t													lastRow										= bReverse ? displayDepth - 1 : 0;
+		uint64_t													seed										= (uint64_t)(disturbance+lastTimeSeconds*100000*(1+(rand()%100)));
+		uint32_t													randBase									= (uint32_t)(lastTimeSeconds*(disturbance+654)*100000			);
+		for(uint32_t x = 0; x<displayWidth; ++x)
+			if(display.DisplayWeights[firstRow][x] == 0) {
+				if( 0 == (rand()%4) ) {
+					display.Screen			[firstRow][x]				=  (::gpk::noise1D(randBase+x, seed+1203) > 0.0) ? '.' :  (::gpk::noise1D(randBase + 1 + x * x, seed+1235) > 0.0) ? '|' : ',';
+					display.DisplayWeights	[firstRow][x]				= .00001f;
+					display.Speed			[firstRow][x]				= rand()*.001f+0.001f;
+					display.SpeedTarget		[firstRow][x]				= rand()*.0009f+0.001f;
+					display.TextAttributes	[firstRow][x]				= bReverse ? ((::gpk::noise1D(randBase+321+x, seed+91423) > 0.0)?COLOR_CYAN:COLOR_BLUE) :  (::gpk::noise1D(randBase+32+x, seed<<1) > 0.0) ? COLOR_RED : (::gpk::noise1D(randBase+987429654+x, seed+98234) > 0.0) ? COLOR_ORANGE : COLOR_DARKYELLOW;
+				}
+			}
+
+		for(uint32_t z = 0; z < displayDepth; ++z)
+		for(uint32_t x = 0; x < displayWidth; ++x) {
+			if(lastRow == z) {
+				display.Screen			[lastRow][x]				= ' ';
+				display.DisplayWeights	[lastRow][x]				= 0;
+				display.Speed			[lastRow][x]				= 0;
+				display.SpeedTarget		[lastRow][x]				= 0;
+			}
+			if(display.Screen[z][x] == ' ')
+				continue;
+
+			display.DisplayWeights[z][x]						+= (float)(lastTimeSeconds*display.Speed[z][x]);
+
+			if(display.Speed[z][x] < display.SpeedTarget[z][x])
+				display.Speed[z][x] += (float)(display.Speed[z][x]*lastTimeSeconds);
+			else
+				display.Speed[z][x] -= (float)(display.Speed[z][x]*lastTimeSeconds);
+		}
+
+		for(uint32_t z = 0, maxZ = displayDepth; z < maxZ; z ++)
+			for(uint32_t x=0; x<displayWidth; ++x) {
+				if(display.Screen[z][x] == ' ')
+					continue;
+
+				if(display.DisplayWeights[z][x] > 1.0) {
+					int randX = ((::gpk::noise1D(randBase + x + z * displayWidth), seed+544) > 0.0) ? rand()%(1+disturbance*2)-disturbance : 0;
+					int32_t xpos = ::gpk::min(x + randX, displayWidth - 1);
+					int32_t zpos = bReverse ? z+1 : z-1;
+
+					if((rand()%disappearChanceDivisor) == 0) {
+						display.Screen			[zpos][xpos] = ' ';
+						display.DisplayWeights	[zpos][xpos] = 0;
+					}
+					else {
+						if(('|' == display.Screen	[z][x]) && z < (displayDepth / 5 * 4)) {
+							display.Screen			[zpos][xpos] = '.';
+							display.TextAttributes	[zpos][xpos] = ((bReverse) || (::gpk::noiseNormal1D(x, seed<<2) < 0.0)) ? COLOR_DARKGREY : COLOR_YELLOW;
+						}
+						else if( bReverse && z > (displayDepth / 5)) {
+							display.Screen			[zpos][xpos] = '|';
+							display.TextAttributes	[zpos][xpos] = COLOR_CYAN;
+						}
+						else {
+							display.Screen			[zpos][xpos]	= display.Screen[z][x];
+							display.TextAttributes	[zpos][xpos]	= display.TextAttributes[z][x];
+						}
+
+						display.DisplayWeights	[zpos][xpos]	= 0.00001f;
+						display.Speed			[zpos][xpos]	= display.Speed[z][x];
+						display.SpeedTarget		[zpos][xpos]	= (float)::gpk::noiseNormal1D(x, seed)*50.0f;
+						if(bDontSlowdown)
+							display.SpeedTarget	[zpos][xpos]	*= ((bReverse ? displayDepth - z : z ) * 2 / (float)displayDepth);
+						display.SpeedTarget		[zpos][xpos]	+= 0.001f;
+					}
+
+					display.Screen				[z][x]	= ' ';
+					display.DisplayWeights		[z][x]	= 0;
+					display.Speed				[z][x]	= 0;
+					display.SpeedTarget			[z][x]	= 0;
+					display.TextAttributes		[z][x]	= COLOR_WHITE;
+				}
+			}
+	}
+
+	void drawRainBackground( SWeightedDisplay& display, double lastTimeSeconds ) {
+		for(uint32_t i=0; i<display.Screen.metrics().x; ++i)
+			if(rand()%2)
+				display.Screen[display.Screen.metrics().y - 1][i]	= (rand()%2) ? '.' : '|';
+		return drawFireBackground( display, lastTimeSeconds*1.5, 0, 20, true, false );
+	}
+
 template<typename _TCell>
 void										drawDisplay						(::gpk::view_grid<_TCell> source, uint32_t offsetY, uint32_t offsetX, ::klib::SASCIITarget& asciiTarget)															{ blitGrid(source, offsetY, offsetX, (_TCell*)asciiTarget.Characters.begin(), asciiTarget.Characters.metrics().x, asciiTarget.Characters.metrics().y); }
 void										drawStateBackground				( SGame& instanceGame )																																				{
@@ -168,7 +312,7 @@ void										klib::drawAndPresentGame		(SGame& instanceGame, ::klib::SASCIITarg
 	::drawStateBackground	(instanceGame);
 	::showMenu				(instanceGame);
 
-	drawDisplay(instanceGame.GlobalDisplay.Screen, 0, 0, target);
+	drawDisplay(instanceGame.GlobalDisplay.Screen.View, 0, 0, target);
 
 	uint32_t										bbWidth							= target.Width		();
 	uint32_t										bbHeight						= target.Height		();
@@ -180,25 +324,25 @@ void										klib::drawAndPresentGame		(SGame& instanceGame, ::klib::SASCIITarg
 	//case GAME_STATE_MENU_ACTION:
 	case GAME_STATE_MENU_LAN_MISSION	:
 	case GAME_STATE_TACTICAL_CONTROL	:
-	case GAME_STATE_START_MISSION		: drawDisplay(instanceGame.TacticalDisplay.Screen, TACTICAL_DISPLAY_POSY, (instanceGame.GlobalDisplay.Screen.Width>>1)-(instanceGame.TacticalDisplay.Width>>1), target);									break;
-	case GAME_STATE_CREDITS				: drawCredits((char_t*)bbChar, bbWidth, bbHeight, instanceGame.FrameTimer.LastTimeSeconds, namesSpecialThanks, instanceGame.State);																			break;
-	case GAME_STATE_MEMORIAL			: drawMemorial((char_t*)bbChar, bbWidth, bbHeight, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], instanceGame.FrameTimer.LastTimeSeconds, instanceGame.Players[0].Memorial, instanceGame.State);	break;
+	case GAME_STATE_START_MISSION		: drawDisplay(instanceGame.TacticalDisplay.Screen.View, TACTICAL_DISPLAY_POSY, (instanceGame.GlobalDisplay.Screen.metrics().x >> 1) - (instanceGame.TacticalDisplay.Screen.metrics().x >> 1), target);	break;
+	case GAME_STATE_CREDITS				: drawCredits((char_t*)bbChar, bbWidth, bbHeight, instanceGame.FrameTimer.LastTimeSeconds, namesSpecialThanks, instanceGame.State);																		break;
+	case GAME_STATE_MEMORIAL			: drawMemorial((char_t*)bbChar, bbWidth, bbHeight, instanceGame.GlobalDisplay.TextAttributes.begin(), instanceGame.FrameTimer.LastTimeSeconds, instanceGame.Players[0].Memorial, instanceGame.State);	break;
 	case GAME_STATE_WELCOME_COMMANDER	:
 	case GAME_STATE_MENU_SQUAD_SETUP	:
 	case GAME_STATE_MENU_EQUIPMENT		: break;
 	default:
-		drawDisplay(instanceGame.TacticalDisplay.Screen, TACTICAL_DISPLAY_POSY, (instanceGame.GlobalDisplay.Screen.Width >> 1) - (instanceGame.TacticalDisplay.Width >> 1), target);
+		drawDisplay(instanceGame.TacticalDisplay.Screen.View, TACTICAL_DISPLAY_POSY, (instanceGame.GlobalDisplay.Screen.metrics().x >> 1) - (instanceGame.TacticalDisplay.Screen.metrics().x >> 1), target);
 	}
 
-	memcpy(bbColor, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], instanceGame.GlobalDisplay.TextAttributes.Width * instanceGame.GlobalDisplay.TextAttributes.Depth * sizeof(uint16_t));
+	memcpy(bbColor, instanceGame.GlobalDisplay.TextAttributes.begin(), instanceGame.GlobalDisplay.TextAttributes.size() * sizeof(uint16_t));
 
 	switch(instanceGame.State.State) {
 	//case GAME_STATE_MENU_ACTION:
 	case GAME_STATE_MENU_LAN_MISSION	:
 	case GAME_STATE_TACTICAL_CONTROL	:
 	case GAME_STATE_START_MISSION		:
-		for(uint32_t y = 0; y<instanceGame.TacticalDisplay.TextAttributes.Depth; ++y)
-			memcpy(&bbColor[(TACTICAL_DISPLAY_POSY + y) * bbWidth + ((bbWidth >> 1) - (instanceGame.TacticalDisplay.TextAttributes.Width >> 1))], &instanceGame.TacticalDisplay.TextAttributes.Cells[y][0], instanceGame.TacticalDisplay.TextAttributes.Width * sizeof(uint16_t));
+		for(uint32_t y = 0; y<instanceGame.TacticalDisplay.TextAttributes.metrics().y; ++y)
+			memcpy(&bbColor[(TACTICAL_DISPLAY_POSY + y) * bbWidth + ((bbWidth >> 1) - (instanceGame.TacticalDisplay.TextAttributes.metrics().x >> 1))], &instanceGame.TacticalDisplay.TextAttributes[y][0], instanceGame.TacticalDisplay.TextAttributes.metrics().x * sizeof(uint16_t));
 		break;
 	case GAME_STATE_CREDITS				:
 	case GAME_STATE_MEMORIAL			:
@@ -206,8 +350,8 @@ void										klib::drawAndPresentGame		(SGame& instanceGame, ::klib::SASCIITarg
 	case GAME_STATE_MENU_SQUAD_SETUP	:
 	case GAME_STATE_MENU_EQUIPMENT		: break;
 	default:
-		for(uint32_t y = 0; y<instanceGame.TacticalDisplay.TextAttributes.Depth; ++y)
-			memcpy(&bbColor[(TACTICAL_DISPLAY_POSY+y)*bbWidth+((bbWidth>>1)-(instanceGame.TacticalDisplay.TextAttributes.Width>>1))], &instanceGame.TacticalDisplay.TextAttributes.Cells[y][0], instanceGame.TacticalDisplay.TextAttributes.Width*sizeof(uint16_t));
+		for(uint32_t y = 0; y<instanceGame.TacticalDisplay.TextAttributes.metrics().y; ++y)
+			memcpy(&bbColor[(TACTICAL_DISPLAY_POSY+y)*bbWidth+((bbWidth>>1)-(instanceGame.TacticalDisplay.TextAttributes.metrics().x >> 1))], &instanceGame.TacticalDisplay.TextAttributes[y][0], instanceGame.TacticalDisplay.TextAttributes.metrics().x*sizeof(uint16_t));
 	}
 
 	// Frame timer
@@ -225,7 +369,7 @@ void										klib::drawAndPresentGame		(SGame& instanceGame, ::klib::SASCIITarg
 
 	// Print some debugging information
 	if(::gpk::bit_true(instanceGame.Flags,GAME_FLAGS_HELPON)) {
-		int32_t											offsetYHelp						= TACTICAL_DISPLAY_POSY+instanceGame.TacticalDisplay.Depth;
+		int32_t											offsetYHelp						= TACTICAL_DISPLAY_POSY + instanceGame.TacticalDisplay.Screen.metrics().y;
 		actualOffsetX								= ::klib::lineToRectColored(target, COLOR_YELLOW	, offsetYHelp+18-5, 2, ::klib::SCREEN_RIGHT, "Help!!! Press F1 to hide.");
 		//												::
 		actualOffsetX								= ::klib::lineToRectColored(target, COLOR_ORANGE	, offsetYHelp+20-5, bbWidth/4*3, ::klib::SCREEN_LEFT, "Keys:");
@@ -251,7 +395,7 @@ void										klib::drawAndPresentGame		(SGame& instanceGame, ::klib::SASCIITarg
 		actualOffsetX								= ::klib::lineToRectColored(target, COLOR_YELLOW		, offsetYHelp+40-5, bbWidth/4*3, ::klib::SCREEN_LEFT, "a valid target selected in order to work!");
 	}
 	else
-		actualOffsetX								= ::klib::lineToRectColored(target, COLOR_YELLOW, TACTICAL_DISPLAY_POSY+instanceGame.TacticalDisplay.Depth+18-5, 2, ::klib::SCREEN_RIGHT, "Press F1 to display help.");
+		actualOffsetX								= ::klib::lineToRectColored(target, COLOR_YELLOW, TACTICAL_DISPLAY_POSY+instanceGame.TacticalDisplay.Screen.metrics().y + 18 - 5, 2, ::klib::SCREEN_RIGHT, "Press F1 to display help.");
 
 	actualOffsetX								= ::klib::printfToRectColored(target, COLOR_DARKGREEN	, bbHeight-4, 1, ::klib::SCREEN_LEFT, "Mouse: %i, %i."			, instanceGame.FrameInput.Mouse.Deltas.x, instanceGame.FrameInput.Mouse.Deltas.y);
 	actualOffsetX								= ::klib::printfToRectColored(target, COLOR_GREEN		, bbHeight-3, 1, ::klib::SCREEN_LEFT, "Frame time: %.5f seconds."	, instanceGame.FrameTimer.LastTimeSeconds	);
@@ -316,13 +460,13 @@ void										klib::drawAndPresentGame		(SGame& instanceGame, ::klib::SASCIITarg
 
 void										drawIntro						( SGame& instanceGame ) {
 	drawFireBackground(instanceGame.TacticalDisplay, instanceGame.FrameTimer.LastTimeSeconds);
-	int32_t											displayDepth					= (int32_t)instanceGame.TacticalDisplay.Depth;
+	int32_t											displayDepth					= (int32_t)instanceGame.TacticalDisplay.Screen.metrics().y;
 
 	static const	::std::string					words			[]				= {"Vulgar", "Display", "of", "Power"};
 	for( uint32_t i=0; i < ::gpk::size(words); ++i) {
 		uint32_t										offsetY							= (uint32_t)((displayDepth >> 1)-(::gpk::size(words) >> 1) + i * 2);
 		//uint32_t										offsetX							=
-			printfToGridColored(instanceGame.TacticalDisplay.Screen, instanceGame.TacticalDisplay.TextAttributes, COLOR_ORANGE, offsetY, 0, ::klib::SCREEN_CENTER, "%s", words[i].c_str());
+			printfToGridColored(instanceGame.TacticalDisplay.Screen.View, instanceGame.TacticalDisplay.TextAttributes, COLOR_ORANGE, offsetY, 0, ::klib::SCREEN_CENTER, "%s", words[i].c_str());
 	}
 }
 
@@ -455,7 +599,7 @@ void									klib::displayStatusEffectsAndTechs	(::gpk::view_grid<char> display,
 	iLine									+= displayEntityEffect		(display, textAttributes, offsetY+iLine, offsetX, character.FinalFlags.Effect	);
 }
 
-static void								displayEmptySlot				(::gpk::view_grid<char>& display, ::gpk::view_grid<uint16_t>& textAttributes, int32_t offsetY, int32_t offsetX, int32_t agentIndex)																			{
+static void								displayEmptySlot				(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int32_t offsetY, int32_t offsetX, int32_t agentIndex)																			{
 	static const size_t							LINE_SIZE						= 30;
 	uint16_t									color							= COLOR_GREEN;
 	printfToGridColored(display, textAttributes, color, offsetY, offsetX, ::klib::SCREEN_LEFT, "-- Agent #%i: %-14.14s --", agentIndex, "Open position");
@@ -573,8 +717,8 @@ void									klib::displayAgentSlot					(::gpk::view_grid<char> display, ::gpk::
 }
 
 void									klib::drawSquadSlots					(SGame& instanceGame)																																						{
-	SGlobalDisplay								& display								= instanceGame.GlobalDisplay;
-	static const int32_t						slotWidth								= display.Width / MAX_AGENT_COLUMNS;
+	SWeightedDisplay								& display								= instanceGame.GlobalDisplay;
+	static const int32_t						slotWidth								= display.Screen.metrics().x / MAX_AGENT_COLUMNS;
 	static const int32_t						slotRowSpace							= 30;// display.Depth / (MAX_AGENT_ROWS);
 
 	static const int32_t						offsetYBase								= 2;
@@ -596,7 +740,7 @@ void									klib::drawSquadSlots					(SGame& instanceGame)																					
 				if( player.Squad.Agents[agentIndexOffset] != -1 )
 					::displayAgentSlot(display.Screen, display.TextAttributes, offsetYBase+slotRowSpace*y, offsetXBase+slotWidth*x, agentIndexOffset+1, *player.Army[player.Squad.Agents[agentIndexOffset]], true);
 				else
-					::displayEmptySlot(display.Screen, display.TextAttributes, offsetYBase+slotRowSpace*y, offsetXBase+slotWidth*x, agentIndexOffset+1);
+					::displayEmptySlot(display.Screen.View, display.TextAttributes.View, offsetYBase+slotRowSpace*y, offsetXBase+slotWidth*x, agentIndexOffset+1);
 			}
 		}
 		if(bStop)

@@ -6,7 +6,7 @@
 namespace klib
 {
 #pragma pack(push, 1)
-	struct SPlayerSelection	{ 
+	struct SPlayerSelection	{
 		int16_t							PlayerSquad			;
 		int16_t							PlayerUnit			;
 		int16_t							TargetPlayer		;
@@ -48,10 +48,6 @@ namespace klib
 		PLAYER_CONTROL					Type				;//	= PLAYER_CONTROL_AI;
 		PLAYER_AI						AIMode				;//	= PLAYER_AI_NEUTRAL;
 	};
-
-	//struct SPlayerEconomy	{ 
-	//	int32_t						Money			= 25000;
-	//};
 #pragma pack(pop)
 }
 

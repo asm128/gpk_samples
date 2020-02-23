@@ -76,8 +76,7 @@ namespace klib
 	};
 
 
-	struct SBullet
-	{
+	struct SBullet {
 		STacticalCoord											Position										;
 		::gpk::SCoord3<float>									Direction										;
 		STileCharacter											Shooter											;
@@ -99,32 +98,32 @@ namespace klib
 #pragma pack(pop)
 #define MAX_MAP_SHOTS 64
 #define MAX_MAP_BULLET_COORDS ((MAX_MAP_SHOTS)*100)
-	typedef SEntityContainer<::gpk::SCoord3<int32_t>, MAX_MAP_BULLET_COORDS> SCoordContainerBullet;
+	typedef SEntityContainer<::gpk::SCoord3<int32_t>> SCoordContainerBullet;
 	struct SMapShots
 	{
-		SEntityContainer<SBullet, MAX_MAP_SHOTS>				Bullet											= {};
-		SCoordContainerBullet									Coords											= {};
+		SEntityContainer<SBullet>					Bullet											= {};
+		SCoordContainerBullet						Coords											= {};
 	};
 
-	typedef SEntityContainer<::gpk::SCoord3<int32_t>, MAX_INVENTORY_SLOTS> SCoordContainerEntity;
+	typedef SEntityContainer<::gpk::SCoord3<int32_t>> SCoordContainerEntity;
 	struct SMapInventory {
-		SEntityContainer<SProfession	, MAX_INVENTORY_SLOTS>	Profession										= {};
-		SEntityContainer<SAccessory		, MAX_INVENTORY_SLOTS>	Accessory										= {};
-		SEntityContainer<SArmor			, MAX_INVENTORY_SLOTS>	Armor											= {};
-		SEntityContainer<SWeapon		, MAX_INVENTORY_SLOTS>	Weapon											= {};
-		SEntityContainer<SVehicle		, MAX_INVENTORY_SLOTS>	Vehicle											= {};
-		SEntityContainer<SFacility		, MAX_INVENTORY_SLOTS>	Facility										= {};
-		SEntityContainer<SStageProp		, MAX_INVENTORY_SLOTS>	StageProp										= {};
-		SEntityContainer<SItem			, MAX_INVENTORY_SLOTS>	Items											= {};
+		SEntityContainer<SProfession>				Profession										= {};
+		SEntityContainer<SAccessory	>				Accessory										= {};
+		SEntityContainer<SArmor		>				Armor											= {};
+		SEntityContainer<SWeapon	>				Weapon											= {};
+		SEntityContainer<SVehicle	>				Vehicle											= {};
+		SEntityContainer<SFacility	>				Facility										= {};
+		SEntityContainer<SStageProp	>				StageProp										= {};
+		SEntityContainer<SItem		>				Items											= {};
 
-		SCoordContainerEntity									CoordsProfession								= {};
-		SCoordContainerEntity									CoordsAccessory									= {};
-		SCoordContainerEntity									CoordsArmor										= {};
-		SCoordContainerEntity									CoordsWeapon									= {};
-		SCoordContainerEntity									CoordsVehicle									= {};
-		SCoordContainerEntity									CoordsFacility									= {};
-		SCoordContainerEntity									CoordsStageProp									= {};
-		SCoordContainerEntity									CoordsItems										= {};
+		SEntityContainer<::gpk::SCoord3<int32_t>>	CoordsProfession								= {};
+		SEntityContainer<::gpk::SCoord3<int32_t>>	CoordsAccessory									= {};
+		SEntityContainer<::gpk::SCoord3<int32_t>>	CoordsArmor										= {};
+		SEntityContainer<::gpk::SCoord3<int32_t>>	CoordsWeapon									= {};
+		SEntityContainer<::gpk::SCoord3<int32_t>>	CoordsVehicle									= {};
+		SEntityContainer<::gpk::SCoord3<int32_t>>	CoordsFacility									= {};
+		SEntityContainer<::gpk::SCoord3<int32_t>>	CoordsStageProp									= {};
+		SEntityContainer<::gpk::SCoord3<int32_t>>	CoordsItems										= {};
 	};
 
 
@@ -159,11 +158,10 @@ namespace klib
 
 #define MAX_AOE_SLOTS		64
 #define MAX_MAP_AOE_COORDS	((MAX_AOE_SLOTS)*100)
-	typedef SEntityContainer<::gpk::SCoord3<int32_t>, MAX_MAP_AOE_COORDS> SCoordContainerAOE;
-	struct SMapAOE
-	{
-		SEntityContainer<SAOE, MAX_AOE_SLOTS>					AOE												= {};
-		SCoordContainerAOE										Coords											= {};
+	typedef SEntityContainer<::gpk::SCoord3<int32_t>> SCoordContainerAOE;
+	struct SMapAOE {
+		SEntityContainer<SAOE>									AOE												= {};
+		SEntityContainer<::gpk::SCoord3<int32_t>>				Coords											= {};
 	};
 
 	struct STacticalBoard {

@@ -15,25 +15,14 @@ void																displayAccessory							(const klib::CCharacter			& adventure
 void																displayVehicle								(const klib::CCharacter			& adventurer);	//
 void																displayProfession							(const klib::CCharacter			& adventurer);	//
 void																displayFacility								(const klib::CCharacter			& adventurer);	//
-void																displayScore								(const klib::SCharacterScore	& adventurer);	// Displays the player's character points and statistics.
-
-template <size_t _InventorySize>
-void																displayInventory							(const klib::SEntityContainer<klib::SItem, _InventorySize>& inventory, const ::std::string& characterName)												{
-	printf("\n-- %s's inventory --\n", characterName.c_str());
-	if(inventory.Count) {
-		printf("You look at the remaining supplies...\n");
-		for (unsigned int i = 0; i < inventory.Count; i++)
-			printf("%u: x%.2u %s.\n", i + 1, inventory[i].Count, ::klib::getItemName(inventory[i].Entity).c_str());
-	}
-	printf("\n");
-}
-
+void																displayScore								(const ::klib::SCharacterScore	& adventurer);	// Displays the player's character points and statistics.
+void																displayInventory							(const ::klib::SEntityContainer<klib::SItem>& inventory, const ::std::string& characterName);
 template <size_t _Size1, size_t _Size2>
 int32_t																displayInventoryMenu						(klib::CCharacter& adventurer, const char (&menuTitle)[_Size1], const char (&exitOption)[_Size2], bool bPrintPrice=false, bool bSellPrice=true)			{
-	::klib::SMenuItem<int32_t>												itemOptions	[MAX_INVENTORY_SLOTS+1]			= {};
+	::klib::SMenuItem<int32_t>												itemOptions	[4096+1]						= {};
 	char																	itemOption	[128]							= {};
-	for(uint32_t i=0; i<adventurer.Goods.Inventory.Items.Count; ++i) {
-		const klib::SItem														& itemEntity								= adventurer.Goods.Inventory.Items[i].Entity;
+	for(uint32_t i=0; i<adventurer.Goods.Inventory.Items.Slots.size(); ++i) {
+		const ::klib::SItem														& itemEntity								= adventurer.Goods.Inventory.Items[i].Entity;
 		::std::string															itemName									= klib::getItemName(itemEntity);
 		int32_t																	finalPrice									= klib::getItemPrice(itemEntity, bSellPrice);
 
@@ -45,10 +34,10 @@ int32_t																displayInventoryMenu						(klib::CCharacter& adventurer, 
 		itemOptions[i].ReturnValue											= i;
  		itemOptions[i].Text													= itemOption;
 	}
-	itemOptions[adventurer.Goods.Inventory.Items.Count].ReturnValue		= adventurer.Goods.Inventory.Items.Count;
-	itemOptions[adventurer.Goods.Inventory.Items.Count].Text			= exitOption;
+	itemOptions[adventurer.Goods.Inventory.Items.Slots.size()].ReturnValue	= adventurer.Goods.Inventory.Items.Slots.size();
+	itemOptions[adventurer.Goods.Inventory.Items.Slots.size()].Text			= exitOption;
 
-	return displayMenu(adventurer.Goods.Inventory.Items.Count+1, menuTitle, itemOptions);
+	return displayMenu(adventurer.Goods.Inventory.Items.Slots.size() + 1, menuTitle, itemOptions);
 }
 
 // Combat is executed from the mercenary job menu and executes the battle turns until one of the combatants is dead.

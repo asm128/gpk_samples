@@ -38,7 +38,7 @@ void																	assignDrops					(klib::CCharacter& winner, klib::CCharacter
 	printf("\n%s dropped %u coins!!\n", loser.Name.c_str(), drop);
 	winner	.Points.Coins													+= drop;
 	loser	.Points.Coins													-= drop;
-	for(uint32_t i=0; i<loser.Goods.Inventory.Items.Count; i++)
+	for(uint32_t i=0; i<loser.Goods.Inventory.Items.Slots.size(); i++)
 		if( 0 == (rand()%2) ) {
 			const ::klib::SEntitySlot<klib::SItem>										& itemDrop					= loser.Goods.Inventory.Items[i];
 			::std::string																itemDropName				= klib::getItemName(itemDrop.Entity);
@@ -340,7 +340,7 @@ void																	printCharacterShortInfo		(::klib::CCharacter& character)			
 }
 
 TURN_OUTCOME															playerTurn					(::klib::CCharacter& adventurer, ::klib::CCharacter& currentEnemy)										{
-	static const klib::SMenuItem<TURN_ACTION>									combatOptions[]				=
+	static const ::klib::SMenuItem<TURN_ACTION>									combatOptions[]				=
 		{ { TURN_ACTION_ATTACK		, "Attack"		}
 		, { TURN_ACTION_INVENTORY	, "Inventory"	}
 		, { TURN_ACTION_SKILL		, "Skills"		}
@@ -368,7 +368,7 @@ TURN_OUTCOME															playerTurn					(::klib::CCharacter& adventurer, ::kli
 
 TURN_ACTION																resolveAI					(klib::CCharacter& enemy)													{
 	TURN_ACTION																	action						= TURN_ACTION_ATTACK;
-	if(enemy.Goods.Inventory.Items.Count)
+	if(enemy.Goods.Inventory.Items.Slots.size())
 		action																	= (rand()%2) ? action : TURN_ACTION_INVENTORY;
 	else if(enemy.Points.LifeCurrent.Health <= (enemy.Points.LifeMax.Health/9) && 0 == (rand()%7))	// chance of escape attempt if health is less than 11%.
 		action																	= TURN_ACTION_RUN;
@@ -435,25 +435,25 @@ void																	combat						(::klib::CCharacter& adventurer, int32_t enemyT
 }
 
 int32_t																	selectItemsPlayer			(klib::CCharacter& user)														{
-	int32_t indexInventory = user.Goods.Inventory.Items.Count;	// this initial value exits the menu
+	int32_t indexInventory = user.Goods.Inventory.Items.size();	// this initial value exits the menu
 
-	klib::SMenuItem<int32_t>													itemOptions[MAX_INVENTORY_SLOTS+1]	;
-	char																		itemOption[128]						= {};
-	for(uint32_t i = 0; i < user.Goods.Inventory.Items.Count; ++i) {
+	klib::SMenuItem<int32_t>													itemOptions[4096]			= {};
+	char																		itemOption[128]				= {};
+	for(uint32_t i = 0; i < user.Goods.Inventory.Items.size(); ++i) {
 		std::string itemName = klib::getItemName(user.Goods.Inventory.Items[i].Entity);
 		sprintf_s(itemOption, "- x%.2u %s", user.Goods.Inventory.Items[i].Count, itemName.c_str());
 		itemOptions[i].ReturnValue												= i;
  		itemOptions[i].Text														= itemOption;
 	}
-	itemOptions[user.Goods.Inventory.Items.Count].ReturnValue				= user.Goods.Inventory.Items.Count;
-	itemOptions[user.Goods.Inventory.Items.Count].Text						= "Back to combat options";
-	indexInventory															= displayMenu(user.Goods.Inventory.Items.Count+1, "Select an item to use", itemOptions);
+	itemOptions[user.Goods.Inventory.Items.size()].ReturnValue				= user.Goods.Inventory.Items.size();
+	itemOptions[user.Goods.Inventory.Items.size()].Text						= "Back to combat options";
+	indexInventory															= displayMenu(user.Goods.Inventory.Items.size() + 1, "Select an item to use", itemOptions);
 
-	if(indexInventory == (int32_t)user.Goods.Inventory.Items.Count)	// exit option
-		indexInventory															= user.Goods.Inventory.Items.Count;	// Exit menu
+	if(indexInventory == (int32_t)user.Goods.Inventory.Items.Slots.size())	// exit option
+		indexInventory															= user.Goods.Inventory.Items.size();	// Exit menu
 	else if (user.Goods.Inventory.Items[indexInventory].Count <= 0) {
 		printf("You don't have anymore of that. Use something else...\n");
-		indexInventory															= user.Goods.Inventory.Items.Count;
+		indexInventory															= user.Goods.Inventory.Items.size();
 	}
 	else {
 		// Only use potions if we have less than Max HP
@@ -471,7 +471,7 @@ int32_t																	selectItemsPlayer			(klib::CCharacter& user)												
 			const ::std::string															userMessage			= "You don't need to use %s!\n";
 			const ::std::string															itemName			= klib::getItemName(user.Goods.Inventory.Items[indexInventory].Entity);
 			printf(userMessage.c_str(), itemName.c_str());
-			indexInventory															= user.Goods.Inventory.Items.Count;
+			indexInventory															= user.Goods.Inventory.Items.size();
 		}
 	}
 	return indexInventory;
@@ -479,7 +479,7 @@ int32_t																	selectItemsPlayer			(klib::CCharacter& user)												
 
 
 int32_t																	selectItemsAI				(klib::CCharacter& user)														{
-	int32_t																		indexInventory				= (int32_t)(rand() % user.Goods.Inventory.Items.Count);
+	int32_t																		indexInventory				= (int32_t)(rand() % user.Goods.Inventory.Items.size());
 
 	const ::klib::SItem															& entityItem				= user.Goods.Inventory.Items[indexInventory].Entity;
 	const ::klib::CItem															& itemDescription			= klib::itemDescriptions[entityItem.Definition];
@@ -495,7 +495,7 @@ int32_t																	selectItemsAI				(klib::CCharacter& user)														{
 		const ::std::string userMessage											= "The enemy changes his mind about consuming %s because it doens't seem to be necessary!\n\n";
 		const ::std::string itemName											= klib::getItemName(user.Goods.Inventory.Items[indexInventory].Entity);
 		printf(userMessage.c_str(), itemName.c_str());
-		indexInventory															= user.Goods.Inventory.Items.Count;
+		indexInventory															= user.Goods.Inventory.Items.size();
 	}
 
 	return indexInventory;
@@ -505,8 +505,8 @@ int32_t																	selectItemsAI				(klib::CCharacter& user)														{
 // This function returns true if an item was used or false if the menu was exited without doing anything.
 bool																	useItems					(klib::CCharacter& user, klib::CCharacter& target, bool bIsAIControlled)								{
 	uint32_t																	indexInventory				= ~0U;
-	static const size_t															inventorySize				= ::gpk::size(user.Goods.Inventory.Items.Slots);
-	if(0 == user.Goods.Inventory.Items.Count) {
+	static const size_t															inventorySize				= user.Goods.Inventory.Items.Slots.size();
+	if(0 == user.Goods.Inventory.Items.size()) {
 		printf("%s has no items in the inventory.\n", user.Name.c_str());
 		return false;
 	}
@@ -515,12 +515,12 @@ bool																	useItems					(klib::CCharacter& user, klib::CCharacter& tar
 	bool																		bUsedItem					= false;
 	if(!bIsAIControlled) {
 		indexInventory															= selectItemsPlayer(user);
-		if(indexInventory < user.Goods.Inventory.Items.Count)
+		if(indexInventory < user.Goods.Inventory.Items.size())
 			bUsedItem																= true;
 	}
 	else { // not a player so execute choice by AI
 		indexInventory															= selectItemsAI(user);
-		if(indexInventory < user.Goods.Inventory.Items.Count)
+		if(indexInventory < user.Goods.Inventory.Items.size())
 			bUsedItem																= true;
 	}
 

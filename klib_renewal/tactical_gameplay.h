@@ -14,8 +14,6 @@ namespace klib
 	void handleAgentDeath		(SGame& instanceGame, CCharacter& deadTarget, CCharacter& attacker, TEAM_TYPE teamId);
 	bool isTacticalValid		(SGame& instanceGame);
 
-
-
 	static int32_t												getAgentsInSight									(SGame& instanceGame, const ::gpk::SCoord3<int32_t>& origin, double range, SAgentsReference& agentsInRange)	{
 		agentsInRange												= SAgentsReference();
 		STacticalInfo													& tacticalInfo										= instanceGame.TacticalInfo;
@@ -34,7 +32,7 @@ namespace klib
 
 				const ::gpk::SCoord3<int32_t>									& coordAgent										= agent.Position;
 				const ::gpk::SCoord3<float>									distance											= (coordAgent-origin).Cast<float>();
-				if(distance.Length() > range) 
+				if(distance.Length() > range)
 					continue;
 
 				agentsInRange.Agents[agentsInRange.Count++]					= {tacticalInfo.Setup.TeamPerPlayer[iPlayer], (int8_t)iPlayer, 0, (int8_t)iAgent};
@@ -46,6 +44,6 @@ namespace klib
 	}
 
 
-}; // 
+}; //
 
 #endif // __TACTICAL_GAMEPLAY_H__9823490273460921364098237432__

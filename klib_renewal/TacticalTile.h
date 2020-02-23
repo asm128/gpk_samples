@@ -38,12 +38,12 @@ namespace klib
 				::gpk::SImage<::klib::STopologyDetail	>			Topology;
 
 		inline	int32_t												Resize			(::gpk::SCoord2<uint32_t> newSize)											{
-			Geometry.resize(newSize);
-			return Topology.resize(newSize);
+			Geometry.resize(newSize, {{0, 0, 0, 0}, 0});
+			return Topology.resize(newSize, {0, 0, 0});
 		}
 		inline	void												Clear			()											{
-			clearGrid(Geometry.View, {{0, 0, 0, 0}, 0});
-			clearGrid(Topology.View, {0, 0, 0});
+			::klib::clearGrid(Geometry.View, {{0, 0, 0, 0}, 0});
+			::klib::clearGrid(Topology.View, {0, 0, 0});
 		}
 	};
 
@@ -53,14 +53,14 @@ namespace klib
 				::gpk::SImage<int32_t		>						Coins	;
 
 		inline	int32_t												Resize			(::gpk::SCoord2<uint32_t> newSize)											{
-			Agents	.resize(newSize);
-			Props	.resize(newSize);
-			return Coins	.resize(newSize);
+			Agents	.resize(newSize, {TEAM_TYPE_INVALID, -1, -1, -1} );
+			Props	.resize(newSize, {-1, -1, -1, -1});
+			return Coins	.resize(newSize, 0);
 		}
 		inline	void												Clear			()											{
-			clearGrid(Agents.View, {TEAM_TYPE_INVALID, -1, -1, -1} );
-			clearGrid(Props	.View, {-1, -1, -1, -1} );
-			clearGrid(Coins	.View, 0 );
+			::klib::clearGrid(Agents.View, {TEAM_TYPE_INVALID, -1, -1, -1} );
+			::klib::clearGrid(Props	.View, {-1, -1, -1, -1} );
+			::klib::clearGrid(Coins	.View, 0 );
 		}
 	};
 
@@ -80,7 +80,7 @@ namespace klib
 				&&	Entities.Props		[z][x].Level		== -1
 				&&	Terrain.Topology	[z][x].Sharp									< PARTIAL_COVER_HEIGHT
 				&&	Terrain.Topology	[z][x].Smooth									< PARTIAL_COVER_HEIGHT
-				&&	(Terrain.Topology	[z][x].Smooth+Terrain.Topology	[z][x].Sharp)	< PARTIAL_COVER_HEIGHT
+				&&	(Terrain.Topology	[z][x].Smooth + Terrain.Topology[z][x].Sharp)	< PARTIAL_COVER_HEIGHT
 				;
 		}
 

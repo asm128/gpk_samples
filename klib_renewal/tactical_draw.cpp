@@ -105,11 +105,10 @@ void									klib::boardToDisplay			(::klib::SGame& instanceGame, const STactica
 		}
 		else if( board.Shots.Coords.FindElement(currentCoord) != -1) {
 			static const float GAME_EPSILON = 0.000001f;
-			char bulletAscii = '*';
-			uint16_t bulletColor = bSwaps[2] ? COLOR_DARKGREY : COLOR_DARKGREY;
-			for(uint32_t iBullet=0, bulletCount = board.Shots.Bullet.Count; iBullet < bulletCount; iBullet++)
-			{
-				const SBullet& bullet = board.Shots.Bullet[iBullet].Entity;
+			char						bulletAscii		= '*';
+			uint16_t					bulletColor		= bSwaps[2] ? COLOR_DARKGREY : COLOR_DARKGREY;
+			for(uint32_t iBullet=0, bulletCount = board.Shots.Bullet.Slots.size(); iBullet < bulletCount; ++iBullet) {
+				const SBullet				& bullet		= board.Shots.Bullet[iBullet].Entity;
 				if(bullet.Points.StatusInflict)
 					bulletColor = getStatusColor(bullet.Points.StatusInflict, bSwaps[2], bulletColor);
 
@@ -158,45 +157,45 @@ void									klib::boardToDisplay			(::klib::SGame& instanceGame, const STactica
 		}
 		else if(topologyHeight || cornerHeight[0] || cornerHeight[1] || cornerHeight[2] || cornerHeight[3]) {
 			// I suppose this chooses a color depending on the slope between tile corners.
-					if(cornerHeight[0]	<	cornerHeight[3] && cornerHeight[0]	<	cornerHeight[1] && cornerHeight[0]	<	cornerHeight[2])	{	display[z][x] = -80; textAttributes[z][x] = COLOR_DARKGREEN	<< 4 | COLOR_DARKGREY		; }
-			else if(cornerHeight[1]	<	cornerHeight[0] && cornerHeight[1]	<	cornerHeight[3] && cornerHeight[1]	<	cornerHeight[2])	{	display[z][x] = -78; textAttributes[z][x] = COLOR_DARKGREEN	<< 4 | COLOR_DARKGREY		; }
-			else if(cornerHeight[2]	<	cornerHeight[0] && cornerHeight[2]	<	cornerHeight[1] && cornerHeight[2]	<	cornerHeight[3])	{	display[z][x] = -80; textAttributes[z][x] = COLOR_GREEN		<< 4 | 0				; }
-			else if(cornerHeight[3]	<	cornerHeight[0] && cornerHeight[3]	<	cornerHeight[1] && cornerHeight[3]	<	cornerHeight[2])	{	display[z][x] = -79; textAttributes[z][x] = COLOR_GREEN		<< 4 | COLOR_DARKGREY		; }
+				 if(cornerHeight[0]	<	cornerHeight[3] && cornerHeight[0]	<	cornerHeight[1] && cornerHeight[0]	<	cornerHeight[2]) { display[z][x] = -80; textAttributes[z][x] = COLOR_DARKGREEN	<< 4 | COLOR_DARKGREY		; }
+			else if(cornerHeight[1]	<	cornerHeight[0] && cornerHeight[1]	<	cornerHeight[3] && cornerHeight[1]	<	cornerHeight[2]) { display[z][x] = -78; textAttributes[z][x] = COLOR_DARKGREEN	<< 4 | COLOR_DARKGREY		; }
+			else if(cornerHeight[2]	<	cornerHeight[0] && cornerHeight[2]	<	cornerHeight[1] && cornerHeight[2]	<	cornerHeight[3]) { display[z][x] = -80; textAttributes[z][x] = COLOR_GREEN		<< 4 | 0					; }
+			else if(cornerHeight[3]	<	cornerHeight[0] && cornerHeight[3]	<	cornerHeight[1] && cornerHeight[3]	<	cornerHeight[2]) { display[z][x] = -79; textAttributes[z][x] = COLOR_GREEN		<< 4 | COLOR_DARKGREY		; }
 
-			else if(cornerHeight[0]	>	cornerHeight[3] && cornerHeight[0]	>	cornerHeight[1] && cornerHeight[0]	>	cornerHeight[2])	{	display[z][x] = -80; textAttributes[z][x] = COLOR_DARKGREEN	<< 4 | COLOR_DARKGREY		; }
-			else if(cornerHeight[1]	>	cornerHeight[0] && cornerHeight[1]	>	cornerHeight[3] && cornerHeight[1]	>	cornerHeight[2])	{	display[z][x] = -78; textAttributes[z][x] = COLOR_DARKGREEN	<< 4 | COLOR_DARKGREY		; }
-			else if(cornerHeight[2]	>	cornerHeight[0] && cornerHeight[2]	>	cornerHeight[1] && cornerHeight[2]	>	cornerHeight[3])	{	display[z][x] = -80; textAttributes[z][x] = COLOR_GREEN		<< 4 | 0				; }
-			else if(cornerHeight[3]	>	cornerHeight[0] && cornerHeight[3]	>	cornerHeight[1] && cornerHeight[3]	>	cornerHeight[2])	{	display[z][x] = -79; textAttributes[z][x] = COLOR_GREEN		<< 4 | COLOR_DARKGREY		; }
+			else if(cornerHeight[0]	>	cornerHeight[3] && cornerHeight[0]	>	cornerHeight[1] && cornerHeight[0]	>	cornerHeight[2]) { display[z][x] = -80; textAttributes[z][x] = COLOR_DARKGREEN	<< 4 | COLOR_DARKGREY		; }
+			else if(cornerHeight[1]	>	cornerHeight[0] && cornerHeight[1]	>	cornerHeight[3] && cornerHeight[1]	>	cornerHeight[2]) { display[z][x] = -78; textAttributes[z][x] = COLOR_DARKGREEN	<< 4 | COLOR_DARKGREY		; }
+			else if(cornerHeight[2]	>	cornerHeight[0] && cornerHeight[2]	>	cornerHeight[1] && cornerHeight[2]	>	cornerHeight[3]) { display[z][x] = -80; textAttributes[z][x] = COLOR_GREEN		<< 4 | 0					; }
+			else if(cornerHeight[3]	>	cornerHeight[0] && cornerHeight[3]	>	cornerHeight[1] && cornerHeight[3]	>	cornerHeight[2]) { display[z][x] = -79; textAttributes[z][x] = COLOR_GREEN		<< 4 | COLOR_DARKGREY		; }
 			///----------------------
-			else if(cornerHeight[0]	>	cornerHeight[3] && cornerHeight[0]	<	cornerHeight[1] && cornerHeight[0]	<	cornerHeight[2])	{	display[z][x] = -80; textAttributes[z][x] = COLOR_DARKGREEN	<< 4 | COLOR_DARKGREY		; }
-			else if(cornerHeight[1]	>	cornerHeight[0] && cornerHeight[1]	<	cornerHeight[3] && cornerHeight[1]	<	cornerHeight[2])	{	display[z][x] = -78; textAttributes[z][x] = COLOR_DARKGREEN	<< 4 | COLOR_DARKGREY		; }
-			else if(cornerHeight[2]	>	cornerHeight[0] && cornerHeight[2]	<	cornerHeight[1] && cornerHeight[2]	<	cornerHeight[3])	{	display[z][x] = -80; textAttributes[z][x] = COLOR_GREEN		<< 4 | 0				; }
-			else if(cornerHeight[3]	>	cornerHeight[0] && cornerHeight[3]	<	cornerHeight[1] && cornerHeight[3]	<	cornerHeight[2])	{	display[z][x] = -79; textAttributes[z][x] = COLOR_GREEN		<< 4 | COLOR_DARKGREY		; }
+			else if(cornerHeight[0]	>	cornerHeight[3] && cornerHeight[0]	<	cornerHeight[1] && cornerHeight[0]	<	cornerHeight[2]) { display[z][x] = -80; textAttributes[z][x] = COLOR_DARKGREEN	<< 4 | COLOR_DARKGREY		; }
+			else if(cornerHeight[1]	>	cornerHeight[0] && cornerHeight[1]	<	cornerHeight[3] && cornerHeight[1]	<	cornerHeight[2]) { display[z][x] = -78; textAttributes[z][x] = COLOR_DARKGREEN	<< 4 | COLOR_DARKGREY		; }
+			else if(cornerHeight[2]	>	cornerHeight[0] && cornerHeight[2]	<	cornerHeight[1] && cornerHeight[2]	<	cornerHeight[3]) { display[z][x] = -80; textAttributes[z][x] = COLOR_GREEN		<< 4 | 0					; }
+			else if(cornerHeight[3]	>	cornerHeight[0] && cornerHeight[3]	<	cornerHeight[1] && cornerHeight[3]	<	cornerHeight[2]) { display[z][x] = -79; textAttributes[z][x] = COLOR_GREEN		<< 4 | COLOR_DARKGREY		; }
 
-			else if(cornerHeight[0]	<	cornerHeight[3] && cornerHeight[0]	>	cornerHeight[1] && cornerHeight[0]	<	cornerHeight[2])	{	display[z][x] = -80; textAttributes[z][x] = COLOR_DARKGREEN	<< 4 | COLOR_DARKGREY		; }
-			else if(cornerHeight[1]	<	cornerHeight[0] && cornerHeight[1]	>	cornerHeight[3] && cornerHeight[1]	<	cornerHeight[2])	{	display[z][x] = -78; textAttributes[z][x] = COLOR_DARKGREEN	<< 4 | COLOR_DARKGREY		; }
-			else if(cornerHeight[2]	<	cornerHeight[0] && cornerHeight[2]	>	cornerHeight[1] && cornerHeight[2]	<	cornerHeight[3])	{	display[z][x] = -80; textAttributes[z][x] = COLOR_GREEN		<< 4 | 0				; }
-			else if(cornerHeight[3]	<	cornerHeight[0] && cornerHeight[3]	>	cornerHeight[1] && cornerHeight[3]	<	cornerHeight[2])	{	display[z][x] = -79; textAttributes[z][x] = COLOR_GREEN		<< 4 | COLOR_DARKGREY		; }
+			else if(cornerHeight[0]	<	cornerHeight[3] && cornerHeight[0]	>	cornerHeight[1] && cornerHeight[0]	<	cornerHeight[2]) { display[z][x] = -80; textAttributes[z][x] = COLOR_DARKGREEN	<< 4 | COLOR_DARKGREY		; }
+			else if(cornerHeight[1]	<	cornerHeight[0] && cornerHeight[1]	>	cornerHeight[3] && cornerHeight[1]	<	cornerHeight[2]) { display[z][x] = -78; textAttributes[z][x] = COLOR_DARKGREEN	<< 4 | COLOR_DARKGREY		; }
+			else if(cornerHeight[2]	<	cornerHeight[0] && cornerHeight[2]	>	cornerHeight[1] && cornerHeight[2]	<	cornerHeight[3]) { display[z][x] = -80; textAttributes[z][x] = COLOR_GREEN		<< 4 | 0					; }
+			else if(cornerHeight[3]	<	cornerHeight[0] && cornerHeight[3]	>	cornerHeight[1] && cornerHeight[3]	<	cornerHeight[2]) { display[z][x] = -79; textAttributes[z][x] = COLOR_GREEN		<< 4 | COLOR_DARKGREY		; }
 
-			else if(cornerHeight[0]	<	cornerHeight[3] && cornerHeight[0]	<	cornerHeight[1] && cornerHeight[0]	>	cornerHeight[2])	{	display[z][x] = -80; textAttributes[z][x] = COLOR_DARKGREEN	<< 4 | COLOR_DARKGREY		; }
-			else if(cornerHeight[1]	<	cornerHeight[0] && cornerHeight[1]	<	cornerHeight[3] && cornerHeight[1]	>	cornerHeight[2])	{	display[z][x] = -78; textAttributes[z][x] = COLOR_DARKGREEN	<< 4 | COLOR_DARKGREY		; }
-			else if(cornerHeight[2]	<	cornerHeight[0] && cornerHeight[2]	<	cornerHeight[1] && cornerHeight[2]	>	cornerHeight[3])	{	display[z][x] = -80; textAttributes[z][x] = COLOR_GREEN		<< 4 | 0				; }
-			else if(cornerHeight[3]	<	cornerHeight[0] && cornerHeight[3]	<	cornerHeight[1] && cornerHeight[3]	>	cornerHeight[2])	{	display[z][x] = -79; textAttributes[z][x] = COLOR_GREEN		<< 4 | COLOR_DARKGREY		; }
+			else if(cornerHeight[0]	<	cornerHeight[3] && cornerHeight[0]	<	cornerHeight[1] && cornerHeight[0]	>	cornerHeight[2]) { display[z][x] = -80; textAttributes[z][x] = COLOR_DARKGREEN	<< 4 | COLOR_DARKGREY		; }
+			else if(cornerHeight[1]	<	cornerHeight[0] && cornerHeight[1]	<	cornerHeight[3] && cornerHeight[1]	>	cornerHeight[2]) { display[z][x] = -78; textAttributes[z][x] = COLOR_DARKGREEN	<< 4 | COLOR_DARKGREY		; }
+			else if(cornerHeight[2]	<	cornerHeight[0] && cornerHeight[2]	<	cornerHeight[1] && cornerHeight[2]	>	cornerHeight[3]) { display[z][x] = -80; textAttributes[z][x] = COLOR_GREEN		<< 4 | 0					; }
+			else if(cornerHeight[3]	<	cornerHeight[0] && cornerHeight[3]	<	cornerHeight[1] && cornerHeight[3]	>	cornerHeight[2]) { display[z][x] = -79; textAttributes[z][x] = COLOR_GREEN		<< 4 | COLOR_DARKGREY		; }
 			///----------------------
-			else if(cornerHeight[0]	>	cornerHeight[3] && cornerHeight[0]	<	cornerHeight[1] && cornerHeight[0]	>	cornerHeight[2])	{	display[z][x] = -80; textAttributes[z][x] = COLOR_DARKGREEN	<< 4 | COLOR_DARKGREY		; }
-			else if(cornerHeight[1]	>	cornerHeight[0] && cornerHeight[1]	<	cornerHeight[3] && cornerHeight[1]	>	cornerHeight[2])	{	display[z][x] = -78; textAttributes[z][x] = COLOR_DARKGREEN	<< 4 | COLOR_DARKGREY		; }
-			else if(cornerHeight[2]	>	cornerHeight[0] && cornerHeight[2]	<	cornerHeight[1] && cornerHeight[2]	>	cornerHeight[3])	{	display[z][x] = -80; textAttributes[z][x] = COLOR_GREEN		<< 4 | 0				; }
-			else if(cornerHeight[3]	>	cornerHeight[0] && cornerHeight[3]	<	cornerHeight[1] && cornerHeight[3]	>	cornerHeight[2])	{	display[z][x] = -79; textAttributes[z][x] = COLOR_GREEN		<< 4 | COLOR_DARKGREY		; }
+			else if(cornerHeight[0]	>	cornerHeight[3] && cornerHeight[0]	<	cornerHeight[1] && cornerHeight[0]	>	cornerHeight[2]) { display[z][x] = -80; textAttributes[z][x] = COLOR_DARKGREEN	<< 4 | COLOR_DARKGREY		; }
+			else if(cornerHeight[1]	>	cornerHeight[0] && cornerHeight[1]	<	cornerHeight[3] && cornerHeight[1]	>	cornerHeight[2]) { display[z][x] = -78; textAttributes[z][x] = COLOR_DARKGREEN	<< 4 | COLOR_DARKGREY		; }
+			else if(cornerHeight[2]	>	cornerHeight[0] && cornerHeight[2]	<	cornerHeight[1] && cornerHeight[2]	>	cornerHeight[3]) { display[z][x] = -80; textAttributes[z][x] = COLOR_GREEN		<< 4 | 0					; }
+			else if(cornerHeight[3]	>	cornerHeight[0] && cornerHeight[3]	<	cornerHeight[1] && cornerHeight[3]	>	cornerHeight[2]) { display[z][x] = -79; textAttributes[z][x] = COLOR_GREEN		<< 4 | COLOR_DARKGREY		; }
 
-			else if(cornerHeight[0]	>	cornerHeight[3] && cornerHeight[0]	>	cornerHeight[1] && cornerHeight[0]	<	cornerHeight[2])	{	display[z][x] = -80; textAttributes[z][x] = COLOR_DARKGREEN	<< 4 | COLOR_DARKGREY		; }
-			else if(cornerHeight[1]	>	cornerHeight[0] && cornerHeight[1]	>	cornerHeight[3] && cornerHeight[1]	<	cornerHeight[2])	{	display[z][x] = -78; textAttributes[z][x] = COLOR_DARKGREEN	<< 4 | COLOR_DARKGREY		; }
-			else if(cornerHeight[2]	>	cornerHeight[0] && cornerHeight[2]	>	cornerHeight[1] && cornerHeight[2]	<	cornerHeight[3])	{	display[z][x] = -80; textAttributes[z][x] = COLOR_GREEN		<< 4 | 0				; }
-			else if(cornerHeight[3]	>	cornerHeight[0] && cornerHeight[3]	>	cornerHeight[1] && cornerHeight[3]	<	cornerHeight[2])	{	display[z][x] = -79; textAttributes[z][x] = COLOR_GREEN		<< 4 | COLOR_DARKGREY		; }
+			else if(cornerHeight[0]	>	cornerHeight[3] && cornerHeight[0]	>	cornerHeight[1] && cornerHeight[0]	<	cornerHeight[2]) { display[z][x] = -80; textAttributes[z][x] = COLOR_DARKGREEN	<< 4 | COLOR_DARKGREY		; }
+			else if(cornerHeight[1]	>	cornerHeight[0] && cornerHeight[1]	>	cornerHeight[3] && cornerHeight[1]	<	cornerHeight[2]) { display[z][x] = -78; textAttributes[z][x] = COLOR_DARKGREEN	<< 4 | COLOR_DARKGREY		; }
+			else if(cornerHeight[2]	>	cornerHeight[0] && cornerHeight[2]	>	cornerHeight[1] && cornerHeight[2]	<	cornerHeight[3]) { display[z][x] = -80; textAttributes[z][x] = COLOR_GREEN		<< 4 | 0					; }
+			else if(cornerHeight[3]	>	cornerHeight[0] && cornerHeight[3]	>	cornerHeight[1] && cornerHeight[3]	<	cornerHeight[2]) { display[z][x] = -79; textAttributes[z][x] = COLOR_GREEN		<< 4 | COLOR_DARKGREY		; }
 
-			else if(cornerHeight[0]	<	cornerHeight[3] && cornerHeight[0]	>	cornerHeight[1] && cornerHeight[0]	>	cornerHeight[2])	{	display[z][x] = -80; textAttributes[z][x] = COLOR_DARKGREEN	<< 4 | COLOR_DARKGREY		; }
-			else if(cornerHeight[1]	<	cornerHeight[0] && cornerHeight[1]	>	cornerHeight[3] && cornerHeight[1]	>	cornerHeight[2])	{	display[z][x] = -78; textAttributes[z][x] = COLOR_DARKGREEN	<< 4 | COLOR_DARKGREY		; }
-			else if(cornerHeight[2]	<	cornerHeight[0] && cornerHeight[2]	>	cornerHeight[1] && cornerHeight[2]	>	cornerHeight[3])	{	display[z][x] = -80; textAttributes[z][x] = COLOR_GREEN		<< 4 | 0				; }
-			else if(cornerHeight[3]	<	cornerHeight[0] && cornerHeight[3]	>	cornerHeight[1] && cornerHeight[3]	>	cornerHeight[2])	{	display[z][x] = -79; textAttributes[z][x] = COLOR_GREEN		<< 4 | COLOR_DARKGREY		; }
+			else if(cornerHeight[0]	<	cornerHeight[3] && cornerHeight[0]	>	cornerHeight[1] && cornerHeight[0]	>	cornerHeight[2]) { display[z][x] = -80; textAttributes[z][x] = COLOR_DARKGREEN	<< 4 | COLOR_DARKGREY		; }
+			else if(cornerHeight[1]	<	cornerHeight[0] && cornerHeight[1]	>	cornerHeight[3] && cornerHeight[1]	>	cornerHeight[2]) { display[z][x] = -78; textAttributes[z][x] = COLOR_DARKGREEN	<< 4 | COLOR_DARKGREY		; }
+			else if(cornerHeight[2]	<	cornerHeight[0] && cornerHeight[2]	>	cornerHeight[1] && cornerHeight[2]	>	cornerHeight[3]) { display[z][x] = -80; textAttributes[z][x] = COLOR_GREEN		<< 4 | 0					; }
+			else if(cornerHeight[3]	<	cornerHeight[0] && cornerHeight[3]	>	cornerHeight[1] && cornerHeight[3]	>	cornerHeight[2]) { display[z][x] = -79; textAttributes[z][x] = COLOR_GREEN		<< 4 | COLOR_DARKGREY		; }
 
 			//	 if(cornerHeight[0]	<	cornerHeight[1])	{	target.Screen.Cells[z][x] = -78; target.TextAttributes.Cells[z][x] = COLOR_GREEN << 4 | COLOR_DARKGREY; }
 			//else if(cornerHeight[0]	<	cornerHeight[2])	{	target.Screen.Cells[z][x] = -79; target.TextAttributes.Cells[z][x] = COLOR_GREEN << 4 | COLOR_DARKGREY; }
@@ -241,7 +240,7 @@ void									klib::boardToDisplay			(::klib::SGame& instanceGame, const STactica
 		if(initialSight != finalSight)
 			textAttributes[z][x]		= (textAttributes[z][x] & 0xF) | (COLOR_WHITE << 4);
 
-		for(uint32_t iAOE=0, countAOE=board.AreaOfEffect.AOE.Count; iAOE <countAOE; ++iAOE) {
+		for(uint32_t iAOE=0, countAOE=board.AreaOfEffect.AOE.Slots.size(); iAOE <countAOE; ++iAOE) {
 			const SAOE& aoeInstance = board.AreaOfEffect.AOE[iAOE].Entity;
 			const ::gpk::SCoord3<int32_t>& aoeCell = aoeInstance.Position.Cell;
 			::gpk::SCoord3<float> aoePos = {(float)aoeCell.x, (float)aoeCell.y, (float)aoeCell.z};

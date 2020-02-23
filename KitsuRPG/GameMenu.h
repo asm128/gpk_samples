@@ -10,7 +10,7 @@ static inline int64_t										getNumericInput							()																									
 	// Get user input
 	::std::string													userChoice;
 	::std::getline(::std::cin, userChoice);
-	
+
 	// Convert the input string to a menuitem index.
 	int64_t															selectedOption							= -1;
 	try { selectedOption = std::stoll(userChoice); }
@@ -20,18 +20,18 @@ static inline int64_t										getNumericInput							()																									
 }
 
 template <size_t _ArraySize, typename _ReturnType>
-_ReturnType													displayMenu								(size_t optionCount, const std::string& title, const klib::SMenuItem<_ReturnType>(&menuItems)[_ArraySize])		{
+_ReturnType													displayMenu								(size_t optionCount, const std::string& title, const ::klib::SMenuItem<_ReturnType>(&menuItems)[_ArraySize])		{
 	optionCount													= (optionCount < _ArraySize) ? optionCount : _ArraySize; // Fix optionCount to the maximum size of the array if optionCount is higher than the allowed size.
 
 	while (true) {	// Query for user input until a valid selection is made
 		printf(	"\n-- %s.\n", title.c_str() );	// Print menu title
 		printf(	"Make your selection:\n" );
-		
+
 		// Print menu options
 		for(size_t i=0; i<optionCount; i++)
-			printf("%u: %s.\n", (uint32_t)(i+1), menuItems[i].Text.c_str());	
-		
-		// Get user input. 
+			printf("%u: %s.\n", (uint32_t)(i+1), menuItems[i].Text.c_str());
+
+		// Get user input.
 		const uint32_t													selectedIndex							= (uint32_t)(::getNumericInput()-1);	//	Convert the input string to a menuitem index.
 
 		if(selectedIndex >= optionCount)	// We only accept from 0 to optionCount
@@ -44,7 +44,7 @@ _ReturnType													displayMenu								(size_t optionCount, const std::strin
 }
 
 template <size_t _Size, typename _ReturnType>
-_ReturnType													displayMenu								(const std::string& title, const klib::SMenuItem<_ReturnType>(&menuItems)[_Size], int32_t maxItems = ~0U)		{
+_ReturnType													displayMenu								(const std::string& title, const ::klib::SMenuItem<_ReturnType>(&menuItems)[_Size], int32_t maxItems = ~0U)		{
 	return displayMenu((_Size > maxItems) ? maxItems : _Size, title, menuItems);
 }
 

@@ -35,7 +35,6 @@ namespace klib
 	}
 
 
-	static constexpr const uint32_t			MAX_ENTITY_COLUMNS				= 4;
 	static constexpr	const uint32_t		MAX_AGENT_ROWS					= 2;
 	static constexpr	const uint32_t		MAX_AGENT_COLUMNS				= 3;
 	void									displayStatusEffectsAndTechs	(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int32_t offsetY, int32_t offsetX, CCharacter& character);

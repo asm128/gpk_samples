@@ -10,13 +10,17 @@ int main(int /*argc*/, char ** /*argv*/)
 	_CrtSetDbgFlag(tmp);
 #endif
 
-	::klib::initASCIIScreen(klib::SGlobalDisplay::Width, klib::SGlobalDisplay::Depth);
-	
+#define DEFAULT_ASCII_DISPLAY_HEIGHT	70//83
+#define DEFAULT_ASCII_DISPLAY_WIDTH		((uint32_t)(DEFAULT_ASCII_DISPLAY_HEIGHT * 2.666666f))
+	::klib::initASCIIScreen(DEFAULT_ASCII_DISPLAY_WIDTH, DEFAULT_ASCII_DISPLAY_HEIGHT);
+
 	::klib::SGame* pInstancedGame	= new klib::SGame;
 	::klib::SGame& instanceGame		= *pInstancedGame;
+	instanceGame.GlobalDisplay	.Resize({DEFAULT_ASCII_DISPLAY_WIDTH, DEFAULT_ASCII_DISPLAY_HEIGHT});
+	instanceGame.TacticalDisplay.Resize({::klib::GAME_MAP_WIDTH, ::klib::GAME_MAP_DEPTH});
 
 	::klib::initGame(instanceGame);
-	while(instanceGame.Flags & klib::GAME_FLAGS_RUNNING) {
+	while(instanceGame.Flags & ::klib::GAME_FLAGS_RUNNING) {
 		::klib::pollInput(instanceGame.FrameInput);
 		::klib::SASCIITarget							target;
 		::klib::getASCIIBackBuffer						(target);
@@ -34,7 +38,7 @@ int main(int /*argc*/, char ** /*argv*/)
 }
 
 
-int WINAPI WinMain 
+int WINAPI WinMain
 (    _In_		HINSTANCE	//hInstance
 ,    _In_opt_	HINSTANCE	//hPrevInstance
 ,    _In_		LPSTR		//lpCmdLine

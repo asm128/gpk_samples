@@ -67,7 +67,7 @@ void handleSubstateChange(SGame& instanceGame, const SGameState& newState) {
 	instanceGame.GlobalDisplay		.Clear();
 	//instanceGame.TacticalDisplay	.Clear();
 	//instanceGame.PostEffectDisplay	.Clear();
-	::klib::clearGrid(instanceGame.MenuDisplay);
+	//::klib::clearGrid(instanceGame.MenuDisplay);
 
 	switch(newState.State) {
 	case GAME_STATE_MENU_OPTIONS:
@@ -201,20 +201,20 @@ void klib::showMenu(SGame& instanceGame) {
 	static const SMenu<SGameState> menuConfig		(  {GAME_STATE_MENU_MAIN			},	"Options"		, 26);
 	static const SMenu<SGameState> menuSell			(  {GAME_STATE_WELCOME_COMMANDER	},	"Sell"			);
 
-	klib::SGlobalDisplay& globalDisplay = instanceGame.GlobalDisplay;
+	klib::SWeightedDisplay& globalDisplay = instanceGame.GlobalDisplay;
 
 	switch(instanceGame.State.State) {
 	case GAME_STATE_MENU_MAIN			:
 		if( ::gpk::bit_true(instanceGame.Flags, GAME_FLAGS_STARTED) )
-			newAction = processMenuReturn(drawMenu(globalDisplay.Screen, &globalDisplay.TextAttributes[0][0], menuMainInGame, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsMainInGame}, instanceGame.FrameInput, instanceGame.State));
+			newAction = processMenuReturn(drawMenu(globalDisplay.Screen.View, globalDisplay.TextAttributes.begin(), menuMainInGame, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsMainInGame}, instanceGame.FrameInput, instanceGame.State));
 		else
-			newAction = processMenuReturn(drawMenu(globalDisplay.Screen, &globalDisplay.TextAttributes[0][0], menuMain, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsMain}, instanceGame.FrameInput, instanceGame.State));
+			newAction = processMenuReturn(drawMenu(globalDisplay.Screen.View, globalDisplay.TextAttributes.begin(), menuMain, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsMain}, instanceGame.FrameInput, instanceGame.State));
 
 		break;
 
-	case GAME_STATE_MENU_OPTIONS		:	newAction = processMenuReturn(drawMenu(globalDisplay.Screen, &globalDisplay.TextAttributes.Cells[0][0], menuConfig, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsConfig}, instanceGame.FrameInput, instanceGame.State ));	break;
+	case GAME_STATE_MENU_OPTIONS		:	newAction = processMenuReturn(drawMenu(globalDisplay.Screen.View, globalDisplay.TextAttributes.begin(), menuConfig, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsConfig}, instanceGame.FrameInput, instanceGame.State ));	break;
 	case GAME_STATE_MENU_EQUIPMENT		:	newAction = processMenuReturn(drawEquip(instanceGame, instanceGame.State));	break;
-	case GAME_STATE_MENU_SELL			:	newAction = processMenuReturn(drawMenu(globalDisplay.Screen, &globalDisplay.TextAttributes[0][0], menuSell, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsSell}, instanceGame.FrameInput, instanceGame.State ));	break;
+	case GAME_STATE_MENU_SELL			:	newAction = processMenuReturn(drawMenu(globalDisplay.Screen.View, globalDisplay.TextAttributes.begin(), menuSell, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsSell}, instanceGame.FrameInput, instanceGame.State ));	break;
 	case GAME_STATE_MENU_LAN_MISSION	:	//newAction = processMenuReturn(drawLANSetup		(instanceGame, instanceGame.State));	break;
 	case GAME_STATE_START_MISSION		:	newAction = processMenuReturn(drawTacticalScreen	(instanceGame, instanceGame.State));	break;
 	case GAME_STATE_TACTICAL_CONTROL	:	newAction = processMenuReturn(drawTacticalScreen	(instanceGame, instanceGame.State));	break;

@@ -36,8 +36,8 @@ SGameState													drawFactoryMenu										(SGame& instanceGame, const SGam
 				, researchCompleted.EntityToken_																			\
 			);																												\
 		}																													\
-		researchedDefinitions	+= researchedItems.EntityToken_.Definitions.Count;											\
-		researchedModifiers		+= researchedItems.EntityToken_.Modifiers.Count;
+		researchedDefinitions	+= researchedItems.EntityToken_.Definitions.Slots.size();									\
+		researchedModifiers		+= researchedItems.EntityToken_.Modifiers.Slots.size();
 
 #define GET_AVAILABLE_RESEARCH_FOR_ENTITY_NO_EQUIP(EntityToken_, ProgressiveDefinitions_, ProgressiveModifiers_)			\
 		generateResearchedList(researchedItems.EntityToken_, playerInventory.EntityToken_, researchCompleted.EntityToken_);	\
@@ -51,8 +51,8 @@ SGameState													drawFactoryMenu										(SGame& instanceGame, const SGam
 				, researchCompleted.EntityToken_																			\
 			);																												\
 		}																													\
-		researchedDefinitions	+= researchedItems.EntityToken_.Definitions.Count;											\
-		researchedModifiers		+= researchedItems.EntityToken_.Modifiers.Count;
+		researchedDefinitions	+= researchedItems.EntityToken_.Definitions.Slots.size();									\
+		researchedModifiers		+= researchedItems.EntityToken_.Modifiers.Slots.size();
 
 	int32_t															iAgent												= 0;
 	const int32_t													armySize											= (int32_t)player.Army.size();
@@ -90,7 +90,7 @@ SGameState													drawFactoryMenu										(SGame& instanceGame, const SGam
 
 #define ADD_RESEARCH_DEFINITIONS(place, type, records)																																	\
 	labelEntityType												= ::gpk::get_value_label(type).begin();																				\
-	for(uint32_t i=0, count=place.Definitions.Count; i<count; ++i) {																													\
+	for(uint32_t i=0, count=place.Definitions.Slots.size(); i<count; ++i) {																													\
 		menuItems[researchedCount].ReturnValue.ResearchIndex		= i;																												\
 		menuItems[researchedCount].ReturnValue.IsModifier			= false;																											\
 		int32_t															priceUnit											= records[place.Definitions[i].Entity].Points.PriceBuy / 2;	\
@@ -140,8 +140,8 @@ SGameState													drawFactoryMenu										(SGame& instanceGame, const SGam
 //	ADD_RESEARCH_MODIFIERS(researchedItems.StageProp	, ENTITY_TYPE_STAGE_PROP	, modifiersStageProp	, "Enhacement"			);
 
 	SEntityResearch											selectedChoice								= drawMenu
-		( instanceGame.GlobalDisplay.Screen
-		, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0]
+		( instanceGame.GlobalDisplay.Screen.View
+		, instanceGame.GlobalDisplay.TextAttributes.begin()
 		, (size_t)researchedCount
 		, "Available Production"
 		, ::gpk::view_array<const ::klib::SMenuItem<::klib::SEntityResearch>>{menuItems}
@@ -175,7 +175,7 @@ SGameState													drawFactoryMenu										(SGame& instanceGame, const SGam
 SGameState																		drawFactory							(SGame& instanceGame, const SGameState& returnState)																						{
 	const ::std::string																	textToPrint							= "Factory.";
 	bool																				bDonePrinting						= ::klib::getMessageSlow(instanceGame.SlowMessage, {textToPrint.data(), (uint32_t)textToPrint.size()}, instanceGame.FrameTimer.LastTimeSeconds);
-	memcpy(&instanceGame.TacticalDisplay.Screen.Cells[instanceGame.TacticalDisplay.Depth >> 1][instanceGame.TacticalDisplay.Width / 2 - (strlen(instanceGame.SlowMessage) + 1) / 2], instanceGame.SlowMessage, strlen(instanceGame.SlowMessage));
+	memcpy(&instanceGame.TacticalDisplay.Screen[instanceGame.TacticalDisplay.Screen.metrics().y >> 1][instanceGame.TacticalDisplay.Screen.metrics().x / 2 - ((uint32_t)strlen(instanceGame.SlowMessage) + 1) / 2], instanceGame.SlowMessage, strlen(instanceGame.SlowMessage));
 	if ( !bDonePrinting )
 		return returnState;
 

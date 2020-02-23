@@ -194,7 +194,7 @@ int32_t drawEquipDetail
 	return 0;
 }
 
-template <typename _TEntity, size_t _Size, size_t _DefinitionCount, size_t _ModifierCount>
+template <typename _TEntity, size_t _DefinitionCount, size_t _ModifierCount>
 int32_t drawEquipList
 (	::gpk::view_grid<char>		display
 ,	::gpk::view_grid<uint16_t>	textAttributes
@@ -205,7 +205,7 @@ int32_t drawEquipList
 ,	int32_t offsetX
 ,	int32_t selectedRow
 ,	const ::gpk::label& entityTypeName
-,	const SEntityContainer<_TEntity, _Size>& entityContainer
+,	const SEntityContainer<_TEntity>& entityContainer
 ,	const SEntityRecord<_TEntity>(&tableDefinitions	)[_DefinitionCount]
 ,	const SEntityRecord<_TEntity>(&tableModifiers	)[_ModifierCount]
 )
@@ -217,7 +217,7 @@ int32_t drawEquipList
 
 	selectedRow &= ~0x80000000;
 	std::string entityName;
-	for(uint32_t iEntity = 0, entityCount = entityContainer.Count; iEntity < entityCount; ++iEntity)
+	for(uint32_t iEntity = 0, entityCount = entityContainer.Slots.size(); iEntity < entityCount; ++iEntity)
 	{
 		entityName = getEntityName(entityContainer[iEntity].Entity, tableDefinitions, tableModifiers);
 		uint16_t colorRow = (iEntity == (uint32_t)selectedRow) ? COLOR_YELLOW : COLOR_YELLOW << 4;
@@ -440,12 +440,12 @@ SGameState drawWelcome(SGame& instanceGame, const SGameState& returnValue) {
 	instanceGame.GlobalDisplay.Clear();
 
 	const std::string				textToPrint			= "Welcome back commander " + std::string(instanceGame.Players[PLAYER_INDEX_USER].Name.begin()) + ".";
-	SGlobalDisplay					& display			= instanceGame.GlobalDisplay;
+	SWeightedDisplay					& display			= instanceGame.GlobalDisplay;
 	int32_t							lineOffset			= (display.Screen.metrics().y >> 1) - 1;
 	int32_t							columnOffset		=  display.Screen.metrics().x / 2 - (int32_t)textToPrint.size() / 2;
 
 	bool							bDonePrinting		= ::klib::getMessageSlow(instanceGame.SlowMessage, {textToPrint.data(), (uint32_t)textToPrint.size()}, instanceGame.FrameTimer.LastTimeSeconds);
-	columnOffset				= printfToGridColored(display.Screen, display.TextAttributes, COLOR_GREEN, lineOffset, columnOffset, ::klib::SCREEN_LEFT, "%s", instanceGame.SlowMessage);
+	columnOffset				= printfToGridColored(display.Screen.View, display.TextAttributes, COLOR_GREEN, lineOffset, columnOffset, ::klib::SCREEN_LEFT, "%s", instanceGame.SlowMessage);
 
 	if ( bDonePrinting ) {
 		drawWelcomeGUI(instanceGame);
@@ -454,7 +454,7 @@ SGameState drawWelcome(SGame& instanceGame, const SGameState& returnValue) {
 		static const SMenu<SGameState>	menuControlCenter	({GAME_STATE_MENU_MAIN}, "Control Center", 28);
 		bool							bInCourse			= ::gpk::bit_true(instanceGame.Flags, GAME_FLAGS_TACTICAL) || ::gpk::bit_true(instanceGame.Flags, GAME_FLAGS_TACTICAL_REMOTE);
 
-		return drawMenu(display.Screen, &display.TextAttributes[0][0], menuControlCenter, ::gpk::view_array<const ::klib::SMenuItem<SGameState>>{(bInCourse) ? optionsControlCenterMissionInCourse : optionsControlCenter}, instanceGame.FrameInput, returnValue);
+		return drawMenu(display.Screen.View, display.TextAttributes.begin(), menuControlCenter, ::gpk::view_array<const ::klib::SMenuItem<SGameState>>{(bInCourse) ? optionsControlCenterMissionInCourse : optionsControlCenter}, instanceGame.FrameInput, returnValue);
 	}
 	return returnValue;
 };

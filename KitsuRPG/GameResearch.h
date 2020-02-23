@@ -10,24 +10,24 @@
 #pragma pack(push, 1)
 
 // This hell creates an user menu for the entity records available for research
-template <typename _TEquipClass, typename _TInventory, typename _TResearched, size_t _SizeInventory, size_t _SizeResearched, size_t _SizeDefinitions>
+template <typename _TEquipClass, typename _TInventory, typename _TResearched, size_t _SizeDefinitions>
 void																		research
-	( ::klib::SEntityContainer<_TInventory, _SizeInventory>		& equipInventory
-	, ::klib::SEntityContainer<_TResearched, _SizeResearched>	& researchedList
-	, const _TEquipClass										(&definitionsTable)[_SizeDefinitions]
-	, _TInventory												& adventurerMaxEquip
-	, bool														bIsModifier
-	, bool														bIsProgressive
-	, const ::std::string										& itemFormat
-	, const ::std::string										& allResearchComplete
-	, const ::std::string										& noResearchAvailable
-	, const ::std::string										& selectItemToResearch
-	, const ::std::string										& startResearching
-	, const ::std::string										& doneResearching
+	( ::klib::SEntityContainer<_TInventory>		& equipInventory
+	, ::klib::SEntityContainer<_TResearched>	& researchedList
+	, const _TEquipClass						(&definitionsTable)[_SizeDefinitions]
+	, _TInventory								& adventurerMaxEquip
+	, bool										bIsModifier
+	, bool										bIsProgressive
+	, const ::std::string						& itemFormat
+	, const ::std::string						& allResearchComplete
+	, const ::std::string						& noResearchAvailable
+	, const ::std::string						& selectItemToResearch
+	, const ::std::string						& startResearching
+	, const ::std::string						& doneResearching
 	)
 {
-	if(researchedList.Count >= _SizeDefinitions-1) {	// No more research items in the game.
-		printf(allResearchComplete.c_str(), researchedList.Count);
+	if(researchedList.size() >= _SizeDefinitions - 1) {	// No more research items in the game.
+		printf(allResearchComplete.c_str(), researchedList.size());
 		return;
 	}
 
@@ -41,7 +41,7 @@ void																		research
 	adventurerMaxEquip.Level													= (adventurerMaxEquip.Level			> 1) ? adventurerMaxEquip.Level			: 1;
 
 	int32_t																			menuItemCount										= 0;
-	for( uint32_t i=0, count = equipInventory.Count; i<count; ++i ) {
+	for( uint32_t i=0, count = equipInventory.size(); i<count; ++i ) {
 		int32_t																			value												= 0;
 		const char																		* stringLeft										= nullptr
 			,																			* stringRight										= nullptr

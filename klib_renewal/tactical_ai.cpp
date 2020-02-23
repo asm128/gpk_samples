@@ -130,7 +130,7 @@ void													selectAIDestination										(SGame& instanceGame)													
 
 	while(!tacticalInfo.Board.Tiles.IsTileAvailable(targetPositionAgent.x, targetPositionAgent.z)) {
 		do {
-			if( rand()%2 )	targetPositionAgent.x					+= (rand()%2) ? 1 : -1;
+			if(rand() % 2)	targetPositionAgent.x					+= (rand()%2) ? 1 : -1;
 			else			targetPositionAgent.z					+= (rand()%2) ? 1 : -1;
 		}
 		while( (targetPositionAgent.x < 0 || targetPositionAgent.x >= (int32_t)tacticalInfo.Board.Tiles.Terrain.Geometry.metrics().x)

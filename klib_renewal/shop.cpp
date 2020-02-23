@@ -91,15 +91,15 @@ SGameState drawBuyMenu(SGame& instanceGame, const SGameState& returnState) {
 	static ::klib::SMenuItem<SBuyable> menuItems[MAX_BUY_ITEMS+1] = {};
 	::std::string menuTitle;
 	switch(instanceGame.State.Substate) {
-	case GAME_SUBSTATE_ACCESSORY	:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], menuAccessory	,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menuItemsAccessory	},  instanceGame.FrameInput, {-1});	break;
-	case GAME_SUBSTATE_STAGEPROP	:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], menuStageProp	,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menuItemsStageProp	},  instanceGame.FrameInput, {-1});	break;
-	case GAME_SUBSTATE_FACILITY		:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], menuFacility	,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menuItemsFacility	},  instanceGame.FrameInput, {-1});	break;
-	case GAME_SUBSTATE_VEHICLE		:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], menuVehicle	,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menuItemsVehicle		},  instanceGame.FrameInput, {-1});	break;
-	case GAME_SUBSTATE_PROFESSION	:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], menuProfession	,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menuItemsProfession	},  instanceGame.FrameInput, {-1});	break;
-	case GAME_SUBSTATE_WEAPON		:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], menuWeapon		,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menuItemsWeapon		},  instanceGame.FrameInput, {-1});	break;
-	case GAME_SUBSTATE_ARMOR		:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], menuArmor		,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menuItemsArmor		},  instanceGame.FrameInput, {-1});	break;
-	case GAME_SUBSTATE_ITEM			:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], menuItem		,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menuItemsItem		},  instanceGame.FrameInput, {-1});	break;
-	case GAME_SUBSTATE_CHARACTER	:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], menuAgent		,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menuItemsAgent		},  4, instanceGame.FrameInput, {-1});	break;
+	case GAME_SUBSTATE_ACCESSORY	:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.View, instanceGame.GlobalDisplay.TextAttributes.begin(), menuAccessory	,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menuItemsAccessory	},  instanceGame.FrameInput, {-1});	break;
+	case GAME_SUBSTATE_STAGEPROP	:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.View, instanceGame.GlobalDisplay.TextAttributes.begin(), menuStageProp	,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menuItemsStageProp	},  instanceGame.FrameInput, {-1});	break;
+	case GAME_SUBSTATE_FACILITY		:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.View, instanceGame.GlobalDisplay.TextAttributes.begin(), menuFacility	,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menuItemsFacility	},  instanceGame.FrameInput, {-1});	break;
+	case GAME_SUBSTATE_VEHICLE		:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.View, instanceGame.GlobalDisplay.TextAttributes.begin(), menuVehicle	,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menuItemsVehicle		},  instanceGame.FrameInput, {-1});	break;
+	case GAME_SUBSTATE_PROFESSION	:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.View, instanceGame.GlobalDisplay.TextAttributes.begin(), menuProfession	,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menuItemsProfession	},  instanceGame.FrameInput, {-1});	break;
+	case GAME_SUBSTATE_WEAPON		:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.View, instanceGame.GlobalDisplay.TextAttributes.begin(), menuWeapon		,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menuItemsWeapon		},  instanceGame.FrameInput, {-1});	break;
+	case GAME_SUBSTATE_ARMOR		:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.View, instanceGame.GlobalDisplay.TextAttributes.begin(), menuArmor		,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menuItemsArmor		},  instanceGame.FrameInput, {-1});	break;
+	case GAME_SUBSTATE_ITEM			:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.View, instanceGame.GlobalDisplay.TextAttributes.begin(), menuItem		,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menuItemsItem		},  instanceGame.FrameInput, {-1});	break;
+	case GAME_SUBSTATE_CHARACTER	:	selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.View, instanceGame.GlobalDisplay.TextAttributes.begin(), menuAgent		,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menuItemsAgent		},  4, instanceGame.FrameInput, {-1});	break;
 	default:
 		break;
 	}
@@ -164,18 +164,17 @@ SGameState drawBuyMenu(SGame& instanceGame, const SGameState& returnState) {
 	return retVal;
 }
 
-SGameState drawBuy(SGame& instanceGame, const SGameState& returnState)
-{
-	static const ::gpk::label textToPrint = "Tell me how much money you have and I will tell you what you'll become.";
+SGameState drawBuy(SGame& instanceGame, const SGameState& returnState) {
+	static const ::gpk::label		textToPrint			= "Tell me how much money you have and I will tell you what you'll become.";
 
-	bool bDonePrinting = ::klib::getMessageSlow(instanceGame.SlowMessage, textToPrint.begin(), textToPrint.size(), instanceGame.FrameTimer.LastTimeSeconds*3);
-	memcpy(&instanceGame.TacticalDisplay.Screen.Cells[instanceGame.TacticalDisplay.Depth>>1][instanceGame.TacticalDisplay.Width/2-(strlen(instanceGame.SlowMessage)+1)/2], instanceGame.SlowMessage, strlen(instanceGame.SlowMessage));
+	bool							bDonePrinting		= ::klib::getMessageSlow(instanceGame.SlowMessage, textToPrint.begin(), textToPrint.size(), instanceGame.FrameTimer.LastTimeSeconds*3);
+	memcpy(&instanceGame.TacticalDisplay.Screen[instanceGame.TacticalDisplay.Screen.metrics().y >> 1][instanceGame.TacticalDisplay.Screen.metrics().x / 2-((uint32_t)strlen(instanceGame.SlowMessage)+1)/2], instanceGame.SlowMessage, strlen(instanceGame.SlowMessage));
 	if ( !bDonePrinting )
 		return returnState;
 
 	if(GAME_SUBSTATE_MAIN == instanceGame.State.Substate) {
 		static const SMenu<SGameState> menuBuy({GAME_STATE_WELCOME_COMMANDER}, "Order Menu", 26);
-		return drawMenu(instanceGame.GlobalDisplay.Screen, &instanceGame.GlobalDisplay.TextAttributes.Cells[0][0], menuBuy, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsBuy}, instanceGame.FrameInput, instanceGame.State);
+		return drawMenu(instanceGame.GlobalDisplay.Screen.View, instanceGame.GlobalDisplay.TextAttributes.begin(), menuBuy, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsBuy}, instanceGame.FrameInput, instanceGame.State);
 	}
 	else
 		return drawBuyMenu(instanceGame, returnState);

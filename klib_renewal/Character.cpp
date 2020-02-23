@@ -21,11 +21,11 @@ void									klib::SCharacter::RecalculateFinalPoints	()																						no
 	// Currently, SEntityPoints::Coins and SEntityPoints::LifeCurrent values of the equipment are used in a different way from the character's points so we avoid adding the character points to the result for these two.
 	// The correct way of solving this would be to have different functions to calculate the points for the different actions/reactions.
 	SEntityPoints								result										= bonusPoints + weaponPoints + accessoryPoints + armorPoints + professionPoints; // + facilityPoints + vehiclePoints;
-	result.LifeMax							= result.LifeMax			+ Points.LifeMax;	// 
-	result.Attack							= result.Attack				+ Points.Attack;	// 
-	result.Fitness							= result.Fitness			+ Points.Fitness;	// 
-	result.PriceBuy							= result.PriceBuy			+ Points.PriceBuy;	// 
-	result.CostMaintenance					= result.CostMaintenance	+ Points.CostMaintenance;	// 
+	result.LifeMax							= result.LifeMax			+ Points.LifeMax;	//
+	result.Attack							= result.Attack				+ Points.Attack;	//
+	result.Fitness							= result.Fitness			+ Points.Fitness;	//
+	result.PriceBuy							= result.PriceBuy			+ Points.PriceBuy;	//
+	result.CostMaintenance					= result.CostMaintenance	+ Points.CostMaintenance;	//
 	if(result.LifeMax.Health <= 0)
 		result.LifeMax.Health					= 1;
 
@@ -34,12 +34,12 @@ void									klib::SCharacter::RecalculateFinalPoints	()																						no
 
 void									klib::SCharacter::RecalculateFinalFlags		()																						noexcept	{
 	klib::SEntityFlags							result										= {};
-	const klib::SEntityFlags					weaponFlags									= klib::getWeaponFlags		(CurrentEquip.Weapon);
-	const klib::SEntityFlags					accessoryFlags								= klib::getAccessoryFlags	(CurrentEquip.Accessory);
-	const klib::SEntityFlags					armorFlags									= klib::getArmorFlags		(CurrentEquip.Armor);
-	const klib::SEntityFlags					professionFlags								= klib::getProfessionFlags	(CurrentEquip.Profession);
-	const klib::SEntityFlags					& bonusFlags								= ActiveBonus.Points.Flags;
-	
+	const ::klib::SEntityFlags					weaponFlags									= klib::getWeaponFlags		(CurrentEquip.Weapon);
+	const ::klib::SEntityFlags					accessoryFlags								= klib::getAccessoryFlags	(CurrentEquip.Accessory);
+	const ::klib::SEntityFlags					armorFlags									= klib::getArmorFlags		(CurrentEquip.Armor);
+	const ::klib::SEntityFlags					professionFlags								= klib::getProfessionFlags	(CurrentEquip.Profession);
+	const ::klib::SEntityFlags					& bonusFlags								= ActiveBonus.Points.Flags;
+
 	result									= bonusFlags | weaponFlags | accessoryFlags | armorFlags | professionFlags | Flags; // | stagePropFlags | facilityFlags | vehicleFlags;
 	FinalFlags								= result;
 }
