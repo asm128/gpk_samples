@@ -3,17 +3,16 @@
 
 namespace klib
 {
-	template<typename _TEntity, size_t _SizeDefinitions, size_t _SizeModifiers>
+	template<typename _tEntity>
 	void													completeProduction
-		(	SEntityContainer<_TEntity>		& playerInventory
-		,	const _TEntity					& entity
-		,	::std::string					& messageSuccess
-		,	const SEntityRecord<_TEntity>	(&definitionsTable	)[_SizeDefinitions	]
-		,	const SEntityRecord<_TEntity>	(&modifiersTable	)[_SizeModifiers	]
+		(	SEntityContainer<_tEntity>				& playerInventory
+		,	const _tEntity							& entity
+		,	::gpk::array_pod<char_t>				& messageSuccess
+		,	const ::klib::SEntityTable<_tEntity>	& entityTable
 		) {
 		playerInventory.AddElement(entity);
-		::std::string												entityName						= getEntityName(entity, definitionsTable, modifiersTable);
-		messageSuccess											= entityName + " production completed.";
+		messageSuccess									= ::klib::getEntityName(entityTable, entity);
+		messageSuccess.append_string(" production completed.");
 	}
 
 	template <typename _EntityType>
@@ -21,7 +20,7 @@ namespace klib
 		(	const SEntityResearch			& selectedChoice
 		,	_EntityType						& maxResearch
 		,	SResearchGroup<_EntityType>		& researchCompleted
-		,	::std::string					& successMessage
+		,	::gpk::array_pod<char_t>		& successMessage
 		) {
 		if(selectedChoice.IsModifier) {
 			researchCompleted.Modifiers.AddElement(selectedChoice.Entity.Modifier);
@@ -31,17 +30,27 @@ namespace klib
 			researchCompleted.Definitions.AddElement(selectedChoice.Entity.Definition);
 			maxResearch.Definition									= ::gpk::max(maxResearch.Definition,	selectedChoice.Entity.Definition);
 		}
-		successMessage															= "You have successfully researched " + selectedChoice.Name + ".";
+		successMessage											= ::gpk::view_const_string{"You have successfully researched "};
+		successMessage.append(selectedChoice.Name);
+		successMessage.append_string(".");
 	}
 
 	//-------------------------------------------------------------------------------------------
-	static inline	void									acknowledgeResearch				(const SEntityResearch& selectedChoice, SPlayerProjects& playerProjects, std::string& successMessage)	{
+	static inline	void									acknowledgeResearch				(const SEntityResearch& selectedChoice, SPlayerProjects& playerProjects, ::gpk::array_pod<char_t> & successMessage)	{
 		playerProjects.EnqueueResearch(selectedChoice);
-		successMessage											= selectedChoice.Name + " research has begun. Research cost: " + std::to_string(selectedChoice.PriceUnit - selectedChoice.PricePaid);
+		successMessage											= selectedChoice.Name;
+		successMessage.append_string(" research has begun. Research cost: ");
+		char														cost	[32];
+		sprintf_s(cost, "%lli", selectedChoice.PriceUnit - selectedChoice.PricePaid);
+		successMessage.append_string(cost);
 	}
-	static inline	void									acknowledgeProduction			(const SEntityResearch& selectedChoice, SPlayerProjects& playerProjects, std::string& successMessage)	{
+	static inline	void									acknowledgeProduction			(const SEntityResearch& selectedChoice, SPlayerProjects& playerProjects, ::gpk::array_pod<char_t> & successMessage)	{
 		playerProjects.EnqueueProduction(selectedChoice);
-		successMessage											= selectedChoice.Name + " production has begun. Cost: " + std::to_string(selectedChoice.PriceUnit - selectedChoice.PricePaid);
+		successMessage											= selectedChoice.Name;
+		successMessage.append_string(" production has begun. Cost: ");
+		char														cost	[32];
+		sprintf_s(cost, "%lli", selectedChoice.PriceUnit - selectedChoice.PricePaid);
+		successMessage.append_string(cost);
 	}
 } // namespace
 

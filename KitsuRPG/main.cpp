@@ -1,6 +1,8 @@
 //#define NOMINMAX
-
 #include "Game.h"
+
+#include "Tile.h"
+#include "StageProp.h"
 #include "Armor.h"
 #include "Weapon.h"
 #include "Profession.h"
@@ -20,7 +22,7 @@
 #include <Windows.h>
 
 // Sets up initial equipment and items for the player to carry or wear.
-void											initPlayerCharacter								(klib::CCharacter& adventurer, const std::string& name);
+void											initPlayerCharacter								(const ::klib::SEntityTables & tables, klib::CCharacter& adventurer, const ::gpk::view_const_char& name);
 
 // This function seeds the rand() and enters the tavern() after initializing the player.
 // If the player leaves the tavern() it means the game was requested to close.
@@ -45,7 +47,7 @@ int												main											(int argc, char **argv)											{
 	::std::string											adventurerName;
 	::std::getline(std::cin, adventurerName);
 
-	::klib::CCharacter									* pAdventurer									= new ::klib::CCharacter(4, 50, 1, 100, {1,4}, {}, {klib::COMBAT_STATUS_NONE, klib::COMBAT_STATUS_STUN}, adventurerName);
+	::klib::CCharacter									* pAdventurer									= new ::klib::CCharacter(4, 50, 1, 100, {1,4}, {}, {klib::COMBAT_STATUS_NONE, klib::COMBAT_STATUS_STUN}, {adventurerName.data(), (uint32_t)adventurerName.size()});
 	::klib::CCharacter									& adventurer									= *pAdventurer;
 
 	static const ::klib::SMenuItem<int32_t>				playAgainMenu[]									=
@@ -54,17 +56,26 @@ int												main											(int argc, char **argv)											{
 		};
 
 	bool												bPlayAgain										= true;
+	::klib::SEntityTables								entityTables;
+	entityTables.Profession		= {::klib::definitionsProfession, ::klib::modifiersProfession	};
+	entityTables.Weapon			= {::klib::definitionsWeapon	, ::klib::modifiersWeapon		};
+	entityTables.Armor			= {::klib::definitionsArmor		, ::klib::modifiersArmor		};
+	entityTables.Accessory		= {::klib::definitionsAccessory	, ::klib::modifiersAccessory	};
+	entityTables.Vehicle		= {::klib::definitionsVehicle	, ::klib::modifiersVehicle		};
+	entityTables.Facility		= {::klib::definitionsFacility	, ::klib::modifiersFacility		};
+	entityTables.StageProp		= {::klib::definitionsStageProp	, ::klib::modifiersStageProp	};
+	entityTables.Tile			= {::klib::definitionsTile		, ::klib::modifiersTile			};
 
 	while(bPlayAgain) {
-		::initPlayerCharacter(adventurer, adventurerName);
+		::initPlayerCharacter(entityTables, adventurer, {adventurerName.data(), (uint32_t)adventurerName.size()});
 
-		std::cout << "\nSo, " << adventurer.Name << "... What brings you here?\n";
-		::tavern(adventurer);	// Tavern is the main menu of our game.
+		std::cout << "\nSo, " << adventurer.Name.begin() << "... What brings you here?\n";
+		::tavern(entityTables, adventurer);	// Tavern is the main menu of our game.
 
 		printf("\n-- Game Over! --\n");
 		::displayScore(adventurer.Score);
 
-		bPlayAgain										= ::displayMenu("Play again? ..", playAgainMenu) ? true : false;
+		bPlayAgain										= ::displayMenu("Play again? ..", ::gpk::view_array<const ::klib::SMenuItem<int32_t>>{playAgainMenu}) ? true : false;
 	}
 
 	if( pAdventurer )
@@ -74,8 +85,8 @@ int												main											(int argc, char **argv)											{
 }
 
 //
-void											createPlayerCharacter							(klib::CCharacter& adventurer, const std::string& name)			{
-	klib::CCharacter									* tempadventurer								= new klib::CCharacter(4, 50, 1, 100, {1,4}, {}, {klib::COMBAT_STATUS_NONE, klib::COMBAT_STATUS_STUN}, name);
+void											createPlayerCharacter							(klib::CCharacter& adventurer, const ::gpk::view_const_char& name)			{
+	::klib::CCharacter									* tempadventurer								= new klib::CCharacter(4, 50, 1, 100, {1,4}, {}, {klib::COMBAT_STATUS_NONE, klib::COMBAT_STATUS_STUN}, name);
 	adventurer										= *tempadventurer;
 	delete(tempadventurer);
 }
@@ -91,24 +102,24 @@ void											researchEquipped								(klib::CCharacter& agent)										{
 }
 
 //
-void											initPlayerCharacter								(klib::CCharacter& adventurer, const std::string& name)			{
+void											initPlayerCharacter								(const ::klib::SEntityTables & tables, ::klib::CCharacter& adventurer, const ::gpk::view_const_char& name)			{
 	::createPlayerCharacter(adventurer, name);
 	::klib::SCharacterEquip								& currentEquip									= adventurer.CurrentEquip;
 	adventurer.Goods.CompletedResearch				= klib::SCharacterResearch();
 #if defined(POWER_START)
-	currentEquip.Weapon		.Index					= (int16_t)::gpk::min(3U, size(klib::definitionsWeapon		)-1);
-	currentEquip.Accessory	.Index					= (int16_t)::gpk::min(3U, size(klib::definitionsAccessory	)-1);
-	currentEquip.Armor		.Index					= (int16_t)::gpk::min(3U, size(klib::definitionsArmor		)-1);
-	currentEquip.Profession	.Index					= (int16_t)::gpk::min(3U, size(klib::definitionsProfession	)-1);
-	currentEquip.Vehicle	.Index					= (int16_t)::gpk::min(3U, size(klib::definitionsVehicle		)-1);
-	currentEquip.Facility	.Index					= (int16_t)::gpk::min(3U, size(klib::definitionsFacility	)-1);
+	currentEquip.Weapon		.Index					= (int16_t)::gpk::min(3U, tables.Weapon		.Definitions.size()-1);
+	currentEquip.Accessory	.Index					= (int16_t)::gpk::min(3U, tables.Accessory	.Definitions.size()-1);
+	currentEquip.Armor		.Index					= (int16_t)::gpk::min(3U, tables.Armor		.Definitions.size()-1);
+	currentEquip.Profession	.Index					= (int16_t)::gpk::min(3U, tables.Profession	.Definitions.size()-1);
+	currentEquip.Vehicle	.Index					= (int16_t)::gpk::min(3U, tables.Vehicle	.Definitions.size()-1);
+	currentEquip.Facility	.Index					= (int16_t)::gpk::min(3U, tables.Facility	.Definitions.size()-1);
 
-	currentEquip.Weapon		.Modifier				= (int16_t)::gpk::min(3U,	size(klib::modifiersWeapon			)-1);
-	currentEquip.Accessory	.Modifier				= (int16_t)::gpk::min(3U,	size(klib::modifiersAccessory		)-1);
-	currentEquip.Armor		.Modifier				= (int16_t)::gpk::min(3U,	size(klib::modifiersArmor			)-1);
-	currentEquip.Profession	.Modifier				= (int16_t)::gpk::min(3U,	size(klib::modifiersProfession		)-1);
-	currentEquip.Vehicle	.Modifier				= (int16_t)::gpk::min(3U,	size(klib::modifiersVehicle			)-1);
-	currentEquip.Facility	.Modifier				= (int16_t)::gpk::min(3U,	size(klib::modifiersFacility		)-1);
+	currentEquip.Weapon		.Modifier				= (int16_t)::gpk::min(3U, tables.Weapon		.Modifiers.size()-1);
+	currentEquip.Accessory	.Modifier				= (int16_t)::gpk::min(3U, tables.Accessory	.Modifiers.size()-1);
+	currentEquip.Armor		.Modifier				= (int16_t)::gpk::min(3U, tables.Armor		.Modifiers.size()-1);
+	currentEquip.Profession	.Modifier				= (int16_t)::gpk::min(3U, tables.Profession	.Modifiers.size()-1);
+	currentEquip.Vehicle	.Modifier				= (int16_t)::gpk::min(3U, tables.Vehicle	.Modifiers.size()-1);
+	currentEquip.Facility	.Modifier				= (int16_t)::gpk::min(3U, tables.Facility	.Modifiers.size()-1);
 
 	currentEquip.Weapon		.Level					= 10;
 	currentEquip.Accessory	.Level					= 10;
@@ -128,19 +139,19 @@ void											initPlayerCharacter								(klib::CCharacter& adventurer, const s
 	adventurer.Goods.Inventory.Facility		.AddElement({1,1,1});
 
 	int16_t i = 5;
-	adventurer.Goods.Inventory.Weapon		.AddElement({rand() % (int16_t)::gpk::size(klib::definitionsWeapon		), rand()%(int16_t)::gpk::size(klib::modifiersWeapon		), ++i});
-	adventurer.Goods.Inventory.Accessory	.AddElement({rand() % (int16_t)::gpk::size(klib::definitionsAccessory	), rand()%(int16_t)::gpk::size(klib::modifiersAccessory		), ++i});
-	adventurer.Goods.Inventory.Armor		.AddElement({rand() % (int16_t)::gpk::size(klib::definitionsArmor		), rand()%(int16_t)::gpk::size(klib::modifiersArmor			), ++i});
-	adventurer.Goods.Inventory.Profession	.AddElement({rand() % (int16_t)::gpk::size(klib::definitionsProfession	), rand()%(int16_t)::gpk::size(klib::modifiersProfession	), ++i});
-	adventurer.Goods.Inventory.Vehicle		.AddElement({rand() % (int16_t)::gpk::size(klib::definitionsVehicle		), rand()%(int16_t)::gpk::size(klib::modifiersVehicle		), ++i});
-	adventurer.Goods.Inventory.Facility		.AddElement({rand() % (int16_t)::gpk::size(klib::definitionsFacility	), rand()%(int16_t)::gpk::size(klib::modifiersFacility		), ++i});
+	adventurer.Goods.Inventory.Weapon		.AddElement({rand() % (int16_t)tables.Weapon		.Definitions.size(), rand()%(int16_t)tables.Weapon		.Modifiers.size(), ++i});
+	adventurer.Goods.Inventory.Accessory	.AddElement({rand() % (int16_t)tables.Accessory		.Definitions.size(), rand()%(int16_t)tables.Accessory	.Modifiers.size(), ++i});
+	adventurer.Goods.Inventory.Armor		.AddElement({rand() % (int16_t)tables.Armor			.Definitions.size(), rand()%(int16_t)tables.Armor		.Modifiers.size(), ++i});
+	adventurer.Goods.Inventory.Profession	.AddElement({rand() % (int16_t)tables.Profession	.Definitions.size(), rand()%(int16_t)tables.Profession	.Modifiers.size(), ++i});
+	adventurer.Goods.Inventory.Vehicle		.AddElement({rand() % (int16_t)tables.Vehicle		.Definitions.size(), rand()%(int16_t)tables.Vehicle		.Modifiers.size(), ++i});
+	adventurer.Goods.Inventory.Facility		.AddElement({rand() % (int16_t)tables.Facility		.Definitions.size(), rand()%(int16_t)tables.Facility	.Modifiers.size(), ++i});
 
 	adventurer.Goods.Inventory.Items		.AddElement({1,1,1});
 	for(int32_t j = 1;  j < 3; ++j)
 		adventurer.Goods.Inventory.Items		.AddElement({ 1+int16_t(rand()%(::gpk::size(klib::itemDescriptions)-1)), int16_t(1+rand() % ::gpk::size(klib::itemModifiers)), int16_t(rand() % ::gpk::size(klib::itemGrades)) });
 
 	::researchEquipped(adventurer);
-	adventurer.Recalculate();
+	adventurer.Recalculate(tables);
 	adventurer.Points.LifeCurrent					= adventurer.FinalPoints.LifeMax;
 }
 

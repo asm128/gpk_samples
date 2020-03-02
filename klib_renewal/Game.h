@@ -5,6 +5,8 @@
 
 #include "gpk_sync.h"
 
+#include "klib_entity_tables.h"
+
 #include <time.h>
 
 #ifndef __GAME_H__91827309126391263192312312354__
@@ -119,13 +121,7 @@ namespace klib
 #define MAX_PLAYER_TYPES 16
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------
-	struct SGame
-	{
-		struct SLogLine {
-								uint16_t								Color;
-								const std::string						Message;
-		};
-
+	struct SGame {
 							// Game Flags tell us about the			current state of the application.
 							GAME_FLAGS								Flags							= (GAME_FLAGS)(GAME_FLAGS_NETWORK_ENABLED | GAME_FLAGS_TURN_BUSY);
 							GAME_MODE								Mode							= GAME_MODE_CAMPAIGN;	// This is the default because it's the only available mode at the moment
@@ -144,18 +140,13 @@ namespace klib
 
 							// Displays.
 							STacticalDisplay						TacticalDisplay					= {};
-							SWeightedDisplay							GlobalDisplay					= {};
+							SWeightedDisplay						GlobalDisplay					= {};
 
 							// Feedback messages.
-							::std::string							StateMessage					= "";
-							::std::string							UserMessage						= "";
-							::std::string							UserSuccess						= "";
-							::std::string							UserMiss						= "";
-							::std::string							UserError						= "";
-							::gpk::array_obj<SLogLine>				UserLog							= {};
+							::klib::SGameMessages					Messages;
 
 							// For the special effect
-							char									SlowMessage[256]				= {'_',};
+							::klib::SEntityTables					EntityTables					= {};
 
 							::std::mutex							PlayerMutex						= {};
 							::std::mutex							ServerTimeMutex					= {};
@@ -165,29 +156,28 @@ namespace klib
 			GlobalDisplay		.Clear();
 		}
 
-							void									ClearMessages					()
-		{
-			UserError	=
-			UserMessage	=
-			UserMiss	=
-			UserSuccess	= "";
-		}
+		inline				void									LogAuxStateMessage				()	{ Messages.LogAuxStateMessage	(); }
+		inline				void									LogAuxMessage					()	{ Messages.LogAuxMessage		(); }
+		inline				void									LogAuxSuccess					()	{ Messages.LogAuxSuccess		(); }
+		inline				void									LogAuxError						()	{ Messages.LogAuxError			(); }
+		inline				void									LogAuxMiss						()	{ Messages.LogAuxMiss			(); }
 
-		inline				void									LogMessage						()																						{ UserLog.push_back({COLOR_YELLOW	, UserMessage	}); }
-		inline				void									LogSuccess						()																						{ UserLog.push_back({COLOR_CYAN		, UserSuccess	}); }
-		inline				void									LogError						()																						{ UserLog.push_back({COLOR_RED		, UserError		}); }
-		inline				void									LogMiss							()																						{ UserLog.push_back({COLOR_RED		, UserMiss		}); }
-		inline				void									LogStateMessage					()																						{ UserLog.push_back({COLOR_CYAN		, StateMessage	}); }
+		inline				void									LogStateMessage					()	{ Messages.LogStateMessage	(); }
+		inline				void									LogMessage						()	{ Messages.LogMessage		(); }
+		inline				void									LogSuccess						()	{ Messages.LogSuccess		(); }
+		inline				void									LogError						()	{ Messages.LogError			(); }
+		inline				void									LogMiss							()	{ Messages.LogMiss			(); }
+		inline				void									ClearMessages					()	{ Messages.ClearMessages	(); }
 	};	// struct
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------
 	// functions
-						void									initGame						(SGame& instanceGame);
-						void									resetGame						(SGame& instanceGame);
-						void									showMenu						(SGame& instanceGame);
-						void									initTacticalMap					(SGame& instanceGame);
+						::gpk::error_t							initGame						(SGame & instanceGame);
+						::gpk::error_t							resetGame						(SGame & instanceGame);
+						::gpk::error_t							showMenu						(SGame & instanceGame);
+						::gpk::error_t							initTacticalMap					(SGame & instanceGame);
 	static inline		PLAYER_INDEX							getCurrentPlayerIndex			(const STacticalInfo& tacticalInfo)														{ return ( tacticalInfo.CurrentPlayer == -1) ? PLAYER_INDEX_INVALID : tacticalInfo.Setup.Players[tacticalInfo.CurrentPlayer]; }
-						uint32_t								missionCost						(SPlayer& player, const SSquad& squadSetup, uint32_t maxAgents=MAX_AGENT_SQUAD_SLOTS);
+						int64_t									missionCost						(const SPlayer& player, const SSquad& squadSetup, uint32_t maxAgents = MAX_AGENT_SQUAD_SLOTS);
 } // namespace
 
 #endif // __GAME_H__91827309126391263192312312354__

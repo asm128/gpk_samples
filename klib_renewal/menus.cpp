@@ -6,12 +6,9 @@
 
 #include <algorithm>
 
-SDrawMenuGlobals	drawMenu_globals = {{}, {0, 0.30}};
-
 using namespace klib;
 
-CONSOLE_FONT_INFOEX getFontParams()
-{
+CONSOLE_FONT_INFOEX getFontParams() {
 	CONSOLE_FONT_INFOEX								infoFont				= {sizeof(CONSOLE_FONT_INFOEX)};
 	infoFont.FontFamily							= 0;
 	infoFont.FontWeight							= 0;
@@ -20,21 +17,21 @@ CONSOLE_FONT_INFOEX getFontParams()
 	return infoFont;
 }
 
-SGameState processMenuReturn(const SGameState& returnValue_)
-{
-	SGameState returnValue;
-	static bool bSmallFonts = false;
+::klib::SGameState			processMenuReturn		(const SGameState& returnValue_) {
+	::klib::SGameState				returnValue;
+	static bool						bSmallFonts				= false;
 
 	static const HANDLE hConsoleOut = ::GetStdHandle( STD_OUTPUT_HANDLE );
 	static CONSOLE_FONT_INFOEX infoFont = ::getFontParams();
 
 	switch(returnValue_.State) {
 	case GAME_STATE_MENU_MAIN:
-	default: return returnValue_;
-
+	default:
+		return returnValue_;
 	case GAME_STATE_MENU_OPTIONS:
 		switch(returnValue_.Substate) {
-		default: return returnValue_;
+		default:
+			return returnValue_;
 		case GAME_SUBSTATE_SCREEN:
 			bSmallFonts = !bSmallFonts;
 			if(bSmallFonts) {
@@ -46,8 +43,8 @@ SGameState processMenuReturn(const SGameState& returnValue_)
 				infoFont.dwFontSize.Y	= 12;
 			}
 			SetCurrentConsoleFontEx(hConsoleOut, FALSE, &infoFont);
-			returnValue = returnValue_;
-			returnValue.Substate = GAME_SUBSTATE_MAIN;
+			returnValue				= returnValue_;
+			returnValue.Substate	= GAME_SUBSTATE_MAIN;
 			break;
 		}
 	}
@@ -74,7 +71,7 @@ void handleSubstateChange(SGame& instanceGame, const SGameState& newState) {
 	case GAME_STATE_MENU_SELL:
 	case GAME_STATE_MENU_UPGRADE:
 	case GAME_STATE_MENU_FACTORY:
-		instanceGame.UserError = "This function isn't available!";
+		instanceGame.Messages.UserError = "This function isn't available!";
 		instanceGame.LogError();
 	}
 
@@ -82,7 +79,7 @@ void handleSubstateChange(SGame& instanceGame, const SGameState& newState) {
 }
 
 void drawTacticalMap(SGame& instanceGame, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes) {
-	klib::drawTacticalBoard(instanceGame, instanceGame.TacticalInfo, display, textAttributes, PLAYER_INDEX_USER, TEAM_TYPE_CIVILIAN, instanceGame.Players[PLAYER_INDEX_USER].Selection, false);
+	klib::drawTacticalBoard(instanceGame, instanceGame.TacticalInfo, display, textAttributes, PLAYER_INDEX_USER, TEAM_TYPE_CIVILIAN, instanceGame.Players[PLAYER_INDEX_USER].Tactical.Selection, false);
 }
 
 void handleProductionStep(SGame& instanceGame);
@@ -100,85 +97,76 @@ void handleMissionEnd(SGame& instanceGame)
 		handleResearchStep(instanceGame);
 }
 
-void handleStateChange(SGame& instanceGame, const SGameState& newState, const SGameState& prevState)
-{
+::gpk::error_t						handleStateChange				(SGame& instanceGame, const SGameState& newState, const SGameState& prevState)	{
 	::klib::clearASCIIBackBuffer(' ', COLOR_WHITE);
 	instanceGame.ClearDisplays();
-	::klib::resetCursorString(instanceGame.SlowMessage);
+	//::klib::resetCursorString(instanceGame.SlowMessage);
 
-	SPlayer& playerUser = instanceGame.Players[PLAYER_INDEX_USER];
-	int64_t playCost = 0;
-	switch(newState.State)
-	{
+	SPlayer									& playerUser					= instanceGame.Players[PLAYER_INDEX_USER];
+	int64_t									playCost						= 0;
+	switch(newState.State) {
+	case GAME_STATE_TACTICAL_CONTROL	: instanceGame.Messages.StateMessage = "Tactical control"		; break;
+	case GAME_STATE_MENU_LAN_MISSION	: instanceGame.Messages.StateMessage = "LAN mission setup"		; break;
+	case GAME_STATE_MENU_OPTIONS		: instanceGame.Messages.StateMessage = "Options"				; break;
+	case GAME_STATE_MENU_BUY			: instanceGame.Messages.StateMessage = "Buy"					; break;
+	case GAME_STATE_MENU_SELL			: instanceGame.Messages.StateMessage = "Sell"					; break;
+	case GAME_STATE_MENU_UPGRADE		: instanceGame.Messages.StateMessage = "Upgrade"				; break;
+	case GAME_STATE_MENU_FACTORY		: instanceGame.Messages.StateMessage = "Factory"				; break;
+	case GAME_STATE_MENU_SQUAD_SETUP	: instanceGame.Messages.StateMessage = "Squad Setup"			; break;
+	case GAME_STATE_CREDITS				: instanceGame.Messages.StateMessage = "Credits"				; break;
+	case GAME_STATE_MENU_EQUIPMENT		: instanceGame.Messages.StateMessage = "Equipment Setup"		; break;
+	case GAME_STATE_MENU_RESEARCH		: instanceGame.Messages.StateMessage = "Research Center"		; break;
 	case GAME_STATE_MENU_MAIN:
 		drawTacticalMap(instanceGame, instanceGame.TacticalDisplay.Screen, instanceGame.TacticalDisplay.TextAttributes);
-		instanceGame.StateMessage = "Main Menu";
+		instanceGame.Messages.StateMessage			= "Main Menu";
 		break;
-
+	case GAME_STATE_START_MISSION		:
+		playCost							= ::klib::missionCost(playerUser, playerUser.Tactical.Squad, playerUser.Tactical.Squad.Size);
+		playerUser.Tactical.Money			-= playCost;
+		instanceGame.Messages.StateMessage			= "Start mission"		;
+		break;
 	case GAME_STATE_WELCOME_COMMANDER:
 		if(newState.Substate == GAME_SUBSTATE_RESET) {
-			instanceGame.StateMessage = "Welcome commander";
+			instanceGame.Messages.StateMessage		= "Welcome commander";
 			resetGame(instanceGame);
 			handleSubstateChange(instanceGame, newState);
 		}
 		else {
-			instanceGame.StateMessage = "Welcome back commander";
+			instanceGame.Messages.StateMessage		= "Welcome back commander";
 			if(::gpk::bit_false(instanceGame.Flags, GAME_FLAGS_TACTICAL) && (prevState.State == GAME_STATE_TACTICAL_CONTROL || prevState.State == GAME_STATE_START_MISSION))
 				handleMissionEnd(instanceGame);
 		}
 		break;
-
-	case GAME_STATE_TACTICAL_CONTROL	: instanceGame.StateMessage = "Tactical control"	; break;
-	case GAME_STATE_START_MISSION		:
-		playCost			= ::klib::missionCost(playerUser, playerUser.Squad, playerUser.Squad.Size);
-		playerUser.Money	-= (int32_t)playCost;
-		instanceGame.StateMessage = "Start mission"		;
-		break;
-	case GAME_STATE_MENU_LAN_MISSION	: instanceGame.StateMessage = "LAN mission setup"	; break;
-	case GAME_STATE_MENU_OPTIONS		: instanceGame.StateMessage = "Options"				; break;
-	case GAME_STATE_MENU_BUY			: instanceGame.StateMessage = "Buy"					; break;
-	case GAME_STATE_MENU_SELL			: instanceGame.StateMessage = "Sell"				; break;
-	case GAME_STATE_MENU_UPGRADE		: instanceGame.StateMessage = "Upgrade"				; break;
-	case GAME_STATE_MENU_FACTORY		: instanceGame.StateMessage = "Factory"				; break;
-	case GAME_STATE_MENU_SQUAD_SETUP	: instanceGame.StateMessage = "Squad Setup"			; break;
-	case GAME_STATE_CREDITS				: instanceGame.StateMessage = "Credits"				; break;
-	case GAME_STATE_MENU_EQUIPMENT		: instanceGame.StateMessage	= "Equipment Setup"		; break;
-	case GAME_STATE_MENU_RESEARCH		: instanceGame.StateMessage = "Research Center"		; break;
 	default:
 		break;
 	}
-
 	if(prevState.State != GAME_STATE_START_MISSION && prevState.State != GAME_STATE_TACTICAL_CONTROL)
-		instanceGame.ClearMessages();
+		instanceGame.Messages.UserLog.clear();
+	return 0;
 }
 
-void updateState(SGame& instanceGame, const SGameState& newState)
-{
-	if(newState.State == GAME_STATE_START_MISSION && newState.State != instanceGame.State.State)
-	{
-		SPlayer& player = instanceGame.Players[PLAYER_INDEX_USER];
-		int64_t playCost = ::klib::missionCost(player, player.Squad, player.Squad.Size);
+void									updateState					(SGame& instanceGame, const SGameState& newState) {
+	if(newState.State == GAME_STATE_START_MISSION && newState.State != instanceGame.State.State) {
+		SPlayer										& player					= instanceGame.Players[PLAYER_INDEX_USER];
+		int64_t										playCost					= ::klib::missionCost(player, player.Tactical.Squad, player.Tactical.Squad.Size);
 
-		if( player.Money < playCost )
-		{
-			instanceGame.UserError = "You don't have enough money to start a mission with the current squad setup.";
+		if( player.Tactical.Money < playCost ){
+			instanceGame.Messages.UserError			= "You don't have enough money to start a mission with the current squad setup.";
 			instanceGame.LogError();
 			//return;
 		}
 	}
-	else if(newState.State == GAME_STATE_WELCOME_COMMANDER || newState.State == GAME_STATE_MENU_CONTROL_CENTER)
-	{
+	else if(newState.State == GAME_STATE_WELCOME_COMMANDER || newState.State == GAME_STATE_MENU_CONTROL_CENTER){
 	}
 
 	instanceGame.PreviousState = instanceGame.State;
-
 	//
 	if(newState.State != instanceGame.State.State) {
-		instanceGame.State			= newState;
+		instanceGame.State							= newState;
 		handleStateChange(instanceGame, instanceGame.State, instanceGame.PreviousState);
 	}
 	else if(newState.Substate != instanceGame.State.Substate) {
-		instanceGame.State.Substate	= newState.Substate;
+		instanceGame.State.Substate					= newState.Substate;
 		handleSubstateChange(instanceGame, instanceGame.State);
 	}
 }
@@ -192,60 +180,63 @@ SGameState drawTacticalScreen	(SGame& instanceGame, const SGameState& returnStat
 SGameState drawUpgrade			(SGame& instanceGame, const SGameState& returnState);
 SGameState drawFactory			(SGame& instanceGame, const SGameState& returnState);
 
-void klib::showMenu(SGame& instanceGame) {
+::gpk::error_t						klib::showMenu		(SGame& instanceGame)			{
+	SGameState								newAction			= instanceGame.State;
 
-	SGameState newAction=instanceGame.State;
+	static SMenuHeader<SGameState>			menuMain			( {GAME_STATE_EXIT				},	"Main Menu"		, 20, true, "Exit game");
+	static SMenuHeader<SGameState>			menuMainInGame		( {GAME_STATE_EXIT				},	"Main Menu"		, 20, true, "Exit game");
+	static SMenuHeader<SGameState>			menuConfig			( {GAME_STATE_MENU_MAIN			},	"Options"		, 26);
+	static SMenuHeader<SGameState>			menuSell			( {GAME_STATE_WELCOME_COMMANDER	},	"Sell"			);
 
-	static const SMenu<SGameState> menuMain			(  {GAME_STATE_EXIT					},	"Main Menu"		, 20, true, "Exit game");
-	static const SMenu<SGameState> menuMainInGame	(  {GAME_STATE_EXIT					},	"Main Menu"		, 20, true, "Exit game");
-	static const SMenu<SGameState> menuConfig		(  {GAME_STATE_MENU_MAIN			},	"Options"		, 26);
-	static const SMenu<SGameState> menuSell			(  {GAME_STATE_WELCOME_COMMANDER	},	"Sell"			);
+	klib::SWeightedDisplay					& globalDisplay		= instanceGame.GlobalDisplay;
 
-	klib::SWeightedDisplay& globalDisplay = instanceGame.GlobalDisplay;
 
 	switch(instanceGame.State.State) {
 	case GAME_STATE_MENU_MAIN			:
-		if( ::gpk::bit_true(instanceGame.Flags, GAME_FLAGS_STARTED) )
+		if( ::gpk::bit_true(instanceGame.Flags, GAME_FLAGS_STARTED) ) {
 			newAction = processMenuReturn(drawMenu(globalDisplay.Screen.View, globalDisplay.TextAttributes.begin(), menuMainInGame, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsMainInGame}, instanceGame.FrameInput, instanceGame.State));
-		else
+		}
+		else {
 			newAction = processMenuReturn(drawMenu(globalDisplay.Screen.View, globalDisplay.TextAttributes.begin(), menuMain, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsMain}, instanceGame.FrameInput, instanceGame.State));
+		}
 
 		break;
 
-	case GAME_STATE_MENU_OPTIONS		:	newAction = processMenuReturn(drawMenu(globalDisplay.Screen.View, globalDisplay.TextAttributes.begin(), menuConfig, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsConfig}, instanceGame.FrameInput, instanceGame.State ));	break;
-	case GAME_STATE_MENU_EQUIPMENT		:	newAction = processMenuReturn(drawEquip(instanceGame, instanceGame.State));	break;
-	case GAME_STATE_MENU_SELL			:	newAction = processMenuReturn(drawMenu(globalDisplay.Screen.View, globalDisplay.TextAttributes.begin(), menuSell, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsSell}, instanceGame.FrameInput, instanceGame.State ));	break;
-	case GAME_STATE_MENU_LAN_MISSION	:	//newAction = processMenuReturn(drawLANSetup		(instanceGame, instanceGame.State));	break;
-	case GAME_STATE_START_MISSION		:	newAction = processMenuReturn(drawTacticalScreen	(instanceGame, instanceGame.State));	break;
-	case GAME_STATE_TACTICAL_CONTROL	:	newAction = processMenuReturn(drawTacticalScreen	(instanceGame, instanceGame.State));	break;
-	case GAME_STATE_MENU_SQUAD_SETUP	:	newAction = processMenuReturn(drawSquadSetupMenu	(instanceGame));	break;
-	case GAME_STATE_WELCOME_COMMANDER	:	newAction = processMenuReturn(drawWelcome			(instanceGame, instanceGame.State));	break;
-	case GAME_STATE_MENU_RESEARCH		:	newAction = processMenuReturn(drawResearch		(instanceGame, instanceGame.State));	break;
-	case GAME_STATE_MENU_BUY			:	newAction = processMenuReturn(drawBuy				(instanceGame, instanceGame.State));	break;
-	case GAME_STATE_MENU_UPGRADE		:	newAction = processMenuReturn(drawFactory			(instanceGame, instanceGame.State));	break;
-	case GAME_STATE_MENU_FACTORY		:	newAction = processMenuReturn(drawFactory			(instanceGame, instanceGame.State));	break;
+	case GAME_STATE_MENU_OPTIONS		: { static ::klib::SDrawMenuState	menuState; newAction = processMenuReturn(drawMenu(globalDisplay.Screen.View, globalDisplay.TextAttributes.begin(), menuConfig, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsConfig}, instanceGame.FrameInput, instanceGame.State ));	}break;
+	case GAME_STATE_MENU_EQUIPMENT		: { static ::klib::SDrawMenuState	menuState; newAction = processMenuReturn(drawEquip				(instanceGame, instanceGame.State));	}break;
+	case GAME_STATE_MENU_SELL			: { static ::klib::SDrawMenuState	menuState; newAction = processMenuReturn(drawMenu(globalDisplay.Screen.View, globalDisplay.TextAttributes.begin(), menuSell, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsSell}, instanceGame.FrameInput, instanceGame.State ));	}break;
+	case GAME_STATE_MENU_LAN_MISSION	: { static ::klib::SDrawMenuState	menuState; }//newAction = processMenuReturn(drawLANSetup			(instanceGame, instanceGame.State));	}break;
+	case GAME_STATE_START_MISSION		: { static ::klib::SDrawMenuState	menuState; newAction = processMenuReturn(drawTacticalScreen		(instanceGame, instanceGame.State));	}break;
+	case GAME_STATE_TACTICAL_CONTROL	: { static ::klib::SDrawMenuState	menuState; newAction = processMenuReturn(drawTacticalScreen		(instanceGame, instanceGame.State));	}break;
+	case GAME_STATE_MENU_SQUAD_SETUP	: { static ::klib::SDrawMenuState	menuState; newAction = processMenuReturn(drawSquadSetupMenu		(instanceGame));	}break;
+	case GAME_STATE_WELCOME_COMMANDER	: { static ::klib::SDrawMenuState	menuState; newAction = processMenuReturn(drawWelcome			(instanceGame, instanceGame.State));	}break;
+	case GAME_STATE_MENU_RESEARCH		: { static ::klib::SDrawMenuState	menuState; newAction = processMenuReturn(drawResearch			(instanceGame, instanceGame.State));	}break;
+	case GAME_STATE_MENU_BUY			: { static ::klib::SDrawMenuState	menuState; newAction = processMenuReturn(drawBuy				(instanceGame, instanceGame.State));	}break;
+	case GAME_STATE_MENU_UPGRADE		: { static ::klib::SDrawMenuState	menuState; newAction = processMenuReturn(drawFactory			(instanceGame, instanceGame.State));	}break;
+	case GAME_STATE_MENU_FACTORY		: { static ::klib::SDrawMenuState	menuState; newAction = processMenuReturn(drawFactory			(instanceGame, instanceGame.State));	}break;
 
 	case GAME_STATE_MEMORIAL			:
 		if(instanceGame.FrameInput.Keys[VK_ESCAPE])
-			newAction={GAME_STATE_WELCOME_COMMANDER};
+			newAction			= {GAME_STATE_WELCOME_COMMANDER};
 
 		break;
 
 	case GAME_STATE_CREDITS				:
 		if(instanceGame.FrameInput.Keys[VK_ESCAPE])
-			newAction={GAME_STATE_MENU_MAIN};
+			newAction			= {GAME_STATE_MENU_MAIN};
 
 		break;
 	case GAME_STATE_EXIT				:
-		instanceGame.StateMessage = "Exiting game...";
+		instanceGame.Messages.StateMessage = "Exiting game...";
 		::gpk::bit_clear(instanceGame.Flags, GAME_FLAGS_RUNNING);
 		newAction = instanceGame.State;
 		break;
 
 	default:
 		newAction.State = (GAME_STATE)-1;
-		instanceGame.StateMessage = "Unrecognized game state!!";
+		instanceGame.Messages.StateMessage = "Unrecognized game state!!";
 	}
 
 	updateState(instanceGame, newAction);
-};
+	return 0;
+}

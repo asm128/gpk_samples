@@ -10,24 +10,24 @@
 #pragma pack(push, 1)
 
 // This hell creates an user menu for the entity records available for research
-template <typename _TEquipClass, typename _TInventory, typename _TResearched, size_t _SizeDefinitions>
+template <typename _TEquipClass, typename _TInventory, typename _TResearched>
 void																		research
-	( ::klib::SEntityContainer<_TInventory>		& equipInventory
-	, ::klib::SEntityContainer<_TResearched>	& researchedList
-	, const _TEquipClass						(&definitionsTable)[_SizeDefinitions]
-	, _TInventory								& adventurerMaxEquip
-	, bool										bIsModifier
-	, bool										bIsProgressive
-	, const ::std::string						& itemFormat
-	, const ::std::string						& allResearchComplete
-	, const ::std::string						& noResearchAvailable
-	, const ::std::string						& selectItemToResearch
-	, const ::std::string						& startResearching
-	, const ::std::string						& doneResearching
+	( ::klib::SEntityContainer<_TInventory>			& equipInventory
+	, ::klib::SEntityContainer<_TResearched>		& researchedList
+	, const ::gpk::view_array<const _TEquipClass>	& table
+	, _TInventory									& adventurerMaxEquip
+	, bool											bIsModifier
+	, bool											bIsProgressive
+	, const ::gpk::view_const_char					& itemFormat
+	, const ::gpk::view_const_char					& allResearchComplete
+	, const ::gpk::view_const_char					& noResearchAvailable
+	, const ::gpk::view_const_char					& selectItemToResearch
+	, const ::gpk::view_const_char					& startResearching
+	, const ::gpk::view_const_char					& doneResearching
 	)
 {
-	if(researchedList.size() >= _SizeDefinitions - 1) {	// No more research items in the game.
-		printf(allResearchComplete.c_str(), researchedList.size());
+	if(researchedList.size() >= table.size() - 1) {	// No more research items in the game.
+		printf(allResearchComplete.begin(), researchedList.size());
 		return;
 	}
 
@@ -49,8 +49,8 @@ void																		research
 		if(bIsModifier) {
 			int32_t																			selectedEntityModifier								= equipInventory[i].Entity.Modifier;
 			if( 0 != selectedEntityModifier && (-1) == researchedList.FindElement((int16_t)selectedEntityModifier) ) {
-				stringLeft																	= definitionsTable[selectedEntityModifier].Name.begin();
-				stringRight																	= itemFormat.c_str();
+				stringLeft																	= table[selectedEntityModifier].Name.begin();
+				stringRight																	= itemFormat.begin();
 				value																		= selectedEntityModifier;
 				sprintf_s(menuItemText, stringLeft, stringRight);
 #ifndef DISABLE_RESEARCH_REQUIREMENTS
@@ -68,8 +68,8 @@ void																		research
 		else {
 			int32_t																			selectedEntityDefinition							= equipInventory[i].Entity.Definition;
 			if( 0 != selectedEntityDefinition && (-1) == researchedList.FindElement((int16_t)selectedEntityDefinition) ) {
-				stringRight																	= definitionsTable[selectedEntityDefinition].Name.begin();
-				stringLeft																	= itemFormat.c_str();
+				stringRight																	= table[selectedEntityDefinition].Name.begin();
+				stringLeft																	= itemFormat.begin();
 				value																		= selectedEntityDefinition;
 				sprintf_s(menuItemText, stringLeft, stringRight);
 #ifndef DISABLE_RESEARCH_REQUIREMENTS
@@ -98,14 +98,14 @@ void																		research
 	}
 
 	if( 0 == menuItemCount ) {
-		printf("%s", noResearchAvailable.c_str());
+		printf("%s", noResearchAvailable.begin());
 		return;
 	}
 
 	menuItems[menuItemCount++]												= {maxItemCount, "Exit this menu"};
 
-	sprintf_s(menuItemText, "%s", selectItemToResearch.c_str());
-	int32_t																		selectedValue											= displayMenu(menuItemText, menuItems, menuItemCount);
+	sprintf_s(menuItemText, "%s", selectItemToResearch.begin());
+	int32_t																		selectedValue											= displayMenu(menuItemText, ::gpk::view_array<const ::klib::SMenuItem<int32_t>>{menuItems}, menuItemCount);
 
 	if(maxItemCount == selectedValue) {
 		printf("You exit the labs.\n");
@@ -113,26 +113,26 @@ void																		research
 	}
 
 	if(bIsModifier) {
-		sprintf_s(menuItemText, definitionsTable[selectedValue].Name.begin(), itemFormat.c_str());
-		printf(startResearching.c_str(), menuItemText);
+		sprintf_s(menuItemText, table[selectedValue].Name.begin(), itemFormat.begin());
+		printf(startResearching.begin(), menuItemText);
 	}
 	else
-		printf(startResearching.c_str(), definitionsTable[selectedValue].Name.begin());
+		printf(startResearching.begin(), table[selectedValue].Name.begin());
 
 	researchedList.AddElement((int16_t)selectedValue);
 
 	if(bIsModifier) {
 		adventurerMaxEquip.Modifier												= ::gpk::max(adventurerMaxEquip.Modifier, (int16_t)(selectedValue+1));
-		printf(doneResearching.c_str(), menuItemText);
+		printf(doneResearching.begin(), menuItemText);
 	}
 	else {
 		adventurerMaxEquip.Definition											= ::gpk::max(adventurerMaxEquip.Definition, (int16_t)(selectedValue+1));
-		printf(doneResearching.c_str(), definitionsTable[selectedValue].Name.begin());
+		printf(doneResearching.begin(), table[selectedValue].Name.begin());
 	}
 	research
 		( equipInventory
 		, researchedList
-		, definitionsTable
+		, table
 		, adventurerMaxEquip
 		, bIsModifier
 		, bIsProgressive

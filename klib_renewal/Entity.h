@@ -1,6 +1,7 @@
 #include "EntityPoints.h"
 
 #include "klib_draw_misc.h"
+#include <cstring>
 
 #ifndef KLIB_ENTITY_H__38924092634721346098170219783096__
 #define KLIB_ENTITY_H__38924092634721346098170219783096__
@@ -61,9 +62,8 @@ namespace klib
 			) {
 			slotCount														= (_tSize < slotCount) ? _tSize : slotCount;
 			Slots.resize(slotCount);
-			for(uint32_t iSlot = 0; iSlot < slotCount; ++iSlot) {
+			for(uint32_t iSlot = 0; iSlot < slotCount; ++iSlot)
 				Slots[iSlot]													= entitySlots[iSlot];
-			}
 		}
 
 							const uint32_t					size				()									const	noexcept	{ return Slots.size(); }
@@ -111,9 +111,26 @@ namespace klib
 
 							SEntityPoints					Points				;
 							SEntityFlags					Flags				;
-							::gpk::view_const_string		Name				;//::gpk::label					Name				;
+							::gpk::view_const_string		Name				;
 	};
 
+	template <typename _tEntity>
+	struct SEntityTable {
+		::gpk::view_array<const SEntityRecord<_tEntity>>	Definitions	;
+		::gpk::view_array<const SEntityRecord<_tEntity>>	Modifiers	;
+	};
+
+	template<typename _EntityType>
+	SEntityPoints						getEntityPoints					(const SEntityTable<_EntityType> & table, const SEntity & entity) { return (table.Definitions[entity.Definition].Points + table.Modifiers[entity.Modifier].Points) * (_EntityType::getMultipliers() * entity.Level); }
+	template<typename _EntityType>
+	SEntityFlags						getEntityFlags					(const SEntityTable<_EntityType> & table, const SEntity & entity) { return (table.Definitions[entity.Definition].Flags | table.Modifiers[entity.Modifier].Flags); }
+	// Combines two record tables to get the names and combine them as one for display purposes.
+	template<typename _EntityType>
+	::gpk::array_pod<char_t>			getEntityName					(const SEntityTable<_EntityType> & table, const SEntity & entity) {
+		char									formattedName	[128]			= {};
+		sprintf_s(formattedName, table.Modifiers[entity.Modifier].Name.begin(), table.Definitions[entity.Definition].Name.begin());
+		return ::gpk::view_const_string{formattedName};
+	}
 #pragma pack(pop)
 };
 

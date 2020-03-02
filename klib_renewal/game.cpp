@@ -1,5 +1,7 @@
 #include "Game.h"
-
+//
+#include "Tile.h"
+#include "Item.h"
 #include "Enemy.h"
 #include "Accessory.h"
 #include "Armor.h"
@@ -8,7 +10,6 @@
 #include "Vehicle.h"
 #include "Facility.h"
 #include "StageProp.h"
-#include "Item.h"
 
 #include <iostream>
 
@@ -16,63 +17,73 @@
 
 #include <ctime>
 #include <algorithm>
+#include <string>
 
-::std::string						klib::getItemName					(const SItem& item)									{
+::gpk::array_pod<char_t>			klib::getItemName					(const ::klib::SItem& item)									{
 	char									formattedName[128]					= {};
-	sprintf_s(formattedName, itemGrades[item.Level].Name.c_str(), itemDescriptions[item.Definition].Name.c_str());
-	return formattedName;
+	sprintf_s(formattedName, ::klib::itemGrades[item.Level].Name.begin(), ::klib::itemDescriptions[item.Definition].Name.begin());
+	return ::gpk::view_const_string(formattedName);
 }
 
-
-
 // Set up a nice prompt
-void prompt(std::string& userInput, const std::string& displayText, ::klib::SASCIITarget& asciiTarget) {
-	::klib::asciiTargetClear	(asciiTarget, ' ', COLOR_GREEN);
-	uint32_t								screenWidth				=	asciiTarget.Width()
-		,									screenHeight			=	asciiTarget.Height()
+static	::gpk::error_t					prompt					(::std::string& userInput, const ::gpk::view_const_char& displayText, ::klib::SASCIITarget& asciiTarget) {
+	::klib::asciiTargetClear(asciiTarget, ' ', COLOR_GREEN);
+	uint32_t									screenWidth				=	asciiTarget.Width()
+		,										screenHeight			=	asciiTarget.Height()
 		;
-	::klib::lineToRect((char_t*)asciiTarget.Characters.begin(), screenWidth, screenHeight, (screenHeight>>1)-1, 0, ::klib::SCREEN_CENTER, displayText.c_str());
+	::klib::lineToRect((char_t*)asciiTarget.Characters.begin(), screenWidth, screenHeight, (screenHeight>>1)-1, 0, ::klib::SCREEN_CENTER, displayText.begin());
 	::klib::presentASCIIBackBuffer();
 
-	static const HANDLE						hConsoleOut				= ::GetStdHandle( STD_OUTPUT_HANDLE );
-	COORD									cursorPos				= {((SHORT)screenWidth>>1)-5, (SHORT)screenHeight>>1};
+	static const HANDLE							hConsoleOut				= ::GetStdHandle( STD_OUTPUT_HANDLE );
+	COORD										cursorPos				= {((SHORT)screenWidth>>1)-5, (SHORT)screenHeight>>1};
 	::SetConsoleCursorPosition	(hConsoleOut, cursorPos);
 	::SetConsoleTextAttribute	(hConsoleOut, COLOR_GREEN);
 	::SetConsoleDisplayMode		(hConsoleOut, CONSOLE_FULLSCREEN_MODE, 0);
-	static const HANDLE						hConsoleIn				= ::GetStdHandle( STD_INPUT_HANDLE );
+	static const HANDLE							hConsoleIn				= ::GetStdHandle( STD_INPUT_HANDLE );
 	::FlushConsoleInputBuffer	(hConsoleIn);
 	::std::getline(::std::cin, userInput);
+	return 0;
 }
 
-void												klib::resetGame(SGame& instanceGame) {
-	instanceGame.UserLog.clear();
+::gpk::error_t							klib::resetGame(SGame& instanceGame) {
+	instanceGame.Messages.UserLog.clear();
 	::klib::initGame(instanceGame);
 
 	//::klib::clearASCIIBackBuffer(' ', COLOR_WHITE);
 
 	// Set up a nice prompt
-	::std::string playerName;
+	::std::string							playerName;
 	::klib::SASCIITarget					asciiTarget;
 	::klib::getASCIIBackBuffer	(asciiTarget);
-	::prompt(playerName, "Enter your name:", asciiTarget);
-	::std::string password;
+	::prompt(playerName, ::gpk::view_const_char{"Enter your name:"}, asciiTarget);
+	::std::string							password;
 	//::prompt(password, "Enter password:");
 
-	instanceGame.Players[PLAYER_INDEX_USER].Name = {playerName.data(), (uint32_t)playerName.size()};
+	instanceGame.Players[PLAYER_INDEX_USER].Tactical.Name				= ::gpk::view_const_char{playerName.c_str(), (uint32_t)playerName.size()};
 	::gpk::bit_set(instanceGame.Flags, GAME_FLAGS_STARTED);
 	::gpk::bit_clear(instanceGame.Flags, GAME_FLAGS_TACTICAL);
 	::gpk::bit_clear(instanceGame.Flags, GAME_FLAGS_TACTICAL_REMOTE);
+	return 0;
 }
 
 struct SWearables {
-	::klib::SProfession									Profession				= {0, 0, 1, -1};
-	::klib::SWeapon										Weapon					= {0, 0, 1, -1};
-	::klib::SArmor										Armor					= {0, 0, 1, -1};
-	::klib::SAccessory									Accessory				= {0, 0, 1, -1};
+	::klib::SProfession						Profession			= {0, 0, 1, -1};
+	::klib::SWeapon							Weapon				= {0, 0, 1, -1};
+	::klib::SArmor							Armor				= {0, 0, 1, -1};
+	::klib::SAccessory						Accessory			= {0, 0, 1, -1};
 };
 
 // Sets up initial equipment and items for the player to carry or wear.
-void												klib::initGame(SGame& instanceGame) {
+::gpk::error_t							klib::initGame		(SGame& instanceGame) {
+	instanceGame.EntityTables.Profession	= {definitionsProfession, modifiersProfession	};
+	instanceGame.EntityTables.Weapon		= {definitionsWeapon	, modifiersWeapon		};
+	instanceGame.EntityTables.Armor			= {definitionsArmor		, modifiersArmor		};
+	instanceGame.EntityTables.Accessory		= {definitionsAccessory	, modifiersAccessory	};
+	instanceGame.EntityTables.Vehicle		= {definitionsVehicle	, modifiersVehicle		};
+	instanceGame.EntityTables.Facility		= {definitionsFacility	, modifiersFacility		};
+	instanceGame.EntityTables.StageProp		= {definitionsStageProp	, modifiersStageProp	};
+	instanceGame.EntityTables.Tile			= {definitionsTile		, modifiersTile			};
+	//instanceGame.EntityTables.Item			= {definitionsItem		, modifiersItem};
 	info_printf("sizeof(SEntityPoints): %u"							, (uint32_t) sizeof(::klib::SEntityPoints)										);
 	info_printf("sizeof(SEntityFlags): %u"							, (uint32_t) sizeof(::klib::SEntityFlags)										);
 	info_printf("sizeof(SCombatBonus): %u"							, (uint32_t) sizeof(::klib::SCombatBonus)										);
@@ -97,7 +108,8 @@ void												klib::initGame(SGame& instanceGame) {
 	::gpk::bit_clear(instanceGame.Flags, GAME_FLAGS_TACTICAL_REMOTE	);
 	instanceGame.Seed										= time(0);
 	::srand((unsigned int)instanceGame.Seed);
-	::klib::resetCursorString(instanceGame.SlowMessage);
+	static ::klib::SMessageSlow					slowMessage						= {};
+	::klib::resetCursorString(slowMessage);
 	instanceGame.ClearDisplays();
 	instanceGame.TacticalInfo.Clear();
 #define CAMPAIGN_AGENT_COUNT 12
@@ -204,7 +216,7 @@ void												klib::initGame(SGame& instanceGame) {
 			::gpk::ptr_obj<::klib::CCharacter>							newAgentNext;
 			newAgentNext.create(klib::enemyDefinitions[iAgentType]);
 			::klib::CCharacter											& adventurer					= *newAgentNext;
-			::klib::setupAgent(adventurer, adventurer);
+			::klib::setupAgent(instanceGame.EntityTables, adventurer, adventurer);
 			if(iPlayer == 0) {
 				::SWearables wearablesSelected = {};
 				//::klib::GENDER genderSelected = GENDER_FEMALE;
@@ -272,50 +284,55 @@ void												klib::initGame(SGame& instanceGame) {
 				adventurer.CurrentEquip.Profession						= wearablesSelected.Profession	;	// Spy God
 
 				adventurer.Goods.CompletedResearch						= SCharacterResearch();
-				::klib::completeAgentResearch(adventurer);
-				adventurer.Recalculate();
+				::klib::completeAgentResearch(instanceGame.EntityTables, adventurer);
+				adventurer.Recalculate(instanceGame.EntityTables);
 				adventurer.Points.LifeCurrent							= adventurer.FinalPoints.LifeMax;
 			}
 
-			player.Army.push_back(newAgentNext);
+			player.Tactical.Army.push_back(newAgentNext);
 		}
 
 		for(uint32_t i=0; i < 2; ++i) {
-			player.Goods.Inventory.Weapon		.AddElement({2 + ::rand() % 2, 1 + ::rand() % 2, 1, -1});
-			player.Goods.Inventory.Accessory	.AddElement({2 + ::rand() % 2, 1 + ::rand() % 2, 1, -1});
-			player.Goods.Inventory.Armor		.AddElement({2 + ::rand() % 2, 1 + ::rand() % 2, 1, -1});
-			player.Goods.Inventory.Profession	.AddElement({2 + ::rand() % 2, 1 + ::rand() % 2, 1, -1});
+			player.Inventory.Weapon		.AddElement({2 + ::rand() % 2, 1 + ::rand() % 2, 1, -1});
+			player.Inventory.Accessory	.AddElement({2 + ::rand() % 2, 1 + ::rand() % 2, 1, -1});
+			player.Inventory.Armor		.AddElement({2 + ::rand() % 2, 1 + ::rand() % 2, 1, -1});
+			player.Inventory.Profession	.AddElement({2 + ::rand() % 2, 1 + ::rand() % 2, 1, -1});
 		}
 
-		player.Squad.Clear(-1);
-		player.Squad.Agents[0]			= 3;
+		player.Tactical.Squad.Clear(-1);
+		player.Tactical.Squad.Agents[0]			= 3;
 		for(uint32_t i=0; i < 2; ++i)
-			player.Squad.Agents[1 + i]		= (int16_t)(CAMPAIGN_AGENT_COUNT + i);
+			player.Tactical.Squad.Agents[1 + i]		= (int16_t)(CAMPAIGN_AGENT_COUNT + i);
 
-		player.Selection				= {0, 0, -1, -1, -1};
-		::std::string						playerName	= ::std::string(player.Name.begin()) + " #" + ::std::to_string(iPlayer);
-		player.Name						= {playerName.c_str(), (uint32_t)playerName.size()};
+		player.Tactical.Selection				= {0, 0, -1, -1, -1};
+		::gpk::array_pod<char_t>					playerName			= player.Tactical.Name;
+		playerName.append_string(" #");
+		char										striPlayer [64]	;
+		sprintf_s(striPlayer, "%i", iPlayer);
+		playerName.append_string(striPlayer);
+		player.Tactical.Name.append(playerName);
 		//player.Name = ::gpk::get_value_label((PLAYER_INDEX)iPlayer);
 	}
 	::klib::initTacticalMap(instanceGame);
-	::gpk::bit_set(instanceGame.Flags, GAME_FLAGS_RUNNING	);
+	::gpk::bit_set(instanceGame.Flags, GAME_FLAGS_RUNNING);
+	return 0;
 }
 
-uint32_t								klib::missionCost						(SPlayer& player, const SSquad& squadSetup, uint32_t maxAgents)	{
-		int32_t															totalCost						= 0;
+int64_t															klib::missionCost						(const SPlayer& player, const SSquad& squadSetup, uint32_t maxAgents)	{
+		int64_t															totalCost						= 0;
 		for(size_t iAgent=0, agentCount= maxAgents < ::gpk::size(squadSetup.Agents) ? maxAgents : ::gpk::size(squadSetup.Agents); iAgent<agentCount; ++iAgent) {
 			if(squadSetup.Agents[iAgent] == -1)
 				continue;
 
-			CCharacter														& agent							= *player.Army[squadSetup.Agents[iAgent]];
-			const SEntityPoints												& finalPoints					= agent.FinalPoints;
-			if(agent.Points.LifeCurrent.Health <= 0) {
-				agent.Points.LifeCurrent.Health								= 0;
+			const ::klib::CCharacter										& agent							= *player.Tactical.Army[squadSetup.Agents[iAgent]];
+			const ::klib::SEntityPoints										& finalPoints					= agent.FinalPoints;
+			int32_t															healthCurrent					= agent.Points.LifeCurrent.Health;
+			if(healthCurrent <= 0) {
+				healthCurrent												= 0;
 				continue;
 			}
-
-			double														penaltyFromHealth				= agent.Points.LifeCurrent.Health/(double)finalPoints.LifeMax.Health;//agent.Points.LifeCurrent.Health/(double)finalPoints.LifeMax.Health;
-			totalCost												+= finalPoints.CostMaintenance+(int32_t)((1.0-penaltyFromHealth)*agent.Points.CostMaintenance);
+			double															penaltyFromHealth				= healthCurrent / (double)finalPoints.LifeMax.Health;//agent.Points.LifeCurrent.Health/(double)finalPoints.LifeMax.Health;
+			totalCost													+= finalPoints.CostMaintenance + (int64_t)((1.0 - penaltyFromHealth) * agent.Points.CostMaintenance);
 			//totalCost += agent.Points.CostMaintenance+(int32_t)((penaltyFromHealth-1.0)*agent.Points.CostMaintenance);
 		}
 		return totalCost;

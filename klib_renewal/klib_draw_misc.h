@@ -54,7 +54,6 @@ namespace klib
 			if(repeat > 0)
 				valueToRect( rectangleTopLeft, width, height, offsetLine, offsetColumn+valueCount, align, values, valueCount, --repeat );
 		}
-
 		return offsetColumn;
 	}
 

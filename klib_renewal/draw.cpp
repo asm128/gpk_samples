@@ -5,9 +5,9 @@
 
 using namespace klib;
 
-void drawIntro(SGame& instanceGame);
+static	void								drawIntro											(SGame& instanceGame);
 
-void										klib::printMultipageHelp										(char* targetASCII, uint32_t targetWidth, uint32_t targetHeight, uint32_t currentPage, uint32_t pageCount, uint32_t posXOffset)					{
+void										klib::printMultipageHelp							(char* targetASCII, uint32_t targetWidth, uint32_t targetHeight, uint32_t currentPage, uint32_t pageCount, uint32_t posXOffset)					{
 	static const ::gpk::view_const_string			textToShow[3]										=
 		{	"Page down: Next page."
 		,	"Page up: Previous page."
@@ -33,7 +33,7 @@ void										blitGrid						(::gpk::view_grid<_TCell> source, int32_t offsetY, u
 	}
 }
 
-	void													drawSnowBackground							(SWeightedDisplay & display, double lastTimeSeconds, uint32_t disturbance = 1 )																							{
+static	void													drawSnowBackground							(SWeightedDisplay & display, double lastTimeSeconds, uint32_t disturbance = 1 )																							{
 		int32_t														displayWidth								= (int32_t)display.Screen.metrics().x;
 		//int32_t														displayDepth								= (int32_t)display.Depth;
 
@@ -178,8 +178,8 @@ void										blitGrid						(::gpk::view_grid<_TCell> source, int32_t offsetY, u
 	}
 
 template<typename _TCell>
-void										drawDisplay						(::gpk::view_grid<_TCell> source, uint32_t offsetY, uint32_t offsetX, ::klib::SASCIITarget& asciiTarget)															{ blitGrid(source, offsetY, offsetX, (_TCell*)asciiTarget.Characters.begin(), asciiTarget.Characters.metrics().x, asciiTarget.Characters.metrics().y); }
-void										drawStateBackground				( SGame& instanceGame )																																				{
+void										drawDisplay						(::gpk::view_grid<_TCell> source, uint32_t offsetY, uint32_t offsetX, ::klib::SASCIITarget& asciiTarget)	{ ::blitGrid(source, offsetY, offsetX, (_TCell*)asciiTarget.Characters.begin(), asciiTarget.Characters.metrics().x, asciiTarget.Characters.metrics().y); }
+static void									drawStateBackground				( SGame& instanceGame )																						{
 	switch(instanceGame.State.State) {
 	case	GAME_STATE_MENU_MAIN		:	drawIntro(instanceGame);																	; break;
 	case	GAME_STATE_CREDITS			:	//drawSnowBackground(instanceGame.GlobalDisplay, instanceGame.FrameTimer.LastTimeSeconds);	; break;
@@ -363,39 +363,39 @@ void										klib::drawAndPresentGame		(SGame& instanceGame, ::klib::SASCIITarg
 	int32_t											actualOffsetX;
 	// Print log
 	const int32_t									MAX_LOG_LINES					= (instanceGame.State.State == GAME_STATE_WELCOME_COMMANDER || ::gpk::bit_true(instanceGame.Flags, GAME_FLAGS_TACTICAL)) ? 30 : 4;
-	int32_t											logSize							= (int32_t)instanceGame.UserLog.size();
+	int32_t											logSize							= (int32_t)instanceGame.Messages.UserLog.size();
 	for(uint32_t iLogLine=0, logLineCount = ::gpk::min(MAX_LOG_LINES, logSize); iLogLine< logLineCount; ++iLogLine)
-		actualOffsetX								= ::klib::lineToRectColored(target, instanceGame.UserLog[logSize-1-iLogLine].Color, bbHeight-9-iLogLine, 1, ::klib::SCREEN_LEFT, instanceGame.UserLog[logSize-1-iLogLine].Message.c_str());
+		actualOffsetX								= ::klib::lineToRectColored(target, instanceGame.Messages.UserLog[logSize-1-iLogLine].Color, bbHeight-9-iLogLine, 1, ::klib::SCREEN_LEFT, instanceGame.Messages.UserLog[logSize-1-iLogLine].Message.begin());
 
 	// Print some debugging information
 	if(::gpk::bit_true(instanceGame.Flags,GAME_FLAGS_HELPON)) {
-		int32_t											offsetYHelp						= TACTICAL_DISPLAY_POSY + instanceGame.TacticalDisplay.Screen.metrics().y;
-		actualOffsetX								= ::klib::lineToRectColored(target, COLOR_YELLOW	, offsetYHelp+18-5, 2, ::klib::SCREEN_RIGHT, "Help!!! Press F1 to hide.");
-		//												::
-		actualOffsetX								= ::klib::lineToRectColored(target, COLOR_ORANGE	, offsetYHelp+20-5, bbWidth/4*3, ::klib::SCREEN_LEFT, "Keys:");
-		actualOffsetX								= ::klib::lineToRectColored(target, COLOR_DARKGREY	, offsetYHelp+21-5, bbWidth/4*3, ::klib::SCREEN_LEFT, "Up    : Menu cursor up.");
-		actualOffsetX								= ::klib::lineToRectColored(target, COLOR_DARKGREY	, offsetYHelp+22-5, bbWidth/4*3, ::klib::SCREEN_LEFT, "Down  : Menu cursor down.");
-		actualOffsetX								= ::klib::lineToRectColored(target, COLOR_DARKGREY	, offsetYHelp+23-5, bbWidth/4*3, ::klib::SCREEN_LEFT, "Left  : Previous menu page.");
-		actualOffsetX								= ::klib::lineToRectColored(target, COLOR_DARKGREY	, offsetYHelp+24-5, bbWidth/4*3, ::klib::SCREEN_LEFT, "Right : Next menu page.");
-		actualOffsetX								= ::klib::lineToRectColored(target, COLOR_DARKGREY	, offsetYHelp+25-5, bbWidth/4*3, ::klib::SCREEN_LEFT, "Enter : Select menu option.");
-		//
-		actualOffsetX								= ::klib::lineToRectColored(target, COLOR_ORANGE	, offsetYHelp+27-5, bbWidth/4*3, ::klib::SCREEN_LEFT, "Mouse:");
-		actualOffsetX								= ::klib::lineToRectColored(target, COLOR_DARKGREY	, offsetYHelp+28-5, bbWidth/4*3, ::klib::SCREEN_LEFT, "Left Click  : Select menu option");
-		actualOffsetX								= ::klib::lineToRectColored(target, COLOR_DARKGREY	, offsetYHelp+29-5, bbWidth/4*3, ::klib::SCREEN_LEFT, "Left Click  : Select move destination");
-		actualOffsetX								= ::klib::lineToRectColored(target, COLOR_DARKGREY	, offsetYHelp+30-5, bbWidth/4*3, ::klib::SCREEN_LEFT, "Left Click  : Select attack target");
-		actualOffsetX								= ::klib::lineToRectColored(target, COLOR_DARKGREY	, offsetYHelp+31-5, bbWidth/4*3, ::klib::SCREEN_LEFT, "Right Click : Return to the previous screen.");
-		//												::
-		actualOffsetX								= ::klib::lineToRectColored(target, (animTimerAccum.Value > 0.5)? COLOR_CYAN	:	COLOR_DARKBLUE		, offsetYHelp+33-5, bbWidth/4*3, ::klib::SCREEN_LEFT, "\x0C, \x0B: Blue characters are your own squad.");
-		actualOffsetX								= ::klib::lineToRectColored(target, (animTimerAccum.Value > 0.5)? COLOR_MAGENTA	:	COLOR_DARKMAGENTA	, offsetYHelp+34-5, bbWidth/4*3, ::klib::SCREEN_LEFT, "\x0C, \x0B: Magenta characters are your ally squads.");
-		actualOffsetX								= ::klib::lineToRectColored(target, (animTimerAccum.Value > 0.5)? COLOR_RED		:	COLOR_DARKRED		, offsetYHelp+35-5, bbWidth/4*3, ::klib::SCREEN_LEFT, "\x0C, \x0B: Red characters are your enemies.");
-		actualOffsetX								= ::klib::lineToRectColored(target, (animTimerAccum.Value > 0.5)? COLOR_ORANGE	:	COLOR_DARKYELLOW	, offsetYHelp+36-5, bbWidth/4*3, ::klib::SCREEN_LEFT, "\x04: Money is picked up when you walk over it.");
-		actualOffsetX								= ::klib::lineToRectColored(target, (animTimerAccum.Value > 0.5)? COLOR_WHITE	:	COLOR_DARKGREY		, offsetYHelp+37-5, bbWidth/4*3, ::klib::SCREEN_LEFT, "\xB9: Obstacles turn gray when destroyed.");
-		//												::
-		actualOffsetX								= ::klib::lineToRectColored(target, COLOR_YELLOW		, offsetYHelp+39-5, bbWidth/4*3, ::klib::SCREEN_LEFT, "Melee attacks and grenades currently require ");
-		actualOffsetX								= ::klib::lineToRectColored(target, COLOR_YELLOW		, offsetYHelp+40-5, bbWidth/4*3, ::klib::SCREEN_LEFT, "a valid target selected in order to work!");
+		int32_t											offsetYHelp						= 0;
+		++offsetYHelp; actualOffsetX								= ::klib::lineToRectColored(target, COLOR_YELLOW	, offsetYHelp, 2, ::klib::SCREEN_RIGHT, "Help!!! Press F1 to hide.");
+		++offsetYHelp; //												::
+		++offsetYHelp; actualOffsetX								= ::klib::lineToRectColored(target, COLOR_ORANGE	, offsetYHelp, bbWidth/4*3, ::klib::SCREEN_LEFT, "Keys:");
+		++offsetYHelp; actualOffsetX								= ::klib::lineToRectColored(target, COLOR_DARKGREY	, offsetYHelp, bbWidth/4*3, ::klib::SCREEN_LEFT, "Up    : Menu cursor up.");
+		++offsetYHelp; actualOffsetX								= ::klib::lineToRectColored(target, COLOR_DARKGREY	, offsetYHelp, bbWidth/4*3, ::klib::SCREEN_LEFT, "Down  : Menu cursor down.");
+		++offsetYHelp; actualOffsetX								= ::klib::lineToRectColored(target, COLOR_DARKGREY	, offsetYHelp, bbWidth/4*3, ::klib::SCREEN_LEFT, "Left  : Previous menu page.");
+		++offsetYHelp; actualOffsetX								= ::klib::lineToRectColored(target, COLOR_DARKGREY	, offsetYHelp, bbWidth/4*3, ::klib::SCREEN_LEFT, "Right : Next menu page.");
+		++offsetYHelp; actualOffsetX								= ::klib::lineToRectColored(target, COLOR_DARKGREY	, offsetYHelp, bbWidth/4*3, ::klib::SCREEN_LEFT, "Enter : Select menu option.");
+		++offsetYHelp; //
+		++offsetYHelp; actualOffsetX								= ::klib::lineToRectColored(target, COLOR_ORANGE	, offsetYHelp, bbWidth/4*3, ::klib::SCREEN_LEFT, "Mouse:");
+		++offsetYHelp; actualOffsetX								= ::klib::lineToRectColored(target, COLOR_DARKGREY	, offsetYHelp, bbWidth/4*3, ::klib::SCREEN_LEFT, "Left Click  : Select menu option");
+		++offsetYHelp; actualOffsetX								= ::klib::lineToRectColored(target, COLOR_DARKGREY	, offsetYHelp, bbWidth/4*3, ::klib::SCREEN_LEFT, "Left Click  : Select move destination");
+		++offsetYHelp; actualOffsetX								= ::klib::lineToRectColored(target, COLOR_DARKGREY	, offsetYHelp, bbWidth/4*3, ::klib::SCREEN_LEFT, "Left Click  : Select attack target");
+		++offsetYHelp; actualOffsetX								= ::klib::lineToRectColored(target, COLOR_DARKGREY	, offsetYHelp, bbWidth/4*3, ::klib::SCREEN_LEFT, "Right Click : Return to the previous screen.");
+		++offsetYHelp; //												::
+		++offsetYHelp; actualOffsetX								= ::klib::lineToRectColored(target, (animTimerAccum.Value > 0.5)? COLOR_CYAN	:	COLOR_DARKBLUE		, offsetYHelp, bbWidth/4*3, ::klib::SCREEN_LEFT, "\x0C, \x0B: Blue characters are your own squad.");
+		++offsetYHelp; actualOffsetX								= ::klib::lineToRectColored(target, (animTimerAccum.Value > 0.5)? COLOR_MAGENTA	:	COLOR_DARKMAGENTA	, offsetYHelp, bbWidth/4*3, ::klib::SCREEN_LEFT, "\x0C, \x0B: Magenta characters are your ally squads.");
+		++offsetYHelp; actualOffsetX								= ::klib::lineToRectColored(target, (animTimerAccum.Value > 0.5)? COLOR_RED		:	COLOR_DARKRED		, offsetYHelp, bbWidth/4*3, ::klib::SCREEN_LEFT, "\x0C, \x0B: Red characters are your enemies.");
+		++offsetYHelp; actualOffsetX								= ::klib::lineToRectColored(target, (animTimerAccum.Value > 0.5)? COLOR_ORANGE	:	COLOR_DARKYELLOW	, offsetYHelp, bbWidth/4*3, ::klib::SCREEN_LEFT, "\x04: Money is picked up when you walk over it.");
+		++offsetYHelp; actualOffsetX								= ::klib::lineToRectColored(target, (animTimerAccum.Value > 0.5)? COLOR_WHITE	:	COLOR_DARKGREY		, offsetYHelp, bbWidth/4*3, ::klib::SCREEN_LEFT, "\xB9: Obstacles turn gray when destroyed.");
+		++offsetYHelp; //												::
+		++offsetYHelp; actualOffsetX								= ::klib::lineToRectColored(target, COLOR_YELLOW		, offsetYHelp, bbWidth/4*3, ::klib::SCREEN_LEFT, "Melee attacks and grenades currently require ");
+		++offsetYHelp; actualOffsetX								= ::klib::lineToRectColored(target, COLOR_YELLOW		, offsetYHelp, bbWidth/4*3, ::klib::SCREEN_LEFT, "a valid target selected in order to work!");
 	}
 	else
-		actualOffsetX								= ::klib::lineToRectColored(target, COLOR_YELLOW, TACTICAL_DISPLAY_POSY+instanceGame.TacticalDisplay.Screen.metrics().y + 18 - 5, 2, ::klib::SCREEN_RIGHT, "Press F1 to display help.");
+		actualOffsetX								= ::klib::lineToRectColored(target, COLOR_YELLOW, 1, 2, ::klib::SCREEN_RIGHT, "Press F1 to display help.");
 
 	actualOffsetX								= ::klib::printfToRectColored(target, COLOR_DARKGREEN	, bbHeight-4, 1, ::klib::SCREEN_LEFT, "Mouse: %i, %i."			, instanceGame.FrameInput.Mouse.Deltas.x, instanceGame.FrameInput.Mouse.Deltas.y);
 	actualOffsetX								= ::klib::printfToRectColored(target, COLOR_GREEN		, bbHeight-3, 1, ::klib::SCREEN_LEFT, "Frame time: %.5f seconds."	, instanceGame.FrameTimer.LastTimeSeconds	);
@@ -408,23 +408,22 @@ void										klib::drawAndPresentGame		(SGame& instanceGame, ::klib::SASCIITarg
 	char											send_buffer[64]					= {};
 	ctime_s(send_buffer, sizeof(send_buffer), &curTimeWithUnreliableSize);
 
-	::std::string									serverTime						= ::std::string("Server time: ") + send_buffer;
-	serverTime									= serverTime.substr(0, serverTime .size()-2);
-	actualOffsetX								= ::klib::printfToRectColored((char_t*)bbChar, bbWidth, bbHeight, bbColor, COLOR_CYAN		, bbHeight-2, 1, ::klib::SCREEN_RIGHT, "%s."	, serverTime.c_str());
-	actualOffsetX								= ::klib::printfToRectColored((char_t*)bbChar, bbWidth, bbHeight, bbColor, COLOR_DARKGREY	, bbHeight-1, 1, ::klib::SCREEN_CENTER, "%s."	, instanceGame.StateMessage.c_str());
+	::gpk::array_pod<char_t>						serverTime						= ::gpk::view_const_string{"Server time: "};
+	serverTime.append_string({send_buffer, (uint32_t)strlen(send_buffer) - 1});
+	serverTime									= ::gpk::view_const_char{serverTime.begin(), serverTime.size() - 2};
+	actualOffsetX								= ::klib::printfToRectColored((char_t*)bbChar, bbWidth, bbHeight, bbColor, COLOR_CYAN		, bbHeight-2, 0, ::klib::SCREEN_CENTER, "%s.", serverTime.begin());
+	actualOffsetX								= ::klib::printfToRectColored((char_t*)bbChar, bbWidth, bbHeight, bbColor, COLOR_DARKGREY	, bbHeight-1, 0, ::klib::SCREEN_CENTER, "%s.", instanceGame.Messages.StateMessage.begin());
 
 	// Print user error messages and draw cursor.
 	if(instanceGame.State.State != GAME_STATE_CREDITS) {
-		int32_t											finalMissionCost				= ::klib::missionCost(instanceGame.Players[PLAYER_INDEX_USER], instanceGame.Players[PLAYER_INDEX_USER].Squad, instanceGame.Players[PLAYER_INDEX_USER].Squad.Size);
-		int32_t											playerFunds						= instanceGame.Players[PLAYER_INDEX_USER].Money;
-		::klib::printfToRectColored(target, (finalMissionCost > playerFunds) ? COLOR_ORANGE : COLOR_CYAN	, bbHeight-5, 1, ::klib::SCREEN_RIGHT, "Squad size: %i."	, instanceGame.Players[PLAYER_INDEX_USER].Squad.Size);
-		::klib::printfToRectColored(target, (finalMissionCost > playerFunds) ? COLOR_RED : COLOR_ORANGE		, bbHeight-4, 1, ::klib::SCREEN_RIGHT, "Mission cost: %i"	, finalMissionCost);
-		::klib::printfToRectColored(target, (playerFunds < 0) ? COLOR_RED : COLOR_YELLOW					, bbHeight-3, 1, ::klib::SCREEN_RIGHT, "Funds: %i"			, playerFunds);
-
-		::klib::printfToRectColored(target, COLOR_YELLOW	, bbHeight-5, 0, ::klib::SCREEN_CENTER, "%s", instanceGame.UserMessage.c_str());
-		::klib::printfToRectColored(target, COLOR_CYAN		, bbHeight-4, 0, ::klib::SCREEN_CENTER, "%s", instanceGame.UserSuccess.c_str());
-		::klib::printfToRectColored(target, COLOR_RED		, bbHeight-3, 0, ::klib::SCREEN_CENTER, "%s", instanceGame.UserMiss.c_str());
-		::klib::printfToRectColored(target, COLOR_RED		, bbHeight-2, 0, ::klib::SCREEN_CENTER, "%s", instanceGame.UserError.c_str());
+		::klib::SPlayer									& player						= instanceGame.Players[PLAYER_INDEX_USER];
+		int64_t											finalMissionCost				= ::klib::missionCost(player, player.Tactical.Squad, player.Tactical.Squad.Size);
+		int64_t											playerFunds						= instanceGame.Players[PLAYER_INDEX_USER].Tactical.Money;
+		::klib::printfToRectColored(target, (finalMissionCost > playerFunds) ? COLOR_ORANGE : COLOR_CYAN	, bbHeight-17, 1, ::klib::SCREEN_RIGHT, "Squad size: %i."	, instanceGame.Players[PLAYER_INDEX_USER].Tactical.Squad.Size);
+		::klib::printfToRectColored(target, COLOR_YELLOW	, bbHeight-5, 0, ::klib::SCREEN_CENTER, "%s", instanceGame.Messages.UserMessage	.begin());
+		::klib::printfToRectColored(target, COLOR_CYAN		, bbHeight-4, 0, ::klib::SCREEN_CENTER, "%s", instanceGame.Messages.UserSuccess	.begin());
+		::klib::printfToRectColored(target, COLOR_RED		, bbHeight-3, 0, ::klib::SCREEN_CENTER, "%s", instanceGame.Messages.UserMiss	.begin());
+		::klib::printfToRectColored(target, COLOR_RED		, bbHeight-2, 0, ::klib::SCREEN_CENTER, "%s", instanceGame.Messages.UserError	.begin());
 
 		// Draw cursor
 		//int32_t mouseX = instanceGame.FrameInput.MouseX, mouseY = instanceGame.FrameInput.MouseY;
@@ -440,7 +439,7 @@ void										klib::drawAndPresentGame		(SGame& instanceGame, ::klib::SASCIITarg
 
 	profitTimer.Frame();
 	if( profitTimerAccum.Accumulate(profitTimer.LastTimeSeconds) ) {
-		instanceGame.Players[PLAYER_INDEX_USER].Money++;
+		instanceGame.Players[PLAYER_INDEX_USER].Tactical.Money++;
 		profitTimerAccum.Value						= 0;
 	}
 
@@ -458,31 +457,31 @@ void										klib::drawAndPresentGame		(SGame& instanceGame, ::klib::SASCIITarg
 	}
 }
 
-void										drawIntro						( SGame& instanceGame ) {
+static void									drawIntro						( SGame& instanceGame ) {
 	drawFireBackground(instanceGame.TacticalDisplay, instanceGame.FrameTimer.LastTimeSeconds);
 	int32_t											displayDepth					= (int32_t)instanceGame.TacticalDisplay.Screen.metrics().y;
 
-	static const	::std::string					words			[]				= {"Vulgar", "Display", "of", "Power"};
+	static const	::gpk::view_const_string		words			[]				= {"Vulgar", "Display", "of", "Power"};
 	for( uint32_t i=0; i < ::gpk::size(words); ++i) {
 		uint32_t										offsetY							= (uint32_t)((displayDepth >> 1)-(::gpk::size(words) >> 1) + i * 2);
 		//uint32_t										offsetX							=
-			printfToGridColored(instanceGame.TacticalDisplay.Screen.View, instanceGame.TacticalDisplay.TextAttributes, COLOR_ORANGE, offsetY, 0, ::klib::SCREEN_CENTER, "%s", words[i].c_str());
+			printfToGridColored(instanceGame.TacticalDisplay.Screen.View, instanceGame.TacticalDisplay.TextAttributes, COLOR_ORANGE, offsetY, 0, ::klib::SCREEN_CENTER, "%s", words[i].begin());
 	}
 }
 
 
-char										klib::getASCIIWall				(const ::gpk::view_grid<const STileProp>& propGrid, int32_t x, int32_t z) {
+char										klib::getASCIIWall				(const ::gpk::view_array<const ::klib::SEntityRecord<::klib::SStageProp>> definitions, const ::gpk::view_grid<const STileProp>& propGrid, int32_t x, int32_t z) {
 	::klib::SASCIIWallConnection					connection						= {false};
 
 	char											result							= '-';
-	static const ::gpk::label						labelWall						= "Wall";
+	static	const ::gpk::view_const_string			labelWall						= "Wall";
 
 	bool											bIsReinforced					= propGrid[z][x].Modifier > 0;
 
-	if(x - 1 >= 0								&& propGrid[z    ][x - 1].Definition != -1 && definitionsStageProp[propGrid[z    ][x - 1].Definition].Name == labelWall) { connection.Left		= true;	if(propGrid[z    ][x - 1].Modifier > 0) connection.ReinforcedLeft	= true; }
-	if(x + 1 < (int32_t)propGrid.metrics().x	&& propGrid[z    ][x + 1].Definition != -1 && definitionsStageProp[propGrid[z    ][x + 1].Definition].Name == labelWall) { connection.Right		= true;	if(propGrid[z    ][x + 1].Modifier > 0) connection.ReinforcedRight	= true; }
-	if(z - 1 >= 0								&& propGrid[z - 1][x    ].Definition != -1 && definitionsStageProp[propGrid[z - 1][x    ].Definition].Name == labelWall) { connection.Top		= true;	if(propGrid[z - 1][x    ].Modifier > 0) connection.ReinforcedTop	= true; }
-	if(z + 1 < (int32_t)propGrid.metrics().y	&& propGrid[z + 1][x    ].Definition != -1 && definitionsStageProp[propGrid[z + 1][x    ].Definition].Name == labelWall) { connection.Bottom	= true;	if(propGrid[z + 1][x    ].Modifier > 0) connection.ReinforcedBottom	= true; }
+	if(x - 1 >= 0								&& propGrid[z    ][x - 1].Definition != -1 && definitions[propGrid[z    ][x - 1].Definition].Name == labelWall) { connection.Left	= true;	if(propGrid[z    ][x - 1].Modifier > 0) connection.ReinforcedLeft	= true; }
+	if(x + 1 < (int32_t)propGrid.metrics().x	&& propGrid[z    ][x + 1].Definition != -1 && definitions[propGrid[z    ][x + 1].Definition].Name == labelWall) { connection.Right	= true;	if(propGrid[z    ][x + 1].Modifier > 0) connection.ReinforcedRight	= true; }
+	if(z - 1 >= 0								&& propGrid[z - 1][x    ].Definition != -1 && definitions[propGrid[z - 1][x    ].Definition].Name == labelWall) { connection.Top	= true;	if(propGrid[z - 1][x    ].Modifier > 0) connection.ReinforcedTop	= true; }
+	if(z + 1 < (int32_t)propGrid.metrics().y	&& propGrid[z + 1][x    ].Definition != -1 && definitions[propGrid[z + 1][x    ].Definition].Name == labelWall) { connection.Bottom	= true;	if(propGrid[z + 1][x    ].Modifier > 0) connection.ReinforcedBottom	= true; }
 
 		 if(connection.Bottom	&& connection.Top		&& connection.Left && connection.Right	) { result = ::klib::resolveASCIIConnectionCross			(bIsReinforced, connection); }
 	else if(connection.Left		&& connection.Right		&& connection.Top						) { result = ::klib::resolveASCIIConnectionHorizontalUp		(bIsReinforced, connection); }
@@ -510,13 +509,13 @@ uint16_t									klib::getPlayerColor			( const STacticalInfo& tacticalInfo, con
 			color								= (bIsSelected) ? COLOR_MAGENTA :COLOR_DARKMAGENTA;
 	}
 	else {
-		switch(boardPlayer.Control.Type) {
+		switch(boardPlayer.Tactical.Control.Type) {
 		case PLAYER_CONTROL_REMOTE	:
 		case PLAYER_CONTROL_LOCAL	: color		= (bIsSelected) ? COLOR_RED : COLOR_DARKRED;
 			break;
 
 		case PLAYER_CONTROL_AI:
-			switch(boardPlayer.Control.AIMode) {
+			switch(boardPlayer.Tactical.Control.AIMode) {
 			case PLAYER_AI_NEUTRAL		: color		= bIsSelected ? COLOR_DARKGREY	: COLOR_DARKGREY	; break;
 			case PLAYER_AI_FEARFUL		: color		= bIsSelected ? COLOR_DARKGREY	: COLOR_DARKGREY	; break;
 			case PLAYER_AI_CURIOUS		: color		= bIsSelected ? COLOR_DARKGREY	: COLOR_DARKGREY	; break;
@@ -530,11 +529,11 @@ uint16_t									klib::getPlayerColor			( const STacticalInfo& tacticalInfo, con
 	return color;
 }
 
-uint16_t									klib::getStatusColor			( COMBAT_STATUS status, bool bSwap, uint16_t defaultColor )																																	{
+uint16_t									klib::getStatusColor		( COMBAT_STATUS status, bool bSwap, uint16_t defaultColor )																																	{
 	static SStatusColor								statusColors	[32];
-	static const int32_t							initedColors			= initStatusColors(statusColors);
+	static const int32_t							initedColors				= initStatusColors(statusColors);
 
-	uint32_t										bitIndex				= (uint32_t)-1;
+	uint32_t										bitIndex					= (uint32_t)-1;
 
 		 if(::gpk::bit_true(status, COMBAT_STATUS_FROZEN	)) { bitIndex	= getBitIndex(COMBAT_STATUS_FROZEN		, MAX_COMBAT_STATUS_COUNT); }
 	else if(::gpk::bit_true(status, COMBAT_STATUS_PANIC		)) { bitIndex	= getBitIndex(COMBAT_STATUS_PANIC		, MAX_COMBAT_STATUS_COUNT); }
@@ -564,28 +563,28 @@ uint16_t									klib::getStatusColor			( COMBAT_STATUS status, bool bSwap, uint
 
 static int32_t							displayEntityStatus				(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int32_t offsetY, int32_t offsetX, const SEntityStatus& entityStatus)										{
 	int32_t										iLine							= 0;
-	if(entityStatus.Inflict		)	iLine += displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityStatus.Inflict	, MAX_COMBAT_STATUS_COUNT, COLOR_YELLOW, COLOR_RED	, "- Inflicts: %-14.14s");
-	if(entityStatus.Immunity	)	iLine += displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityStatus.Immunity	, MAX_COMBAT_STATUS_COUNT, COLOR_YELLOW, COLOR_CYAN	, "- Immunity: %-14.14s");
+	if(entityStatus.Inflict		)	iLine += displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityStatus.Inflict	, MAX_COMBAT_STATUS_COUNT, COLOR_YELLOW, COLOR_RED	, ::gpk::view_const_string{"- Inflicts: %-14.14s"});
+	if(entityStatus.Immunity	)	iLine += displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityStatus.Immunity	, MAX_COMBAT_STATUS_COUNT, COLOR_YELLOW, COLOR_CYAN	, ::gpk::view_const_string{"- Immunity: %-14.14s"});
 
 	return iLine;
 }
 
 static int32_t							displayEntityEffect				(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int32_t offsetY, int32_t offsetX, const SEntityEffect& entityEffect)										{
 	int32_t										iLine							= 0;
-	if(entityEffect.Attack	)	iLine += displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityEffect.Attack	, MAX_ATTACK_EFFECT_COUNT, COLOR_YELLOW, COLOR_RED	, "- Attack effect: %-14.14s"	);
-	if(entityEffect.Defend	)	iLine += displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityEffect.Defend	, MAX_DEFEND_EFFECT_COUNT, COLOR_YELLOW, COLOR_CYAN	, "- Defend effect: %-14.14s"	);
-	if(entityEffect.Passive	)	iLine += displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityEffect.Passive	, MAX_PASSIVE_EFFECT_COUNT, COLOR_YELLOW, COLOR_GREEN	, "- Passive effect: %-14.14s"	);
+	if(entityEffect.Attack	)	iLine += displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityEffect.Attack		, MAX_ATTACK_EFFECT_COUNT	, COLOR_YELLOW, COLOR_RED	, ::gpk::view_const_string{"- Attack effect: %-14.14s"	});
+	if(entityEffect.Defend	)	iLine += displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityEffect.Defend		, MAX_DEFEND_EFFECT_COUNT	, COLOR_YELLOW, COLOR_CYAN	, ::gpk::view_const_string{"- Defend effect: %-14.14s"	});
+	if(entityEffect.Passive	)	iLine += displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityEffect.Passive	, MAX_PASSIVE_EFFECT_COUNT	, COLOR_YELLOW, COLOR_GREEN	, ::gpk::view_const_string{"- Passive effect: %-14.14s"	});
 
 	return iLine;
 }
 
 static int32_t							displayEntityTechnology			(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int32_t offsetY, int32_t offsetX, const SEntityGrade& entityTech)											{
 	int32_t										iLine							= 0;
-	if(entityTech.Tech				) iLine	+= displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityTech.Tech				, MAX_ENTITY_TECHNOLOGY_COUNT, COLOR_YELLOW, COLOR_GREEN	, "- Technology: %-14.14s"	);
-	if(entityTech.Grade				) iLine	+= displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityTech.Grade				, 3, COLOR_YELLOW, COLOR_GREEN	, "- Grade: %-14.14s"		);
-	if(entityTech.AttackType		) iLine	+= displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityTech.AttackType			, MAX_ATTACK_TYPE_COUNT, COLOR_YELLOW, COLOR_RED		, "- Attack type: %-14.14s"	);
-	if(entityTech.ProjectileClass	) iLine	+= displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityTech.ProjectileClass	, MAX_PROJECTILE_CLASS_COUNT, COLOR_YELLOW, COLOR_RED	, "- Projectile Class: %-14.14s" );
-	if(entityTech.AmmoEffect		) iLine	+= displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityTech.AmmoEffect			, MAX_AMMO_EFFECT_COUNT, COLOR_YELLOW, COLOR_RED		, "- Ammo Effect: %-14.14s"	);
+	if(entityTech.Tech				) iLine	+= displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityTech.Tech				, MAX_ENTITY_TECHNOLOGY_COUNT, COLOR_YELLOW, COLOR_GREEN	, ::gpk::view_const_string{"- Technology: %-14.14s"			});
+	if(entityTech.Grade				) iLine	+= displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityTech.Grade				, 3, COLOR_YELLOW, COLOR_GREEN								, ::gpk::view_const_string{"- Grade: %-14.14s"				});
+	if(entityTech.AttackType		) iLine	+= displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityTech.AttackType			, MAX_ATTACK_TYPE_COUNT, COLOR_YELLOW, COLOR_RED			, ::gpk::view_const_string{"- Attack type: %-14.14s"		});
+	if(entityTech.ProjectileClass	) iLine	+= displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityTech.ProjectileClass	, MAX_PROJECTILE_CLASS_COUNT, COLOR_YELLOW, COLOR_RED		, ::gpk::view_const_string{"- Projectile Class: %-14.14s"	});
+	if(entityTech.AmmoEffect		) iLine	+= displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityTech.AmmoEffect			, MAX_AMMO_EFFECT_COUNT, COLOR_YELLOW, COLOR_RED			, ::gpk::view_const_string{"- Ammo Effect: %-14.14s"		});
 
 	return iLine;
 }
@@ -593,7 +592,7 @@ static int32_t							displayEntityTechnology			(::gpk::view_grid<char> display, 
 void									klib::displayStatusEffectsAndTechs	(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int32_t offsetY, int32_t offsetX, CCharacter& character)													{
 	int32_t										iLine							= 0;
 	if(character.Flags.Tech.Gender)
-		iLine									+= displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, character.Flags.Tech.Gender, 2	, COLOR_YELLOW, COLOR_GREEN	, "- Gender: %-13.13s");
+		iLine									+= displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, character.Flags.Tech.Gender, 2	, COLOR_YELLOW, COLOR_GREEN	, ::gpk::view_const_string{"- Gender: %-13.13s"});
 	iLine									+= displayEntityTechnology	(display, textAttributes, offsetY+iLine, offsetX, character.FinalFlags.Tech		);
 	iLine									+= displayEntityStatus		(display, textAttributes, offsetY+iLine, offsetX, character.FinalFlags.Status	);
 	iLine									+= displayEntityEffect		(display, textAttributes, offsetY+iLine, offsetX, character.FinalFlags.Effect	);
@@ -606,8 +605,7 @@ static void								displayEmptySlot				(::gpk::view_grid<char> display, ::gpk::v
 	valueToGrid(textAttributes, offsetY, offsetX+13, ::klib::SCREEN_LEFT, &(color = COLOR_DARKCYAN), 1, LINE_SIZE-14);
 }
 
-static void								displayResumedAgentSlot			(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int32_t offsetY, int32_t offsetX, int32_t agentIndex, CCharacter& character)													{
-
+static void								displayResumedAgentSlot			(const ::klib::SEntityTables & tables, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int32_t offsetY, int32_t offsetX, int32_t agentIndex, CCharacter& character)													{
 	static const char							formatAgentTitle	[]			= "-- Agent #%i:" " %-34.34s --"	;
 	static const char							formatAgentCoins	[]			= "%-21.21s: %-11.11s"				;
 	static const char							formatAgentPoints	[]			= "%-21.21s: %-10.10s"				;
@@ -615,15 +613,15 @@ static void								displayResumedAgentSlot			(::gpk::view_grid<char> display, ::
 
 	static const size_t							LINE_SIZE						= 56;
 	uint16_t									color							= COLOR_GREEN;
-	::klib::printfToGridColored(display, textAttributes, color, offsetY, offsetX, ::klib::SCREEN_LEFT,  formatAgentTitle, agentIndex, character.Name.c_str());
+	::klib::printfToGridColored(display, textAttributes, color, offsetY, offsetX, ::klib::SCREEN_LEFT,  formatAgentTitle, agentIndex, character.Name.begin());
 	::klib::valueToGrid(textAttributes, offsetY, offsetX+13, ::klib::SCREEN_LEFT, &color, 1, LINE_SIZE-14);
 	offsetY									+= 2;
 
-	std::string									equipName;
-	equipName	 = getProfessionName	(character.CurrentEquip.Profession	); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, "Class"		, equipName.c_str(), character.CurrentEquip.Profession	.Level);
-	equipName	 = getWeaponName		(character.CurrentEquip.Weapon		); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, "Weapon"	, equipName.c_str(), character.CurrentEquip.Weapon		.Level);
-	equipName	 = getArmorName			(character.CurrentEquip.Armor		); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, "Armor"		, equipName.c_str(), character.CurrentEquip.Armor		.Level);
-	equipName	 = getAccessoryName		(character.CurrentEquip.Accessory	); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, "Accessory"	, equipName.c_str(), character.CurrentEquip.Accessory	.Level);
+	::gpk::array_pod<char_t>					equipName;
+	equipName	 = getEntityName	(tables.Profession	, character.CurrentEquip.Profession	); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, "Class"		, equipName.begin(), character.CurrentEquip.Profession	.Level);
+	equipName	 = getEntityName	(tables.Weapon		, character.CurrentEquip.Weapon		); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, "Weapon"	, equipName.begin(), character.CurrentEquip.Weapon		.Level);
+	equipName	 = getEntityName	(tables.Armor		, character.CurrentEquip.Armor		); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, "Armor"		, equipName.begin(), character.CurrentEquip.Armor		.Level);
+	equipName	 = getEntityName	(tables.Accessory	, character.CurrentEquip.Accessory	); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, "Accessory"	, equipName.begin(), character.CurrentEquip.Accessory	.Level);
 
 	::klib::lineToGridColored(display, textAttributes, COLOR_RED, ++offsetY, offsetX, ::klib::SCREEN_LEFT, "- Final Points:");
 	offsetY									+=2;
@@ -633,87 +631,87 @@ static void								displayResumedAgentSlot			(::gpk::view_grid<char> display, ::
 
 	sprintf_s(formattedGauge, "%i/%i"	, ::gpk::max(0, character.Points.LifeCurrent.Health	), agentFinalPoints.LifeMax.Health	); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Health"	, formattedGauge);
 	sprintf_s(formattedGauge, "%i/%i"	, ::gpk::max(0, character.Points.LifeCurrent.Shield	), agentFinalPoints.LifeMax.Shield	); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Shield"	, formattedGauge);
-	sprintf_s(formattedGauge, "%i/%i"	, ::gpk::max(0, character.Points.LifeCurrent.Mana	), agentFinalPoints.LifeMax.Mana	); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Mana"	, formattedGauge);
+	sprintf_s(formattedGauge, "%i/%i"	, ::gpk::max(0, character.Points.LifeCurrent.Mana	), agentFinalPoints.LifeMax.Mana	); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Mana"		, formattedGauge);
 
-	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Attack.Hit						); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Hit Chance"				, formattedGauge);
-	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Attack.Damage					); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Damage"					, formattedGauge);
+	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Attack.Hit						); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Hit Chance"			, formattedGauge);
+	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Attack.Damage					); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Damage"				, formattedGauge);
 	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Attack.DirectDamage.Health		); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Direct Damage Health"	, formattedGauge);
 	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Attack.DirectDamage.Shield		); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Direct Damage Shield"	, formattedGauge);
-	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Attack.DirectDamage.Mana			); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Direct Damage Mana"		, formattedGauge);
-	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Attack.Absorption				); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Absorption"				, formattedGauge);
-	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Attack.Range						); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Range"					, formattedGauge);
+	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Attack.DirectDamage.Mana			); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Direct Damage Mana"	, formattedGauge);
+	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Attack.Absorption				); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Absorption"			, formattedGauge);
+	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Attack.Range						); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Range"				, formattedGauge);
 	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Fitness.Attack					); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Attack Speed"			, formattedGauge);
-	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Fitness.Movement					); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Movement Speed"			, formattedGauge);
+	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Fitness.Movement					); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Movement Speed"		, formattedGauge);
 	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Fitness.Reflexes					); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Reflexes"				, formattedGauge);
-	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Fitness.Sight					); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Sight"					, formattedGauge);
+	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Fitness.Sight					); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Sight"				, formattedGauge);
 
 	const SEntityPoints							& agentBasePoints				= character.Points;
-	sprintf_s(formattedGauge, "%i", agentBasePoints.Coins				); printfToGrid(display, ++offsetY, offsetX, ::klib::SCREEN_LEFT, formatAgentCoins, "- Coins in wallet"		, formattedGauge);
+	sprintf_s(formattedGauge, "%lli", agentBasePoints.Coins				); printfToGrid(display, ++offsetY, offsetX, ::klib::SCREEN_LEFT, formatAgentCoins, "- Coins in wallet"		, formattedGauge);
 	valueToGrid(textAttributes, offsetY, offsetX+23, ::klib::SCREEN_LEFT, &(color = COLOR_ORANGE), 1, 11);
-	sprintf_s(formattedGauge, "%i", agentFinalPoints.Coins				); printfToGrid(display, ++offsetY, offsetX, ::klib::SCREEN_LEFT, formatAgentCoins, "- Coins per turn"		, formattedGauge);
+	sprintf_s(formattedGauge, "%lli", agentFinalPoints.Coins			); printfToGrid(display, ++offsetY, offsetX, ::klib::SCREEN_LEFT, formatAgentCoins, "- Coins per turn"		, formattedGauge);
 	valueToGrid(textAttributes, offsetY, offsetX+23, ::klib::SCREEN_LEFT, &(color = (agentFinalPoints.Coins >= 0) ? COLOR_ORANGE : COLOR_RED), 1, 11);
-	sprintf_s(formattedGauge, "%i", agentBasePoints.CostMaintenance		); printfToGrid(display, ++offsetY, offsetX, ::klib::SCREEN_LEFT, formatAgentCoins, "- Salary"				, formattedGauge);
+	sprintf_s(formattedGauge, "%lli", agentBasePoints.CostMaintenance	); printfToGrid(display, ++offsetY, offsetX, ::klib::SCREEN_LEFT, formatAgentCoins, "- Salary"				, formattedGauge);
 	valueToGrid(textAttributes, offsetY, offsetX+23, ::klib::SCREEN_LEFT, &(color = COLOR_ORANGE), 1, 11);
-	sprintf_s(formattedGauge, "%i", agentFinalPoints.CostMaintenance	); printfToGrid(display, ++offsetY, offsetX, ::klib::SCREEN_LEFT, formatAgentCoins, "- Total Cost"			, formattedGauge);
+	sprintf_s(formattedGauge, "%lli", agentFinalPoints.CostMaintenance	); printfToGrid(display, ++offsetY, offsetX, ::klib::SCREEN_LEFT, formatAgentCoins, "- Total Cost"			, formattedGauge);
 	valueToGrid(textAttributes, offsetY, offsetX+23, ::klib::SCREEN_LEFT, &(color = COLOR_ORANGE), 1, 11);
 }
 
-void								klib::displayDetailedAgentSlot		(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int32_t offsetY, int32_t offsetX, const CCharacter& character, uint16_t color)										{
+void								klib::displayDetailedAgentSlot		(const ::klib::SEntityTables & tables, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int32_t offsetY, int32_t offsetX, const CCharacter& character, uint16_t color)										{
 	static const char							formatAgentTitle	[]			= " - %-34.34s"			;
 	static const char							formatAgentEquip	[]			= "%-36.36s Lv. %i"		;
 	static const char							formatAgentPoints	[]			= "%-21.21s: %-10.10s"	;
 	static const char							formatAgentCoins	[]			= "%-21.21s: %-11.11s"	;
 
-	printfToGridColored(display, textAttributes, color, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentTitle, character.Name.c_str());
+	printfToGridColored(display, textAttributes, color, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentTitle, character.Name.begin());
 	offsetY									+=1;
 
-	std::string									equipName;
-	equipName	= getProfessionName	(character.CurrentEquip.Profession		); printfToGrid(display, offsetY++	, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, equipName.c_str(), character.CurrentEquip.Profession	.Level);
-	equipName	= getWeaponName		(character.CurrentEquip.Weapon			); printfToGrid(display, offsetY++	, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, equipName.c_str(), character.CurrentEquip.Weapon		.Level);
-	equipName	= getArmorName		(character.CurrentEquip.Armor			); printfToGrid(display, offsetY++	, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, equipName.c_str(), character.CurrentEquip.Armor		.Level);
-	equipName	= getAccessoryName	(character.CurrentEquip.Accessory		); printfToGrid(display, offsetY++	, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, equipName.c_str(), character.CurrentEquip.Accessory	.Level);
+	::gpk::array_pod<char_t>					equipName;
+	equipName	= ::klib::getEntityName(tables.Profession	, character.CurrentEquip.Profession	); ::klib::printfToGrid(display, offsetY++	, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, equipName.begin(), character.CurrentEquip.Profession	.Level);
+	equipName	= ::klib::getEntityName(tables.Weapon		, character.CurrentEquip.Weapon		); ::klib::printfToGrid(display, offsetY++	, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, equipName.begin(), character.CurrentEquip.Weapon		.Level);
+	equipName	= ::klib::getEntityName(tables.Armor		, character.CurrentEquip.Armor		); ::klib::printfToGrid(display, offsetY++	, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, equipName.begin(), character.CurrentEquip.Armor		.Level);
+	equipName	= ::klib::getEntityName(tables.Accessory	, character.CurrentEquip.Accessory	); ::klib::printfToGrid(display, offsetY++	, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, equipName.begin(), character.CurrentEquip.Accessory	.Level);
 
-	lineToGridColored(display, textAttributes, COLOR_RED, ++offsetY, offsetX, ::klib::SCREEN_LEFT, "- Final Points:");
+	::klib::lineToGridColored(display, textAttributes, COLOR_RED, ++offsetY, offsetX, ::klib::SCREEN_LEFT, "- Final Points:");
 	offsetY									+=2;
 
 	const SEntityPoints							& agentFinalPoints				= character.FinalPoints;
 	char										formattedGauge[32];
 	sprintf_s(formattedGauge, "%i/%i"	, ::gpk::max(0, character.Points.LifeCurrent.Health	), agentFinalPoints.LifeMax.Health	); printfToGrid(display, offsetY++	, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Health"	, formattedGauge);
 	sprintf_s(formattedGauge, "%i/%i"	, ::gpk::max(0, character.Points.LifeCurrent.Shield	), agentFinalPoints.LifeMax.Shield	); printfToGrid(display, offsetY++	, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Shield"	, formattedGauge);
-	sprintf_s(formattedGauge, "%i/%i"	, ::gpk::max(0, character.Points.LifeCurrent.Mana	), agentFinalPoints.LifeMax.Mana	); printfToGrid(display, offsetY++	, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Mana"		, formattedGauge);
+	sprintf_s(formattedGauge, "%i/%i"	, ::gpk::max(0, character.Points.LifeCurrent.Mana	), agentFinalPoints.LifeMax.Mana	); printfToGrid(display, offsetY++	, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Mana"	, formattedGauge);
 	++offsetY;	//
 
 	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.LifeCurrent.Health			); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Health per turn"		, formattedGauge);
 	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.LifeCurrent.Shield			); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Shield per turn"		, formattedGauge);
-	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.LifeCurrent.Mana				); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Mana per turn"			, formattedGauge);
+	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.LifeCurrent.Mana				); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Mana per turn"		, formattedGauge);
 	++offsetY;	//
 
-	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Attack.Hit					); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Hit Chance"				, formattedGauge);
-	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Attack.Damage				); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Damage"					, formattedGauge);
+	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Attack.Hit					); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Hit Chance"			, formattedGauge);
+	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Attack.Damage				); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Damage"				, formattedGauge);
 	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Attack.DirectDamage.Health	); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Direct Damage Health"	, formattedGauge);
 	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Attack.DirectDamage.Shield	); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Direct Damage Shield"	, formattedGauge);
-	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Attack.DirectDamage.Mana		); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Direct Damage Mana"		, formattedGauge);
-	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Attack.Absorption			); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Absorption"				, formattedGauge);
-	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Attack.Range					); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Range"					, formattedGauge);
+	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Attack.DirectDamage.Mana		); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Direct Damage Mana"	, formattedGauge);
+	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Attack.Absorption			); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Absorption"			, formattedGauge);
+	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Attack.Range					); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Range"				, formattedGauge);
 	++offsetY;	//
 
 	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Fitness.Attack				); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Attack Speed"			, formattedGauge);
-	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Fitness.Movement				); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Movement Speed"			, formattedGauge);
+	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Fitness.Movement				); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Movement Speed"		, formattedGauge);
 	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Fitness.Reflexes				); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Reflexes"				, formattedGauge);
-	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Fitness.Sight				); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Sight"					, formattedGauge);
+	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Fitness.Sight				); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentPoints, "Sight"				, formattedGauge);
 
 	const SEntityPoints							& agentBasePoints				= character.Points;
-	sprintf_s(formattedGauge, "%i"		, agentBasePoints.Coins							); printfToGrid(display, ++offsetY, offsetX, ::klib::SCREEN_LEFT, formatAgentCoins, "- Coins in wallet"	, formattedGauge); valueToGrid(textAttributes, offsetY, offsetX+23, ::klib::SCREEN_LEFT, &(color = COLOR_ORANGE), 1, 11);	//
-	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.Coins						); printfToGrid(display, ++offsetY, offsetX, ::klib::SCREEN_LEFT, formatAgentCoins, "- Coins per turn"	, formattedGauge); valueToGrid(textAttributes, offsetY, offsetX+23, ::klib::SCREEN_LEFT, &(color = (agentFinalPoints.Coins >= 0) ? COLOR_ORANGE : COLOR_RED), 1, 11);	//
-	sprintf_s(formattedGauge, "%i"		, agentBasePoints.CostMaintenance				); printfToGrid(display, ++offsetY, offsetX, ::klib::SCREEN_LEFT, formatAgentCoins, "- Salary"			, formattedGauge); valueToGrid(textAttributes, offsetY, offsetX+23, ::klib::SCREEN_LEFT, &(color = COLOR_ORANGE), 1, 11);	//
-	sprintf_s(formattedGauge, "%i"		, agentFinalPoints.CostMaintenance				); printfToGrid(display, ++offsetY, offsetX, ::klib::SCREEN_LEFT, formatAgentCoins, "- Total Cost"		, formattedGauge); valueToGrid(textAttributes, offsetY, offsetX+23, ::klib::SCREEN_LEFT, &(color = COLOR_ORANGE), 1, 11);
+	sprintf_s(formattedGauge, "%lli"	, agentBasePoints.Coins							); printfToGrid(display, ++offsetY, offsetX, ::klib::SCREEN_LEFT, formatAgentCoins, "- Coins in wallet"	, formattedGauge); valueToGrid(textAttributes, offsetY, offsetX+23, ::klib::SCREEN_LEFT, &(color = COLOR_ORANGE), 1, 11);	//
+	sprintf_s(formattedGauge, "%lli"	, agentFinalPoints.Coins						); printfToGrid(display, ++offsetY, offsetX, ::klib::SCREEN_LEFT, formatAgentCoins, "- Coins per turn"	, formattedGauge); valueToGrid(textAttributes, offsetY, offsetX+23, ::klib::SCREEN_LEFT, &(color = (agentFinalPoints.Coins >= 0) ? COLOR_ORANGE : COLOR_RED), 1, 11);	//
+	sprintf_s(formattedGauge, "%lli"	, agentBasePoints.CostMaintenance				); printfToGrid(display, ++offsetY, offsetX, ::klib::SCREEN_LEFT, formatAgentCoins, "- Salary"			, formattedGauge); valueToGrid(textAttributes, offsetY, offsetX+23, ::klib::SCREEN_LEFT, &(color = COLOR_ORANGE), 1, 11);	//
+	sprintf_s(formattedGauge, "%lli"	, agentFinalPoints.CostMaintenance				); printfToGrid(display, ++offsetY, offsetX, ::klib::SCREEN_LEFT, formatAgentCoins, "- Total Cost"		, formattedGauge); valueToGrid(textAttributes, offsetY, offsetX+23, ::klib::SCREEN_LEFT, &(color = COLOR_ORANGE), 1, 11);
 }
 
-void									klib::displayAgentSlot					(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int32_t offsetY, int32_t offsetX, int32_t agentIndex, CCharacter& character, bool bShort, uint16_t color)	{
+void									klib::displayAgentSlot					(const ::klib::SEntityTables & tables, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int32_t offsetY, int32_t offsetX, int32_t agentIndex, CCharacter& character, bool bShort, uint16_t color)	{
 	if( bShort )
-		displayResumedAgentSlot		(display, textAttributes, offsetY, offsetX, agentIndex, character);
+		displayResumedAgentSlot		(tables, display, textAttributes, offsetY, offsetX, agentIndex, character);
 	else
-		displayDetailedAgentSlot	(display, textAttributes, offsetY, offsetX, character, color);
+		displayDetailedAgentSlot	(tables, display, textAttributes, offsetY, offsetX, character, color);
 }
 
 void									klib::drawSquadSlots					(SGame& instanceGame)																																						{
@@ -721,24 +719,24 @@ void									klib::drawSquadSlots					(SGame& instanceGame)																					
 	static const int32_t						slotWidth								= display.Screen.metrics().x / MAX_AGENT_COLUMNS;
 	static const int32_t						slotRowSpace							= 30;// display.Depth / (MAX_AGENT_ROWS);
 
-	static const int32_t						offsetYBase								= 2;
-	static const int32_t						offsetXBase								= 3;
+	static const int32_t						offsetYBase								= 1;
+	static const int32_t						offsetXBase								= 1;
 
 	SPlayer										& player								= instanceGame.Players[PLAYER_INDEX_USER];
-	int32_t										playerOffset							= (player.Selection.PlayerUnit != -1) ? ::gpk::min(::gpk::max(0, player.Selection.PlayerUnit-5), (int16_t)::gpk::size(player.Squad.Agents)-6) : 0;
+	int32_t										playerOffset							= (player.Tactical.Selection.PlayerUnit != -1) ? ::gpk::min(::gpk::max(0, player.Tactical.Selection.PlayerUnit-5), (int16_t)::gpk::size(player.Tactical.Squad.Agents)-6) : 0;
 
 	bool										bStop									= false;
-	for(int32_t y = 0, countY=MAX_AGENT_ROWS; y < countY; ++y) {
-		for(int32_t x = 0, countX=MAX_AGENT_COLUMNS; x < countX; ++x)  {
-			int32_t										linearIndex								= y*countX+x;
-			if(linearIndex >= player.Squad.Size) {
+	for(uint32_t y = 0, countY=MAX_AGENT_ROWS; y < countY; ++y) {
+		for(uint32_t x = 0, countX=MAX_AGENT_COLUMNS; x < countX; ++x)  {
+			uint32_t									linearIndex								= y*countX+x;
+			if(linearIndex >= player.Tactical.Squad.Size) {
 				bStop									= true;
 				break;
 			}
 			int32_t										agentIndexOffset						= linearIndex+playerOffset;
-			if(agentIndexOffset < (int32_t)::gpk::size(player.Squad.Agents))  {
-				if( player.Squad.Agents[agentIndexOffset] != -1 )
-					::displayAgentSlot(display.Screen, display.TextAttributes, offsetYBase+slotRowSpace*y, offsetXBase+slotWidth*x, agentIndexOffset+1, *player.Army[player.Squad.Agents[agentIndexOffset]], true);
+			if(agentIndexOffset < (int32_t)::gpk::size(player.Tactical.Squad.Agents))  {
+				if( player.Tactical.Squad.Agents[agentIndexOffset] != -1 )
+					::displayAgentSlot(instanceGame.EntityTables, display.Screen, display.TextAttributes, offsetYBase+slotRowSpace*y, offsetXBase+slotWidth*x, agentIndexOffset+1, *player.Tactical.Army[player.Tactical.Squad.Agents[agentIndexOffset]], true);
 				else
 					::displayEmptySlot(display.Screen.View, display.TextAttributes.View, offsetYBase+slotRowSpace*y, offsetXBase+slotWidth*x, agentIndexOffset+1);
 			}
@@ -748,3 +746,203 @@ void									klib::drawSquadSlots					(SGame& instanceGame)																					
 	}
 }
 
+static int32_t							processInput										(const ::klib::SInput& frameInput, uint32_t targetWidth, uint32_t targetHeight, SDrawMenuState& localPersistentState, bool& bResetMenuStuff, bool& bResetTitle, int32_t lineOffset, uint32_t actualOptionCount, uint32_t pageCount, int32_t exitOffset, int32_t numberCharsAvailable, const int32_t noActionValue, bool disableEscKeyClose, const ::gpk::view_const_char& exitText)	{
+	bool										bMouseOverExit										= mouseOver({(int32_t)frameInput.Mouse.Deltas.x, (int32_t)frameInput.Mouse.Deltas.y}, {exitOffset - 4, (int32_t)targetHeight-MENU_ROFFSET-1}, (int32_t)exitText.size()+4);
+	int32_t										resultVal											= noActionValue;
+	if(localPersistentState.CurrentPage < (pageCount-1) && (frameInput.Keys[VK_NEXT] || frameInput.Keys[VK_RIGHT]))
+		(bResetMenuStuff = true) && ++localPersistentState.CurrentPage;
+	else if(localPersistentState.CurrentPage > 0 && (frameInput.Keys[VK_PRIOR] || frameInput.Keys[VK_LEFT]))
+		(bResetMenuStuff = true) && --localPersistentState.CurrentPage;
+	else if(frameInput.Keys[VK_DOWN])  {		// Test down and up keys.
+		++localPersistentState.CurrentOption;
+		bResetMenuStuff							= true;
+		if( localPersistentState.CurrentOption == (int32_t)actualOptionCount ) {
+			if(localPersistentState.CurrentPage < (pageCount-1) )
+				(localPersistentState.CurrentOption = 0) && ++localPersistentState.CurrentPage;
+			else
+				localPersistentState.CurrentOption						= actualOptionCount-1;
+		}
+	}
+	else if(frameInput.Keys[VK_UP]) {
+		--localPersistentState.CurrentOption;
+		bResetMenuStuff							= true;
+		if( localPersistentState.CurrentOption < 0 ) {
+			if(localPersistentState.CurrentPage > 0 )
+				(localPersistentState.CurrentOption = 8) && --localPersistentState.CurrentPage;
+			else
+				localPersistentState.CurrentOption	= 0;
+		}
+	}
+	else if(frameInput.Keys['0'] || frameInput.Keys[VK_NUMPAD0] || ((frameInput.Mouse.Buttons[4] || frameInput.Keys[VK_ESCAPE]) && !disableEscKeyClose) 	// Test exit request keys.
+		|| (frameInput.Mouse.Buttons[0] && bMouseOverExit)
+		)
+	{
+		bResetMenuStuff											= true;
+		bResetTitle												= true;
+		localPersistentState.CurrentPage						= 0;
+		localPersistentState.CurrentOption						= 0;
+		resultVal												= actualOptionCount;
+	}
+	else if(frameInput.Keys[VK_RETURN] && localPersistentState.CurrentOption != -1) {	// Test execute keys.
+		bResetMenuStuff											= true;
+		resultVal												= localPersistentState.CurrentOption;
+	}
+	else { // look if any of the options was chose from the possible inputs
+		for(uint32_t i=0, count = (uint32_t)actualOptionCount; i < count; i++) {
+			int32_t														actualOffsetX										= (int32_t)(targetWidth-targetWidth/2-numberCharsAvailable/2);
+			bool														bMouseOver											= ::klib::mouseOver({(int32_t)frameInput.Mouse.Deltas.x, (int32_t)frameInput.Mouse.Deltas.y}, {(int32_t)(actualOffsetX - 2), (int32_t)(lineOffset + i)}, numberCharsAvailable + 2);
+			if(bMouseOver && frameInput.Mouse.Buttons[0]) {
+				bResetMenuStuff									= true;
+				resultVal										= i;
+				break;
+			}
+			if(frameInput.Keys['1'+i] || frameInput.Keys[VK_NUMPAD1+i]) {
+				bResetMenuStuff									= true;
+				resultVal										= i;
+				break;
+			}
+		}
+	}
+
+	return resultVal;
+}
+
+
+struct SDrawMenuGlobals {
+							::klib::STimer					Timer;
+							::klib::SAccumulator<double>	Accumulator;
+};
+
+static SDrawMenuGlobals	drawMenu_globals = {{}, {0, 0.30}};
+
+int32_t													drawMenu
+	( SDrawMenuState											& localPersistentState
+	, ::gpk::view2d_char										targetASCII
+	, uint16_t													* targetAttributes
+	, int32_t													& lineOffset
+	, const ::gpk::SCoord2<int32_t>								mousePos
+	, const ::gpk::view_const_char								& title
+	, const ::gpk::view_array<const ::gpk::view_const_char>		& menuItems
+	, const uint32_t											actualOptionCount
+	, const uint32_t											itemOffset
+	, const bool												multipage
+	, const uint32_t											pageCount
+	, const uint32_t											numberCharsAvailable
+	, uint32_t													rowWidth
+	, const ::gpk::view_const_char								& exitText
+	) {
+	const uint32_t												targetWidth											= targetASCII.metrics().x;
+	const uint32_t												targetHeight										= targetASCII.metrics().y;
+	const int32_t												clearOffset											= (int32_t)(targetHeight - MENU_ROFFSET - 4 - 9);
+
+	::gpk::array_pod<char_t>									clearString											;
+	clearString.resize(::gpk::max(rowWidth, 64U), ' ');
+	for(int32_t i = -2, count = (int32_t)targetHeight-clearOffset; i<count; ++i)
+		::klib::printfToRectColored(targetASCII.begin(), targetWidth, targetHeight, targetAttributes, (COLOR_BLACK<<4) | COLOR_YELLOW, clearOffset+i, 0, ::klib::SCREEN_CENTER, "%s", clearString.begin()); // clear all lines where we're going to draw
+
+
+	// Build formatted menu title
+	char														titleFormat		[]									= "-- %s --";
+	char														titleFormatted	[128]								= {};
+	int32_t														titleLength											= (int32_t)sprintf_s(titleFormatted, titleFormat, title.begin());
+
+	rowWidth												= ::gpk::max((uint32_t)titleLength, ::gpk::max((uint32_t)exitText.size()+3, rowWidth));
+	const bool													bDonePrinting										= ::klib::getMessageSlow(localPersistentState.SlowTitle, titleFormatted, titleLength, drawMenu_globals.Timer.LastTimeSeconds * 4);
+	int32_t														actualOffsetX										= ::klib::lineToRect(targetASCII.begin(), targetWidth, targetHeight, lineOffset, 0, ::klib::SCREEN_CENTER, localPersistentState.SlowTitle.Message);		//"-- %s --", title.c_str() );	// Print menu title
+	for(uint32_t i=0; i<rowWidth+1; i++)
+		targetAttributes[lineOffset*targetWidth+actualOffsetX+i] = COLOR_GREEN;
+
+	if( !bDonePrinting )
+		return 0;
+
+	lineOffset												+= 2;
+
+	// Print menu options
+	char														formatString	[24]								= {};
+	char														numberKey		[4]									= {};
+	sprintf_s(formatString, "%%2.2s: %%-%u.%us", numberCharsAvailable, numberCharsAvailable);
+
+	// Draw options
+	if(drawMenu_globals.Accumulator.Value < 0.575 && localPersistentState.MenuItemAccum < actualOptionCount)
+		drawMenu_globals.Accumulator.Value						= 0.575;
+
+	for(uint32_t i = 0, count = (uint32_t)actualOptionCount; i < count; ++i) {
+		actualOffsetX											= (int32_t)(targetWidth-targetWidth/2-numberCharsAvailable/2);
+		if(::klib::mouseOver(mousePos, {actualOffsetX - 2, (int32_t)(lineOffset + i)}, numberCharsAvailable + 2)) {
+			localPersistentState.CurrentOption						= i;
+			break;
+		}
+	}
+
+	if( localPersistentState.CurrentOption >= (int32_t)actualOptionCount )
+		localPersistentState.CurrentOption						= actualOptionCount-1;
+
+	for(uint32_t i = 0, count = (localPersistentState.MenuItemAccum < actualOptionCount) ? localPersistentState.MenuItemAccum : actualOptionCount; i < count; ++i) {
+		::sprintf_s(numberKey, "%u", (uint32_t)(i+1));
+		actualOffsetX											= ::klib::printfToRect(targetASCII.begin(), targetWidth, targetHeight, lineOffset, 0, ::klib::SCREEN_CENTER, formatString, numberKey, menuItems[itemOffset+i].begin());
+		if(localPersistentState.CurrentOption == (int32_t)i)
+			for(uint32_t j = 0; j < rowWidth + 1; ++j)
+				targetAttributes[lineOffset * targetWidth + actualOffsetX + j]	= COLOR_YELLOW << 4;
+		else
+			for(uint32_t j = 0; j < rowWidth + 1; ++j)
+				targetAttributes[lineOffset * targetWidth + actualOffsetX + j]	= COLOR_YELLOW;
+
+		++lineOffset;
+	}
+
+	int32_t														exitOffset											= 0;
+	// Print Exit option at the end.
+	if(localPersistentState.MenuItemAccum > actualOptionCount)
+		exitOffset												= ::klib::drawExitOption(targetASCII.begin(), targetAttributes, targetWidth, targetHeight, 0, ::klib::SCREEN_CENTER, formatString, exitText, localPersistentState.CurrentOption == 10);
+
+	if(multipage)
+		printMultipageHelp(targetASCII.begin(), targetWidth, targetHeight, localPersistentState.CurrentPage, pageCount, 0);
+	return 0;
+}
+
+int32_t												klib::drawMenu											(SDrawMenuState	& localPersistentState, ::gpk::view2d_char display, uint16_t* targetAttributes, const ::gpk::view_const_char& title, const ::gpk::view_array<const ::gpk::view_const_char> & menuItems, const ::klib::SInput& frameInput, const int32_t noActionValue, uint32_t rowWidth, bool disableEscKeyClose, const ::gpk::view_const_char& exitText) {
+	drawMenu_globals.Timer.Frame();
+	const uint32_t												targetWidth											= display.metrics().x;
+	const uint32_t												targetHeight										= display.metrics().y;
+	const uint32_t												optionCount											= menuItems.size();
+	const bool													multipage											= optionCount > 9;
+	const uint32_t												pageCount											= (uint32_t)((multipage == false) ? 1 : optionCount/9 + ((optionCount%9)?1:0));
+	if( localPersistentState.CurrentPage >= pageCount )
+		localPersistentState.CurrentPage = 0;
+	const uint32_t												itemOffset											= localPersistentState.CurrentPage * 9;
+	const uint32_t												actualOptionCount									= ::gpk::min(9U, (uint32_t)(optionCount - (localPersistentState.CurrentPage * 9)));
+	int32_t														lineOffset											= (int32_t)(targetHeight - MENU_ROFFSET - 4 - ::gpk::min((int32_t)optionCount, 9));
+	const int32_t												optionsOffset										= lineOffset;
+	const uint32_t												numberCharsAvailable								= rowWidth - 4;	// 4 is for "%2.2s: "
+
+	const int32_t												exitOffset											= ::drawMenu(localPersistentState, display, targetAttributes, lineOffset, {(int32_t)frameInput.Mouse.Deltas.x, (int32_t)frameInput.Mouse.Deltas.y}, title, menuItems, actualOptionCount, itemOffset, multipage, pageCount, numberCharsAvailable, rowWidth, exitText);
+	// Print page control help if multipage.
+
+	int32_t														resultVal											= noActionValue;
+	bool														bResetMenuStuff										= false;
+	bool														bResetTitle											= false;
+	if( drawMenu_globals.Accumulator.Accumulate(drawMenu_globals.Timer.LastTimeSeconds) ) {
+		if(localPersistentState.MenuItemAccum <= actualOptionCount) // Don't process keys until the menu has finished displaying
+			(drawMenu_globals.Accumulator.Value = 0.575) && ++localPersistentState.MenuItemAccum;
+		else {	// Process page change keys first.
+			resultVal												= processInput(frameInput, targetWidth, targetHeight, localPersistentState, bResetMenuStuff, bResetTitle, lineOffset - (int32_t)actualOptionCount, actualOptionCount, pageCount, exitOffset, numberCharsAvailable, -1, disableEscKeyClose, exitText);
+			if(resultVal != -1) {
+				if(resultVal >= (int32_t)actualOptionCount)
+					resultVal												= menuItems.size();
+				else
+					resultVal												+= itemOffset;
+			}
+		}
+
+	}
+
+	if(bResetMenuStuff)
+		drawMenu_globals.Accumulator.Value						= 0;
+
+	if(bResetTitle) {
+		::klib::resetCursorString(localPersistentState.SlowTitle);
+		localPersistentState.MenuItemAccum						= actualOptionCount >> 1;
+	}
+
+	return resultVal;
+}

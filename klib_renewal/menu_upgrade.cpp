@@ -2,35 +2,25 @@
 #include "Game.h"
 #include "draw.h"
 
-#include "Accessory.h"
-#include "Armor.h"
-#include "Weapon.h"
-#include "Profession.h"
-#include "Vehicle.h"
-#include "Facility.h"
-#include "StageProp.h"
-
 #include "projects.h"
 #include "helper_projects.h"
 
-
 using namespace klib;
 
-SGameState								drawUpgradeMenu(SGame& instanceGame, const SGameState& returnState) {
-	SPlayer										& player				= instanceGame.Players[PLAYER_INDEX_USER];
-	SCharacterGoods								& playerCompany			= player.Goods;
-	SCharacterInventory							& playerInventory		= playerCompany.Inventory;
-	klib::SCharacterResearch					& researchCompleted		= playerCompany.CompletedResearch;
+SGameState								drawUpgradeMenu				(SGame& instanceGame, const SGameState& returnState) {
+	::klib::SPlayer								& player					= instanceGame.Players[PLAYER_INDEX_USER];
+	::klib::SCharacterInventory					& playerInventory			= player.Inventory;
+	::klib::SCharacterResearch					& researchCompleted			= player.Tactical.Research;
 
-	klib::SCharacterResearch					researchedItems			= {};
+	::klib::SCharacterResearch					researchedItems				= {};
 
 #define GET_AVAILABLE_RESEARCH_FOR_ENTITY(EntityToken_, ProgressiveDefinitions_, ProgressiveModifiers_)					\
 	generateResearchedList(researchedItems.EntityToken_, playerInventory.EntityToken_, researchCompleted.EntityToken_);	\
 	for(iAgent = 0; iAgent < armySize; ++iAgent) {																		\
-		if( 0 == player.Army[iAgent] )																					\
+		if( 0 == player.Tactical.Army[iAgent] )																			\
 			continue;																									\
 																														\
-		const CCharacter							& playerAgent			= *player.Army[iAgent];						\
+		const CCharacter							& playerAgent			= *player.Tactical.Army[iAgent];			\
 		generateResearchedListFromAgent( researchedItems.EntityToken_ 													\
 			, playerAgent.CurrentEquip.EntityToken_ 																	\
 			, playerAgent.Goods.Inventory.EntityToken_ 																	\
@@ -43,10 +33,10 @@ SGameState								drawUpgradeMenu(SGame& instanceGame, const SGameState& returnS
 #define GET_AVAILABLE_RESEARCH_FOR_ENTITY_NO_EQUIP(EntityToken_, ProgressiveDefinitions_, ProgressiveModifiers_)		\
 	generateResearchedList(researchedItems.EntityToken_, playerInventory.EntityToken_, researchCompleted.EntityToken_);	\
 	for(iAgent = 0; iAgent < armySize; ++iAgent) {																		\
-		if( 0 == player.Army[iAgent] )																					\
+		if( 0 == player.Tactical.Army[iAgent] )																			\
 			continue;																									\
 																														\
-		const CCharacter							& playerAgent					= *player.Army[iAgent];				\
+		const CCharacter							& playerAgent					= *player.Tactical.Army[iAgent];	\
 		generateResearchedListFromAgentNoEquip( researchedItems.EntityToken_ 											\
 			, playerAgent.Goods.Inventory.EntityToken_ 																	\
 			, researchCompleted.EntityToken_																			\
@@ -56,7 +46,7 @@ SGameState								drawUpgradeMenu(SGame& instanceGame, const SGameState& returnS
 	researchedModifiers						+= researchedItems.EntityToken_.Modifiers.Slots.size();
 
 	int32_t										iAgent;
-	const int32_t								armySize						= (int32_t)player.Army.size();
+	const int32_t								armySize						= (int32_t)player.Tactical.Army.size();
 	uint32_t									researchedDefinitions			= 0
 		,										researchedModifiers				= 0
 		;
@@ -68,25 +58,18 @@ SGameState								drawUpgradeMenu(SGame& instanceGame, const SGameState& returnS
 	GET_AVAILABLE_RESEARCH_FOR_ENTITY			(Weapon		, false, false);
 	GET_AVAILABLE_RESEARCH_FOR_ENTITY			(Armor		, false, false);
 
-#define MAX_RESEARCH_ITEMS					\
-	 ::gpk::size(definitionsAccessory)		\
-	+::gpk::size(definitionsWeapon)			\
-	+::gpk::size(definitionsArmor)			\
-	+::gpk::size(definitionsProfession)		\
-	+::gpk::size(definitionsVehicle)			\
-	+::gpk::size(definitionsFacility)		\
-	+::gpk::size(definitionsStageProp)		\
-		//+::gpk::size(modifiersAccessory)		\\
-		//+::gpk::size(modifiersWeapon)			\\
-		//+::gpk::size(modifiersArmor)			\\
-		//+::gpk::size(modifiersProfession)		\\
-		//+::gpk::size(modifiersVehicle)			\\
-		//+::gpk::size(modifiersFacility)		\\
-		//+::gpk::size(modifiersStageProp)
+#define MAX_RESEARCH_ITEMS										\
+	  instanceGame.EntityTables.Accessory	.Definitions.size()	\
+	+ instanceGame.EntityTables.Weapon		.Definitions.size()	\
+	+ instanceGame.EntityTables.Armor		.Definitions.size()	\
+	+ instanceGame.EntityTables.Profession	.Definitions.size()	\
+	+ instanceGame.EntityTables.Vehicle		.Definitions.size()	\
+	+ instanceGame.EntityTables.Facility	.Definitions.size()	\
+	+ instanceGame.EntityTables.StageProp	.Definitions.size()
 
 	typedef ::klib::SMenuItem<SEntityResearch>	TMenuItem;
-	static	TMenuItem							menuItems[MAX_RESEARCH_ITEMS]	= {};
-
+	::gpk::array_obj<TMenuItem>					menuItems						= {};
+	menuItems.resize(MAX_RESEARCH_ITEMS);
 	uint32_t									researchedCount					= 0;
 	char										composite	[256]				= {};
 	const char									* labelEntityType				= nullptr;
@@ -98,14 +81,14 @@ SGameState								drawUpgradeMenu(SGame& instanceGame, const SGameState& returnS
 		int16_t										idEntity						= place.Definitions[i].Entity;			\
 		menuItem.ReturnValue.ResearchIndex		= i;																		\
 		menuItem.ReturnValue.IsModifier			= false;																	\
-		int32_t										priceUnit						= records[idEntity].Points.PriceBuy/2;	\
+		int64_t										priceUnit						= records[idEntity].Points.PriceBuy/2;	\
 		menuItem.ReturnValue.PriceUnit			= priceUnit;																\
 		menuItem.ReturnValue.PricePaid			= 0;																		\
 		menuItem.ReturnValue.Entity				= {idEntity, 0, 1, -1};														\
 		sprintf_s(composite, "%s: %s", labelEntityType, records[idEntity].Name.begin());									\
-		menuItem.ReturnValue.Name				= composite;																\
-		sprintf_s(composite, "%-40.40s $%i", menuItem.ReturnValue.Name.c_str(), priceUnit);									\
-		menuItem.Text							= composite;																\
+		menuItem.ReturnValue.Name				= ::gpk::view_const_string{composite};										\
+		sprintf_s(composite, "%-40.40s $%lli", menuItem.ReturnValue.Name.begin(), priceUnit);								\
+		menuItem.Text							= ::gpk::view_const_string{composite};										\
 		menuItem.ReturnValue.Type				= type;																		\
 		++researchedCount;																									\
 	}
@@ -117,26 +100,26 @@ SGameState								drawUpgradeMenu(SGame& instanceGame, const SGameState& returnS
 		int16_t										idEntity						= place.Modifiers[i].Entity;			\
 		menuItem.ReturnValue.ResearchIndex		= i;																		\
 		menuItem.ReturnValue.IsModifier			= true;																		\
-		int32_t										priceUnit						= records[idEntity].Points.PriceBuy/2;	\
+		int64_t										priceUnit						= records[idEntity].Points.PriceBuy/2;	\
 		menuItem.ReturnValue.PriceUnit			= priceUnit;																\
 		menuItem.ReturnValue.PricePaid			= 0;																		\
 		menuItem.ReturnValue.Entity				= {0, idEntity, 1, -1};														\
-		sprintf_s(precompose, records[idEntity].Name.c_str(), text);														\
+		sprintf_s(precompose, records[idEntity].Name.begin(), text);														\
 		sprintf_s(composite, "%s: %s", labelEntityType, precompose);														\
-		menuItem.ReturnValue.Name				= composite;																\
-		sprintf_s(composite, "%-40.40s $%i", menuItem.ReturnValue.Name.c_str(), priceUnit);									\
-		menuItem.Text							= composite;																\
+		menuItem.ReturnValue.Name				= ::gpk::view_const_string{composite};										\
+		sprintf_s(composite, "%-40.40s $%lli", menuItem.ReturnValue.Name.begin(), priceUnit);								\
+		menuItem.Text							= ::gpk::view_const_string{composite};										\
 		menuItem.ReturnValue.Type				= type;																		\
 		++researchedCount;																									\
 	}
 
-	ADD_RESEARCH_DEFINITIONS(researchedItems.Profession	, ENTITY_TYPE_PROFESSION	, definitionsProfession	);
-	ADD_RESEARCH_DEFINITIONS(researchedItems.Weapon		, ENTITY_TYPE_WEAPON		, definitionsWeapon		);
-	ADD_RESEARCH_DEFINITIONS(researchedItems.Armor		, ENTITY_TYPE_ARMOR			, definitionsArmor		);
-	ADD_RESEARCH_DEFINITIONS(researchedItems.Accessory	, ENTITY_TYPE_ACCESSORY		, definitionsAccessory	);
-	ADD_RESEARCH_DEFINITIONS(researchedItems.Vehicle	, ENTITY_TYPE_VEHICLE		, definitionsVehicle	);
-	ADD_RESEARCH_DEFINITIONS(researchedItems.Facility	, ENTITY_TYPE_FACILITY		, definitionsFacility	);
-	ADD_RESEARCH_DEFINITIONS(researchedItems.StageProp	, ENTITY_TYPE_STAGE_PROP	, definitionsStageProp	);
+	ADD_RESEARCH_DEFINITIONS(researchedItems.Profession	, ENTITY_TYPE_PROFESSION	, instanceGame.EntityTables.Profession	.Definitions);
+	ADD_RESEARCH_DEFINITIONS(researchedItems.Weapon		, ENTITY_TYPE_WEAPON		, instanceGame.EntityTables.Weapon		.Definitions);
+	ADD_RESEARCH_DEFINITIONS(researchedItems.Armor		, ENTITY_TYPE_ARMOR			, instanceGame.EntityTables.Armor		.Definitions);
+	ADD_RESEARCH_DEFINITIONS(researchedItems.Accessory	, ENTITY_TYPE_ACCESSORY		, instanceGame.EntityTables.Accessory	.Definitions);
+	ADD_RESEARCH_DEFINITIONS(researchedItems.Vehicle	, ENTITY_TYPE_VEHICLE		, instanceGame.EntityTables.Vehicle		.Definitions);
+	ADD_RESEARCH_DEFINITIONS(researchedItems.Facility	, ENTITY_TYPE_FACILITY		, instanceGame.EntityTables.Facility	.Definitions);
+	ADD_RESEARCH_DEFINITIONS(researchedItems.StageProp	, ENTITY_TYPE_STAGE_PROP	, instanceGame.EntityTables.StageProp	.Definitions);
 
 //	char precompose[256] ={};
 //	ADD_RESEARCH_MODIFIERS(researchedItems.Profession	, ENTITY_TYPE_PROFESSION	, modifiersProfession	, "Rank"				);
@@ -147,15 +130,16 @@ SGameState								drawUpgradeMenu(SGame& instanceGame, const SGameState& returnS
 //	ADD_RESEARCH_MODIFIERS(researchedItems.Facility		, ENTITY_TYPE_FACILITY		, modifiersFacility		, "Construction"		);
 //	ADD_RESEARCH_MODIFIERS(researchedItems.StageProp	, ENTITY_TYPE_STAGE_PROP	, modifiersStageProp	, "Enhacement"			);
 
+	static ::klib::SDrawMenuState				menuState;
 	SEntityResearch								selectedChoice					= drawMenu
-		(	instanceGame.GlobalDisplay.Screen.View
+		(	menuState
+		,	instanceGame.GlobalDisplay.Screen.View
 		,	instanceGame.GlobalDisplay.TextAttributes.begin()
-		,	(size_t)researchedCount
-		,	"Available Production"
-		,	::gpk::view_array<const TMenuItem>{menuItems}
+		,	::gpk::view_const_string{"Available Production"}
+		,	::gpk::view_array<const TMenuItem>{menuItems.begin(), researchedCount}
 		,	instanceGame.FrameInput
-		,	SEntityResearch{"Exit upgrade menu"	, {(int32_t)researchedCount}}
-		,	SEntityResearch{"No action selected", -1}
+		,	{::gpk::view_const_string{"Exit upgrade menu"	}, (int32_t)researchedCount}
+		,	{::gpk::view_const_string{"No action selected"	}, -1}
 		,	50U
 		);
 	if(selectedChoice.ResearchIndex == (int32_t)researchedCount)
@@ -174,7 +158,7 @@ SGameState								drawUpgradeMenu(SGame& instanceGame, const SGameState& returnS
 	case ENTITY_TYPE_PROFESSION	:
 	case ENTITY_TYPE_WEAPON		:
 	case ENTITY_TYPE_ARMOR		:
-		acknowledgeProduction(selectedChoice, player.Projects, instanceGame.UserSuccess);
+		acknowledgeProduction(selectedChoice, player.Projects, instanceGame.Messages.UserSuccess);
 		instanceGame.LogSuccess();
 		break;
 	default:
@@ -185,9 +169,12 @@ SGameState								drawUpgradeMenu(SGame& instanceGame, const SGameState& returnS
 }
 
 SGameState								drawUpgrade				(SGame& instanceGame, const SGameState& returnState) {
-	static const ::gpk::label					textToPrint				= "Upgrade.";
-	bool										bDonePrinting			= ::klib::getMessageSlow(instanceGame.SlowMessage, textToPrint.begin(), textToPrint.size(), instanceGame.FrameTimer.LastTimeSeconds);
-	memcpy(&instanceGame.TacticalDisplay.Screen[instanceGame.TacticalDisplay.Screen.metrics().y >> 1][instanceGame.TacticalDisplay.Screen.metrics().x / 2 - ((uint32_t)strlen(instanceGame.SlowMessage) + 1) / 2], instanceGame.SlowMessage, strlen(instanceGame.SlowMessage));
+	static const ::gpk::view_const_string		textToPrint				= "Upgrade.";
+	static ::klib::SMessageSlow					slowMessage;
+	bool										bDonePrinting			= ::klib::getMessageSlow(slowMessage, textToPrint.begin(), textToPrint.size(), instanceGame.FrameTimer.LastTimeSeconds);
+	::gpk::SCoord2<uint32_t>					position				= instanceGame.TacticalDisplay.Screen.metrics() / 2;
+	const uint32_t								messageLen				= (uint32_t)strlen(slowMessage.Message);
+	memcpy(&instanceGame.TacticalDisplay.Screen[position.y][position.x - (messageLen + 1) / 2], slowMessage.Message, messageLen);
 	if ( !bDonePrinting )
 		return returnState;
 

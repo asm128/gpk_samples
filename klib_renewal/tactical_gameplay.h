@@ -22,11 +22,11 @@ namespace klib
 				continue;
 
 			SPlayer															& currentPlayer										= instanceGame.Players[tacticalInfo.Setup.Players[iPlayer]];
-			for(uint32_t iAgent = 0, agentCount =  currentPlayer.Squad.Size; iAgent < agentCount; ++iAgent) {
-				if(currentPlayer.Squad.Agents[iAgent] == -1)
+			for(uint32_t iAgent = 0, agentCount =  currentPlayer.Tactical.Squad.Size; iAgent < agentCount; ++iAgent) {
+				if(currentPlayer.Tactical.Squad.Agents[iAgent] == -1)
 					continue;
 
-				const CCharacter												& agent												= *currentPlayer.Army[currentPlayer.Squad.Agents[iAgent]];
+				const CCharacter												& agent												= *currentPlayer.Tactical.Army[currentPlayer.Tactical.Squad.Agents[iAgent]];
 				if(false == agent.IsAlive())
 					continue;
 

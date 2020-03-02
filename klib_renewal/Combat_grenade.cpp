@@ -28,37 +28,38 @@ COMBAT_STATUS getGrenadeStatusFromProperty(PROPERTY_TYPE grenadeProperty) {
 	return result;
 }
 
-bool										klib::useGrenade						(const SItem& itemGrenade, CCharacter& thrower, CCharacter& target)											{
+bool										klib::useGrenade						(const ::klib::SEntityTables & tables, ::klib::SGameMessages & messages, const SItem& itemGrenade, CCharacter& thrower, CCharacter& target)											{
 	const CItem										& itemDescription						= itemDescriptions[itemGrenade.Definition];
 
 	if(0 == itemGrenade.Level) {
-		::printf("The prop grenade thrown by %s puffs in the air and quickly falls to the ground.\n", thrower.Name.c_str());
+		::sprintf_s(messages.Aux, "The prop grenade thrown by %s puffs in the air and quickly falls to the ground.", thrower.Name.begin());
 		return true;
 	}
 
-	const int										itemGrade								= itemGrenade.Level; 
+	const int										itemGrade								= itemGrenade.Level;
 
 	// Currently the hit chance for all the grenade types are calculated with the same formula.
 	int												lotteryRange							= 60+(10*itemGrade);	// calculate hit chance from item grade
 	int												lotteryResult							= ::rand()%100;
 
-	thrower.Recalculate(), 
-	target .Recalculate();
+	thrower.Recalculate(tables),
+	target .Recalculate(tables);
 
-	const SEntityPoints								& finalPointsThrower					= thrower	.FinalPoints; 
+	const SEntityPoints								& finalPointsThrower					= thrower	.FinalPoints;
 	const SEntityPoints								& finalPointsTarget						= target	.FinalPoints;
 
 	int32_t											itemEffectValue							= int32_t(finalPointsTarget .LifeMax.Health*(0.2f*itemGrade));
 	int32_t											itemEffectValueSelf						= int32_t(finalPointsThrower.LifeMax.Health*(0.2f*itemGrade)) >> 1;
 
 	ATTACK_TARGET									hitTarget								= ATTACK_TARGET_MISS;
-
-	::printf("%s throws %s to %s.\n", thrower.Name.c_str(), ::klib::getItemName(itemGrenade).c_str(), target.Name.c_str());
+	::gpk::array_pod<char_t>						itemName								= ::klib::getItemName(itemGrenade);
+	::sprintf_s(messages.Aux, "%s throws %s to %s.", thrower.Name.begin(), itemName.begin(), target.Name.begin());
+	messages.LogAuxMessage();
 	bool											bAddStatus								= false;
 
 	PROPERTY_TYPE									grenadeProperty							= itemDescription.Property;
 	COMBAT_STATUS									grenadeStatus							= ::getGrenadeStatusFromProperty(grenadeProperty);
-	const ::std::string								targetArmorName							= ::klib::getArmorName(target.CurrentEquip.Armor);
+	const ::gpk::array_pod<char_t>					targetArmorName							= ::klib::getEntityName(tables.Armor, target.CurrentEquip.Armor);
 	switch(grenadeProperty) {
 	case PROPERTY_TYPE_SMOKE		:
 	case PROPERTY_TYPE_STUN			:
@@ -68,10 +69,12 @@ bool										klib::useGrenade						(const SItem& itemGrenade, CCharacter& throw
 	case PROPERTY_TYPE_FLASHBANG	:
 	case PROPERTY_TYPE_EMP			: // Apply status with fixed 50% chance
 		if( lotteryResult < lotteryRange )
-			::klib::applyAttackStatus(target, grenadeStatus, itemGrade ? 1+itemGrade : 0, itemDescription.Name);
-		else
-			::printf("%s throws the grenade too far away.\n", thrower.Name.c_str());
-		break;
+			::klib::applyAttackStatus(tables, messages, target, grenadeStatus, itemGrade ? 1+itemGrade : 0, itemDescription.Name);
+		else {
+			::sprintf_s(messages.Aux, "%s throws the grenade too far away.", thrower.Name.begin());
+			messages.LogAuxMessage();
+		}
+	break;
 
 	case PROPERTY_TYPE_PIERCING		:
 	case PROPERTY_TYPE_FRAG			:
@@ -84,39 +87,40 @@ bool										klib::useGrenade						(const SItem& itemGrenade, CCharacter& throw
 
 	case PROPERTY_TYPE_BLAST:
 		if(lotteryResult == lotteryRange) {
-			::klib::applySuccessfulHit(thrower, thrower, itemEffectValueSelf, bAddStatus, grenadeStatus, 1+itemGrade, ::klib::getItemName(itemGrenade));
+			::klib::applySuccessfulHit(tables, messages, thrower, thrower, itemEffectValueSelf, bAddStatus, grenadeStatus, 1+itemGrade, itemName);
 
 			hitTarget									= ATTACK_TARGET_SELF;
-			::printf("%s throws the grenade too close...\n"		
-				"The grenade explodes near %s doing %u damage!\n", thrower.Name.c_str(), thrower.Name.c_str(), itemEffectValueSelf);
+			::sprintf_s(messages.Aux, "%s throws the grenade too close and explodes near %s doing %u damage!", thrower.Name.begin(), thrower.Name.begin(), itemEffectValueSelf);
 		}
 		else if( lotteryResult == (lotteryRange-1) ) {
-			::klib::applySuccessfulHit(thrower, target,		itemEffectValue		>> 1, bAddStatus, grenadeStatus, itemGrade, ::klib::getItemName(itemGrenade));
-			::klib::applySuccessfulHit(thrower, thrower,	itemEffectValueSelf	>> 1, bAddStatus, grenadeStatus, (itemGrade > 0) ? itemGrade-1 : 0, ::klib::getItemName(itemGrenade));
+			::klib::applySuccessfulHit(tables, messages, thrower, target,		itemEffectValue		>> 1, bAddStatus, grenadeStatus, itemGrade, itemName);
+			::klib::applySuccessfulHit(tables, messages, thrower, thrower,	itemEffectValueSelf	>> 1, bAddStatus, grenadeStatus, (itemGrade > 0) ? itemGrade-1 : 0, itemName);
 
 			hitTarget									= (ATTACK_TARGET)(ATTACK_TARGET_SELF | ATTACK_TARGET_OTHER);
-			::printf("%s doesn't throw the grenade far enough so %s receives %u damage but also %s receives %u damage.\n", thrower.Name.c_str(), target.Name.c_str(), itemEffectValue >> 1, thrower.Name.c_str(), itemEffectValueSelf >> 1);
+			::sprintf_s(messages.Aux, "%s doesn't throw the grenade far enough so %s receives %u damage but also %s receives %u damage.", thrower.Name.begin(), target.Name.begin(), itemEffectValue >> 1, thrower.Name.begin(), itemEffectValueSelf >> 1);
 		}
 		else if( lotteryResult < lotteryRange ) {
-			::klib::applySuccessfulHit(thrower, target, itemEffectValue, bAddStatus, grenadeStatus, 1+itemGrade, ::klib::getItemName(itemGrenade));
+			::klib::applySuccessfulHit(tables, messages, thrower, target, itemEffectValue, bAddStatus, grenadeStatus, 1+itemGrade, itemName);
 			hitTarget									= ATTACK_TARGET_OTHER;
-			::printf("The grenade hits the target doing %u damage.\n", itemEffectValue);
+			::sprintf_s(messages.Aux, "The grenade hits the target doing %u damage.", itemEffectValue);
 		}
 		else
-			::printf("%s throws the grenade too far away.\n", thrower.Name.c_str());
+			::sprintf_s(messages.Aux, "%s throws the grenade too far away.", thrower.Name.begin());
+		messages.LogAuxMessage();
 
 		if(hitTarget & ATTACK_TARGET_OTHER) {
-			thrower	.Score.DamageDealt					+= itemEffectValue; 
-			target	.Score.DamageTaken					+= itemEffectValue; 
+			thrower	.Score.DamageDealt					+= itemEffectValue;
+			target	.Score.DamageTaken					+= itemEffectValue;
 		}
-	
+
 		if(hitTarget & ATTACK_TARGET_SELF)  {
-			thrower	.Score.DamageDealt					+= itemEffectValueSelf; 
-			thrower	.Score.DamageTaken					+= itemEffectValueSelf; 
+			thrower	.Score.DamageDealt					+= itemEffectValueSelf;
+			thrower	.Score.DamageTaken					+= itemEffectValueSelf;
 		}
 		break;
 	default:
-		::printf("Grenade type not implemented!");
+		::sprintf_s(messages.Aux, "Grenade type not implemented!");
+		messages.LogAuxMessage();
 	}
 
 	++thrower.Score.GrenadesUsed;

@@ -12,7 +12,7 @@ namespace klib
 {
 	struct SProjectBudget {
 		bool											bIsRatio;
-		int32_t											Money;
+		int64_t											Money;
 	};
 
 	struct SPlayerProjects {
@@ -24,9 +24,9 @@ namespace klib
 		::gpk::array_obj<SEntityResearch>				QueuedResearch				= {};
 		::gpk::array_obj<SEntityResearch>				QueuedUpgrade				= {};
 
-		int32_t											CostProduction				= 0;
-		int32_t											CostResearch				= 0;
-		int32_t											CostUpgrade					= 0;
+		int64_t											CostProduction				= 0;
+		int64_t											CostResearch				= 0;
+		int64_t											CostUpgrade					= 0;
 
 		void											EnqueueProduction			( const SEntityResearch&	production	)			{ QueuedProduction	.push_back(	production	); CostProduction	 +=	production	.PriceUnit -	production	.PricePaid; };
 		void											EnqueueResearch				( const SEntityResearch&	research	)			{ QueuedResearch	.push_back(	research	); CostResearch		 +=	research	.PriceUnit -	research	.PricePaid; };
@@ -51,87 +51,78 @@ namespace klib
 	DECLARE_EQUIP_TYPE(Item			);
 	DECLARE_EQUIP_TYPE(Tile			);
 
-	struct SPlayerInventory {
-		::gpk::array_obj<::gpk::ptr_obj<::klib::SEquipProfession>>		EquipProfession				= {};
-		::gpk::array_obj<::gpk::ptr_obj<::klib::SEquipWeapon	>>		EquipWeapon					= {};
-		::gpk::array_obj<::gpk::ptr_obj<::klib::SEquipArmor		>>		EquipArmor					= {};
-		::gpk::array_obj<::gpk::ptr_obj<::klib::SEquipAccessory	>>		EquipAccessory				= {};
-		::gpk::array_obj<::gpk::ptr_obj<::klib::SEquipVehicle	>>		EquipVehicle				= {};
-		::gpk::array_obj<::gpk::ptr_obj<::klib::SEquipFacility	>>		EquipFacility				= {};
-		::gpk::array_obj<::gpk::ptr_obj<::klib::SEquipStageProp	>>		EquipStageProp				= {};
-		::gpk::array_obj<::gpk::ptr_obj<::klib::SEquipItem		>>		EquipItem					= {};
-		::gpk::array_obj<::gpk::ptr_obj<::klib::SEquipTile		>>		EquipTile					= {};
+	struct STacticalPlayer { // can be AI or human.
+		int64_t													Money						= 2500000;
+		SPlayerControl											Control						= {};
+		SPlayerSelection										Selection					= {0, 0, -1, -1, -1};
+		SSquad													Squad						= {};
+		SCharacterResearch										Research					= {};
+		SCharacterScore											Score						= {};
+		::gpk::array_pod<char_t>								Name						= ::gpk::view_const_string{"Kasparov"};
+		::gpk::array_obj<::gpk::ptr_obj<::klib::CCharacter>>	Army						= {};
 	};
 
-	//
-	//GDECLARE_OBJ(CCharacter);
-
 	struct SPlayer { // can be AI or human.
-		int32_t													Money						= 2500000;
-		SPlayerControl											Control						= SPlayerControl();
-		SPlayerSelection										Selection					= {0, 0, -1, -1, -1};
-		SSquad													Squad						= SSquad();
-		SCharacterScore											Score						= {};
-		SCharacterGoods											Goods						= {};
+		STacticalPlayer											Tactical					= {};
+		SCharacterInventory										Inventory					= {};
 		SPlayerProjects											Projects					= {};
-		SPlayerInventory										Inventory					= {};
-		::gpk::array_obj<::gpk::ptr_obj<::klib::CCharacter>>	Army						= {};
 		::gpk::array_obj<CDeadCharacter>						Memorial					= {};
-		::gpk::label											Name						= "Kasparov";
 
 		bool													IsAlive						()											const	{
-			for(int32_t iAgent = 0; iAgent < Squad.Size; iAgent++)
-				if(Squad.Agents[iAgent] != -1 && Army[Squad.Agents[iAgent]]->IsAlive())
+			for(uint32_t iAgent = 0; iAgent < Tactical.Squad.Size; iAgent++)
+				if(Tactical.Squad.Agents[iAgent] != -1 && Tactical.Army[Tactical.Squad.Agents[iAgent]]->IsAlive())
 					return true;
 
 			return false;
 		}
 
 		bool											CanMove						()											const	{
-			for(int32_t iAgent = 0; iAgent < Squad.Size; iAgent++)
-				if(Squad.Agents[iAgent] != -1 && Army[Squad.Agents[iAgent]]->CanMove())
+			for(uint32_t iAgent = 0; iAgent < Tactical.Squad.Size; iAgent++)
+				if(Tactical.Squad.Agents[iAgent] != -1 && Tactical.Army[Tactical.Squad.Agents[iAgent]]->CanMove())
 					return true;
 
 			return false;
 		}
 
 		bool											SelectNextAgent				()													{
-			int32_t												count						= 0;
-			const int32_t										maxCount					= Squad.Size;
-			do
-				Selection.PlayerUnit							= (Selection.PlayerUnit + 1) % maxCount;
+			uint32_t											count						= 0;
+			const uint32_t										maxCount					= Tactical.Squad.Size;
+			int32_t												agent						= -1;
+			do {
+				Tactical.Selection.PlayerUnit					= (Tactical.Selection.PlayerUnit + 1) % maxCount;
+				agent											= Tactical.Squad.Agents[Tactical.Selection.PlayerUnit];
+			}
 			while((count++) < maxCount
-			  &&  (Squad.Agents[Selection.PlayerUnit] == -1 || 0 >= Army[Squad.Agents[Selection.PlayerUnit]]->Points.LifeCurrent.Health || Army[Squad.Agents[Selection.PlayerUnit]]->DidLoseTurn()) 
+			  &&  (agent == -1 || 0 >= Tactical.Army[agent]->Points.LifeCurrent.Health || Tactical.Army[agent]->DidLoseTurn())
 			);
 
 			if(count >= maxCount
-				&& (Squad.Agents[Selection.PlayerUnit] == -1 || 0 >= Army[Squad.Agents[Selection.PlayerUnit]]->Points.LifeCurrent.Health || Army[Squad.Agents[Selection.PlayerUnit]]->DidLoseTurn()) 
+				&& (agent == -1 || 0 >= Tactical.Army[agent]->Points.LifeCurrent.Health || Tactical.Army[agent]->DidLoseTurn())
 			)
 				return false;
 
-			Squad.TargetPositions[Selection.PlayerUnit] = Army[Squad.Agents[Selection.PlayerUnit]]->Position;
+			Tactical.Squad.TargetPositions[Tactical.Selection.PlayerUnit] = Tactical.Army[agent]->Position;
 			return true;
 		}
 
 		bool											SelectPreviousAgent			()													{
-			int32_t												count						= 0;
-			const int32_t										maxCount					= Squad.Size;
+			uint32_t											count						= 0;
+			const uint32_t										maxCount					= Tactical.Squad.Size;
 			do {
-				--Selection.PlayerUnit;
-				if(Selection.PlayerUnit < 0) 
-					Selection.PlayerUnit							= ((int16_t)maxCount-1);
+				--Tactical.Selection.PlayerUnit;
+				if(Tactical.Selection.PlayerUnit < 0)
+					Tactical.Selection.PlayerUnit							= ((int16_t)maxCount-1);
 			}
 			while ((count++) < maxCount
-				&& (Squad.Agents[Selection.PlayerUnit] == -1 || 0 >= Army[Squad.Agents[Selection.PlayerUnit]]->Points.LifeCurrent.Health || Army[Squad.Agents[Selection.PlayerUnit]]->DidLoseTurn()) 
+				&& (Tactical.Squad.Agents[Tactical.Selection.PlayerUnit] == -1 || 0 >= Tactical.Army[Tactical.Squad.Agents[Tactical.Selection.PlayerUnit]]->Points.LifeCurrent.Health || Tactical.Army[Tactical.Squad.Agents[Tactical.Selection.PlayerUnit]]->DidLoseTurn())
 			);
 
-			if(count >= Squad.Size
-				&& (Squad.Agents[Selection.PlayerUnit] == -1 || 0 >= Army[Squad.Agents[Selection.PlayerUnit]]->Points.LifeCurrent.Health || Army[Squad.Agents[Selection.PlayerUnit]]->DidLoseTurn()) 
+			if(count >= Tactical.Squad.Size
+				&& (Tactical.Squad.Agents[Tactical.Selection.PlayerUnit] == -1 || 0 >= Tactical.Army[Tactical.Squad.Agents[Tactical.Selection.PlayerUnit]]->Points.LifeCurrent.Health || Tactical.Army[Tactical.Squad.Agents[Tactical.Selection.PlayerUnit]]->DidLoseTurn())
 			)
 				return false;
 
-			Squad.TargetPositions[Selection.PlayerUnit]		= Army[Squad.Agents[Selection.PlayerUnit]]->Position;
-
+			Tactical.Squad.TargetPositions[Tactical.Selection.PlayerUnit]		= Tactical.Army[Tactical.Squad.Agents[Tactical.Selection.PlayerUnit]]->Position;
 			return true;
 		}
 	};

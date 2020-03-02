@@ -10,8 +10,6 @@
 namespace klib
 {
 #pragma pack(push, 1)
-	typedef					::gpk::view_array<::gpk::SColorRGBA>			PaletteRGBA;
-
 	struct SASCIITarget {
 								::gpk::view_grid<uint8_t>						Characters									= {};
 								::gpk::view_grid<uint16_t>						Colors										= {};

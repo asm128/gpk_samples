@@ -1,21 +1,16 @@
 #include "gpk_label.h"
 
-#include <string>
-//#include <iostream>
-
 #ifndef __MENU_H__926349827164392740982169862598423__
 #define __MENU_H__926349827164392740982169862598423__
 
 namespace klib
 {
-#pragma pack(push, 1)
 	template <typename _ReturnType>
 	class SMenuItem {
 	public:
 		_ReturnType								ReturnValue;
-		::std::string							Text;
+		::gpk::array_pod<char_t>				Text;
 	};
-#pragma pack(pop)
 };
 
 #endif // __MENU_H__926349827164392740982169862598423__

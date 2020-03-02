@@ -34,9 +34,9 @@ namespace klib
 #define DEFAULT_SQUAD_SIZE		3
 	// Squads should be indices to the army
 	struct SSquad {
-				int32_t									Size										= DEFAULT_SQUAD_SIZE; //MAX_AGENT_SQUAD_SLOTS;
+				uint32_t								Size										= DEFAULT_SQUAD_SIZE; //MAX_AGENT_SQUAD_SLOTS;
 
-				int16_t									Agents				[MAX_AGENT_SQUAD_SLOTS]	= {};
+				int16_t									Agents				[MAX_AGENT_SQUAD_SLOTS]	= {-1, -1, -1, -1, -1, -1, -1, -1,};
 				STileCharacter							TargetAgents		[MAX_AGENT_SQUAD_SLOTS]	= {};
 				::gpk::SCoord3<int32_t>					TargetPositions		[MAX_AGENT_SQUAD_SLOTS]	= {};
 				AGENT_STATE								AgentStates			[MAX_AGENT_SQUAD_SLOTS]	= {};
@@ -48,7 +48,7 @@ namespace klib
 
 				bool									IsAgentAssigned								(int32_t indexAgent)	const	{
 			bool										bAlreadySet									= false;
-			for(int32_t iAgentOther = 0; iAgentOther < Size; ++iAgentOther)
+			for(uint32_t iAgentOther = 0; iAgentOther < Size; ++iAgentOther)
 				if(Agents[iAgentOther] == indexAgent) {
 					bAlreadySet								= true;
 					break;

@@ -19,14 +19,14 @@ namespace klib
 
 		constexpr										SEntityPointsMultiplier						()															= default;
 		constexpr										SEntityPointsMultiplier
-			(	const SLifePointsMultiplier			& lifeMax				
-			,	const SLifePointsMultiplier			& lifeCurrent			
-			,	const SAttackPointsMultiplier		& attack				
-			,	const SFitnessPointsMultiplier		& fitness				
-			,	double								coins				
-			,	double								priceBuy			
-			,	double								costMaintenance		
-			) 
+			(	const SLifePointsMultiplier			& lifeMax
+			,	const SLifePointsMultiplier			& lifeCurrent
+			,	const SAttackPointsMultiplier		& attack
+			,	const SFitnessPointsMultiplier		& fitness
+			,	double								coins
+			,	double								priceBuy
+			,	double								costMaintenance
+			)
 				: LifeMax				(lifeMax				)
 				, LifeCurrent			(lifeCurrent			)
 				, Attack				(attack					)
@@ -48,16 +48,16 @@ namespace klib
 		}
 	};
 
-	// 
+	//
 	struct SEntityPoints {
 							SLifePoints					LifeMax			;
 							SLifePoints					LifeCurrent		;
 							SAttackPoints				Attack			;
 							SFitnessPoints				Fitness			;
-							int32_t						Coins			;
-							int32_t						PriceBuy		;
-							int32_t						CostMaintenance	;
-	
+							int64_t						Coins			;
+							int64_t						PriceBuy		;
+							int64_t						CostMaintenance	;
+
 							void						Print										()										const				{
 			printf("- Max Life:\n");			LifeMax		.Print();
 			printf("- Current Life:\n");		LifeCurrent	.Print();
@@ -70,15 +70,15 @@ namespace klib
 			printf("- Maintenance Cost..: %i.\n", (int32_t)CostMaintenance);
 		}
 
-		inline constexpr	SEntityPoints				operator+									(const SEntityPoints& other)			const	noexcept	{ 
+		inline constexpr	SEntityPoints				operator+									(const SEntityPoints& other)			const	noexcept	{
 			return { LifeMax+other.LifeMax, LifeCurrent+other.LifeCurrent, Attack+other.Attack, Fitness+other.Fitness, Coins+other.Coins, PriceBuy+other.PriceBuy, CostMaintenance+other.CostMaintenance };
 		}
 
-		inline constexpr	SEntityPoints				operator-									(const SEntityPoints& other)			const	noexcept	{ 
+		inline constexpr	SEntityPoints				operator-									(const SEntityPoints& other)			const	noexcept	{
 			return { LifeMax-other.LifeMax, LifeCurrent-other.LifeCurrent, Attack-other.Attack, Fitness-other.Fitness, Coins-other.Coins, PriceBuy-other.PriceBuy, CostMaintenance-other.CostMaintenance };
 		}
 
-		inline				SEntityPoints				operator*									(const SEntityPointsMultiplier& other)	const	noexcept	{ 
+		inline				SEntityPoints				operator*									(const SEntityPointsMultiplier& other)	const	noexcept	{
 			double												coins										= Coins				*	other.Coins				;
 			double												priceBuy									= PriceBuy			*	other.PriceBuy			;
 			double												costMaintenance								= CostMaintenance	*	other.CostMaintenance	;
@@ -87,17 +87,17 @@ namespace klib
 			priceBuy										= (	priceBuy		< 0 &&	priceBuy		> -1.0) ? -1.000000001 : (	priceBuy		> 0 &&	priceBuy		< 1.0) ?	priceBuy		= 1.000000001 : priceBuy		;
 			costMaintenance									= (	costMaintenance	< 0 &&	costMaintenance	> -1.0) ? -1.000000001 : (	costMaintenance	> 0 &&	costMaintenance	< 1.0) ?	costMaintenance	= 1.000000001 : costMaintenance	;
 
-			return	{ LifeMax					*	other.LifeMax		
-					, LifeCurrent				*	other.LifeCurrent	
-					, Attack					*	other.Attack	
+			return	{ LifeMax					*	other.LifeMax
+					, LifeCurrent				*	other.LifeCurrent
+					, Attack					*	other.Attack
 					, Fitness					*	other.Fitness
-					, (int32_t)(coins			)	
+					, (int32_t)(coins			)
 					, (int32_t)(priceBuy		)
 					, (int32_t)(costMaintenance	)
 					};
 		}
 	};
-	
+
 	// Can be status immunity, status inflict, attack effect, defend effect or passive effect and the allowance of tech, attack types and entity grades.
 	struct SEntityFlags {
 							SEntityEffect				Effect			;

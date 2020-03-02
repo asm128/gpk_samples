@@ -19,35 +19,35 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 	::gpk::SFramework										& framework						= app.Framework;
 	::gpk::SDisplay											& mainWindow					= framework.MainDisplay;
 	framework.Input.create();
-	mainWindow.Size														= {1280, 720};
+	mainWindow.Size										= {1280, 720};
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window. %s.", "why?????!?!?!?!?");
 	{ // Build the exit button
-		::gpk::SGUI																& gui								= *framework.GUI;
-		gui.ColorModeDefault												= ::gpk::GUI_COLOR_MODE_3D;
-		gui.ThemeDefault													= ::gpk::ASCII_COLOR_DARKGREEN * 16 + 7;
-		app.IdExit															= ::gpk::controlCreate(gui);
-		::gpk::SControl															& controlExit						= gui.Controls.Controls[app.IdExit];
-		controlExit.Area													= {{}, {64, 20}};
-		controlExit.Border													= {10, 10, 10, 10};
-		controlExit.Margin													= {1, 1, 1, 1};
-		controlExit.Align													= ::gpk::ALIGN_BOTTOM_RIGHT;
-		::gpk::SControlText														& controlText						= gui.Controls.Text[app.IdExit];
-		controlText.Text													= "Exit";
-		controlText.Align													= ::gpk::ALIGN_CENTER;
-		::gpk::SControlConstraints												& controlConstraints				= gui.Controls.Constraints[app.IdExit];
-		controlConstraints.AttachSizeToControl								= {app.IdExit, -1};
+		::gpk::SGUI											& gui								= *framework.GUI;
+		gui.ColorModeDefault							= ::gpk::GUI_COLOR_MODE_3D;
+		gui.ThemeDefault								= ::gpk::ASCII_COLOR_DARKGREEN * 16 + 7;
+		app.IdExit										= ::gpk::controlCreate(gui);
+		::gpk::SControl										& controlExit						= gui.Controls.Controls[app.IdExit];
+		controlExit.Area								= {{}, {64, 20}};
+		controlExit.Border								= {10, 10, 10, 10};
+		controlExit.Margin								= {1, 1, 1, 1};
+		controlExit.Align								= ::gpk::ALIGN_BOTTOM_RIGHT;
+		::gpk::SControlText									& controlText						= gui.Controls.Text[app.IdExit];
+		controlText.Text								= "Exit";
+		controlText.Align								= ::gpk::ALIGN_CENTER;
+		::gpk::SControlConstraints							& controlConstraints				= gui.Controls.Constraints[app.IdExit];
+		controlConstraints.AttachSizeToControl			= {app.IdExit, -1};
 		::gpk::controlSetParent(gui, app.IdExit, -1);
 	}
 	srand((uint32_t)time(0));
 
-	const ::gpk::SCoord2<uint32_t>											metricsMap			= app.TextOverlay.MetricsMap;
-	const ::gpk::SCoord2<uint32_t>											metricsLetter		= app.TextOverlay.MetricsLetter;
-	::gpk::SImage<::gpk::SColorBGRA>										fontImage;
+	const ::gpk::SCoord2<uint32_t>							metricsMap			= app.TextOverlay.MetricsMap;
+	const ::gpk::SCoord2<uint32_t>							metricsLetter		= app.TextOverlay.MetricsLetter;
+	::gpk::SImage<::gpk::SColorBGRA>						fontImage;
 	::gpk::pngFileLoad(::gpk::view_const_string{"../gpk_data/images/Codepage_437_24_12x12.png"}, fontImage);
-	::gpk::view_grid<::gpk::SGeometryQuads>									viewGeometries		= {app.TextOverlay.GeometryLetters, {16, 16}};
-	const uint32_t															imagePitch			= metricsLetter.x * metricsMap.x;
+	::gpk::view_grid<::gpk::SGeometryQuads>					viewGeometries		= {app.TextOverlay.GeometryLetters, {16, 16}};
+	const uint32_t											imagePitch			= metricsLetter.x * metricsMap.x;
 
-	::gpk::array_pod<::gpk::STile>											tiles;
+	::gpk::array_pod<::gpk::STile>							tiles;
 	for(uint32_t y = 0; y < metricsMap.y; ++y)
 	for(uint32_t x = 0; x < metricsMap.x; ++x) {
 		tiles.clear();
@@ -68,6 +68,11 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 	instanceGame.TacticalDisplay.Resize({::klib::GAME_MAP_WIDTH, ::klib::GAME_MAP_DEPTH});
 
 	::klib::initGame(instanceGame);
+
+
+	::gpk::tcpipInitialize();
+	::gpk::tcpipAddress("192.168.0.3", "51515", app.TacticalClient.AddressConnect);
+	::gpk::clientConnect(app.TacticalClient);
 
 	return 0;
 }
@@ -112,6 +117,10 @@ int													update				(SApplication & app, bool exitSignal)	{
  		::klib::drawAndPresentGame(app.Game, target);
 	}
 	::klib::presentASCIIBackBuffer();
+	::gpk::connectionPushData(app.TacticalClient, app.TacticalClient.Queue, "Message arrived! 4", false, false, 0);
+	::gpk::clientUpdate(app.TacticalClient);
+	::gpk::sleep(10);
+
 
 	Sleep(1);
 	return 0;
@@ -244,7 +253,7 @@ int													draw					(SApplication & app) {
 			matrixView.LookAt(app.TextOverlay.CameraPosition, app.TextOverlay.CameraTarget, app.TextOverlay.CameraUp);
 		else {
 			::klib::SPlayer											& player			= app.Game.Players[app.Game.TacticalInfo.Setup.Players[app.Game.TacticalInfo.CurrentPlayer]];
-			::gpk::SCoord3<float>									agentPosition		= player.Army[player.Squad.Agents[player.Selection.PlayerUnit]]->Position.Cast<float>();
+			::gpk::SCoord3<float>									agentPosition		= player.Tactical.Army[player.Tactical.Squad.Agents[player.Tactical.Selection.PlayerUnit]]->Position.Cast<float>();
 			agentPosition.Scale({1, 1, -1});
 			agentPosition										-= ::gpk::SCoord3<float>{mapToDraw.metrics().x * .5f, 0, mapToDraw.metrics().y * .5f * -1.f};
 			::gpk::SCoord3<float>									cameraPosition		= agentPosition;

@@ -33,10 +33,10 @@ void									klib::boardToDisplay			(::klib::SGame& instanceGame, const STactica
 				SPlayer										& currentPlayer			= instanceGame.Players[tacticalSetup.Players[iTacticalPlayer]];
 
 				for(uint32_t iAgent = 0, agentCount = tacticalSetup.SquadSize[iTacticalPlayer]; iAgent < agentCount; ++iAgent) {
-					if(currentPlayer.Squad.Agents[iAgent] == -1)
+					if(currentPlayer.Tactical.Squad.Agents[iAgent] == -1)
 						continue;
 
-					CCharacter									& playerAgent			= *currentPlayer.Army[currentPlayer.Squad.Agents[iAgent]];
+					CCharacter									& playerAgent			= *currentPlayer.Tactical.Army[currentPlayer.Tactical.Squad.Agents[iAgent]];
 					if(false == playerAgent.IsAlive())
 						continue;
 
@@ -76,7 +76,7 @@ void									klib::boardToDisplay			(::klib::SGame& instanceGame, const STactica
 				|| (cellPlayerIndex == selection.TargetPlayer	&& board.Tiles.Entities.Agents[z][x].AgentIndex == selection.TargetUnit)
 				;
 			const SPlayer									& boardPlayer				= instanceGame.Players[tacticalInfo.Setup.Players[cellPlayerIndex]];
-			const SCharacter								& agent						= *boardPlayer.Army[boardPlayer.Squad.Agents[agentIndex]];
+			const SCharacter								& agent						= *boardPlayer.Tactical.Army[boardPlayer.Tactical.Squad.Agents[agentIndex]];
 			uint16_t										color						= COLOR_BLACK;
 			if(agent.IsAlive()) {
 				double fractionLife		= agent.Points.LifeCurrent.Health / (double)agent.FinalPoints.LifeMax.Health;
@@ -140,16 +140,16 @@ void									klib::boardToDisplay			(::klib::SGame& instanceGame, const STactica
 		else if(board.Tiles.Entities.Props[z][x].Definition != -1) {
 			static const ::gpk::view_const_string chestLabel	= "Chest";
 			static const ::gpk::view_const_string wallLabel		= "Wall";
-			if(chestLabel == definitionsStageProp[board.Tiles.Entities.Props[z][x].Definition].Name) {
+			if(chestLabel == instanceGame.EntityTables.StageProp.Definitions[board.Tiles.Entities.Props[z][x].Definition].Name) {
 				display			[z][x] = ::klib::ascii_cards[DECK_CLUBS];
 				textAttributes	[z][x] |= bSwaps[10] ? COLOR_YELLOW : COLOR_BLACK;
 			}
-			else if(wallLabel == definitionsStageProp[board.Tiles.Entities.Props[z][x].Definition].Name){
-				display			[z][x] = ::klib::getASCIIWall(::gpk::view_grid<const STileProp>{board.Tiles.Entities.Props.Texels.begin(), board.Tiles.Entities.Props.metrics()}, x, z);
+			else if(wallLabel == instanceGame.EntityTables.StageProp.Definitions[board.Tiles.Entities.Props[z][x].Definition].Name){
+				display			[z][x] = ::klib::getASCIIWall(instanceGame.EntityTables.StageProp.Definitions, ::gpk::view_grid<const STileProp>{board.Tiles.Entities.Props.Texels.begin(), board.Tiles.Entities.Props.metrics()}, x, z);
 				textAttributes	[z][x] |= COLOR_BLACK;
 			}
 			else {
-				display			[z][x] = definitionsStageProp[board.Tiles.Entities.Props[z][x].Definition].Name[0];
+				display			[z][x] = instanceGame.EntityTables.StageProp.Definitions[board.Tiles.Entities.Props[z][x].Definition].Name[0];
 				textAttributes	[z][x] |= COLOR_BLACK;
 			}
 			if(board.Tiles.Entities.Props[z][x].Level == -1)

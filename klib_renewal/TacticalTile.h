@@ -50,7 +50,7 @@ namespace klib
 	struct SEntityTiles {
 				::gpk::SImage<STileCharacter>						Agents	;
 				::gpk::SImage<STileProp		>						Props	;
-				::gpk::SImage<int32_t		>						Coins	;
+				::gpk::SImage<int64_t		>						Coins	;
 
 		inline	int32_t												Resize			(::gpk::SCoord2<uint32_t> newSize)											{
 			Agents	.resize(newSize, {TEAM_TYPE_INVALID, -1, -1, -1} );
@@ -60,7 +60,7 @@ namespace klib
 		inline	void												Clear			()											{
 			::klib::clearGrid(Agents.View, {TEAM_TYPE_INVALID, -1, -1, -1} );
 			::klib::clearGrid(Props	.View, {-1, -1, -1, -1} );
-			::klib::clearGrid(Coins	.View, 0 );
+			::klib::clearGrid(Coins	.View, 0LL);
 		}
 	};
 
@@ -90,7 +90,7 @@ namespace klib
 		}
 	};
 
-			char												getASCIIWall	(const ::gpk::view_grid<const STileProp>& propGrid, int32_t x, int32_t z);
+			char												getASCIIWall	(const ::gpk::view_array<const ::klib::SEntityRecord<::klib::SStageProp>> definitions, const ::gpk::view_grid<const STileProp>& propGrid, int32_t x, int32_t z);
 };
 
 

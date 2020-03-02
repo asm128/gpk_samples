@@ -4,9 +4,9 @@
 #include "gpk_image.h"
 #include "gpk_framework.h"
 
-#include "draw.h"
+#include "gpk_udp_server.h"
 
-#include "gpk_udp_client.h"
+#include "draw.h"
 
 #ifndef CED_DEMO_08_H_298837492837
 #define CED_DEMO_08_H_298837492837
@@ -45,8 +45,8 @@ struct SApplication {
 				::STextOverlay														TextOverlay					= {};
 				::klib::SGame														Game						= {};
 
-				::gpk::SUDPClient													TacticalClient				= {};
-				::gpk::array_obj<::gpk::ptr_obj<::gpk::SUDPConnectionMessage>>		TacticalMessages;
+				::gpk::SUDPServer													TacticalServer;
+				::gpk::array_obj<::gpk::array_obj<::gpk::ptr_obj<::gpk::SUDPConnectionMessage>>>	MessagesToProcess;
 
 				uint8_t																MapToDraw[5][32]			=
 					{ {0xDA, 0xC4,  0xC4,  0xC4	,  0xC4	,  0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xBF}

@@ -3,8 +3,7 @@
 #include "gpk_enum.h"
 #include "gpk_size.h"
 #include "gpk_bit.h"
-
-#include <string>
+#include "gpk_ascii_color.h"
 
 #ifndef __ENTITYIMPL_H__928374092634923746298374__
 #define __ENTITYIMPL_H__928374092634923746298374__
@@ -26,10 +25,10 @@ namespace klib
 	GDEFINE_ENUM_VALUE(ENTITY_TYPE, TILE		, 9);
 
 	struct SEntityResearch  {
-								::std::string						Name;
+								::gpk::array_pod<char_t>			Name;
 								int32_t								ResearchIndex;
-								int32_t								PriceUnit;
-								int32_t								PricePaid;
+								int64_t								PriceUnit;
+								int64_t								PricePaid;
 								bool								IsModifier;
 								SEntity								Entity;
 								ENTITY_TYPE							Type;
@@ -54,7 +53,7 @@ namespace klib
 		inline constexpr										S##_name						(const SEntity& other)									: SEntity(other)													{}	\
 																																																								\
 		static inline constexpr	::klib::ENTITY_TYPE				getType							()														{ return _type;														}	\
-		static inline const		::gpk::view_const_string&		getName							()														{ static const ::gpk::view_const_string name = #_name; return name;	}	\
+		static inline const		::gpk::view_const_char&			getName							()														{ static const ::gpk::view_const_char & name = ::gpk::view_const_string{#_name}; return name;	}	\
 		static inline constexpr	::klib::SEntityPointsMultiplier	getMultipliers					()														{ return _multipliers;												}	\
 	};
 
@@ -90,8 +89,7 @@ namespace klib
 		}
 
 								void							NextTurn						()														{
-			for(uint32_t i=0, count = MaxStatus; i<count; ++i)
-			{
+			for(uint32_t i=0, count = MaxStatus; i<count; ++i) {
 				COMBAT_STATUS	statusBit	= (COMBAT_STATUS)(1 << i);
 				if(0 == (statusBit & Status))
 					continue;
@@ -115,7 +113,7 @@ namespace klib
 					continue;
 
 				// Clear bit if zero turns left.
-				if(0 < TurnsLeft[i] && 0 == --TurnsLeft[i]) 
+				if(0 < TurnsLeft[i] && 0 == --TurnsLeft[i])
 					Status			= (COMBAT_STATUS)(Status & ~statusBit);
 				else if(0 > TurnsLeft[i] && 0 == ++TurnsLeft[i])
 					Status			= (COMBAT_STATUS)(Status & ~statusBit);
@@ -123,8 +121,7 @@ namespace klib
 		}
 
 								void							NextEnemyTurn					()														{
-			for(uint32_t i=0, count = MaxStatus; i<count; ++i)
-			{
+			for(uint32_t i=0, count = MaxStatus; i<count; ++i) {
 				COMBAT_STATUS	statusBit	= (COMBAT_STATUS)(1 << i);
 				if(0 == (statusBit & Status))
 					continue;
@@ -157,7 +154,7 @@ namespace klib
 
 
 				// Clear bit if zero turns left.
-				if(0 < TurnsLeft[i] && 0 == --TurnsLeft[i]) 
+				if(0 < TurnsLeft[i] && 0 == --TurnsLeft[i])
 					Status			= (COMBAT_STATUS)(Status & ~statusBit);
 				else if(0 > TurnsLeft[i] && 0 == ++TurnsLeft[i])
 					Status			= (COMBAT_STATUS)(Status & ~statusBit);
@@ -165,8 +162,7 @@ namespace klib
 		}
 
 								void							NextRound						()														{
-			for(uint32_t i=0, count = MaxStatus; i<count; ++i)
-			{
+			for(uint32_t i=0, count = MaxStatus; i<count; ++i) {
 				COMBAT_STATUS	statusBit	= (COMBAT_STATUS)(1 << i);
 				if(0 == (statusBit & Status))
 					continue;
@@ -181,7 +177,7 @@ namespace klib
 					continue;
 
 				// Clear bit if zero turns left.
-				if(0 < TurnsLeft[i] && 0 == --TurnsLeft[i]) 
+				if(0 < TurnsLeft[i] && 0 == --TurnsLeft[i])
 					Status			= (COMBAT_STATUS)(Status & ~statusBit);
 				else if(0 > TurnsLeft[i] && 0 == ++TurnsLeft[i])
 					Status			= (COMBAT_STATUS)(Status & ~statusBit);
@@ -189,7 +185,7 @@ namespace klib
 		}
 	};
 
-							void							addStatus						(SCombatStatus& characterStatus, COMBAT_STATUS statusType, int32_t turnCount);	
+							void							addStatus						(SCombatStatus& characterStatus, COMBAT_STATUS statusType, int32_t turnCount);
 
 	typedef					SEntityPoints					SEntityPointsTurns;
 	struct SCombatBonus {
@@ -200,39 +196,39 @@ namespace klib
 
 								// Turn
 								void							NextTurn						()														{
-			if( 0 < TurnsLeftPoints.LifeMax.Health				)	{	if( 0 == --TurnsLeftPoints.LifeMax.Health				)	Points	.LifeMax		.Health		= 0										;} else if( 0 > TurnsLeftPoints.LifeMax.Health					)	{	if( 0 == ++TurnsLeftPoints.LifeMax.Health				)	Points.LifeMax.Health				= 0;	} 
-			if( 0 < TurnsLeftPoints.LifeMax.Mana				)	{	if( 0 == --TurnsLeftPoints.LifeMax.Mana					)	Points	.LifeMax		.Mana		= 0										;} else if( 0 > TurnsLeftPoints.LifeMax.Mana					)	{	if( 0 == ++TurnsLeftPoints.LifeMax.Mana					)	Points.LifeMax.Mana					= 0;	} 
-			if( 0 < TurnsLeftPoints.LifeMax.Shield				)	{	if( 0 == --TurnsLeftPoints.LifeMax.Shield				)	Points	.LifeMax		.Shield		= 0										;} else if( 0 > TurnsLeftPoints.LifeMax.Shield					)	{	if( 0 == ++TurnsLeftPoints.LifeMax.Shield				)	Points.LifeMax.Shield				= 0;	} 
-			if( 0 < TurnsLeftPoints.LifeCurrent.Health			)	{	if( 0 == --TurnsLeftPoints.LifeCurrent.Health			)	Points	.LifeCurrent	.Health		= 0										;} else if( 0 > TurnsLeftPoints.LifeCurrent.Health				)	{	if( 0 == ++TurnsLeftPoints.LifeCurrent.Health			)	Points.LifeCurrent.Health			= 0;	} 
-			if( 0 < TurnsLeftPoints.LifeCurrent.Mana			)	{	if( 0 == --TurnsLeftPoints.LifeCurrent.Mana				)	Points	.LifeCurrent	.Mana		= 0										;} else if( 0 > TurnsLeftPoints.LifeCurrent.Mana				)	{	if( 0 == ++TurnsLeftPoints.LifeCurrent.Mana				)	Points.LifeCurrent.Mana				= 0;	} 
-			if( 0 < TurnsLeftPoints.LifeCurrent.Shield			)	{	if( 0 == --TurnsLeftPoints.LifeCurrent.Shield			)	Points	.LifeCurrent	.Shield		= 0										;} else if( 0 > TurnsLeftPoints.LifeCurrent.Shield				)	{	if( 0 == ++TurnsLeftPoints.LifeCurrent.Shield			)	Points.LifeCurrent.Shield			= 0;	} 
-			if( 0 < TurnsLeftPoints.Coins						)	{	if( 0 == --TurnsLeftPoints.Coins						)	Points	.Coins						= 0										;} else if( 0 > TurnsLeftPoints.Coins							)	{	if( 0 == ++TurnsLeftPoints.Coins						)	Points.Coins						= 0;	} 
-			if( 0 < TurnsLeftFlags.Effect.Passive				)	{	if( 0 == --TurnsLeftFlags.Effect	.Passive			)	Flags	.Effect			.Passive	= PASSIVE_EFFECT_NONE					;} else if( 0 > TurnsLeftFlags.Effect	.Passive				)	{	if( 0 == ++TurnsLeftFlags.Effect	.Passive	)	Flags.Effect	.Passive	= PASSIVE_EFFECT_NONE		;	} 
+			if( 0 < TurnsLeftPoints.LifeMax.Health				)	{	if( 0 == --TurnsLeftPoints.LifeMax.Health				)	Points	.LifeMax		.Health		= 0										;} else if( 0 > TurnsLeftPoints.LifeMax.Health					)	{	if( 0 == ++TurnsLeftPoints.LifeMax.Health				)	Points.LifeMax.Health				= 0;	}
+			if( 0 < TurnsLeftPoints.LifeMax.Mana				)	{	if( 0 == --TurnsLeftPoints.LifeMax.Mana					)	Points	.LifeMax		.Mana		= 0										;} else if( 0 > TurnsLeftPoints.LifeMax.Mana					)	{	if( 0 == ++TurnsLeftPoints.LifeMax.Mana					)	Points.LifeMax.Mana					= 0;	}
+			if( 0 < TurnsLeftPoints.LifeMax.Shield				)	{	if( 0 == --TurnsLeftPoints.LifeMax.Shield				)	Points	.LifeMax		.Shield		= 0										;} else if( 0 > TurnsLeftPoints.LifeMax.Shield					)	{	if( 0 == ++TurnsLeftPoints.LifeMax.Shield				)	Points.LifeMax.Shield				= 0;	}
+			if( 0 < TurnsLeftPoints.LifeCurrent.Health			)	{	if( 0 == --TurnsLeftPoints.LifeCurrent.Health			)	Points	.LifeCurrent	.Health		= 0										;} else if( 0 > TurnsLeftPoints.LifeCurrent.Health				)	{	if( 0 == ++TurnsLeftPoints.LifeCurrent.Health			)	Points.LifeCurrent.Health			= 0;	}
+			if( 0 < TurnsLeftPoints.LifeCurrent.Mana			)	{	if( 0 == --TurnsLeftPoints.LifeCurrent.Mana				)	Points	.LifeCurrent	.Mana		= 0										;} else if( 0 > TurnsLeftPoints.LifeCurrent.Mana				)	{	if( 0 == ++TurnsLeftPoints.LifeCurrent.Mana				)	Points.LifeCurrent.Mana				= 0;	}
+			if( 0 < TurnsLeftPoints.LifeCurrent.Shield			)	{	if( 0 == --TurnsLeftPoints.LifeCurrent.Shield			)	Points	.LifeCurrent	.Shield		= 0										;} else if( 0 > TurnsLeftPoints.LifeCurrent.Shield				)	{	if( 0 == ++TurnsLeftPoints.LifeCurrent.Shield			)	Points.LifeCurrent.Shield			= 0;	}
+			if( 0 < TurnsLeftPoints.Coins						)	{	if( 0 == --TurnsLeftPoints.Coins						)	Points	.Coins						= 0										;} else if( 0 > TurnsLeftPoints.Coins							)	{	if( 0 == ++TurnsLeftPoints.Coins						)	Points.Coins						= 0;	}
+			if( 0 < TurnsLeftFlags.Effect.Passive				)	{	if( 0 == --TurnsLeftFlags.Effect	.Passive			)	Flags	.Effect			.Passive	= PASSIVE_EFFECT_NONE					;} else if( 0 > TurnsLeftFlags.Effect	.Passive				)	{	if( 0 == ++TurnsLeftFlags.Effect	.Passive	)	Flags.Effect	.Passive	= PASSIVE_EFFECT_NONE		;	}
 		}
 
 		// Player turn (round)
 								void							NextRound						()														{
-			if( 0 < TurnsLeftPoints.Attack.Hit					)	{	if( 0 == --TurnsLeftPoints.Attack.Hit					)	Points	.Attack			.Hit					= 0							;} else if( 0 > TurnsLeftPoints.Attack.Hit						)	{	if( 0 == ++TurnsLeftPoints.Attack.Hit					)	Points.Attack.Hit					= 0;	} 
-			if( 0 < TurnsLeftPoints.Attack.Damage				)	{	if( 0 == --TurnsLeftPoints.Attack.Damage				)	Points	.Attack			.Damage					= 0							;} else if( 0 > TurnsLeftPoints.Attack.Damage					)	{	if( 0 == ++TurnsLeftPoints.Attack.Damage				)	Points.Attack.Damage				= 0;	} 
-			if( 0 < TurnsLeftPoints.Fitness.Attack				)	{	if( 0 == --TurnsLeftPoints.Fitness.Attack				)	Points	.Fitness		.Attack					= 0							;} else if( 0 > TurnsLeftPoints.Fitness.Attack					)	{	if( 0 == ++TurnsLeftPoints.Fitness.Attack				)	Points.Fitness.Attack				= 0;	} 
-			if( 0 < TurnsLeftPoints.Fitness.Movement			)	{	if( 0 == --TurnsLeftPoints.Fitness.Movement				)	Points	.Fitness		.Movement				= 0							;} else if( 0 > TurnsLeftPoints.Fitness.Movement				)	{	if( 0 == ++TurnsLeftPoints.Fitness.Movement				)	Points.Fitness.Movement				= 0;	} 
-			if( 0 < TurnsLeftPoints.Fitness.Sight				)	{	if( 0 == --TurnsLeftPoints.Fitness.Sight				)	Points	.Fitness		.Sight					= 0							;} else if( 0 > TurnsLeftPoints.Fitness.Sight					)	{	if( 0 == ++TurnsLeftPoints.Fitness.Sight				)	Points.Fitness.Sight				= 0;	} 
-			if( 0 < TurnsLeftPoints.Attack.Range				)	{	if( 0 == --TurnsLeftPoints.Attack.Range					)	Points	.Attack			.Range					= 0							;} else if( 0 > TurnsLeftPoints.Attack.Range					)	{	if( 0 == ++TurnsLeftPoints.Attack.Range					)	Points.Attack.Range					= 0;	} 
-			if( 0 < TurnsLeftPoints.Attack.DirectDamage.Health	)	{	if( 0 == --TurnsLeftPoints.Attack.DirectDamage.Health	)	Points	.Attack			.DirectDamage.Health	= 0							;} else if( 0 > TurnsLeftPoints.Attack.DirectDamage.Health		)	{	if( 0 == ++TurnsLeftPoints.Attack.DirectDamage.Health	)	Points.Attack.DirectDamage.Health	= 0;	} 
-			if( 0 < TurnsLeftPoints.Attack.DirectDamage.Mana	)	{	if( 0 == --TurnsLeftPoints.Attack.DirectDamage.Mana		)	Points	.Attack			.DirectDamage.Mana		= 0							;} else if( 0 > TurnsLeftPoints.Attack.DirectDamage.Mana		)	{	if( 0 == ++TurnsLeftPoints.Attack.DirectDamage.Mana		)	Points.Attack.DirectDamage.Mana		= 0;	} 
-			if( 0 < TurnsLeftPoints.Attack.DirectDamage.Shield	)	{	if( 0 == --TurnsLeftPoints.Attack.DirectDamage.Shield	)	Points	.Attack			.DirectDamage.Shield	= 0							;} else if( 0 > TurnsLeftPoints.Attack.DirectDamage.Shield		)	{	if( 0 == ++TurnsLeftPoints.Attack.DirectDamage.Shield	)	Points.Attack.DirectDamage.Shield	= 0;	} 
-			if( 0 < TurnsLeftFlags.Effect.Attack				)	{	if( 0 == --TurnsLeftFlags.Effect	.Attack				)	Flags	.Effect			.Attack					= ATTACK_EFFECT_NONE		;} else if( 0 > TurnsLeftFlags.Effect	.Attack					)	{	if( 0 == ++TurnsLeftFlags.Effect	.Attack		)	Flags.Effect	.Attack		= ATTACK_EFFECT_NONE		;	} 
-			if( 0 < TurnsLeftFlags.Status.Inflict				)	{	if( 0 == --TurnsLeftFlags.Status	.Inflict			)	Flags	.Status			.Inflict				= COMBAT_STATUS_NONE		;} else if( 0 > TurnsLeftFlags.Status	.Inflict				)	{	if( 0 == ++TurnsLeftFlags.Status	.Inflict	)	Flags.Status	.Inflict	= COMBAT_STATUS_NONE		;	} 
-			if( 0 < TurnsLeftFlags.Tech.Tech					)	{	if( 0 == --TurnsLeftFlags.Tech.Tech						)	Flags	.Tech			.Tech					= ENTITY_TECHNOLOGY_UNKNOWN	;} else if( 0 > TurnsLeftFlags.Tech		.Tech					)	{	if( 0 == ++TurnsLeftFlags.Tech		.Tech		)	Flags.Tech		.Tech		= ENTITY_TECHNOLOGY_UNKNOWN	;	} 
-			if( 0 < TurnsLeftFlags.Tech.Grade					)	{	if( 0 == --TurnsLeftFlags.Tech.Grade					)	Flags	.Tech			.Grade					= ENTITY_GRADE_ILLUSION		;} else if( 0 > TurnsLeftFlags.Tech		.Grade					)	{	if( 0 == ++TurnsLeftFlags.Tech		.Grade		)	Flags.Tech		.Grade		= ENTITY_GRADE_ILLUSION		;	} 
+			if( 0 < TurnsLeftPoints.Attack.Hit					)	{	if( 0 == --TurnsLeftPoints.Attack.Hit					)	Points	.Attack			.Hit					= 0							;} else if( 0 > TurnsLeftPoints.Attack.Hit						)	{	if( 0 == ++TurnsLeftPoints.Attack.Hit					)	Points.Attack.Hit					= 0;	}
+			if( 0 < TurnsLeftPoints.Attack.Damage				)	{	if( 0 == --TurnsLeftPoints.Attack.Damage				)	Points	.Attack			.Damage					= 0							;} else if( 0 > TurnsLeftPoints.Attack.Damage					)	{	if( 0 == ++TurnsLeftPoints.Attack.Damage				)	Points.Attack.Damage				= 0;	}
+			if( 0 < TurnsLeftPoints.Fitness.Attack				)	{	if( 0 == --TurnsLeftPoints.Fitness.Attack				)	Points	.Fitness		.Attack					= 0							;} else if( 0 > TurnsLeftPoints.Fitness.Attack					)	{	if( 0 == ++TurnsLeftPoints.Fitness.Attack				)	Points.Fitness.Attack				= 0;	}
+			if( 0 < TurnsLeftPoints.Fitness.Movement			)	{	if( 0 == --TurnsLeftPoints.Fitness.Movement				)	Points	.Fitness		.Movement				= 0							;} else if( 0 > TurnsLeftPoints.Fitness.Movement				)	{	if( 0 == ++TurnsLeftPoints.Fitness.Movement				)	Points.Fitness.Movement				= 0;	}
+			if( 0 < TurnsLeftPoints.Fitness.Sight				)	{	if( 0 == --TurnsLeftPoints.Fitness.Sight				)	Points	.Fitness		.Sight					= 0							;} else if( 0 > TurnsLeftPoints.Fitness.Sight					)	{	if( 0 == ++TurnsLeftPoints.Fitness.Sight				)	Points.Fitness.Sight				= 0;	}
+			if( 0 < TurnsLeftPoints.Attack.Range				)	{	if( 0 == --TurnsLeftPoints.Attack.Range					)	Points	.Attack			.Range					= 0							;} else if( 0 > TurnsLeftPoints.Attack.Range					)	{	if( 0 == ++TurnsLeftPoints.Attack.Range					)	Points.Attack.Range					= 0;	}
+			if( 0 < TurnsLeftPoints.Attack.DirectDamage.Health	)	{	if( 0 == --TurnsLeftPoints.Attack.DirectDamage.Health	)	Points	.Attack			.DirectDamage.Health	= 0							;} else if( 0 > TurnsLeftPoints.Attack.DirectDamage.Health		)	{	if( 0 == ++TurnsLeftPoints.Attack.DirectDamage.Health	)	Points.Attack.DirectDamage.Health	= 0;	}
+			if( 0 < TurnsLeftPoints.Attack.DirectDamage.Mana	)	{	if( 0 == --TurnsLeftPoints.Attack.DirectDamage.Mana		)	Points	.Attack			.DirectDamage.Mana		= 0							;} else if( 0 > TurnsLeftPoints.Attack.DirectDamage.Mana		)	{	if( 0 == ++TurnsLeftPoints.Attack.DirectDamage.Mana		)	Points.Attack.DirectDamage.Mana		= 0;	}
+			if( 0 < TurnsLeftPoints.Attack.DirectDamage.Shield	)	{	if( 0 == --TurnsLeftPoints.Attack.DirectDamage.Shield	)	Points	.Attack			.DirectDamage.Shield	= 0							;} else if( 0 > TurnsLeftPoints.Attack.DirectDamage.Shield		)	{	if( 0 == ++TurnsLeftPoints.Attack.DirectDamage.Shield	)	Points.Attack.DirectDamage.Shield	= 0;	}
+			if( 0 < TurnsLeftFlags.Effect.Attack				)	{	if( 0 == --TurnsLeftFlags.Effect	.Attack				)	Flags	.Effect			.Attack					= ATTACK_EFFECT_NONE		;} else if( 0 > TurnsLeftFlags.Effect	.Attack					)	{	if( 0 == ++TurnsLeftFlags.Effect	.Attack		)	Flags.Effect	.Attack		= ATTACK_EFFECT_NONE		;	}
+			if( 0 < TurnsLeftFlags.Status.Inflict				)	{	if( 0 == --TurnsLeftFlags.Status	.Inflict			)	Flags	.Status			.Inflict				= COMBAT_STATUS_NONE		;} else if( 0 > TurnsLeftFlags.Status	.Inflict				)	{	if( 0 == ++TurnsLeftFlags.Status	.Inflict	)	Flags.Status	.Inflict	= COMBAT_STATUS_NONE		;	}
+			if( 0 < TurnsLeftFlags.Tech.Tech					)	{	if( 0 == --TurnsLeftFlags.Tech.Tech						)	Flags	.Tech			.Tech					= ENTITY_TECHNOLOGY_UNKNOWN	;} else if( 0 > TurnsLeftFlags.Tech		.Tech					)	{	if( 0 == ++TurnsLeftFlags.Tech		.Tech		)	Flags.Tech		.Tech		= ENTITY_TECHNOLOGY_UNKNOWN	;	}
+			if( 0 < TurnsLeftFlags.Tech.Grade					)	{	if( 0 == --TurnsLeftFlags.Tech.Grade					)	Flags	.Tech			.Grade					= ENTITY_GRADE_ILLUSION		;} else if( 0 > TurnsLeftFlags.Tech		.Grade					)	{	if( 0 == ++TurnsLeftFlags.Tech		.Grade		)	Flags.Tech		.Grade		= ENTITY_GRADE_ILLUSION		;	}
 		}
 
 		// Enemy turn
 								void							NextEnemyTurn					()														{
-			if( 0 < TurnsLeftPoints.Attack	.Absorption			)	{	if( 0 == --TurnsLeftPoints.Attack	.Absorption			)	Points	.Attack			.Absorption				= 0							;} else if( 0 > TurnsLeftPoints.Attack.Absorption				)	{	if( 0 == ++TurnsLeftPoints.Attack.Absorption	)	Points.Attack.Absorption			= 0;	} 
-			if( 0 < TurnsLeftPoints.Fitness	.Reflexes			)	{	if( 0 == --TurnsLeftPoints.Fitness	.Reflexes			)	Points	.Fitness		.Reflexes				= 0							;} else if( 0 > TurnsLeftPoints.Fitness.Reflexes					)	{	if( 0 == ++TurnsLeftPoints.Fitness.Reflexes		)	Points.Fitness.Reflexes				= 0;	} 
-			if( 0 < TurnsLeftFlags.Effect	.Defend				)	{	if( 0 == --TurnsLeftFlags.Effect	.Defend				)	Flags	.Effect			.Defend					= DEFEND_EFFECT_NONE		;} else if( 0 > TurnsLeftFlags.Effect	.Defend					)	{	if( 0 == ++TurnsLeftFlags.Effect	.Defend		)	Flags.Effect	.Defend		= DEFEND_EFFECT_NONE		;	} 
-			if( 0 < TurnsLeftFlags.Status	.Immunity			)	{	if( 0 == --TurnsLeftFlags.Status	.Immunity			)	Flags	.Status			.Immunity				= COMBAT_STATUS_NONE		;} else if( 0 > TurnsLeftFlags.Status	.Immunity				)	{	if( 0 == ++TurnsLeftFlags.Status	.Immunity	)	Flags.Status	.Immunity	= COMBAT_STATUS_NONE		;	} 
+			if( 0 < TurnsLeftPoints.Attack	.Absorption			)	{	if( 0 == --TurnsLeftPoints.Attack	.Absorption			)	Points	.Attack			.Absorption				= 0							;} else if( 0 > TurnsLeftPoints.Attack.Absorption				)	{	if( 0 == ++TurnsLeftPoints.Attack.Absorption	)	Points.Attack.Absorption			= 0;	}
+			if( 0 < TurnsLeftPoints.Fitness	.Reflexes			)	{	if( 0 == --TurnsLeftPoints.Fitness	.Reflexes			)	Points	.Fitness		.Reflexes				= 0							;} else if( 0 > TurnsLeftPoints.Fitness.Reflexes					)	{	if( 0 == ++TurnsLeftPoints.Fitness.Reflexes		)	Points.Fitness.Reflexes				= 0;	}
+			if( 0 < TurnsLeftFlags.Effect	.Defend				)	{	if( 0 == --TurnsLeftFlags.Effect	.Defend				)	Flags	.Effect			.Defend					= DEFEND_EFFECT_NONE		;} else if( 0 > TurnsLeftFlags.Effect	.Defend					)	{	if( 0 == ++TurnsLeftFlags.Effect	.Defend		)	Flags.Effect	.Defend		= DEFEND_EFFECT_NONE		;	}
+			if( 0 < TurnsLeftFlags.Status	.Immunity			)	{	if( 0 == --TurnsLeftFlags.Status	.Immunity			)	Flags	.Status			.Immunity				= COMBAT_STATUS_NONE		;} else if( 0 > TurnsLeftFlags.Status	.Immunity				)	{	if( 0 == ++TurnsLeftFlags.Status	.Immunity	)	Flags.Status	.Immunity	= COMBAT_STATUS_NONE		;	}
 		}
 	};
 
@@ -241,66 +237,85 @@ namespace klib
 								SCombatStatus					Status							= SCombatStatus	();
 	};
 
-	template<typename _TEntity>
+	template<typename _tEntity>
 	struct SEquip {
-		typedef					_TEntity						TEntity;
+		typedef					_tEntity						TEntity;
 
 								TEntity							Entity							= SEntity		();
-								SEntityPoints					Points							= SEntityPoints	();	
-								SEntityFlags					Flags							= SEntityFlags	();	
+								SEntityPoints					Points							= SEntityPoints	();
+								SEntityFlags					Flags							= SEntityFlags	();
 
-								SEntityPoints					FinalPoints						= SEntityPoints	();	
-								SEntityFlags					FinalFlags						= SEntityFlags	();	
+								SEntityPoints					FinalPoints						= SEntityPoints	();
+								SEntityFlags					FinalFlags						= SEntityFlags	();
 
 								SCharacterTurnBonus				ActiveBonus						= SCharacterTurnBonus();
 
-		template<size_t _SizeDefinitions, size_t _SizeModifiers>
-								void							RecalculateFinalPoints	
-			(	const SEntityRecord<TEntity> (&entityDefinitions)[_SizeDefinitions	]
-			,	const SEntityRecord<TEntity> (&entityModifiers	)[_SizeModifiers	]
-			)
-		{
-			const SEntityPoints											weaponPoints					= klib::getEntityPoints(Entity, entityDefinitions, entityModifiers);
+								void							RecalculateFinalPoints			(const ::klib::SEntityTable<TEntity> & table)				noexcept		{
+			const SEntityPoints											weaponPoints					= ::klib::getEntityPoints(Entity, table);
 			const SEntityPoints											& bonusPoints					= ActiveBonus.Points.Points;
 
-			// Currently, SEntityPoints::Coins and SEntityPoints::LifeCurrent values of the equipment are used in a different 
+			// Currently, SEntityPoints::Coins and SEntityPoints::LifeCurrent values of the equipment are used in a different
 			// way from the character's points so we avoid adding the character points to the result for these two.
 			SEntityPoints												result							= bonusPoints + weaponPoints; // + facilityPoints + vehiclePoints;
 
-			result.LifeMax											= result.LifeMax			+ Points.LifeMax;	// 
-			result.Attack											= result.Attack				+ Points.Attack;	// 
-			result.Fitness											= result.Fitness			+ Points.Fitness;	// 
-			result.PriceBuy											= result.PriceBuy			+ Points.PriceBuy;	// 
-			result.CostMaintenance									= result.CostMaintenance	+ Points.CostMaintenance;	// 
+			result.LifeMax											= result.LifeMax			+ Points.LifeMax;	//
+			result.Attack											= result.Attack				+ Points.Attack;	//
+			result.Fitness											= result.Fitness			+ Points.Fitness;	//
+			result.PriceBuy											= result.PriceBuy			+ Points.PriceBuy;	//
+			result.CostMaintenance									= result.CostMaintenance	+ Points.CostMaintenance;	//
 
 			FinalPoints												= result;
 		}
-
-		template<size_t _SizeDefinitions, size_t _SizeModifiers>
-								void							RecalculateFinalFlags	
-			( const SEntityRecord<TEntity> (&entityDefinitions	)[_SizeDefinitions	]
-			, const SEntityRecord<TEntity> (&entityModifiers	)[_SizeModifiers	]
-			)
-		{
-			const SEntityFlags											weaponFlags						= klib::getEntityFlags(Entity, entityDefinitions, entityModifiers);
+								void							RecalculateFinalFlags			(const ::klib::SEntityTable<TEntity> & table)				noexcept		{
+			const SEntityFlags											weaponFlags						= ::klib::getEntityFlags(Entity, table);
 			const SEntityFlags											& bonusFlags					= ActiveBonus.Points.Flags;
 			FinalFlags												= bonusFlags | weaponFlags | Flags;
 		}
-		
-		template<size_t _SizeDefinitions, size_t _SizeModifiers>
-								void							Recalculate
-			(	const SEntityRecord<TEntity> (&entityDefinitions)[_SizeDefinitions	]
-			,	const SEntityRecord<TEntity> (&entityModifiers	)[_SizeModifiers	] 
-			)
-		{
-			RecalculateFinalPoints	(entityDefinitions, entityModifiers);
-			RecalculateFinalFlags	(entityDefinitions, entityModifiers);
+								void							Recalculate						(const ::klib::SEntityTable<TEntity> & table)				noexcept		{
+			RecalculateFinalPoints	(table);
+			RecalculateFinalFlags	(table);
 		}
 	};
 
 
-
+	template<typename _tEntity>
+	static inline	constexpr int32_t getArmorAbsorption(const ::klib::SEntityTable<_tEntity> & table, const SArmor& armor) {
+		return	(int32_t)((table.Definitions[armor.Definition].Points.Attack.Absorption + table.Modifiers[armor.Modifier].Points.Attack.Absorption) * armor.Level);
+	}
 #pragma pack(pop)
+
+	struct SLogLine {
+							uint16_t								Color;
+							const ::gpk::array_pod<char_t>			Message;
+	};
+	struct SGameMessages {
+							char									Aux		[4096]					= {};
+							::gpk::array_pod<char_t>				UserMessage						= "";
+							::gpk::array_pod<char_t>				UserSuccess						= "";
+							::gpk::array_pod<char_t>				UserMiss						= "";
+							::gpk::array_pod<char_t>				UserError						= "";
+							::gpk::array_pod<char_t>				StateMessage					= "";
+							::gpk::array_obj<SLogLine>				UserLog							= {};
+							void									ClearMessages					()	{
+			UserError	.clear();
+			UserMessage	.clear();
+			UserMiss	.clear();
+			UserSuccess	.clear();
+			StateMessage.clear();
+		}
+
+							void									LogStateMessage					()																						{ StateMessage	.push_back(0); UserLog.push_back({::gpk::ASCII_COLOR_CYAN	, StateMessage	});StateMessage	[0] = 0; StateMessage	.clear(); }
+							void									LogMessage						()																						{ UserMessage	.push_back(0); UserLog.push_back({::gpk::ASCII_COLOR_YELLOW	, UserMessage	});UserMessage	[0] = 0; UserMessage	.clear(); }
+							void									LogSuccess						()																						{ UserSuccess	.push_back(0); UserLog.push_back({::gpk::ASCII_COLOR_CYAN	, UserSuccess	});UserSuccess	[0] = 0; UserSuccess	.clear(); }
+							void									LogError						()																						{ UserError		.push_back(0); UserLog.push_back({::gpk::ASCII_COLOR_RED	, UserError		});UserError	[0] = 0; UserError		.clear(); }
+							void									LogMiss							()																						{ UserMiss		.push_back(0); UserLog.push_back({::gpk::ASCII_COLOR_RED	, UserMiss		});UserMiss		[0] = 0; UserMiss		.clear(); }
+							void									LogAuxStateMessage				()																						{ if(0 == Aux[0]) return; UserLog.push_back({::gpk::ASCII_COLOR_CYAN	, ::gpk::view_const_string{Aux}}); Aux[0] = 0; }
+							void									LogAuxMessage					()																						{ if(0 == Aux[0]) return; UserLog.push_back({::gpk::ASCII_COLOR_YELLOW	, ::gpk::view_const_string{Aux}}); Aux[0] = 0; }
+							void									LogAuxSuccess					()																						{ if(0 == Aux[0]) return; UserLog.push_back({::gpk::ASCII_COLOR_CYAN	, ::gpk::view_const_string{Aux}}); Aux[0] = 0; }
+							void									LogAuxError						()																						{ if(0 == Aux[0]) return; UserLog.push_back({::gpk::ASCII_COLOR_RED		, ::gpk::view_const_string{Aux}}); Aux[0] = 0; }
+							void									LogAuxMiss						()																						{ if(0 == Aux[0]) return; UserLog.push_back({::gpk::ASCII_COLOR_RED		, ::gpk::view_const_string{Aux}}); Aux[0] = 0; }
+	};
+
 } // namespace
 
 #endif //__ENTITYIMPL_H__928374092634923746298374__

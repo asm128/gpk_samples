@@ -19,7 +19,7 @@ bool																	handleUserInput									(SGame& instanceGame, const SGameSt
 	STacticalInfo																& tacticalInfo									= instanceGame.TacticalInfo;
 	//SPlayer																	& playerUser									= instanceGame.Players[PLAYER_INDEX_USER];
 	SPlayer																		& currentPlayer									= instanceGame.Players[tacticalInfo.Setup.Players[tacticalInfo.CurrentPlayer]];
-	SPlayerSelection															& playerSelection								= currentPlayer.Selection;
+	SPlayerSelection															& playerSelection								= currentPlayer.Tactical.Selection;
 	const bool																	bDoneWaiting									= keyAccum.Accumulate(instanceGame.FrameTimer.LastTimeSeconds) > 0.0;
 	if(instanceGame.FrameInput.Keys[VK_TAB] && bDoneWaiting) {
 		//if(playerSelection.PlayerUnit != -1 && currentPlayer.Squad.Agents[playerSelection.PlayerUnit] != -1) {
@@ -38,8 +38,8 @@ bool																	handleUserInput									(SGame& instanceGame, const SGameSt
 		}
 		if(playerSelection.TargetPlayer != -1 && playerSelection.TargetUnit != -1) {
 			SPlayer																		& playerTarget									= instanceGame.Players[tacticalInfo.Setup.Players[playerSelection.TargetPlayer]];
-			if(playerTarget.Squad.Agents[playerSelection.TargetUnit] != -1)
-				currentPlayer.Squad.TargetPositions[playerSelection.PlayerUnit]			= playerTarget.Army[playerTarget.Squad.Agents[playerSelection.TargetUnit]]->Position;
+			if(playerTarget.Tactical.Squad.Agents[playerSelection.TargetUnit] != -1)
+				currentPlayer.Tactical.Squad.TargetPositions[playerSelection.PlayerUnit]			= playerTarget.Tactical.Army[playerTarget.Tactical.Squad.Agents[playerSelection.TargetUnit]]->Position;
 			else
 				playerSelection.ClearTarget();
 		}
@@ -49,7 +49,7 @@ bool																	handleUserInput									(SGame& instanceGame, const SGameSt
 		int32_t																		mouseX											= instanceGame.FrameInput.Mouse.Deltas.x;
 		int32_t																		mouseY											= instanceGame.FrameInput.Mouse.Deltas.y;
 
-		::klib::SWeightedDisplay														& globalDisplay									= instanceGame.GlobalDisplay;
+		::klib::SWeightedDisplay													& globalDisplay									= instanceGame.GlobalDisplay;
 		::klib::STacticalDisplay													& tacticalDisplay								= instanceGame.TacticalDisplay;
 		int32_t																		tacticalDisplayX								= (globalDisplay.Screen.metrics().x >> 1)	- (tacticalDisplay.Screen.metrics().x >> 1);
 		//int32_t																		tacticalDisplayStop								= TACTICAL_DISPLAY_POSY		+ (tacticalDisplay.Depth);
@@ -68,21 +68,21 @@ bool																	handleUserInput									(SGame& instanceGame, const SGameSt
 
 		STacticalBoard																& tacticalBoard									= tacticalInfo.Board;
 
-		if(playerSelection.PlayerUnit != -1 && currentPlayer.Squad.Agents[playerSelection.PlayerUnit] != -1) {
-			CCharacter																	& currentAgent									= *currentPlayer.Army[currentPlayer.Squad.Agents[playerSelection.PlayerUnit]];
+		if(playerSelection.PlayerUnit != -1 && currentPlayer.Tactical.Squad.Agents[playerSelection.PlayerUnit] != -1) {
+			CCharacter																	& currentAgent									= *currentPlayer.Tactical.Army[currentPlayer.Tactical.Squad.Agents[playerSelection.PlayerUnit]];
 			const ::gpk::SCoord3<int32_t>												& currentAgentPosition							= currentAgent.Position;
 			int32_t																		targetPlayerIndex								= tacticalBoard.Tiles.Entities.Agents[tacticalMouseY][tacticalMouseX].PlayerIndex;
 			int32_t																		agentIndex										= tacticalBoard.Tiles.Entities.Agents[tacticalMouseY][tacticalMouseX].AgentIndex;
 			if(0 != instanceGame.FrameInput.Mouse.Buttons[0]) {// || 0 != instanceGame.FrameInput.MouseButtons[4])
-				currentPlayer.Squad.TargetPositions[playerSelection.PlayerUnit]			= {tacticalMouseX, currentAgentPosition.y, tacticalMouseY};
+				currentPlayer.Tactical.Squad.TargetPositions[playerSelection.PlayerUnit]			= {tacticalMouseX, currentAgentPosition.y, tacticalMouseY};
 				if(	targetPlayerIndex != -1 && agentIndex != -1 ) {
-					if(targetPlayerIndex == tacticalInfo.CurrentPlayer && currentPlayer.Army[currentPlayer.Squad.Agents[agentIndex]]->IsAlive() && false == currentPlayer.Army[currentPlayer.Squad.Agents[agentIndex]]->DidLoseTurn() && (0 == instanceGame.FrameInput.Keys[VK_CONTROL] && 0 == instanceGame.FrameInput.Keys[VK_LCONTROL])) {
+					if(targetPlayerIndex == tacticalInfo.CurrentPlayer && currentPlayer.Tactical.Army[currentPlayer.Tactical.Squad.Agents[agentIndex]]->IsAlive() && false == currentPlayer.Tactical.Army[currentPlayer.Tactical.Squad.Agents[agentIndex]]->DidLoseTurn() && (0 == instanceGame.FrameInput.Keys[VK_CONTROL] && 0 == instanceGame.FrameInput.Keys[VK_LCONTROL])) {
 						playerSelection.PlayerUnit												= (int16_t)agentIndex;
 						playerSelection.PlayerSquad												= 0;
 						if(playerSelection.TargetPlayer != -1 && playerSelection.TargetUnit != -1) {
 							SPlayer																		& playerTarget										= instanceGame.Players[tacticalInfo.Setup.Players[playerSelection.TargetPlayer]];
-							if(playerTarget.Squad.Agents[playerSelection.TargetUnit] != -1)
-								currentPlayer.Squad.TargetPositions[playerSelection.PlayerUnit]			= playerTarget.Army[playerTarget.Squad.Agents[playerSelection.TargetUnit]]->Position;
+							if(playerTarget.Tactical.Squad.Agents[playerSelection.TargetUnit] != -1)
+								currentPlayer.Tactical.Squad.TargetPositions[playerSelection.PlayerUnit]			= playerTarget.Tactical.Army[playerTarget.Tactical.Squad.Agents[playerSelection.TargetUnit]]->Position;
 							else
 								playerSelection.ClearTarget();
 						}
@@ -91,12 +91,12 @@ bool																	handleUserInput									(SGame& instanceGame, const SGameSt
 						playerSelection.TargetPlayer											= (int16_t)targetPlayerIndex;
 						playerSelection.TargetSquad												= 0;
 						playerSelection.TargetUnit												= (int16_t)agentIndex;
-						currentPlayer.Squad.TargetPositions[playerSelection.PlayerUnit]			= {tacticalMouseX, currentAgentPosition.y, tacticalMouseY};
+						currentPlayer.Tactical.Squad.TargetPositions[playerSelection.PlayerUnit]			= {tacticalMouseX, currentAgentPosition.y, tacticalMouseY};
 					}
 				}
 				else {
 					playerSelection.ClearTarget();
-					currentPlayer.Squad.TargetPositions[playerSelection.PlayerUnit]			= {tacticalMouseX, currentAgentPosition.y, tacticalMouseY};
+					currentPlayer.Tactical.Squad.TargetPositions[playerSelection.PlayerUnit]			= {tacticalMouseX, currentAgentPosition.y, tacticalMouseY};
 				}
 			}
 		}
@@ -113,8 +113,8 @@ void																	drawTileInfo
 	,	STacticalDisplay				& tacticalDisplay
 	)
 {
-	static	std::string															selectedTile									= "";
-	static	char																messageSlow		[256]							= {'_',};
+	static	::gpk::array_pod<char_t>											selectedTile									= "";
+	static	::klib::SMessageSlow												messageSlow										= {};
 	static	uint16_t															messageColor									= COLOR_DARKGREEN;
 
 	int32_t																		tacticalDisplayStop								= TACTICAL_DISPLAY_POSY + (tacticalDisplay.Screen.metrics().y);
@@ -138,24 +138,27 @@ void																	drawTileInfo
 
 		if(playerIndex	!= -1 && agentIndex != -1 && tacticalInfo.Setup.Players[playerIndex] != -1) {
 			const SPlayer																& boardPlayer									= instanceGame.Players[tacticalInfo.Setup.Players[playerIndex]];
-			bool																		bDarken											= !	( boardPlayer.Control.Type == PLAYER_CONTROL_AI
-																																		 && ( (boardPlayer.Control.AIMode == PLAYER_AI_ASSISTS)
-																																		   || (boardPlayer.Control.AIMode == PLAYER_AI_RIOTERS)
-																																		   || (boardPlayer.Control.AIMode == PLAYER_AI_VIOLENT)
+			bool																		bDarken											= !	( boardPlayer.Tactical.Control.Type == PLAYER_CONTROL_AI
+																																		 && ( (boardPlayer.Tactical.Control.AIMode == PLAYER_AI_ASSISTS)
+																																		   || (boardPlayer.Tactical.Control.AIMode == PLAYER_AI_RIOTERS)
+																																		   || (boardPlayer.Tactical.Control.AIMode == PLAYER_AI_VIOLENT)
 																																			)
 																																		);
 			messageColor															= getPlayerColor(tacticalInfo, boardPlayer, (int8_t)playerIndex, PLAYER_INDEX_USER, bDarken);
 
-			selectedTile															= boardPlayer.Army[boardPlayer.Squad.Agents[agentIndex]]->Name;
+			selectedTile															= boardPlayer.Tactical.Army[boardPlayer.Tactical.Squad.Agents[agentIndex]]->Name;
 			bDrawText																= true;
 		}
 		else if(tacticalInfo.Board.Tiles.Entities.Coins[boardZ][boardX]) {
-			selectedTile															= "Coins: " + std::to_string(tacticalInfo.Board.Tiles.Entities.Coins[boardZ][boardX]);
+			selectedTile = ::gpk::view_const_string{"Coins: "};
+			char																		tileString	[64];
+			sprintf_s(tileString, "%lli", tacticalInfo.Board.Tiles.Entities.Coins[boardZ][boardX]);
+			selectedTile.append_string(tileString);
 			messageColor															= COLOR_ORANGE;
 			bDrawText																= true;
 		}
 		else if(tacticalInfo.Board.Tiles.Entities.Props[boardZ][boardX].Definition != -1) {
-			::std::string																stagePropName									= getStagePropName(
+			::gpk::array_pod<char_t>													stagePropName									= getEntityName(instanceGame.EntityTables.StageProp,
 				{	tacticalInfo.Board.Tiles.Entities.Props[boardZ][boardX].Definition
 				,	tacticalInfo.Board.Tiles.Entities.Props[boardZ][boardX].Modifier
 				,	tacticalInfo.Board.Tiles.Entities.Props[boardZ][boardX].Level
@@ -163,7 +166,7 @@ void																	drawTileInfo
 				});
 			selectedTile															= stagePropName;
 			if(tacticalInfo.Board.Tiles.Entities.Props[boardZ][boardX].Level == -1)
-				selectedTile															+= " (Destroyed)";
+				selectedTile.append_string(" (Destroyed)");
 			messageColor															= COLOR_DARKGREY;
 			bDrawText																= true;
 		}
@@ -209,11 +212,11 @@ void																	drawTileInfo
 			//	bDrawText																= true;
 			//}
 		}
-		::klib::getMessageSlow(messageSlow, selectedTile.c_str(), (uint32_t)selectedTile.size(), instanceGame.FrameTimer.LastTimeSeconds*4);
+		::klib::getMessageSlow(messageSlow, selectedTile, instanceGame.FrameTimer.LastTimeSeconds * 4);
 	}
 
 	if(bDrawText)
-		::klib::lineToGridColored(globalDisplay.Screen, globalDisplay.TextAttributes, messageColor, tacticalDisplayStop + 3, 0, ::klib::SCREEN_CENTER, messageSlow);
+		::klib::lineToGridColored(globalDisplay.Screen, globalDisplay.TextAttributes, messageColor, tacticalDisplayStop + 3, 0, ::klib::SCREEN_CENTER, messageSlow.Message);
 
 	::klib::printfToGridColored(globalDisplay.Screen.View, globalDisplay.TextAttributes, bInTacticalMap ? messageColor : COLOR_DARKGREY, tacticalDisplayStop+3, tacticalDisplayX	+1, ::klib::SCREEN_LEFT, "%i, %i", mouseX-tacticalDisplayX, mouseY-TACTICAL_DISPLAY_POSY);
 }
@@ -228,7 +231,7 @@ void																	drawPlayerInfo									(SGame& instanceGame)															
 		bSwap																	= !bSwap;
 		animationAccum.Value													= 0;
 	}
-	SWeightedDisplay																& globalDisplay									= instanceGame.GlobalDisplay;
+	SWeightedDisplay															& globalDisplay									= instanceGame.GlobalDisplay;
 	STacticalDisplay															& tacticalDisplay								= instanceGame.TacticalDisplay;
 	const int32_t																tacticalDisplayStop								= TACTICAL_DISPLAY_POSY						+ (tacticalDisplay.Screen.metrics().y);
 	const int32_t																tacticalDisplayX								= (globalDisplay.Screen.metrics().x >> 1)	- (tacticalDisplay.Screen.metrics().x >> 1);
@@ -241,107 +244,122 @@ void																	drawPlayerInfo									(SGame& instanceGame)															
 #define PLAYER_INFO_POSY 1
 
 	uint16_t																	messageColor									= COLOR_DARKGREEN;
-	::std::string																selectionText									= "";
+	::gpk::array_pod<char_t>													selectionText									= {};
 	SPlayer&																	currentPlayer									= instanceGame.Players[currentPlayerIndex];
-	if( currentPlayer.Selection.PlayerUnit != -1
-	 && currentPlayer.Squad.Agents[currentPlayer.Selection.PlayerUnit] != -1
-	 && currentPlayer.Army[currentPlayer.Squad.Agents[currentPlayer.Selection.PlayerUnit]]->IsAlive()
+	const int32_t																selectionPlayerUnit								= currentPlayer.Tactical.Selection.PlayerUnit;
+	if( selectionPlayerUnit != -1
+	 && currentPlayer.Tactical.Squad.Agents[selectionPlayerUnit] != -1
+	 && currentPlayer.Tactical.Army[currentPlayer.Tactical.Squad.Agents[selectionPlayerUnit]]->IsAlive()
 	 )
 	{
-		bool																		bDarken											= !	( currentPlayer.Control.Type == PLAYER_CONTROL_AI
-																																		 && ( (currentPlayer.Control.AIMode == PLAYER_AI_ASSISTS)
-																																		   || (currentPlayer.Control.AIMode == PLAYER_AI_RIOTERS)
-																																		   || (currentPlayer.Control.AIMode == PLAYER_AI_VIOLENT)
-																																			)
-																																		);
+		bool																		bDarken											= !	( currentPlayer.Tactical.Control.Type == PLAYER_CONTROL_AI
+																																	 && ( (currentPlayer.Tactical.Control.AIMode == PLAYER_AI_ASSISTS)
+																																	   || (currentPlayer.Tactical.Control.AIMode == PLAYER_AI_RIOTERS)
+																																	   || (currentPlayer.Tactical.Control.AIMode == PLAYER_AI_VIOLENT)
+																																		)
+																																	);
 		messageColor															= getPlayerColor(tacticalInfo, currentPlayer, tacticalInfo.CurrentPlayer, PLAYER_INDEX_USER, bDarken);
-		if(currentPlayer.Selection.PlayerUnit != -1 && currentPlayer.Squad.Agents[currentPlayer.Selection.PlayerUnit] != -1) {
-			CCharacter																	& playerAgent									= *currentPlayer.Army[currentPlayer.Squad.Agents[currentPlayer.Selection.PlayerUnit]];
-			displayDetailedAgentSlot	(globalDisplay.Screen, globalDisplay.TextAttributes, PLAYER_INFO_POSY, 4, playerAgent, messageColor);
+		if(selectionPlayerUnit != -1 && currentPlayer.Tactical.Squad.Agents[selectionPlayerUnit] != -1) {
+			CCharacter																	& playerAgent									= *currentPlayer.Tactical.Army[currentPlayer.Tactical.Squad.Agents[selectionPlayerUnit]];
+			displayDetailedAgentSlot	(instanceGame.EntityTables, globalDisplay.Screen, globalDisplay.TextAttributes, PLAYER_INFO_POSY, 4, playerAgent, messageColor);
 			displayStatusEffectsAndTechs(globalDisplay.Screen, globalDisplay.TextAttributes, PLAYER_INFO_POSY + 36, 4, playerAgent);
 		}
 
-		selectionText															= "Player name: "	+ ::std::string(currentPlayer.Name.begin());
-		lineToGridColored(globalDisplay.Screen, globalDisplay.TextAttributes, messageColor, 1, tacticalDisplayX+1, ::klib::SCREEN_LEFT, selectionText.c_str(), (uint32_t)selectionText.size());
-		selectionText															= "Agent name: "	+ currentPlayer.Army[currentPlayer.Squad.Agents[currentPlayer.Selection.PlayerUnit]]->Name;
-		lineToGridColored(globalDisplay.Screen, globalDisplay.TextAttributes, messageColor, 2, tacticalDisplayX+1, ::klib::SCREEN_LEFT, selectionText.c_str(), (uint32_t)selectionText.size());
-		selectionText															= "Moves left: " + std::to_string(currentPlayer.Squad.ActionsLeft[currentPlayer.Selection.PlayerUnit].Moves) + ". Actions left: " + std::to_string(currentPlayer.Squad.ActionsLeft[currentPlayer.Selection.PlayerUnit].Actions) + ".";
-		lineToGridColored(globalDisplay.Screen, globalDisplay.TextAttributes, messageColor, 3, tacticalDisplayX+1, ::klib::SCREEN_LEFT, selectionText.c_str(), (uint32_t)selectionText.size());
+		selectionText	= ::gpk::view_const_string{"Player name: "};	selectionText.append(currentPlayer.Tactical.Name);
+		lineToGridColored(globalDisplay.Screen, globalDisplay.TextAttributes, messageColor, 1, tacticalDisplayX+1, ::klib::SCREEN_LEFT, selectionText.begin(), (uint32_t)selectionText.size());
+		selectionText	= ::gpk::view_const_string{"Agent name: "};		selectionText.append(currentPlayer.Tactical.Army[currentPlayer.Tactical.Squad.Agents[selectionPlayerUnit]]->Name);
+		lineToGridColored(globalDisplay.Screen, globalDisplay.TextAttributes, messageColor, 2, tacticalDisplayX+1, ::klib::SCREEN_LEFT, selectionText.begin(), (uint32_t)selectionText.size());
+		selectionText															= ::gpk::view_const_string{"Moves left: "};
+		char				number[65];
+		sprintf_s(number, "%i", currentPlayer.Tactical.Squad.ActionsLeft[selectionPlayerUnit].Moves);
+		selectionText.append_string(number);
+		selectionText.append_string(". Actions left: ");
+		sprintf_s(number, "%i", currentPlayer.Tactical.Squad.ActionsLeft[selectionPlayerUnit].Actions);
+		selectionText.append_string(number);
+		selectionText.append_string(".");
+		lineToGridColored(globalDisplay.Screen, globalDisplay.TextAttributes, messageColor, 3, tacticalDisplayX + 1, ::klib::SCREEN_LEFT, selectionText.begin(), (uint32_t)selectionText.size());
 
-		int32_t																		selectionX										= currentPlayer.Squad.TargetPositions[currentPlayer.Selection.PlayerUnit].x;
-		int32_t																		selectionZ										= currentPlayer.Squad.TargetPositions[currentPlayer.Selection.PlayerUnit].z;
-		selectionText															= "Target Position: " + std::to_string(selectionX) + ", " + std::to_string(selectionZ);
-		lineToGridColored(globalDisplay.Screen, globalDisplay.TextAttributes, messageColor, 4, tacticalDisplayX+1, ::klib::SCREEN_LEFT, selectionText.c_str(), (uint32_t)selectionText.size());
+		int32_t																		selectionX										= currentPlayer.Tactical.Squad.TargetPositions[selectionPlayerUnit].x;
+		int32_t																		selectionZ										= currentPlayer.Tactical.Squad.TargetPositions[selectionPlayerUnit].z;
+		selectionText															= ::gpk::view_const_string{"Target Position: "};
+		sprintf_s(number, "%i", selectionX);
+		selectionText.append_string(number);
+		selectionText.append_string(", ");
+		sprintf_s(number, "%i", selectionZ);
+		selectionText.append_string(number);
+		lineToGridColored(globalDisplay.Screen, globalDisplay.TextAttributes, messageColor, 4, tacticalDisplayX+1, ::klib::SCREEN_LEFT, selectionText.begin(), (uint32_t)selectionText.size());
 
-		if(bSwap && currentPlayer.Squad.TargetPositions[currentPlayer.Selection.PlayerUnit] != currentPlayer.Army[currentPlayer.Squad.Agents[currentPlayer.Selection.PlayerUnit]]->Position) {
-			selectionText															= "-";
+		if(bSwap && currentPlayer.Tactical.Squad.TargetPositions[selectionPlayerUnit] != currentPlayer.Tactical.Army[currentPlayer.Tactical.Squad.Agents[selectionPlayerUnit]]->Position) {
+			selectionText															= ::gpk::view_const_string{"-"};
 			if(selectionX-1 >= 0)
-				lineToGridColored(tacticalDisplay.Screen	, tacticalDisplay.TextAttributes	, messageColor, selectionZ, selectionX-1, ::klib::SCREEN_LEFT, selectionText.c_str(), (uint32_t)selectionText.size());
+				lineToGridColored(tacticalDisplay.Screen	, tacticalDisplay.TextAttributes, messageColor, selectionZ, selectionX-1, ::klib::SCREEN_LEFT, selectionText.begin(), (uint32_t)selectionText.size());
 			if(selectionX + 1 < (int32_t)tacticalDisplay.Screen.metrics().x)
-				lineToGridColored(tacticalDisplay.Screen	, tacticalDisplay.TextAttributes	, messageColor, selectionZ, selectionX+1, ::klib::SCREEN_LEFT, selectionText.c_str(), (uint32_t)selectionText.size());
+				lineToGridColored(tacticalDisplay.Screen	, tacticalDisplay.TextAttributes, messageColor, selectionZ, selectionX+1, ::klib::SCREEN_LEFT, selectionText.begin(), (uint32_t)selectionText.size());
 
-			selectionText															= "|";
+			selectionText															= ::gpk::view_const_string{"|"};
 			if(selectionZ-1 >= 0)
-				lineToGridColored(tacticalDisplay.Screen	, tacticalDisplay.TextAttributes	, messageColor, selectionZ-1, selectionX, ::klib::SCREEN_LEFT, selectionText.c_str(), (uint32_t)selectionText.size());
+				lineToGridColored(tacticalDisplay.Screen	, tacticalDisplay.TextAttributes, messageColor, selectionZ-1, selectionX, ::klib::SCREEN_LEFT, selectionText.begin(), (uint32_t)selectionText.size());
 			if(selectionZ+1 < (int32_t)tacticalDisplay.Screen.metrics().y)
-				lineToGridColored(tacticalDisplay.Screen	, tacticalDisplay.TextAttributes	, messageColor, selectionZ+1, selectionX, ::klib::SCREEN_LEFT, selectionText.c_str(), (uint32_t)selectionText.size());
+				lineToGridColored(tacticalDisplay.Screen	, tacticalDisplay.TextAttributes, messageColor, selectionZ+1, selectionX, ::klib::SCREEN_LEFT, selectionText.begin(), (uint32_t)selectionText.size());
 		}
 	}
 
-	if(currentPlayer.Selection.TargetPlayer == -1 || tacticalInfo.Setup.Players[currentPlayer.Selection.TargetPlayer] == -1)
+	if(currentPlayer.Tactical.Selection.TargetPlayer == -1 || tacticalInfo.Setup.Players[currentPlayer.Tactical.Selection.TargetPlayer] == -1)
 		return;
 
-	SPlayer																		& currentTarget									= instanceGame.Players[tacticalInfo.Setup.Players[currentPlayer.Selection.TargetPlayer]];
-	bool																		bDarken											= !	( currentTarget.Control.Type == PLAYER_CONTROL_AI
-																																	&&	(	(currentTarget.Control.AIMode == PLAYER_AI_ASSISTS)
-																																		||	(currentTarget.Control.AIMode == PLAYER_AI_RIOTERS)
-																																		||	(currentTarget.Control.AIMode == PLAYER_AI_VIOLENT)
-																																		)
-																																	);
+	SPlayer																		& currentTarget									= instanceGame.Players[tacticalInfo.Setup.Players[currentPlayer.Tactical.Selection.TargetPlayer]];
+	bool																		bDarken											= !	( currentTarget.Tactical.Control.Type == PLAYER_CONTROL_AI
+																																&&	(	(currentTarget.Tactical.Control.AIMode == PLAYER_AI_ASSISTS)
+																																	||	(currentTarget.Tactical.Control.AIMode == PLAYER_AI_RIOTERS)
+																																	||	(currentTarget.Tactical.Control.AIMode == PLAYER_AI_VIOLENT)
+																																	)
+																																);
 
-	messageColor															= getPlayerColor(tacticalInfo, currentTarget, (int8_t)currentPlayer.Selection.TargetPlayer, PLAYER_INDEX_USER, bDarken);
+	messageColor															= getPlayerColor(tacticalInfo, currentTarget, (int8_t)currentPlayer.Tactical.Selection.TargetPlayer, PLAYER_INDEX_USER, bDarken);
 
-	selectionText															= std::string("Target player: ") + std::string(currentTarget.Name.begin());
-	lineToGridColored(globalDisplay.Screen, globalDisplay.TextAttributes, messageColor, 2, tacticalDisplayX+1, ::klib::SCREEN_RIGHT, selectionText.c_str());
+	selectionText															= ::gpk::view_const_string{"Target player: "};
+	selectionText.append(currentTarget.Tactical.Name);
+	lineToGridColored(globalDisplay.Screen, globalDisplay.TextAttributes, messageColor, 2, tacticalDisplayX+1, ::klib::SCREEN_RIGHT, selectionText.begin());
 
-	if( currentPlayer.Selection.TargetUnit == -1 || currentTarget.Squad.Agents[currentPlayer.Selection.TargetUnit] == -1 )
+	if( currentPlayer.Tactical.Selection.TargetUnit == -1 || currentTarget.Tactical.Squad.Agents[currentPlayer.Tactical.Selection.TargetUnit] == -1 )
 		return;
 
-	CCharacter																	& targetAgent									= *currentTarget.Army[currentTarget.Squad.Agents[currentPlayer.Selection.TargetUnit]];
+	CCharacter																	& targetAgent									= *currentTarget.Tactical.Army[currentTarget.Tactical.Squad.Agents[currentPlayer.Tactical.Selection.TargetUnit]];
 
 	int32_t																		agentX											= targetAgent.Position.x;
 	int32_t																		agentZ											= targetAgent.Position.z;
 	if(bSwap) {
 		selectionText															= "-";
 		if(agentX-1 >= 0)
-			lineToGridColored(tacticalDisplay.Screen	, tacticalDisplay.TextAttributes	, messageColor, agentZ, agentX-1, ::klib::SCREEN_LEFT, selectionText.c_str(), (uint32_t)selectionText.size());
+			lineToGridColored(tacticalDisplay.Screen	, tacticalDisplay.TextAttributes	, messageColor, agentZ, agentX-1, ::klib::SCREEN_LEFT, selectionText.begin(), (uint32_t)selectionText.size());
 		if(agentX+1 < (int32_t)tacticalDisplay.Screen.metrics().x)
-			lineToGridColored(tacticalDisplay.Screen	, tacticalDisplay.TextAttributes	, messageColor, agentZ, agentX+1, ::klib::SCREEN_LEFT, selectionText.c_str(), (uint32_t)selectionText.size());
+			lineToGridColored(tacticalDisplay.Screen	, tacticalDisplay.TextAttributes	, messageColor, agentZ, agentX+1, ::klib::SCREEN_LEFT, selectionText.begin(), (uint32_t)selectionText.size());
 
 		selectionText															= "|";
 		if(agentZ-1 >= 0)
-			lineToGridColored(tacticalDisplay.Screen	, tacticalDisplay.TextAttributes	, messageColor, agentZ-1, agentX, ::klib::SCREEN_LEFT, selectionText.c_str(), (uint32_t)selectionText.size());
+			lineToGridColored(tacticalDisplay.Screen	, tacticalDisplay.TextAttributes	, messageColor, agentZ-1, agentX, ::klib::SCREEN_LEFT, selectionText.begin(), (uint32_t)selectionText.size());
 		if(agentZ+1 < (int32_t)tacticalDisplay.Screen.metrics().y)
-			lineToGridColored(tacticalDisplay.Screen	, tacticalDisplay.TextAttributes	, messageColor, agentZ+1, agentX, ::klib::SCREEN_LEFT, selectionText.c_str(), (uint32_t)selectionText.size());
+			lineToGridColored(tacticalDisplay.Screen	, tacticalDisplay.TextAttributes	, messageColor, agentZ+1, agentX, ::klib::SCREEN_LEFT, selectionText.begin(), (uint32_t)selectionText.size());
 	}
 
 	if( !targetAgent.IsAlive() )
 		return;
 
 	int32_t																		xOffset											= tacticalDisplayX + tacticalDisplay.Screen.metrics().x + 4;
-	displayDetailedAgentSlot	(globalDisplay.Screen, globalDisplay.TextAttributes, PLAYER_INFO_POSY, xOffset, targetAgent, messageColor);
+	displayDetailedAgentSlot	(instanceGame.EntityTables, globalDisplay.Screen, globalDisplay.TextAttributes, PLAYER_INFO_POSY, xOffset, targetAgent, messageColor);
 	displayStatusEffectsAndTechs(globalDisplay.Screen, globalDisplay.TextAttributes, PLAYER_INFO_POSY + 36, xOffset, targetAgent);
-	selectionText															= "Target: " + targetAgent.Name;
-	lineToGridColored(globalDisplay.Screen, globalDisplay.TextAttributes, messageColor, 3, tacticalDisplayX+1, ::klib::SCREEN_RIGHT, selectionText.c_str());
+	selectionText															= ::gpk::view_const_string{"Target: "};
+	selectionText.append(targetAgent.Name);
+	lineToGridColored(globalDisplay.Screen, globalDisplay.TextAttributes, messageColor, 3, tacticalDisplayX+1, ::klib::SCREEN_RIGHT, selectionText.begin());
 }
 
 bool																	shoot											(SGame& instanceGame, int32_t tacticalPlayer, int32_t squadAgent)					{
 	//STacticalDisplay															& tacticalDisplay								= instanceGame.TacticalDisplay;
 	STacticalInfo																& tacticalInfo									= instanceGame.TacticalInfo;
 	SPlayer																		& playerShooter									= instanceGame.Players[tacticalInfo.Setup.Players[tacticalPlayer]];
-	CCharacter																	& agentShooter									= *playerShooter.Army[playerShooter.Squad.Agents[squadAgent]];
+	CCharacter																	& agentShooter									= *playerShooter.Tactical.Army[playerShooter.Tactical.Squad.Agents[squadAgent]];
 
-	const ::gpk::SCoord3<int32_t>												& targetTile									= playerShooter.Squad.TargetPositions[squadAgent];
+	const ::gpk::SCoord3<int32_t>												& targetTile									= playerShooter.Tactical.Squad.TargetPositions[squadAgent];
 	if(targetTile == agentShooter.Position)
 		return false;
 
@@ -351,18 +369,20 @@ bool																	shoot											(SGame& instanceGame, int32_t tacticalPlaye
 
 	//int																			finalChance										= agentShooter.FinalPoints.Attack.Hit;
 	bool																		bIsBlind										= true_if(agentShooter.ActiveBonus.Status.Status & COMBAT_STATUS_BLIND);
-	if(bIsBlind)
-		printf("Blindness causes %s to have %u hit chance for this turn.\n", agentShooter.Name.c_str(), agentShooter.FinalPoints.Attack.Hit >>= 1);
+	if(bIsBlind) {
+		sprintf_s(instanceGame.Messages.Aux, "Blindness causes %s to have %u hit chance for this turn.", agentShooter.Name.begin(), agentShooter.FinalPoints.Attack.Hit >>= 1);
+		instanceGame.Messages.LogAuxMessage();
+	}
 
 	//if ((rand() % 100) < finalChance ) {
 		 if(::gpk::bit_true(agentShooter.FinalFlags.Tech.AttackType			, ATTACK_TYPE_SPLASH		)) PlaySound("..\\gpk_data\\sounds\\Shotgun_Blast-Jim_Rogers-1914772763.wav"		, 0, SND_ASYNC | SND_FILENAME);
 	else if(::gpk::bit_true(agentShooter.FinalFlags.Tech.ProjectileClass	, PROJECTILE_CLASS_ROCKET	)) PlaySound("..\\gpk_data\\sounds\\Missle_Launch-Kibblesbob-2118796725.wav"		, 0, SND_ASYNC | SND_FILENAME);
-	else if(::gpk::bit_true(agentShooter.FinalFlags.Tech.ProjectileClass	, PROJECTILE_CLASS_GRENADE	)) PlaySound("..\\gpk_data\\sounds\\grenade-launcher-daniel_simon.wav"			, 0, SND_ASYNC | SND_FILENAME);
+	else if(::gpk::bit_true(agentShooter.FinalFlags.Tech.ProjectileClass	, PROJECTILE_CLASS_GRENADE	)) PlaySound("..\\gpk_data\\sounds\\grenade-launcher-daniel_simon.wav"				, 0, SND_ASYNC | SND_FILENAME);
 	else if(::gpk::bit_true(agentShooter.FinalFlags.Tech.ProjectileClass	, PROJECTILE_CLASS_BULLET	)) PlaySound("..\\gpk_data\\sounds\\Anti Aircraft Gun-Mike_Koenig-1303768514.wav"	, 0, SND_ASYNC | SND_FILENAME);
-	else if(::gpk::bit_true(agentShooter.FinalFlags.Tech.ProjectileClass	, PROJECTILE_CLASS_RAY		)) PlaySound("..\\gpk_data\\sounds\\Gun_Shot-Marvin-1140816320.wav"				, 0, SND_ASYNC | SND_FILENAME);
+	else if(::gpk::bit_true(agentShooter.FinalFlags.Tech.ProjectileClass	, PROJECTILE_CLASS_RAY		)) PlaySound("..\\gpk_data\\sounds\\Gun_Shot-Marvin-1140816320.wav"					, 0, SND_ASYNC | SND_FILENAME);
 
 	for(int32_t iBullet=0; iBullet<totalBullets; ++iBullet) {
-		::gpk::bit_clear(playerShooter.Squad.AgentStates[squadAgent], AGENT_STATE_MOVE);
+		::gpk::bit_clear(playerShooter.Tactical.Squad.AgentStates[squadAgent], AGENT_STATE_MOVE);
 		SBullet																		newBullet;
 		newBullet.Position.Cell													= {agentShooter.Position.x, agentShooter.Position.y, agentShooter.Position.z};
 		newBullet.Position.Offset												= {.5f, .75f, .5f};
@@ -391,7 +411,7 @@ bool																	shoot											(SGame& instanceGame, int32_t tacticalPlaye
 		tacticalInfo.AddBullet(newBullet);
 
 	}
-	playerShooter.Squad.TargetPositions[squadAgent]							= agentShooter.Position;
+	playerShooter.Tactical.Squad.TargetPositions[squadAgent]							= agentShooter.Position;
 	return true;
 }
 
@@ -399,41 +419,43 @@ bool																	shoot											(SGame& instanceGame, int32_t tacticalPlaye
 inline	TURN_ACTION														selectRemoteAction								(SGame& instanceGame)																{ return selectAIAction(instanceGame); }
 		bool															characterTurn									(SGame& instanceGame, TURN_ACTION combatOption)										{
 	STacticalInfo																& tacticalInfo									= instanceGame.TacticalInfo;
-	SWeightedDisplay																& globalDisplay									= instanceGame.GlobalDisplay;
+	SWeightedDisplay															& globalDisplay									= instanceGame.GlobalDisplay;
 	SPlayer																		& currentPlayer									= instanceGame.Players[tacticalInfo.Setup.Players[tacticalInfo.CurrentPlayer]];
 	bool																		bNotCanceled									= true;
 
-	if(combatOption == TURN_ACTION_ATTACK && currentPlayer.Squad.ActionsLeft[currentPlayer.Selection.PlayerUnit].Actions > 0) {
-		CCharacter																	& currentAgent									= *currentPlayer.Army[currentPlayer.Squad.Agents[currentPlayer.Selection.PlayerUnit]];
-		CCharacter																	& playerAgent									= *currentPlayer.Army[currentPlayer.Squad.Agents[currentPlayer.Selection.PlayerUnit]];
+	const int32_t																selectionPlayerUnit								= currentPlayer.Tactical.Selection.PlayerUnit;
+	if(combatOption == TURN_ACTION_ATTACK && currentPlayer.Tactical.Squad.ActionsLeft[selectionPlayerUnit].Actions > 0) {
+		CCharacter																	& currentAgent									= *currentPlayer.Tactical.Army[currentPlayer.Tactical.Squad.Agents[selectionPlayerUnit]];
+		CCharacter																	& playerAgent									= *currentPlayer.Tactical.Army[currentPlayer.Tactical.Squad.Agents[selectionPlayerUnit]];
 		instanceGame.ClearMessages();
 		if(::gpk::bit_true(currentAgent.FinalFlags.Tech.AttackType, ATTACK_TYPE_RANGED)) {
-			if(true_if(playerAgent.ActiveBonus.Status.Status & COMBAT_STATUS_BLACKOUT) && (getWeaponFlags(playerAgent.CurrentEquip.Weapon).Tech.Tech & ENTITY_TECHNOLOGY_DIGITAL)) {
-				instanceGame.UserMessage												= "This weapon was disabled by an electromagnetic pulse.";
+			if(true_if(playerAgent.ActiveBonus.Status.Status & COMBAT_STATUS_BLACKOUT) && (getWeaponFlags(instanceGame.EntityTables, playerAgent.CurrentEquip.Weapon).Tech.Tech & ENTITY_TECHNOLOGY_DIGITAL)) {
+				instanceGame.Messages.UserMessage												= ::gpk::view_const_string{"This weapon was disabled by an electromagnetic pulse."};
 				instanceGame.LogMessage();
 			}
-			else if(shoot(instanceGame, tacticalInfo.CurrentPlayer, currentPlayer.Selection.PlayerUnit)) {
-				instanceGame.UserSuccess												= playerAgent.Name + " shoots!";
+			else if(shoot(instanceGame, tacticalInfo.CurrentPlayer, selectionPlayerUnit)) {
+				instanceGame.Messages.UserSuccess												= playerAgent.Name;
+				instanceGame.Messages.UserSuccess.append_string(" shoots!");
 				instanceGame.LogSuccess();
-				--currentPlayer.Squad.ActionsLeft[currentPlayer.Selection.PlayerUnit].Actions;
+				--currentPlayer.Tactical.Squad.ActionsLeft[selectionPlayerUnit].Actions;
 			}
 			else {
-				instanceGame.UserMiss													= "You need to select a valid target in order to attack!";
+				instanceGame.Messages.UserMiss													= ::gpk::view_const_string{"You need to select a valid target in order to attack!"};
 				instanceGame.LogMiss();
 			}
 		}
 		else if(::gpk::bit_true(currentAgent.FinalFlags.Tech.AttackType, ATTACK_TYPE_MELEE)) {
-			if(currentPlayer.Selection.TargetPlayer == -1 || tacticalInfo.Setup.Players[currentPlayer.Selection.TargetPlayer] == PLAYER_INDEX_INVALID || currentPlayer.Selection.TargetUnit == -1) {
-				instanceGame.UserMiss													= "You need to select a valid target in order to attack!";
+			if(currentPlayer.Tactical.Selection.TargetPlayer == -1 || tacticalInfo.Setup.Players[currentPlayer.Tactical.Selection.TargetPlayer] == PLAYER_INDEX_INVALID || currentPlayer.Tactical.Selection.TargetUnit == -1) {
+				instanceGame.Messages.UserMiss													= ::gpk::view_const_string{"You need to select a valid target in order to attack!"};
 				instanceGame.LogMiss();
 			}
 			else {
-				SPlayer																		& targetPlayer									= instanceGame.Players[tacticalInfo.Setup.Players[currentPlayer.Selection.TargetPlayer]];
-				CCharacter																	& targetAgent									= *targetPlayer	.Army[targetPlayer.Squad.Agents[currentPlayer.Selection.TargetUnit]];
+				SPlayer																		& targetPlayer									= instanceGame.Players[tacticalInfo.Setup.Players[currentPlayer.Tactical.Selection.TargetPlayer]];
+				CCharacter																	& targetAgent									= *targetPlayer	.Tactical.Army[targetPlayer.Tactical.Squad.Agents[currentPlayer.Tactical.Selection.TargetUnit]];
 				//CCharacter																	& playerAgent									= *currentPlayer.Army[currentPlayer.Squad.Agents[currentPlayer.Selection.PlayerUnit]];
 
-				::gpk::SCoord3<int32_t>													coordPlayer										= playerAgent.Position;
-				::gpk::SCoord3<int32_t>													coordTarget										= targetAgent.Position;
+				::gpk::SCoord3<int32_t>														coordPlayer										= playerAgent.Position;
+				::gpk::SCoord3<int32_t>														coordTarget										= targetAgent.Position;
 				::gpk::SCoord3<float>														distance										= (coordTarget-coordPlayer).Cast<float>();
 
 				const SEntityPoints															& playerAgentPoints								= playerAgent.FinalPoints;
@@ -445,33 +467,54 @@ inline	TURN_ACTION														selectRemoteAction								(SGame& instanceGame)	
 				 && ::gpk::bit_false(playerAgentFlags.Tech.AttackType, ATTACK_TYPE_RANGED)
 				 )
 				{
-					instanceGame.UserMiss													= "You can't attack " + targetAgent.Name + " from that distance.";
+					instanceGame.Messages.UserMiss													= ::gpk::view_const_string{"You can't attack "};
+					instanceGame.Messages.UserMiss.append(targetAgent.Name);
+					instanceGame.Messages.UserMiss.append_string(" from that distance.");
 					instanceGame.LogMiss();
 				}
 				else {
 					char																		formatCoords[256]								= {};
 					sprintf_s(formatCoords, "{x=%i, y=%i, z=%i}", coordTarget.x, coordTarget.y, coordTarget.z);
-					::std::string																targetType										= "Target Coords: " + std::string(formatCoords) + ". Target player index: "	+ std::to_string(currentPlayer.Selection.TargetPlayer)	+ ". Target player unit: "	+ std::to_string(currentPlayer.Selection.TargetUnit) + ". Target player name: "		+ std::string(targetPlayer.Name.begin());
+					::gpk::array_pod<char_t>													targetType										= ::gpk::view_const_string{"Target Coords: "};
+					targetType.append_string(formatCoords);
+					targetType.append_string(". Target player index: ");
+					sprintf_s(formatCoords, "%i", currentPlayer.Tactical.Selection.TargetPlayer);
+					targetType.append_string(formatCoords);
+					targetType.append_string(". Target player unit: ");
+					sprintf_s(formatCoords, "%i", currentPlayer.Tactical.Selection.TargetUnit);
+					targetType.append_string(formatCoords);
+					targetType.append_string(". Target player name: ");
+					targetType.append(targetPlayer.Tactical.Name);
 					sprintf_s(formatCoords, "{x=%i, y=%i, z=%i}", coordPlayer.x, coordPlayer.y, coordPlayer.z);
-					::std::string																userType										= "Origin Coords: " + std::string(formatCoords) + ". Current player index: "	+ std::to_string(tacticalInfo.CurrentPlayer)			+ ". Current player unit: "	+ std::to_string(currentPlayer.Selection.PlayerUnit) + ". Current player name: "	+ std::string(currentPlayer.Name.begin());
+					::gpk::array_pod<char_t>													userType										= ::gpk::view_const_string{"Origin Coords: "};
+					userType.append_string(formatCoords);
+					sprintf_s(formatCoords, ". Current player index: %i", tacticalInfo.CurrentPlayer);
+					userType.append_string(formatCoords);
+					userType.append_string(". Current player unit: ");
+					sprintf_s(formatCoords, "%i", currentPlayer.Tactical.Selection.PlayerUnit);
+					userType.append_string(". Current player name: ");
+					userType.append(currentPlayer.Tactical.Name);
 
 					static const HANDLE															hConsoleOut										= GetStdHandle( STD_OUTPUT_HANDLE );
 					COORD																		cursorPos										= {0, ((SHORT)globalDisplay.Screen.metrics().y >> 1) + 7};
 					SetConsoleCursorPosition( hConsoleOut, cursorPos );
-					printf("%s.\n%s.\n\n", targetType.c_str(), userType.c_str());
+					sprintf_s(instanceGame.Messages.Aux, "%s.", targetType.begin());
+					instanceGame.Messages.LogAuxMessage();
+					sprintf_s(instanceGame.Messages.Aux, "%s.", userType.begin());
+					instanceGame.Messages.LogAuxMessage();
 
-					klib::attack(playerAgent, targetAgent);
+					::klib::attack(instanceGame.EntityTables, instanceGame.Messages, playerAgent, targetAgent);
 
 					if(!targetAgent.IsAlive())
-						handleAgentDeath(instanceGame, targetAgent, playerAgent, tacticalInfo.Setup.TeamPerPlayer[currentPlayer.Selection.TargetPlayer]);
+						handleAgentDeath(instanceGame, targetAgent, playerAgent, tacticalInfo.Setup.TeamPerPlayer[currentPlayer.Tactical.Selection.TargetPlayer]);
 					if(!playerAgent.IsAlive()) {
 						handleAgentDeath(instanceGame, playerAgent, targetAgent, tacticalInfo.Setup.TeamPerPlayer[tacticalInfo.CurrentPlayer]);
 						bNotCanceled															= false;
 						endTurn(instanceGame);
 					}
 
-					--currentPlayer.Squad.ActionsLeft[currentPlayer.Selection.PlayerUnit].Actions;
-					getchar();
+					--currentPlayer.Tactical.Squad.ActionsLeft[selectionPlayerUnit].Actions;
+					//getchar();
 				}
 			}
 		}// if(melee)
@@ -481,39 +524,39 @@ inline	TURN_ACTION														selectRemoteAction								(SGame& instanceGame)	
 		instanceGame.State.Substate												= GAME_SUBSTATE_CHARACTER;
 	}
 	else if(combatOption == TURN_ACTION_CANCEL) {
-		instanceGame.UserMessage												= std::string(currentPlayer.Name.begin()) + " canceled the turn.";
+		instanceGame.Messages.UserMessage												= currentPlayer.Tactical.Name;
+		instanceGame.Messages.UserMessage.append_string(" canceled the turn.");
 		instanceGame.LogMessage();
 		bNotCanceled															= false;
 		endTurn(instanceGame);
 	}
 	else if(combatOption == TURN_ACTION_MOVE) {
 		char																		buffer[128]										= {};
-		CCharacter																	& playerAgent									= *currentPlayer.Army[currentPlayer.Squad.Agents[currentPlayer.Selection.PlayerUnit]];
+		CCharacter																	& playerAgent									= *currentPlayer.Tactical.Army[currentPlayer.Tactical.Squad.Agents[selectionPlayerUnit]];
 		//bool																		bSuccess										= false;
-		if(tacticalInfo.Board.Tiles.IsTileAvailable(currentPlayer.Squad.TargetPositions[currentPlayer.Selection.PlayerUnit].x, currentPlayer.Squad.TargetPositions[currentPlayer.Selection.PlayerUnit].z)) {
-			currentPlayer.Squad.AgentStates[currentPlayer.Selection.PlayerUnit]		= AGENT_STATE_MOVE;
-			sprintf_s(buffer, "Player %s moves %s to {%i, %i, %i}."
-				, currentPlayer.Name.begin()
-				, playerAgent.Name.c_str()
-				, currentPlayer.Squad.TargetPositions[currentPlayer.Selection.PlayerUnit].x
-				, currentPlayer.Squad.TargetPositions[currentPlayer.Selection.PlayerUnit].y
-				, currentPlayer.Squad.TargetPositions[currentPlayer.Selection.PlayerUnit].z
+		if(tacticalInfo.Board.Tiles.IsTileAvailable(currentPlayer .Tactical.Squad.TargetPositions[selectionPlayerUnit].x, currentPlayer.Tactical.Squad.TargetPositions[selectionPlayerUnit].z)) {
+			currentPlayer.Tactical.Squad.AgentStates[selectionPlayerUnit]		= AGENT_STATE_MOVE;
+			sprintf_s(instanceGame.Messages.Aux, "Player %s moves %s to {%i, %i, %i}."
+				, currentPlayer.Tactical.Name.begin()
+				, playerAgent.Name.begin()
+				, currentPlayer.Tactical.Squad.TargetPositions[selectionPlayerUnit].x
+				, currentPlayer.Tactical.Squad.TargetPositions[selectionPlayerUnit].y
+				, currentPlayer.Tactical.Squad.TargetPositions[selectionPlayerUnit].z
 			);
-			instanceGame.UserSuccess												= buffer;
-			instanceGame.LogSuccess();
+			instanceGame.Messages.LogAuxSuccess();
 		}
 		else {
 			sprintf_s(buffer, "Cannot move to {%i, %i, %i}. Terrain occupied or unreachable."
-				, currentPlayer.Squad.TargetPositions[currentPlayer.Selection.PlayerUnit].x
-				, currentPlayer.Squad.TargetPositions[currentPlayer.Selection.PlayerUnit].y
-				, currentPlayer.Squad.TargetPositions[currentPlayer.Selection.PlayerUnit].z
+				, currentPlayer.Tactical.Squad.TargetPositions[selectionPlayerUnit].x
+				, currentPlayer.Tactical.Squad.TargetPositions[selectionPlayerUnit].y
+				, currentPlayer.Tactical.Squad.TargetPositions[selectionPlayerUnit].z
 			);
-			instanceGame.UserError													= buffer;
+			instanceGame.Messages.UserError													= ::gpk::view_const_string{buffer};
 			instanceGame.LogError();
 		}
 	}
 	else if(combatOption != TURN_ACTION_CONTINUE) {
-		instanceGame.UserError													= "This function isn't available!";
+		instanceGame.Messages.UserError													= "This function isn't available!";
 		instanceGame.LogError();
 	}
 
@@ -526,14 +569,14 @@ int32_t																	initInventoryMenu								(klib::CCharacter& adventurer, 
 
 	for(uint32_t i=0; i<adventurer.Goods.Inventory.Items.Slots.size(); ++i) {
 		const ::klib::SItem															& itemEntity									= adventurer.Goods.Inventory.Items[i].Entity;
-		std::string																	itemName										= getItemName(itemEntity);
+		::gpk::array_pod<char_t>													itemName										= getItemName(itemEntity);
 
 		if(bPrintPrice) {
 			int32_t																		finalPrice										= getItemPrice(itemEntity, bSellPrice);
-			sprintf_s(itemOption, "%i coins each - x%.2u %s", finalPrice, adventurer.Goods.Inventory.Items[i].Count, itemName.c_str());
+			sprintf_s(itemOption, "%i coins each - x%.2u %s", finalPrice, adventurer.Goods.Inventory.Items[i].Count, itemName.begin());
 		}
 		else
-			sprintf_s(itemOption, "- x%.2u %s", adventurer.Goods.Inventory.Items[i].Count, itemName.c_str());
+			sprintf_s(itemOption, "- x%.2u %s", adventurer.Goods.Inventory.Items[i].Count, itemName.begin());
 
 		itemOptions[i].ReturnValue												= i;
  		itemOptions[i].Text														= itemOption;
@@ -542,17 +585,20 @@ int32_t																	initInventoryMenu								(klib::CCharacter& adventurer, 
 	return 0;
 }
 
-int32_t																	drawInventoryMenu								(SGame& instanceGame, klib::CCharacter& adventurer, const std::string& menuTitle)								{
+int32_t																	drawInventoryMenu								(SGame& instanceGame, klib::CCharacter& adventurer, const ::gpk::view_const_char& menuTitle)								{
 	::klib::SMenuItem<int32_t>													itemOptions[4096]								= {};
-	SWeightedDisplay&																globalDisplay									= instanceGame.GlobalDisplay;
+	SWeightedDisplay&															globalDisplay									= instanceGame.GlobalDisplay;
 	SCharacterInventory&														characterInventory								= adventurer.Goods.Inventory;
 	//int32_t																		initMenu										=
 		initInventoryMenu(adventurer, itemOptions, false, false);
-	return drawMenu(instanceGame.GlobalDisplay.Screen.View, globalDisplay.TextAttributes.begin(), characterInventory.Items.Slots.size(), menuTitle, ::gpk::view_array<const ::klib::SMenuItem<int32_t>>{itemOptions}, instanceGame.FrameInput, (int32_t)adventurer.Goods.Inventory.Items.Slots.size(), -1, 50);
+	static ::klib::SDrawMenuState												menuState;
+	::gpk::view_array<const ::klib::SMenuItem<int32_t>>							menuItems										= {itemOptions, characterInventory.Items.Slots.size()};
+	int32_t																		countMenuItems									= menuItems.size();
+	return drawMenu(menuState, instanceGame.GlobalDisplay.Screen.View, globalDisplay.TextAttributes.begin(), menuTitle, menuItems, instanceGame.FrameInput, countMenuItems, -1, 50);
 
 };
 
-TURN_ACTION																useItems										(SGame& instanceGame, SPlayer& player, klib::CCharacter& user, const std::string& menuTitle, bool bIsAIControlled) {
+TURN_ACTION																useItems										(SGame& instanceGame, ::klib::SGameMessages & messages, SPlayer& player, klib::CCharacter& user, const ::gpk::view_const_char& menuTitle, bool bIsAIControlled) {
 	int32_t																		indexInventory									= ~0U;
 	bool																		bUsedItem										= false;
 	if(!bIsAIControlled)  {
@@ -584,8 +630,9 @@ TURN_ACTION																useItems										(SGame& instanceGame, SPlayer& play
 					)
 			)
 		{
-			std::string																	itemName										= getItemName(entityItem);
-			instanceGame.UserMessage												= "You don't need to use " + itemName + "!";
+			messages.UserMessage												= ::gpk::view_const_string{"You don't need to use "};
+			messages.UserMessage.append(::klib::getItemName(entityItem));
+			messages.UserMessage.append_string("!");
 			instanceGame.LogMessage();
 			bUsedItem																= false;
 		}
@@ -597,36 +644,40 @@ TURN_ACTION																useItems										(SGame& instanceGame, SPlayer& play
 		const ::klib::SItem															& entityItem									= user.Goods.Inventory.Items[indexInventory].Entity;
 		const klib::CItem															& itemDescription								= klib::itemDescriptions[entityItem.Definition];
 		if( klib::ITEM_TYPE_POTION == itemDescription.Type )
-			bUsedItem																= klib::executeItem(indexInventory, user, user);
+			bUsedItem																= klib::executeItem(instanceGame.EntityTables, instanceGame.Messages, indexInventory, user, user);
 		else {
 		//if( klib::ITEM_TYPE_GRENADE == itemDescription.Type )
 		//{
 		//
 		//}
 		//else if( klib::ITEM_TYPE_POTION == itemDescription.Type )
-			if(player.Selection.TargetPlayer != -1 && player.Selection.TargetUnit != -1) {
-				SPlayer																		& targetPlayer									= instanceGame.Players[instanceGame.TacticalInfo.Setup.Players[player.Selection.TargetPlayer]];
-				if(targetPlayer.Squad.Agents[player.Selection.TargetUnit] != -1) {
-					CCharacter																	& targetAgent									= *targetPlayer.Army[targetPlayer.Squad.Agents[player.Selection.TargetUnit]];
-					bUsedItem																= klib::executeItem(indexInventory, user, targetAgent);
+			if(player.Tactical.Selection.TargetPlayer != -1 && player.Tactical.Selection.TargetUnit != -1) {
+				SPlayer																		& targetPlayer									= instanceGame.Players[instanceGame.TacticalInfo.Setup.Players[player.Tactical.Selection.TargetPlayer]];
+				if(targetPlayer.Tactical.Squad.Agents[player.Tactical.Selection.TargetUnit] != -1) {
+					CCharacter																	& targetAgent									= *targetPlayer.Tactical.Army[targetPlayer.Tactical.Squad.Agents[player.Tactical.Selection.TargetUnit]];
+					bUsedItem																= klib::executeItem(instanceGame.EntityTables, instanceGame.Messages, indexInventory, user, targetAgent);
 				}
 				else {
 					bUsedItem																= false;
-					std::string																	itemName										= getItemName(entityItem);
-					instanceGame.UserMessage												= "You need to select a valid target in order to use " + itemName + "!";
+					::gpk::array_pod<char_t>													itemName										= getItemName(entityItem);
+					instanceGame.Messages.UserMessage												= ::gpk::view_const_string{"You need to select a valid target in order to use "};
+					instanceGame.Messages.UserMessage.append(itemName);
+					instanceGame.Messages.UserMessage.append_string("!");
 					instanceGame.LogMessage();
 				}
 			}
 			else {
 				bUsedItem																= false;
-				std::string																	itemName										= getItemName(entityItem);
-				instanceGame.UserMessage = "You need to select a valid target in order to use " + itemName + "!";
+				::gpk::array_pod<char_t>													itemName										= getItemName(entityItem);
+				instanceGame.Messages.UserMessage												= ::gpk::view_const_string{"You need to select a valid target in order to use "};
+				instanceGame.Messages.UserMessage.append(itemName);
+				instanceGame.Messages.UserMessage.append_string("!");
 				instanceGame.LogMessage();
 			}
 		}
 	}
 
-	if(bUsedItem && 0 >= player.Squad.ActionsLeft[player.Selection.PlayerUnit].Moves)
+	if(bUsedItem && 0 >= player.Tactical.Squad.ActionsLeft[player.Tactical.Selection.PlayerUnit].Moves)
 		return TURN_ACTION_CANCEL;
 
 	return TURN_ACTION_CONTINUE;
@@ -644,7 +695,9 @@ void																	updateBullets									(SGame& instanceGame)									{
 	for(uint32_t iBullet=0;iBullet<tacticalInfo.Board.Shots.Bullet.size(); ++iBullet) {
 		for(uint32_t iShot=0; true; ++iShot) {
 			const uint32_t bulletCount = tacticalInfo.Board.Shots.Bullet.size();
-			always_printf("bulletCount is %i. iBullet: %i.", (int32_t)bulletCount, (int32_t)iBullet);
+			//always_printf("bulletCount is %i. iBullet: %i.", (int32_t)bulletCount, (int32_t)iBullet);
+			//always_printf("bulletCount is %i.", (int32_t)bulletCount);
+			always_printf("iBullet: %i.", (int32_t)iBullet);
 			if(iBullet >= bulletCount)
 				break;
 			if(iShot >= tacticalInfo.Board.Shots.Bullet[iBullet].Count)
@@ -696,19 +749,19 @@ void																	updateBullets									(SGame& instanceGame)									{
 						if(tacticalInfo.Setup.Players[tacticalInfo.Board.Tiles.Entities.Agents[newz][newx].PlayerIndex] != PLAYER_INDEX_INVALID) {
 							SPlayer																		& playerHit										= instanceGame.Players[tacticalInfo.Setup.Players[tacticalInfo.Board.Tiles.Entities.Agents[newz][newx].PlayerIndex]];
 							SPlayer																		& playerShooter									= instanceGame.Players[tacticalInfo.Setup.Players[newBullet.Shooter.PlayerIndex]];
-							if( playerHit.Squad.Agents[tacticalInfo.Setup.Players[tacticalInfo.Board.Tiles.Entities.Agents[newz][newx].AgentIndex]] != -1 ) {
-								CCharacter																	& agentHit										= *playerHit.Army[playerHit.Squad.Agents[tacticalInfo.Board.Tiles.Entities.Agents[newz][newx].AgentIndex]];
+							if( playerHit.Tactical.Squad.Agents[tacticalInfo.Setup.Players[tacticalInfo.Board.Tiles.Entities.Agents[newz][newx].AgentIndex]] != -1 ) {
+								CCharacter																	& agentHit										= *playerHit.Tactical.Army[playerHit.Tactical.Squad.Agents[tacticalInfo.Board.Tiles.Entities.Agents[newz][newx].AgentIndex]];
 								if(agentHit.IsAlive()) {
-									CCharacter																	& agentShooter									= *playerShooter	.Army[playerShooter.Squad.Agents[newBullet.Shooter.AgentIndex]];
+									CCharacter																	& agentShooter									= *playerShooter.Tactical.Army[playerShooter.Tactical.Squad.Agents[newBullet.Shooter.AgentIndex]];
 									char																		agentName[128]									= {};
-									sprintf_s(agentName, "Bullet shot by %s.", agentShooter.Name.c_str());
- 									applySuccessfulWeaponHit(agentShooter, agentHit, newBullet.Points.Damage, agentName);
+									sprintf_s(agentName, "Bullet shot by %s.", agentShooter.Name.begin());
+ 									applySuccessfulWeaponHit(instanceGame.EntityTables, instanceGame.Messages, agentShooter, agentHit, newBullet.Points.Damage, agentName);
 									agentShooter	.Score.DamageDealt										+= newBullet.Points.Damage;
 									++agentShooter	.Score.AttacksHit;
 									agentHit		.Score.DamageTaken										+= newBullet.Points.Damage;
 									++agentHit		.Score.AttacksReceived;
-									agentShooter	.Recalculate();
-									agentHit		.Recalculate();
+									agentShooter	.Recalculate(instanceGame.EntityTables);
+									agentHit		.Recalculate(instanceGame.EntityTables);
 									if(0 >= agentShooter	.Points.LifeCurrent.Health)	handleAgentDeath(instanceGame, agentShooter	, agentHit		, tacticalInfo.Setup.TeamPerPlayer[newBullet.Shooter.PlayerIndex]);
 									if(0 >= agentHit		.Points.LifeCurrent.Health)	handleAgentDeath(instanceGame, agentHit		, agentShooter	, tacticalInfo.Setup.TeamPerPlayer[tacticalInfo.Board.Tiles.Entities.Agents[newz][newx].PlayerIndex]);
 								}
@@ -738,7 +791,7 @@ void																	updateBullets									(SGame& instanceGame)									{
 					}
 				}
 				else
-					instanceGame.UserMessage.clear();
+					instanceGame.Messages.UserMessage.clear();
 
 				tacticalInfo.Board.Shots.Bullet.DecreaseEntity(iBullet);
 				tacticalInfo.Board.Shots.Coords.DecreaseEntity(tacticalInfo.Board.Shots.Coords.FindElement(oldBulletPos.Cell));
@@ -816,15 +869,15 @@ void																	updateBullets									(SGame& instanceGame)									{
 						SAgentsReference					agentsInRange;
 						getAgentsInSight(instanceGame, newAOE.Position.Cell, newAOE.RadiusOrHalfSize, agentsInRange);
 						SPlayer								& playerShooter		= instanceGame.Players[tacticalInfo.Setup.Players[newAOE.Caster.PlayerIndex]];
-						CCharacter							& shooter			= *playerShooter.Army[playerShooter.Squad.Agents[newAOE.Caster.AgentIndex]];
+						CCharacter							& shooter			= *playerShooter.Tactical.Army[playerShooter.Tactical.Squad.Agents[newAOE.Caster.AgentIndex]];
 						TEAM_TYPE							teamShooter			= tacticalInfo.Setup.TeamPerPlayer[newAOE.Caster.PlayerIndex];
 						for(int32_t iAgentInRange=0; iAgentInRange < agentsInRange.Count; ++iAgentInRange) {
 							SPlayer&							playerVictim			= instanceGame.Players[tacticalInfo.Setup.Players[agentsInRange.Agents[iAgentInRange].Agent.PlayerIndex]];
 							TEAM_TYPE							teamVictim				= tacticalInfo.Setup.TeamPerPlayer[agentsInRange.Agents[iAgentInRange].Agent.PlayerIndex];
-							CCharacter&							agentVictim				= *playerVictim.Army[playerVictim.Squad.Agents[agentsInRange.Agents[iAgentInRange].Agent.AgentIndex]];
+							CCharacter&							agentVictim				= *playerVictim.Tactical.Army[playerVictim.Tactical.Squad.Agents[agentsInRange.Agents[iAgentInRange].Agent.AgentIndex]];
 							//::gpk::SCoord3<int32_t> distance = agentVictim.Position-newAOE.Position.Cell;
 							const ::gpk::SCoord3<int32_t>		& coordAgent			= agentVictim.Position;
-							const ::gpk::SCoord3<float>		distance				= (coordAgent-newAOE.Position.Cell).Cast<float>();
+							const ::gpk::SCoord3<float>			distance				= (coordAgent - newAOE.Position.Cell).Cast<float>();
 							double								length					= distance.Length();
 							if(length > newAOE.RadiusOrHalfSize)
 								continue;
@@ -832,8 +885,8 @@ void																	updateBullets									(SGame& instanceGame)									{
 							double proportion = length/newAOE.RadiusOrHalfSize;
 							if(proportion >= 1.0)
 								continue;
-							const std::string weaponName = getWeaponName(shooter.CurrentEquip.Weapon);
-							applySuccessfulWeaponHit(shooter, agentVictim, (int32_t)(newBullet.Points.Damage*(1.0-proportion)), weaponName.c_str());
+							const ::gpk::array_pod<char_t>		weaponName				= getEntityName(instanceGame.EntityTables.Weapon, shooter.CurrentEquip.Weapon);
+							applySuccessfulWeaponHit(instanceGame.EntityTables, instanceGame.Messages, shooter, agentVictim, (int32_t)(newBullet.Points.Damage * (1.0 - proportion)), weaponName);
 							if(false == agentVictim.IsAlive())
 								handleAgentDeath(instanceGame, agentVictim, shooter, teamVictim);
 							if(false == shooter.IsAlive())
@@ -879,7 +932,7 @@ SGameState																drawTacticalScreen								(SGame& instanceGame, const 
 
 	STacticalDisplay&	tacticalDisplay	= instanceGame.TacticalDisplay;
 	SPlayer&			currentPlayer	= instanceGame.Players[tacticalInfo.Setup.Players[tacticalInfo.CurrentPlayer]];
-	drawTacticalBoard(instanceGame, tacticalInfo, tacticalDisplay.Screen, tacticalDisplay.TextAttributes, tacticalInfo.CurrentPlayer, tacticalInfo.Setup.TeamPerPlayer[tacticalInfo.CurrentPlayer], currentPlayer.Selection, true);
+	drawTacticalBoard(instanceGame, tacticalInfo, tacticalDisplay.Screen, tacticalDisplay.TextAttributes, tacticalInfo.CurrentPlayer, tacticalInfo.Setup.TeamPerPlayer[tacticalInfo.CurrentPlayer], currentPlayer.Tactical.Selection, true);
 
 	SWeightedDisplay&		globalDisplay	= instanceGame.GlobalDisplay;
 	clearGrid(globalDisplay.Screen.View, ' ');
@@ -890,50 +943,60 @@ SGameState																drawTacticalScreen								(SGame& instanceGame, const 
 
 	if(tacticalInfo.Board.Shots.Bullet.Slots.size() <= 0) {
 		// Need to construct menu title
-		std::string menuTitle = "Mission Over";
-		if( currentPlayer.Selection.PlayerUnit != -1 && currentPlayer.Squad.Agents[currentPlayer.Selection.PlayerUnit] != -1 && GAME_SUBSTATE_CHARACTER != instanceGame.State.Substate)
-			menuTitle = "Agent #" + std::to_string(currentPlayer.Selection.PlayerUnit+1) + ": " + currentPlayer.Army[currentPlayer.Squad.Agents[currentPlayer.Selection.PlayerUnit]]->Name;
-		else if(currentPlayer.Selection.PlayerUnit != -1)
-			menuTitle = "Agent #" + std::to_string(currentPlayer.Selection.PlayerUnit+1);
+		::gpk::array_pod<char_t>	menuTitle			= ::gpk::view_const_string{"Mission Over"};
+		const int32_t				selectionPlayerUnit								= currentPlayer.Tactical.Selection.PlayerUnit;
+		char						playerUnitPlusOne	[64];
+		sprintf_s(playerUnitPlusOne, "%i", selectionPlayerUnit + 1);
+		if( selectionPlayerUnit != -1 && currentPlayer.Tactical.Squad.Agents[selectionPlayerUnit] != -1 && GAME_SUBSTATE_CHARACTER != instanceGame.State.Substate) {
+			menuTitle				= ::gpk::view_const_string{"Agent #"};
+			menuTitle.append_string(playerUnitPlusOne);
+			menuTitle.append_string(": ");
+			menuTitle.append(currentPlayer.Tactical.Army[currentPlayer.Tactical.Squad.Agents[selectionPlayerUnit]]->Name);
+		}
+		else if(selectionPlayerUnit != -1) {
+			menuTitle				= ::gpk::view_const_string{"Agent #"};
+			menuTitle.append_string(playerUnitPlusOne);
+		}
 
-		if(currentPlayer.Control.Type == PLAYER_CONTROL_LOCAL)  {
+		if(currentPlayer.Tactical.Control.Type == PLAYER_CONTROL_LOCAL)  {
  			if(instanceGame.State.Substate == GAME_SUBSTATE_INVENTORY) {
-				menuTitle += " - Inventory";
-				CCharacter& currentAgent = *currentPlayer.Army[currentPlayer.Squad.Agents[currentPlayer.Selection.PlayerUnit]];
-				selectedAction = useItems(instanceGame, currentPlayer, currentAgent, menuTitle, false);
+				menuTitle.append_string(" - Inventory");
+				CCharacter				& currentAgent = *currentPlayer.Tactical.Army[currentPlayer.Tactical.Squad.Agents[selectionPlayerUnit]];
+				selectedAction		= useItems(instanceGame, instanceGame.Messages, currentPlayer, currentAgent, menuTitle, false);
 			}
  			else if(instanceGame.State.Substate == GAME_SUBSTATE_EQUIPMENT) {
-				menuTitle += " - Equipment";
-				exitState = drawMenu(instanceGame.GlobalDisplay.Screen.View, globalDisplay.TextAttributes.begin(), menuTitle, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsCombatTurnEquip}, instanceGame.FrameInput, {GAME_STATE_TACTICAL_CONTROL, GAME_SUBSTATE_MAIN}, exitState, 10);
-				selectedAction = TURN_ACTION_CONTINUE;
+				menuTitle.append_string(" - Equipment");
+				static ::klib::SDrawMenuState	menuState;
+				exitState			= drawMenu(menuState, instanceGame.GlobalDisplay.Screen.View, globalDisplay.TextAttributes.begin(), menuTitle, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsCombatTurnEquip}, instanceGame.FrameInput, {GAME_STATE_TACTICAL_CONTROL, GAME_SUBSTATE_MAIN}, exitState, 20);
+				selectedAction		= TURN_ACTION_CONTINUE;
 			}
 			else {
 				if(instanceGame.State.Substate != GAME_SUBSTATE_MAIN) {
 					instanceGame.ClearMessages();
-					instanceGame.UserError = "Unrecognized game substate!";
+					instanceGame.Messages.UserError = ::gpk::view_const_string{"Unrecognized game substate!"};
 					instanceGame.LogError();
 				}
-				selectedAction = drawMenu(instanceGame.GlobalDisplay.Screen.View, globalDisplay.TextAttributes.begin(), menuTitle, ::gpk::view_array<const ::klib::SMenuItem<::klib::TURN_ACTION>>{optionsCombatTurn}, instanceGame.FrameInput, TURN_ACTION_MENUS, TURN_ACTION_CONTINUE, 10);
+				static ::klib::SDrawMenuState	menuState;
+				selectedAction = drawMenu(menuState, instanceGame.GlobalDisplay.Screen.View, globalDisplay.TextAttributes.begin(), menuTitle, ::gpk::view_array<const ::klib::SMenuItem<::klib::TURN_ACTION>>{optionsCombatTurn}, instanceGame.FrameInput, TURN_ACTION_MENUS, TURN_ACTION_CONTINUE, 20);
 			}
 		}
-		else if(currentPlayer.Control.Type == PLAYER_CONTROL_AI)  {
+		else if(currentPlayer.Tactical.Control.Type == PLAYER_CONTROL_AI)  {
 			selectedAction = selectAIAction(instanceGame);
 //#if !(defined(GPK_DEBUG_ENABLED))
 //			Sleep(70);
 //#endif
 		}
-		else if(currentPlayer.Control.Type == PLAYER_CONTROL_REMOTE)
+		else if(currentPlayer.Tactical.Control.Type == PLAYER_CONTROL_REMOTE)
 			selectedAction = selectRemoteAction(instanceGame);
 	}
 	else {
-		char					bulletInfo[256];
 		::gpk::SCoord3<float>	bulletPos		= {0.0f,0.0f,0.0f};
 		const SBullet&			bulletToPrint	= tacticalInfo.Board.Shots.Bullet[0].Entity;
 		bulletPos.x = bulletToPrint.Position.Cell.x + bulletToPrint.Position.Offset.x;
 		bulletPos.y = bulletToPrint.Position.Cell.y + bulletToPrint.Position.Offset.y;
 		bulletPos.z = bulletToPrint.Position.Cell.z + bulletToPrint.Position.Offset.z;
-		sprintf_s(bulletInfo, "Bullet at {%f, %f, %f} with direction {%f, %f, %f}", bulletPos.x, bulletPos.y, bulletPos.z, bulletToPrint.Direction.x, bulletToPrint.Direction.y, bulletToPrint.Direction.z);
-		instanceGame.UserMessage = bulletInfo;
+		sprintf_s(instanceGame.Messages.Aux, "Bullet at {%f, %f, %f} with direction {%f, %f, %f}", bulletPos.x, bulletPos.y, bulletPos.z, bulletToPrint.Direction.x, bulletToPrint.Direction.y, bulletToPrint.Direction.z);
+		instanceGame.LogAuxMessage();
 	}
 
 	bool	bNotCanceled	= true;
@@ -942,11 +1005,11 @@ SGameState																drawTacticalScreen								(SGame& instanceGame, const 
 	else if(selectedAction == TURN_ACTION_EQUIPMENT)		return {exitState.State, GAME_SUBSTATE_EQUIPMENT};
 	else if(selectedAction == TURN_ACTION_MAIN)				return {exitState.State, GAME_SUBSTATE_MAIN};
 	else if(selectedAction == TURN_ACTION_ABORT_MISSION) {
-		currentPlayer.Squad.Clear(-1);
+		currentPlayer.Tactical.Squad.Clear(-1);
 		return endMission(instanceGame);
 	}
 	else if(selectedAction == TURN_ACTION_AUTOPLAY) {
-		currentPlayer.Control.Type = PLAYER_CONTROL_AI;
+		currentPlayer.Tactical.Control.Type = PLAYER_CONTROL_AI;
 		tacticalInfo.Setup.Controls[tacticalInfo.CurrentPlayer].Type = PLAYER_CONTROL_AI;
 		return exitState;
 	}
@@ -955,10 +1018,10 @@ SGameState																drawTacticalScreen								(SGame& instanceGame, const 
 
 	bool movesRemaining = false;
 
-	for(int32_t i = 0; i < currentPlayer.Squad.Size; i++) {
-		if(currentPlayer.Squad.ActionsLeft[i].Actions != 0 || currentPlayer.Squad.ActionsLeft[i].Moves != 0){
+	for(uint32_t i = 0; i < currentPlayer.Tactical.Squad.Size; i++) {
+		if(currentPlayer.Tactical.Squad.ActionsLeft[i].Actions != 0 || currentPlayer.Tactical.Squad.ActionsLeft[i].Moves != 0){
 			movesRemaining = true;
-		break;
+			break;
 		}
 	}
 

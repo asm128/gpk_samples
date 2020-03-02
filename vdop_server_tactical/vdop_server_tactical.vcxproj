@@ -20,7 +20,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
-    <ProjectGuid>{56C14827-EBAC-41A6-9136-30FC2BA83E48}</ProjectGuid>
+    <ProjectGuid>{B18C8F5D-113D-41F6-81F0-B8A8FF65AEAE}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>cedgame</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
@@ -171,10 +171,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="ced_vdop.h" />
+    <ClInclude Include="vdop_server_tactical.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ced_vdop.cpp" />
+    <ClCompile Include="vdop_server_tactical.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

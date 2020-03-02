@@ -1,21 +1,18 @@
 #include "EntityImpl.h"
 #include "klib_draw_misc.h"
 
-//#include <string>
-
 #ifndef __ITEM_H__98214809271346928734293846__
 #define __ITEM_H__98214809271346928734293846__
 
 namespace klib
 {
 #pragma pack(push, 1)
-
 	enum ITEM_TYPE : uint16_t
-	{	ITEM_TYPE_UNKNOWN	= 0x00
-	,	ITEM_TYPE_POTION	= 0x01
-	,	ITEM_TYPE_GRENADE	= 0x02
-	,	ITEM_TYPE_BOX		= 0x04
-	};
+		{	ITEM_TYPE_UNKNOWN	= 0x00
+		,	ITEM_TYPE_POTION	= 0x01
+		,	ITEM_TYPE_GRENADE	= 0x02
+		,	ITEM_TYPE_BOX		= 0x04
+		};
 
 	enum PROPERTY_TYPE : uint32_t
 	{	PROPERTY_TYPE_NONE				= 0x00000000
@@ -51,23 +48,23 @@ namespace klib
 	};
 
 	struct CItem {
-		ITEM_TYPE		Type;
-		PROPERTY_TYPE	Property;
-		int32_t			Price;
-		std::string		Name;
+		ITEM_TYPE					Type;
+		PROPERTY_TYPE				Property;
+		int64_t						Price;
+		::gpk::view_const_string	Name;
 	};
 
 	struct CItemV2 {
-		ITEM_TYPE		Type;
-		int32_t			Price;
-		std::string		Name;
+		ITEM_TYPE					Type;
+		int64_t						Price;
+		::gpk::view_const_string	Name;
 	};
 
 	struct CItemGrade {
-		std::string		Name;
+		::gpk::view_const_string	Name;
 	};
 
-static const CItemGrade itemGrades[] = 
+static const CItemGrade itemGrades[] =
 {	{	"%s (Prop)"		}
 ,	{	"%s (Small)"	}
 ,	{	"%s (Regular)"	}
@@ -75,7 +72,7 @@ static const CItemGrade itemGrades[] =
 //,	{	"%s (Huge)"		}
 };
 
-static const SEntityRecord<SItem>	itemModifiers[] = 
+static const SEntityRecord<SItem>	itemModifiers[] =
 {	{	{{},{},{},{},0, 0	,0},{},	"%s"					}
 ,	{	{{},{},{},{},0, 0	,0},{},	"%s of Healing"			}
 ,	{	{{},{},{},{},0, 5	,0},{},	"%s of Mana"			}
@@ -103,16 +100,16 @@ static const SEntityRecord<SItem>	itemModifiers[] =
 ,	{	{{},{},{},{},0, 5	,0},{},	"EMP %s"				}
 };
 
-static const CItemV2 itemDefinitions[] = 
+static const CItemV2 itemDefinitions[] =
 	// Type										Price		Name
-{	{ITEM_TYPE_UNKNOWN							,	0	,	"Advice"			}	
+{	{ITEM_TYPE_UNKNOWN							,	0	,	"Advice"			}
 ,	{ITEM_TYPE_POTION							,	10	,	"Potion"			}
 ,	{ITEM_TYPE_GRENADE							,	20	,	"Grenade"			}
 //,	{(ITEM_TYPE)(ITEM_TYPE_BOX|ITEM_TYPE_POTION	),	100	,	"Potion Box"		}
 //,	{(ITEM_TYPE)(ITEM_TYPE_BOX|ITEM_TYPE_GRENADE),	200	,	"Grenade Box"		}
 };
 
-static const CItem itemDescriptions[] = 
+static const CItem itemDescriptions[] =
 	// Type					Property				Price	Name
 {	{ITEM_TYPE_GRENADE	,	PROPERTY_TYPE_NONE											,	0	,	"Rock"							}
 ,	{ITEM_TYPE_POTION	,	PROPERTY_TYPE_HEALTH										,	10	,	"Potion of Healing"				}
@@ -143,9 +140,9 @@ static const CItem itemDescriptions[] =
 ,	{ITEM_TYPE_GRENADE	,	PROPERTY_TYPE_EMP											,	10	,	"EMP Grenade"					}
 };
 
-	static inline constexpr	int32_t				getFinalItemCount					()													{ return (int32_t)((::gpk::size(itemDescriptions)-1)*::gpk::size(itemGrades)); }
-	static inline			int32_t				getItemPrice						(const SItem& item, bool bSellPrice=false)			{ return (int32_t)( bSellPrice ? (itemDescriptions[item.Definition].Price*item.Level)*.5 : itemDescriptions[item.Definition].Price*item.Level ); }
-							::std::string		getItemName							(const SItem& item);
+	static inline constexpr	int32_t						getFinalItemCount					()													{ return (int32_t)((::gpk::size(itemDescriptions)-1)*::gpk::size(itemGrades)); }
+	static inline			int32_t						getItemPrice						(const SItem& item, bool bSellPrice=false)			{ return (int32_t)( bSellPrice ? (itemDescriptions[item.Definition].Price*item.Level)*.5 : itemDescriptions[item.Definition].Price*item.Level ); }
+							::gpk::array_pod<char_t>	getItemName							(const SItem& item);
 
 #pragma pack(pop)
 } // namespace

@@ -4,8 +4,6 @@
 #include "gpk_label.h"
 #include "gpk_array.h"
 
-#include <string>
-
 #ifndef KLIB_TEXT_H_923649827346982746982346298734623
 #define KLIB_TEXT_H_923649827346982746982346298734623
 
@@ -52,39 +50,18 @@ namespace klib
 	template<typename... _Args>	int32_t	printfToRectColored		(::klib::SASCIITarget& target, uint16_t messageColor, int32_t offsetLine, int32_t offsetColumn, ::klib::ALIGN_SCREEN align, const char* format, _Args&&... args)						{
 		return printfToRectColored	((char_t*)target.Characters.begin(), target.Width(), target.Height(), target.Colors.begin(), messageColor, offsetLine, offsetColumn, align, format, args...);
 	}
-	template <size_t _Size>		void	resetCursorString		(char (&textContainer)[_Size])																																				{ textContainer[textContainer[1] = 0] = '_';	}
-	template <size_t _Size> 	bool	getMessageSlow			(char (&message)[_Size], const char* textToPrint, uint32_t sizeToPrint, double lastFrameSeconds, double limit = 0.025f)														{
-		static	float							nextTick				= 0.0f;
-		static	uint32_t						tickCount				= 0;
-				uint32_t						mesLen					= (int32_t)strlen(message);
-		if(0 == mesLen)
-			return true;
 
-		if(memcmp(message, textToPrint, ::gpk::max(0U, ::gpk::min(sizeToPrint, mesLen-1)))) {
-			resetCursorString(message);
-			mesLen								= (uint32_t)strlen(message);
-		}
-		mesLen								= ((mesLen+1) > (_Size-1)) ? _Size-2 : mesLen;
-		nextTick							+= (float)lastFrameSeconds;
-		if(nextTick > limit) {
-			tickCount++;
-			uint32_t								cursorIndex				= mesLen-1;
-			if(cursorIndex < sizeToPrint) {
-				message[cursorIndex]				= textToPrint[cursorIndex];
-				message[mesLen]						= '_';
-				message[cursorIndex+2]				= 0;
-				nextTick							= 0.0f;
-			}
-			else if(0 == (tickCount % 20))
-				message[cursorIndex]				= (message[cursorIndex] == ' ') ? '_' : ' ';
-		}
-		return ( mesLen-1 == sizeToPrint );
-	}
 
-	template <size_t _Size> 
-	static inline				bool	getMessageSlow			(char (&message)[_Size], const ::gpk::view_const_string& textToPrint, double lastFrameSeconds)		{ return ::klib::getMessageSlow(message, textToPrint.begin(), textToPrint.size(), lastFrameSeconds); }
+	struct SMessageSlow {
+		char								Message[256]			= {'_',};
+		float								NextTick				= 0.0f;
+		uint32_t							TickCount				= 0;
+	};
+	static inline	void				resetCursorString		(::gpk::view_char message)			{ message[message[1] = 0] = '_'; }
+	static inline	void				resetCursorString		(::klib::SMessageSlow & message)	{ return resetCursorString(message.Message); }
 
-	int32_t								getLines				(const char* source, int32_t maxLen, ::gpk::array_obj<::std::string>& lines_);
+	bool								getMessageSlow			(::klib::SMessageSlow & message, const char* textToPrint, uint32_t sizeToPrint, double lastFrameSeconds, double limit = 0.025f);
+	static inline	bool				getMessageSlow			(::klib::SMessageSlow & message, const ::gpk::view_const_char & textToPrint, double lastFrameSeconds, double limit = 0.025f)	{ return getMessageSlow(message, textToPrint.begin(), textToPrint.size(), lastFrameSeconds, limit); }
 } // namespace
 
 #endif // KLIB_TEXT_H_923649827346982746982346298734623

@@ -8,16 +8,16 @@ namespace klib
 {
 #pragma pack(push, 1)
 //	{SEntityPoints, SEntityFlags, Name}
-static const SEntityRecord<SFacility> modifiersFacility[] = 
+static const SEntityRecord<SFacility> modifiersFacility[] =
 {	{{{0,0,0},{0,0,0}	,{0,0,{0,0,0},0,0},{0,0,0,0},0,	    0	,    0}	,{{},{}	,{ENTITY_TECHNOLOGY_BASIC	, ENTITY_GRADE_LIGHT}}, "Small %s"		}
 ,	{{{0,0,0},{0,0,0}	,{0,0,{0,0,0},0,0},{0,0,0,0},0,	10000	, 1000}	,{{},{}	,{ENTITY_TECHNOLOGY_BASIC	, ENTITY_GRADE_LIGHT}}, "Large %s"		}
 ,	{{{0,0,0},{0,0,0}	,{0,0,{0,0,0},0,0},{0,0,0,0},0,	20000	,10000}	,{{},{}	,{ENTITY_TECHNOLOGY_BASIC	, ENTITY_GRADE_LIGHT}}, "Advanced %s"	}
 ,	{{{0,0,0},{0,0,0}	,{0,0,{0,0,0},0,0},{0,0,0,0},0,	50000	,50000}	,{{},{}	,{ENTITY_TECHNOLOGY_BASIC	, ENTITY_GRADE_LIGHT}}, "%s Hub"		}
-};	
-	
+};
+
 #define DEFAULT_FACILITY_EFFECTS	{ATTACK_EFFECT_NONE, DEFEND_EFFECT_NONE, }
 
-// Currently the amount of points available for a single character is 14.	
+// Currently the amount of points available for a single character is 14.
 //	{SEntityPoints, SEntityFlags, Name}
 static const SEntityRecord<SFacility> definitionsFacility[] =
 {	{{{00,0,00},{0,0,0}	,{0,0,{0,0,0},0,0},{0,0,0,0},0,     100	, 100}	,{{},{}	,{ENTITY_TECHNOLOGY_BASIC	, ENTITY_GRADE_LIGHT}}, "Dog House"			}
@@ -69,10 +69,6 @@ static const SEntityRecord<SFacility> definitionsFacility[] =
 //,	{{{10,0,10},{0,0,0}	,{0,0,{0,0,0},0,0},{0,0,0,0},0,0}	,{{},{}	,{ENTITY_TECHNOLOGY_BASIC	, ENTITY_GRADE_LIGHT}}, "Space Academy"		}
 //,	{{{10,0,10},{0,0,0}	,{0,0,{0,0,0},0,0},{0,0,0,0},0,0}	,{{},{}	,{ENTITY_TECHNOLOGY_BASIC	, ENTITY_GRADE_LIGHT}}, "Lanch Platform"	}
 };
-
-	static inline	::std::string	getFacilityName		(const SFacility& facility) { return getEntityName	(facility, definitionsFacility, modifiersFacility); }
-	static inline	SEntityPoints	getFacilityPoints	(const SFacility& facility) { return getEntityPoints(facility, definitionsFacility, modifiersFacility); }
-	static inline	SEntityFlags	getFacilityFlags	(const SFacility& facility) { return getEntityFlags	(facility, definitionsFacility, modifiersFacility); }
 
 #pragma pack(pop)
 }

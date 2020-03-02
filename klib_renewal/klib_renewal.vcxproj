@@ -200,6 +200,7 @@
     <ClInclude Include="klib_input.h" />
     <ClInclude Include="klib_draw_misc.h" />
     <ClInclude Include="klib_random_generator.h" />
+    <ClInclude Include="klib_entity_tables.h" />
     <ClInclude Include="klib_text.h" />
     <ClInclude Include="klib_timer.h" />
     <ClInclude Include="Menu.h" />

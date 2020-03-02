@@ -7,20 +7,6 @@
 #define KLIB_GRID_H_902837982374
 namespace klib
 {
-	template<typename _tCell, size_t _sizeWidth, size_t _sizeDepth>
-	struct SGrid : public ::gpk::view_grid<_tCell> {
-		typedef				_tCell										TCell;
-		typedef				::gpk::view_grid<_tCell>					TGridView;
-
-		//using				TGridView									::gpk::view_grid;
-
-		static constexpr	const uint32_t								Width									= (uint32_t)_sizeWidth;
-		static constexpr	const uint32_t								Depth									= (uint32_t)_sizeDepth;
-
-							TCell										Cells[_sizeDepth][_sizeWidth]			= {};
-
-		inline constexpr												SGrid									()																		: TGridView::view_grid{&Cells[0][0], _sizeWidth, _sizeDepth}	{}
-	};
 
 	template<typename _tCell>
 	void																fillCellsFromNoise						(::gpk::view_grid<_tCell> grid, const _tCell& value, int64_t seed, int32_t diceFaces=10)														{

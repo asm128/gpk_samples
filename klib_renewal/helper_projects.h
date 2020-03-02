@@ -6,7 +6,7 @@ namespace klib
 	//------------------------------------------------------------ Researched
 	template<typename _EntityType>
 	void																							addIfResearched
-		(	klib::SResearchGroup<_EntityType>						& researchedItems
+		(	::klib::SResearchGroup<_EntityType>						& researchedItems
 		,	const _EntityType										& entity
 		,	const ::klib::SResearchGroup<_EntityType>					& researchCompleted
 		)
@@ -21,7 +21,7 @@ namespace klib
 	// Returns the possible research for a given type of researchable
 	template<typename _EntityType>
 	void																							generateResearchedList
-		(	klib::SResearchGroup		<_EntityType>	& researchableItems
+		(	::klib::SResearchGroup		<_EntityType>	& researchableItems
 		,	const ::klib::SEntityContainer<_EntityType>	& playerInventory
 		,	const ::klib::SResearchGroup	<_EntityType>	& researchCompleted
 		)
@@ -34,10 +34,10 @@ namespace klib
 
 	template<typename _EntityType>
 	void																							generateResearchedListFromAgent
-		(	klib::SResearchGroup<_EntityType>			& researchableItems
+		(	::klib::SResearchGroup<_EntityType>			& researchableItems
 		,	const _EntityType							& equippedEntity
 		,	const ::klib::SEntityContainer<_EntityType>	& agentInventory
-		,	const ::klib::SResearchGroup<_EntityType>		& researchCompleted
+		,	const ::klib::SResearchGroup<_EntityType>	& researchCompleted
 		)
 	{
 		addIfResearched			(researchableItems, equippedEntity, researchCompleted);
@@ -46,8 +46,8 @@ namespace klib
 
 	template<typename _EntityType>
 	void																							generateResearchedListFromAgentNoEquip
-		(	klib::SResearchGroup		<_EntityType>	& researchableItems
-		,	const ::klib::SEntityContainer<_EntityType>	& agentInventory
+		(	::klib::SResearchGroup			<_EntityType>	& researchableItems
+		,	const ::klib::SEntityContainer	<_EntityType>	& agentInventory
 		,	const ::klib::SResearchGroup	<_EntityType>	& researchCompleted
 		)
 	{
@@ -58,19 +58,20 @@ namespace klib
 	//------------------------------------------------------------ Researchable
 	template<typename _EntityType>
 	void																							addIfResearchable
-		(	klib::SResearchGroup		<_EntityType>				& researchableItems
+		(	::klib::SResearchGroup		<_EntityType>				& researchableItems
 		,	const _EntityType										& entity
-		,	const ::klib::SResearchGroup	<_EntityType>				& researchCompleted
+		,	const ::klib::SResearchGroup<_EntityType>				& researchCompleted
 		,	const ::gpk::array_obj		<SEntityResearch>			& queuedResearch
 		,	bool													bIsParallelDefinition
 		,	bool													bIsParallelModifier
 		)
 	{
+		const ENTITY_TYPE curType = entity.getType();
 		if(entity.Definition && -1 == researchCompleted.Definitions.FindElement(entity.Definition) && (bIsParallelDefinition || entity.Definition <= (researchCompleted.MaxResearch.Definition+1)) ) {
 			bool																							bNotFound					= true;
 			for(uint32_t i=0, count = (uint32_t)queuedResearch.size(); i<count; ++i) {
 				const SEntityResearch																			& queuedStuff				= queuedResearch[i];
-				if(queuedStuff.Type == entity.getType() && queuedStuff.Entity.Definition == entity.Definition) {
+				if(queuedStuff.Type == curType && queuedStuff.Entity.Definition == entity.Definition) {
 					bNotFound																					= false;	// we just don't add it if it's already added
 					break;
 				}
@@ -84,7 +85,7 @@ namespace klib
 			bool																							bNotFound					= true;
 			for(uint32_t i=0, count = (uint32_t)queuedResearch.size(); i<count; ++i) {
 				const SEntityResearch																			& queuedStuff				= queuedResearch[i];
-				if(queuedStuff.Type == entity.getType() && queuedStuff.Entity.Modifier == entity.Modifier) {
+				if(queuedStuff.Type == curType && queuedStuff.Entity.Modifier == entity.Modifier) {
 					bNotFound																					= false;	// we just don't add it if it's already added
 					break;
 				}
@@ -98,9 +99,9 @@ namespace klib
 	// Returns the possible research for a given type of researchable
 	template<typename _EntityType>
 	void																							generateResearchableList
-		(	klib::SResearchGroup			<_EntityType>			& researchableItems
+		(	::klib::SResearchGroup			<_EntityType>			& researchableItems
 		,	const ::klib::SEntityContainer	<_EntityType>			& playerInventory
-		,	const ::klib::SResearchGroup		<_EntityType>			& researchCompleted
+		,	const ::klib::SResearchGroup	<_EntityType>			& researchCompleted
 		,	const ::gpk::array_obj			<SEntityResearch>		& queuedResearch
 		,	bool													bIsParallelDefinition
 		,	bool													bIsParallelModifier
@@ -114,10 +115,10 @@ namespace klib
 
 	template<typename _EntityType>
 	void																							generateResearchableListFromAgent
-		(	klib::SResearchGroup			<_EntityType>			& researchableItems
+		(	::klib::SResearchGroup			<_EntityType>			& researchableItems
 		,	const _EntityType										& equippedEntity
 		,	const ::klib::SEntityContainer	<_EntityType>			& agentInventory
-		,	const ::klib::SResearchGroup		<_EntityType>			& researchCompleted
+		,	const ::klib::SResearchGroup	<_EntityType>			& researchCompleted
 		,	const ::gpk::array_obj			<SEntityResearch>		& queuedResearch
 		,	bool													bIsParallelDefinition
 		,	bool													bIsParallelModifier
@@ -130,9 +131,9 @@ namespace klib
 
 	template<typename _EntityType>
 	void																							generateResearchableListFromAgentNoEquip
-		(	klib::SResearchGroup			<_EntityType>			& researchableItems
+		(	::klib::SResearchGroup			<_EntityType>			& researchableItems
 		,	const ::klib::SEntityContainer	<_EntityType>			& agentInventory
-		,	const ::klib::SResearchGroup		<_EntityType>			& researchCompleted
+		,	const ::klib::SResearchGroup	<_EntityType>			& researchCompleted
 		,	const ::gpk::array_obj			<SEntityResearch>		& queuedResearch
 		,	bool													bIsParallelDefinition
 		,	bool													bIsParallelModifier
