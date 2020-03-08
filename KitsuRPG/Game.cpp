@@ -545,7 +545,7 @@ void																	displayScore								(const ::klib::SCharacterScore& score)	
 		, gameCounters.AttacksReceived
 		, gameCounters.AttacksAvoided
 
-		, gameCounters.PotionsUsed
-		, gameCounters.GrenadesUsed
+		, gameCounters.UsedPotions
+		, gameCounters.UsedGrenades
 	);
 }

@@ -2,15 +2,14 @@
 
 int main(int /*argc*/, char ** /*argv*/)
 {
-#if defined(GPK_DEBUG_ENABLED)
+#if defined(DEBUG) || defined(_DEBUG)
 	int tmp = _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF|_CRTDBG_LEAK_CHECK_DF);//|_CRTDBG_DELAY_FREE_MEM_DF);
 	// Clear the upper 16 bits and OR in the desired freqency
 	//tmp = (tmp & 0x0000FFFF) | _CRTDBG_CHECK_EVERY_16_DF;
 	// Set the new bits
 	_CrtSetDbgFlag(tmp);
 #endif
-
-#define DEFAULT_ASCII_DISPLAY_HEIGHT	70//83
+#define DEFAULT_ASCII_DISPLAY_HEIGHT	64//83
 #define DEFAULT_ASCII_DISPLAY_WIDTH		((uint32_t)(DEFAULT_ASCII_DISPLAY_HEIGHT * 2.666666f))
 	::klib::initASCIIScreen(DEFAULT_ASCII_DISPLAY_WIDTH, DEFAULT_ASCII_DISPLAY_HEIGHT);
 
@@ -24,7 +23,7 @@ int main(int /*argc*/, char ** /*argv*/)
 		::klib::pollInput(instanceGame.FrameInput);
 		::klib::SASCIITarget							target;
 		::klib::getASCIIBackBuffer						(target);
-		::klib::clearASCIIBackBuffer(' ', COLOR_WHITE);
+		::klib::clearASCIIBackBuffer(' ', ::klib::ASCII_COLOR_INDEX_WHITE);
  		::klib::drawAndPresentGame(instanceGame, target);
 		::klib::presentASCIIBackBuffer();
 	}

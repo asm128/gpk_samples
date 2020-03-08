@@ -15,8 +15,7 @@ namespace klib
 	// This struct holds both the tile coordinate as integers and the floating point vector indicating the position inside the tile.
 	// This is done this way for simplifying a bunch of operations for which we only need the integer part
 	// while improving the precision of the floating point values by only requiring them to represent a value between 0 and 1 for a very small distance.
-	struct STacticalCoord
-	{
+	struct STacticalCoord {
 		::gpk::SCoord3<int32_t>									Cell											;	// Position in tile map.
 		::gpk::SCoord3<float>									Offset											;	// Position between 0 and 1 relative to the tile.
 
@@ -30,8 +29,7 @@ namespace klib
 		}
 	};
 
-	struct SBulletPoints
-	{
+	struct SBulletPoints {
 		SEntityGrade											Tech											;
 		ATTACK_EFFECT											Effect											;
 		COMBAT_STATUS											StatusInflict									;
@@ -50,8 +48,7 @@ namespace klib
 		}
 	};
 
-	struct SAOE
-	{
+	struct SAOE {
 		STacticalCoord											Position										;	// AOE Center
 		double													RadiusOrHalfSize								;	// For both radial AOE and square/cube AOE.
 		STileCharacter											Caster											;	// We need to keep track of the one who spanwed this AOE in order to enable a variety of operations such as creating AOE that affect only a given character or team.
@@ -98,11 +95,9 @@ namespace klib
 #pragma pack(pop)
 #define MAX_MAP_SHOTS 64
 #define MAX_MAP_BULLET_COORDS ((MAX_MAP_SHOTS)*100)
-	typedef SEntityContainer<::gpk::SCoord3<int32_t>> SCoordContainerBullet;
-	struct SMapShots
-	{
-		SEntityContainer<SBullet>					Bullet											= {};
-		SCoordContainerBullet						Coords											= {};
+	struct SMapShots {
+		::gpk::array_pod<::klib::SBullet>			Bullet											= {};
+		::gpk::array_pod<::gpk::SCoord3<int32_t>>	Coords											= {};
 	};
 
 	typedef SEntityContainer<::gpk::SCoord3<int32_t>> SCoordContainerEntity;
@@ -132,27 +127,27 @@ namespace klib
 	GDEFINE_ENUM_VALUE(PLAYER_INDEX, USER, 0);
 
 	struct STacticalSetup {
-		uint64_t												Seed																;//= 15731;
-		uint32_t												TotalPlayers														;//= 0;
-		uint32_t												TotalTeams															;//= 0;
-		PLAYER_INDEX											Players				[MAX_TACTICAL_PLAYERS]							;//= {};
-		SPlayerControl											Controls			[MAX_TACTICAL_PLAYERS]							;//= {};
-		TEAM_TYPE												TeamPerPlayer		[MAX_TACTICAL_PLAYERS]							;//= {};
-		int8_t													PlayersPerTeam		[MAX_TACTICAL_PLAYERS][MAX_TACTICAL_PLAYERS]	;//= {};
-		int8_t													PlayerCountPerTeam	[MAX_TACTICAL_PLAYERS]							;//= {};
-		uint8_t													SquadSize			[MAX_TACTICAL_PLAYERS]							;//= {};
+		uint64_t													Seed				;//= 15731;
+		uint32_t													TotalPlayers		;//= 0;
+		uint32_t													TotalTeams			;//= 0;
+		::gpk::array_static<PLAYER_INDEX	, MAX_TACTICAL_PLAYERS>	Players				;//= {};
+		::gpk::array_static<SPlayerControl	, MAX_TACTICAL_PLAYERS>	Controls			;//= {};
+		::gpk::array_static<TEAM_TYPE		, MAX_TACTICAL_PLAYERS>	TeamPerPlayer		;//= {};
+		int8_t														PlayersPerTeam		[MAX_TACTICAL_PLAYERS][MAX_TACTICAL_PLAYERS]	;//= {};
+		::gpk::array_static<int8_t			, MAX_TACTICAL_PLAYERS>	PlayerCountPerTeam	;//= {};
+		::gpk::array_static<uint8_t			, MAX_TACTICAL_PLAYERS>	SquadSize			;//= {};
 
 		void													Clear											()															{
 			Seed													= 15731;
 			TotalPlayers											= 0;
 			TotalTeams												= 0;
+			memset(PlayersPerTeam, -1, sizeof(int8_t) * MAX_TACTICAL_PLAYERS * MAX_TACTICAL_PLAYERS);
 
-			memset(Players				, -1, sizeof(PLAYER_INDEX	)*::gpk::size(Players				));
-			memset(Controls				,  0, sizeof(SPlayerControl	)*::gpk::size(Controls				));
-			memset(TeamPerPlayer		, -1, sizeof(TEAM_TYPE		)*::gpk::size(TeamPerPlayer			));
-			memset(PlayersPerTeam		, -1, sizeof(int8_t			)*::gpk::size(PlayersPerTeam		));
-			memset(PlayerCountPerTeam	,  0, sizeof(int8_t			)*::gpk::size(PlayerCountPerTeam	));
-			memset(SquadSize			,  0, sizeof(uint8_t		)*::gpk::size(SquadSize				));
+			memset(Players				.begin(), -1, sizeof(PLAYER_INDEX	) * Players				.size());
+			memset(Controls				.begin(),  0, sizeof(SPlayerControl	) * Controls			.size());
+			memset(TeamPerPlayer		.begin(), -1, sizeof(TEAM_TYPE		) * TeamPerPlayer		.size());
+			memset(PlayerCountPerTeam	.begin(),  0, sizeof(int8_t			) * PlayerCountPerTeam	.size());
+			memset(SquadSize			.begin(),  0, sizeof(uint8_t		) * SquadSize			.size());
 		};
 	};
 
@@ -192,11 +187,8 @@ namespace klib
 
 		inline	int32_t											ResizeBoard										(::gpk::SCoord2<uint32_t> newSize)							{ Board.Resize(newSize); }
 		bool													AddBullet										(const SBullet& newBullet)									{
-			if(Board.Shots.Bullet.AddElement(newBullet))
-				Board.Shots.Coords.AddElement(newBullet.Position.Cell);
-			else
-				return false;
-
+			Board.Shots.Bullet.push_back(newBullet);
+			Board.Shots.Coords.push_back(newBullet.Position.Cell);
 			return true;
 		}
 

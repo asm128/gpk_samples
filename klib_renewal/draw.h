@@ -47,6 +47,6 @@ namespace klib
 
 } // namespace
 
-#define TACTICAL_DISPLAY_POSY 5
+#define TACTICAL_DISPLAY_POSY 6
 
 #endif // __DRAW_H_2394623987462983746823749623__

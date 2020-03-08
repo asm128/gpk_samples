@@ -17,8 +17,8 @@ namespace klib
 		return valueToRect(rectangleTopLeft, width, height, offsetLine, offsetColumn, align, text, textLen);
 	}
 
-	template<typename _tChar, typename... _tArgs>
-								int32_t	printfToRect			( _tChar* rectangleTopLeft, uint32_t width, uint32_t height, int32_t offsetLine, int32_t offsetColumn, ::klib::ALIGN_SCREEN align, const char* format, _tArgs&&... args )		{
+	template<typename... _tArgs>
+								int32_t	printfToRect			( char* rectangleTopLeft, uint32_t width, uint32_t height, int32_t offsetLine, int32_t offsetColumn, ::klib::ALIGN_SCREEN align, const char* format, _tArgs&&... args )		{
 		char									precookStr[1024]		= {};
 		int32_t									precookLen				= sprintf_s(precookStr, format, args...);
 		return valueToRect(rectangleTopLeft, width, height, offsetLine, offsetColumn, align, precookStr, precookLen);
@@ -47,8 +47,15 @@ namespace klib
 	static inline				int32_t	lineToRectColored		(::klib::SASCIITarget& target, uint16_t messageColor, int32_t offsetLine, int32_t offsetColumn, ::klib::ALIGN_SCREEN align, const char* text, uint32_t charCount = 0xFFFFFFFF)		{
 		return lineToRectColored	((char_t*)target.Characters.begin(), target.Width(), target.Height(), target.Colors.begin(), messageColor, offsetLine, offsetColumn, align, text, charCount);
 	}
+	static inline				int32_t	lineToRectColored		(::gpk::view2d_char chars, ::gpk::view2d_uint16 colors, uint16_t messageColor, int32_t offsetLine, int32_t offsetColumn, ::klib::ALIGN_SCREEN align, const char* text, uint32_t charCount = 0xFFFFFFFF)		{
+		return lineToRectColored	((char_t*)chars.begin(), chars.metrics().x, chars.metrics().y, colors.begin(), messageColor, offsetLine, offsetColumn, align, text, charCount);
+	}
 	template<typename... _Args>	int32_t	printfToRectColored		(::klib::SASCIITarget& target, uint16_t messageColor, int32_t offsetLine, int32_t offsetColumn, ::klib::ALIGN_SCREEN align, const char* format, _Args&&... args)						{
 		return printfToRectColored	((char_t*)target.Characters.begin(), target.Width(), target.Height(), target.Colors.begin(), messageColor, offsetLine, offsetColumn, align, format, args...);
+	}
+
+	template<typename... _Args>	int32_t	printfToRectColored		(::gpk::view2d_char chars, ::gpk::view2d_uint16 colors, uint16_t messageColor, int32_t offsetLine, int32_t offsetColumn, ::klib::ALIGN_SCREEN align, const char* format, _Args&&... args)						{
+		return printfToRectColored	(chars.begin(), chars.metrics().x, chars.metrics().y, colors.begin(), messageColor, offsetLine, offsetColumn, align, format, args...);
 	}
 
 

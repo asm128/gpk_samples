@@ -43,7 +43,7 @@ static int32_t												getAgentsInRange									(SGame& instanceGame, const :
 				continue;
 
 			agentsInRange.Agents[agentsInRange.Count++]					= {{tacticalInfo.Setup.TeamPerPlayer[iPlayer], (int8_t)iPlayer, 0, (int8_t)iAgent}, {0, 0, 0}};
-			if(agentsInRange.Count >= (int32_t)::gpk::size(agentsInRange.Agents))
+			if(agentsInRange.Count >= (int32_t)agentsInRange.Agents.size())
 				break;
 		}
 	}
@@ -59,8 +59,8 @@ void																					recalculateAgentsInRangeAndSight										(SGame& insta
 			continue;
 
 		SPlayer																						& player																= instanceGame.Players[tacticalInfo.Setup.Players[iPlayer]];
-		uint8_t																						squadSize																= tacticalInfo.Setup.SquadSize[iPlayer];
-		for(uint32_t iAgent=0, agentCount = squadSize > ::gpk::size(tacticalInfo.Setup.SquadSize) ? (uint32_t)::gpk::size(tacticalInfo.Setup.SquadSize) : squadSize; iAgent < agentCount; ++iAgent) {
+		uint16_t																					squadSize																= tacticalInfo.Setup.SquadSize[iPlayer];
+		for(uint32_t iAgent=0; iAgent < squadSize; ++iAgent) {
 			if(player.Tactical.Squad.Agents[iAgent] == -1)
 				continue;
 
@@ -436,7 +436,7 @@ void																					distributeDropsForVictoriousTeam										(SGame& insta
 		pickupEntities(winnerPlayer.Inventory.Facility	, tacticalInfo.Drops.Facility	);
 		pickupEntities(winnerPlayer.Inventory.StageProp	, tacticalInfo.Drops.StageProp	);
 		pickupEntities(winnerPlayer.Inventory.Items		, tacticalInfo.Drops.Items		);
-		for(uint32_t iAgent = 0; iAgent < ::gpk::size(winnerPlayer.Tactical.Squad.Agents); ++iAgent) {
+		for(uint32_t iAgent = 0; iAgent < winnerPlayer.Tactical.Squad.Agents.size(); ++iAgent) {
 			int16_t currentAgent = winnerPlayer.Tactical.Squad.Agents[iAgent];
 			if(-1 != currentAgent) {
 				winnerPlayer.Tactical.Army[currentAgent]->Recalculate(instanceGame.EntityTables);
@@ -577,10 +577,14 @@ void																					distributeDropsForVictoriousTeam										(SGame& insta
 	}
 }
 
-void																					klib::determineOutcome													(SGame& instanceGame)																	{
+void																					klib::determineOutcome													(SGame& instanceGame, bool aborted)																	{
 	TEAM_TYPE																					teamVictorious															= TEAM_TYPE_SPECTATOR;
 	STacticalInfo																				& tacticalInfo															= instanceGame.TacticalInfo;
-	instanceGame.Messages.UserLog.clear();
+	if(aborted)  {
+		instanceGame.Messages.UserMessage	= ::gpk::view_const_string{"Mission aborted."};
+		instanceGame.LogMessage();
+		return;
+	}
 	for(uint32_t iPlayer = 0, playerCount = tacticalInfo.Setup.TotalPlayers; iPlayer < playerCount; ++iPlayer) {
 		if(tacticalInfo.Setup.Players[iPlayer] == -1)
 			continue;
@@ -652,8 +656,8 @@ template<typename _TEntity>
 {
 	while(deadTargetEntities.Slots.size()) {
 		if(deadTargetEntities[0].Entity.Definition != -1) {
-			if(mapEntities			.AddElement(deadTargetEntities[0].Entity))
-				entityCoords		.AddElement(deadTargetCoords);
+			if(mapEntities	.AddElement(deadTargetEntities[0].Entity))
+				entityCoords.AddElement(deadTargetCoords);
 		}
 		deadTargetEntities	.DecreaseEntity(0);
 	}

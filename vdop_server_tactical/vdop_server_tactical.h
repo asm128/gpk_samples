@@ -43,10 +43,11 @@ struct SApplication {
 				::std::mutex														LockRender;
 
 				::STextOverlay														TextOverlay					= {};
-				::klib::SGame														Game						= {};
+				::gpk::array_obj<::gpk::ptr_obj<::klib::SGame>>						Game						= {};
 
 				::gpk::SUDPServer													TacticalServer;
-				::gpk::array_obj<::gpk::array_obj<::gpk::ptr_obj<::gpk::SUDPConnectionMessage>>>	MessagesToProcess;
+				typedef ::gpk::array_obj<::gpk::ptr_obj<::gpk::SUDPConnectionMessage>> TClientQueue;
+				::gpk::array_obj<TClientQueue>										MessagesToProcess;
 
 				uint8_t																MapToDraw[5][32]			=
 					{ {0xDA, 0xC4,  0xC4,  0xC4	,  0xC4	,  0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xBF}

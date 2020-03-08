@@ -76,7 +76,7 @@ bool									klib::usePotion						(const ::klib::SEntityTables & tables, ::klib:
 
 	if(bUsedItem) {
 		potionDrinker.Recalculate(tables);
-		++potionDrinker.Score.PotionsUsed;
+		++potionDrinker.Score.UsedPotions;
 	}
 
 	return bUsedItem;

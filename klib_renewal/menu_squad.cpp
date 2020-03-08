@@ -32,8 +32,8 @@ SGameState														drawSquadSetupMenu									(SGame& instanceGame)								
 	static ::klib::SDrawMenuState										menuState;
 	int32_t																result												= ::klib::drawMenu
 		( menuState
-		, instanceGame.GlobalDisplay.Screen.View
-		, instanceGame.GlobalDisplay.TextAttributes.begin()
+		, instanceGame.GlobalDisplay.Screen.Color.View
+		, instanceGame.GlobalDisplay.Screen.DepthStencil.begin()
 		, ::gpk::view_const_string{"Squad setup"}
 		, ::gpk::view_array<const ::gpk::view_const_char>{menuItemsView.begin(), menuItemsView.size()}
 		, instanceGame.FrameInput
@@ -43,7 +43,7 @@ SGameState														drawSquadSetupMenu									(SGame& instanceGame)								
 	if(menuItems.size() == (uint32_t)result)
 		return {GAME_STATE_WELCOME_COMMANDER};
 
-	if( result < 0 || result >= (int32_t)::gpk::size(player.Tactical.Squad.Agents) )
+	if( result < 0 || result >= (int32_t)player.Tactical.Squad.Agents.size() )
 		return {GAME_STATE_MENU_SQUAD_SETUP};
 
 	player.Tactical.Selection.PlayerUnit										= (int16_t)result;

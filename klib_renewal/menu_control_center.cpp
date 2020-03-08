@@ -83,15 +83,15 @@ int32_t							drawAgentResume				(const ::klib::SEntityTables & tables, ::gpk::v
 	char								formatted[64]				= {};
 
 	int32_t								columnOffset;
-	int32_t								finalColor, genderColor = agent.Flags.Tech.Gender == GENDER_FEMALE ? COLOR_DARKMAGENTA : agent.Flags.Tech.Gender == GENDER_MALE ? COLOR_BLUE : COLOR_GREEN;
+	int32_t								finalColor, genderColor = agent.Flags.Tech.Gender == GENDER_FEMALE ? ::klib::ASCII_COLOR_INDEX_DARKMAGENTA : agent.Flags.Tech.Gender == GENDER_MALE ? ::klib::ASCII_COLOR_INDEX_BLUE : ::klib::ASCII_COLOR_INDEX_GREEN;
 	::gpk::array_pod<char_t>			equipName;
 
-	finalColor						= (selectedAgentField == ENTITY_TYPE_CHARACTER) ? (genderColor<<4)|COLOR_DARKGREY : (COLOR_DARKGREY<<4)|genderColor;
+	finalColor						= (selectedAgentField == ENTITY_TYPE_CHARACTER) ? (genderColor<<4)|::klib::ASCII_COLOR_INDEX_DARKGREY : (::klib::ASCII_COLOR_INDEX_DARKGREY<<4)|genderColor;
 	columnOffset					= printfToGridColored(display, textAttributes, (uint16_t)finalColor, offsetY++, offsetX, ::klib::SCREEN_LEFT, " %c - %-38.38s", ::klib::ascii_gender[agent.Flags.Tech.Gender], agent.Name.begin());
 
 	SListItem<int32_t>					equipSlots[4];
 	for(uint32_t i=0; i < ::gpk::size(equipSlots); ++i)
-		equipSlots[i].Color = (selectedAgentField == (int32_t)i + 1) ? COLOR_GREEN : COLOR_GREEN << 4;
+		equipSlots[i].Color = (selectedAgentField == (int32_t)i + 1) ? ::klib::ASCII_COLOR_INDEX_GREEN : ::klib::ASCII_COLOR_INDEX_GREEN << 4;
 
 	equipName = getEntityName(tables.Profession	, agent.CurrentEquip.Profession	);	sprintf_s(formatted, " %-10.10s: %-30.30s", "Job"		, equipName.begin());	equipSlots[ENTITY_TYPE_PROFESSION	-1].Text = ::gpk::view_const_string{formatted};
 	equipName = getEntityName(tables.Weapon		, agent.CurrentEquip.Weapon		);	sprintf_s(formatted, " %-10.10s: %-30.30s", "Weapon"	, equipName.begin());	equipSlots[ENTITY_TYPE_WEAPON		-1].Text = ::gpk::view_const_string{formatted};
@@ -101,9 +101,9 @@ int32_t							drawAgentResume				(const ::klib::SEntityTables & tables, ::gpk::v
 
 	offsetY += (uint32_t)::gpk::size(equipSlots);
 
-	sprintf_s(preformatted0, "%i", agent.Points.LifeCurrent.Health	);	sprintf_s(preformatted1, "%i", agent.FinalPoints.LifeMax.Health	);	sprintf_s(formatted, " Health    : %7.7s/%7.7s"	, preformatted0, preformatted1); columnOffset = printfToGridColored(display, textAttributes, COLOR_GREEN<<0, offsetY++, offsetX, ::klib::SCREEN_LEFT, "%-43.43s", formatted);
-	sprintf_s(preformatted0, "%i", agent.Points.LifeCurrent.Mana	);	sprintf_s(preformatted1, "%i", agent.FinalPoints.LifeMax.Mana	);	sprintf_s(formatted, " Mana      : %7.7s/%7.7s"	, preformatted0, preformatted1); columnOffset = printfToGridColored(display, textAttributes, COLOR_GREEN<<0, offsetY++, offsetX, ::klib::SCREEN_LEFT, "%-43.43s", formatted);
-	sprintf_s(preformatted0, "%i", agent.Points.LifeCurrent.Shield	);	sprintf_s(preformatted1, "%i", agent.FinalPoints.LifeMax.Shield	);	sprintf_s(formatted, " Shield    : %7.7s/%7.7s"	, preformatted0, preformatted1); columnOffset = printfToGridColored(display, textAttributes, COLOR_GREEN<<0, offsetY++, offsetX, ::klib::SCREEN_LEFT, "%-43.43s", formatted);
+	sprintf_s(preformatted0, "%i", agent.Points.LifeCurrent.Health	);	sprintf_s(preformatted1, "%i", agent.FinalPoints.LifeMax.Health	);	sprintf_s(formatted, " Health    : %7.7s/%7.7s"	, preformatted0, preformatted1); columnOffset = printfToGridColored(display, textAttributes, ::klib::ASCII_COLOR_INDEX_GREEN, offsetY++, offsetX, ::klib::SCREEN_LEFT, "%-43.43s", formatted);
+	sprintf_s(preformatted0, "%i", agent.Points.LifeCurrent.Mana	);	sprintf_s(preformatted1, "%i", agent.FinalPoints.LifeMax.Mana	);	sprintf_s(formatted, " Mana      : %7.7s/%7.7s"	, preformatted0, preformatted1); columnOffset = printfToGridColored(display, textAttributes, ::klib::ASCII_COLOR_INDEX_GREEN, offsetY++, offsetX, ::klib::SCREEN_LEFT, "%-43.43s", formatted);
+	sprintf_s(preformatted0, "%i", agent.Points.LifeCurrent.Shield	);	sprintf_s(preformatted1, "%i", agent.FinalPoints.LifeMax.Shield	);	sprintf_s(formatted, " Shield    : %7.7s/%7.7s"	, preformatted0, preformatted1); columnOffset = printfToGridColored(display, textAttributes, ::klib::ASCII_COLOR_INDEX_GREEN, offsetY++, offsetX, ::klib::SCREEN_LEFT, "%-43.43s", formatted);
 	return 0;
 }
 
@@ -119,16 +119,16 @@ int32_t processSliderInput(const ::klib::SInput& frameInput, int32_t offsetY, in
 int32_t drawValueSlider(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int32_t offsetY, int32_t offsetX, int64_t value, int32_t labelMaxLen, const ::gpk::view_const_char & controlLabel ) {
 	char preformatted[16] = {};
 
-	sprintf_s(preformatted, "%%-%i.%is:", labelMaxLen, labelMaxLen);	; printfToGridColored(display, textAttributes, COLOR_GREEN<<0	, offsetY, offsetX+00				, ::klib::SCREEN_LEFT, preformatted	, controlLabel.begin());
-	preformatted[0] = ::klib::ascii_arrow[1]; preformatted[1] = 0;		; printfToGridColored(display, textAttributes, COLOR_GREEN<<4	, offsetY, offsetX+labelMaxLen+ 1	, ::klib::SCREEN_LEFT, " %s "			, preformatted);
-	sprintf_s(preformatted, "%lli", value);								; printfToGridColored(display, textAttributes, COLOR_GREEN<<0	, offsetY, offsetX+labelMaxLen+ 4	, ::klib::SCREEN_LEFT, " %3.3s%% "	, preformatted);
-	preformatted[0] = ::klib::ascii_arrow[3]; preformatted[1] = 0;		; printfToGridColored(display, textAttributes, COLOR_GREEN<<4	, offsetY, offsetX+labelMaxLen+10	, ::klib::SCREEN_LEFT, " %s"			, preformatted);
+	sprintf_s(preformatted, "%%-%i.%is:", labelMaxLen, labelMaxLen);	; printfToGridColored(display, textAttributes, ::klib::ASCII_COLOR_INDEX_GREEN<<0	, offsetY, offsetX+00				, ::klib::SCREEN_LEFT, preformatted	, controlLabel.begin());
+	preformatted[0] = ::klib::ascii_arrow[1]; preformatted[1] = 0;		; printfToGridColored(display, textAttributes, ::klib::ASCII_COLOR_INDEX_GREEN<<4	, offsetY, offsetX+labelMaxLen+ 1	, ::klib::SCREEN_LEFT, " %s "		, preformatted);
+	sprintf_s(preformatted, "%lli", value);								; printfToGridColored(display, textAttributes, ::klib::ASCII_COLOR_INDEX_GREEN<<0	, offsetY, offsetX+labelMaxLen+ 4	, ::klib::SCREEN_LEFT, " %3.3s%% "	, preformatted);
+	preformatted[0] = ::klib::ascii_arrow[3]; preformatted[1] = 0;		; printfToGridColored(display, textAttributes, ::klib::ASCII_COLOR_INDEX_GREEN<<4	, offsetY, offsetX+labelMaxLen+10	, ::klib::SCREEN_LEFT, " %s"		, preformatted);
 	return 0;
 };
 
 static	void drawBalance(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, const ::klib::SInput& frameInput, SPlayer& player, int32_t offsetX, int32_t offsetY) {
 	// Budgets
-	printfToGridColored(display, textAttributes, COLOR_YELLOW << 4, offsetY, offsetX+14, ::klib::SCREEN_LEFT, "%s", "    Project budgets   ");
+	printfToGridColored(display, textAttributes, ::klib::ASCII_COLOR_INDEX_YELLOW << 4, offsetY, offsetX+14, ::klib::SCREEN_LEFT, "%s", "    Project budgets   ");
 	drawValueSlider		(display	, textAttributes, offsetY+2, offsetX+14, player.Projects.BudgetProduction	.Money	, 10, "Production");
 	drawValueSlider		(display	, textAttributes, offsetY+4, offsetX+14, player.Projects.BudgetResearch		.Money	, 10, "Research");
 	processSliderInput	(frameInput	, offsetY+2, offsetX+14, player.Projects.BudgetProduction	.Money	, 0, 100);
@@ -147,14 +147,14 @@ static	void drawBalance(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_
 
 	char formatted[64];
 	sprintf_s(formatted, "%15.15s%s%14.14s", "", "Balance", "");
-	printfToGridColored(display, textAttributes, COLOR_YELLOW << 4, offsetY+7, offsetX, ::klib::SCREEN_LEFT, "%s", formatted);
+	printfToGridColored(display, textAttributes, ::klib::ASCII_COLOR_INDEX_YELLOW << 4, offsetY+7, offsetX, ::klib::SCREEN_LEFT, "%s", formatted);
 
 	// draw fields
 	int32_t selectedIndex = mouseOverList(frameInput, 5, offsetX, offsetY+8, 37) & ~0x80000000;
 	SListItem<int32_t> balanceOptions[5] = {};
 
 	for(uint32_t i=0; i<::gpk::size(balanceOptions); ++i)
-		balanceOptions[i].Color = (selectedIndex == (int32_t)i) ? COLOR_GREEN : COLOR_GREEN << 4;
+		balanceOptions[i].Color = (selectedIndex == (int32_t)i) ? ::klib::ASCII_COLOR_INDEX_GREEN : ::klib::ASCII_COLOR_INDEX_GREEN << 4;
 
 	char preformatted[16];
 	sprintf_s(preformatted, "%lli", funds										);	sprintf_s(formatted, " Funds               : %13.13s", preformatted); balanceOptions[0].Text = ::gpk::view_const_string{formatted};
@@ -185,7 +185,7 @@ int32_t												drawEquipDetail
 	for(uint32_t i = 4, count= (uint32_t)::gpk::size(formattedTitle); i<count; ++i)
 		formattedTitle[i]									= (char)::tolower(formattedTitle[i]);
 
-	printfToGridColored(display, textAttributes, COLOR_YELLOW << 4 | COLOR_BLUE, offsetY, offsetX, ::klib::SCREEN_LEFT, "%-37.37s", formattedTitle);
+	printfToGridColored(display, textAttributes, ::klib::ASCII_COLOR_INDEX_YELLOW << 4 | ::klib::ASCII_COLOR_INDEX_BLUE, offsetY, offsetX, ::klib::SCREEN_LEFT, "%-37.37s", formattedTitle);
 	return 0;
 }
 
@@ -209,7 +209,7 @@ int32_t										drawEquipList
 	::gpk::array_pod<char_t>						entityName;
 	for(uint32_t iEntity = 0, entityCount = entityContainer.Slots.size(); iEntity < entityCount; ++iEntity) {
 		entityName									= ::klib::getEntityName(table, entityContainer[iEntity].Entity);
-		uint16_t										colorRow						= (iEntity == (uint32_t)selectedRow) ? COLOR_YELLOW : COLOR_YELLOW << 4;
+		uint16_t										colorRow						= (iEntity == (uint32_t)selectedRow) ? ::klib::ASCII_COLOR_INDEX_YELLOW : ::klib::ASCII_COLOR_INDEX_YELLOW << 4;
 		printfToGridColored(display, textAttributes, colorRow, offsetY+1+iEntity, offsetX, ::klib::SCREEN_LEFT, "%12.12s %-30.30s", "", entityName.begin());
 	}
 	return 0;
@@ -232,11 +232,11 @@ int32_t drawAgentList
 
 		const CCharacter								& agent							= *army[iEntity];
 		const ::gpk::array_pod<char>					& entityName					= agent.Name;
-		uint16_t										colorRow						= ((int32_t)iEntity == selectedRow) ? COLOR_YELLOW : COLOR_YELLOW << 4;
+		uint16_t										colorRow						= ((int32_t)iEntity == selectedRow) ? ::klib::ASCII_COLOR_INDEX_YELLOW : ::klib::ASCII_COLOR_INDEX_YELLOW << 4;
 
 		printfToGridColored(display, textAttributes, colorRow, offsetY+1+actualRowsDisplayed, offsetX, ::klib::SCREEN_LEFT, " %c - %-38.38s", ::klib::ascii_gender[agent.Flags.Tech.Gender], entityName.begin());
 		colorRow									&= 0xF0;
-		colorRow									|= agent.Flags.Tech.Gender == ::klib::GENDER_FEMALE ? COLOR_MAGENTA : agent.Flags.Tech.Gender == ::klib::GENDER_MALE ? COLOR_CYAN : COLOR_GREEN;
+		colorRow									|= agent.Flags.Tech.Gender == ::klib::GENDER_FEMALE ? ::klib::ASCII_COLOR_INDEX_MAGENTA : agent.Flags.Tech.Gender == ::klib::GENDER_MALE ? ::klib::ASCII_COLOR_INDEX_CYAN : ::klib::ASCII_COLOR_INDEX_GREEN;
 		printfToGridColored(display, textAttributes, colorRow, offsetY+1+actualRowsDisplayed, offsetX, ::klib::SCREEN_LEFT, " %c", ::klib::ascii_gender[agent.Flags.Tech.Gender]);
 
 		++actualRowsDisplayed;
@@ -283,7 +283,7 @@ int32_t processEquipInput(ENTITY_TYPE entityType, const ::klib::SInput& frameInp
 int32_t drawEquipDetail(const ::klib::SEntityTables & tables, ENTITY_TYPE entityType, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, const CCharacter& agent, int32_t offsetY, int32_t offsetX) {
 	const ::gpk::view_const_char					labelSelectedEquip = ::gpk::get_value_label(entityType);
 	switch(entityType) {
-	case ENTITY_TYPE_CHARACTER	:	displayDetailedAgentSlot(tables, display, textAttributes, offsetY, offsetX, agent, (COLOR_YELLOW<<4)| COLOR_BLUE );	break;
+	case ENTITY_TYPE_CHARACTER	:	displayDetailedAgentSlot(tables, display, textAttributes, offsetY, offsetX, agent, (::klib::ASCII_COLOR_INDEX_YELLOW << 4)| ::klib::ASCII_COLOR_INDEX_BLUE );	break;
 	case ENTITY_TYPE_PROFESSION	:	drawEquipDetail(display, textAttributes, offsetY, offsetX, labelSelectedEquip, agent.CurrentEquip.Profession, tables.Profession	); break;
 	case ENTITY_TYPE_WEAPON		:	drawEquipDetail(display, textAttributes, offsetY, offsetX, labelSelectedEquip, agent.CurrentEquip.Weapon	, tables.Weapon		); break;
 	case ENTITY_TYPE_ARMOR		:	drawEquipDetail(display, textAttributes, offsetY, offsetX, labelSelectedEquip, agent.CurrentEquip.Armor		, tables.Armor		); break;
@@ -301,8 +301,8 @@ bool	equipIfResearchedAccessory	(SGame& instanceGame, int32_t indexAgent, int16_
 
 int32_t drawWelcomeGUI(SGame& instanceGame) {
 
-	::gpk::view_grid<char>				display					= instanceGame.GlobalDisplay.Screen;
-	::gpk::view_grid<uint16_t>			textAttributes			= instanceGame.GlobalDisplay.TextAttributes;
+	::gpk::view_grid<char>				display					= instanceGame.GlobalDisplay.Screen.Color;
+	::gpk::view_grid<uint16_t>			textAttributes			= instanceGame.GlobalDisplay.Screen.DepthStencil;
 
 	int32_t								startY					= 1;
 
@@ -313,7 +313,7 @@ int32_t drawWelcomeGUI(SGame& instanceGame) {
 	SPlayer								& player				= instanceGame.Players[PLAYER_INDEX_USER];
 
 	// Squad
-	printfToGridColored(display, textAttributes, COLOR_YELLOW << 4, startY, 1, ::klib::SCREEN_LEFT, "%-43.43s", " Assigned squad:");
+	printfToGridColored(display, textAttributes, ::klib::ASCII_COLOR_INDEX_YELLOW << 4, startY, 1, ::klib::SCREEN_LEFT, "%-43.43s", " Assigned squad:");
 	int32_t								agentsDisplayed			= 0;
 	int32_t								selectedRow				= -1;
 	int32_t								indexRow				= -1;
@@ -359,7 +359,7 @@ int32_t drawWelcomeGUI(SGame& instanceGame) {
 					int32_t offsetX = 45*2;
 					const ::gpk::view_const_char			labelSelectedEquip = ::gpk::get_value_label(selectedEntityType);
 					switch(selectedEntityType) {
-					case ENTITY_TYPE_CHARACTER	:	if(player.Tactical.Army[indexRow]) displayDetailedAgentSlot(instanceGame.EntityTables, display, textAttributes, startY, offsetX, *player.Tactical.Army[indexRow], (COLOR_YELLOW<<4)| COLOR_BLUE);	break;
+					case ENTITY_TYPE_CHARACTER	:	if(player.Tactical.Army[indexRow]) displayDetailedAgentSlot(instanceGame.EntityTables, display, textAttributes, startY, offsetX, *player.Tactical.Army[indexRow], (::klib::ASCII_COLOR_INDEX_YELLOW << 4)| ::klib::ASCII_COLOR_INDEX_BLUE);	break;
 					case ENTITY_TYPE_PROFESSION	:	drawEquipDetail(display, textAttributes, startY, offsetX, labelSelectedEquip, player.Inventory.Profession	[indexRow].Entity, instanceGame.EntityTables.Profession	);	break;
 					case ENTITY_TYPE_WEAPON		:	drawEquipDetail(display, textAttributes, startY, offsetX, labelSelectedEquip, player.Inventory.Weapon		[indexRow].Entity, instanceGame.EntityTables.Weapon		);	break;
 					case ENTITY_TYPE_ARMOR		:	drawEquipDetail(display, textAttributes, startY, offsetX, labelSelectedEquip, player.Inventory.Armor		[indexRow].Entity, instanceGame.EntityTables.Armor		);	break;
@@ -433,7 +433,7 @@ SGameState								drawWelcome			(SGame& instanceGame, const SGameState& returnVa
 
 	static ::klib::SMessageSlow					slowMessage;
 	bool										bDonePrinting		= ::klib::getMessageSlow(slowMessage, textToPrint, instanceGame.FrameTimer.LastTimeSeconds);
-	columnOffset							= printfToGridColored(display.Screen.View, display.TextAttributes, COLOR_GREEN, lineOffset, columnOffset, ::klib::SCREEN_LEFT, "%s", slowMessage);
+	columnOffset							= printfToGridColored(display.Screen.Color.View, display.Screen.DepthStencil, ::klib::ASCII_COLOR_INDEX_GREEN, lineOffset, columnOffset, ::klib::SCREEN_LEFT, "%s", slowMessage);
 
 	if ( bDonePrinting ) {
 		drawWelcomeGUI(instanceGame);
@@ -441,7 +441,7 @@ SGameState								drawWelcome			(SGame& instanceGame, const SGameState& returnVa
 		// Menu
 		static SMenuHeader<SGameState>				menuControlCenter	({GAME_STATE_MENU_MAIN}, ::gpk::view_const_string{"Control Center"}, 28);
 		bool										bInCourse			= ::gpk::bit_true(instanceGame.Flags, GAME_FLAGS_TACTICAL) || ::gpk::bit_true(instanceGame.Flags, GAME_FLAGS_TACTICAL_REMOTE);
-		return drawMenu(display.Screen.View, display.TextAttributes.begin(), menuControlCenter, ::gpk::view_array<const ::klib::SMenuItem<SGameState>>{(bInCourse) ? optionsControlCenterMissionInCourse : optionsControlCenter}, instanceGame.FrameInput, returnValue);
+		return drawMenu(display.Screen.Color.View, display.Screen.DepthStencil.begin(), menuControlCenter, ::gpk::view_array<const ::klib::SMenuItem<SGameState>>{(bInCourse) ? optionsControlCenterMissionInCourse : optionsControlCenter}, instanceGame.FrameInput, returnValue);
 	}
 	return returnValue;
 };

@@ -211,7 +211,7 @@ static	int64_t										getEnemyCoinsForTerrainFun							(SGame& instanceGame)		
 	int64_t													maxCoins											= 0;
 	STacticalSetup											& tacticalSetup										= instanceGame.TacticalInfo.Setup;
 	int32_t													totalAgents											= 0;
-	for(size_t iTacticalPlayer=0, playerCount = tacticalSetup.TotalPlayers; iTacticalPlayer<playerCount; ++iTacticalPlayer) {
+	for(uint32_t iTacticalPlayer=0, playerCount = tacticalSetup.TotalPlayers; iTacticalPlayer < playerCount; ++iTacticalPlayer) {
 		if(tacticalSetup.Players[iTacticalPlayer] == -1)
 			continue;
 
@@ -219,9 +219,9 @@ static	int64_t										getEnemyCoinsForTerrainFun							(SGame& instanceGame)		
 		if( enemy.Tactical.Control.Type == PLAYER_CONTROL_AI && enemy.Tactical.Control.AIMode != PLAYER_AI_TEAMERS )
 			continue;
 
-		for(size_t iAgent=0, count=tacticalSetup.SquadSize[iTacticalPlayer]; iAgent<count; ++iAgent) {
+		for(uint32_t iAgent=0, count=tacticalSetup.SquadSize[iTacticalPlayer]; iAgent<count; ++iAgent) {
 			if(enemy.Tactical.Squad.Agents[iAgent] != -1) {
-				CCharacter												& characterAgent									= *enemy.Tactical.Army[enemy.Tactical.Squad.Agents[iAgent]];
+				CCharacter												& characterAgent									= * enemy.Tactical.Army[enemy.Tactical.Squad.Agents[iAgent]];
 				if(characterAgent.IsAlive()) {
 					maxCoins											+= characterAgent.FinalPoints.CostMaintenance;
 					++totalAgents;
@@ -360,16 +360,16 @@ static const STacticalSetup							tacticalSetupForCampaign							=
 		, (PLAYER_INDEX)8
 		, (PLAYER_INDEX)9
 		}											//PLAYER_INDEX	Players						[MAX_TACTICAL_PLAYERS]	= {};
-	,	{ {PLAYER_CONTROL_LOCAL, PLAYER_AI_TEAMERS}
-		, {PLAYER_CONTROL_AI, PLAYER_AI_TEAMERS}
-		, {PLAYER_CONTROL_AI, PLAYER_AI_TEAMERS}
-		, {PLAYER_CONTROL_AI, PLAYER_AI_TEAMERS}
-		, {PLAYER_CONTROL_AI, PLAYER_AI_NEUTRAL}
-		, {PLAYER_CONTROL_AI, PLAYER_AI_CURIOUS}
-		, {PLAYER_CONTROL_AI, PLAYER_AI_FEARFUL}
-		, {PLAYER_CONTROL_AI, PLAYER_AI_ASSISTS}
-		, {PLAYER_CONTROL_AI, PLAYER_AI_RIOTERS}
-		, {PLAYER_CONTROL_AI, PLAYER_AI_VIOLENT}
+	,	{ SPlayerControl{PLAYER_CONTROL_LOCAL, PLAYER_AI_TEAMERS}
+		, SPlayerControl{PLAYER_CONTROL_AI, PLAYER_AI_TEAMERS}
+		, SPlayerControl{PLAYER_CONTROL_AI, PLAYER_AI_TEAMERS}
+		, SPlayerControl{PLAYER_CONTROL_AI, PLAYER_AI_TEAMERS}
+		, SPlayerControl{PLAYER_CONTROL_AI, PLAYER_AI_NEUTRAL}
+		, SPlayerControl{PLAYER_CONTROL_AI, PLAYER_AI_CURIOUS}
+		, SPlayerControl{PLAYER_CONTROL_AI, PLAYER_AI_FEARFUL}
+		, SPlayerControl{PLAYER_CONTROL_AI, PLAYER_AI_ASSISTS}
+		, SPlayerControl{PLAYER_CONTROL_AI, PLAYER_AI_RIOTERS}
+		, SPlayerControl{PLAYER_CONTROL_AI, PLAYER_AI_VIOLENT}
 		}											//SPlayerControl	Controls				[MAX_TACTICAL_PLAYERS]	= {};
 	,	{ TEAM_TYPE_ALLY
 		, TEAM_TYPE_ALLY
@@ -488,7 +488,7 @@ bool												initCampaignGame									(SGame& instanceGame)											{
 	tacticalSetup.Seed									= instanceGame.Seed + instanceGame.Players[PLAYER_INDEX_USER].Tactical.Score.BattlesWon;
 	::initCampaignPlayers(instanceGame);
 	::klib::initTacticalMap(instanceGame);
-	::klib::drawTacticalBoard(instanceGame, tacticalInfo, instanceGame.TacticalDisplay.Screen, instanceGame.TacticalDisplay.TextAttributes, PLAYER_INDEX_USER, TEAM_TYPE_CIVILIAN, instanceGame.Players[PLAYER_INDEX_USER].Tactical.Selection, true);
+	::klib::drawTacticalBoard(instanceGame, tacticalInfo, instanceGame.TacticalDisplay.Screen.Color, instanceGame.TacticalDisplay.Screen.DepthStencil, PLAYER_INDEX_USER, TEAM_TYPE_CIVILIAN, instanceGame.Players[PLAYER_INDEX_USER].Tactical.Selection, true);
 
 	::gpk::bit_set(instanceGame.Flags, klib::GAME_FLAGS_TACTICAL);
 	tacticalInfo.CurrentPlayer							= (int8_t)::resolveNextPlayer(instanceGame);

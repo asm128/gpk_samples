@@ -126,9 +126,6 @@
     <ClInclude Include="Enemy.h">
       <Filter>Tables</Filter>
     </ClInclude>
-    <ClInclude Include="projects.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="helper_projects.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -169,6 +166,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="klib_entity_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="projects.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="klib_character.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -227,9 +230,6 @@
     <ClCompile Include="menu_squad.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="projects.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="menu_control_center.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -255,6 +255,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="klib_text.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="projects.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

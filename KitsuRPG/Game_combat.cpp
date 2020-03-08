@@ -409,7 +409,7 @@ void																	combat						(const ::klib::SEntityTables & tables, ::klib::
 			turnOutcome															= playerTurn(tables, messages, adventurer, currentEnemy);
 
 		for(uint32_t iMessage = 0; iMessage < messages.UserLog.size(); ++iMessage)
-			printf(messages.UserLog[iMessage].Message.begin());
+			printf("%s", messages.UserLog[iMessage].Message.begin());
 		messages.UserLog.clear();
 		if(!combatContinues(turnOutcome, adventurer.Points.LifeCurrent.Health, currentEnemy.Points.LifeCurrent.Health))
 			break;
@@ -423,7 +423,7 @@ void																	combat						(const ::klib::SEntityTables & tables, ::klib::
 		else
 			turnOutcome															= enemyTurn(tables, messages, currentEnemy, adventurer);
 		for(uint32_t iMessage = 0; iMessage < messages.UserLog.size(); ++iMessage)
-			printf(messages.UserLog[iMessage].Message.begin());
+			printf("%s", messages.UserLog[iMessage].Message.begin());
 		messages.UserLog.clear();
 	}
 

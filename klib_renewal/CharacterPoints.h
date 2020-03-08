@@ -29,8 +29,8 @@ namespace klib
 		uint32_t					AttacksReceived			= 0;
 		uint32_t					AttacksAvoided			= 0;
 
-		uint32_t					PotionsUsed				= 0;
-		uint32_t					GrenadesUsed			= 0;
+		uint32_t					UsedPotions				= 0;
+		uint32_t					UsedGrenades			= 0;
 
 		uint32_t					CompletedResearch		= 0;
 		uint32_t					CompletedProduction		= 0;

@@ -70,9 +70,9 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 	::klib::initGame(instanceGame);
 
 
-	::gpk::tcpipInitialize();
-	::gpk::tcpipAddress("192.168.0.3", "51515", app.TacticalClient.AddressConnect);
-	::gpk::clientConnect(app.TacticalClient);
+	//::gpk::tcpipInitialize();
+	//::gpk::tcpipAddress("192.168.0.3", "51515", app.TacticalClient.AddressConnect);
+	//::gpk::clientConnect(app.TacticalClient);
 
 	return 0;
 }
@@ -113,12 +113,14 @@ int													update				(SApplication & app, bool exitSignal)	{
 
 	{
 		::gpk::mutex_guard									lock						(app.LockRender);
-		::klib::clearASCIIBackBuffer(' ', COLOR_WHITE);
+		::klib::clearASCIIBackBuffer(' ', ::klib::ASCII_COLOR_INDEX_WHITE);
  		::klib::drawAndPresentGame(app.Game, target);
 	}
 	::klib::presentASCIIBackBuffer();
-	::gpk::connectionPushData(app.TacticalClient, app.TacticalClient.Queue, "Message arrived! 4", false, false, 0);
-	::gpk::clientUpdate(app.TacticalClient);
+
+	//::gpk::connectionPushData(app.TacticalClient, app.TacticalClient.Queue, "Message arrived! 4", false, false, 0);
+	//::gpk::clientUpdate(app.TacticalClient);
+
 	::gpk::sleep(10);
 
 
@@ -222,8 +224,8 @@ int													draw					(SApplication & app) {
 
 	{
 		::gpk::mutex_guard										lock						(app.LockRender);
-		::gpk::view_grid<char>									mapToDraw					= app.Game.GlobalDisplay.Screen;
-		::gpk::view_grid<uint16_t>								mapColors					= app.Game.GlobalDisplay.TextAttributes;
+		::gpk::view_grid<char>									mapToDraw					= app.Game.GlobalDisplay.Screen.Color;
+		::gpk::view_grid<uint16_t>								mapColors					= app.Game.GlobalDisplay.Screen.DepthStencil;
 		matrixView.LookAt(app.TextOverlay.CameraPosition, app.TextOverlay.CameraTarget, app.TextOverlay.CameraUp);
 		matrixView											*= matrixProjection;
 		matrixView											*= matrixViewport;
@@ -246,8 +248,8 @@ int													draw					(SApplication & app) {
 
 	{
 		::gpk::mutex_guard										lock						(app.LockRender);
-		::gpk::view_grid<char>									mapToDraw					= app.Game.TacticalDisplay.Screen;
-		::gpk::view_grid<uint16_t>								mapColors					= app.Game.TacticalDisplay.TextAttributes;
+		::gpk::view_grid<char>									mapToDraw					= app.Game.TacticalDisplay.Screen.Color;
+		::gpk::view_grid<uint16_t>								mapColors					= app.Game.TacticalDisplay.Screen.DepthStencil;
 
 		if((app.Game.State.State != ::klib::GAME_STATE_START_MISSION && app.Game.State.State != ::klib::GAME_STATE_TACTICAL_CONTROL) || 0 > app.Game.TacticalInfo.CurrentPlayer)
 			matrixView.LookAt(app.TextOverlay.CameraPosition, app.TextOverlay.CameraTarget, app.TextOverlay.CameraUp);

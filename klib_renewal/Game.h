@@ -35,38 +35,29 @@ namespace klib
 	static inline		double						getFinalSight			(const CCharacter& playerAgent, const SEntityPoints& playerAgentPoints)						{	return getFinalSight(playerAgentPoints.Fitness	.Sight + SIGHT_OFFSET, playerAgent);	}
 	static inline		double						getFinalRange			(const CCharacter& playerAgent, const SEntityPoints& playerAgentPoints)						{	return getFinalSight(playerAgentPoints.Attack	.Range + RANGE_OFFSET, playerAgent);	}
 
-	//template<size_t _Width, size_t _Depth>
 	struct SWeightedDisplay {
-		//static constexpr	const uint32_t				Width					= (uint32_t)_Width;
-		//static constexpr	const uint32_t				Depth					= (uint32_t)_Depth;
+							::gpk::SRenderTarget<char, uint16_t>	Screen					= {};
+							::gpk::SImage<float	>					DisplayWeights			= {};
+							::gpk::SImage<float	>					Speed					= {};
+							::gpk::SImage<float	>					SpeedTarget				= {};
 
-							::gpk::SImage<char		>	Screen					= {};
-							::gpk::SImage<uint16_t	>	TextAttributes			= {};
-							::gpk::SImage<float	>		DisplayWeights			= {};
-							::gpk::SImage<float	>		Speed					= {};
-							::gpk::SImage<float	>		SpeedTarget				= {};
-
-		inline				::gpk::error_t				Resize					(::gpk::SCoord2<uint32_t> newSize)															{
-			Screen			.resize(newSize, ' ');
-			TextAttributes	.resize(newSize, (uint16_t)COLOR_WHITE);
+		inline				::gpk::error_t							Resize					(::gpk::SCoord2<uint32_t> newSize)															{
+			Screen			.resize(newSize, ' ', (uint16_t)::klib::ASCII_COLOR_INDEX_WHITE);
 			DisplayWeights	.resize(newSize, 0.0f);
 			Speed			.resize(newSize, 0.0f);
 			SpeedTarget		.resize(newSize, 0.0f);
 			return 0;
 		}
-		inline				void						Clear					()																							{
-			::klib::clearGrid(Screen			.View, ' ');
-			::klib::clearGrid(TextAttributes	.View, (uint16_t)COLOR_WHITE);
-			::klib::clearGrid(DisplayWeights	.View, 0.0f);
-			::klib::clearGrid(Speed				.View, 0.0f);
-			::klib::clearGrid(SpeedTarget		.View, 0.0f);
+		inline				void									Clear					()																							{
+			::klib::clearGrid(Screen.Color			.View, ' ');
+			::klib::clearGrid(Screen.DepthStencil	.View, (uint16_t)::klib::ASCII_COLOR_INDEX_WHITE);
+			::klib::clearGrid(DisplayWeights		.View, 0.0f);
+			::klib::clearGrid(Speed					.View, 0.0f);
+			::klib::clearGrid(SpeedTarget			.View, 0.0f);
 		}
 	};
 
 
-	//typedef	SWeightedDisplay<DEFAULT_ASCII_DISPLAY_WIDTH0, DEFAULT_ASCII_DISPLAY_HEIGHT>	SWeightedDisplay		;
-	//typedef SWeightedDisplay<GAME_MAP_WIDTH, GAME_MAP_DEPTH>							STacticalDisplay	;
-	typedef SWeightedDisplay	STacticalDisplay	;
 
 	struct SFrameInfo {
 							::klib::SInput								Input			= {};
@@ -119,6 +110,8 @@ namespace klib
 	GDEFINE_ENUM_VALUE(GAME_CHEAT, IMWINNER	, 0x8000);	// Win the tactical game.
 
 #define MAX_PLAYER_TYPES 16
+	struct SGameMenus {
+	};
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------
 	struct SGame {
@@ -139,7 +132,7 @@ namespace klib
 							STacticalInfo							TacticalInfo					= {};
 
 							// Displays.
-							STacticalDisplay						TacticalDisplay					= {};
+							SWeightedDisplay						TacticalDisplay					= {};
 							SWeightedDisplay						GlobalDisplay					= {};
 
 							// Feedback messages.

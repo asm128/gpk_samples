@@ -9,13 +9,13 @@ namespace klib
 	bool isTacticalValid		(SGame& instanceGame);
 	void endTurn				(SGame& instanceGame);
 	bool updateCurrentPlayer	(SGame& instanceGame);
-	void determineOutcome		(SGame& instanceGame);
+	void determineOutcome		(SGame& instanceGame, bool aborted);
 	void handleAgentDeath		(SGame& instanceGame, CCharacter& deadTarget, TEAM_TYPE teamId);
 	void handleAgentDeath		(SGame& instanceGame, CCharacter& deadTarget, CCharacter& attacker, TEAM_TYPE teamId);
 	bool isTacticalValid		(SGame& instanceGame);
 
 	static int32_t												getAgentsInSight									(SGame& instanceGame, const ::gpk::SCoord3<int32_t>& origin, double range, SAgentsReference& agentsInRange)	{
-		agentsInRange												= SAgentsReference();
+		agentsInRange												= {};
 		STacticalInfo													& tacticalInfo										= instanceGame.TacticalInfo;
 		for(uint32_t iPlayer = 0, playerCount = tacticalInfo.Setup.TotalPlayers; iPlayer < playerCount; ++iPlayer) {
 			if(tacticalInfo.Setup.Players[iPlayer] == PLAYER_INDEX_INVALID)
@@ -36,7 +36,7 @@ namespace klib
 					continue;
 
 				agentsInRange.Agents[agentsInRange.Count++]					= {tacticalInfo.Setup.TeamPerPlayer[iPlayer], (int8_t)iPlayer, 0, (int8_t)iAgent};
-				if(agentsInRange.Count >= (int32_t)::gpk::size(agentsInRange.Agents))
+				if(agentsInRange.Count >= (int32_t)agentsInRange.Agents.size())
 					break;
 			}
 		}

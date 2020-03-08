@@ -1,4 +1,5 @@
 #include "gpk_coord.h"
+#include "gpk_array_static.h"
 
 #include "CharacterTile.h"
 
@@ -14,11 +15,11 @@ namespace klib
 
 
 	GDEFINE_ENUM_TYPE(AGENT_STATE, uint8_t);
-	GDEFINE_ENUM_VALUE(AGENT_STATE,						IDLE	, 0x0000);
-	GDEFINE_ENUM_VALUE(AGENT_STATE,						MOVE	, 0x0001);
+	GDEFINE_ENUM_VALUE(AGENT_STATE,					IDLE	, 0x0000);
+	GDEFINE_ENUM_VALUE(AGENT_STATE,					MOVE	, 0x0001);
 
-#define MAX_AGENT_SQUAD_SLOTS	8
-#define MAX_TACTICAL_PLAYERS	16
+	static constexpr const uint32_t					MAX_AGENT_SQUAD_SLOTS	= 8	;
+	static constexpr const uint32_t					MAX_TACTICAL_PLAYERS	= 16;
 	struct SAgentReference {
 				STileCharacter							Agent;
 				::gpk::SCoord3<int32_t>					Position;
@@ -27,8 +28,8 @@ namespace klib
 #define MAX_POSSIBLE_AGENTS MAX_AGENT_SQUAD_SLOTS*MAX_TACTICAL_PLAYERS
 
 	struct SAgentsReference {
-				int32_t									Count										= 0;
-				SAgentReference							Agents				[MAX_POSSIBLE_AGENTS]	= {};
+				int32_t														Count										= 0;
+				::gpk::array_static<SAgentReference,MAX_POSSIBLE_AGENTS>	Agents					= {};
 	};
 
 #define DEFAULT_SQUAD_SIZE		3
@@ -36,13 +37,13 @@ namespace klib
 	struct SSquad {
 				uint32_t								Size										= DEFAULT_SQUAD_SIZE; //MAX_AGENT_SQUAD_SLOTS;
 
-				int16_t									Agents				[MAX_AGENT_SQUAD_SLOTS]	= {-1, -1, -1, -1, -1, -1, -1, -1,};
-				STileCharacter							TargetAgents		[MAX_AGENT_SQUAD_SLOTS]	= {};
-				::gpk::SCoord3<int32_t>					TargetPositions		[MAX_AGENT_SQUAD_SLOTS]	= {};
-				AGENT_STATE								AgentStates			[MAX_AGENT_SQUAD_SLOTS]	= {};
-				SAgentActions							ActionsLeft			[MAX_AGENT_SQUAD_SLOTS]	= {};
-				SAgentsReference						AgentsInRange		[MAX_AGENT_SQUAD_SLOTS]	= {};
-				SAgentsReference						AgentsInSight		[MAX_AGENT_SQUAD_SLOTS]	= {};
+				::gpk::array_static<int16_t					, MAX_AGENT_SQUAD_SLOTS>	Agents			= {-1, -1, -1, -1, -1, -1, -1, -1,};
+				::gpk::array_static<STileCharacter			, MAX_AGENT_SQUAD_SLOTS>	TargetAgents	= {};
+				::gpk::array_static<::gpk::SCoord3<int32_t>	, MAX_AGENT_SQUAD_SLOTS>	TargetPositions	= {};
+				::gpk::array_static<AGENT_STATE				, MAX_AGENT_SQUAD_SLOTS>	AgentStates		= {};
+				::gpk::array_static<SAgentActions			, MAX_AGENT_SQUAD_SLOTS>	ActionsLeft		= {};
+				::gpk::array_static<SAgentsReference		, MAX_AGENT_SQUAD_SLOTS>	AgentsInRange	= {};
+				::gpk::array_static<SAgentsReference		, MAX_AGENT_SQUAD_SLOTS>	AgentsInSight	= {};
 				SAgentsReference						AgentsInSquadSight							= {};
 				int8_t									LockedAgent									= -1;
 
@@ -59,13 +60,13 @@ namespace klib
 
 		inline	void								Clear										(int32_t index)					{
 			if(index == -1) {
-				::memset(Agents				, -1, sizeof(int16_t					)*::gpk::size(Agents			));
-				::memset(TargetAgents		, -1, sizeof(STileCharacter				)*::gpk::size(TargetAgents		));
-				::memset(TargetPositions	, -1, sizeof(::gpk::SCoord3<int32_t>	)*::gpk::size(TargetPositions	));
-				::memset(AgentStates		,  0, sizeof(AGENT_STATE				)*::gpk::size(AgentStates		));
-				::memset(ActionsLeft		, -1, sizeof(SAgentActions				)*::gpk::size(ActionsLeft		));
-				::memset(AgentsInRange		,  0, sizeof(SAgentsReference			)*::gpk::size(AgentsInRange	));
-				::memset(AgentsInSight		,  0, sizeof(SAgentsReference			)*::gpk::size(AgentsInSight	));
+				::memset(Agents				.begin(), -1, sizeof(int16_t					)* Agents			.size());
+				::memset(TargetAgents		.begin(), -1, sizeof(STileCharacter				)* TargetAgents		.size());
+				::memset(TargetPositions	.begin(), -1, sizeof(::gpk::SCoord3<int32_t>	)* TargetPositions	.size());
+				::memset(AgentStates		.begin(),  0, sizeof(AGENT_STATE				)* AgentStates		.size());
+				::memset(ActionsLeft		.begin(), -1, sizeof(SAgentActions				)* ActionsLeft		.size());
+				::memset(AgentsInRange		.begin(),  0, sizeof(SAgentsReference			)* AgentsInRange	.size());
+				::memset(AgentsInSight		.begin(),  0, sizeof(SAgentsReference			)* AgentsInSight	.size());
 				AgentsInSquadSight.Count				= 0;
 				LockedAgent								= -1;
 			}

@@ -20,6 +20,7 @@ namespace klib
 		SFacility							Facility				= {0,0,1,-1};	// Index, ModifierIndex, Level
 		SStageProp							StageProp				= {0,0,1,-1};	// Index, ModifierIndex, Level
 	};
+#pragma pack(pop)
 
 	struct SCharacterResearch {
 		SResearchGroup<SWeapon		>		Weapon					= {};
@@ -111,7 +112,6 @@ namespace klib
 		character.Recalculate(tables);
 		character.Points.LifeCurrent							= character.FinalPoints.LifeMax;
 	}
-#pragma pack(pop)
 
 
 

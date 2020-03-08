@@ -60,7 +60,7 @@ SGameState processMenuReturn(TURN_ACTION returnValue) {
 }
 
 void handleSubstateChange(SGame& instanceGame, const SGameState& newState) {
-	::klib::clearASCIIBackBuffer(' ', COLOR_WHITE);
+	::klib::clearASCIIBackBuffer(' ', ::klib::ASCII_COLOR_INDEX_WHITE);
 	instanceGame.GlobalDisplay		.Clear();
 	//instanceGame.TacticalDisplay	.Clear();
 	//instanceGame.PostEffectDisplay	.Clear();
@@ -82,23 +82,21 @@ void drawTacticalMap(SGame& instanceGame, ::gpk::view_grid<char> display, ::gpk:
 	klib::drawTacticalBoard(instanceGame, instanceGame.TacticalInfo, display, textAttributes, PLAYER_INDEX_USER, TEAM_TYPE_CIVILIAN, instanceGame.Players[PLAYER_INDEX_USER].Tactical.Selection, false);
 }
 
-void handleProductionStep(SGame& instanceGame);
-void handleResearchStep(SGame& instanceGame);
-
-void handleMissionEnd(SGame& instanceGame)
-{
-	SPlayer&			playerUser		= instanceGame.Players[PLAYER_INDEX_USER];
-	SPlayerProjects&	playerProjects	= playerUser.Projects;
+void											handleMissionEnd					(SGame& instanceGame) {
+	::klib::SPlayer										& player							= instanceGame.Players[PLAYER_INDEX_USER];
+	SPlayerProjects										& playerProjects					= player.Projects;
 
 	if(playerProjects.QueuedProduction.size())
-		handleProductionStep(instanceGame);
+		::klib::handleProductionStep(instanceGame.EntityTables, player.Inventory, playerProjects, player.Tactical.Money, player.Tactical.Score, instanceGame.Messages);
 
 	if(playerProjects.QueuedResearch.size())
-		handleResearchStep(instanceGame);
+		::klib::handleResearchStep(player.Tactical.Research, playerProjects, player.Tactical.Money, player.Tactical.Score, instanceGame.Messages);
+
+	::klib::playerUpdateResearchLists(instanceGame.EntityTables, player);
 }
 
 ::gpk::error_t						handleStateChange				(SGame& instanceGame, const SGameState& newState, const SGameState& prevState)	{
-	::klib::clearASCIIBackBuffer(' ', COLOR_WHITE);
+	::klib::clearASCIIBackBuffer(' ', ::klib::ASCII_COLOR_INDEX_WHITE);
 	instanceGame.ClearDisplays();
 	//::klib::resetCursorString(instanceGame.SlowMessage);
 
@@ -117,7 +115,7 @@ void handleMissionEnd(SGame& instanceGame)
 	case GAME_STATE_MENU_EQUIPMENT		: instanceGame.Messages.StateMessage = "Equipment Setup"		; break;
 	case GAME_STATE_MENU_RESEARCH		: instanceGame.Messages.StateMessage = "Research Center"		; break;
 	case GAME_STATE_MENU_MAIN:
-		drawTacticalMap(instanceGame, instanceGame.TacticalDisplay.Screen, instanceGame.TacticalDisplay.TextAttributes);
+		drawTacticalMap(instanceGame, instanceGame.TacticalDisplay.Screen.Color, instanceGame.TacticalDisplay.Screen.DepthStencil);
 		instanceGame.Messages.StateMessage			= "Main Menu";
 		break;
 	case GAME_STATE_START_MISSION		:
@@ -140,8 +138,8 @@ void handleMissionEnd(SGame& instanceGame)
 	default:
 		break;
 	}
-	if(prevState.State != GAME_STATE_START_MISSION && prevState.State != GAME_STATE_TACTICAL_CONTROL)
-		instanceGame.Messages.UserLog.clear();
+	//if(prevState.State != GAME_STATE_START_MISSION && prevState.State != GAME_STATE_TACTICAL_CONTROL)
+	//	instanceGame.Messages.UserLog.clear();
 	return 0;
 }
 
@@ -194,23 +192,24 @@ SGameState drawFactory			(SGame& instanceGame, const SGameState& returnState);
 	switch(instanceGame.State.State) {
 	case GAME_STATE_MENU_MAIN			:
 		if( ::gpk::bit_true(instanceGame.Flags, GAME_FLAGS_STARTED) ) {
-			newAction = processMenuReturn(drawMenu(globalDisplay.Screen.View, globalDisplay.TextAttributes.begin(), menuMainInGame, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsMainInGame}, instanceGame.FrameInput, instanceGame.State));
+			newAction = processMenuReturn(drawMenu(globalDisplay.Screen.Color.View, globalDisplay.Screen.DepthStencil.begin(), menuMainInGame, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsMainInGame}, instanceGame.FrameInput, instanceGame.State));
 		}
 		else {
-			newAction = processMenuReturn(drawMenu(globalDisplay.Screen.View, globalDisplay.TextAttributes.begin(), menuMain, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsMain}, instanceGame.FrameInput, instanceGame.State));
+			newAction = processMenuReturn(drawMenu(globalDisplay.Screen.Color.View, globalDisplay.Screen.DepthStencil.begin(), menuMain, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsMain}, instanceGame.FrameInput, instanceGame.State));
 		}
 
 		break;
 
-	case GAME_STATE_MENU_OPTIONS		: { static ::klib::SDrawMenuState	menuState; newAction = processMenuReturn(drawMenu(globalDisplay.Screen.View, globalDisplay.TextAttributes.begin(), menuConfig, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsConfig}, instanceGame.FrameInput, instanceGame.State ));	}break;
-	case GAME_STATE_MENU_EQUIPMENT		: { static ::klib::SDrawMenuState	menuState; newAction = processMenuReturn(drawEquip				(instanceGame, instanceGame.State));	}break;
-	case GAME_STATE_MENU_SELL			: { static ::klib::SDrawMenuState	menuState; newAction = processMenuReturn(drawMenu(globalDisplay.Screen.View, globalDisplay.TextAttributes.begin(), menuSell, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsSell}, instanceGame.FrameInput, instanceGame.State ));	}break;
+	case GAME_STATE_MENU_OPTIONS		: { static ::klib::SDrawMenuState	menuState; newAction = processMenuReturn(drawMenu	(globalDisplay.Screen.Color.View, globalDisplay.Screen.DepthStencil.begin(), menuConfig, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsConfig}, instanceGame.FrameInput, instanceGame.State ));	}break;
+	case GAME_STATE_MENU_EQUIPMENT		: { static ::klib::SDrawMenuState	menuState; newAction = processMenuReturn(drawEquip	(instanceGame, instanceGame.State));	}break;
+	case GAME_STATE_MENU_SELL			: { static ::klib::SDrawMenuState	menuState; newAction = processMenuReturn(drawMenu	(globalDisplay.Screen.Color.View, globalDisplay.Screen.DepthStencil.begin(), menuSell, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsSell}, instanceGame.FrameInput, instanceGame.State ));	}break;
 	case GAME_STATE_MENU_LAN_MISSION	: { static ::klib::SDrawMenuState	menuState; }//newAction = processMenuReturn(drawLANSetup			(instanceGame, instanceGame.State));	}break;
 	case GAME_STATE_START_MISSION		: { static ::klib::SDrawMenuState	menuState; newAction = processMenuReturn(drawTacticalScreen		(instanceGame, instanceGame.State));	}break;
 	case GAME_STATE_TACTICAL_CONTROL	: { static ::klib::SDrawMenuState	menuState; newAction = processMenuReturn(drawTacticalScreen		(instanceGame, instanceGame.State));	}break;
 	case GAME_STATE_MENU_SQUAD_SETUP	: { static ::klib::SDrawMenuState	menuState; newAction = processMenuReturn(drawSquadSetupMenu		(instanceGame));	}break;
 	case GAME_STATE_WELCOME_COMMANDER	: { static ::klib::SDrawMenuState	menuState; newAction = processMenuReturn(drawWelcome			(instanceGame, instanceGame.State));	}break;
-	case GAME_STATE_MENU_RESEARCH		: { static ::klib::SDrawMenuState	menuState; newAction = processMenuReturn(drawResearch			(instanceGame, instanceGame.State));	}break;
+	case GAME_STATE_MENU_RESEARCH		: {
+		newAction = processMenuReturn(drawResearch(instanceGame, instanceGame.State));	}break;
 	case GAME_STATE_MENU_BUY			: { static ::klib::SDrawMenuState	menuState; newAction = processMenuReturn(drawBuy				(instanceGame, instanceGame.State));	}break;
 	case GAME_STATE_MENU_UPGRADE		: { static ::klib::SDrawMenuState	menuState; newAction = processMenuReturn(drawFactory			(instanceGame, instanceGame.State));	}break;
 	case GAME_STATE_MENU_FACTORY		: { static ::klib::SDrawMenuState	menuState; newAction = processMenuReturn(drawFactory			(instanceGame, instanceGame.State));	}break;

@@ -23,18 +23,6 @@ namespace klib
 	GDEFINE_ENUM_VALUE(ENTITY_TYPE, STAGE_PROP	, 7);
 	GDEFINE_ENUM_VALUE(ENTITY_TYPE, ITEM		, 8);
 	GDEFINE_ENUM_VALUE(ENTITY_TYPE, TILE		, 9);
-
-	struct SEntityResearch  {
-								::gpk::array_pod<char_t>			Name;
-								int32_t								ResearchIndex;
-								int64_t								PriceUnit;
-								int64_t								PricePaid;
-								bool								IsModifier;
-								SEntity								Entity;
-								ENTITY_TYPE							Type;
-	};
-
-
 	static constexpr		const SEntityPointsMultiplier		g_MultipliersItem			= {{ .125,  .125,  .125}, { .125,  .125,  .125}, { .125,  .125, { .125,  .125,  .125},  .125,  .125}, {.125, .125, .125,  .125}, 0.125, 0.85, 1.0};
 	static constexpr		const SEntityPointsMultiplier		g_MultipliersWeapon			= {{ .125,    .1, .0625}, { .125, .0625, .0625}, { .125,   .25, { .125,    .1,  .125}, .0625,   .25}, {.125,  .125, .125,   .1}, 0.125, 0.85, 1.0};
 	static constexpr		const SEntityPointsMultiplier		g_MultipliersArmor			= {{ .125,    .1,   .25}, { .125,    .1,   .25}, {.0625, .0625, { .125, .0625,  .125},  .125, .0625}, {.125, .0625, .125,   .1}, 0.125, 0.85, 1.0};
@@ -45,16 +33,16 @@ namespace klib
 	static constexpr		const SEntityPointsMultiplier		g_MultipliersStageProp		= {{  .25,   .25,   .25}, {  .25,   .25,   .25}, {  .25,   .25, {  .25,   .25,   .25},   .25,   .25}, { .25,   .25,  .25,   .1}, 0.125, 0.85, 1.0};
 	static constexpr		const SEntityPointsMultiplier		g_MultipliersTile			= {{  .25,   .25,   .25}, {  .25,   .25,   .25}, {  .25,   .25, {  .25,   .25,   .25},   .25,   .25}, { .25,   .25,  .25,   .1}, 0.125, 0.85, 1.0};
 
-#define DECLARE_ENTITY(_multipliers, _type, _name)																																											\
-	struct S##_name : public ::klib::SEntity { 																																												\
-		using					::klib::SEntity					::SEntity; 																																					\
-																																																							\
-		inline constexpr										S##_name						(void)													{}																		\
-		inline constexpr										S##_name						(const SEntity& other)									: SEntity(other)													{}	\
-																																																								\
-		static inline constexpr	::klib::ENTITY_TYPE				getType							()														{ return _type;														}	\
+#define DECLARE_ENTITY(_multipliers, _type, _name)																																	\
+	struct S##_name : public ::klib::SEntity { 																																		\
+		using					::klib::SEntity					::SEntity; 																											\
+																																													\
+		inline constexpr										S##_name						()																				{}	\
+		inline constexpr										S##_name						(const SEntity& other)									: SEntity(other)		{}	\
+																																													\
+		static inline constexpr	::klib::ENTITY_TYPE				getType							()														{ return _type;			}	\
+		static inline constexpr	::klib::SEntityPointsMultiplier	getMultipliers					()														{ return _multipliers;	}	\
 		static inline const		::gpk::view_const_char&			getName							()														{ static const ::gpk::view_const_char & name = ::gpk::view_const_string{#_name}; return name;	}	\
-		static inline constexpr	::klib::SEntityPointsMultiplier	getMultipliers					()														{ return _multipliers;												}	\
 	};
 
 	DECLARE_ENTITY(g_MultipliersProfession	, ENTITY_TYPE_PROFESSION	, Profession	);

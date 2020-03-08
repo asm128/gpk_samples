@@ -13,19 +13,22 @@ namespace klib
 							int16_t							Definition			=  0;
 							int16_t							Modifier			=  0;
 							int16_t							Level				=  1;
-							int16_t							Owner				= -1;
+							int8_t							Owner				= -1;
+							//ENTITY_TYPE						Type				= ENTITY_TYPE_INVALID;
 
 		inline constexpr									SEntity				(const SEntity& other)									= default;
 		inline constexpr									SEntity
-			(	int16_t index		= 0
-			,	int16_t modifier	= 0
-			,	int16_t level		= 1
-			,	int16_t owner		=-1
+			(	int16_t		index		=  0
+			,	int16_t		modifier	=  0
+			,	int16_t		level		=  1
+			,	int8_t		owner		= -1
+			//,	ENTITY_TYPE type		= ENTITY_TYPE_INVALID
 			)
 			: Definition	(index		)
 			, Modifier		(modifier	)
 			, Level			(level		)
 			, Owner			(owner		)
+			//, Type			(type		)
 		{}
 
 		inline				operator						SEntity				()														{ return *this; }
@@ -39,9 +42,11 @@ namespace klib
 			printf("Modifier ---: %i.\n",	Modifier	);
 			printf("Level ......: %i.\n",	Level		);
 			printf("Owner ------: %i.\n",	Owner		);
+			//printf("Type ------: %i.\n",	::gpk::get_value_label(Type).begin());
 		}
 	};
 
+#pragma pack(pop)
 	template<typename _EntityType>
 	struct SEntitySlot {
 							uint32_t									Count				= 0;
@@ -131,7 +136,6 @@ namespace klib
 		sprintf_s(formattedName, table.Modifiers[entity.Modifier].Name.begin(), table.Definitions[entity.Definition].Name.begin());
 		return ::gpk::view_const_string{formattedName};
 	}
-#pragma pack(pop)
 };
 
 #endif // KLIB_ENTITY_H__38924092634721346098170219783096__

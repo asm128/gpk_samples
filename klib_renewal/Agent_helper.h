@@ -10,7 +10,7 @@ namespace klib
 {
 	template <typename _BitfieldType>
 	int32_t									displayFlag						(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, ::gpk::SCoord2<int32_t> offset, _BitfieldType characterBits, uint32_t statusCount, uint16_t colorTitle, uint16_t colorField, const ::gpk::view_const_char& textFormat)	{
-		uint16_t									color							= COLOR_GREEN;
+		uint16_t									color							= ::klib::ASCII_COLOR_INDEX_GREEN;
 		int32_t										iLine							= 0;
 		for(uint32_t iStatus=0; iStatus<statusCount; ++iStatus) {
 			_BitfieldType								statusBit						= (_BitfieldType)(1 << iStatus);
@@ -30,8 +30,8 @@ namespace klib
 	static constexpr	const uint32_t		MAX_AGENT_ROWS					= 2;
 	static constexpr	const uint32_t		MAX_AGENT_COLUMNS				= 3;
 	void									displayStatusEffectsAndTechs	(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int32_t offsetY, int32_t offsetX, CCharacter& character);
-	void									displayDetailedAgentSlot		(const ::klib::SEntityTables & tables, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int32_t offsetY, int32_t offsetX, const CCharacter& character, uint16_t color=COLOR_GREEN);
-	void									displayAgentSlot				(const ::klib::SEntityTables & tables, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int32_t offsetY, int32_t offsetX, int32_t agentIndex, CCharacter& character, bool bShort=false, uint16_t color=COLOR_GREEN);
+	void									displayDetailedAgentSlot		(const ::klib::SEntityTables & tables, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int32_t offsetY, int32_t offsetX, const CCharacter& character, uint16_t color = ::klib::ASCII_COLOR_INDEX_GREEN);
+	void									displayAgentSlot				(const ::klib::SEntityTables & tables, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int32_t offsetY, int32_t offsetX, int32_t agentIndex, CCharacter& character, bool bShort=false, uint16_t color = ::klib::ASCII_COLOR_INDEX_GREEN);
 	void									drawSquadSlots					(::klib::SGame& instanceGame);
 }
 

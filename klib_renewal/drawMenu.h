@@ -11,7 +11,7 @@
 #ifndef __DRAWMENU_H__98237409236409872364987236498__
 #define __DRAWMENU_H__98237409236409872364987236498__
 
-#define MENU_ROFFSET 8
+#define MENU_ROFFSET 6
 
 namespace klib
 {
@@ -33,7 +33,7 @@ namespace klib
 		int32_t														offsetY							= (int32_t)targetHeight-MENU_ROFFSET-1;
 		int32_t														actualOffsetX					= ::klib::printfToRect(targetASCII, targetWidth, targetHeight, offsetY, posXOffset, align, formatString, "0", exitText.begin());
 
-		uint16_t													colorBkg						= bSelected ? COLOR_GREEN << 4 : COLOR_GREEN;
+		uint16_t													colorBkg						= bSelected ? ::klib::ASCII_COLOR_INDEX_GREEN << 4 : ::klib::ASCII_COLOR_INDEX_GREEN;
 		return ::klib::valueToRect(targetAttributes, targetWidth, targetHeight,  offsetY, actualOffsetX, ::klib::SCREEN_LEFT, &colorBkg, 1, (int32_t)exitText.size()+3);
 	}
 

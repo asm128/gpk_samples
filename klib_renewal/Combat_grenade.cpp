@@ -123,7 +123,7 @@ bool										klib::useGrenade						(const ::klib::SEntityTables & tables, ::kli
 		messages.LogAuxMessage();
 	}
 
-	++thrower.Score.GrenadesUsed;
+	++thrower.Score.UsedGrenades;
 
 	return true;
 }

@@ -1,57 +1,83 @@
+#include "klib_entity_tables.h"
+
 #ifndef __PROJECTS_H__9826348709234698723469823__
 #define __PROJECTS_H__9826348709234698723469823__
 
 namespace klib
 {
-	template<typename _tEntity>
-	void													completeProduction
-		(	SEntityContainer<_tEntity>				& playerInventory
-		,	const _tEntity							& entity
-		,	::gpk::array_pod<char_t>				& messageSuccess
-		,	const ::klib::SEntityTable<_tEntity>	& entityTable
-		) {
-		playerInventory.AddElement(entity);
-		messageSuccess									= ::klib::getEntityName(entityTable, entity);
-		messageSuccess.append_string(" production completed.");
-	}
+	struct SEntityResearch  {
+		::gpk::array_pod<char_t>					Name;
+		int32_t										ResearchIndex;
+		int64_t										PriceUnit;
+		int64_t										PricePaid;
+		::klib::SEntity								Entity;
+		bool										IsModifier;
+		::klib::ENTITY_TYPE							Type;
+	};
 
-	template <typename _EntityType>
-	void													completeResearch
-		(	const SEntityResearch			& selectedChoice
-		,	_EntityType						& maxResearch
-		,	SResearchGroup<_EntityType>		& researchCompleted
-		,	::gpk::array_pod<char_t>		& successMessage
-		) {
-		if(selectedChoice.IsModifier) {
-			researchCompleted.Modifiers.AddElement(selectedChoice.Entity.Modifier);
-			maxResearch.Modifier									= ::gpk::max(maxResearch.Modifier,	selectedChoice.Entity.Modifier);
-		}
-		else {
-			researchCompleted.Definitions.AddElement(selectedChoice.Entity.Definition);
-			maxResearch.Definition									= ::gpk::max(maxResearch.Definition,	selectedChoice.Entity.Definition);
-		}
-		successMessage											= ::gpk::view_const_string{"You have successfully researched "};
-		successMessage.append(selectedChoice.Name);
-		successMessage.append_string(".");
-	}
+#pragma pack(push, 1)
+	struct SProjectBudget {
+		bool										bIsRatio	;
+		int64_t										Money		;
+	};
+#pragma pack(pop)
 
-	//-------------------------------------------------------------------------------------------
-	static inline	void									acknowledgeResearch				(const SEntityResearch& selectedChoice, SPlayerProjects& playerProjects, ::gpk::array_pod<char_t> & successMessage)	{
-		playerProjects.EnqueueResearch(selectedChoice);
-		successMessage											= selectedChoice.Name;
-		successMessage.append_string(" research has begun. Research cost: ");
-		char														cost	[32];
-		sprintf_s(cost, "%lli", selectedChoice.PriceUnit - selectedChoice.PricePaid);
-		successMessage.append_string(cost);
-	}
-	static inline	void									acknowledgeProduction			(const SEntityResearch& selectedChoice, SPlayerProjects& playerProjects, ::gpk::array_pod<char_t> & successMessage)	{
-		playerProjects.EnqueueProduction(selectedChoice);
-		successMessage											= selectedChoice.Name;
-		successMessage.append_string(" production has begun. Cost: ");
-		char														cost	[32];
-		sprintf_s(cost, "%lli", selectedChoice.PriceUnit - selectedChoice.PricePaid);
-		successMessage.append_string(cost);
-	}
+	struct SPlayerProjects {
+		SProjectBudget								BudgetProduction			= {true, 10};
+		SProjectBudget								BudgetResearch				= {true, 10};
+		SProjectBudget								BudgetUpgrade				= {true, 10};
+
+		::gpk::array_obj<::klib::SEntityResearch>	QueuedProduction			= {};
+		::gpk::array_obj<::klib::SEntityResearch>	QueuedResearch				= {};
+		::gpk::array_obj<::klib::SEntityResearch>	QueuedUpgrade				= {};
+
+		int64_t										CostProduction				= 0;
+		int64_t										CostResearch				= 0;
+		int64_t										CostUpgrade					= 0;
+
+		void										EnqueueProduction			( const SEntityResearch&	production	)	{ QueuedProduction	.push_back(	production	); CostProduction	 +=	production	.PriceUnit -	production	.PricePaid; };
+		void										EnqueueResearch				( const SEntityResearch&	research	)	{ QueuedResearch	.push_back(	research	); CostResearch		 +=	research	.PriceUnit -	research	.PricePaid; };
+		void										EnqueueUpgrade				( const SEntityResearch&	upgrade		)	{ QueuedUpgrade		.push_back(	upgrade		); CostUpgrade		 +=	upgrade		.PriceUnit -	upgrade		.PricePaid; };
+
+		void										DequeueProduction			( int32_t index	)							{ const SEntityResearch & production	= QueuedProduction	[index]; CostProduction	 -=	production	.PriceUnit -	production	.PricePaid; QueuedProduction	.remove(index); }
+		void										DequeueResearch				( int32_t index	)							{ const SEntityResearch & research		= QueuedResearch	[index]; CostResearch	 -=	research	.PriceUnit -	research	.PricePaid; QueuedResearch		.remove(index); }
+		void										DequeueUpgrade				( int32_t index	)							{ const SEntityResearch & upgrade		= QueuedUpgrade		[index]; CostUpgrade	 -=	upgrade		.PriceUnit -	upgrade		.PricePaid; QueuedUpgrade		.remove(index); }
+	};
+
+
+
+	::gpk::error_t								getResearchableItems
+		(	const ::klib::SEntityTables								& entityTables
+		,	const ::klib::SCharacterInventory						& playerInventory
+		,	const ::klib::SCharacterResearch						& researchCompleted
+		,	const ::gpk::view_array<const ::klib::SEntityResearch>	& queuedResearch
+		,	const ::gpk::view_array<const ::klib::CCharacter*>		& playerArmy
+		,	::gpk::array_obj<::klib::SEntityResearch>				& menuItemsValue
+		,	::gpk::array_obj<::gpk::array_pod<char_t>>				& menuItemsText
+		);
+	::gpk::error_t								getResearchedItems
+		(	const ::klib::SEntityTables								& entityTables
+		,	const ::klib::SCharacterInventory						& playerInventory
+		,	const ::klib::SCharacterResearch						& researchCompleted
+		,	const ::gpk::view_array<const ::klib::CCharacter*>		& playerArmy
+		,	::gpk::array_obj<::klib::SEntityResearch>				& menuItemsValue
+		,	::gpk::array_obj<::gpk::array_pod<char_t>>				& menuItemsText
+		);
+	void										handleProductionStep
+		( const ::klib::SEntityTables	& entityTables
+		, ::klib::SCharacterInventory	& playerInventory
+		, ::klib::SPlayerProjects		& playerProjects
+		, int64_t						& playerMoney
+		, ::klib::SCharacterScore		& playerScore
+		, ::klib::SGameMessages			& messages
+		);
+	void										handleResearchStep
+		( ::klib::SCharacterResearch	& playerResearch
+		, ::klib::SPlayerProjects		& playerProjects
+		, int64_t						& playerMoney
+		, ::klib::SCharacterScore		& playerScore
+		, ::klib::SGameMessages			& messages
+		);
 } // namespace
 
 #endif // __PROJECTS_H__9826348709234698723469823__

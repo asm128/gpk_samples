@@ -26,8 +26,8 @@
 }
 
 // Set up a nice prompt
-static	::gpk::error_t					prompt					(::std::string& userInput, const ::gpk::view_const_char& displayText, ::klib::SASCIITarget& asciiTarget) {
-	::klib::asciiTargetClear(asciiTarget, ' ', COLOR_GREEN);
+static	::gpk::error_t					prompt					(::gpk::array_pod<char_t>& userInput, const ::gpk::view_const_char& displayText, ::klib::SASCIITarget& asciiTarget) {
+	::klib::asciiTargetClear(asciiTarget, ' ', ::klib::ASCII_COLOR_INDEX_GREEN);
 	uint32_t									screenWidth				=	asciiTarget.Width()
 		,										screenHeight			=	asciiTarget.Height()
 		;
@@ -37,11 +37,13 @@ static	::gpk::error_t					prompt					(::std::string& userInput, const ::gpk::vie
 	static const HANDLE							hConsoleOut				= ::GetStdHandle( STD_OUTPUT_HANDLE );
 	COORD										cursorPos				= {((SHORT)screenWidth>>1)-5, (SHORT)screenHeight>>1};
 	::SetConsoleCursorPosition	(hConsoleOut, cursorPos);
-	::SetConsoleTextAttribute	(hConsoleOut, COLOR_GREEN);
+	::SetConsoleTextAttribute	(hConsoleOut, ::klib::ASCII_COLOR_INDEX_GREEN);
 	::SetConsoleDisplayMode		(hConsoleOut, CONSOLE_FULLSCREEN_MODE, 0);
 	static const HANDLE							hConsoleIn				= ::GetStdHandle( STD_INPUT_HANDLE );
 	::FlushConsoleInputBuffer	(hConsoleIn);
-	::std::getline(::std::cin, userInput);
+	::std::string								consoleInput;
+	::std::getline(::std::cin, consoleInput);
+	userInput								= {consoleInput.data(), (uint32_t)consoleInput.size()};
 	return 0;
 }
 
@@ -52,14 +54,13 @@ static	::gpk::error_t					prompt					(::std::string& userInput, const ::gpk::vie
 	//::klib::clearASCIIBackBuffer(' ', COLOR_WHITE);
 
 	// Set up a nice prompt
-	::std::string							playerName;
+	::gpk::array_pod<char_t>				playerName;
 	::klib::SASCIITarget					asciiTarget;
 	::klib::getASCIIBackBuffer	(asciiTarget);
-	::prompt(playerName, ::gpk::view_const_char{"Enter your name:"}, asciiTarget);
+
+	::prompt(instanceGame.Players[PLAYER_INDEX_USER].Tactical.Name, ::gpk::view_const_char{"Enter your name:"}, asciiTarget);
 	::std::string							password;
 	//::prompt(password, "Enter password:");
-
-	instanceGame.Players[PLAYER_INDEX_USER].Tactical.Name				= ::gpk::view_const_char{playerName.c_str(), (uint32_t)playerName.size()};
 	::gpk::bit_set(instanceGame.Flags, GAME_FLAGS_STARTED);
 	::gpk::bit_clear(instanceGame.Flags, GAME_FLAGS_TACTICAL);
 	::gpk::bit_clear(instanceGame.Flags, GAME_FLAGS_TACTICAL_REMOTE);
@@ -239,21 +240,21 @@ struct SWearables {
 				case 21:
 					wearablesSelected										= wearablesAssault;
 					wearablesAssault.Weapon.Definition						+= iAgent&1;
-					adventurer.Name											= "Slave - Assault";
+					adventurer.Name											= ::gpk::view_const_string{"Slave - Assault"};
 					break;
 				case 13:	// Heavy
 				case 16:
 				case 19:
 				case 22:
 					wearablesSelected										= wearablesHeavy;
-					adventurer.Name											= "Slave - Heavy";
+					adventurer.Name											= ::gpk::view_const_string{"Slave - Heavy"};
 					break;
 				case 14:	// Sniper
 				case 17:
 				case 20:
 				case 23:
 					wearablesSelected										= wearablesSniper;	// Squaddie Sniper
-					adventurer.Name											= "Slave - Sniper";
+					adventurer.Name											= ::gpk::view_const_string{"Slave - Sniper"};
 					break;
 				}
 
@@ -305,12 +306,11 @@ struct SWearables {
 			player.Tactical.Squad.Agents[1 + i]		= (int16_t)(CAMPAIGN_AGENT_COUNT + i);
 
 		player.Tactical.Selection				= {0, 0, -1, -1, -1};
-		::gpk::array_pod<char_t>					playerName			= player.Tactical.Name;
-		playerName.append_string(" #");
+		::gpk::array_pod<char_t>					& playerName			= player.Tactical.Name;
 		char										striPlayer [64]	;
-		sprintf_s(striPlayer, "%i", iPlayer);
+		sprintf_s(striPlayer, " #%i", iPlayer);
 		playerName.append_string(striPlayer);
-		player.Tactical.Name.append(playerName);
+
 		//player.Name = ::gpk::get_value_label((PLAYER_INDEX)iPlayer);
 	}
 	::klib::initTacticalMap(instanceGame);
@@ -319,23 +319,21 @@ struct SWearables {
 }
 
 int64_t															klib::missionCost						(const SPlayer& player, const SSquad& squadSetup, uint32_t maxAgents)	{
-		int64_t															totalCost						= 0;
-		for(size_t iAgent=0, agentCount= maxAgents < ::gpk::size(squadSetup.Agents) ? maxAgents : ::gpk::size(squadSetup.Agents); iAgent<agentCount; ++iAgent) {
-			if(squadSetup.Agents[iAgent] == -1)
-				continue;
+	int64_t															totalCost						= 0;
+	for(uint32_t iAgent=0, agentCount= maxAgents < squadSetup.Agents.size() ? maxAgents : squadSetup.Agents.size(); iAgent<agentCount; ++iAgent) {
+		if(squadSetup.Agents[iAgent] == -1)
+			continue;
 
-			const ::klib::CCharacter										& agent							= *player.Tactical.Army[squadSetup.Agents[iAgent]];
-			const ::klib::SEntityPoints										& finalPoints					= agent.FinalPoints;
-			int32_t															healthCurrent					= agent.Points.LifeCurrent.Health;
-			if(healthCurrent <= 0) {
-				healthCurrent												= 0;
-				continue;
-			}
-			double															penaltyFromHealth				= healthCurrent / (double)finalPoints.LifeMax.Health;//agent.Points.LifeCurrent.Health/(double)finalPoints.LifeMax.Health;
-			totalCost													+= finalPoints.CostMaintenance + (int64_t)((1.0 - penaltyFromHealth) * agent.Points.CostMaintenance);
-			//totalCost += agent.Points.CostMaintenance+(int32_t)((penaltyFromHealth-1.0)*agent.Points.CostMaintenance);
+		const ::klib::CCharacter										& agent							= *player.Tactical.Army[squadSetup.Agents[iAgent]];
+		const ::klib::SEntityPoints										& finalPoints					= agent.FinalPoints;
+		int32_t															healthCurrent					= agent.Points.LifeCurrent.Health;
+		if(healthCurrent <= 0) {
+			healthCurrent												= 0;
+			continue;
 		}
-		return totalCost;
+		double															penaltyFromHealth				= healthCurrent / (double)finalPoints.LifeMax.Health;//agent.Points.LifeCurrent.Health/(double)finalPoints.LifeMax.Health;
+		totalCost													+= finalPoints.CostMaintenance + (int64_t)((1.0 - penaltyFromHealth) * agent.Points.CostMaintenance);
+		//totalCost += agent.Points.CostMaintenance+(int32_t)((penaltyFromHealth-1.0)*agent.Points.CostMaintenance);
 	}
-
-
+	return totalCost;
+}

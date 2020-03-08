@@ -6,7 +6,6 @@
 
 namespace klib
 {
-#pragma pack(push, 1)
 	template<typename _EntityType>
 	struct SResearchGroup {
 		_EntityType									MaxResearch;
@@ -22,7 +21,6 @@ namespace klib
 		container.AddElement(currentEntity);
 		currentEntity								= {0,0,0};
 	}
-#pragma pack(pop)
 }	// namespace
 
 #endif __ENTITYHELPER_H__98234092340283749023874920834234__
