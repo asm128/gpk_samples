@@ -1,9 +1,8 @@
 #include "draw.h"
 
-int main(int /*argc*/, char ** /*argv*/)
-{
+int											main							(int /*argc*/, char ** /*argv*/) {
 #if defined(DEBUG) || defined(_DEBUG)
-	int tmp = _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF|_CRTDBG_LEAK_CHECK_DF);//|_CRTDBG_DELAY_FREE_MEM_DF);
+	int												tmp								= _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF|_CRTDBG_LEAK_CHECK_DF);//|_CRTDBG_DELAY_FREE_MEM_DF);
 	// Clear the upper 16 bits and OR in the desired freqency
 	//tmp = (tmp & 0x0000FFFF) | _CRTDBG_CHECK_EVERY_16_DF;
 	// Set the new bits
@@ -13,8 +12,8 @@ int main(int /*argc*/, char ** /*argv*/)
 #define DEFAULT_ASCII_DISPLAY_WIDTH		((uint32_t)(DEFAULT_ASCII_DISPLAY_HEIGHT * 2.666666f))
 	::klib::initASCIIScreen(DEFAULT_ASCII_DISPLAY_WIDTH, DEFAULT_ASCII_DISPLAY_HEIGHT);
 
-	::klib::SGame* pInstancedGame	= new klib::SGame;
-	::klib::SGame& instanceGame		= *pInstancedGame;
+	::klib::SGame									* pInstancedGame				= new klib::SGame;
+	::klib::SGame									& instanceGame					= *pInstancedGame;
 	instanceGame.GlobalDisplay	.Resize({DEFAULT_ASCII_DISPLAY_WIDTH, DEFAULT_ASCII_DISPLAY_HEIGHT});
 	instanceGame.TacticalDisplay.Resize({::klib::GAME_MAP_WIDTH, ::klib::GAME_MAP_DEPTH});
 
@@ -32,12 +31,11 @@ int main(int /*argc*/, char ** /*argv*/)
 		delete(pInstancedGame);
 
 	::klib::shutdownASCIIScreen();
-
 	return 0;
 }
 
 
-int WINAPI WinMain
+int WINAPI									WinMain
 (    _In_		HINSTANCE	//hInstance
 ,    _In_opt_	HINSTANCE	//hPrevInstance
 ,    _In_		LPSTR		//lpCmdLine

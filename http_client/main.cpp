@@ -35,7 +35,7 @@ static	::gpk::error_t			httpRequestChunkedJoin			(const ::gpk::view_const_byte &
 		::gpk::view_const_string			strSize;
 		if(iStop <= body.size())
 			strSize						= {&body[iBegin], (uint32_t)iStop - iBegin};
-		else 
+		else
 			break;
 		uint64_t							sizeChunk						= 0;
 		::gpk::parseArbitraryBaseInteger(16, "0123456789abcdef", strSize, &sizeChunk);
@@ -85,7 +85,7 @@ int								main							()						{
     printf("client: connecting to %s\n", strAddress);
     freeaddrinfo(servinfo); // all done with this structure
 
-	const char							http_request	[]				= 
+	const char							http_request	[]				=
 		"GET /users.exe HTTP/1.1"
 		"\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE5.01; Windows NT)"
 		"\r\nHost: 192.168.0.2"//www.tutorialspoint.com"
@@ -95,7 +95,7 @@ int								main							()						{
 		"\r\n"
 		"\r\n"
 		;
-    int									numbytes						= 0;  
+    int									numbytes						= 0;
     ree_if(-1 == (numbytes = send(sockfd, http_request, ::gpk::size(http_request), 0)), "%s", "send");
 
 	::gpk::array_pod<char>				buf								= {};
@@ -113,7 +113,7 @@ int								main							()						{
 	uint32_t							stopOfHeader					= (uint32_t)::gpk::find_sequence_pod(::gpk::view_const_string{"\r\n\r\n"}, {buf.begin(), buf.size()});
 	::gpk::view_const_byte				httpheaderReceived				= buf;
 	::gpk::view_const_byte				contentReceived					= {};
-	if(stopOfHeader >= buf.size() - 4) 
+	if(stopOfHeader >= buf.size() - 4)
 		stopOfHeader					= buf.size();
 	info_printf("Header stop at position %u.", (uint32_t)stopOfHeader);
 
@@ -127,7 +127,7 @@ int								main							()						{
 		::gpk::array_pod<char_t>			strLine = headerLines[iLine];
 		strLine.push_back(0);
 		printf("\n%s", strLine.begin());
-		if(0 <= ::gpk::find_sequence_pod(::gpk::view_const_string{"chunked"}, ::gpk::view_const_char{strLine})) 
+		if(0 <= ::gpk::find_sequence_pod(::gpk::view_const_string{"chunked"}, ::gpk::view_const_char{strLine}))
 			bChunked					= true;
 	}
 

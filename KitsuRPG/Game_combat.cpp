@@ -179,7 +179,7 @@ void																	assignDrops					(const ::klib::SEntityTables & tables, ::kl
 
 }
 
-void																	determineOutcome			(const ::klib::SEntityTables & tables, ::klib::CCharacter& adventurer, klib::CCharacter& enemy)								{
+static	void															determineOutcome			(const ::klib::SEntityTables & tables, ::klib::CCharacter& adventurer, klib::CCharacter& enemy)								{
 		// Determine the outcome of the battle and give rewards if applicable.
 	if (adventurer.Points.LifeCurrent.Health <= 0)
 		assignDrops(tables, enemy, adventurer, false);

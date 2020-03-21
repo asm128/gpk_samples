@@ -14,23 +14,23 @@
 namespace klib
 {
 
-	void				drawFireBackground			( SWeightedDisplay& display, double lastTimeSeconds, uint32_t disturbance = 2, uint32_t disappearChanceDivisor=10, bool bReverse=false, bool bDontSlowdown=true );
+	void				drawFireBackground			( ::klib::SWeightedDisplay& display, double lastTimeSeconds, uint32_t disturbance = 2, uint32_t disappearChanceDivisor=10, bool bReverse=false, bool bDontSlowdown=true );
 
 	template<typename _TCell, size_t _LineCount>
-	SGameState drawCredits(_TCell* display, uint32_t width, uint32_t depth, double lastFrameTime, const ::gpk::view_const_string (&namesCredits)[_LineCount], const SGameState& returnValue) {
-		static double	offset			= (double)depth;
-		int32_t			curLine			= (int32_t)offset;
-		static int32_t	maxDifference	= curLine;
-		int32_t			curDifference	= curLine;
-		double			bbHeight		= (double)depth;
+	SGameState			drawCredits					(_TCell* display, uint32_t width, uint32_t depth, double lastFrameTime, const ::gpk::view_const_string (&namesCredits)[_LineCount], const SGameState& returnValue) {
+		static double			offset						= (double)depth;
+		int32_t					curLine						= (int32_t)offset;
+		static int32_t			maxDifference				= curLine;
+		int32_t					curDifference				= curLine;
+		double					bbHeight					= (double)depth;
 
 		for(uint32_t i=0, count = (uint32_t)::gpk::size(namesCredits); i < count && curLine < bbHeight; ++i)
 			if((curLine+=2) >= 0)
 				printfToRect((char_t*)display, width, depth, curLine, 0, ::klib::SCREEN_CENTER, "%s", namesCredits[i].begin());
 
-		maxDifference = ::gpk::max(curLine - curDifference, maxDifference);
+		maxDifference			= ::gpk::max(curLine - curDifference, maxDifference);
 
-		offset -= lastFrameTime*6.0;
+		offset					-= lastFrameTime*6.0;
 
 		if( offset <= -maxDifference )
 			offset += depth+maxDifference;

@@ -45,7 +45,7 @@ namespace klib
 
 #define MAX_DEFEND_EFFECT_COUNT 4
 	GDEFINE_ENUM_TYPE(DEFEND_EFFECT, uint16_t);
-	GDEFINE_ENUM_VALUE(DEFEND_EFFECT, NONE			, 0x00	); 
+	GDEFINE_ENUM_VALUE(DEFEND_EFFECT, NONE			, 0x00	);
 	GDEFINE_ENUM_VALUE(DEFEND_EFFECT, REFLECT		, 0x01	); 	// Reflects damage to the attacker
 	GDEFINE_ENUM_VALUE(DEFEND_EFFECT, BLIND			, 0x02	); 	// Blinds the attacker when inflicting 1 to 1 damage.
 	GDEFINE_ENUM_VALUE(DEFEND_EFFECT, IMPENETRABLE	, 0x04	); 	// Reflects damage to the attacker
@@ -59,7 +59,7 @@ namespace klib
 	GDEFINE_ENUM_VALUE(PASSIVE_EFFECT, SHIELD_REPAIR	, 0x04);
 
 #define MAX_ENTITY_TECHNOLOGY_COUNT 15
-	#define ENTITY_TECHNOLOGY_ALL	((ENTITY_TECHNOLOGY)	0xFFFF)
+	#define ENTITY_TECHNOLOGY_ALL	((::klib::ENTITY_TECHNOLOGY)	0xFFFF)
 	GDEFINE_ENUM_TYPE(ENTITY_TECHNOLOGY, uint16_t);
 	GDEFINE_ENUM_VALUE(ENTITY_TECHNOLOGY, UNKNOWN		, 0x0000);
 
@@ -83,7 +83,7 @@ namespace klib
 
 	// ------------------------------------ PROJECTILE_CLASS: Declares values for representing ammunition categories -------------------------------------------------
 #define MAX_PROJECTILE_CLASS_COUNT 19
-	GDEFINE_FLAG_TYPE(PROJECTILE_CLASS, int32_t);	
+	GDEFINE_FLAG_TYPE(PROJECTILE_CLASS, int32_t);
 	// these are the ammo classes that I can think of right now
 	GDEFINE_FLAG_VALUE(PROJECTILE_CLASS,	NONE		,	0x00000UL);	// 0000 0000 0000 0000
 
@@ -91,7 +91,7 @@ namespace klib
 	GDEFINE_FLAG_VALUE(PROJECTILE_CLASS,	BULLET		,	0x00002UL);	// This kind of ammo is also very light and can be made from different materials. It can also be enchanted.
 	GDEFINE_FLAG_VALUE(PROJECTILE_CLASS,	GRENADE		,	0x00004UL);	// This kind of ammo is heavy and can be made from different materials. It cannot be enchanted.
 	GDEFINE_FLAG_VALUE(PROJECTILE_CLASS,	ROCKET		,	0x00008UL);	// This kind of ammo is heavy and can be made from different materials. It cannot be enchanted.
-	GDEFINE_FLAG_VALUE(PROJECTILE_CLASS,	RAY			,	0x00010UL);	// This kind of ammo comes in batteries. It can't be enchanted. 
+	GDEFINE_FLAG_VALUE(PROJECTILE_CLASS,	RAY			,	0x00010UL);	// This kind of ammo comes in batteries. It can't be enchanted.
 
 	GDEFINE_FLAG_VALUE(PROJECTILE_CLASS,	DART		,	0x00020UL);	// This kind of ammo is very light and can be thrown without a weapon. It can cause effects from injecting substances to the target. It can't be enchanted.
 	GDEFINE_FLAG_VALUE(PROJECTILE_CLASS,	FLAME		,	0x00040UL);	// This kind of ammo is meant for flamethrowers and has particular collision behaviours.
@@ -110,11 +110,11 @@ namespace klib
 	GDEFINE_FLAG_VALUE(PROJECTILE_CLASS,	SINGULARITY	,	0x20000UL);	// This kind of ammo is very heavy and can be thrown without a weapon. It can also be enchanted.
 
 	GDEFINE_FLAG_VALUE(PROJECTILE_CLASS,	TEMPORIZED	,	0x40000UL);	// The ammo can be thrown/shoot/placed and will explode/activate after a specified delay.
-	GDEFINE_FLAG_VALUE(PROJECTILE_CLASS,	DETONABLE	,	0x80000UL);	// The ammo can be thrown/shoot/placed and is detonated by the player if he wants to. It may be combined with the AMMO_CLASS_TEMPORIZED flag. 
+	GDEFINE_FLAG_VALUE(PROJECTILE_CLASS,	DETONABLE	,	0x80000UL);	// The ammo can be thrown/shoot/placed and is detonated by the player if he wants to. It may be combined with the AMMO_CLASS_TEMPORIZED flag.
 
 	// ------------------------------------ AMMO_EFFECT: Declares values for representing properties of ammunition -------------------------------------------------
 #define MAX_AMMO_EFFECT_COUNT 17
-	GDEFINE_FLAG_TYPE(AMMO_EFFECT, int32_t);	
+	GDEFINE_FLAG_TYPE(AMMO_EFFECT, int32_t);
 	GDEFINE_FLAG_VALUE(AMMO_EFFECT,	NONE		,	0x00000UL);// 0000 0000 0000 0000
 
 	//GDEFINE_FLAG_VALUE(AMMO_EFFECT,	0x00001UL,	FRAGMENTARY	);// This kind of ammo explodes on impact and release its dangerous fragments to fly around the impact point.
@@ -141,7 +141,7 @@ namespace klib
 
 
 #define MAX_ENTITY_GRADE_COUNT 3
-#define ENTITY_GRADE_ALL		((ENTITY_GRADE)			0xFF)
+#define ENTITY_GRADE_ALL		((::klib::ENTITY_GRADE)			0xFF)
 	GDEFINE_ENUM_TYPE(ENTITY_GRADE, uint8_t);
 	GDEFINE_ENUM_VALUE(ENTITY_GRADE, ILLUSION	, 0x00);
 	GDEFINE_ENUM_VALUE(ENTITY_GRADE, LIGHT		, 0x01);
@@ -149,7 +149,7 @@ namespace klib
 	GDEFINE_ENUM_VALUE(ENTITY_GRADE, HEAVY		, 0x03);
 
 #define MAX_ATTACK_TYPE_COUNT 13
-#define ATTACK_TYPE_ALL			((ATTACK_TYPE)			0xFFFF)
+#define ATTACK_TYPE_ALL			((::klib::ATTACK_TYPE)			0xFFFF)
 	GDEFINE_ENUM_TYPE(ATTACK_TYPE, uint16_t);
 	GDEFINE_ENUM_VALUE(ATTACK_TYPE, NONE			, 0x0000);
 
@@ -169,9 +169,9 @@ namespace klib
 	GDEFINE_ENUM_VALUE(ATTACK_TYPE, NUKE			, 0x2000);
 	GDEFINE_ENUM_VALUE(ATTACK_TYPE, ANTITANK		, 0x4000);
 
-#define COMBAT_STATUS_ALL		((COMBAT_STATUS)		0xFFFFFFFF)
-#define PROJECTILE_CLASS_ALL	((PROJECTILE_CLASS)		0xFFFFFFFF)
-#define AMMO_EFFECT_ALL			((AMMO_EFFECT)			0xFFFFFFFF)
+#define COMBAT_STATUS_ALL		((::klib::COMBAT_STATUS)		0xFFFFFFFF)
+#define PROJECTILE_CLASS_ALL	((::klib::PROJECTILE_CLASS)		0xFFFFFFFF)
+#define AMMO_EFFECT_ALL			((::klib::AMMO_EFFECT)			0xFFFFFFFF)
 
 #define MAX_EQUIP_MATERIAL_COUNT 16
 	enum EQUIP_MATERIAL : uint16_t
@@ -207,10 +207,10 @@ namespace klib
 		{
 			printf("- Flags for Status Inflict ..: 0x%.08x.\n"	, (int32_t)	Inflict		);
 			printf("- Flags for Status Immunity -: 0x%.08x.\n"	, (int32_t)	Immunity	);
-		}										
+		}
 	};
 
-	// ------------------------------------ GENDER: Defines values for character gender and sexual orientation (!!) ------------------------------------ 
+	// ------------------------------------ GENDER: Defines values for character gender and sexual orientation (!!) ------------------------------------
 	GDEFINE_FLAG_TYPE(GENDER, int8_t);	// 2 bits for gender and 2 bits for sexual orientation, everything else for padding
 	GDEFINE_FLAG_VALUE(GENDER,	HYBRID			,	0x00UL);
 	GDEFINE_FLAG_VALUE(GENDER,	FEMALE			,	0x01UL);
@@ -235,7 +235,7 @@ namespace klib
 		}
 	};
 
-#define ENTITY_GRADE_STRUCT_ALL	{ENTITY_TECHNOLOGY_ALL	, ENTITY_GRADE_ALL	,	ATTACK_TYPE_ALL, PROJECTILE_CLASS_ALL, AMMO_EFFECT_ALL, GENDER_HERMAPHRODITE}
+#define ENTITY_GRADE_STRUCT_ALL	{ENTITY_TECHNOLOGY_ALL	, ENTITY_GRADE_ALL	,	ATTACK_TYPE_ALL, PROJECTILE_CLASS_ALL, AMMO_EFFECT_ALL, ::klib::GENDER_HERMAPHRODITE}
 
 	struct SEntityEffectTurns {
 							int32_t				Attack;

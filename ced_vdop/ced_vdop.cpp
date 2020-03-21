@@ -101,9 +101,9 @@ int													update				(SApplication & app, bool exitSignal)	{
 		}
 	}
 	if(framework.MainDisplay.Resized) {
-		::gpk::SMatrix4<float>									& matrixProjection	= app.TextOverlay.MatrixProjection;
+		::gpk::SMatrix4<float>									& matrixProjection			= app.TextOverlay.MatrixProjection;
 		matrixProjection.FieldOfView(::gpk::math_pi * .25, framework.MainDisplay.Size.x / (double)framework.MainDisplay.Size.y, 0.01, 500);
-		::gpk::SMatrix4<float>									matrixViewport		= {};
+		::gpk::SMatrix4<float>									matrixViewport				= {};
 		matrixViewport.ViewportLH(framework.MainDisplay.Size);
 		matrixProjection									*= matrixViewport;
 	}
@@ -254,7 +254,7 @@ int													draw					(SApplication & app) {
 		if((app.Game.State.State != ::klib::GAME_STATE_START_MISSION && app.Game.State.State != ::klib::GAME_STATE_TACTICAL_CONTROL) || 0 > app.Game.TacticalInfo.CurrentPlayer)
 			matrixView.LookAt(app.TextOverlay.CameraPosition, app.TextOverlay.CameraTarget, app.TextOverlay.CameraUp);
 		else {
-			::klib::SPlayer											& player			= app.Game.Players[app.Game.TacticalInfo.Setup.Players[app.Game.TacticalInfo.CurrentPlayer]];
+			::klib::SGamePlayer											& player			= app.Game.Players[app.Game.TacticalInfo.Setup.Players[app.Game.TacticalInfo.CurrentPlayer]];
 			::gpk::SCoord3<float>									agentPosition		= player.Tactical.Army[player.Tactical.Squad.Agents[player.Tactical.Selection.PlayerUnit]]->Position.Cast<float>();
 			agentPosition.Scale({1, 1, -1});
 			agentPosition										-= ::gpk::SCoord3<float>{mapToDraw.metrics().x * .5f, 0, mapToDraw.metrics().y * .5f * -1.f};

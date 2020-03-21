@@ -1,5 +1,4 @@
 #include "gpk_view_grid.h"
-#include "gpk_noise.h"
 
 #include "klib_text.h"
 
@@ -7,32 +6,8 @@
 #define KLIB_GRID_H_902837982374
 namespace klib
 {
-
 	template<typename _tCell>
-	void																fillCellsFromNoise						(::gpk::view_grid<_tCell> grid, const _tCell& value, int64_t seed, int32_t diceFaces=10)														{
-		_tCell																	* cells									= grid.begin();
-		for(uint32_t i = 0, count = grid.size();  i < count; ++i) {
-			double																	noise									= ::gpk::noiseNormal1D(i + 1, seed);
-			int32_t																	dice									= int32_t(noise * diceFaces);
-			if(0 == dice)
-				cells[i]															= value;
-		}
-	}
-
-	template<typename _tCell>
-	inline	void														clearGrid								(::gpk::view_grid<_tCell> grid, const _tCell& clearValue = ' ')		{ ::gpk::drawRectangle(grid, clearValue, ::gpk::SRectangle2<uint32_t>{{}, grid.metrics()}); }
-
-	template<typename _tCell>
-	void																drawGridBorders							( ::gpk::view_grid<_tCell> grid, const _tCell& value)																												{
-		for(uint32_t z = 0, maxZ = grid.height(); z < maxZ; ++z) {
-			grid[z][0]															= value;
-			grid[z][grid.width() - 1]											= value;
-		}
-		for(uint32_t x=0, maxX = grid.width() ; x < maxX; ++x) {
-			grid[0][x]															= value;
-			grid[grid.height() - 1][x]											= value;
-		}
-	}
+	inline	void									clearGrid						(::gpk::view_grid<_tCell> grid, const _tCell& clearValue = ' ')		{ ::gpk::drawRectangle(grid, clearValue, ::gpk::SRectangle2<uint32_t>{{}, grid.metrics()}); }
 
 	template<typename _tCell>
 	inline			int32_t							valueToGrid						( ::gpk::view_grid<_tCell> grid, int32_t offsetLine, int32_t offsetColumn, ::klib::ALIGN_SCREEN align, const _tCell* values, int32_t valueCount, int32_t repeat = 0 )	{

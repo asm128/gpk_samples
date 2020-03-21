@@ -58,13 +58,13 @@ namespace klib
 		char								Enemy						;
 		char								Chest						;
 		char								Coins						;
-		STileASCIIGender					Gender						;
-		STileASCIIWalls						WallsThin					;
-		STileASCIIWalls						WallsThick					;
-		STileASCIITopology					Topology					;
+		::klib::STileASCIIGender			Gender						;
+		::klib::STileASCIIWalls				WallsThin					;
+		::klib::STileASCIIWalls				WallsThick					;
+		::klib::STileASCIITopology			Topology					;
 	};
 
-	uint16_t							getPlayerColor				( const STacticalInfo& tacticalInfo, const SPlayer& boardPlayer, int8_t indexBoardPlayer, int8_t indexPlayerViewer, bool bIsSelected );
+	uint16_t							getPlayerColor				( const ::klib::STacticalInfo& tacticalInfo, const ::klib::STacticalPlayer& boardPlayer, int8_t indexBoardPlayer, int8_t indexPlayerViewer, bool bIsSelected );
 
 	struct SStatusColor {
 		int8_t								Bright	;//: 4;
@@ -90,7 +90,7 @@ namespace klib
 	}
 
 	template<size_t _StatusCount>
-	int32_t									initStatusColors		(SStatusColor (&statusColors)[_StatusCount])																																				{
+	int32_t									initStatusColors		(::klib::SStatusColor (&statusColors)[_StatusCount])																																				{
 		int32_t										nBitIndex;
 		// Stun
 		nBitIndex								= ::klib::getBitIndex(COMBAT_STATUS_FROZEN		, MAX_COMBAT_STATUS_COUNT); statusColors[nBitIndex] = {::klib::ASCII_COLOR_INDEX_DARKGREY		, ::klib::ASCII_COLOR_INDEX_WHITE		};
@@ -121,7 +121,7 @@ namespace klib
 		return 0;
 	}
 
-	uint16_t								getStatusColor			(COMBAT_STATUS status, bool bSwap, uint16_t defaultColor);
+	uint16_t								getStatusColor			(::klib::COMBAT_STATUS status, bool bSwap, uint16_t defaultColor);
 	void									boardToDisplay			(::klib::SGame& instanceGame, const STacticalBoard& board, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int8_t indexBoardPlayer	, TEAM_TYPE teamId, const SPlayerSelection& selection, bool bFogOfWar);
 	void									drawTacticalBoard		(::klib::SGame& instanceGame, STacticalInfo& tacticalInfo, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int8_t playerIndex		, TEAM_TYPE teamId, const SPlayerSelection& selection, bool bFogOfWar);
 }

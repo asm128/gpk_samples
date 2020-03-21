@@ -5,8 +5,6 @@
 
 #include "gpk_sync.h"
 
-#include "klib_entity_tables.h"
-
 #include <time.h>
 
 #ifndef __GAME_H__91827309126391263192312312354__
@@ -123,7 +121,7 @@ namespace klib
 							uint64_t								ServerTime						= 0;
 							int64_t									Seed							= 0;
 
-							SPlayer									Players[MAX_PLAYER_TYPES]		= {};
+							SGamePlayer								Players[MAX_PLAYER_TYPES]		= {};
 
 							::klib::SInput							FrameInput						= {};
 							::klib::STimer							FrameTimer						= {};
@@ -132,8 +130,8 @@ namespace klib
 							STacticalInfo							TacticalInfo					= {};
 
 							// Displays.
-							SWeightedDisplay						TacticalDisplay					= {};
-							SWeightedDisplay						GlobalDisplay					= {};
+							::klib::SWeightedDisplay				TacticalDisplay					= {};
+							::klib::SWeightedDisplay				GlobalDisplay					= {};
 
 							// Feedback messages.
 							::klib::SGameMessages					Messages;
@@ -170,7 +168,7 @@ namespace klib
 						::gpk::error_t							showMenu						(SGame & instanceGame);
 						::gpk::error_t							initTacticalMap					(SGame & instanceGame);
 	static inline		PLAYER_INDEX							getCurrentPlayerIndex			(const STacticalInfo& tacticalInfo)														{ return ( tacticalInfo.CurrentPlayer == -1) ? PLAYER_INDEX_INVALID : tacticalInfo.Setup.Players[tacticalInfo.CurrentPlayer]; }
-						int64_t									missionCost						(const SPlayer& player, const SSquad& squadSetup, uint32_t maxAgents = MAX_AGENT_SQUAD_SLOTS);
+						int64_t									missionCost						(const SGamePlayer& player, const SSquad& squadSetup, uint32_t maxAgents = MAX_AGENT_SQUAD_SLOTS);
 } // namespace
 
 #endif // __GAME_H__91827309126391263192312312354__

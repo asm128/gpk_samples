@@ -1,9 +1,7 @@
 #include "Item.h"
 #include "Combat.h"
 
-using namespace klib;
-
-bool									potionRestore						(const ::klib::SEntityTables & tables, ::klib::SGameMessages & messages, ::klib::CCharacter& potionDrinker, const int32_t potionGrade, const int32_t maxPoints, int32_t& currentPoints, const ::gpk::view_const_char& pointName)				{
+static	bool							potionRestore						(const ::klib::SEntityTables & tables, ::klib::SGameMessages & messages, ::klib::CCharacter& potionDrinker, const int32_t potionGrade, const int32_t maxPoints, int32_t& currentPoints, const ::gpk::view_const_char& pointName)				{
 	if(maxPoints <= currentPoints) {
 		sprintf_s(messages.Aux, "Your %s is full!", pointName.begin());
 		messages.LogAuxMessage();
@@ -25,7 +23,7 @@ bool									potionRestore						(const ::klib::SEntityTables & tables, ::klib::S
 	return true;
 }
 
-bool									potionAttackBonus					(const ::klib::SEntityTables & tables, ::klib::SGameMessages & messages, ::klib::CCharacter& potionDrinker, const int32_t potionGrade, int32_t& currentPoints, int32_t& turnsLeft, const ::gpk::view_const_char& pointName)					{
+static	bool							potionAttackBonus					(const ::klib::SEntityTables & tables, ::klib::SGameMessages & messages, ::klib::CCharacter& potionDrinker, const int32_t potionGrade, int32_t& currentPoints, int32_t& turnsLeft, const ::gpk::view_const_char& pointName)					{
 	int32_t										pointsGainedBase					= 5*potionGrade;
 	int32_t										pointsGainedExtra					= pointsGainedBase>>2;
 
@@ -38,7 +36,7 @@ bool									potionAttackBonus					(const ::klib::SEntityTables & tables, ::klib
 
 	potionDrinker.Recalculate(tables);
 
-	const SEntityPoints						& finalPoints							= potionDrinker.FinalPoints;
+	const ::klib::SEntityPoints					& finalPoints						= potionDrinker.FinalPoints;
 	sprintf_s(messages.Aux, "The potion gives %s %u %s points for %u turns. %s now has %u %s points for the next %u turns.", potionDrinker.Name.begin(), itemEffectValue, pointName.begin(), potionGrade, potionDrinker.Name.begin(), finalPoints.Attack.Damage, pointName.begin(), turnsLeft-1);
 	messages.LogAuxMessage();
 	return true;
@@ -55,24 +53,24 @@ bool									klib::usePotion						(const ::klib::SEntityTables & tables, ::klib:
 
 	bool										bUsedItem							= false;
 
-	SLifePoints									& currentPoints						= potionDrinker.Points.LifeCurrent;
-	SCombatBonus								& drinkerBonus						= potionDrinker.ActiveBonus.Points;
-	const SLifePoints							maxPoints							= potionDrinker.FinalPoints.LifeMax;
+	::klib::SLifePoints							& currentPoints						= potionDrinker.Points.LifeCurrent;
+	::klib::SCombatBonus						& drinkerBonus						= potionDrinker.ActiveBonus.Points;
+	const ::klib::SLifePoints					maxPoints							= potionDrinker.FinalPoints.LifeMax;
 
-	if(	itemDescription.Property	&	 PROPERTY_TYPE_HEALTH			)	bUsedItem = bUsedItem || potionRestore		(tables, messages, potionDrinker, itemPotion.Level,	maxPoints.Health								, currentPoints.Health										, "Health"			);
-	if(	itemDescription.Property	&	 PROPERTY_TYPE_MANA				)	bUsedItem = bUsedItem || potionRestore		(tables, messages, potionDrinker, itemPotion.Level,	maxPoints.Mana									, currentPoints.Mana										, "Mana"			);
-	if(	itemDescription.Property	&	 PROPERTY_TYPE_SHIELD			)	bUsedItem = bUsedItem || potionRestore		(tables, messages, potionDrinker, itemPotion.Level,	maxPoints.Shield								, currentPoints.Shield										, "Shield"			);
-	if(	itemDescription.Property	&	 PROPERTY_TYPE_HIT				)	bUsedItem = bUsedItem || potionAttackBonus	(tables, messages, potionDrinker, itemPotion.Level,	drinkerBonus.Points.Attack.Hit					, drinkerBonus.TurnsLeftPoints.Attack.Hit					, "Hit"				);
-	if(	itemDescription.Property	&	 PROPERTY_TYPE_DAMAGE			)	bUsedItem = bUsedItem || potionAttackBonus	(tables, messages, potionDrinker, itemPotion.Level,	drinkerBonus.Points.Attack.Damage				, drinkerBonus.TurnsLeftPoints.Attack.Damage				, "Damage"			);
-	if(	itemDescription.Property	&	 PROPERTY_TYPE_HEALTH_DAMAGE	)	bUsedItem = bUsedItem || potionAttackBonus	(tables, messages, potionDrinker, itemPotion.Level,	drinkerBonus.Points.Attack.DirectDamage.Health	, drinkerBonus.TurnsLeftPoints.Attack.DirectDamage.Health	, "Health Damage"	);
-	if(	itemDescription.Property	&	 PROPERTY_TYPE_MANA_DAMAGE		)	bUsedItem = bUsedItem || potionAttackBonus	(tables, messages, potionDrinker, itemPotion.Level,	drinkerBonus.Points.Attack.DirectDamage.Mana	, drinkerBonus.TurnsLeftPoints.Attack.DirectDamage.Mana		, "Mana Damage"		);
-	if(	itemDescription.Property	&	 PROPERTY_TYPE_SHIELD_DAMAGE	)	bUsedItem = bUsedItem || potionAttackBonus	(tables, messages, potionDrinker, itemPotion.Level,	drinkerBonus.Points.Attack.DirectDamage.Shield	, drinkerBonus.TurnsLeftPoints.Attack.DirectDamage.Shield	, "Shield Damage"	);
-	if(	itemDescription.Property	&	 PROPERTY_TYPE_ABSORPTION		)	bUsedItem = bUsedItem || potionAttackBonus	(tables, messages, potionDrinker, itemPotion.Level,	drinkerBonus.Points.Attack.Absorption			, drinkerBonus.TurnsLeftPoints.Attack.Absorption			, "Absorption"		);
-	if(	itemDescription.Property	&	 PROPERTY_TYPE_RANGE			)	bUsedItem = bUsedItem || potionAttackBonus	(tables, messages, potionDrinker, itemPotion.Level,	drinkerBonus.Points.Attack.Range				, drinkerBonus.TurnsLeftPoints.Attack.Absorption			, "Absorption"		);
-	if(	itemDescription.Property	&	 PROPERTY_TYPE_ATTACK_SPEED		)	bUsedItem = bUsedItem || potionAttackBonus	(tables, messages, potionDrinker, itemPotion.Level,	drinkerBonus.Points.Fitness.Attack				, drinkerBonus.TurnsLeftPoints.Fitness.Attack				, "Attack Speed"	);
-	if(	itemDescription.Property	&	 PROPERTY_TYPE_MOVEMENT_SPEED	)	bUsedItem = bUsedItem || potionAttackBonus	(tables, messages, potionDrinker, itemPotion.Level,	drinkerBonus.Points.Fitness.Movement			, drinkerBonus.TurnsLeftPoints.Fitness.Movement				, "Movement Speed"	);
-	if(	itemDescription.Property	&	 PROPERTY_TYPE_REFLEXES			)	bUsedItem = bUsedItem || potionAttackBonus	(tables, messages, potionDrinker, itemPotion.Level,	drinkerBonus.Points.Fitness.Reflexes			, drinkerBonus.TurnsLeftPoints.Fitness.Reflexes				, "Reflexes"		);
-	if(	itemDescription.Property	&	 PROPERTY_TYPE_SIGHT			)	bUsedItem = bUsedItem || potionAttackBonus	(tables, messages, potionDrinker, itemPotion.Level,	drinkerBonus.Points.Fitness.Sight				, drinkerBonus.TurnsLeftPoints.Fitness.Sight				, "Sight"			);
+	if(itemDescription.Property & PROPERTY_TYPE_HEALTH			) bUsedItem = bUsedItem || potionRestore		(tables, messages, potionDrinker, itemPotion.Level,	maxPoints.Health								, currentPoints.Health										, ::gpk::view_const_string{"Health"			});
+	if(itemDescription.Property & PROPERTY_TYPE_MANA			) bUsedItem = bUsedItem || potionRestore		(tables, messages, potionDrinker, itemPotion.Level,	maxPoints.Mana									, currentPoints.Mana										, ::gpk::view_const_string{"Mana"			});
+	if(itemDescription.Property & PROPERTY_TYPE_SHIELD			) bUsedItem = bUsedItem || potionRestore		(tables, messages, potionDrinker, itemPotion.Level,	maxPoints.Shield								, currentPoints.Shield										, ::gpk::view_const_string{"Shield"			});
+	if(itemDescription.Property & PROPERTY_TYPE_HIT				) bUsedItem = bUsedItem || potionAttackBonus	(tables, messages, potionDrinker, itemPotion.Level,	drinkerBonus.Points.Attack.Hit					, drinkerBonus.TurnsLeftPoints.Attack.Hit					, ::gpk::view_const_string{"Hit"			});
+	if(itemDescription.Property & PROPERTY_TYPE_DAMAGE			) bUsedItem = bUsedItem || potionAttackBonus	(tables, messages, potionDrinker, itemPotion.Level,	drinkerBonus.Points.Attack.Damage				, drinkerBonus.TurnsLeftPoints.Attack.Damage				, ::gpk::view_const_string{"Damage"			});
+	if(itemDescription.Property & PROPERTY_TYPE_HEALTH_DAMAGE	) bUsedItem = bUsedItem || potionAttackBonus	(tables, messages, potionDrinker, itemPotion.Level,	drinkerBonus.Points.Attack.DirectDamage.Health	, drinkerBonus.TurnsLeftPoints.Attack.DirectDamage.Health	, ::gpk::view_const_string{"Health Damage"	});
+	if(itemDescription.Property & PROPERTY_TYPE_MANA_DAMAGE		) bUsedItem = bUsedItem || potionAttackBonus	(tables, messages, potionDrinker, itemPotion.Level,	drinkerBonus.Points.Attack.DirectDamage.Mana	, drinkerBonus.TurnsLeftPoints.Attack.DirectDamage.Mana		, ::gpk::view_const_string{"Mana Damage"	});
+	if(itemDescription.Property & PROPERTY_TYPE_SHIELD_DAMAGE	) bUsedItem = bUsedItem || potionAttackBonus	(tables, messages, potionDrinker, itemPotion.Level,	drinkerBonus.Points.Attack.DirectDamage.Shield	, drinkerBonus.TurnsLeftPoints.Attack.DirectDamage.Shield	, ::gpk::view_const_string{"Shield Damage"	});
+	if(itemDescription.Property & PROPERTY_TYPE_ABSORPTION		) bUsedItem = bUsedItem || potionAttackBonus	(tables, messages, potionDrinker, itemPotion.Level,	drinkerBonus.Points.Attack.Absorption			, drinkerBonus.TurnsLeftPoints.Attack.Absorption			, ::gpk::view_const_string{"Absorption"		});
+	if(itemDescription.Property & PROPERTY_TYPE_RANGE			) bUsedItem = bUsedItem || potionAttackBonus	(tables, messages, potionDrinker, itemPotion.Level,	drinkerBonus.Points.Attack.Range				, drinkerBonus.TurnsLeftPoints.Attack.Absorption			, ::gpk::view_const_string{"Absorption"		});
+	if(itemDescription.Property & PROPERTY_TYPE_ATTACK_SPEED	) bUsedItem = bUsedItem || potionAttackBonus	(tables, messages, potionDrinker, itemPotion.Level,	drinkerBonus.Points.Fitness.Attack				, drinkerBonus.TurnsLeftPoints.Fitness.Attack				, ::gpk::view_const_string{"Attack Speed"	});
+	if(itemDescription.Property & PROPERTY_TYPE_MOVEMENT_SPEED	) bUsedItem = bUsedItem || potionAttackBonus	(tables, messages, potionDrinker, itemPotion.Level,	drinkerBonus.Points.Fitness.Movement			, drinkerBonus.TurnsLeftPoints.Fitness.Movement				, ::gpk::view_const_string{"Movement Speed"	});
+	if(itemDescription.Property & PROPERTY_TYPE_REFLEXES		) bUsedItem = bUsedItem || potionAttackBonus	(tables, messages, potionDrinker, itemPotion.Level,	drinkerBonus.Points.Fitness.Reflexes			, drinkerBonus.TurnsLeftPoints.Fitness.Reflexes				, ::gpk::view_const_string{"Reflexes"		});
+	if(itemDescription.Property & PROPERTY_TYPE_SIGHT			) bUsedItem = bUsedItem || potionAttackBonus	(tables, messages, potionDrinker, itemPotion.Level,	drinkerBonus.Points.Fitness.Sight				, drinkerBonus.TurnsLeftPoints.Fitness.Sight				, ::gpk::view_const_string{"Sight"			});
 
 	if(bUsedItem) {
 		potionDrinker.Recalculate(tables);

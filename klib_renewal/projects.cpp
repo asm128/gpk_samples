@@ -289,12 +289,12 @@ int32_t									klib::getResearchableItems
 	ADD_RESEARCH_DEFINITIONS(researchedItems.Facility	, ENTITY_TYPE_FACILITY		, entityTables.Facility		.Definitions);
 	ADD_RESEARCH_DEFINITIONS(researchedItems.StageProp	, ENTITY_TYPE_STAGE_PROP	, entityTables.StageProp	.Definitions);
 
-	ADD_RESEARCH_MODIFIERS(researchedItems.Weapon		, ENTITY_TYPE_WEAPON		, entityTables.Weapon		.Modifiers, "Module");
-	ADD_RESEARCH_MODIFIERS(researchedItems.Armor		, ENTITY_TYPE_ARMOR			, entityTables.Armor		.Modifiers, "Module");
-	ADD_RESEARCH_MODIFIERS(researchedItems.Accessory	, ENTITY_TYPE_ACCESSORY		, entityTables.Accessory	.Modifiers, "Module");
+	ADD_RESEARCH_MODIFIERS(researchedItems.Weapon		, ENTITY_TYPE_WEAPON		, entityTables.Weapon		.Modifiers, "Mod");
+	ADD_RESEARCH_MODIFIERS(researchedItems.Armor		, ENTITY_TYPE_ARMOR			, entityTables.Armor		.Modifiers, "Mod");
+	ADD_RESEARCH_MODIFIERS(researchedItems.Accessory	, ENTITY_TYPE_ACCESSORY		, entityTables.Accessory	.Modifiers, "Mod");
 	ADD_RESEARCH_MODIFIERS(researchedItems.Profession	, ENTITY_TYPE_PROFESSION	, entityTables.Profession	.Modifiers, "Badge" );
-	ADD_RESEARCH_MODIFIERS(researchedItems.Vehicle		, ENTITY_TYPE_VEHICLE		, entityTables.Vehicle		.Modifiers, "Module");
-	ADD_RESEARCH_MODIFIERS(researchedItems.Facility		, ENTITY_TYPE_FACILITY		, entityTables.Facility		.Modifiers, "Module");
-	ADD_RESEARCH_MODIFIERS(researchedItems.StageProp	, ENTITY_TYPE_STAGE_PROP	, entityTables.StageProp	.Modifiers, "Module");
+	ADD_RESEARCH_MODIFIERS(researchedItems.Vehicle		, ENTITY_TYPE_VEHICLE		, entityTables.Vehicle		.Modifiers, "Mod");
+	ADD_RESEARCH_MODIFIERS(researchedItems.Facility		, ENTITY_TYPE_FACILITY		, entityTables.Facility		.Modifiers, "Mod");
+	ADD_RESEARCH_MODIFIERS(researchedItems.StageProp	, ENTITY_TYPE_STAGE_PROP	, entityTables.StageProp	.Modifiers, "Mod");
 	return menuItemsValue.size();
 }

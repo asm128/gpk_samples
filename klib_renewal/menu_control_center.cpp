@@ -58,7 +58,7 @@ int32_t drawList(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> text
 	return 0;
 }
 
-int32_t processEquipAgentInput(const ::klib::SInput& frameInput, const SPlayer& player, uint32_t rowCount, int32_t offsetY, int32_t offsetX) {
+int32_t processEquipAgentInput(const ::klib::SInput& frameInput, const ::klib::STacticalPlayer& player, uint32_t rowCount, int32_t offsetY, int32_t offsetX) {
 	const int32_t mouseX = frameInput.Mouse.Deltas.x;
 	const int32_t mouseY = frameInput.Mouse.Deltas.y;
 	int32_t indexEquip = -1;
@@ -66,7 +66,7 @@ int32_t processEquipAgentInput(const ::klib::SInput& frameInput, const SPlayer& 
 	offsetY += 1;
 	int32_t actualAgentsProcessed = 0;
 	for(uint32_t iRow = 0; iRow < rowCount; ++iRow) {
-		if(0 == player.Tactical.Army[iRow] || player.Tactical.Squad.IsAgentAssigned((int32_t)iRow))
+		if(0 == player.Army[iRow] || player.Squad.IsAgentAssigned((int32_t)iRow))
 			continue;
 
 		if(mouseOver({mouseX, mouseY}, {offsetX, offsetY+actualAgentsProcessed}, AGENT_ROW_WIDTH)) { indexEquip = iRow | (frameInput.Mouse.Buttons[0] ? 0x80000000 : 0); break; }
@@ -126,7 +126,7 @@ int32_t drawValueSlider(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_
 	return 0;
 };
 
-static	void drawBalance(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, const ::klib::SInput& frameInput, SPlayer& player, int32_t offsetX, int32_t offsetY) {
+static	void drawBalance(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, const ::klib::SInput& frameInput, SGamePlayer& player, int32_t offsetX, int32_t offsetY) {
 	// Budgets
 	printfToGridColored(display, textAttributes, ::klib::ASCII_COLOR_INDEX_YELLOW << 4, offsetY, offsetX+14, ::klib::SCREEN_LEFT, "%s", "    Project budgets   ");
 	drawValueSlider		(display	, textAttributes, offsetY+2, offsetX+14, player.Projects.BudgetProduction	.Money	, 10, "Production");
@@ -163,7 +163,7 @@ static	void drawBalance(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_
 	sprintf_s(preformatted, "%lli", researchCost								);	sprintf_s(formatted, " Research Cost       : %13.13s", preformatted); balanceOptions[3].Text = ::gpk::view_const_string{formatted};
 	sprintf_s(preformatted, "%lli", fundsAfterCost-productionCost-researchCost);	sprintf_s(formatted, " Funds after mission : %13.13s", preformatted); balanceOptions[4].Text = ::gpk::view_const_string{formatted};
 
-	drawList(display, textAttributes, balanceOptions, (uint32_t)::gpk::size(balanceOptions), offsetX, offsetY+8, 36);
+	::drawList(display, textAttributes, balanceOptions, (uint32_t)::gpk::size(balanceOptions), offsetX, offsetY+8, 36);
 
 }
 
@@ -185,7 +185,7 @@ int32_t												drawEquipDetail
 	for(uint32_t i = 4, count= (uint32_t)::gpk::size(formattedTitle); i<count; ++i)
 		formattedTitle[i]									= (char)::tolower(formattedTitle[i]);
 
-	printfToGridColored(display, textAttributes, ::klib::ASCII_COLOR_INDEX_YELLOW << 4 | ::klib::ASCII_COLOR_INDEX_BLUE, offsetY, offsetX, ::klib::SCREEN_LEFT, "%-37.37s", formattedTitle);
+	::klib::printfToGridColored(display, textAttributes, ::klib::ASCII_COLOR_INDEX_YELLOW << 4 | ::klib::ASCII_COLOR_INDEX_BLUE, offsetY, offsetX, ::klib::SCREEN_LEFT, "%-37.37s", formattedTitle);
 	return 0;
 }
 
@@ -197,8 +197,8 @@ int32_t										drawEquipList
 ,	int32_t										offsetX
 ,	int32_t										selectedRow
 ,	const ::gpk::view_const_char				& entityTypeName
-,	const SEntityContainer		<_tEntity>		& entityContainer
-,	const ::klib::SEntityTable	<_tEntity>		& table
+,	const ::klib::SEntityContainer	<_tEntity>	& entityContainer
+,	const ::klib::SEntityTable		<_tEntity>	& table
 ) {
 	char											formattedTitle[32] = {};
 	sprintf_s(formattedTitle, " - %s:", entityTypeName.begin());
@@ -210,7 +210,7 @@ int32_t										drawEquipList
 	for(uint32_t iEntity = 0, entityCount = entityContainer.Slots.size(); iEntity < entityCount; ++iEntity) {
 		entityName									= ::klib::getEntityName(table, entityContainer[iEntity].Entity);
 		uint16_t										colorRow						= (iEntity == (uint32_t)selectedRow) ? ::klib::ASCII_COLOR_INDEX_YELLOW : ::klib::ASCII_COLOR_INDEX_YELLOW << 4;
-		printfToGridColored(display, textAttributes, colorRow, offsetY+1+iEntity, offsetX, ::klib::SCREEN_LEFT, "%12.12s %-30.30s", "", entityName.begin());
+		::klib::printfToGridColored(display, textAttributes, colorRow, offsetY+1+iEntity, offsetX, ::klib::SCREEN_LEFT, "%12.12s %-30.30s", "", entityName.begin());
 	}
 	return 0;
 }
@@ -218,7 +218,7 @@ int32_t										drawEquipList
 int32_t drawAgentList
 	( ::gpk::view_grid<char>										display
 	, ::gpk::view_grid<uint16_t>									textAttributes
-	, const SPlayer													& player
+	, const SGamePlayer													& player
 	, int32_t														offsetY
 	, int32_t														offsetX
 	, int32_t														selectedRow
@@ -246,7 +246,7 @@ int32_t drawAgentList
 }
 
 //
-int32_t										drawEquipList					(::klib::SEntityTables & tables, ENTITY_TYPE entityType, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, const SPlayer& player, int32_t offsetY, int32_t offsetX, int32_t selectedRow) {
+int32_t										drawEquipList					(::klib::SEntityTables & tables, ENTITY_TYPE entityType, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, const SGamePlayer& player, int32_t offsetY, int32_t offsetX, int32_t selectedRow) {
 	const ::gpk::view_const_char					labelet						= ::gpk::get_value_label(entityType);
 
 	switch(entityType) {
@@ -263,16 +263,16 @@ int32_t										drawEquipList					(::klib::SEntityTables & tables, ENTITY_TYPE 
 	return -1;
 }
 
-int32_t processEquipInput(ENTITY_TYPE entityType, const ::klib::SInput& frameInput, const SPlayer& player, int32_t offsetY)
+int32_t processEquipInput(ENTITY_TYPE entityType, const ::klib::SInput& frameInput, const SGamePlayer& player, int32_t offsetY)
 {
 	int32_t tempRow = -1;
 
 	switch(entityType) {
-	case ENTITY_TYPE_CHARACTER	:	tempRow = processEquipAgentInput(frameInput, player, player.Tactical.Army.size(), offsetY + entityType, 1); break;
+	case ENTITY_TYPE_CHARACTER	:	tempRow = ::processEquipAgentInput(frameInput, player.Tactical, player.Tactical.Army.size(), offsetY + entityType, 1); break;
 	case ENTITY_TYPE_PROFESSION	:
 	case ENTITY_TYPE_WEAPON		:
 	case ENTITY_TYPE_ARMOR		:
-	case ENTITY_TYPE_ACCESSORY	:	tempRow = mouseOverList(frameInput, player.Inventory.GetCount(entityType), 1, offsetY + 1 + entityType, AGENT_ROW_WIDTH);
+	case ENTITY_TYPE_ACCESSORY	:	tempRow = ::mouseOverList(frameInput, player.Inventory.GetCount(entityType), 1, offsetY + 1 + entityType, AGENT_ROW_WIDTH);
 	default:
 		break;
 	}
@@ -310,7 +310,7 @@ int32_t drawWelcomeGUI(SGame& instanceGame) {
 	static int32_t						selectedAgent			= -1;
 	bool								bHandledKey				= false;
 
-	SPlayer								& player				= instanceGame.Players[PLAYER_INDEX_USER];
+	::klib::SGamePlayer					& player				= instanceGame.Players[PLAYER_INDEX_USER];
 
 	// Squad
 	printfToGridColored(display, textAttributes, ::klib::ASCII_COLOR_INDEX_YELLOW << 4, startY, 1, ::klib::SCREEN_LEFT, "%-43.43s", " Assigned squad:");
@@ -318,59 +318,66 @@ int32_t drawWelcomeGUI(SGame& instanceGame) {
 	int32_t								selectedRow				= -1;
 	int32_t								indexRow				= -1;
 	startY							+= 2;
-	for(uint32_t iAgent=0; iAgent < player.Tactical.Squad.Size; ++iAgent) {
+	for(uint32_t iAgent=0; iAgent < player.Tactical.Squad.Agents.size(); ++iAgent) {
 		const int32_t						offsetY					= startY + ((agentsDisplayed)*10);
-		if(player.Tactical.Squad.Agents[iAgent] == -1)
+		if(player.Tactical.Squad.Agents[iAgent] == -1 && iAgent > 0 && player.Tactical.Squad.Agents[iAgent - 1] == -1)
+			break;
+
+		if(player.Tactical.Squad.Agents[iAgent] == -1) {
+			printfToGridColored(display, textAttributes, ::klib::ASCII_COLOR_INDEX_YELLOW << 4, offsetY, 1, ::klib::SCREEN_LEFT, "%-43.43s", " Empty Slot");
+			int32_t				selectedAgentField		= mouseOverList(instanceGame.FrameInput, 5, 1, offsetY, AGENT_ROW_WIDTH);
+			if(selectedAgentField == -1)
+				//selectedAgentField &= ~0x80000000;
 			continue;
+		}
+		else {
+			int32_t				selectedAgentField		= mouseOverList(instanceGame.FrameInput, 5, 1, offsetY, AGENT_ROW_WIDTH);
+			if(selectedAgentField != -1)
+				selectedAgentField &= ~0x80000000;
 
-		CCharacter& agent = *player.Tactical.Army[player.Tactical.Squad.Agents[iAgent]];
+			CCharacter			& agent					= *player.Tactical.Army[player.Tactical.Squad.Agents[iAgent]];
+			drawAgentResume(instanceGame.EntityTables, display, textAttributes, agent, offsetY, 1, selectedAgentField);
+			if(selectedEquip != -1 && selectedAgent == (int32_t)iAgent) {
+				ENTITY_TYPE			selectedEntityType		= (ENTITY_TYPE)selectedEquip;
+				int32_t				tempRow					= processEquipInput(selectedEntityType, instanceGame.FrameInput, player, offsetY);
 
-		int32_t selectedAgentField = mouseOverList(instanceGame.FrameInput, 5, 1, offsetY, AGENT_ROW_WIDTH);
-		if(selectedAgentField != -1)
-			selectedAgentField &= ~0x80000000;
+				drawEquipDetail(instanceGame.EntityTables, selectedEntityType, display, textAttributes, agent, startY, 45+1);
 
-		drawAgentResume(instanceGame.EntityTables, display, textAttributes, agent, offsetY, 1, selectedAgentField);
+				if(tempRow != -1) {
+					selectedRow = tempRow;
+					indexRow	= tempRow & ~0x80000000;
 
-		if(selectedEquip != -1 && selectedAgent == (int32_t)iAgent) {
-			ENTITY_TYPE		selectedEntityType	= (ENTITY_TYPE)selectedEquip;
-			int32_t			tempRow				= processEquipInput(selectedEntityType, instanceGame.FrameInput, player, offsetY);
-
-			drawEquipDetail(instanceGame.EntityTables, selectedEntityType, display, textAttributes, agent, startY, 45+1);
-
-			if(tempRow != -1) {
-				selectedRow = tempRow;
-				indexRow	= tempRow & ~0x80000000;
-
-				if(tempRow & 0x80000000) {
-					switch(selectedEntityType) {
-					case ENTITY_TYPE_CHARACTER	:	player.Tactical.Squad.Agents[iAgent] = int16_t(indexRow); break;
-					case ENTITY_TYPE_PROFESSION	:	equipIfResearchedProfession	(instanceGame, player.Tactical.Squad.Agents[iAgent], (int16_t)indexRow); break;
-					case ENTITY_TYPE_WEAPON		:	equipIfResearchedWeapon		(instanceGame, player.Tactical.Squad.Agents[iAgent], (int16_t)indexRow); break;
-					case ENTITY_TYPE_ARMOR		:	equipIfResearchedArmor		(instanceGame, player.Tactical.Squad.Agents[iAgent], (int16_t)indexRow); break;
-					case ENTITY_TYPE_ACCESSORY	:	equipIfResearchedAccessory	(instanceGame, player.Tactical.Squad.Agents[iAgent], (int16_t)indexRow); break;
-					default:
-						break;
+					if(tempRow & 0x80000000) {
+						switch(selectedEntityType) {
+						case ENTITY_TYPE_CHARACTER	:	player.Tactical.Squad.Agents[iAgent] = int16_t(indexRow); break;
+						case ENTITY_TYPE_PROFESSION	:	equipIfResearchedProfession	(instanceGame, player.Tactical.Squad.Agents[iAgent], (int16_t)indexRow); break;
+						case ENTITY_TYPE_WEAPON		:	equipIfResearchedWeapon		(instanceGame, player.Tactical.Squad.Agents[iAgent], (int16_t)indexRow); break;
+						case ENTITY_TYPE_ARMOR		:	equipIfResearchedArmor		(instanceGame, player.Tactical.Squad.Agents[iAgent], (int16_t)indexRow); break;
+						case ENTITY_TYPE_ACCESSORY	:	equipIfResearchedAccessory	(instanceGame, player.Tactical.Squad.Agents[iAgent], (int16_t)indexRow); break;
+						default:
+							break;
+						}
+						selectedAgent = -1;
+						selectedEquip = -1;
+						bHandledKey = true;
 					}
-					selectedAgent = -1;
-					selectedEquip = -1;
-					bHandledKey = true;
-				}
-				else {//if(tempRow != -1)
-					int32_t offsetX = 45*2;
-					const ::gpk::view_const_char			labelSelectedEquip = ::gpk::get_value_label(selectedEntityType);
-					switch(selectedEntityType) {
-					case ENTITY_TYPE_CHARACTER	:	if(player.Tactical.Army[indexRow]) displayDetailedAgentSlot(instanceGame.EntityTables, display, textAttributes, startY, offsetX, *player.Tactical.Army[indexRow], (::klib::ASCII_COLOR_INDEX_YELLOW << 4)| ::klib::ASCII_COLOR_INDEX_BLUE);	break;
-					case ENTITY_TYPE_PROFESSION	:	drawEquipDetail(display, textAttributes, startY, offsetX, labelSelectedEquip, player.Inventory.Profession	[indexRow].Entity, instanceGame.EntityTables.Profession	);	break;
-					case ENTITY_TYPE_WEAPON		:	drawEquipDetail(display, textAttributes, startY, offsetX, labelSelectedEquip, player.Inventory.Weapon		[indexRow].Entity, instanceGame.EntityTables.Weapon		);	break;
-					case ENTITY_TYPE_ARMOR		:	drawEquipDetail(display, textAttributes, startY, offsetX, labelSelectedEquip, player.Inventory.Armor		[indexRow].Entity, instanceGame.EntityTables.Armor		);	break;
-					case ENTITY_TYPE_ACCESSORY	:	drawEquipDetail(display, textAttributes, startY, offsetX, labelSelectedEquip, player.Inventory.Accessory	[indexRow].Entity, instanceGame.EntityTables.Accessory	);	break;
-					default:
-						break;
+					else {//if(tempRow != -1)
+						int32_t offsetX = 45*2;
+						const ::gpk::view_const_char			labelSelectedEquip = ::gpk::get_value_label(selectedEntityType);
+						switch(selectedEntityType) {
+						case ENTITY_TYPE_CHARACTER	:	if(player.Tactical.Army[indexRow]) displayDetailedAgentSlot(instanceGame.EntityTables, display, textAttributes, startY, offsetX, *player.Tactical.Army[indexRow], (::klib::ASCII_COLOR_INDEX_YELLOW << 4)| ::klib::ASCII_COLOR_INDEX_BLUE);	break;
+						case ENTITY_TYPE_PROFESSION	:	drawEquipDetail(display, textAttributes, startY, offsetX, labelSelectedEquip, player.Inventory.Profession	[indexRow].Entity, instanceGame.EntityTables.Profession	);	break;
+						case ENTITY_TYPE_WEAPON		:	drawEquipDetail(display, textAttributes, startY, offsetX, labelSelectedEquip, player.Inventory.Weapon		[indexRow].Entity, instanceGame.EntityTables.Weapon		);	break;
+						case ENTITY_TYPE_ARMOR		:	drawEquipDetail(display, textAttributes, startY, offsetX, labelSelectedEquip, player.Inventory.Armor		[indexRow].Entity, instanceGame.EntityTables.Armor		);	break;
+						case ENTITY_TYPE_ACCESSORY	:	drawEquipDetail(display, textAttributes, startY, offsetX, labelSelectedEquip, player.Inventory.Accessory	[indexRow].Entity, instanceGame.EntityTables.Accessory	);	break;
+						default:
+							break;
+						}
 					}
 				}
 			}
+			++agentsDisplayed;
 		}
-		++agentsDisplayed;
 	}
 
 	if(selectedEquip != -1) {
@@ -427,13 +434,13 @@ SGameState								drawWelcome			(SGame& instanceGame, const SGameState& returnVa
 	::gpk::array_pod<char_t>					textToPrint			= ::gpk::view_const_string{"Welcome back commander "};
 	textToPrint.append(instanceGame.Players[PLAYER_INDEX_USER].Tactical.Name);
 	textToPrint.append_string(".");
-	SWeightedDisplay							& display			= instanceGame.GlobalDisplay;
-	int32_t										lineOffset			= (display.Screen.metrics().y >> 1) - 1;
-	int32_t										columnOffset		=  display.Screen.metrics().x / 2 - (int32_t)textToPrint.size() / 2;
+	::gpk::SRenderTarget<char, uint16_t>		& display			= instanceGame.GlobalDisplay.Screen;
+	int32_t										lineOffset			= (display.metrics().y >> 1) - 1;
+	int32_t										columnOffset		=  display.metrics().x / 2 - (int32_t)textToPrint.size() / 2;
 
 	static ::klib::SMessageSlow					slowMessage;
 	bool										bDonePrinting		= ::klib::getMessageSlow(slowMessage, textToPrint, instanceGame.FrameTimer.LastTimeSeconds);
-	columnOffset							= printfToGridColored(display.Screen.Color.View, display.Screen.DepthStencil, ::klib::ASCII_COLOR_INDEX_GREEN, lineOffset, columnOffset, ::klib::SCREEN_LEFT, "%s", slowMessage);
+	columnOffset							= printfToGridColored(display.Color.View, display.DepthStencil, ::klib::ASCII_COLOR_INDEX_GREEN, lineOffset, columnOffset, ::klib::SCREEN_LEFT, "%s", slowMessage);
 
 	if ( bDonePrinting ) {
 		drawWelcomeGUI(instanceGame);
@@ -441,7 +448,7 @@ SGameState								drawWelcome			(SGame& instanceGame, const SGameState& returnVa
 		// Menu
 		static SMenuHeader<SGameState>				menuControlCenter	({GAME_STATE_MENU_MAIN}, ::gpk::view_const_string{"Control Center"}, 28);
 		bool										bInCourse			= ::gpk::bit_true(instanceGame.Flags, GAME_FLAGS_TACTICAL) || ::gpk::bit_true(instanceGame.Flags, GAME_FLAGS_TACTICAL_REMOTE);
-		return drawMenu(display.Screen.Color.View, display.Screen.DepthStencil.begin(), menuControlCenter, ::gpk::view_array<const ::klib::SMenuItem<SGameState>>{(bInCourse) ? optionsControlCenterMissionInCourse : optionsControlCenter}, instanceGame.FrameInput, returnValue);
+		return drawMenu(display.Color.View, display.DepthStencil.begin(), menuControlCenter, ::gpk::view_array<const ::klib::SMenuItem<SGameState>>{(bInCourse) ? optionsControlCenterMissionInCourse : optionsControlCenter}, instanceGame.FrameInput, returnValue);
 	}
 	return returnValue;
 };

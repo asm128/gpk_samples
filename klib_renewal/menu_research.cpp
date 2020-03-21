@@ -9,7 +9,7 @@
 using namespace klib;
 
 static	SGameState						drawResearchMenu				(SGame& instanceGame, const SGameState& returnState) {
-	::klib::SPlayer								& player						= instanceGame.Players[PLAYER_INDEX_USER];
+	::klib::SGamePlayer								& player						= instanceGame.Players[PLAYER_INDEX_USER];
 	::klib::playerUpdateResearchLists(instanceGame.EntityTables, player);
 
 	::gpk::array_obj<::klib::SEntityResearch>	& menuItemsValue			= player.ResearchablesValue;
@@ -54,7 +54,7 @@ static	SGameState						drawResearchMenu				(SGame& instanceGame, const SGameStat
 	return returnState;
 }
 
-static void				drawBubblesBackground		( SWeightedDisplay & display, double lastTimeSeconds, uint32_t disturbance=2 ) {
+static void				drawBubblesBackground		( ::klib::SWeightedDisplay & display, double lastTimeSeconds, uint32_t disturbance=2 ) {
 	uint32_t				displayWidth				= (int32_t)display.Screen.metrics().x;
 	uint32_t				displayDepth				= (int32_t)display.Screen.metrics().y;
 

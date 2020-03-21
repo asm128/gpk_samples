@@ -8,7 +8,7 @@
 using namespace klib;
 
 static	SGameState						drawUpgradeMenu				(::klib::SGame& instanceGame, const ::klib::SGameState& returnState)				{
-	::klib::SPlayer								& player					= instanceGame.Players[PLAYER_INDEX_USER];
+	::klib::SGamePlayer								& player					= instanceGame.Players[PLAYER_INDEX_USER];
 	::klib::playerUpdateResearchLists(instanceGame.EntityTables, player);
 
 	::gpk::array_obj<::klib::SEntityResearch>	& menuItemsValue			= player.ResearchablesValue;

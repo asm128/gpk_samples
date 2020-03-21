@@ -13,8 +13,8 @@ void									klib::boardToDisplay			(::klib::SGame& instanceGame, const STactica
 	for(uint32_t x = 0; x < board.Tiles.Terrain.Geometry.metrics().x; ++x) {
 		int32_t										topologyHeight			= board.Tiles.Terrain.Topology[z][x].Smooth + board.Tiles.Terrain.Topology[z][x].Sharp;
 		float										cornerHeight[4]			= {};
-		memcpy(cornerHeight, board.Tiles.Terrain.Geometry[z][x].fHeight, sizeof(float)*4);
-		::gpk::SCoord3<int32_t>					currentCoord			= {(int32_t)x, (int32_t)y, (int32_t)z};
+		::memcpy(cornerHeight, board.Tiles.Terrain.Geometry[z][x].fHeight, sizeof(float)*4);
+		::gpk::SCoord3<int32_t>						currentCoord			= {(int32_t)x, (int32_t)y, (int32_t)z};
 		bool										bInRange				= false;
 		double										initialSight			= 0.0;
 		double										finalSight				= 0.0;
@@ -30,17 +30,17 @@ void									klib::boardToDisplay			(::klib::SGame& instanceGame, const STactica
 				if(tacticalSetup.TeamPerPlayer[iTacticalPlayer] != teamId)
 					continue;
 
-				SPlayer										& currentPlayer			= instanceGame.Players[tacticalSetup.Players[iTacticalPlayer]];
+				::klib::STacticalPlayer								& currentPlayer			= instanceGame.Players[tacticalSetup.Players[iTacticalPlayer]].Tactical;
 
 				for(uint32_t iAgent = 0, agentCount = tacticalSetup.SquadSize[iTacticalPlayer]; iAgent < agentCount; ++iAgent) {
-					if(currentPlayer.Tactical.Squad.Agents[iAgent] == -1)
+					if(currentPlayer.Squad.Agents[iAgent] == -1)
 						continue;
 
-					CCharacter									& playerAgent			= *currentPlayer.Tactical.Army[currentPlayer.Tactical.Squad.Agents[iAgent]];
+					CCharacter									& playerAgent			= *currentPlayer.Army[currentPlayer.Squad.Agents[iAgent]];
 					if(false == playerAgent.IsAlive())
 						continue;
 
-					::gpk::SCoord3<int32_t>					coordPlayer				= playerAgent.Position;
+					::gpk::SCoord3<int32_t>						coordPlayer				= playerAgent.Position;
 					::gpk::SCoord3<float>						distance				= currentTilePos - coordPlayer.Cast<float>();;
 
 					SEntityPoints								playerAgentPoints		= playerAgent.FinalPoints	;
@@ -75,8 +75,8 @@ void									klib::boardToDisplay			(::klib::SGame& instanceGame, const STactica
 				=  (cellPlayerIndex == indexBoardPlayer			&& board.Tiles.Entities.Agents[z][x].AgentIndex == selection.PlayerUnit)
 				|| (cellPlayerIndex == selection.TargetPlayer	&& board.Tiles.Entities.Agents[z][x].AgentIndex == selection.TargetUnit)
 				;
-			const SPlayer									& boardPlayer				= instanceGame.Players[tacticalInfo.Setup.Players[cellPlayerIndex]];
-			const SCharacter								& agent						= *boardPlayer.Tactical.Army[boardPlayer.Tactical.Squad.Agents[agentIndex]];
+			const STacticalPlayer							& boardPlayer				= instanceGame.Players[tacticalInfo.Setup.Players[cellPlayerIndex]].Tactical;
+			const SCharacter								& agent						= *boardPlayer.Army[boardPlayer.Squad.Agents[agentIndex]];
 			uint16_t										color						= ::klib::ASCII_COLOR_INDEX_BLACK;
 			if(agent.IsAlive()) {
 				double fractionLife		= agent.Points.LifeCurrent.Health / (double)agent.FinalPoints.LifeMax.Health;
@@ -93,8 +93,8 @@ void									klib::boardToDisplay			(::klib::SGame& instanceGame, const STactica
 					color = bSwaps[0] ? color : ::klib::ASCII_COLOR_INDEX_YELLOW;
 				}
 				else {
-					bool bIsMale			= agent.Flags.Tech.Gender == GENDER_MALE;
-					bool bIsHermaphrodite	= agent.Flags.Tech.Gender == GENDER_HERMAPHRODITE;
+					bool				bIsMale				= agent.Flags.Tech.Gender == ::klib::GENDER_MALE;
+					bool				bIsHermaphrodite	= agent.Flags.Tech.Gender == ::klib::GENDER_HERMAPHRODITE;
 					display[z][x] = ::klib::ascii_gender[bIsMale ? MALE : bIsHermaphrodite ? HERMAPHRODITE : FEMALE];
 				}
 			}
@@ -240,8 +240,8 @@ void									klib::boardToDisplay			(::klib::SGame& instanceGame, const STactica
 		if(initialSight != finalSight)
 			textAttributes[z][x]		= (textAttributes[z][x] & 0xF) | (::klib::ASCII_COLOR_INDEX_WHITE << 4);
 
-		for(uint32_t iAOE=0, countAOE=board.AreaOfEffect.AOE.Slots.size(); iAOE <countAOE; ++iAOE) {
-			const SAOE& aoeInstance = board.AreaOfEffect.AOE[iAOE].Entity;
+		for(uint32_t iAOE = 0, countAOE = board.AreaOfEffect.AOE.size(); iAOE <countAOE; ++iAOE) {
+			const ::klib::SAOE						& aoeInstance			= board.AreaOfEffect.AOE[iAOE];
 			const ::gpk::SCoord3<int32_t>& aoeCell = aoeInstance.Position.Cell;
 			::gpk::SCoord3<float> aoePos = {(float)aoeCell.x, (float)aoeCell.y, (float)aoeCell.z};
 			aoePos += aoeInstance.Position.Offset;

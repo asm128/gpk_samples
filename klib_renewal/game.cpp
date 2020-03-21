@@ -95,8 +95,8 @@ struct SWearables {
 	info_printf("sizeof(SCharacterGoods): %u"						, (uint32_t) sizeof(::klib::SCharacterGoods)									);
 	info_printf("sizeof(SCharacter): %u"							, (uint32_t) sizeof(::klib::SCharacter)											);
 	info_printf("sizeof(SCharacter)-sizeof(SCharacterGoods): %u"	, (uint32_t)(sizeof(::klib::SCharacter)		- sizeof(::klib::SCharacterGoods))	);
-	info_printf("sizeof(SPlayer): %u"								, (uint32_t) sizeof(::klib::SPlayer)											);
-	info_printf("sizeof(SPlayer)-sizeof(SCharacterGoods): %u"		, (uint32_t)(sizeof(::klib::SPlayer)		- sizeof(::klib::SCharacterGoods))	);
+	info_printf("sizeof(SGamePlayer): %u"								, (uint32_t) sizeof(::klib::SGamePlayer)											);
+	info_printf("sizeof(SGamePlayer)-sizeof(SCharacterGoods): %u"		, (uint32_t)(sizeof(::klib::SGamePlayer)		- sizeof(::klib::SCharacterGoods))	);
 	info_printf("sizeof(STacticalInfo): %u"							, (uint32_t) sizeof(::klib::STacticalInfo)										);
 	info_printf("sizeof(STacticalBoard): %u"						, (uint32_t) sizeof(::klib::STacticalBoard)										);
 	info_printf("sizeof(SMapInventory): %u"							, (uint32_t) sizeof(::klib::SMapInventory)										);
@@ -208,7 +208,7 @@ struct SWearables {
 
 
 	for(uint32_t iPlayer=0, count=1/*MAX_PLAYER_TYPES*/; iPlayer < count; ++iPlayer) {
-		::klib::SPlayer												& player						= instanceGame.Players[iPlayer]	= SPlayer();
+		::klib::SGamePlayer												& player						= instanceGame.Players[iPlayer]	= SGamePlayer();
 		::gpk::ptr_obj<::klib::CCharacter> newAgent;// = ::klib::enemyDefinitions[1 + ::rand() % (::gpk::size(klib::enemyDefinitions)-1)];
 		newAgent.create(::klib::enemyDefinitions[1 + ::rand() % (::gpk::size(klib::enemyDefinitions)-1)]);
 
@@ -318,7 +318,7 @@ struct SWearables {
 	return 0;
 }
 
-int64_t															klib::missionCost						(const SPlayer& player, const SSquad& squadSetup, uint32_t maxAgents)	{
+int64_t															klib::missionCost						(const SGamePlayer& player, const SSquad& squadSetup, uint32_t maxAgents)	{
 	int64_t															totalCost						= 0;
 	for(uint32_t iAgent=0, agentCount= maxAgents < squadSetup.Agents.size() ? maxAgents : squadSetup.Agents.size(); iAgent<agentCount; ++iAgent) {
 		if(squadSetup.Agents[iAgent] == -1)

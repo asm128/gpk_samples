@@ -165,9 +165,6 @@
     <ClInclude Include="klib_draw_misc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="klib_entity_tables.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="projects.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -35,9 +35,65 @@ namespace klib
 		::klib::SCharacterScore									Score						= {};
 		::gpk::array_pod<char_t>								Name						= ::gpk::view_const_string{"Kasparov"};
 		::gpk::array_obj<::gpk::ptr_obj<::klib::CCharacter>>	Army						= {};
+		bool													SelectNextAgent				()													{
+			uint32_t													count						= 0;
+			const uint32_t												maxCount					= Squad.Size;
+			int32_t														agent						= -1;
+			do {
+				Selection.PlayerUnit									= (Selection.PlayerUnit + 1) % maxCount;
+				agent													= Squad.Agents[Selection.PlayerUnit];
+			}
+			while((count++) < maxCount
+			  &&  (agent == -1 || 0 >= Army[agent]->Points.LifeCurrent.Health || Army[agent]->DidLoseTurn())
+			);
+
+			if(count >= maxCount
+				&& (agent == -1 || 0 >= Army[agent]->Points.LifeCurrent.Health || Army[agent]->DidLoseTurn())
+			)
+				return false;
+
+			Squad.TargetPositions[Selection.PlayerUnit] = Army[agent]->Position;
+			return true;
+		}
+
+		bool													SelectPreviousAgent			()													{
+			uint32_t													count						= 0;
+			const uint32_t												maxCount					= Squad.Size;
+			do {
+				--Selection.PlayerUnit;
+				if(Selection.PlayerUnit < 0)
+					Selection.PlayerUnit							= ((int16_t)maxCount-1);
+			}
+			while ((count++) < maxCount
+				&& (Squad.Agents[Selection.PlayerUnit] == -1 || 0 >= Army[Squad.Agents[Selection.PlayerUnit]]->Points.LifeCurrent.Health || Army[Squad.Agents[Selection.PlayerUnit]]->DidLoseTurn())
+			);
+
+			if(count >= Squad.Size
+				&& (Squad.Agents[Selection.PlayerUnit] == -1 || 0 >= Army[Squad.Agents[Selection.PlayerUnit]]->Points.LifeCurrent.Health || Army[Squad.Agents[Selection.PlayerUnit]]->DidLoseTurn())
+			)
+				return false;
+
+			Squad.TargetPositions[Selection.PlayerUnit]		= Army[Squad.Agents[Selection.PlayerUnit]]->Position;
+			return true;
+		}
+		bool													IsAlive						()											const	{
+			for(uint32_t iAgent = 0; iAgent < Squad.Size; iAgent++)
+				if(Squad.Agents[iAgent] != -1 && Army[Squad.Agents[iAgent]]->IsAlive())
+					return true;
+
+			return false;
+		}
+
+		bool													CanMove						()											const	{
+			for(uint32_t iAgent = 0; iAgent < Squad.Size; iAgent++)
+				if(Squad.Agents[iAgent] != -1 && Army[Squad.Agents[iAgent]]->CanMove())
+					return true;
+
+			return false;
+		}
 	};
 
-	struct SPlayer { // can be AI or human.
+	struct SGamePlayer { // can be AI or human.
 		::klib::STacticalPlayer									Tactical					= {};
 		::klib::SCharacterInventory								Inventory					= {};
 		::klib::SPlayerProjects									Projects					= {};
@@ -49,66 +105,9 @@ namespace klib
 
 		::gpk::array_obj<::klib::CDeadCharacter>				Memorial					= {};
 
-		bool													IsAlive						()											const	{
-			for(uint32_t iAgent = 0; iAgent < Tactical.Squad.Size; iAgent++)
-				if(Tactical.Squad.Agents[iAgent] != -1 && Tactical.Army[Tactical.Squad.Agents[iAgent]]->IsAlive())
-					return true;
-
-			return false;
-		}
-
-		bool													CanMove						()											const	{
-			for(uint32_t iAgent = 0; iAgent < Tactical.Squad.Size; iAgent++)
-				if(Tactical.Squad.Agents[iAgent] != -1 && Tactical.Army[Tactical.Squad.Agents[iAgent]]->CanMove())
-					return true;
-
-			return false;
-		}
-
-		bool													SelectNextAgent				()													{
-			uint32_t													count						= 0;
-			const uint32_t												maxCount					= Tactical.Squad.Size;
-			int32_t														agent						= -1;
-			do {
-				Tactical.Selection.PlayerUnit							= (Tactical.Selection.PlayerUnit + 1) % maxCount;
-				agent													= Tactical.Squad.Agents[Tactical.Selection.PlayerUnit];
-			}
-			while((count++) < maxCount
-			  &&  (agent == -1 || 0 >= Tactical.Army[agent]->Points.LifeCurrent.Health || Tactical.Army[agent]->DidLoseTurn())
-			);
-
-			if(count >= maxCount
-				&& (agent == -1 || 0 >= Tactical.Army[agent]->Points.LifeCurrent.Health || Tactical.Army[agent]->DidLoseTurn())
-			)
-				return false;
-
-			Tactical.Squad.TargetPositions[Tactical.Selection.PlayerUnit] = Tactical.Army[agent]->Position;
-			return true;
-		}
-
-		bool													SelectPreviousAgent			()													{
-			uint32_t													count						= 0;
-			const uint32_t												maxCount					= Tactical.Squad.Size;
-			do {
-				--Tactical.Selection.PlayerUnit;
-				if(Tactical.Selection.PlayerUnit < 0)
-					Tactical.Selection.PlayerUnit							= ((int16_t)maxCount-1);
-			}
-			while ((count++) < maxCount
-				&& (Tactical.Squad.Agents[Tactical.Selection.PlayerUnit] == -1 || 0 >= Tactical.Army[Tactical.Squad.Agents[Tactical.Selection.PlayerUnit]]->Points.LifeCurrent.Health || Tactical.Army[Tactical.Squad.Agents[Tactical.Selection.PlayerUnit]]->DidLoseTurn())
-			);
-
-			if(count >= Tactical.Squad.Size
-				&& (Tactical.Squad.Agents[Tactical.Selection.PlayerUnit] == -1 || 0 >= Tactical.Army[Tactical.Squad.Agents[Tactical.Selection.PlayerUnit]]->Points.LifeCurrent.Health || Tactical.Army[Tactical.Squad.Agents[Tactical.Selection.PlayerUnit]]->DidLoseTurn())
-			)
-				return false;
-
-			Tactical.Squad.TargetPositions[Tactical.Selection.PlayerUnit]		= Tactical.Army[Tactical.Squad.Agents[Tactical.Selection.PlayerUnit]]->Position;
-			return true;
-		}
 	};
 
-	void											playerUpdateResearchLists			(const ::klib::SEntityTables & entityTables, ::klib::SPlayer & player);
+	void											playerUpdateResearchLists			(const ::klib::SEntityTables & entityTables, ::klib::SGamePlayer & player);
 
 } // namespace
 

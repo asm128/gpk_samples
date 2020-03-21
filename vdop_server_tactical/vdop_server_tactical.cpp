@@ -41,12 +41,12 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 	}
 	srand((uint32_t)time(0));
 
-	const ::gpk::SCoord2<uint32_t>							metricsMap			= app.TextOverlay.MetricsMap;
-	const ::gpk::SCoord2<uint32_t>							metricsLetter		= app.TextOverlay.MetricsLetter;
+	const ::gpk::SCoord2<uint32_t>							metricsMap						= app.TextOverlay.MetricsMap;
+	const ::gpk::SCoord2<uint32_t>							metricsLetter					= app.TextOverlay.MetricsLetter;
 	::gpk::SImage<::gpk::SColorBGRA>						fontImage;
 	::gpk::pngFileLoad(::gpk::view_const_string{"../gpk_data/images/Codepage_437_24_12x12.png"}, fontImage);
-	::gpk::view_grid<::gpk::SGeometryQuads>					viewGeometries		= {app.TextOverlay.GeometryLetters, {16, 16}};
-	const uint32_t											imagePitch			= metricsLetter.x * metricsMap.x;
+	::gpk::view_grid<::gpk::SGeometryQuads>					viewGeometries					= {app.TextOverlay.GeometryLetters, {16, 16}};
+	const uint32_t											imagePitch						= metricsLetter.x * metricsMap.x;
 
 	::gpk::array_pod<::gpk::STile>							tiles;
 	for(uint32_t y = 0; y < metricsMap.y; ++y)
@@ -60,20 +60,18 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 	}
 
 
-#define DEFAULT_ASCII_DISPLAY_HEIGHT	70
-#define DEFAULT_ASCII_DISPLAY_WIDTH		((uint32_t)(DEFAULT_ASCII_DISPLAY_HEIGHT * 2.666666f))
+	static constexpr const uint32_t							DEFAULT_ASCII_DISPLAY_HEIGHT	= 70;
+	static constexpr const uint32_t							DEFAULT_ASCII_DISPLAY_WIDTH		= (uint32_t)(DEFAULT_ASCII_DISPLAY_HEIGHT * 2.666666f);
 	::klib::initASCIIScreen(DEFAULT_ASCII_DISPLAY_WIDTH, DEFAULT_ASCII_DISPLAY_HEIGHT);
 
 	app.Game.push_back({});
 	::gpk::ptr_obj<::klib::SGame>							& instanceGame		= app.Game[0];
-	instanceGame->GlobalDisplay	.Resize({DEFAULT_ASCII_DISPLAY_WIDTH, DEFAULT_ASCII_DISPLAY_HEIGHT});
-	instanceGame->TacticalDisplay.Resize({::klib::GAME_MAP_WIDTH, ::klib::GAME_MAP_DEPTH});
+	instanceGame->GlobalDisplay		.Resize({DEFAULT_ASCII_DISPLAY_WIDTH, DEFAULT_ASCII_DISPLAY_HEIGHT});
+	instanceGame->TacticalDisplay	.Resize({::klib::GAME_MAP_WIDTH, ::klib::GAME_MAP_DEPTH});
 
 	::klib::initGame(*instanceGame);
-
 	::gpk::tcpipInitialize();
 	::gpk::serverStart(app.TacticalServer, 51515, 0);
-
 	return 0;
 }
 

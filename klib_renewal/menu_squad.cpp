@@ -3,12 +3,9 @@
 #include "Agent_helper.h"
 #include "draw.h"
 
-
-using namespace klib;
-
-SGameState														drawSquadSetupMenu									(SGame& instanceGame)												{
-	drawSquadSlots(instanceGame);
-	SPlayer																& player											= instanceGame.Players[PLAYER_INDEX_USER];
+::klib::SGameState												drawSquadSetupMenu									(::klib::SGame& instanceGame)												{
+	::klib::drawSquadSlots(instanceGame);
+	::klib::SGamePlayer													& player											= instanceGame.Players[::klib::PLAYER_INDEX_USER];
 
 	::gpk::array_obj<::gpk::array_pod<char_t>>							menuItems											= {};
 	::gpk::array_obj<::gpk::view_const_char>							menuItemsView										= {};
@@ -18,7 +15,7 @@ SGameState														drawSquadSetupMenu									(SGame& instanceGame)								
 	for(uint32_t i = 0, count = player.Tactical.Squad.Size; i < count; ++i) {
 		char																buffer[128];
 		if(player.Tactical.Squad.Agents[i] != -1)  {
-			const CCharacter													& playerAgent										= *player.Tactical.Army[player.Tactical.Squad.Agents[i]];
+			const ::klib::CCharacter											& playerAgent										= *player.Tactical.Army[player.Tactical.Squad.Agents[i]];
 			maxNameLen														= ::gpk::max(maxNameLen, sprintf_s(buffer, "Agent #%u: %s", i + 1, playerAgent.Name.begin()));
 			menuItems[i]													= ::gpk::view_const_string{buffer};
 		}
@@ -41,15 +38,15 @@ SGameState														drawSquadSetupMenu									(SGame& instanceGame)								
 		, ::gpk::max(24, maxNameLen+4)
 		);
 	if(menuItems.size() == (uint32_t)result)
-		return {GAME_STATE_WELCOME_COMMANDER};
+		return {::klib::GAME_STATE_WELCOME_COMMANDER};
 
 	if( result < 0 || result >= (int32_t)player.Tactical.Squad.Agents.size() )
-		return {GAME_STATE_MENU_SQUAD_SETUP};
+		return {::klib::GAME_STATE_MENU_SQUAD_SETUP};
 
 	player.Tactical.Selection.PlayerUnit										= (int16_t)result;
 
 	if( player.Tactical.Squad.Agents[result] != -1 && 0 == instanceGame.FrameInput.Keys[VK_LSHIFT] )
-		return {GAME_STATE_MENU_EQUIPMENT};
+		return {::klib::GAME_STATE_MENU_EQUIPMENT};
 
-	return {GAME_STATE_MENU_EQUIPMENT, GAME_SUBSTATE_CHARACTER};
+	return {::klib::GAME_STATE_MENU_EQUIPMENT, ::klib::GAME_SUBSTATE_CHARACTER};
 }

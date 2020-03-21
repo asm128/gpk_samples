@@ -148,7 +148,7 @@ void											initPlayerCharacter								(const ::klib::SEntityTables & tables,
 
 	adventurer.Goods.Inventory.Items		.AddElement({1,1,1});
 	for(int32_t j = 1;  j < 3; ++j)
-		adventurer.Goods.Inventory.Items		.AddElement({ 1+int16_t(rand()%(::gpk::size(klib::itemDescriptions)-1)), int16_t(1+rand() % ::gpk::size(klib::itemModifiers)), int16_t(rand() % ::gpk::size(klib::itemGrades)) });
+		adventurer.Goods.Inventory.Items		.AddElement({ 1+int16_t(rand()%(::gpk::size(klib::itemDescriptions)-1)), int16_t(1+rand() % ::gpk::size(klib::itemModifiers)), int16_t(rand() % ::klib::itemGrades.size()) });
 
 	::researchEquipped(adventurer);
 	adventurer.Recalculate(tables);

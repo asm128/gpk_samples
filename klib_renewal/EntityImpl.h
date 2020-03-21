@@ -42,7 +42,7 @@ namespace klib
 																																													\
 		static inline constexpr	::klib::ENTITY_TYPE				getType							()														{ return _type;			}	\
 		static inline constexpr	::klib::SEntityPointsMultiplier	getMultipliers					()														{ return _multipliers;	}	\
-		static inline const		::gpk::view_const_char&			getName							()														{ static const ::gpk::view_const_char & name = ::gpk::view_const_string{#_name}; return name;	}	\
+		static					const ::gpk::view_const_char &	getName							()														{ static const ::gpk::view_const_char & name = ::gpk::view_const_string{#_name}; return name; }	\
 	};
 
 	DECLARE_ENTITY(g_MultipliersProfession	, ENTITY_TYPE_PROFESSION	, Profession	);
@@ -61,11 +61,11 @@ namespace klib
 								int8_t							TurnsLeft						[MAX_COMBAT_STATUS_COUNT]								= {};
 
 								void							Clear							()														{
-			Status		= COMBAT_STATUS_NONE;
+			Status													= COMBAT_STATUS_NONE;
 			memset(TurnsLeft, 0, sizeof(uint8_t)*::gpk::size(TurnsLeft));
 		}
 								int32_t							GetStatusTurns					(const COMBAT_STATUS status)			const			{
-			int32_t			turns		= 0;
+			int32_t														turns							= 0;
 			for(uint32_t i=0, count = MaxStatus; i<count; ++i) {
 				COMBAT_STATUS	statusBit	= (COMBAT_STATUS)(1 << i);
 				if(0 == (statusBit & Status & status))
@@ -78,7 +78,7 @@ namespace klib
 
 								void							NextTurn						()														{
 			for(uint32_t i=0, count = MaxStatus; i<count; ++i) {
-				COMBAT_STATUS	statusBit	= (COMBAT_STATUS)(1 << i);
+				COMBAT_STATUS												statusBit						= (COMBAT_STATUS)(1 << i);
 				if(0 == (statusBit & Status))
 					continue;
 
@@ -191,32 +191,32 @@ namespace klib
 			if( 0 < TurnsLeftPoints.LifeCurrent.Mana			)	{	if( 0 == --TurnsLeftPoints.LifeCurrent.Mana				)	Points	.LifeCurrent	.Mana		= 0										;} else if( 0 > TurnsLeftPoints.LifeCurrent.Mana				)	{	if( 0 == ++TurnsLeftPoints.LifeCurrent.Mana				)	Points.LifeCurrent.Mana				= 0;	}
 			if( 0 < TurnsLeftPoints.LifeCurrent.Shield			)	{	if( 0 == --TurnsLeftPoints.LifeCurrent.Shield			)	Points	.LifeCurrent	.Shield		= 0										;} else if( 0 > TurnsLeftPoints.LifeCurrent.Shield				)	{	if( 0 == ++TurnsLeftPoints.LifeCurrent.Shield			)	Points.LifeCurrent.Shield			= 0;	}
 			if( 0 < TurnsLeftPoints.Coins						)	{	if( 0 == --TurnsLeftPoints.Coins						)	Points	.Coins						= 0										;} else if( 0 > TurnsLeftPoints.Coins							)	{	if( 0 == ++TurnsLeftPoints.Coins						)	Points.Coins						= 0;	}
-			if( 0 < TurnsLeftFlags.Effect.Passive				)	{	if( 0 == --TurnsLeftFlags.Effect	.Passive			)	Flags	.Effect			.Passive	= PASSIVE_EFFECT_NONE					;} else if( 0 > TurnsLeftFlags.Effect	.Passive				)	{	if( 0 == ++TurnsLeftFlags.Effect	.Passive	)	Flags.Effect	.Passive	= PASSIVE_EFFECT_NONE		;	}
+			if( 0 < TurnsLeftFlags.Effect.Passive				)	{	if( 0 == --TurnsLeftFlags.Effect	.Passive			)	Flags	.Effect			.Passive	= PASSIVE_EFFECT_NONE					;} else if( 0 > TurnsLeftFlags.Effect	.Passive				)	{	if( 0 == ++TurnsLeftFlags.Effect.Passive				)	Flags.Effect.Passive				= PASSIVE_EFFECT_NONE;	}
 		}
 
 		// Player turn (round)
 								void							NextRound						()														{
-			if( 0 < TurnsLeftPoints.Attack.Hit					)	{	if( 0 == --TurnsLeftPoints.Attack.Hit					)	Points	.Attack			.Hit					= 0							;} else if( 0 > TurnsLeftPoints.Attack.Hit						)	{	if( 0 == ++TurnsLeftPoints.Attack.Hit					)	Points.Attack.Hit					= 0;	}
-			if( 0 < TurnsLeftPoints.Attack.Damage				)	{	if( 0 == --TurnsLeftPoints.Attack.Damage				)	Points	.Attack			.Damage					= 0							;} else if( 0 > TurnsLeftPoints.Attack.Damage					)	{	if( 0 == ++TurnsLeftPoints.Attack.Damage				)	Points.Attack.Damage				= 0;	}
-			if( 0 < TurnsLeftPoints.Fitness.Attack				)	{	if( 0 == --TurnsLeftPoints.Fitness.Attack				)	Points	.Fitness		.Attack					= 0							;} else if( 0 > TurnsLeftPoints.Fitness.Attack					)	{	if( 0 == ++TurnsLeftPoints.Fitness.Attack				)	Points.Fitness.Attack				= 0;	}
-			if( 0 < TurnsLeftPoints.Fitness.Movement			)	{	if( 0 == --TurnsLeftPoints.Fitness.Movement				)	Points	.Fitness		.Movement				= 0							;} else if( 0 > TurnsLeftPoints.Fitness.Movement				)	{	if( 0 == ++TurnsLeftPoints.Fitness.Movement				)	Points.Fitness.Movement				= 0;	}
-			if( 0 < TurnsLeftPoints.Fitness.Sight				)	{	if( 0 == --TurnsLeftPoints.Fitness.Sight				)	Points	.Fitness		.Sight					= 0							;} else if( 0 > TurnsLeftPoints.Fitness.Sight					)	{	if( 0 == ++TurnsLeftPoints.Fitness.Sight				)	Points.Fitness.Sight				= 0;	}
-			if( 0 < TurnsLeftPoints.Attack.Range				)	{	if( 0 == --TurnsLeftPoints.Attack.Range					)	Points	.Attack			.Range					= 0							;} else if( 0 > TurnsLeftPoints.Attack.Range					)	{	if( 0 == ++TurnsLeftPoints.Attack.Range					)	Points.Attack.Range					= 0;	}
-			if( 0 < TurnsLeftPoints.Attack.DirectDamage.Health	)	{	if( 0 == --TurnsLeftPoints.Attack.DirectDamage.Health	)	Points	.Attack			.DirectDamage.Health	= 0							;} else if( 0 > TurnsLeftPoints.Attack.DirectDamage.Health		)	{	if( 0 == ++TurnsLeftPoints.Attack.DirectDamage.Health	)	Points.Attack.DirectDamage.Health	= 0;	}
-			if( 0 < TurnsLeftPoints.Attack.DirectDamage.Mana	)	{	if( 0 == --TurnsLeftPoints.Attack.DirectDamage.Mana		)	Points	.Attack			.DirectDamage.Mana		= 0							;} else if( 0 > TurnsLeftPoints.Attack.DirectDamage.Mana		)	{	if( 0 == ++TurnsLeftPoints.Attack.DirectDamage.Mana		)	Points.Attack.DirectDamage.Mana		= 0;	}
-			if( 0 < TurnsLeftPoints.Attack.DirectDamage.Shield	)	{	if( 0 == --TurnsLeftPoints.Attack.DirectDamage.Shield	)	Points	.Attack			.DirectDamage.Shield	= 0							;} else if( 0 > TurnsLeftPoints.Attack.DirectDamage.Shield		)	{	if( 0 == ++TurnsLeftPoints.Attack.DirectDamage.Shield	)	Points.Attack.DirectDamage.Shield	= 0;	}
-			if( 0 < TurnsLeftFlags.Effect.Attack				)	{	if( 0 == --TurnsLeftFlags.Effect	.Attack				)	Flags	.Effect			.Attack					= ATTACK_EFFECT_NONE		;} else if( 0 > TurnsLeftFlags.Effect	.Attack					)	{	if( 0 == ++TurnsLeftFlags.Effect	.Attack		)	Flags.Effect	.Attack		= ATTACK_EFFECT_NONE		;	}
-			if( 0 < TurnsLeftFlags.Status.Inflict				)	{	if( 0 == --TurnsLeftFlags.Status	.Inflict			)	Flags	.Status			.Inflict				= COMBAT_STATUS_NONE		;} else if( 0 > TurnsLeftFlags.Status	.Inflict				)	{	if( 0 == ++TurnsLeftFlags.Status	.Inflict	)	Flags.Status	.Inflict	= COMBAT_STATUS_NONE		;	}
-			if( 0 < TurnsLeftFlags.Tech.Tech					)	{	if( 0 == --TurnsLeftFlags.Tech.Tech						)	Flags	.Tech			.Tech					= ENTITY_TECHNOLOGY_UNKNOWN	;} else if( 0 > TurnsLeftFlags.Tech		.Tech					)	{	if( 0 == ++TurnsLeftFlags.Tech		.Tech		)	Flags.Tech		.Tech		= ENTITY_TECHNOLOGY_UNKNOWN	;	}
-			if( 0 < TurnsLeftFlags.Tech.Grade					)	{	if( 0 == --TurnsLeftFlags.Tech.Grade					)	Flags	.Tech			.Grade					= ENTITY_GRADE_ILLUSION		;} else if( 0 > TurnsLeftFlags.Tech		.Grade					)	{	if( 0 == ++TurnsLeftFlags.Tech		.Grade		)	Flags.Tech		.Grade		= ENTITY_GRADE_ILLUSION		;	}
+			if(0 < TurnsLeftPoints.Attack.Hit					) {	if(0 == --TurnsLeftPoints.Attack.Hit					)	Points	.Attack			.Hit					= 0							;} else if( 0 > TurnsLeftPoints.Attack.Hit					)	{	if( 0 == ++TurnsLeftPoints.Attack.Hit					) Points.Attack.Hit					= 0; }
+			if(0 < TurnsLeftPoints.Attack.Damage				) {	if(0 == --TurnsLeftPoints.Attack.Damage					)	Points	.Attack			.Damage					= 0							;} else if( 0 > TurnsLeftPoints.Attack.Damage				)	{	if( 0 == ++TurnsLeftPoints.Attack.Damage				) Points.Attack.Damage				= 0; }
+			if(0 < TurnsLeftPoints.Fitness.Attack				) {	if(0 == --TurnsLeftPoints.Fitness.Attack				)	Points	.Fitness		.Attack					= 0							;} else if( 0 > TurnsLeftPoints.Fitness.Attack				)	{	if( 0 == ++TurnsLeftPoints.Fitness.Attack				) Points.Fitness.Attack				= 0; }
+			if(0 < TurnsLeftPoints.Fitness.Movement				) {	if(0 == --TurnsLeftPoints.Fitness.Movement				)	Points	.Fitness		.Movement				= 0							;} else if( 0 > TurnsLeftPoints.Fitness.Movement			)	{	if( 0 == ++TurnsLeftPoints.Fitness.Movement				) Points.Fitness.Movement			= 0; }
+			if(0 < TurnsLeftPoints.Fitness.Sight				) {	if(0 == --TurnsLeftPoints.Fitness.Sight					)	Points	.Fitness		.Sight					= 0							;} else if( 0 > TurnsLeftPoints.Fitness.Sight				)	{	if( 0 == ++TurnsLeftPoints.Fitness.Sight				) Points.Fitness.Sight				= 0; }
+			if(0 < TurnsLeftPoints.Attack.Range					) {	if(0 == --TurnsLeftPoints.Attack.Range					)	Points	.Attack			.Range					= 0							;} else if( 0 > TurnsLeftPoints.Attack.Range				)	{	if( 0 == ++TurnsLeftPoints.Attack.Range					) Points.Attack.Range				= 0; }
+			if(0 < TurnsLeftPoints.Attack.DirectDamage.Health	) {	if(0 == --TurnsLeftPoints.Attack.DirectDamage.Health	)	Points	.Attack			.DirectDamage.Health	= 0							;} else if( 0 > TurnsLeftPoints.Attack.DirectDamage.Health	)	{	if( 0 == ++TurnsLeftPoints.Attack.DirectDamage.Health	) Points.Attack.DirectDamage.Health	= 0; }
+			if(0 < TurnsLeftPoints.Attack.DirectDamage.Mana		) {	if(0 == --TurnsLeftPoints.Attack.DirectDamage.Mana		)	Points	.Attack			.DirectDamage.Mana		= 0							;} else if( 0 > TurnsLeftPoints.Attack.DirectDamage.Mana	)	{	if( 0 == ++TurnsLeftPoints.Attack.DirectDamage.Mana		) Points.Attack.DirectDamage.Mana	= 0; }
+			if(0 < TurnsLeftPoints.Attack.DirectDamage.Shield	) {	if(0 == --TurnsLeftPoints.Attack.DirectDamage.Shield	)	Points	.Attack			.DirectDamage.Shield	= 0							;} else if( 0 > TurnsLeftPoints.Attack.DirectDamage.Shield	)	{	if( 0 == ++TurnsLeftPoints.Attack.DirectDamage.Shield	) Points.Attack.DirectDamage.Shield	= 0; }
+			if(0 < TurnsLeftFlags.Effect.Attack					) {	if(0 == --TurnsLeftFlags.Effect	.Attack					)	Flags	.Effect			.Attack					= ATTACK_EFFECT_NONE		;} else if( 0 > TurnsLeftFlags.Effect	.Attack				)	{	if( 0 == ++TurnsLeftFlags.Effect	.Attack				) Flags.Effect.Attack				= ATTACK_EFFECT_NONE		; }
+			if(0 < TurnsLeftFlags.Status.Inflict				) {	if(0 == --TurnsLeftFlags.Status	.Inflict				)	Flags	.Status			.Inflict				= COMBAT_STATUS_NONE		;} else if( 0 > TurnsLeftFlags.Status	.Inflict			)	{	if( 0 == ++TurnsLeftFlags.Status	.Inflict			) Flags.Status.Inflict				= COMBAT_STATUS_NONE		; }
+			if(0 < TurnsLeftFlags.Tech.Tech						) {	if(0 == --TurnsLeftFlags.Tech.Tech						)	Flags	.Tech			.Tech					= ENTITY_TECHNOLOGY_UNKNOWN	;} else if( 0 > TurnsLeftFlags.Tech		.Tech				)	{	if( 0 == ++TurnsLeftFlags			.Tech.Tech			) Flags.Tech.Tech					= ENTITY_TECHNOLOGY_UNKNOWN	; }
+			if(0 < TurnsLeftFlags.Tech.Grade					) {	if(0 == --TurnsLeftFlags.Tech.Grade						)	Flags	.Tech			.Grade					= ENTITY_GRADE_ILLUSION		;} else if( 0 > TurnsLeftFlags.Tech		.Grade				)	{	if( 0 == ++TurnsLeftFlags			.Tech.Grade			) Flags.Tech.Grade					= ENTITY_GRADE_ILLUSION		; }
 		}
 
 		// Enemy turn
 								void							NextEnemyTurn					()														{
-			if( 0 < TurnsLeftPoints.Attack	.Absorption			)	{	if( 0 == --TurnsLeftPoints.Attack	.Absorption			)	Points	.Attack			.Absorption				= 0							;} else if( 0 > TurnsLeftPoints.Attack.Absorption				)	{	if( 0 == ++TurnsLeftPoints.Attack.Absorption	)	Points.Attack.Absorption			= 0;	}
-			if( 0 < TurnsLeftPoints.Fitness	.Reflexes			)	{	if( 0 == --TurnsLeftPoints.Fitness	.Reflexes			)	Points	.Fitness		.Reflexes				= 0							;} else if( 0 > TurnsLeftPoints.Fitness.Reflexes					)	{	if( 0 == ++TurnsLeftPoints.Fitness.Reflexes		)	Points.Fitness.Reflexes				= 0;	}
-			if( 0 < TurnsLeftFlags.Effect	.Defend				)	{	if( 0 == --TurnsLeftFlags.Effect	.Defend				)	Flags	.Effect			.Defend					= DEFEND_EFFECT_NONE		;} else if( 0 > TurnsLeftFlags.Effect	.Defend					)	{	if( 0 == ++TurnsLeftFlags.Effect	.Defend		)	Flags.Effect	.Defend		= DEFEND_EFFECT_NONE		;	}
-			if( 0 < TurnsLeftFlags.Status	.Immunity			)	{	if( 0 == --TurnsLeftFlags.Status	.Immunity			)	Flags	.Status			.Immunity				= COMBAT_STATUS_NONE		;} else if( 0 > TurnsLeftFlags.Status	.Immunity				)	{	if( 0 == ++TurnsLeftFlags.Status	.Immunity	)	Flags.Status	.Immunity	= COMBAT_STATUS_NONE		;	}
+			if(0 < TurnsLeftPoints.Attack	.Absorption		) { if(0 == --TurnsLeftPoints.Attack	.Absorption			)	Points	.Attack			.Absorption				= 0							;} else if( 0 > TurnsLeftPoints.Attack.Absorption			)	{	if( 0 == ++TurnsLeftPoints.Attack.Absorption	)	Points.Attack.Absorption			= 0; }
+			if(0 < TurnsLeftPoints.Fitness	.Reflexes		) { if(0 == --TurnsLeftPoints.Fitness	.Reflexes			)	Points	.Fitness		.Reflexes				= 0							;} else if( 0 > TurnsLeftPoints.Fitness.Reflexes			)	{	if( 0 == ++TurnsLeftPoints.Fitness.Reflexes		)	Points.Fitness.Reflexes				= 0; }
+			if(0 < TurnsLeftFlags.Effect	.Defend			) { if(0 == --TurnsLeftFlags.Effect		.Defend				)	Flags	.Effect			.Defend					= DEFEND_EFFECT_NONE		;} else if( 0 > TurnsLeftFlags.Effect	.Defend				)	{	if( 0 == ++TurnsLeftFlags.Effect	.Defend		)	Flags.Effect.Defend					= DEFEND_EFFECT_NONE; }
+			if(0 < TurnsLeftFlags.Status	.Immunity		) { if(0 == --TurnsLeftFlags.Status		.Immunity			)	Flags	.Status			.Immunity				= COMBAT_STATUS_NONE		;} else if( 0 > TurnsLeftFlags.Status	.Immunity			)	{	if( 0 == ++TurnsLeftFlags.Status	.Immunity	)	Flags.Status.Immunity				= COMBAT_STATUS_NONE; }
 		}
 	};
 
@@ -267,24 +267,24 @@ namespace klib
 
 
 	template<typename _tEntity>
-	static inline	constexpr int32_t getArmorAbsorption(const ::klib::SEntityTable<_tEntity> & table, const SArmor& armor) {
+	inline					int32_t								getArmorAbsorption				(const ::klib::SEntityTable<_tEntity> & table, const SArmor& armor)			{
 		return	(int32_t)((table.Definitions[armor.Definition].Points.Attack.Absorption + table.Modifiers[armor.Modifier].Points.Attack.Absorption) * armor.Level);
 	}
 #pragma pack(pop)
 
 	struct SLogLine {
-							uint16_t								Color;
-							const ::gpk::array_pod<char_t>			Message;
+							uint16_t							Color;
+							const ::gpk::array_pod<char_t>		Message;
 	};
 	struct SGameMessages {
-							char									Aux		[4096]					= {};
-							::gpk::array_pod<char_t>				UserMessage						= "";
-							::gpk::array_pod<char_t>				UserSuccess						= "";
-							::gpk::array_pod<char_t>				UserMiss						= "";
-							::gpk::array_pod<char_t>				UserError						= "";
-							::gpk::array_pod<char_t>				StateMessage					= "";
-							::gpk::array_obj<SLogLine>				UserLog							= {};
-							void									ClearMessages					()	{
+							char								Aux		[4096]					= {};
+							::gpk::array_pod<char_t>			UserMessage						= "";
+							::gpk::array_pod<char_t>			UserSuccess						= "";
+							::gpk::array_pod<char_t>			UserMiss						= "";
+							::gpk::array_pod<char_t>			UserError						= "";
+							::gpk::array_pod<char_t>			StateMessage					= "";
+							::gpk::array_obj<SLogLine>			UserLog							= {};
+							void								ClearMessages					()	{
 			UserError	.clear();
 			UserMessage	.clear();
 			UserMiss	.clear();
@@ -304,6 +304,24 @@ namespace klib
 							void									LogAuxMiss						()																						{ if(0 == Aux[0]) return; UserLog.push_back({::gpk::ASCII_COLOR_RED		, ::gpk::view_const_string{Aux}}); Aux[0] = 0; }
 	};
 
+	struct SEntityTables {
+		::klib::SEntityTable<::klib::SProfession>		Profession			= {};
+		::klib::SEntityTable<::klib::SWeapon	>		Weapon				= {};
+		::klib::SEntityTable<::klib::SArmor		>		Armor				= {};
+		::klib::SEntityTable<::klib::SAccessory	>		Accessory			= {};
+		::klib::SEntityTable<::klib::SVehicle	>		Vehicle				= {};
+		::klib::SEntityTable<::klib::SFacility	>		Facility			= {};
+		::klib::SEntityTable<::klib::SStageProp	>		StageProp			= {};
+		::klib::SEntityTable<::klib::STile		>		Tile				= {};
+		::klib::SEntityTable<::klib::SItem		>		Item				= {};
+	};
+
+	template<typename _EntityType>
+	struct SResearchGroup {
+		_EntityType										MaxResearch;
+		SEntityContainer<int16_t>						Definitions;
+		SEntityContainer<int16_t>						Modifiers;
+	};
 } // namespace
 
 #endif //__ENTITYIMPL_H__928374092634923746298374__

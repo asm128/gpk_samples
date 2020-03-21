@@ -1,4 +1,4 @@
-#include "klib_entity_tables.h"
+#include "EntityImpl.h"
 
 #ifndef __PROJECTS_H__9826348709234698723469823__
 #define __PROJECTS_H__9826348709234698723469823__
@@ -23,9 +23,9 @@ namespace klib
 #pragma pack(pop)
 
 	struct SPlayerProjects {
-		SProjectBudget								BudgetProduction			= {true, 10};
-		SProjectBudget								BudgetResearch				= {true, 10};
-		SProjectBudget								BudgetUpgrade				= {true, 10};
+		::klib::SProjectBudget						BudgetProduction			= {true, 10};
+		::klib::SProjectBudget						BudgetResearch				= {true, 10};
+		::klib::SProjectBudget						BudgetUpgrade				= {true, 10};
 
 		::gpk::array_obj<::klib::SEntityResearch>	QueuedProduction			= {};
 		::gpk::array_obj<::klib::SEntityResearch>	QueuedResearch				= {};
@@ -44,8 +44,6 @@ namespace klib
 		void										DequeueUpgrade				( int32_t index	)							{ const SEntityResearch & upgrade		= QueuedUpgrade		[index]; CostUpgrade	 -=	upgrade		.PriceUnit -	upgrade		.PricePaid; QueuedUpgrade		.remove(index); }
 	};
 
-
-
 	::gpk::error_t								getResearchableItems
 		(	const ::klib::SEntityTables								& entityTables
 		,	const ::klib::SCharacterInventory						& playerInventory
@@ -55,6 +53,7 @@ namespace klib
 		,	::gpk::array_obj<::klib::SEntityResearch>				& menuItemsValue
 		,	::gpk::array_obj<::gpk::array_pod<char_t>>				& menuItemsText
 		);
+
 	::gpk::error_t								getResearchedItems
 		(	const ::klib::SEntityTables								& entityTables
 		,	const ::klib::SCharacterInventory						& playerInventory
@@ -63,6 +62,7 @@ namespace klib
 		,	::gpk::array_obj<::klib::SEntityResearch>				& menuItemsValue
 		,	::gpk::array_obj<::gpk::array_pod<char_t>>				& menuItemsText
 		);
+
 	void										handleProductionStep
 		( const ::klib::SEntityTables	& entityTables
 		, ::klib::SCharacterInventory	& playerInventory

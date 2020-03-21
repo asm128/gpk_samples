@@ -30,11 +30,11 @@ void											klib::completeAgentResearch										(const ::klib::SEntityTables
 }
 
 void											klib::setupAgent												(const ::klib::SEntityTables & tables, const CCharacter& adventurer, CCharacter& currentEnemy)	{
-	currentEnemy.Goods.Inventory.Items.AddElement({ 1+int16_t(rand()%(::gpk::size(itemDescriptions)-1)), 1+int16_t(rand()%(::gpk::size(itemModifiers)-1)), 1+int16_t(rand() % (::gpk::size(itemGrades)-1)) });
+	currentEnemy.Goods.Inventory.Items.AddElement({ 1+int16_t(rand()%(::gpk::size(itemDescriptions)-1)), 1+int16_t(rand()%(::gpk::size(itemModifiers)-1)), 1+int16_t(rand() % (itemGrades.size()-1)) });
 
 	for(int32_t iSlot=0, slotCount=adventurer.Goods.Inventory.Items.Slots.size(); iSlot<slotCount; ++iSlot)
 		for(int32_t iItemUnit=0, itemUnitCount=adventurer.Goods.Inventory.Items[iSlot].Count; iItemUnit<itemUnitCount; ++iItemUnit)
-			currentEnemy.Goods.Inventory.Items.AddElement({ 1+int16_t(rand()%(::gpk::size(itemDescriptions)-1)), 1+int16_t(rand()%(::gpk::size(itemModifiers)-1)), int16_t(rand() % ::gpk::size(itemGrades)) });
+			currentEnemy.Goods.Inventory.Items.AddElement({ 1+int16_t(rand()%(::gpk::size(itemDescriptions)-1)), 1+int16_t(rand()%(::gpk::size(itemModifiers)-1)), int16_t(rand() % itemGrades.size()) });
 
 	currentEnemy.Goods.CompletedResearch			= SCharacterResearch();
 	setupAgentEquip(currentEnemy.CurrentEquip.Profession	, adventurer.CurrentEquip.	Profession		, tables.Profession	);

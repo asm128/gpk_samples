@@ -6,7 +6,7 @@ using namespace klib;
 //template <size_t _Size>
 //int32_t getEnemyPlayers();
 
-bool													isRelevantPlayer										(STacticalInfo& tacticalInfo, int32_t currentPlayer, int32_t otherPlayer)			{
+static	bool											isRelevantPlayer										(::klib::STacticalInfo& tacticalInfo, int32_t currentPlayer, int32_t otherPlayer)			{
 	bool														bResult													= true;
 
 	if( tacticalInfo.CurrentPlayer						== otherPlayer
@@ -19,10 +19,9 @@ bool													isRelevantPlayer										(STacticalInfo& tacticalInfo, int32_t
 	return bResult;
 };
 
-void													selectAITarget											(SGame& instanceGame)																{
-	STacticalInfo												& tacticalInfo											= instanceGame.TacticalInfo;
-	SPlayer														& currentPlayer											= instanceGame.Players[tacticalInfo.Setup.Players[tacticalInfo.CurrentPlayer]];
-	SPlayerControl												& playerControl											= currentPlayer.Tactical.Control;
+static	void											selectAITarget											(::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players)																{
+	::klib::SGamePlayer												& currentPlayer											= players[tacticalInfo.Setup.Players[tacticalInfo.CurrentPlayer]];
+	::klib::SPlayerControl										& playerControl											= currentPlayer.Tactical.Control;
 
 	if(playerControl.AIMode == PLAYER_AI_ASSISTS)
 		return;
@@ -50,7 +49,7 @@ void													selectAITarget											(SGame& instanceGame)																{
 			currentPlayer.Tactical.Selection.TargetSquad						= tacticalInfo.AgentsInTeamSight[playerTeam].Agents[iAgentInSight].Agent.SquadIndex;
 
 			targetPlayerIndex										= tacticalInfo.Setup.Players[currentPlayer.Tactical.Selection.TargetPlayer];
-			SPlayer														& targetPlayer											= instanceGame.Players[targetPlayerIndex];
+			SGamePlayer														& targetPlayer											= players[targetPlayerIndex];
 			const CCharacter											& targetAgent											= *targetPlayer.Tactical.Army[targetPlayer.Tactical.Squad.Agents[currentPlayer.Tactical.Selection.TargetUnit]];
 			if(false == targetAgent.IsAlive())
 				continue;
@@ -61,7 +60,7 @@ void													selectAITarget											(SGame& instanceGame)																{
 	}
 }
 
-void													selectAvailableTile										(const STacticalBoard& tacticalBoard, ::gpk::SCoord3<int32_t>& targetPosition)		{
+static	void											selectAvailableTile										(const STacticalBoard& tacticalBoard, ::gpk::SCoord3<int32_t>& targetPosition)		{
 	do {
 		targetPosition.x										= (rand() % tacticalBoard.Tiles.Terrain.Geometry.metrics().x);
 		targetPosition.z										= (rand() % tacticalBoard.Tiles.Terrain.Geometry.metrics().y);
@@ -73,7 +72,7 @@ void													selectAvailableTile										(const STacticalBoard& tacticalBoa
 	);
 }
 
-void													getValidCoordForAgentDestination						(::gpk::SCoord3<int32_t>& targetPositionAgent, const STacticalBoard& tacticalBoard)	{
+static	void											getValidCoordForAgentDestination						(::gpk::SCoord3<int32_t>& targetPositionAgent, const STacticalBoard& tacticalBoard)	{
 	do {
 			 if( rand()%2 )	targetPositionAgent.x = (rand()%tacticalBoard.Tiles.Terrain.Geometry.metrics().x);
 		else if( rand()%2 )	targetPositionAgent.z = (rand()%tacticalBoard.Tiles.Terrain.Geometry.metrics().y);
@@ -86,11 +85,10 @@ void													getValidCoordForAgentDestination						(::gpk::SCoord3<int32_t>&
 	return;
 }
 
-void													selectAIDestination										(SGame& instanceGame)																{
-	STacticalInfo												& tacticalInfo											= instanceGame.TacticalInfo;
-	SPlayer														& currentPlayer											= instanceGame.Players[tacticalInfo.Setup.Players[tacticalInfo.CurrentPlayer]];
+void													selectAIDestination										(::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players)	{
+	::klib::SGamePlayer												& currentPlayer											= players[tacticalInfo.Setup.Players[tacticalInfo.CurrentPlayer]];
 
-	::gpk::SCoord3<int32_t>									& targetPositionAgent									= currentPlayer.Tactical.Squad.TargetPositions[currentPlayer.Tactical.Selection.PlayerUnit];
+	::gpk::SCoord3<int32_t>										& targetPositionAgent									= currentPlayer.Tactical.Squad.TargetPositions[currentPlayer.Tactical.Selection.PlayerUnit];
 
 	if(currentPlayer.Tactical.Control.AIMode == PLAYER_AI_ASSISTS) {
 		selectAvailableTile(tacticalInfo.Board, targetPositionAgent);
@@ -111,7 +109,7 @@ void													selectAIDestination										(SGame& instanceGame)													
 		return;
 	}
 
-	SPlayer														& playerTarget											= instanceGame.Players[tacticalInfo.Setup.Players[currentPlayer.Tactical.Selection.TargetPlayer]];
+	SGamePlayer														& playerTarget											= players[tacticalInfo.Setup.Players[currentPlayer.Tactical.Selection.TargetPlayer]];
 
 	if(currentPlayer.Tactical.Selection.TargetUnit == -1 || playerTarget.Tactical.Squad.Agents[currentPlayer.Tactical.Selection.TargetUnit] == -1) {
 		getValidCoordForAgentDestination(targetPositionAgent, tacticalInfo.Board);
@@ -139,16 +137,15 @@ void													selectAIDestination										(SGame& instanceGame)													
 	}
 };
 
-TURN_ACTION												selectAIAction											(SGame& instanceGame)																{
-	TURN_ACTION													result													= TURN_ACTION_CONTINUE;
-	STacticalInfo												& tacticalInfo											= instanceGame.TacticalInfo;
-	SPlayer														& currentPlayer											= instanceGame.Players[getCurrentPlayerIndex(tacticalInfo)];
-	CCharacter													& currentAgent											= *currentPlayer.Tactical.Army[currentPlayer.Tactical.Squad.Agents[currentPlayer.Tactical.Selection.PlayerUnit]];
+TURN_ACTION												selectAIAction											(::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players)	{
+	::klib::TURN_ACTION											result													= TURN_ACTION_CONTINUE;
+	::klib::SGamePlayer												& currentPlayer											= players[getCurrentPlayerIndex(tacticalInfo)];
+	::klib::CCharacter											& currentAgent											= *currentPlayer.Tactical.Army[currentPlayer.Tactical.Squad.Agents[currentPlayer.Tactical.Selection.PlayerUnit]];
 	if(0 < currentPlayer.Tactical.Squad.ActionsLeft[currentPlayer.Tactical.Selection.PlayerUnit].Moves
 		&& currentPlayer.Tactical.Squad.TargetPositions[currentPlayer.Tactical.Selection.PlayerUnit] == currentAgent.Position)
 	{
-		selectAITarget		(instanceGame);
-		selectAIDestination	(instanceGame);
+		selectAITarget		(tacticalInfo, players);
+		selectAIDestination	(tacticalInfo, players);
 	}
 	else if(0 >= currentPlayer.Tactical.Squad.ActionsLeft[currentPlayer.Tactical.Selection.PlayerUnit].Moves && 0 < currentPlayer.Tactical.Squad.ActionsLeft[currentPlayer.Tactical.Selection.PlayerUnit].Actions) {
 		if(currentPlayer.Tactical.Control.AIMode == PLAYER_AI_ASSISTS)
@@ -160,9 +157,9 @@ TURN_ACTION												selectAIAction											(SGame& instanceGame)											
 			)
 			result													= TURN_ACTION_CANCEL;
 		else {
-			selectAITarget(instanceGame);
+			selectAITarget(tacticalInfo, players);
 			if(currentPlayer.Tactical.Selection.TargetPlayer != -1 && tacticalInfo.Setup.Players[currentPlayer.Tactical.Selection.TargetPlayer] != -1) {
-				const SPlayer												& targetPlayer											= instanceGame.Players[tacticalInfo.Setup.Players[currentPlayer.Tactical.Selection.TargetPlayer]];
+				const SGamePlayer												& targetPlayer											= players[tacticalInfo.Setup.Players[currentPlayer.Tactical.Selection.TargetPlayer]];
 				if((currentAgent.ActiveBonus.Status.Status & COMBAT_STATUS_BLACKOUT) && (currentAgent.FinalFlags.Tech.Tech & ENTITY_TECHNOLOGY_DIGITAL))
 					result													= TURN_ACTION_CANCEL;	// currently there is no better handling for this situation.
 				else if(currentPlayer.Tactical.Selection.TargetUnit != -1 && targetPlayer.Tactical.Squad.Agents[currentPlayer.Tactical.Selection.TargetUnit] != -1) {

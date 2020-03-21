@@ -38,12 +38,12 @@ namespace klib
 				::gpk::SImage<::klib::STopologyDetail	>			Topology;
 
 		inline	int32_t												Resize			(::gpk::SCoord2<uint32_t> newSize)											{
-			Geometry.resize(newSize, {{0, 0, 0, 0}, 0});
-			return Topology.resize(newSize, {0, 0, 0});
+			Geometry.resize(newSize, {});
+			return Topology.resize(newSize, {});
 		}
 		inline	void												Clear			()											{
-			::klib::clearGrid(Geometry.View, {{0, 0, 0, 0}, 0});
-			::klib::clearGrid(Topology.View, {0, 0, 0});
+			::klib::clearGrid(Geometry.View, {});
+			::klib::clearGrid(Topology.View, {});
 		}
 	};
 
@@ -69,7 +69,7 @@ namespace klib
 				::klib::SEntityTiles								Entities;
 
 		inline	int32_t												Resize			(::gpk::SCoord2<uint32_t> newSize)											{
-			Terrain .Resize(newSize);
+			Terrain.Resize(newSize);
 			return Entities.Resize(newSize);
 		}
 #define TILE_SCALE 16

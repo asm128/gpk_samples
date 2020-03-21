@@ -43,11 +43,20 @@
 
 #include "klib_random_generator.h"
 
-using namespace klib;
+template<typename _tCell>
+void												fillCellsFromNoise									(::gpk::view_grid<_tCell> grid, const _tCell& value, int64_t seed, int32_t diceFaces=10)														{
+	_tCell													* cells												= grid.begin();
+	for(uint32_t i = 0, count = grid.size();  i < count; ++i) {
+		double													noise												= ::gpk::noiseNormal1D(i + 1, seed);
+		int32_t													dice												= int32_t(noise * diceFaces);
+		if(0 == dice)
+			cells[i]											= value;
+	}
+}
 
-bool												initCampaignGame									(SGame& instanceGame);
-bool												initTacticalGame									(SGame& instanceGame) {
-	if(instanceGame.Mode == GAME_MODE_CAMPAIGN)
+bool												initCampaignGame									(::klib::SGame& instanceGame);
+bool												initTacticalGame									(::klib::SGame& instanceGame) {
+	if(instanceGame.Mode == ::klib::GAME_MODE_CAMPAIGN)
 		return ::initCampaignGame(instanceGame);
 
 	return false;
@@ -56,38 +65,38 @@ bool												initTacticalGame									(SGame& instanceGame) {
 //static bool											isEnemyTeam											(TEAM_TYPE teamIdCurrent, TEAM_TYPE teamIdPossibleEnemy) { return isRelevantTeam(teamIdPossibleEnemy) && (teamIdCurrent != teamIdPossibleEnemy); }
 
 void												deployCampaignAgents
-	( SPlayer											& player
+	( ::klib::STacticalPlayer							& player
 	, const int8_t										playerIndex
-	, STacticalSetup									& tacticalSetup
+	, ::klib::STacticalSetup							& tacticalSetup
 	, const ::gpk::view_grid<::klib::STopologyDetail>	terrainTopology
-	, SEntityTiles										& terrainEntities
+	, ::klib::SEntityTiles								& terrainEntities
 	)
 {
 	const uint32_t											terrainWidth										= terrainTopology.metrics().x
 		,													terrainDepth										= terrainTopology.metrics().y
 		;
 
-	const TEAM_TYPE											teamId												= tacticalSetup.TeamPerPlayer[playerIndex];
+	const ::klib::TEAM_TYPE									teamId												= tacticalSetup.TeamPerPlayer[playerIndex];
 	const int32_t											squadSize											= tacticalSetup.SquadSize[playerIndex];
 	int64_t													seed												= tacticalSetup.Seed + playerIndex;
 
 	const int32_t											rangeX												= terrainWidth / 5;
 	const int32_t											rangeZ												= terrainDepth / 5;
 
-	for(uint32_t iAgent=0, agentCount = squadSize; iAgent<agentCount; iAgent++)	{
-		if(player.Tactical.Squad.Agents[iAgent] == -1)
+	for(uint32_t iAgent = 0, agentCount = squadSize; iAgent < agentCount; iAgent++)	{
+		if(player.Squad.Agents[iAgent] == -1)
 			continue;
 
-		CCharacter												& playerAgent										= *player.Tactical.Army[player.Tactical.Squad.Agents[iAgent]];
+		::klib::CCharacter										& playerAgent										= *player.Army[player.Squad.Agents[iAgent]];
 
 		if(!playerAgent.IsAlive())
 			continue;
 
-		::gpk::SCoord3<int32_t>								agentPosition										= {0,0,0};
-		if(::isRelevantTeam(teamId))  {
+		::gpk::SCoord3<int32_t>									agentPosition										= {0,0,0};
+		if(::klib::isRelevantTeam(teamId))  {
 			agentPosition.x										= 1 + (int32_t)(rangeX * ::gpk::noiseNormal1D(iAgent, seed			) );
 			agentPosition.z										= 1 + (int32_t)(rangeZ * ::gpk::noiseNormal1D(iAgent, seed << 8	) );
-			if(teamId == TEAM_TYPE_ENEMY) {
+			if(teamId == ::klib::TEAM_TYPE_ENEMY) {
 				agentPosition.x										+= terrainWidth - rangeX - 2;
 				agentPosition.z										+= terrainDepth - rangeZ - 2;
 			}
@@ -108,10 +117,10 @@ void												deployCampaignAgents
 			|| check4
 			)
 		{
-			if(::isRelevantTeam(teamId)) {
+			if(::klib::isRelevantTeam(teamId)) {
 				agentPosition.x										= 1 + (int32_t)(rangeX * ::gpk::noiseNormal1D(	(1+iAgent)		* agentPosition.z * (iAgent+agentPosition.x), seed+rangeZ) );
 				agentPosition.z										= 1 + (int32_t)(rangeZ * ::gpk::noiseNormal1D(((1+iAgent)<<16)	* agentPosition.x, seed = (int32_t)time(0))	);
-				if(teamId == TEAM_TYPE_ENEMY)  {
+				if(teamId == ::klib::TEAM_TYPE_ENEMY)  {
 					agentPosition.x										+= terrainWidth-rangeX-2;
 					agentPosition.z										+= terrainDepth-rangeZ-2;
 				}
@@ -120,15 +129,18 @@ void												deployCampaignAgents
 				agentPosition.x										= 1+(int32_t)((terrainWidth-1) * ::gpk::noiseNormal1D((1+iAgent)*agentPosition.z*(iAgent+agentPosition.x), seed+rangeZ)	);
 				agentPosition.z										= 1+(int32_t)((terrainDepth-1) * ::gpk::noiseNormal1D(((1+iAgent)<<16)*agentPosition.x, seed = (int32_t)time(0))			);
 			}
-			check0						= terrainTopology			[agentPosition.z][agentPosition.x].Sharp		>=	PARTIAL_COVER_HEIGHT																			;
-			check1						= terrainTopology			[agentPosition.z][agentPosition.x].Smooth		>=	PARTIAL_COVER_HEIGHT																			;
-			check2						= (terrainTopology			[agentPosition.z][agentPosition.x].Sharp		+ terrainTopology			[agentPosition.z][agentPosition.x].Smooth)		>=	PARTIAL_COVER_HEIGHT;
-			check3						= terrainEntities.Agents	[agentPosition.z][agentPosition.x].PlayerIndex	!= -1																									;
-			check4						= terrainEntities.Props		[agentPosition.z][agentPosition.x].Definition	!= -1																									;
+			const ::klib::STopologyDetail							& topologyCell					= terrainTopology[agentPosition.z][agentPosition.x];
+
+
+			check0						= topologyCell.Sharp							>=	PARTIAL_COVER_HEIGHT;
+			check1						= topologyCell.Smooth							>=	PARTIAL_COVER_HEIGHT;
+			check2						= (topologyCell.Sharp + topologyCell.Smooth)	>=	PARTIAL_COVER_HEIGHT;
+			check3						= terrainEntities.Agents	[agentPosition.z][agentPosition.x].PlayerIndex	!= -1;
+			check4						= terrainEntities.Props		[agentPosition.z][agentPosition.x].Definition	!= -1;
 		}
 
 		playerAgent.Position								= agentPosition;
-		player.Tactical.Squad.TargetPositions[iAgent]				= agentPosition;
+		player.Squad.TargetPositions[iAgent]				= agentPosition;
 		::klib::STileCharacter									& terrainAgent										= terrainEntities.Agents[agentPosition.z][agentPosition.x];
 		terrainAgent.TeamId									= teamId;
 		terrainAgent.PlayerIndex							= playerIndex;
@@ -136,18 +148,18 @@ void												deployCampaignAgents
 		terrainAgent.AgentIndex								= (int8_t)iAgent;
 
 		//playerAgent.Recalculate();
-		player.Tactical.Squad.ActionsLeft[iAgent].Moves				= (int8_t)playerAgent.FinalPoints.Fitness.Movement;
+		player.Squad.ActionsLeft[iAgent].Moves				= (int8_t)playerAgent.FinalPoints.Fitness.Movement;
 	}
 }
 
-void												generateTopology									(::gpk::view_grid<STopologyDetail>	terrainTopology, int64_t seed )		{
+void												generateTopology									(::gpk::view_grid<::klib::STopologyDetail>	terrainTopology, int64_t seed )		{
 	const uint32_t											terrainWidth										= terrainTopology.metrics().x
 		,													terrainDepth										= terrainTopology.metrics().y
 		;
-	::klib::fillCellsFromNoise(terrainTopology, {- 1,  0}, (int32_t)(seed +  987 + 1), 200);
-	::klib::fillCellsFromNoise(terrainTopology, {-15,  0}, (int32_t)(seed + 7331 + 5), 200);
+	::fillCellsFromNoise(terrainTopology, {- 1,  0}, (int32_t)(seed +  987 + 1), 200);
+	::fillCellsFromNoise(terrainTopology, {-15,  0}, (int32_t)(seed + 7331 + 5), 200);
 
-	STopologyDetail											* cellsHeight										= terrainTopology.begin();
+	::klib::STopologyDetail									* cellsHeight										= terrainTopology.begin();
 	for(uint32_t i=0, count = terrainTopology.size(); i<count; i++)
 		cellsHeight[i].Collision							= cellsHeight[i].Sharp + cellsHeight[i].Smooth;
 }
@@ -155,7 +167,7 @@ void												generateTopology									(::gpk::view_grid<STopologyDetail>	terr
 void												populateProps
 	( const ::klib::SEntityTable<::klib::SStageProp>	& entityTable
 	, ::gpk::view_grid<::klib::STopologyDetail>			terrainTopology
-	, SEntityTiles										& terrainEntities
+	, ::klib::SEntityTiles								& terrainEntities
 	, int64_t											seed
 	, int64_t											maxCoins
 	)
@@ -207,21 +219,21 @@ void												populateProps
 	}
 }
 
-static	int64_t										getEnemyCoinsForTerrainFun							(SGame& instanceGame)																	{
+static	int64_t										getEnemyCoinsForTerrainFun							(::klib::SGame& instanceGame)																	{
 	int64_t													maxCoins											= 0;
-	STacticalSetup											& tacticalSetup										= instanceGame.TacticalInfo.Setup;
+	::klib::STacticalSetup									& tacticalSetup										= instanceGame.TacticalInfo.Setup;
 	int32_t													totalAgents											= 0;
 	for(uint32_t iTacticalPlayer=0, playerCount = tacticalSetup.TotalPlayers; iTacticalPlayer < playerCount; ++iTacticalPlayer) {
 		if(tacticalSetup.Players[iTacticalPlayer] == -1)
 			continue;
 
-		SPlayer													& enemy												= instanceGame.Players[tacticalSetup.Players[iTacticalPlayer]];
-		if( enemy.Tactical.Control.Type == PLAYER_CONTROL_AI && enemy.Tactical.Control.AIMode != PLAYER_AI_TEAMERS )
+		::klib::SGamePlayer										& enemy												= instanceGame.Players[tacticalSetup.Players[iTacticalPlayer]];
+		if( enemy.Tactical.Control.Type == ::klib::PLAYER_CONTROL_AI && enemy.Tactical.Control.AIMode != ::klib::PLAYER_AI_TEAMERS )
 			continue;
 
 		for(uint32_t iAgent=0, count=tacticalSetup.SquadSize[iTacticalPlayer]; iAgent<count; ++iAgent) {
 			if(enemy.Tactical.Squad.Agents[iAgent] != -1) {
-				CCharacter												& characterAgent									= * enemy.Tactical.Army[enemy.Tactical.Squad.Agents[iAgent]];
+				::klib::CCharacter										& characterAgent									= * enemy.Tactical.Army[enemy.Tactical.Squad.Agents[iAgent]];
 				if(characterAgent.IsAlive()) {
 					maxCoins											+= characterAgent.FinalPoints.CostMaintenance;
 					++totalAgents;
@@ -233,9 +245,9 @@ static	int64_t										getEnemyCoinsForTerrainFun							(SGame& instanceGame)		
 	return totalAgents ? maxCoins : 1;	// totalAgents / 4
 }
 
-void												recalculateAgentsInRangeAndSight					(SGame& instanceGame);
+void									recalculateAgentsInRangeAndSight					(::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players);
 
-::gpk::error_t							klib::initTacticalMap								(SGame& instanceGame)																	{
+::gpk::error_t							klib::initTacticalMap								(::klib::SGame& instanceGame)																	{
 	STacticalInfo											& tacticalInfo										= instanceGame.TacticalInfo;
 	tacticalInfo.Board.Clear();
 	tacticalInfo.Board.Resize({::klib::GAME_MAP_WIDTH, ::klib::GAME_MAP_DEPTH});
@@ -252,16 +264,16 @@ void												recalculateAgentsInRangeAndSight					(SGame& instanceGame);
 	// We need to deploy the agents after we generated the map so all the player initialization is done before calling this function
 	for(uint32_t iTacticalPlayer = 0, tacticalPlayerCount = tacticalInfo.Setup.TotalPlayers; iTacticalPlayer<tacticalPlayerCount; ++iTacticalPlayer) {
 		if(tacticalInfo.Setup.Players[iTacticalPlayer] != -1)
-			::deployCampaignAgents(instanceGame.Players[tacticalInfo.Setup.Players[iTacticalPlayer]], (int8_t)iTacticalPlayer, tacticalInfo.Setup, terrainTopology, terrainEntities);
+			::deployCampaignAgents(instanceGame.Players[tacticalInfo.Setup.Players[iTacticalPlayer]].Tactical, (int8_t)iTacticalPlayer, tacticalInfo.Setup, terrainTopology, terrainEntities);
 
 	}
-	::recalculateAgentsInRangeAndSight(instanceGame);
+	::recalculateAgentsInRangeAndSight(tacticalInfo, instanceGame.Players);
 	return 0;
 }
 
 
-static	void										initTacticalPlayer									(SGame& instanceGame, int32_t playerSlot, const STacticalSetup& tacticalSetup)			{
-	SPlayer													& player											= instanceGame.Players[tacticalSetup.Players[playerSlot]];
+static	void										initTacticalPlayer									(::klib::SGame& instanceGame, int32_t playerSlot, const ::klib::STacticalSetup& tacticalSetup)			{
+	::klib::SGamePlayer										& player											= instanceGame.Players[tacticalSetup.Players[playerSlot]];
 	player.Tactical.Squad.Size							= tacticalSetup.SquadSize	[playerSlot];
 	player.Tactical.Control								= tacticalSetup.Controls	[playerSlot];
 	player.Tactical.Selection							= {0, 0, -1, -1, -1};
@@ -271,25 +283,25 @@ static	void										initTacticalPlayer									(SGame& instanceGame, int32_t pl
 		if(player.Tactical.Squad.Agents[iAgent] == -1)
 			continue;
 
-		CCharacter												& playerAgent										= *player.Tactical.Army[player.Tactical.Squad.Agents[iAgent]];
-		playerAgent.ActiveBonus								= SCharacterTurnBonus();
+		::klib::CCharacter										& playerAgent										= *player.Tactical.Army[player.Tactical.Squad.Agents[iAgent]];
+		playerAgent.ActiveBonus								= ::klib::SCharacterTurnBonus();
 		playerAgent.Recalculate(instanceGame.EntityTables);
-		const SEntityPoints										& agentPoints										= playerAgent.FinalPoints;
+		const ::klib::SEntityPoints								& agentPoints										= playerAgent.FinalPoints;
 		playerAgent.Points.LifeCurrent						= agentPoints.LifeMax;
 
 		player.Tactical.Squad.ActionsLeft		[iAgent].Moves		= (int8_t)agentPoints.Fitness.Movement;
 		player.Tactical.Squad.ActionsLeft		[iAgent].Actions	= 1;
 		player.Tactical.Squad.TargetPositions	[iAgent]			= playerAgent.Position;
-		player.Tactical.Squad.TargetAgents		[iAgent]			= {TEAM_TYPE_INVALID, -1, -1, -1};
+		player.Tactical.Squad.TargetAgents		[iAgent]			= {::klib::TEAM_TYPE_INVALID, -1, -1, -1};
 	}
 }
 
 template<size_t _Size>
-uint32_t											getRelevantTeams									(SGame& instanceGame, const STacticalInfo& tacticalInfo, TEAM_TYPE (&teams)[_Size] )	{
+uint32_t											getRelevantTeams									(::klib::SGame& instanceGame, const ::klib::STacticalInfo& tacticalInfo, ::klib::TEAM_TYPE (&teams)[_Size] )	{
 	uint32_t												teamCount											= 0;
 
 	for(size_t iPlayer = 0; iPlayer < _Size; ++iPlayer) {
-		if(!::isRelevantTeam(tacticalInfo.Setup.TeamPerPlayer[iPlayer]))
+		if(!::klib::isRelevantTeam(tacticalInfo.Setup.TeamPerPlayer[iPlayer]))
 			continue;
 
 		bool													bAdded												= false;
@@ -336,7 +348,7 @@ namespace klib
 	GDEFINE_ENUM_VALUE(PLAYER_INDEX, SPECTATOR	, 23);
 }
 
-static	bool										initFromTacticalSetup								(SGame& instanceGame, const STacticalSetup& tacticalSetup)		{
+static	bool										initFromTacticalSetup								(::klib::SGame& instanceGame, const ::klib::STacticalSetup& tacticalSetup)		{
 	//STacticalInfo											& tacticalInfo										= instanceGame.TacticalInfo;
 	uint32_t												effectivePlayers									= 0;
 	for(uint32_t iTacticalPlayer = 0, playerCount = tacticalSetup.TotalPlayers; iTacticalPlayer < playerCount; ++iTacticalPlayer)
@@ -345,54 +357,54 @@ static	bool										initFromTacticalSetup								(SGame& instanceGame, const ST
 	return true;
 }
 
-static const STacticalSetup							tacticalSetupForCampaign							=
+static const ::klib::STacticalSetup					tacticalSetupForCampaign							=
 	{	15731U										//, uint64_t		Seed					= 15731;
 	,	4U											//,	uint32_t		TotalPlayers			= 0;
 	,	2U											//	uint32_t		TotalTeams				= 0;
-	,	{ PLAYER_INDEX_USER
-		, (PLAYER_INDEX)1
-		, (PLAYER_INDEX)2
-		, (PLAYER_INDEX)3
-		, (PLAYER_INDEX)4
-		, (PLAYER_INDEX)5
-		, (PLAYER_INDEX)6
-		, (PLAYER_INDEX)7
-		, (PLAYER_INDEX)8
-		, (PLAYER_INDEX)9
+	,	{ ::klib::PLAYER_INDEX_USER
+		, (::klib::PLAYER_INDEX)1
+		, (::klib::PLAYER_INDEX)2
+		, (::klib::PLAYER_INDEX)3
+		, (::klib::PLAYER_INDEX)4
+		, (::klib::PLAYER_INDEX)5
+		, (::klib::PLAYER_INDEX)6
+		, (::klib::PLAYER_INDEX)7
+		, (::klib::PLAYER_INDEX)8
+		, (::klib::PLAYER_INDEX)9
 		}											//PLAYER_INDEX	Players						[MAX_TACTICAL_PLAYERS]	= {};
-	,	{ SPlayerControl{PLAYER_CONTROL_LOCAL, PLAYER_AI_TEAMERS}
-		, SPlayerControl{PLAYER_CONTROL_AI, PLAYER_AI_TEAMERS}
-		, SPlayerControl{PLAYER_CONTROL_AI, PLAYER_AI_TEAMERS}
-		, SPlayerControl{PLAYER_CONTROL_AI, PLAYER_AI_TEAMERS}
-		, SPlayerControl{PLAYER_CONTROL_AI, PLAYER_AI_NEUTRAL}
-		, SPlayerControl{PLAYER_CONTROL_AI, PLAYER_AI_CURIOUS}
-		, SPlayerControl{PLAYER_CONTROL_AI, PLAYER_AI_FEARFUL}
-		, SPlayerControl{PLAYER_CONTROL_AI, PLAYER_AI_ASSISTS}
-		, SPlayerControl{PLAYER_CONTROL_AI, PLAYER_AI_RIOTERS}
-		, SPlayerControl{PLAYER_CONTROL_AI, PLAYER_AI_VIOLENT}
+	,	{ ::klib::SPlayerControl{::klib::PLAYER_CONTROL_LOCAL, ::klib::PLAYER_AI_TEAMERS}
+		, ::klib::SPlayerControl{::klib::PLAYER_CONTROL_AI, ::klib::PLAYER_AI_TEAMERS}
+		, ::klib::SPlayerControl{::klib::PLAYER_CONTROL_AI, ::klib::PLAYER_AI_TEAMERS}
+		, ::klib::SPlayerControl{::klib::PLAYER_CONTROL_AI, ::klib::PLAYER_AI_TEAMERS}
+		, ::klib::SPlayerControl{::klib::PLAYER_CONTROL_AI, ::klib::PLAYER_AI_NEUTRAL}
+		, ::klib::SPlayerControl{::klib::PLAYER_CONTROL_AI, ::klib::PLAYER_AI_CURIOUS}
+		, ::klib::SPlayerControl{::klib::PLAYER_CONTROL_AI, ::klib::PLAYER_AI_FEARFUL}
+		, ::klib::SPlayerControl{::klib::PLAYER_CONTROL_AI, ::klib::PLAYER_AI_ASSISTS}
+		, ::klib::SPlayerControl{::klib::PLAYER_CONTROL_AI, ::klib::PLAYER_AI_RIOTERS}
+		, ::klib::SPlayerControl{::klib::PLAYER_CONTROL_AI, ::klib::PLAYER_AI_VIOLENT}
 		}											//SPlayerControl	Controls				[MAX_TACTICAL_PLAYERS]	= {};
-	,	{ TEAM_TYPE_ALLY
-		, TEAM_TYPE_ALLY
-		, TEAM_TYPE_ENEMY
-		, TEAM_TYPE_ENEMY
-		, TEAM_TYPE_CIVILIAN
-		, TEAM_TYPE_CIVILIAN
-		, TEAM_TYPE_CIVILIAN
-		, TEAM_TYPE_CIVILIAN
-		, TEAM_TYPE_CIVILIAN
-		, TEAM_TYPE_CIVILIAN
+	,	{ ::klib::TEAM_TYPE_ALLY
+		, ::klib::TEAM_TYPE_ALLY
+		, ::klib::TEAM_TYPE_ENEMY
+		, ::klib::TEAM_TYPE_ENEMY
+		, ::klib::TEAM_TYPE_CIVILIAN
+		, ::klib::TEAM_TYPE_CIVILIAN
+		, ::klib::TEAM_TYPE_CIVILIAN
+		, ::klib::TEAM_TYPE_CIVILIAN
+		, ::klib::TEAM_TYPE_CIVILIAN
+		, ::klib::TEAM_TYPE_CIVILIAN
 		}											//TEAM_TYPE			Teams					[MAX_TACTICAL_PLAYERS]	= {};
-	,	{{0,1}, {2,3}, {4,5,6,7,8,9}}				//int8_t			PlayersPerTeam			[MAX_TACTICAL_PLAYERS][MAX_TACTICAL_PLAYERS]	= {};
 	,	{2,2,5}										//int8_t			PlayerCountPerTeam		[MAX_TACTICAL_PLAYERS]	= {};
-	,	{DEFAULT_SQUAD_SIZE,DEFAULT_SQUAD_SIZE,DEFAULT_SQUAD_SIZE,DEFAULT_SQUAD_SIZE, 2,2,2,2, 1,1}						//uint8_t			SquadSize				[MAX_TACTICAL_PLAYERS]	= {};
+	,	{::klib::DEFAULT_SQUAD_SIZE,::klib::DEFAULT_SQUAD_SIZE,::klib::DEFAULT_SQUAD_SIZE,::klib::DEFAULT_SQUAD_SIZE, 2,2,2,2, 1,1}						//uint8_t			SquadSize				[MAX_TACTICAL_PLAYERS]	= {};
+	,	{{0,1}, {2,3}, {4,5,6,7,8,9}}				//int8_t			PlayersPerTeam			[MAX_TACTICAL_PLAYERS][MAX_TACTICAL_PLAYERS]	= {};
 	};
 
-void												getDefaultTacticalSetupForCampaign					(STacticalSetup& tacticalSetup)									{ tacticalSetup = tacticalSetupForCampaign; }
+void												getDefaultTacticalSetupForCampaign					(::klib::STacticalSetup& tacticalSetup)							{ tacticalSetup = ::tacticalSetupForCampaign; }
 
-uint32_t											resolveNextPlayer									(SGame& instanceGame);
-bool												initCampaignPlayers									(SGame& instanceGame)											{
-	STacticalInfo											& tacticalInfo										= instanceGame.TacticalInfo;
-	STacticalSetup											& tacticalSetup										= tacticalInfo.Setup;
+uint32_t											resolveNextPlayer									(const ::klib::SEntityTables & entityTables, ::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players, ::klib::SGameMessages & messages);
+bool												initCampaignPlayers									(::klib::SGame & instanceGame)									{
+	::klib::STacticalInfo									& tacticalInfo										= instanceGame.TacticalInfo;
+	::klib::STacticalSetup									& tacticalSetup										= tacticalInfo.Setup;
 	// Team players
 	//instanceGame.Players[tacticalSetup.Players[0]].Name = "ALLY_0";
 	instanceGame.Players[tacticalSetup.Players[1]].Tactical.Name	= ::gpk::view_const_string{"Ivan"	};
@@ -401,55 +413,55 @@ bool												initCampaignPlayers									(SGame& instanceGame)											{
 
 	// Civilian players
 	for(uint32_t iTacticalPlayer=0, maxPlayers=tacticalSetup.TotalPlayers; iTacticalPlayer<maxPlayers; ++iTacticalPlayer)
-		if(tacticalSetup.Controls[iTacticalPlayer].Type == PLAYER_CONTROL_AI && ::gpk::bit_false(tacticalSetup.Controls[iTacticalPlayer].AIMode, PLAYER_AI_TEAMERS))
+		if(tacticalSetup.Controls[iTacticalPlayer].Type == ::klib::PLAYER_CONTROL_AI && ::gpk::bit_false(tacticalSetup.Controls[iTacticalPlayer].AIMode, ::klib::PLAYER_AI_TEAMERS))
 			instanceGame.Players[tacticalSetup.Players[iTacticalPlayer]].Tactical.Name = ::gpk::get_value_label(tacticalSetup.Controls[iTacticalPlayer].AIMode);
 
 	// Clear selection and reset player stuff relevant to the tactical mode.
-	SPlayer													& playerUser										= instanceGame.Players[PLAYER_INDEX_USER];
+	::klib::STacticalPlayer										& playerUser										= instanceGame.Players[::klib::PLAYER_INDEX_USER].Tactical;
 	// Set up AI player's agents using the main human player as reference in order to determine the level and equipment.
 	for(uint32_t iPlayer = 0; iPlayer<tacticalSetup.TotalPlayers; ++iPlayer) {
-		if(tacticalSetup.Players[iPlayer] == PLAYER_INDEX_INVALID || tacticalSetup.Players[iPlayer] == PLAYER_INDEX_USER)
+		if(tacticalSetup.Players[iPlayer] == ::klib::PLAYER_INDEX_INVALID || tacticalSetup.Players[iPlayer] == ::klib::PLAYER_INDEX_USER)
 			continue;
 
 		// Set up AI squads
-		if(tacticalSetup.Controls[iPlayer].Type != PLAYER_CONTROL_AI)
+		if(tacticalSetup.Controls[iPlayer].Type != ::klib::PLAYER_CONTROL_AI)
 			continue;
 
-		SPlayer													& playerAI											= instanceGame.Players[tacticalSetup.Players[iPlayer]];
-		if(tacticalSetup.Controls[iPlayer].Type == PLAYER_CONTROL_AI && tacticalSetup.Players[iPlayer] != PLAYER_INDEX_USER)
-			playerAI.Tactical.Army.resize(tacticalSetup.SquadSize[iPlayer]);
+		::klib::STacticalPlayer										& playerAI											= instanceGame.Players[tacticalSetup.Players[iPlayer]].Tactical;
+		if(tacticalSetup.Controls[iPlayer].Type == ::klib::PLAYER_CONTROL_AI && tacticalSetup.Players[iPlayer] != ::klib::PLAYER_INDEX_USER)
+			playerAI.Army.resize(tacticalSetup.SquadSize[iPlayer]);
 
 		bool													bHeroSet											= true;
 		for(uint32_t iSquadAgentSlot=0, squadAgentCount=tacticalSetup.SquadSize[iPlayer]; iSquadAgentSlot<squadAgentCount; ++iSquadAgentSlot) {
-			if( playerUser.Tactical.Squad.Agents[iSquadAgentSlot] == -1 || 0 == playerUser.Tactical.Army[playerUser.Tactical.Squad.Agents[iSquadAgentSlot]] ) {
-				playerAI.Tactical.Squad.Agents[iSquadAgentSlot]				= -1;
+			if( playerUser.Squad.Agents[iSquadAgentSlot] == -1 || 0 == playerUser.Army[playerUser.Squad.Agents[iSquadAgentSlot]] ) {
+				playerAI.Squad.Agents[iSquadAgentSlot]				= -1;
 				continue;
 			}
 			else
-				playerAI.Tactical.Squad.Agents[iSquadAgentSlot]				= (int16_t)iSquadAgentSlot;
+				playerAI.Squad.Agents[iSquadAgentSlot]				= (int16_t)iSquadAgentSlot;
 
 			//if( 0 == playerAI.Army[playerAI.Squad.Agents[iSquadAgentSlot]] )
 			//{
 				::gpk::ptr_obj<::klib::CCharacter>										newAgent											;
-				newAgent.create(enemyDefinitions[1+rand()%3]);
-				playerAI.Tactical.Army[playerAI.Tactical.Squad.Agents[iSquadAgentSlot]] = newAgent;
+				newAgent.create(::klib::enemyDefinitions[1+rand()%3]);
+				playerAI.Army[playerAI.Squad.Agents[iSquadAgentSlot]] = newAgent;
 			//}
-			CCharacter												& agentAI											= *playerAI		.Tactical.Army[playerAI	 .Tactical.Squad.Agents[iSquadAgentSlot]];
-			const CCharacter										& agentUser											= *playerUser	.Tactical.Army[playerUser.Tactical.Squad.Agents[iSquadAgentSlot]];
-			if(playerUser.Tactical.Score.BattlesWon <= 0) {
-				if(tacticalSetup.TeamPerPlayer[iPlayer] != TEAM_TYPE_ALLY)
-					agentAI												= enemyDefinitions[2+(rand()&1)];
+			::klib::CCharacter										& agentAI											= *playerAI		.Army[playerAI	.Squad.Agents[iSquadAgentSlot]];
+			const ::klib::CCharacter								& agentUser											= *playerUser	.Army[playerUser.Squad.Agents[iSquadAgentSlot]];
+			if(playerUser.Score.BattlesWon <= 0) {
+				if(tacticalSetup.TeamPerPlayer[iPlayer] != ::klib::TEAM_TYPE_ALLY)
+					agentAI												= ::klib::enemyDefinitions[2+(rand()&1)];
 				if(bHeroSet) {
-					::setupAgent(instanceGame.EntityTables, agentAI, agentAI);
-					agentAI.Flags.Tech.Gender							= GENDER_FEMALE;
+					::klib::setupAgent(instanceGame.EntityTables, agentAI, agentAI);
+					agentAI.Flags.Tech.Gender							= ::klib::GENDER_FEMALE;
 				}
 				else {
-					if(tacticalSetup.TeamPerPlayer[iPlayer] != TEAM_TYPE_ALLY)
-						::setupAgent(instanceGame.EntityTables, agentAI, agentAI);
+					if(tacticalSetup.TeamPerPlayer[iPlayer] != ::klib::TEAM_TYPE_ALLY)
+						::klib::setupAgent(instanceGame.EntityTables, agentAI, agentAI);
 					else {
 						bHeroSet											= true;
-						agentAI												= enemyDefinitions[::gpk::size(enemyDefinitions)-1];
-						::setupAgent(instanceGame.EntityTables, agentAI, agentAI);
+						agentAI												= ::klib::enemyDefinitions[::gpk::size(::klib::enemyDefinitions)-1];
+						::klib::setupAgent(instanceGame.EntityTables, agentAI, agentAI);
 						agentAI.CurrentEquip.Weapon		.Definition			= (int16_t)instanceGame.EntityTables.Weapon		.Definitions.size()-1;
 						agentAI.CurrentEquip.Armor		.Definition			= (int16_t)instanceGame.EntityTables.Armor		.Definitions.size()-1;
 						agentAI.CurrentEquip.Profession	.Definition			= (int16_t)instanceGame.EntityTables.Profession	.Definitions.size()-1;
@@ -463,15 +475,15 @@ bool												initCampaignPlayers									(SGame& instanceGame)											{
 						agentAI.CurrentEquip.Profession	.Level				=
 						agentAI.CurrentEquip.Accessory	.Level				= 15;
 						agentAI.Recalculate(instanceGame.EntityTables);
-						const SEntityPoints										& finalAgentPoints									= agentAI.FinalPoints;
+						const ::klib::SEntityPoints								& finalAgentPoints									= agentAI.FinalPoints;
 						agentAI.Points.LifeCurrent							= finalAgentPoints.LifeMax;
 						agentAI.Points.Coins								= agentAI.Points.CostMaintenance;
-						agentAI.Flags.Tech.Gender							= GENDER_MALE;
+						agentAI.Flags.Tech.Gender							= ::klib::GENDER_MALE;
 					}
 				}
 			}
 			else {
-				::setupAgent(instanceGame.EntityTables, agentUser, agentAI);
+				::klib::setupAgent(instanceGame.EntityTables, agentUser, agentAI);
 			}
 		}
 	}
@@ -479,18 +491,18 @@ bool												initCampaignPlayers									(SGame& instanceGame)											{
 	return false;
 }
 
-bool												initCampaignGame									(SGame& instanceGame)											{
-	STacticalInfo											& tacticalInfo										= instanceGame.TacticalInfo;
+bool												initCampaignGame									(::klib::SGame& instanceGame)											{
+	::klib::STacticalInfo									& tacticalInfo										= instanceGame.TacticalInfo;
 	tacticalInfo.Clear();
 
-	STacticalSetup											& tacticalSetup										= tacticalInfo.Setup;
+	::klib::STacticalSetup									& tacticalSetup										= tacticalInfo.Setup;
 	::getDefaultTacticalSetupForCampaign(tacticalSetup);
-	tacticalSetup.Seed									= instanceGame.Seed + instanceGame.Players[PLAYER_INDEX_USER].Tactical.Score.BattlesWon;
+	tacticalSetup.Seed									= instanceGame.Seed + instanceGame.Players[::klib::PLAYER_INDEX_USER].Tactical.Score.BattlesWon;
 	::initCampaignPlayers(instanceGame);
 	::klib::initTacticalMap(instanceGame);
-	::klib::drawTacticalBoard(instanceGame, tacticalInfo, instanceGame.TacticalDisplay.Screen.Color, instanceGame.TacticalDisplay.Screen.DepthStencil, PLAYER_INDEX_USER, TEAM_TYPE_CIVILIAN, instanceGame.Players[PLAYER_INDEX_USER].Tactical.Selection, true);
+	::klib::drawTacticalBoard(instanceGame, tacticalInfo, instanceGame.TacticalDisplay.Screen.Color, instanceGame.TacticalDisplay.Screen.DepthStencil, ::klib::PLAYER_INDEX_USER, ::klib::TEAM_TYPE_CIVILIAN, instanceGame.Players[::klib::PLAYER_INDEX_USER].Tactical.Selection, true);
 
-	::gpk::bit_set(instanceGame.Flags, klib::GAME_FLAGS_TACTICAL);
-	tacticalInfo.CurrentPlayer							= (int8_t)::resolveNextPlayer(instanceGame);
+	::gpk::bit_set(instanceGame.Flags, ::klib::GAME_FLAGS_TACTICAL);
+	tacticalInfo.CurrentPlayer							= (int8_t)::resolveNextPlayer(instanceGame.EntityTables, tacticalInfo, instanceGame.Players, instanceGame.Messages);
 	return true;
 }

@@ -83,9 +83,9 @@ namespace klib
 
 																SCharacter				()													= default;
 																SCharacter				(int maxHP, int hitChance, int attack, int coins, SFitnessPoints speed, SEntityEffect characterEffect, SEntityStatus characterStatus )
-			:Points				({{maxHP}, {maxHP}, {hitChance, attack, {}, 0, 0}, speed, coins, coins, coins/10})
-			,Flags				({characterEffect, characterStatus})
-			,Gauges				({{maxHP, maxHP}, {0, 0}, {0, 0}})
+			: Points	({{maxHP}, {maxHP}, {hitChance, attack, {}, 0, 0}, speed, coins, coins, coins / 10})
+			, Flags		({characterEffect, characterStatus})
+			, Gauges	({{maxHP, maxHP}, {0, 0}, {0, 0}})
 		{}
 
 							void								RecalculateFinalPoints	(const ::klib::SEntityTables & tables);
@@ -130,7 +130,7 @@ namespace klib
 
 	class CDeadCharacter {
 	public:
-						SCharacterScore							Score					= {};
+						::klib::SCharacterScore					Score					= {};
 						::gpk::array_pod<char_t>				Name					= "Unnamed";
 
 		inline													CDeadCharacter			()									= default;
@@ -150,17 +150,17 @@ namespace klib
 
 	template <typename _EntityType>
 	static bool													equipIfResearched
-		( const ::klib::SEntityTables								& tables
-		, int16_t													selectedChoice
-		, CCharacter												& playerAgent
-		, SEntityContainer<_EntityType>								& playerInventory
-		, _EntityType												& agentEquippedEntity
-		, const SResearchGroup<_EntityType>							& playerCompletedResearch
-		, const SResearchGroup<_EntityType>							& agentCompletedResearch
-		, const ::klib::SEntityTable<_EntityType>					& table
-		, const ::gpk::view_const_char								& modifierTypeName
-		, ::gpk::array_pod<char_t>									& messageSuccess
-		, ::gpk::array_pod<char_t>									& messageError
+		( const ::klib::SEntityTables					& tables
+		, int16_t										selectedChoice
+		, CCharacter									& playerAgent
+		, ::klib::SEntityContainer<_EntityType>			& playerInventory
+		, _EntityType									& agentEquippedEntity
+		, const ::klib::SResearchGroup<_EntityType>		& playerCompletedResearch
+		, const ::klib::SResearchGroup<_EntityType>		& agentCompletedResearch
+		, const ::klib::SEntityTable<_EntityType>		& table
+		, const ::gpk::view_const_char					& modifierTypeName
+		, ::gpk::array_pod<char_t>						& messageSuccess
+		, ::gpk::array_pod<char_t>						& messageError
 		)
 	{
 		_EntityType			selectedItem	= playerInventory[selectedChoice].Entity;

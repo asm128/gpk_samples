@@ -76,6 +76,9 @@ namespace klib
 		inline				const SEntitySlot<_EntityType>&	operator[]			(uint32_t index)					const				{ return Slots[index]; }
 		inline				SEntitySlot<_EntityType>&		operator[]			(uint32_t index)										{ return Slots[index]; }
 
+		inline	operator ::gpk::view_array<const SEntitySlot<_EntityType>	>	()									const	noexcept	{ return Slots; }
+		inline	operator ::gpk::view_array<SEntitySlot<_EntityType>			>&	()											noexcept	{ return Slots; }
+
 		// Returns false if the container is full
 		inline				bool							AddElement			(const _EntityType& element)							{
 			// look in the inventory for the name so we just increment the counter instead of adding the item
