@@ -3,6 +3,7 @@
 #include "Game.h"
 #include "draw.h"
 #include "tactical_draw.h"
+#include "helper_projects.h"
 
 #include <algorithm>
 
@@ -52,6 +53,7 @@ CONSOLE_FONT_INFOEX							getFontParams			() {
 static	void						handleSubstateChange				(::klib::SGame& instanceGame, const ::klib::SGameState& newState) {
 	::klib::clearASCIIBackBuffer(' ', ::klib::ASCII_COLOR_INDEX_WHITE);
 	instanceGame.GlobalDisplay.Clear();
+	::klib::SGamePlayer						& player							= instanceGame.Players[::klib::PLAYER_INDEX_USER];
 	switch(newState.State) {
 	case ::klib::GAME_STATE_MENU_OPTIONS:
 	case ::klib::GAME_STATE_MENU_SELL:
@@ -59,6 +61,10 @@ static	void						handleSubstateChange				(::klib::SGame& instanceGame, const ::k
 	case ::klib::GAME_STATE_MENU_FACTORY:
 		instanceGame.Messages.UserError		= ::gpk::view_const_string{"This function isn't available!"};
 		instanceGame.LogError();
+		break;
+	case ::klib::GAME_STATE_MENU_RESEARCH:
+		::klib::playerUpdateResearchLists(instanceGame.EntityTables, player);
+		break;
 	}
 	//resetCursorString(instanceGame.SlowMessage);	we shuold leave this out unless it becomes a need. This is because it turns screen transitions into an annoyance.
 }
@@ -68,7 +74,7 @@ static	void						drawTacticalMap						(::klib::SGame& instanceGame, ::gpk::view_
 }
 
 void								handleMissionEnd					(::klib::SGame& instanceGame) {
-	::klib::SGamePlayer							& player							= instanceGame.Players[::klib::PLAYER_INDEX_USER];
+	::klib::SGamePlayer						& player							= instanceGame.Players[::klib::PLAYER_INDEX_USER];
 	::klib::SPlayerProjects					& playerProjects					= player.Projects;
 
 	if(playerProjects.QueuedProduction.size())
@@ -85,7 +91,7 @@ void								handleMissionEnd					(::klib::SGame& instanceGame) {
 	instanceGame.ClearDisplays();
 	//::klib::resetCursorString(instanceGame.SlowMessage);
 
-	::klib::SGamePlayer							& playerUser						= instanceGame.Players[::klib::PLAYER_INDEX_USER];
+	::klib::SGamePlayer						& playerUser						= instanceGame.Players[::klib::PLAYER_INDEX_USER];
 	int64_t									playCost							= 0;
 	switch(newState.State) {
 	case ::klib::GAME_STATE_TACTICAL_CONTROL	: instanceGame.Messages.StateMessage = ::gpk::view_const_string{"Tactical control"	}; break;
@@ -98,7 +104,10 @@ void								handleMissionEnd					(::klib::SGame& instanceGame) {
 	case ::klib::GAME_STATE_MENU_SQUAD_SETUP	: instanceGame.Messages.StateMessage = ::gpk::view_const_string{"Squad Setup"		}; break;
 	case ::klib::GAME_STATE_CREDITS				: instanceGame.Messages.StateMessage = ::gpk::view_const_string{"Credits"			}; break;
 	case ::klib::GAME_STATE_MENU_EQUIPMENT		: instanceGame.Messages.StateMessage = ::gpk::view_const_string{"Equipment Setup"	}; break;
-	case ::klib::GAME_STATE_MENU_RESEARCH		: instanceGame.Messages.StateMessage = ::gpk::view_const_string{"Research Center"	}; break;
+	case ::klib::GAME_STATE_MENU_RESEARCH		:
+		::klib::playerUpdateResearchLists(instanceGame.EntityTables, playerUser);
+		instanceGame.Messages.StateMessage	= ::gpk::view_const_string{"Research Center"	};
+		break;
 	case ::klib::GAME_STATE_MENU_MAIN:
 		drawTacticalMap(instanceGame, instanceGame.TacticalDisplay.Screen.Color, instanceGame.TacticalDisplay.Screen.DepthStencil);
 		instanceGame.Messages.StateMessage	= "Main Menu";
@@ -128,9 +137,44 @@ void								handleMissionEnd					(::klib::SGame& instanceGame) {
 	return 0;
 }
 
+
+static	::gpk::error_t					eventProcess				(::klib::SGame& instanceGame) {
+	::klib::SGamePlayer							& player					= instanceGame.Players[::klib::PLAYER_INDEX_USER];
+
+	instanceGame.Messages.UserSuccess.clear();
+	for(uint32_t iEvent = 0; iEvent < instanceGame.Events.size(); ++iEvent) {
+		::klib::SGameEvent							event						= instanceGame.Events[iEvent];
+		switch(event.GameState.State) {
+		default: break;
+		case ::klib::GAME_STATE_MENU_RESEARCH: {
+			const ::klib::SEntityResearch				& acknowladgedResearch			= player.ResearchablesValue[(int32_t)event.Value];
+			switch(event.Event) {
+			default: break;
+			case ::klib::GAME_EVENT_CONFIRM:
+				::klib::acknowledgeResearch(acknowladgedResearch, player.Projects, instanceGame.Messages.UserSuccess); instanceGame.LogSuccess();
+				break;
+			}
+			::klib::playerUpdateResearchLists(instanceGame.EntityTables, player);
+			break;
+			}
+		case ::klib::GAME_STATE_MENU_FACTORY: {
+			const ::klib::SEntityResearch				& acknowladgedResearch			= player.ResearchedValue[(int32_t)event.Value];
+			switch(event.Event) {
+			default: break;
+			case ::klib::GAME_EVENT_CONFIRM:
+				::klib::acknowledgeProduction(acknowladgedResearch, player.Projects, instanceGame.Messages.UserSuccess); instanceGame.LogSuccess();
+				break;
+			}
+			}
+		}
+	}
+	instanceGame.Events.clear();
+	return 0;
+}
+
 static	void							updateState					(::klib::SGame& instanceGame, const ::klib::SGameState& newState) {
 	if(newState.State == ::klib::GAME_STATE_START_MISSION && newState.State != instanceGame.State.State) {
-		::klib::SGamePlayer								& player					= instanceGame.Players[::klib::PLAYER_INDEX_USER];
+		::klib::SGamePlayer							& player					= instanceGame.Players[::klib::PLAYER_INDEX_USER];
 		int64_t										playCost					= ::klib::missionCost(player, player.Tactical.Squad, player.Tactical.Squad.Size);
 
 		if( player.Tactical.Money < playCost ){
@@ -216,6 +260,7 @@ static	void							updateState					(::klib::SGame& instanceGame, const ::klib::SG
 		instanceGame.Messages.StateMessage	= ::gpk::view_const_string{"Unrecognized game state!!"};
 	}
 
+	::eventProcess(instanceGame);
 	::updateState(instanceGame, newAction);
 	return 0;
 }

@@ -6,15 +6,9 @@
 #include "projects.h"
 #include "helper_projects.h"
 
-using namespace klib;
-
-static	SGameState						drawResearchMenu				(SGame& instanceGame, const SGameState& returnState) {
-	::klib::SGamePlayer								& player						= instanceGame.Players[PLAYER_INDEX_USER];
-	::klib::playerUpdateResearchLists(instanceGame.EntityTables, player);
-
-	::gpk::array_obj<::klib::SEntityResearch>	& menuItemsValue			= player.ResearchablesValue;
-	::gpk::array_obj<::gpk::array_pod<char_t>>	& menuItemsText				= player.ResearchablesText;
-
+static	::klib::SGameState				drawResearchMenu				(::klib::SGame& instanceGame, const ::klib::SGameState& returnState) {
+	::klib::SGamePlayer							& player						= instanceGame.Players[::klib::PLAYER_INDEX_USER];
+	::gpk::array_obj<::gpk::array_pod<char_t>>	& menuItemsText					= player.ResearchablesText;
 	::gpk::array_obj<::gpk::view_const_char>	menuItemsView					= {};
 	menuItemsView.resize(menuItemsText.size());
 	for(uint32_t i = 0, count = menuItemsText.size(); i < count; ++i)
@@ -32,25 +26,12 @@ static	SGameState						drawResearchMenu				(SGame& instanceGame, const SGameStat
 		, 55U
 		);
 	if(selectedChoice == (int32_t)menuItemsView.size())
-		return {GAME_STATE_WELCOME_COMMANDER};
+		return {::klib::GAME_STATE_WELCOME_COMMANDER};
 
 	if(selectedChoice == -1)
 		return returnState;
 
-	instanceGame.ClearMessages();
-	const ::klib::SEntityResearch				& selectedValue					= menuItemsValue[selectedChoice];
-	switch(menuItemsValue[selectedChoice].Type) {
-	case ENTITY_TYPE_ACCESSORY	: acknowledgeResearch(selectedValue, player.Projects, instanceGame.Messages.UserSuccess); instanceGame.LogSuccess(); break;
-	case ENTITY_TYPE_STAGE_PROP	: acknowledgeResearch(selectedValue, player.Projects, instanceGame.Messages.UserSuccess); instanceGame.LogSuccess(); break;
-	case ENTITY_TYPE_FACILITY	: acknowledgeResearch(selectedValue, player.Projects, instanceGame.Messages.UserSuccess); instanceGame.LogSuccess(); break;
-	case ENTITY_TYPE_VEHICLE	: acknowledgeResearch(selectedValue, player.Projects, instanceGame.Messages.UserSuccess); instanceGame.LogSuccess(); break;
-	case ENTITY_TYPE_PROFESSION	: acknowledgeResearch(selectedValue, player.Projects, instanceGame.Messages.UserSuccess); instanceGame.LogSuccess(); break;
-	case ENTITY_TYPE_WEAPON		: acknowledgeResearch(selectedValue, player.Projects, instanceGame.Messages.UserSuccess); instanceGame.LogSuccess(); break;
-	case ENTITY_TYPE_ARMOR		: acknowledgeResearch(selectedValue, player.Projects, instanceGame.Messages.UserSuccess); instanceGame.LogSuccess(); break;
-	default:
-		break;
-	}
-
+	instanceGame.Events.push_back({::klib::GAME_EVENT_CONFIRM, returnState, selectedChoice});
 	return returnState;
 }
 
@@ -135,7 +116,7 @@ static void				drawBubblesBackground		( ::klib::SWeightedDisplay & display, doub
 	}
 }
 
-SGameState									drawResearch				(SGame& instanceGame, const SGameState& returnState) {
+::klib::SGameState							drawResearch				(::klib::SGame& instanceGame, const ::klib::SGameState& returnState) {
 	const ::gpk::view_const_string					textToPrint					= "Research center.";
 
 	static ::klib::SMessageSlow						slowMessage;
@@ -146,6 +127,6 @@ SGameState									drawResearch				(SGame& instanceGame, const SGameState& retur
 	if ( !bDonePrinting )
 		return returnState;
 
-	drawBubblesBackground(instanceGame.TacticalDisplay, instanceGame.FrameTimer.LastTimeSeconds);
-	return drawResearchMenu(instanceGame, returnState);
+	::drawBubblesBackground(instanceGame.TacticalDisplay, instanceGame.FrameTimer.LastTimeSeconds);
+	return ::drawResearchMenu(instanceGame, returnState);
 };

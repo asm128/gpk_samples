@@ -69,14 +69,14 @@ namespace klib
 	};
 
 	// 1
-	static	const ::klib::SMenuItem<SGameState>			optionsMain								[] = 
+	static	const ::klib::SMenuItem<SGameState>			optionsMain								[] =
 		{	{ { GAME_STATE_WELCOME_COMMANDER	, GAME_SUBSTATE_RESET			}, "Start new game"					}
 		,	{ { GAME_STATE_MENU_OPTIONS			, GAME_SUBSTATE_MAIN			}, "Options"						}
 		,	{ { GAME_STATE_CREDITS				, GAME_SUBSTATE_MAIN			}, "Credits"						}
 		};
 
 	// 2
-	static	const ::klib::SMenuItem<SGameState>			optionsMainInGame						[] = 
+	static	const ::klib::SMenuItem<SGameState>			optionsMainInGame						[] =
 		{	{ { GAME_STATE_WELCOME_COMMANDER	, GAME_SUBSTATE_MAIN			}, "Continue game"					}
 		,	{ { GAME_STATE_WELCOME_COMMANDER	, GAME_SUBSTATE_RESET			}, "Start new game"					}
 		,	{ { GAME_STATE_MENU_OPTIONS			, GAME_SUBSTATE_MAIN			}, "Options"						}
@@ -158,7 +158,7 @@ namespace klib
 		};
 
 	// 12
-	static	const ::klib::SMenuItem<SGameState>			optionsControlCenter					[] = 
+	static	const ::klib::SMenuItem<SGameState>			optionsControlCenter					[] =
 		{	{ { GAME_STATE_START_MISSION		}, "Start new Mission"			}
 		//,	{ { GAME_STATE_MENU_LAN_MISSION		}, "Join LAN Mission"			}
 		,	{ { GAME_STATE_MENU_SQUAD_SETUP		}, "Set up Squad"				}
@@ -171,7 +171,7 @@ namespace klib
 		};
 
 	// 13
-	static	const ::klib::SMenuItem<SGameState>			optionsControlCenterMissionInCourse		[] = 
+	static	const ::klib::SMenuItem<SGameState>			optionsControlCenterMissionInCourse		[] =
 		{	{ { GAME_STATE_TACTICAL_CONTROL		}, "Continue Mission"			}
 		,	{ { GAME_STATE_MENU_SQUAD_SETUP		}, "Set up Squad"				}
 		,	{ { GAME_STATE_MENU_RESEARCH		}, "Visit Labs"					}
@@ -223,7 +223,7 @@ namespace klib
 		};
 
 	// 16
-	static	const ::klib::SMenuItem<int32_t>			optionsAreYouSure						[] = 
+	static	const ::klib::SMenuItem<int32_t>			optionsAreYouSure						[] =
 		{	{ 1, "Yes"	}
 		,	{ 0, "No"	}
 		};

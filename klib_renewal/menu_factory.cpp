@@ -36,19 +36,7 @@ static	SGameState						drawFactoryMenu				(::klib::SGame& instanceGame, const ::
 	if(selectedChoice == -1)
 		return returnState;
 
-	instanceGame.Messages.ClearMessages();
-	switch(menuItemsValue[selectedChoice].Type) {
-	case ::klib::ENTITY_TYPE_ACCESSORY	: ::klib::acknowledgeProduction(menuItemsValue[selectedChoice], player.Projects, instanceGame.Messages.UserSuccess); instanceGame.LogSuccess(); break;
-	case ::klib::ENTITY_TYPE_STAGE_PROP	: ::klib::acknowledgeProduction(menuItemsValue[selectedChoice], player.Projects, instanceGame.Messages.UserSuccess); instanceGame.LogSuccess(); break;
-	case ::klib::ENTITY_TYPE_FACILITY	: ::klib::acknowledgeProduction(menuItemsValue[selectedChoice], player.Projects, instanceGame.Messages.UserSuccess); instanceGame.LogSuccess(); break;
-	case ::klib::ENTITY_TYPE_VEHICLE	: ::klib::acknowledgeProduction(menuItemsValue[selectedChoice], player.Projects, instanceGame.Messages.UserSuccess); instanceGame.LogSuccess(); break;
-	case ::klib::ENTITY_TYPE_PROFESSION	: ::klib::acknowledgeProduction(menuItemsValue[selectedChoice], player.Projects, instanceGame.Messages.UserSuccess); instanceGame.LogSuccess(); break;
-	case ::klib::ENTITY_TYPE_WEAPON		: ::klib::acknowledgeProduction(menuItemsValue[selectedChoice], player.Projects, instanceGame.Messages.UserSuccess); instanceGame.LogSuccess(); break;
-	case ::klib::ENTITY_TYPE_ARMOR		: ::klib::acknowledgeProduction(menuItemsValue[selectedChoice], player.Projects, instanceGame.Messages.UserSuccess); instanceGame.LogSuccess(); break;
-	default:
-		break;
-	}
-
+	instanceGame.Events.push_back({::klib::GAME_EVENT_CONFIRM, returnState, selectedChoice});
 	return returnState;
 }
 

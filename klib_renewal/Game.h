@@ -110,24 +110,38 @@ namespace klib
 #define MAX_PLAYER_TYPES 16
 	struct SGameMenus {
 	};
+#pragma pack(push, 1)
+	GDEFINE_ENUM_TYPE (GAME_EVENT, uint8_t);
+	GDEFINE_ENUM_VALUE(GAME_EVENT, NOOP		, 0x00);
+	GDEFINE_ENUM_VALUE(GAME_EVENT, CONFIRM	, 0x01);
+	GDEFINE_ENUM_VALUE(GAME_EVENT, CANCEL	, 0x02);
 
+	struct SGameEvent {
+							::klib::GAME_EVENT						Event;
+							::klib::SGameState						GameState;
+							//::klib::ENTITY_TYPE						EntityType;
+							//::klib::ENTITY_GRADE					EntityGrade;
+							//::klib::SEntity							Entity;
+							int64_t									Value;
+	};
+#pragma pack(pop)
 	//----------------------------------------------------------------------------------------------------------------------------------------------
 	struct SGame {
 							// Game Flags tell us about the			current state of the application.
-							GAME_FLAGS								Flags							= (GAME_FLAGS)(GAME_FLAGS_NETWORK_ENABLED | GAME_FLAGS_TURN_BUSY);
-							GAME_MODE								Mode							= GAME_MODE_CAMPAIGN;	// This is the default because it's the only available mode at the moment
-							SGameState								State							= {GAME_STATE_MENU_MAIN,};
-							SGameState								PreviousState					= {GAME_STATE_MENU_MAIN,};
+							::klib::GAME_FLAGS						Flags							= (::klib::GAME_FLAGS)(::klib::GAME_FLAGS_NETWORK_ENABLED | ::klib::GAME_FLAGS_TURN_BUSY);
+							::klib::GAME_MODE						Mode							= ::klib::GAME_MODE_CAMPAIGN;	// This is the default because it's the only available mode at the moment
+							::klib::SGameState						State							= {::klib::GAME_STATE_MENU_MAIN,};
+							::klib::SGameState						PreviousState					= {::klib::GAME_STATE_MENU_MAIN,};
 							uint64_t								ServerTime						= 0;
 							int64_t									Seed							= 0;
 
-							SGamePlayer								Players[MAX_PLAYER_TYPES]		= {};
+							::klib::SGamePlayer						Players[MAX_PLAYER_TYPES]		= {};
 
 							::klib::SInput							FrameInput						= {};
 							::klib::STimer							FrameTimer						= {};
 
 							// Tactical board.
-							STacticalInfo							TacticalInfo					= {};
+							::klib::STacticalInfo					TacticalInfo					= {};
 
 							// Displays.
 							::klib::SWeightedDisplay				TacticalDisplay					= {};
@@ -135,6 +149,7 @@ namespace klib
 
 							// Feedback messages.
 							::klib::SGameMessages					Messages;
+							::gpk::array_pod<::klib::SGameEvent>	Events;
 
 							// For the special effect
 							::klib::SEntityTables					EntityTables					= {};
@@ -143,8 +158,8 @@ namespace klib
 							::std::mutex							ServerTimeMutex					= {};
 
 							void									ClearDisplays					()																						{
-			TacticalDisplay		.Clear();
-			GlobalDisplay		.Clear();
+			TacticalDisplay	.Clear();
+			GlobalDisplay	.Clear();
 		}
 
 		inline				void									LogAuxStateMessage				()	{ Messages.LogAuxStateMessage	(); }
@@ -163,12 +178,12 @@ namespace klib
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------
 	// functions
-						::gpk::error_t							initGame						(SGame & instanceGame);
-						::gpk::error_t							resetGame						(SGame & instanceGame);
-						::gpk::error_t							showMenu						(SGame & instanceGame);
-						::gpk::error_t							initTacticalMap					(SGame & instanceGame);
-	static inline		PLAYER_INDEX							getCurrentPlayerIndex			(const STacticalInfo& tacticalInfo)														{ return ( tacticalInfo.CurrentPlayer == -1) ? PLAYER_INDEX_INVALID : tacticalInfo.Setup.Players[tacticalInfo.CurrentPlayer]; }
-						int64_t									missionCost						(const SGamePlayer& player, const SSquad& squadSetup, uint32_t maxAgents = MAX_AGENT_SQUAD_SLOTS);
+						::gpk::error_t							initGame						(::klib::SGame & instanceGame);
+						::gpk::error_t							resetGame						(::klib::SGame & instanceGame);
+						::gpk::error_t							showMenu						(::klib::SGame & instanceGame);
+						::gpk::error_t							initTacticalMap					(::klib::SGame & instanceGame);
+	static inline		::klib::PLAYER_INDEX					getCurrentPlayerIndex			(const ::klib::STacticalInfo& tacticalInfo)				{ return ( tacticalInfo.CurrentPlayer == -1) ? ::klib::PLAYER_INDEX_INVALID : tacticalInfo.Setup.Players[tacticalInfo.CurrentPlayer]; }
+						int64_t									missionCost						(const ::klib::SGamePlayer& player, const SSquad& squadSetup, uint32_t maxAgents = ::klib::MAX_AGENT_SQUAD_SLOTS);
 } // namespace
 
 #endif // __GAME_H__91827309126391263192312312354__
