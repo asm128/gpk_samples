@@ -696,10 +696,10 @@ static	::klib::SGameState												endMission										( ::klib::SGame & insta
 static	void															updateBullets									(::klib::SGame & instanceGame, double secondsLastTick)									{
 	::klib::STacticalInfo														& tacticalInfo									= instanceGame.TacticalInfo;
 	::gpk::array_pod<::klib::SBullet>											& bullets										= tacticalInfo.Board.Shots.Bullet;
-	for(uint32_t iBullet=0;iBullet < bullets.size(); ++iBullet) {
+	for(uint32_t iBullet=0; iBullet < bullets.size(); ++iBullet) {
 		double																		fSpeed											= 10.0;
 		double																		fActualSpeed									= secondsLastTick * fSpeed;
-		//double fActualSpeed = 1.0*fSpeed;
+		//double																	fActualSpeed									= 1.0 * fSpeed;
 		if(fActualSpeed >= 0.25)
 			fActualSpeed															= 0.25;
 		::klib::STacticalCoord														& bulletPos										= bullets[iBullet].Position;
@@ -733,8 +733,7 @@ static	void															updateBullets									(::klib::SGame & instanceGame, d
 
 			if( newBulletPos.Cell.x >= 0 && newBulletPos.Cell.x < (int32_t)tacticalInfo.Board.Tiles.Terrain.Geometry.metrics().x
 				&& newBulletPos.Cell.z >= 0 && newBulletPos.Cell.z < (int32_t)tacticalInfo.Board.Tiles.Terrain.Geometry.metrics().y
-			)
-			{
+			) {
 				int32_t																		newx											= newBulletPos.Cell.x;
 				int32_t																		newz											= newBulletPos.Cell.z;
 				if(tacticalInfo.Board.Tiles.Entities.Agents	[newz][newx].AgentIndex	!= -1	&& tacticalInfo.Board.Tiles.Entities.Agents	[newz][newx].PlayerIndex != -1 ) {

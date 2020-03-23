@@ -229,6 +229,7 @@
     <ClCompile Include="Combat_potion.cpp" />
     <ClCompile Include="klib_ascii_display.cpp" />
     <ClCompile Include="klib_ascii_target.cpp" />
+    <ClCompile Include="klib_event.cpp" />
     <ClCompile Include="klib_input.cpp" />
     <ClCompile Include="klib_text.cpp" />
     <ClCompile Include="klib_timer.cpp" />

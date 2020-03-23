@@ -125,6 +125,51 @@ namespace klib
 							int64_t									Value;
 	};
 #pragma pack(pop)
+	static constexpr const uint32_t		SHOP_EXIT_VALUE				= 0x7FFF;
+
+	struct SBuyable {
+		int16_t							Definition;
+		int16_t							Grade;
+		int64_t							Price;
+		int64_t							MaintenanceCost;
+		::gpk::array_pod<char_t>		Name;
+	};
+
+	struct SShopMenus {
+		::klib::SMenuItem<::klib::SBuyable>		MenuItemsAccessory	[256]	= {};
+		::klib::SMenuItem<::klib::SBuyable>		MenuItemsStageProp	[256]	= {};
+		::klib::SMenuItem<::klib::SBuyable>		MenuItemsFacility	[256]	= {};
+		::klib::SMenuItem<::klib::SBuyable>		MenuItemsVehicle	[256]	= {};
+		::klib::SMenuItem<::klib::SBuyable>		MenuItemsProfession	[256]	= {};
+		::klib::SMenuItem<::klib::SBuyable>		MenuItemsWeapon		[256]	= {};
+		::klib::SMenuItem<::klib::SBuyable>		MenuItemsArmor		[256]	= {};
+		::klib::SMenuItem<::klib::SBuyable>		MenuItemsItem		[256]	= {};
+		::klib::SMenuItem<::klib::SBuyable>		MenuItemsAgent		[256]	= {};
+
+		::klib::SMenuHeader<::klib::SBuyable>	MenuAccessory				= {{::klib::SHOP_EXIT_VALUE},	::gpk::view_const_string{"Accessory"	" a la carte"}, 48};
+		::klib::SMenuHeader<::klib::SBuyable>	MenuStageProp				= {{::klib::SHOP_EXIT_VALUE},	::gpk::view_const_string{"Stage Prop"	" a la carte"}, 48};
+		::klib::SMenuHeader<::klib::SBuyable>	MenuFacility				= {{::klib::SHOP_EXIT_VALUE},	::gpk::view_const_string{"Facility"		" a la carte"}, 48};
+		::klib::SMenuHeader<::klib::SBuyable>	MenuVehicle					= {{::klib::SHOP_EXIT_VALUE},	::gpk::view_const_string{"Vehicle"		" a la carte"}, 48};
+		::klib::SMenuHeader<::klib::SBuyable>	MenuProfession				= {{::klib::SHOP_EXIT_VALUE},	::gpk::view_const_string{"Job License"	" a la carte"}, 48};
+		::klib::SMenuHeader<::klib::SBuyable>	MenuWeapon					= {{::klib::SHOP_EXIT_VALUE},	::gpk::view_const_string{"Weapon"		" a la carte"}, 48};
+		::klib::SMenuHeader<::klib::SBuyable>	MenuArmor					= {{::klib::SHOP_EXIT_VALUE},	::gpk::view_const_string{"Armor"		" a la carte"}, 48};
+		::klib::SMenuHeader<::klib::SBuyable>	MenuItem					= {{::klib::SHOP_EXIT_VALUE},	::gpk::view_const_string{"Item"			" a la carte"}, 48};
+		::klib::SMenuHeader<::klib::SBuyable>	MenuAgent					= {{::klib::SHOP_EXIT_VALUE},	::gpk::view_const_string{"Agent"		" a la carte"}, 48};
+
+		::gpk::array_pod<char_t>				NamesAccessory		[256]	= {};
+		::gpk::array_pod<char_t>				NamesStageProp		[256]	= {};
+		::gpk::array_pod<char_t>				NamesFacility		[256]	= {};
+		::gpk::array_pod<char_t>				NamesVehicle		[256]	= {};
+		::gpk::array_pod<char_t>				NamesProfession		[256]	= {};
+		::gpk::array_pod<char_t>				NamesWeapon			[256]	= {};
+		::gpk::array_pod<char_t>				NamesArmor			[256]	= {};
+		::gpk::array_pod<char_t>				NamesItem			[256]	= {};
+		::gpk::array_pod<char_t>				NamesAgent			[256]	= {};
+	};
+
+	::gpk::error_t												initBuyMenus		(const ::klib::SEntityTables & entityTables, ::klib::SShopMenus& menus);
+	::gpk::error_t												reinitBuyMenus		(const ::klib::SEntityTables & entityTables, ::klib::SCharacterInventory & playerInventory, ::klib::SShopMenus& menus);
+
 	//----------------------------------------------------------------------------------------------------------------------------------------------
 	struct SGame {
 							// Game Flags tell us about the			current state of the application.
@@ -157,6 +202,8 @@ namespace klib
 							::std::mutex							PlayerMutex						= {};
 							::std::mutex							ServerTimeMutex					= {};
 
+							::klib::SShopMenus						ShopMenus;
+
 							void									ClearDisplays					()																						{
 			TacticalDisplay	.Clear();
 			GlobalDisplay	.Clear();
@@ -180,8 +227,10 @@ namespace klib
 	// functions
 						::gpk::error_t							initGame						(::klib::SGame & instanceGame);
 						::gpk::error_t							resetGame						(::klib::SGame & instanceGame);
-						::gpk::error_t							showMenu						(::klib::SGame & instanceGame);
+						::gpk::error_t							eventProcess					(::klib::SGame & instanceGame);
 						::gpk::error_t							initTacticalMap					(::klib::SGame & instanceGame);
+						::gpk::error_t							handleMissionEnd				(::klib::SGame & instanceGame);
+						::gpk::error_t							showMenu						(::klib::SGame & instanceGame);
 	static inline		::klib::PLAYER_INDEX					getCurrentPlayerIndex			(const ::klib::STacticalInfo& tacticalInfo)				{ return ( tacticalInfo.CurrentPlayer == -1) ? ::klib::PLAYER_INDEX_INVALID : tacticalInfo.Setup.Players[tacticalInfo.CurrentPlayer]; }
 						int64_t									missionCost						(const ::klib::SGamePlayer& player, const SSquad& squadSetup, uint32_t maxAgents = ::klib::MAX_AGENT_SQUAD_SLOTS);
 } // namespace

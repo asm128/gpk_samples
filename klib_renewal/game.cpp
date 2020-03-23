@@ -47,6 +47,41 @@ static	::gpk::error_t					prompt					(::gpk::array_pod<char_t>& userInput, const
 	return 0;
 }
 
+int64_t								klib::missionCost				(const SGamePlayer& player, const SSquad& squadSetup, uint32_t maxAgents)	{
+	int64_t									totalCost						= 0;
+	for(uint32_t iAgent=0, agentCount= maxAgents < squadSetup.Agents.size() ? maxAgents : squadSetup.Agents.size(); iAgent<agentCount; ++iAgent) {
+		if(squadSetup.Agents[iAgent] == -1)
+			continue;
+
+		const ::klib::CCharacter				& agent							= *player.Tactical.Army[squadSetup.Agents[iAgent]];
+		const ::klib::SEntityPoints				& finalPoints					= agent.FinalPoints;
+		int32_t									healthCurrent					= agent.Points.LifeCurrent.Health;
+		if(healthCurrent <= 0) {
+			healthCurrent						= 0;
+			continue;
+		}
+		double									penaltyFromHealth				= healthCurrent / (double)finalPoints.LifeMax.Health;//agent.Points.LifeCurrent.Health/(double)finalPoints.LifeMax.Health;
+		totalCost							+= finalPoints.CostMaintenance  +  (int64_t)((1.0 - penaltyFromHealth) * agent.Points.CostMaintenance);
+		//totalCost							+= agent.Points.CostMaintenance + (int32_t)((penaltyFromHealth-1.0)*agent.Points.CostMaintenance);
+	}
+	return totalCost;
+}
+
+::gpk::error_t						klib::handleMissionEnd			(::klib::SGame& instanceGame) {
+	::klib::SGamePlayer						& player						= instanceGame.Players[::klib::PLAYER_INDEX_USER];
+	::klib::SPlayerProjects					& playerProjects				= player.Projects;
+
+	if(playerProjects.QueuedProduction.size())
+		::klib::handleProductionStep(instanceGame.EntityTables, player.Inventory, playerProjects, player.Tactical.Money, player.Tactical.Score, instanceGame.Messages);
+
+	if(playerProjects.QueuedResearch.size())
+		::klib::handleResearchStep(player.Tactical.Research, playerProjects, player.Tactical.Money, player.Tactical.Score, instanceGame.Messages);
+
+	::klib::playerUpdateResearchLists(instanceGame.EntityTables, player);
+	::klib::reinitBuyMenus(instanceGame.EntityTables, player.Inventory, instanceGame.ShopMenus);
+	return 0;
+}
+
 ::gpk::error_t							klib::resetGame(SGame& instanceGame) {
 	instanceGame.Messages.UserLog.clear();
 	::klib::initGame(instanceGame);
@@ -56,14 +91,14 @@ static	::gpk::error_t					prompt					(::gpk::array_pod<char_t>& userInput, const
 	// Set up a nice prompt
 	::gpk::array_pod<char_t>				playerName;
 	::klib::SASCIITarget					asciiTarget;
-	::klib::getASCIIBackBuffer	(asciiTarget);
+	::klib::getASCIIBackBuffer(asciiTarget);
 
-	::prompt(instanceGame.Players[PLAYER_INDEX_USER].Tactical.Name, ::gpk::view_const_char{"Enter your name:"}, asciiTarget);
+	::prompt(instanceGame.Players[::klib::PLAYER_INDEX_USER].Tactical.Name, ::gpk::view_const_char{"Enter your name:"}, asciiTarget);
 	::std::string							password;
 	//::prompt(password, "Enter password:");
-	::gpk::bit_set(instanceGame.Flags, GAME_FLAGS_STARTED);
-	::gpk::bit_clear(instanceGame.Flags, GAME_FLAGS_TACTICAL);
-	::gpk::bit_clear(instanceGame.Flags, GAME_FLAGS_TACTICAL_REMOTE);
+	::gpk::bit_set	(instanceGame.Flags, ::klib::GAME_FLAGS_STARTED);
+	::gpk::bit_clear(instanceGame.Flags, ::klib::GAME_FLAGS_TACTICAL);	// Tell the system that the tactical mode is over.
+	::gpk::bit_clear(instanceGame.Flags, ::klib::GAME_FLAGS_TACTICAL_REMOTE);
 	return 0;
 }
 
@@ -313,27 +348,11 @@ struct SWearables {
 
 		//player.Name = ::gpk::get_value_label((PLAYER_INDEX)iPlayer);
 	}
+
+	::klib::initBuyMenus(instanceGame.EntityTables, instanceGame.ShopMenus);
+	::klib::reinitBuyMenus(instanceGame.EntityTables, instanceGame.Players[::klib::PLAYER_INDEX_USER].Inventory, instanceGame.ShopMenus);
+
 	::klib::initTacticalMap(instanceGame);
 	::gpk::bit_set(instanceGame.Flags, GAME_FLAGS_RUNNING);
 	return 0;
-}
-
-int64_t															klib::missionCost						(const SGamePlayer& player, const SSquad& squadSetup, uint32_t maxAgents)	{
-	int64_t															totalCost						= 0;
-	for(uint32_t iAgent=0, agentCount= maxAgents < squadSetup.Agents.size() ? maxAgents : squadSetup.Agents.size(); iAgent<agentCount; ++iAgent) {
-		if(squadSetup.Agents[iAgent] == -1)
-			continue;
-
-		const ::klib::CCharacter										& agent							= *player.Tactical.Army[squadSetup.Agents[iAgent]];
-		const ::klib::SEntityPoints										& finalPoints					= agent.FinalPoints;
-		int32_t															healthCurrent					= agent.Points.LifeCurrent.Health;
-		if(healthCurrent <= 0) {
-			healthCurrent												= 0;
-			continue;
-		}
-		double															penaltyFromHealth				= healthCurrent / (double)finalPoints.LifeMax.Health;//agent.Points.LifeCurrent.Health/(double)finalPoints.LifeMax.Health;
-		totalCost													+= finalPoints.CostMaintenance + (int64_t)((1.0 - penaltyFromHealth) * agent.Points.CostMaintenance);
-		//totalCost += agent.Points.CostMaintenance+(int32_t)((penaltyFromHealth-1.0)*agent.Points.CostMaintenance);
-	}
-	return totalCost;
 }

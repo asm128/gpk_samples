@@ -6,104 +6,81 @@
 #include "Item.h"
 #include "Enemy.h"
 
-struct SBuyable {
-	int16_t						Definition;
-	int16_t						Grade;
-	int64_t						Price;
-	int64_t						MaintenanceCost;
-	::gpk::array_pod<char_t>	Name;
-};
+template <typename _tEntity>
+static int32_t										reinitBuyMenuItem			(::klib::SMenuItem<::klib::SBuyable> & menuItem, const ::gpk::view_const_char & nameItem, const ::klib::SEntityContainer<_tEntity> & inventory) {
+	char													preformatted	[256]		= {};
+	int32_t													indexElement				= inventory.FindElement({menuItem.ReturnValue.Definition, 0, menuItem.ReturnValue.Grade, -1});
+	char													strCount		[32];
+	sprintf_s(strCount, "%i", (indexElement != -1) ? inventory[indexElement].Count : 0);
+	::sprintf_s(preformatted, "x%3.3s: %s", strCount, nameItem.begin() ); menuItem.Text = preformatted;
+	return 0;
+}
 
-#define SHOP_EXIT_VALUE 0x7FFF
-struct SShopMenus {
-	::klib::SMenuItem<SBuyable>		MenuItemsAccessory	[256]	= {};
-	::klib::SMenuItem<SBuyable>		MenuItemsStageProp	[256]	= {};
-	::klib::SMenuItem<SBuyable>		MenuItemsFacility	[256]	= {};
-	::klib::SMenuItem<SBuyable>		MenuItemsVehicle	[256]	= {};
-	::klib::SMenuItem<SBuyable>		MenuItemsProfession	[256]	= {};
-	::klib::SMenuItem<SBuyable>		MenuItemsWeapon		[256]	= {};
-	::klib::SMenuItem<SBuyable>		MenuItemsArmor		[256]	= {};
-	::klib::SMenuItem<SBuyable>		MenuItemsItem		[256]	= {};
-	::klib::SMenuItem<SBuyable>		MenuItemsAgent		[256]	= {};
+template <typename _tEntity>
+static int32_t										initBuyMenuItem				(const int32_t itemIndex, const ::klib::SEntityRecord<_tEntity> & definition, ::klib::SMenuItem<::klib::SBuyable> & menuItem, ::gpk::array_pod<char_t> & nameItem) {
+	char													preformatted	[256]		= {};
+	char													strPrice		[64];
+	::sprintf_s(strPrice, "%lli", definition.Points.PriceBuy);
+	::sprintf_s(preformatted, "%-28.28s $%8.8s", definition.Name.begin(), strPrice);
+	menuItem											= { { (int16_t)itemIndex, 1, definition.Points.PriceBuy, definition.Points.CostMaintenance, definition.Name}, ""};
+	nameItem											= preformatted;
+	return 0;
+}
 
-	::klib::SMenuHeader<SBuyable>	MenuAccessory				= {{SHOP_EXIT_VALUE},	::gpk::view_const_string{"Accessory"	" a la carte"}, 48};
-	::klib::SMenuHeader<SBuyable>	MenuStageProp				= {{SHOP_EXIT_VALUE},	::gpk::view_const_string{"Stage Prop"	" a la carte"}, 48};
-	::klib::SMenuHeader<SBuyable>	MenuFacility				= {{SHOP_EXIT_VALUE},	::gpk::view_const_string{"Facility"		" a la carte"}, 48};
-	::klib::SMenuHeader<SBuyable>	MenuVehicle					= {{SHOP_EXIT_VALUE},	::gpk::view_const_string{"Vehicle"		" a la carte"}, 48};
-	::klib::SMenuHeader<SBuyable>	MenuProfession				= {{SHOP_EXIT_VALUE},	::gpk::view_const_string{"Job License"	" a la carte"}, 48};
-	::klib::SMenuHeader<SBuyable>	MenuWeapon					= {{SHOP_EXIT_VALUE},	::gpk::view_const_string{"Weapon"		" a la carte"}, 48};
-	::klib::SMenuHeader<SBuyable>	MenuArmor					= {{SHOP_EXIT_VALUE},	::gpk::view_const_string{"Armor"		" a la carte"}, 48};
-	::klib::SMenuHeader<SBuyable>	MenuItem					= {{SHOP_EXIT_VALUE},	::gpk::view_const_string{"Item"			" a la carte"}, 48};
-	::klib::SMenuHeader<SBuyable>	MenuAgent					= {{SHOP_EXIT_VALUE},	::gpk::view_const_string{"Agent"		" a la carte"}, 48};
-
-	::gpk::array_pod<char_t>		NamesAccessory		[256]	= {};
-	::gpk::array_pod<char_t>		NamesStageProp		[256]	= {};
-	::gpk::array_pod<char_t>		NamesFacility		[256]	= {};
-	::gpk::array_pod<char_t>		NamesVehicle		[256]	= {};
-	::gpk::array_pod<char_t>		NamesProfession		[256]	= {};
-	::gpk::array_pod<char_t>		NamesWeapon			[256]	= {};
-	::gpk::array_pod<char_t>		NamesArmor			[256]	= {};
-	::gpk::array_pod<char_t>		NamesItem			[256]	= {};
-	::gpk::array_pod<char_t>		NamesAgent			[256]	= {};
-};
-
-static int32_t										initBuyMenus				(const ::klib::SEntityTables & entityTables, SShopMenus& menus) {
+int32_t												klib::initBuyMenus			(const ::klib::SEntityTables & entityTables, ::klib::SShopMenus& menus) {
 	char													preformatted[256]			= {};
-	for(uint32_t i = 0, itemCount = entityTables.Accessory	.Definitions.size(); i<itemCount; ++i){ const ::klib::SEntityRecord<::klib::SAccessory	> &	definition = entityTables.Accessory		.Definitions[i]; char strPrice [64]; sprintf_s(strPrice, "%lli", definition.Points.PriceBuy); ::sprintf_s(preformatted, "%-28.28s $%8.8s", definition.Name.begin(), strPrice); menus.MenuItemsAccessory	[i] = { { (int16_t)i, 1, definition.Points.PriceBuy	, definition.Points.CostMaintenance	, definition.Name}, ""}; menus.NamesAccessory	[i] = preformatted; };
-	for(uint32_t i = 0, itemCount = entityTables.StageProp	.Definitions.size(); i<itemCount; ++i){ const ::klib::SEntityRecord<::klib::SStageProp	> &	definition = entityTables.StageProp		.Definitions[i]; char strPrice [64]; sprintf_s(strPrice, "%lli", definition.Points.PriceBuy); ::sprintf_s(preformatted, "%-28.28s $%8.8s", definition.Name.begin(), strPrice); menus.MenuItemsStageProp	[i] = { { (int16_t)i, 1, definition.Points.PriceBuy	, definition.Points.CostMaintenance	, definition.Name}, ""}; menus.NamesStageProp	[i] = preformatted; };
-	for(uint32_t i = 0, itemCount = entityTables.Facility	.Definitions.size(); i<itemCount; ++i){ const ::klib::SEntityRecord<::klib::SFacility	> &	definition = entityTables.Facility		.Definitions[i]; char strPrice [64]; sprintf_s(strPrice, "%lli", definition.Points.PriceBuy); ::sprintf_s(preformatted, "%-28.28s $%8.8s", definition.Name.begin(), strPrice); menus.MenuItemsFacility	[i] = { { (int16_t)i, 1, definition.Points.PriceBuy	, definition.Points.CostMaintenance	, definition.Name}, ""}; menus.NamesFacility	[i] = preformatted; };
-	for(uint32_t i = 0, itemCount = entityTables.Vehicle	.Definitions.size(); i<itemCount; ++i){ const ::klib::SEntityRecord<::klib::SVehicle	> &	definition = entityTables.Vehicle		.Definitions[i]; char strPrice [64]; sprintf_s(strPrice, "%lli", definition.Points.PriceBuy); ::sprintf_s(preformatted, "%-28.28s $%8.8s", definition.Name.begin(), strPrice); menus.MenuItemsVehicle	[i] = { { (int16_t)i, 1, definition.Points.PriceBuy	, definition.Points.CostMaintenance	, definition.Name}, ""}; menus.NamesVehicle		[i] = preformatted; };
-	for(uint32_t i = 0, itemCount = entityTables.Profession	.Definitions.size(); i<itemCount; ++i){ const ::klib::SEntityRecord<::klib::SProfession	> &	definition = entityTables.Profession	.Definitions[i]; char strPrice [64]; sprintf_s(strPrice, "%lli", definition.Points.PriceBuy); ::sprintf_s(preformatted, "%-28.28s $%8.8s", definition.Name.begin(), strPrice); menus.MenuItemsProfession[i] = { { (int16_t)i, 1, definition.Points.PriceBuy	, definition.Points.CostMaintenance	, definition.Name}, ""}; menus.NamesProfession	[i] = preformatted; };
-	for(uint32_t i = 0, itemCount = entityTables.Weapon		.Definitions.size(); i<itemCount; ++i){ const ::klib::SEntityRecord<::klib::SWeapon		> &	definition = entityTables.Weapon		.Definitions[i]; char strPrice [64]; sprintf_s(strPrice, "%lli", definition.Points.PriceBuy); ::sprintf_s(preformatted, "%-28.28s $%8.8s", definition.Name.begin(), strPrice); menus.MenuItemsWeapon	[i] = { { (int16_t)i, 1, definition.Points.PriceBuy	, definition.Points.CostMaintenance	, definition.Name}, ""}; menus.NamesWeapon		[i] = preformatted; };
-	for(uint32_t i = 0, itemCount = entityTables.Armor		.Definitions.size(); i<itemCount; ++i){ const ::klib::SEntityRecord<::klib::SArmor		> &	definition = entityTables.Armor			.Definitions[i]; char strPrice [64]; sprintf_s(strPrice, "%lli", definition.Points.PriceBuy); ::sprintf_s(preformatted, "%-28.28s $%8.8s", definition.Name.begin(), strPrice); menus.MenuItemsArmor		[i] = { { (int16_t)i, 1, definition.Points.PriceBuy	, definition.Points.CostMaintenance	, definition.Name}, ""}; menus.NamesArmor		[i] = preformatted; };
-	for(uint32_t i = 0, itemCount = (uint32_t)::gpk::size(::klib::itemDescriptions); i<itemCount; ++i){ char strPrice [64]; sprintf_s(strPrice, "%lli", ::klib::itemDescriptions[i].Price			); ::sprintf_s(preformatted, "%-28.28s $%8.8s", ::klib::itemDescriptions[i].Name.begin(), strPrice); menus.MenuItemsItem	[i] = { { (int16_t)i, 1, ::klib::itemDescriptions[i].Price			, 0											, ::klib::itemDescriptions	[i].Name}, ""};	menus.NamesItem	[i] = preformatted; };
+	for(uint32_t i = 0, itemCount = entityTables.Accessory	.Definitions.size(); i<itemCount; ++i){ ::initBuyMenuItem(i, entityTables.Accessory		.Definitions[i], menus.MenuItemsAccessory	[i], menus.NamesAccessory	[i]); };
+	for(uint32_t i = 0, itemCount = entityTables.StageProp	.Definitions.size(); i<itemCount; ++i){ ::initBuyMenuItem(i, entityTables.StageProp		.Definitions[i], menus.MenuItemsStageProp	[i], menus.NamesStageProp	[i]); };
+	for(uint32_t i = 0, itemCount = entityTables.Facility	.Definitions.size(); i<itemCount; ++i){ ::initBuyMenuItem(i, entityTables.Facility		.Definitions[i], menus.MenuItemsFacility	[i], menus.NamesFacility	[i]); };
+	for(uint32_t i = 0, itemCount = entityTables.Vehicle	.Definitions.size(); i<itemCount; ++i){ ::initBuyMenuItem(i, entityTables.Vehicle		.Definitions[i], menus.MenuItemsVehicle		[i], menus.NamesVehicle		[i]); };
+	for(uint32_t i = 0, itemCount = entityTables.Profession	.Definitions.size(); i<itemCount; ++i){ ::initBuyMenuItem(i, entityTables.Profession	.Definitions[i], menus.MenuItemsProfession	[i], menus.NamesProfession	[i]); };
+	for(uint32_t i = 0, itemCount = entityTables.Weapon		.Definitions.size(); i<itemCount; ++i){ ::initBuyMenuItem(i, entityTables.Weapon		.Definitions[i], menus.MenuItemsWeapon		[i], menus.NamesWeapon		[i]); };
+	for(uint32_t i = 0, itemCount = entityTables.Armor		.Definitions.size(); i<itemCount; ++i){ ::initBuyMenuItem(i, entityTables.Armor			.Definitions[i], menus.MenuItemsArmor		[i], menus.NamesArmor		[i]); };
+	for(uint32_t i = 0, itemCount = (uint32_t)::gpk::size(::klib::itemDescriptions); i<itemCount; ++i){ char strPrice [64]; sprintf_s(strPrice, "%lli", ::klib::itemDescriptions[i].Price			); ::sprintf_s(preformatted, "%-28.28s $%8.8s", ::klib::itemDescriptions[i].Name.begin(), strPrice); menus.MenuItemsItem	[i] = { { (int16_t)i, 1, ::klib::itemDescriptions[i].Price			, 0													, ::klib::itemDescriptions	[i].Name}, ""};	menus.NamesItem	[i] = preformatted; };
 	for(uint32_t i = 0, itemCount = (uint32_t)::gpk::size(::klib::enemyDefinitions); i<itemCount; ++i){ char strPrice [64]; sprintf_s(strPrice, "%lli", ::klib::enemyDefinitions[i].Points.PriceBuy	); ::sprintf_s(preformatted, "%-28.28s $%8.8s", ::klib::enemyDefinitions[i].Name.begin(), strPrice); menus.MenuItemsAgent	[i] = { { (int16_t)i, 1, ::klib::enemyDefinitions[i].Points.PriceBuy, ::klib::enemyDefinitions[i].Points.CostMaintenance, ::klib::enemyDefinitions	[i].Name}, ""};	menus.NamesAgent[i] = preformatted; };
 	return 0;
 }
 
-static int32_t										reinitBuyMenus				(::klib::SGame& instanceGame, SShopMenus& menus) {
+int32_t												klib::reinitBuyMenus		(const ::klib::SEntityTables & entityTables, ::klib::SCharacterInventory & playerInventory, ::klib::SShopMenus& menus) {
 	char													preformatted[256]			= {};
-	::klib::SCharacterInventory								& playerInventory			= instanceGame.Players[::klib::PLAYER_INDEX_USER].Inventory;
-	for(size_t i = 0, itemCount = instanceGame.EntityTables.Accessory	.Definitions.size(); i<itemCount; ++i){	int32_t indexElement = playerInventory.Accessory	.FindElement({	menus.MenuItemsAccessory	[i].ReturnValue.Definition, 0, menus.MenuItemsAccessory		[i].ReturnValue.Grade, -1}); char strCount [32]; sprintf_s(strCount, "%i", (indexElement != -1) ? playerInventory.Accessory	[indexElement].Count : 0); ::sprintf_s(preformatted, "x%3.3s: %s", strCount, menus.NamesAccessory	[i].begin() );	menus.MenuItemsAccessory	[i].Text = preformatted; }
-	for(size_t i = 0, itemCount = instanceGame.EntityTables.StageProp	.Definitions.size(); i<itemCount; ++i){	int32_t indexElement = playerInventory.StageProp	.FindElement({	menus.MenuItemsStageProp	[i].ReturnValue.Definition, 0, menus.MenuItemsStageProp		[i].ReturnValue.Grade, -1}); char strCount [32]; sprintf_s(strCount, "%i", (indexElement != -1) ? playerInventory.StageProp	[indexElement].Count : 0); ::sprintf_s(preformatted, "x%3.3s: %s", strCount, menus.NamesStageProp	[i].begin() );	menus.MenuItemsStageProp	[i].Text = preformatted; }
-	for(size_t i = 0, itemCount = instanceGame.EntityTables.Facility	.Definitions.size(); i<itemCount; ++i){	int32_t indexElement = playerInventory.Facility		.FindElement({	menus.MenuItemsFacility		[i].ReturnValue.Definition, 0, menus.MenuItemsFacility		[i].ReturnValue.Grade, -1}); char strCount [32]; sprintf_s(strCount, "%i", (indexElement != -1) ? playerInventory.Facility	[indexElement].Count : 0); ::sprintf_s(preformatted, "x%3.3s: %s", strCount, menus.NamesFacility	[i].begin() );	menus.MenuItemsFacility		[i].Text = preformatted; }
-	for(size_t i = 0, itemCount = instanceGame.EntityTables.Vehicle		.Definitions.size(); i<itemCount; ++i){	int32_t indexElement = playerInventory.Vehicle		.FindElement({	menus.MenuItemsVehicle		[i].ReturnValue.Definition, 0, menus.MenuItemsVehicle		[i].ReturnValue.Grade, -1}); char strCount [32]; sprintf_s(strCount, "%i", (indexElement != -1) ? playerInventory.Vehicle	[indexElement].Count : 0); ::sprintf_s(preformatted, "x%3.3s: %s", strCount, menus.NamesVehicle		[i].begin() );	menus.MenuItemsVehicle		[i].Text = preformatted; }
-	for(size_t i = 0, itemCount = instanceGame.EntityTables.Profession	.Definitions.size(); i<itemCount; ++i){	int32_t indexElement = playerInventory.Profession	.FindElement({	menus.MenuItemsProfession	[i].ReturnValue.Definition, 0, menus.MenuItemsProfession	[i].ReturnValue.Grade, -1}); char strCount [32]; sprintf_s(strCount, "%i", (indexElement != -1) ? playerInventory.Profession[indexElement].Count : 0); ::sprintf_s(preformatted, "x%3.3s: %s", strCount, menus.NamesProfession	[i].begin() );	menus.MenuItemsProfession	[i].Text = preformatted; }
-	for(size_t i = 0, itemCount = instanceGame.EntityTables.Weapon		.Definitions.size(); i<itemCount; ++i){	int32_t indexElement = playerInventory.Weapon		.FindElement({	menus.MenuItemsWeapon		[i].ReturnValue.Definition, 0, menus.MenuItemsWeapon		[i].ReturnValue.Grade, -1}); char strCount [32]; sprintf_s(strCount, "%i", (indexElement != -1) ? playerInventory.Weapon	[indexElement].Count : 0); ::sprintf_s(preformatted, "x%3.3s: %s", strCount, menus.NamesWeapon		[i].begin() );	menus.MenuItemsWeapon		[i].Text = preformatted; }
-	for(size_t i = 0, itemCount = instanceGame.EntityTables.Armor		.Definitions.size(); i<itemCount; ++i){	int32_t indexElement = playerInventory.Armor		.FindElement({	menus.MenuItemsArmor		[i].ReturnValue.Definition, 0, menus.MenuItemsArmor			[i].ReturnValue.Grade, -1}); char strCount [32]; sprintf_s(strCount, "%i", (indexElement != -1) ? playerInventory.Armor		[indexElement].Count : 0); ::sprintf_s(preformatted, "x%3.3s: %s", strCount, menus.NamesArmor		[i].begin() );	menus.MenuItemsArmor		[i].Text = preformatted; }
-	for(size_t i = 0, itemCount = ::gpk::size(::klib::itemDescriptions); i<itemCount; ++i){	int32_t indexElement = playerInventory.Items.FindElement({ menus.MenuItemsItem[i].ReturnValue.Definition, 0, menus.MenuItemsItem[i].ReturnValue.Grade, -1}); char strCount [32]; sprintf_s(strCount, "%i", (indexElement != -1) ? playerInventory.Items[indexElement].Count : 0); ::sprintf_s(preformatted, "x%3.3s: %s", strCount, menus.NamesItem[i].begin() ); menus.MenuItemsItem[i].Text = preformatted; }
-	for(size_t i = 0, itemCount = ::gpk::size(::klib::enemyDefinitions); i<itemCount; ++i){	menus.MenuItemsAgent[i].Text = menus.NamesAgent[i]; }
+	for(uint32_t i = 0, itemCount = entityTables.Accessory	.Definitions.size(); i<itemCount; ++i){	::reinitBuyMenuItem(menus.MenuItemsAccessory	[i], menus.NamesAccessory	[i], playerInventory.Accessory	);  }
+	for(uint32_t i = 0, itemCount = entityTables.StageProp	.Definitions.size(); i<itemCount; ++i){	::reinitBuyMenuItem(menus.MenuItemsStageProp	[i], menus.NamesStageProp	[i], playerInventory.StageProp	);  }
+	for(uint32_t i = 0, itemCount = entityTables.Facility	.Definitions.size(); i<itemCount; ++i){	::reinitBuyMenuItem(menus.MenuItemsFacility		[i], menus.NamesFacility	[i], playerInventory.Facility	);  }
+	for(uint32_t i = 0, itemCount = entityTables.Vehicle	.Definitions.size(); i<itemCount; ++i){	::reinitBuyMenuItem(menus.MenuItemsVehicle		[i], menus.NamesVehicle		[i], playerInventory.Vehicle	);  }
+	for(uint32_t i = 0, itemCount = entityTables.Profession	.Definitions.size(); i<itemCount; ++i){	::reinitBuyMenuItem(menus.MenuItemsProfession	[i], menus.NamesProfession	[i], playerInventory.Profession	);  }
+	for(uint32_t i = 0, itemCount = entityTables.Weapon		.Definitions.size(); i<itemCount; ++i){	::reinitBuyMenuItem(menus.MenuItemsWeapon		[i], menus.NamesWeapon		[i], playerInventory.Weapon		);  }
+	for(uint32_t i = 0, itemCount = entityTables.Armor		.Definitions.size(); i<itemCount; ++i){	::reinitBuyMenuItem(menus.MenuItemsArmor		[i], menus.NamesArmor		[i], playerInventory.Armor		);  }
+	for(uint32_t i = 0, itemCount = ::gpk::size(::klib::itemDescriptions); i<itemCount; ++i){	int32_t indexElement = playerInventory.Items.FindElement({ menus.MenuItemsItem[i].ReturnValue.Definition, 0, menus.MenuItemsItem[i].ReturnValue.Grade, -1}); char strCount [32]; sprintf_s(strCount, "%i", (indexElement != -1) ? playerInventory.Items[indexElement].Count : 0); ::sprintf_s(preformatted, "x%3.3s: %s", strCount, menus.NamesItem[i].begin() ); menus.MenuItemsItem[i].Text = preformatted; }
+	for(uint32_t i = 0, itemCount = ::gpk::size(::klib::enemyDefinitions); i<itemCount; ++i){	menus.MenuItemsAgent[i].Text = menus.NamesAgent[i]; }
 	return 0;
 }
 
 ::klib::SGameState									drawBuyMenu					(::klib::SGame& instanceGame, const ::klib::SGameState& returnState) {
 #define MAX_BUY_ITEMS 64
-	static ::SShopMenus										menus						= {};
-	static const int32_t									initedMenus					= ::initBuyMenus(instanceGame.EntityTables, menus);
-	::reinitBuyMenus(instanceGame, menus);
-	static ::klib::SMenuItem<SBuyable>						menuItems[MAX_BUY_ITEMS+1] = {};
-	SBuyable												selectedChoice				= {-1, -1, LLONG_MAX, LLONG_MAX, "Invalid item"};
+	::klib::SShopMenus										& menus						= instanceGame.ShopMenus;
+	::klib::SGamePlayer										& player					= instanceGame.Players[::klib::PLAYER_INDEX_USER];
+	static ::klib::SMenuItem<::klib::SBuyable>				menuItems[MAX_BUY_ITEMS+1]	= {};
+	::klib::SBuyable										selectedChoice				= {-1, -1, LLONG_MAX, LLONG_MAX, "Invalid item"};
 	switch(instanceGame.State.Substate) {
-	case ::klib::GAME_SUBSTATE_ACCESSORY	: { static ::klib::SDrawMenuState menuState; selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.Color.View, instanceGame.GlobalDisplay.Screen.DepthStencil.begin(), menus.MenuAccessory	,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menus.MenuItemsAccessory		},  instanceGame.FrameInput, {-1});		} break;
-	case ::klib::GAME_SUBSTATE_STAGEPROP	: { static ::klib::SDrawMenuState menuState; selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.Color.View, instanceGame.GlobalDisplay.Screen.DepthStencil.begin(), menus.MenuStageProp	,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menus.MenuItemsStageProp		},  instanceGame.FrameInput, {-1});		} break;
-	case ::klib::GAME_SUBSTATE_FACILITY		: { static ::klib::SDrawMenuState menuState; selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.Color.View, instanceGame.GlobalDisplay.Screen.DepthStencil.begin(), menus.MenuFacility	,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menus.MenuItemsFacility		},  instanceGame.FrameInput, {-1});		} break;
-	case ::klib::GAME_SUBSTATE_VEHICLE		: { static ::klib::SDrawMenuState menuState; selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.Color.View, instanceGame.GlobalDisplay.Screen.DepthStencil.begin(), menus.MenuVehicle	,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menus.MenuItemsVehicle		},  instanceGame.FrameInput, {-1});		} break;
-	case ::klib::GAME_SUBSTATE_PROFESSION	: { static ::klib::SDrawMenuState menuState; selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.Color.View, instanceGame.GlobalDisplay.Screen.DepthStencil.begin(), menus.MenuProfession	,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menus.MenuItemsProfession	},  instanceGame.FrameInput, {-1});		} break;
-	case ::klib::GAME_SUBSTATE_WEAPON		: { static ::klib::SDrawMenuState menuState; selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.Color.View, instanceGame.GlobalDisplay.Screen.DepthStencil.begin(), menus.MenuWeapon		,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menus.MenuItemsWeapon		},  instanceGame.FrameInput, {-1});		} break;
-	case ::klib::GAME_SUBSTATE_ARMOR		: { static ::klib::SDrawMenuState menuState; selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.Color.View, instanceGame.GlobalDisplay.Screen.DepthStencil.begin(), menus.MenuArmor		,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menus.MenuItemsArmor			},  instanceGame.FrameInput, {-1});		} break;
-	case ::klib::GAME_SUBSTATE_ITEM			: { static ::klib::SDrawMenuState menuState; selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.Color.View, instanceGame.GlobalDisplay.Screen.DepthStencil.begin(), menus.MenuItem		,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menus.MenuItemsItem			},  instanceGame.FrameInput, {-1});		} break;
-	case ::klib::GAME_SUBSTATE_CHARACTER	: { static ::klib::SDrawMenuState menuState; selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.Color.View, instanceGame.GlobalDisplay.Screen.DepthStencil.begin(), menus.MenuAgent		,	::gpk::view_array<const ::klib::SMenuItem<::SBuyable>>{menus.MenuItemsAgent	,  4	}, instanceGame.FrameInput, {-1});	} break;
+	case ::klib::GAME_SUBSTATE_ACCESSORY	: { static ::klib::SDrawMenuState menuState; selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.Color.View, instanceGame.GlobalDisplay.Screen.DepthStencil.begin(), menus.MenuAccessory	, ::gpk::view_array<const ::klib::SMenuItem<::klib::SBuyable>>{menus.MenuItemsAccessory		}, instanceGame.FrameInput, {-1});	} break;
+	case ::klib::GAME_SUBSTATE_STAGEPROP	: { static ::klib::SDrawMenuState menuState; selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.Color.View, instanceGame.GlobalDisplay.Screen.DepthStencil.begin(), menus.MenuStageProp	, ::gpk::view_array<const ::klib::SMenuItem<::klib::SBuyable>>{menus.MenuItemsStageProp		}, instanceGame.FrameInput, {-1});	} break;
+	case ::klib::GAME_SUBSTATE_FACILITY		: { static ::klib::SDrawMenuState menuState; selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.Color.View, instanceGame.GlobalDisplay.Screen.DepthStencil.begin(), menus.MenuFacility		, ::gpk::view_array<const ::klib::SMenuItem<::klib::SBuyable>>{menus.MenuItemsFacility		}, instanceGame.FrameInput, {-1});	} break;
+	case ::klib::GAME_SUBSTATE_VEHICLE		: { static ::klib::SDrawMenuState menuState; selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.Color.View, instanceGame.GlobalDisplay.Screen.DepthStencil.begin(), menus.MenuVehicle		, ::gpk::view_array<const ::klib::SMenuItem<::klib::SBuyable>>{menus.MenuItemsVehicle		}, instanceGame.FrameInput, {-1});	} break;
+	case ::klib::GAME_SUBSTATE_PROFESSION	: { static ::klib::SDrawMenuState menuState; selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.Color.View, instanceGame.GlobalDisplay.Screen.DepthStencil.begin(), menus.MenuProfession	, ::gpk::view_array<const ::klib::SMenuItem<::klib::SBuyable>>{menus.MenuItemsProfession	}, instanceGame.FrameInput, {-1});	} break;
+	case ::klib::GAME_SUBSTATE_WEAPON		: { static ::klib::SDrawMenuState menuState; selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.Color.View, instanceGame.GlobalDisplay.Screen.DepthStencil.begin(), menus.MenuWeapon		, ::gpk::view_array<const ::klib::SMenuItem<::klib::SBuyable>>{menus.MenuItemsWeapon		}, instanceGame.FrameInput, {-1});	} break;
+	case ::klib::GAME_SUBSTATE_ARMOR		: { static ::klib::SDrawMenuState menuState; selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.Color.View, instanceGame.GlobalDisplay.Screen.DepthStencil.begin(), menus.MenuArmor		, ::gpk::view_array<const ::klib::SMenuItem<::klib::SBuyable>>{menus.MenuItemsArmor			}, instanceGame.FrameInput, {-1});	} break;
+	case ::klib::GAME_SUBSTATE_ITEM			: { static ::klib::SDrawMenuState menuState; selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.Color.View, instanceGame.GlobalDisplay.Screen.DepthStencil.begin(), menus.MenuItem			, ::gpk::view_array<const ::klib::SMenuItem<::klib::SBuyable>>{menus.MenuItemsItem			}, instanceGame.FrameInput, {-1});	} break;
+	case ::klib::GAME_SUBSTATE_CHARACTER	: { static ::klib::SDrawMenuState menuState; selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.Color.View, instanceGame.GlobalDisplay.Screen.DepthStencil.begin(), menus.MenuAgent		, ::gpk::view_array<const ::klib::SMenuItem<::klib::SBuyable>>{menus.MenuItemsAgent	,  4	}, instanceGame.FrameInput, {-1});	} break;
 	default:
 		break;
 	}
 
-	if(selectedChoice.Definition == SHOP_EXIT_VALUE)
+	if(selectedChoice.Definition == ::klib::SHOP_EXIT_VALUE)
 		return {::klib::GAME_STATE_MENU_BUY};
 	else if( selectedChoice.Definition == -1 )
 		return returnState;
 
-	::klib::SGameState						retVal = returnState;
-	::klib::SGamePlayer							& player = instanceGame.Players[::klib::PLAYER_INDEX_USER];
+	::klib::SGameState										retVal						= returnState;
 	instanceGame.ClearMessages();
 	if(selectedChoice.Price > player.Tactical.Money) {
 		instanceGame.Messages.UserError		= ::gpk::view_const_string{"You don't have enough money for "};
@@ -158,6 +135,7 @@ static int32_t										reinitBuyMenus				(::klib::SGame& instanceGame, SShopMen
 		instanceGame.LogSuccess();
 		player.Tactical.Money				-= selectedChoice.Price;
 		player.Tactical.Score.MoneySpent	+= selectedChoice.Price;
+		::klib::reinitBuyMenus(instanceGame.EntityTables, player.Inventory, menus);
 	}
 	else {
 		instanceGame.Messages.UserError		= "There is not enough space in your inventory!";

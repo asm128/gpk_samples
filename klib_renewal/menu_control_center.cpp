@@ -4,8 +4,6 @@
 
 #include "klib_ascii_reference.h"
 
-using namespace klib;
-
 #define AGENT_ROW_WIDTH 43
 
 template <typename _TReturn>
@@ -15,7 +13,7 @@ struct SListItem {
 	::gpk::array_pod<char_t>	Text;
 };
 
-int32_t mouseOverList(const ::klib::SInput& frameInput, uint32_t rowCount, int32_t offsetX, int32_t offsetY, int32_t width) {
+static	int32_t mouseOverList(const ::klib::SInput& frameInput, uint32_t rowCount, int32_t offsetX, int32_t offsetY, int32_t width) {
 	int32_t indexSelected = -1;
 	for(uint32_t iRow = 0; iRow < rowCount; ++iRow)
 		if(::klib::mouseOver({frameInput.Mouse.Deltas.x, frameInput.Mouse.Deltas.y}, {offsetX, (int32_t)(offsetY + iRow)}, width)) {
@@ -28,7 +26,7 @@ int32_t mouseOverList(const ::klib::SInput& frameInput, uint32_t rowCount, int32
 
 template <typename _TReturn, size_t _Size>
 _TReturn processListInput(const ::klib::SInput& frameInput, const SListItem<_TReturn> (&listItems)[_Size], uint32_t rowCount, int32_t offsetX, int32_t offsetY, int32_t width, const _TReturn& noActionValue) {
-	int32_t indexSelected = mouseOverList(frameInput, rowCount, offsetX, offsetY, width);
+	int32_t indexSelected = ::mouseOverList(frameInput, rowCount, offsetX, offsetY, width);
 	if(indexSelected != -1 && (indexSelected & 0x80000000))
 		return listItems[indexSelected & ~0x80000000].ReturnValue;
 
@@ -69,7 +67,7 @@ int32_t processEquipAgentInput(const ::klib::SInput& frameInput, const ::klib::S
 		if(0 == player.Army[iRow] || player.Squad.IsAgentAssigned((int32_t)iRow))
 			continue;
 
-		if(mouseOver({mouseX, mouseY}, {offsetX, offsetY+actualAgentsProcessed}, AGENT_ROW_WIDTH)) { indexEquip = iRow | (frameInput.Mouse.Buttons[0] ? 0x80000000 : 0); break; }
+		if(::klib::mouseOver({mouseX, mouseY}, {offsetX, offsetY+actualAgentsProcessed}, AGENT_ROW_WIDTH)) { indexEquip = iRow | (frameInput.Mouse.Buttons[0] ? 0x80000000 : 0); break; }
 
 		++actualAgentsProcessed;
 	}
@@ -77,26 +75,26 @@ int32_t processEquipAgentInput(const ::klib::SInput& frameInput, const ::klib::S
 	return indexEquip;
 }
 
-int32_t							drawAgentResume				(const ::klib::SEntityTables & tables, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, const CCharacter& agent, int32_t offsetY, int32_t offsetX, int32_t selectedAgentField) {
+int32_t							drawAgentResume				(const ::klib::SEntityTables & tables, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, const ::klib::CCharacter& agent, int32_t offsetY, int32_t offsetX, int32_t selectedAgentField) {
 	char								preformatted0[12]			= {};
 	char								preformatted1[12]			= {};
 	char								formatted[64]				= {};
 
 	int32_t								columnOffset;
-	int32_t								finalColor, genderColor = agent.Flags.Tech.Gender == GENDER_FEMALE ? ::klib::ASCII_COLOR_INDEX_DARKMAGENTA : agent.Flags.Tech.Gender == GENDER_MALE ? ::klib::ASCII_COLOR_INDEX_BLUE : ::klib::ASCII_COLOR_INDEX_GREEN;
+	int32_t								finalColor, genderColor = agent.Flags.Tech.Gender == ::klib::GENDER_FEMALE ? ::klib::ASCII_COLOR_INDEX_DARKMAGENTA : agent.Flags.Tech.Gender == ::klib::GENDER_MALE ? ::klib::ASCII_COLOR_INDEX_BLUE : ::klib::ASCII_COLOR_INDEX_GREEN;
 	::gpk::array_pod<char_t>			equipName;
 
-	finalColor						= (selectedAgentField == ENTITY_TYPE_CHARACTER) ? (genderColor<<4)|::klib::ASCII_COLOR_INDEX_DARKGREY : (::klib::ASCII_COLOR_INDEX_DARKGREY<<4)|genderColor;
+	finalColor						= (selectedAgentField == ::klib::ENTITY_TYPE_CHARACTER) ? (genderColor<<4)|::klib::ASCII_COLOR_INDEX_DARKGREY : (::klib::ASCII_COLOR_INDEX_DARKGREY<<4)|genderColor;
 	columnOffset					= printfToGridColored(display, textAttributes, (uint16_t)finalColor, offsetY++, offsetX, ::klib::SCREEN_LEFT, " %c - %-38.38s", ::klib::ascii_gender[agent.Flags.Tech.Gender], agent.Name.begin());
 
 	SListItem<int32_t>					equipSlots[4];
 	for(uint32_t i=0; i < ::gpk::size(equipSlots); ++i)
 		equipSlots[i].Color = (selectedAgentField == (int32_t)i + 1) ? ::klib::ASCII_COLOR_INDEX_GREEN : ::klib::ASCII_COLOR_INDEX_GREEN << 4;
 
-	equipName = getEntityName(tables.Profession	, agent.CurrentEquip.Profession	);	sprintf_s(formatted, " %-10.10s: %-30.30s", "Job"		, equipName.begin());	equipSlots[ENTITY_TYPE_PROFESSION	-1].Text = ::gpk::view_const_string{formatted};
-	equipName = getEntityName(tables.Weapon		, agent.CurrentEquip.Weapon		);	sprintf_s(formatted, " %-10.10s: %-30.30s", "Weapon"	, equipName.begin());	equipSlots[ENTITY_TYPE_WEAPON		-1].Text = ::gpk::view_const_string{formatted};
-	equipName = getEntityName(tables.Armor		, agent.CurrentEquip.Armor		);	sprintf_s(formatted, " %-10.10s: %-30.30s", "Armor"		, equipName.begin());	equipSlots[ENTITY_TYPE_ARMOR		-1].Text = ::gpk::view_const_string{formatted};
-	equipName = getEntityName(tables.Accessory	, agent.CurrentEquip.Accessory	);	sprintf_s(formatted, " %-10.10s: %-30.30s", "Accessory"	, equipName.begin());	equipSlots[ENTITY_TYPE_ACCESSORY	-1].Text = ::gpk::view_const_string(formatted);
+	equipName = getEntityName(tables.Profession	, agent.CurrentEquip.Profession	);	sprintf_s(formatted, " %-10.10s: %-30.30s", "Job"		, equipName.begin());	equipSlots[::klib::ENTITY_TYPE_PROFESSION	-1].Text = ::gpk::view_const_string{formatted};
+	equipName = getEntityName(tables.Weapon		, agent.CurrentEquip.Weapon		);	sprintf_s(formatted, " %-10.10s: %-30.30s", "Weapon"	, equipName.begin());	equipSlots[::klib::ENTITY_TYPE_WEAPON		-1].Text = ::gpk::view_const_string{formatted};
+	equipName = getEntityName(tables.Armor		, agent.CurrentEquip.Armor		);	sprintf_s(formatted, " %-10.10s: %-30.30s", "Armor"		, equipName.begin());	equipSlots[::klib::ENTITY_TYPE_ARMOR		-1].Text = ::gpk::view_const_string{formatted};
+	equipName = getEntityName(tables.Accessory	, agent.CurrentEquip.Accessory	);	sprintf_s(formatted, " %-10.10s: %-30.30s", "Accessory"	, equipName.begin());	equipSlots[::klib::ENTITY_TYPE_ACCESSORY	-1].Text = ::gpk::view_const_string(formatted);
 	drawList(display, textAttributes, equipSlots, (uint32_t)::gpk::size(equipSlots), offsetX, offsetY, 43);
 
 	offsetY += (uint32_t)::gpk::size(equipSlots);
@@ -110,8 +108,8 @@ int32_t							drawAgentResume				(const ::klib::SEntityTables & tables, ::gpk::v
 int32_t processSliderInput(const ::klib::SInput& frameInput, int32_t offsetY, int32_t offsetX, int64_t& value, int32_t minValue, int32_t maxValue) {
 	int32_t mouseX = frameInput.Mouse.Deltas.x;
 	int32_t mouseY = frameInput.Mouse.Deltas.y;
-		 if( mouseOver({mouseX, mouseY}, {offsetX + 11, offsetY}, 3) && frameInput.Mouse.Buttons[0]) {if( value > minValue ) --value; }
-	else if( mouseOver({mouseX, mouseY}, {offsetX + 20, offsetY}, 3) && frameInput.Mouse.Buttons[0]) {if( value < maxValue ) ++value; }
+		 if( ::klib::mouseOver({mouseX, mouseY}, {offsetX + 11, offsetY}, 3) && frameInput.Mouse.Buttons[0]) {if( value > minValue ) --value; }
+	else if( ::klib::mouseOver({mouseX, mouseY}, {offsetX + 20, offsetY}, 3) && frameInput.Mouse.Buttons[0]) {if( value < maxValue ) ++value; }
 
 	return 0;
 }
@@ -126,7 +124,7 @@ int32_t drawValueSlider(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_
 	return 0;
 };
 
-static	void drawBalance(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, const ::klib::SInput& frameInput, SGamePlayer& player, int32_t offsetX, int32_t offsetY) {
+static	void drawBalance(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, const ::klib::SInput& frameInput, ::klib::SGamePlayer& player, int32_t offsetX, int32_t offsetY) {
 	// Budgets
 	printfToGridColored(display, textAttributes, ::klib::ASCII_COLOR_INDEX_YELLOW << 4, offsetY, offsetX+14, ::klib::SCREEN_LEFT, "%s", "    Project budgets   ");
 	drawValueSlider		(display	, textAttributes, offsetY+2, offsetX+14, player.Projects.BudgetProduction	.Money	, 10, "Production");
@@ -161,7 +159,7 @@ static	void drawBalance(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_
 	sprintf_s(preformatted, "%lli", cost										);	sprintf_s(formatted, " Mission Cost        : %13.13s", preformatted); balanceOptions[1].Text = ::gpk::view_const_string{formatted};
 	sprintf_s(preformatted, "%lli", productionCost								);	sprintf_s(formatted, " Production Cost     : %13.13s", preformatted); balanceOptions[2].Text = ::gpk::view_const_string{formatted};
 	sprintf_s(preformatted, "%lli", researchCost								);	sprintf_s(formatted, " Research Cost       : %13.13s", preformatted); balanceOptions[3].Text = ::gpk::view_const_string{formatted};
-	sprintf_s(preformatted, "%lli", fundsAfterCost-productionCost-researchCost);	sprintf_s(formatted, " Funds after mission : %13.13s", preformatted); balanceOptions[4].Text = ::gpk::view_const_string{formatted};
+	sprintf_s(preformatted, "%lli", fundsAfterCost - productionCost-researchCost);	sprintf_s(formatted, " Funds after mission : %13.13s", preformatted); balanceOptions[4].Text = ::gpk::view_const_string{formatted};
 
 	::drawList(display, textAttributes, balanceOptions, (uint32_t)::gpk::size(balanceOptions), offsetX, offsetY+8, 36);
 
@@ -169,16 +167,16 @@ static	void drawBalance(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_
 
 template <typename _TEntity>
 int32_t												drawEquipDetail
-	( ::gpk::view_grid<char>		display
-	, ::gpk::view_grid<uint16_t>	textAttributes
-	, int32_t						offsetY
-	, int32_t						offsetX
-	, const ::gpk::view_const_char	& entityTypeName
-	, const _TEntity				& entity
-	, const SEntityTable<_TEntity>	& table
+	( ::gpk::view_grid<char>				display
+	, ::gpk::view_grid<uint16_t>			textAttributes
+	, int32_t								offsetY
+	, int32_t								offsetX
+	, const ::gpk::view_const_char			& entityTypeName
+	, const _TEntity						& entity
+	, const ::klib::SEntityTable<_TEntity>	& table
 	) {
 	//const ::gpk::array_pod<char_t>						entityName = ::getEntityName(entity, tableDefinitions, tableModifiers);
-	::drawEntityDetail(display, textAttributes, offsetY, offsetX, entity, table, entityTypeName);
+	::klib::drawEntityDetail(display, textAttributes, offsetY, offsetX, entity, table, entityTypeName);
 
 	char													formattedTitle[32]					= {};
 	sprintf_s(formattedTitle, " - %s:", entityTypeName.begin());
@@ -218,7 +216,7 @@ int32_t										drawEquipList
 int32_t drawAgentList
 	( ::gpk::view_grid<char>										display
 	, ::gpk::view_grid<uint16_t>									textAttributes
-	, const SGamePlayer													& player
+	, const ::klib::SGamePlayer										& player
 	, int32_t														offsetY
 	, int32_t														offsetX
 	, int32_t														selectedRow
@@ -230,7 +228,7 @@ int32_t drawAgentList
 		if(0 == army[iEntity] || player.Tactical.Squad.IsAgentAssigned(iEntity))
 			continue;
 
-		const CCharacter								& agent							= *army[iEntity];
+		const ::klib::CCharacter						& agent							= *army[iEntity];
 		const ::gpk::array_pod<char>					& entityName					= agent.Name;
 		uint16_t										colorRow						= ((int32_t)iEntity == selectedRow) ? ::klib::ASCII_COLOR_INDEX_YELLOW : ::klib::ASCII_COLOR_INDEX_YELLOW << 4;
 
@@ -246,15 +244,15 @@ int32_t drawAgentList
 }
 
 //
-int32_t										drawEquipList					(::klib::SEntityTables & tables, ENTITY_TYPE entityType, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, const SGamePlayer& player, int32_t offsetY, int32_t offsetX, int32_t selectedRow) {
+int32_t										drawEquipList					(::klib::SEntityTables & tables, ::klib::ENTITY_TYPE entityType, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, const ::klib::SGamePlayer& player, int32_t offsetY, int32_t offsetX, int32_t selectedRow) {
 	const ::gpk::view_const_char					labelet						= ::gpk::get_value_label(entityType);
 
 	switch(entityType) {
-	case ENTITY_TYPE_CHARACTER	:	drawAgentList(display, textAttributes, player, offsetY	, offsetX + entityType, selectedRow, player.Tactical.Army); break;
-	case ENTITY_TYPE_PROFESSION	:	drawEquipList(display, textAttributes, offsetY + entityType, offsetX, selectedRow, labelet, player.Inventory.Profession	, tables.Profession	); break;
-	case ENTITY_TYPE_WEAPON		:	drawEquipList(display, textAttributes, offsetY + entityType, offsetX, selectedRow, labelet, player.Inventory.Weapon		, tables.Weapon		); break;
-	case ENTITY_TYPE_ARMOR		:	drawEquipList(display, textAttributes, offsetY + entityType, offsetX, selectedRow, labelet, player.Inventory.Armor		, tables.Armor		); break;
-	case ENTITY_TYPE_ACCESSORY	:	drawEquipList(display, textAttributes, offsetY + entityType, offsetX, selectedRow, labelet, player.Inventory.Accessory	, tables.Accessory	); break;
+	case ::klib::ENTITY_TYPE_CHARACTER	:	drawAgentList(display, textAttributes, player, offsetY	, offsetX + entityType, selectedRow, player.Tactical.Army); break;
+	case ::klib::ENTITY_TYPE_PROFESSION	:	::drawEquipList(display, textAttributes, offsetY + entityType, offsetX, selectedRow, labelet, player.Inventory.Profession	, tables.Profession	); break;
+	case ::klib::ENTITY_TYPE_WEAPON		:	::drawEquipList(display, textAttributes, offsetY + entityType, offsetX, selectedRow, labelet, player.Inventory.Weapon		, tables.Weapon		); break;
+	case ::klib::ENTITY_TYPE_ARMOR		:	::drawEquipList(display, textAttributes, offsetY + entityType, offsetX, selectedRow, labelet, player.Inventory.Armor		, tables.Armor		); break;
+	case ::klib::ENTITY_TYPE_ACCESSORY	:	::drawEquipList(display, textAttributes, offsetY + entityType, offsetX, selectedRow, labelet, player.Inventory.Accessory	, tables.Accessory	); break;
 	case -1:
 	default:
 		break;
@@ -263,16 +261,16 @@ int32_t										drawEquipList					(::klib::SEntityTables & tables, ENTITY_TYPE 
 	return -1;
 }
 
-int32_t processEquipInput(ENTITY_TYPE entityType, const ::klib::SInput& frameInput, const SGamePlayer& player, int32_t offsetY)
+int32_t processEquipInput(::klib::ENTITY_TYPE entityType, const ::klib::SInput& frameInput, const ::klib::SGamePlayer& player, int32_t offsetY)
 {
 	int32_t tempRow = -1;
 
 	switch(entityType) {
-	case ENTITY_TYPE_CHARACTER	:	tempRow = ::processEquipAgentInput(frameInput, player.Tactical, player.Tactical.Army.size(), offsetY + entityType, 1); break;
-	case ENTITY_TYPE_PROFESSION	:
-	case ENTITY_TYPE_WEAPON		:
-	case ENTITY_TYPE_ARMOR		:
-	case ENTITY_TYPE_ACCESSORY	:	tempRow = ::mouseOverList(frameInput, player.Inventory.GetCount(entityType), 1, offsetY + 1 + entityType, AGENT_ROW_WIDTH);
+	case ::klib::ENTITY_TYPE_CHARACTER	:	tempRow = ::processEquipAgentInput(frameInput, player.Tactical, player.Tactical.Army.size(), offsetY + entityType, 1); break;
+	case ::klib::ENTITY_TYPE_PROFESSION	:
+	case ::klib::ENTITY_TYPE_WEAPON		:
+	case ::klib::ENTITY_TYPE_ARMOR		:
+	case ::klib::ENTITY_TYPE_ACCESSORY	:	tempRow = ::mouseOverList(frameInput, player.Inventory.GetCount(entityType), 1, offsetY + 1 + entityType, AGENT_ROW_WIDTH);
 	default:
 		break;
 	}
@@ -280,26 +278,21 @@ int32_t processEquipInput(ENTITY_TYPE entityType, const ::klib::SInput& frameInp
 	return tempRow;
 }
 
-int32_t drawEquipDetail(const ::klib::SEntityTables & tables, ENTITY_TYPE entityType, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, const CCharacter& agent, int32_t offsetY, int32_t offsetX) {
+int32_t			drawEquipDetail		(const ::klib::SEntityTables & tables, ::klib::ENTITY_TYPE entityType, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, const ::klib::CCharacter& agent, int32_t offsetY, int32_t offsetX) {
 	const ::gpk::view_const_char					labelSelectedEquip = ::gpk::get_value_label(entityType);
 	switch(entityType) {
-	case ENTITY_TYPE_CHARACTER	:	displayDetailedAgentSlot(tables, display, textAttributes, offsetY, offsetX, agent, (::klib::ASCII_COLOR_INDEX_YELLOW << 4)| ::klib::ASCII_COLOR_INDEX_BLUE );	break;
-	case ENTITY_TYPE_PROFESSION	:	drawEquipDetail(display, textAttributes, offsetY, offsetX, labelSelectedEquip, agent.CurrentEquip.Profession, tables.Profession	); break;
-	case ENTITY_TYPE_WEAPON		:	drawEquipDetail(display, textAttributes, offsetY, offsetX, labelSelectedEquip, agent.CurrentEquip.Weapon	, tables.Weapon		); break;
-	case ENTITY_TYPE_ARMOR		:	drawEquipDetail(display, textAttributes, offsetY, offsetX, labelSelectedEquip, agent.CurrentEquip.Armor		, tables.Armor		); break;
-	case ENTITY_TYPE_ACCESSORY	:	drawEquipDetail(display, textAttributes, offsetY, offsetX, labelSelectedEquip, agent.CurrentEquip.Accessory	, tables.Accessory	); break;
+	case ::klib::ENTITY_TYPE_CHARACTER	:	displayDetailedAgentSlot(tables, display, textAttributes, offsetY, offsetX, agent, (::klib::ASCII_COLOR_INDEX_YELLOW << 4)| ::klib::ASCII_COLOR_INDEX_BLUE );	break;
+	case ::klib::ENTITY_TYPE_PROFESSION	:	::drawEquipDetail(display, textAttributes, offsetY, offsetX, labelSelectedEquip, agent.CurrentEquip.Profession, tables.Profession	); break;
+	case ::klib::ENTITY_TYPE_WEAPON		:	::drawEquipDetail(display, textAttributes, offsetY, offsetX, labelSelectedEquip, agent.CurrentEquip.Weapon	, tables.Weapon		); break;
+	case ::klib::ENTITY_TYPE_ARMOR		:	::drawEquipDetail(display, textAttributes, offsetY, offsetX, labelSelectedEquip, agent.CurrentEquip.Armor		, tables.Armor		); break;
+	case ::klib::ENTITY_TYPE_ACCESSORY	:	::drawEquipDetail(display, textAttributes, offsetY, offsetX, labelSelectedEquip, agent.CurrentEquip.Accessory	, tables.Accessory	); break;
 	default:
 		break;
 	}
 	return 0;
 }
 
-bool	equipIfResearchedProfession	(SGame& instanceGame, int32_t indexAgent, int16_t selectedChoice);
-bool	equipIfResearchedWeapon		(SGame& instanceGame, int32_t indexAgent, int16_t selectedChoice);
-bool	equipIfResearchedArmor		(SGame& instanceGame, int32_t indexAgent, int16_t selectedChoice);
-bool	equipIfResearchedAccessory	(SGame& instanceGame, int32_t indexAgent, int16_t selectedChoice);
-
-int32_t drawWelcomeGUI(SGame& instanceGame) {
+int32_t drawWelcomeGUI(::klib::SGame& instanceGame) {
 
 	::gpk::view_grid<char>				display					= instanceGame.GlobalDisplay.Screen.Color;
 	::gpk::view_grid<uint16_t>			textAttributes			= instanceGame.GlobalDisplay.Screen.DepthStencil;
@@ -310,7 +303,7 @@ int32_t drawWelcomeGUI(SGame& instanceGame) {
 	static int32_t						selectedAgent			= -1;
 	bool								bHandledKey				= false;
 
-	::klib::SGamePlayer					& player				= instanceGame.Players[PLAYER_INDEX_USER];
+	::klib::SGamePlayer					& player				= instanceGame.Players[::klib::PLAYER_INDEX_USER];
 
 	// Squad
 	printfToGridColored(display, textAttributes, ::klib::ASCII_COLOR_INDEX_YELLOW << 4, startY, 1, ::klib::SCREEN_LEFT, "%-43.43s", " Assigned squad:");
@@ -325,7 +318,7 @@ int32_t drawWelcomeGUI(SGame& instanceGame) {
 
 		if(player.Tactical.Squad.Agents[iAgent] == -1) {
 			printfToGridColored(display, textAttributes, ::klib::ASCII_COLOR_INDEX_YELLOW << 4, offsetY, 1, ::klib::SCREEN_LEFT, "%-43.43s", " Empty Slot");
-			int32_t				selectedAgentField		= mouseOverList(instanceGame.FrameInput, 5, 1, offsetY, AGENT_ROW_WIDTH);
+			int32_t								selectedAgentField		= mouseOverList(instanceGame.FrameInput, 5, 1, offsetY, AGENT_ROW_WIDTH);
 			if(selectedAgentField == -1)
 				//selectedAgentField &= ~0x80000000;
 			continue;
@@ -335,10 +328,10 @@ int32_t drawWelcomeGUI(SGame& instanceGame) {
 			if(selectedAgentField != -1)
 				selectedAgentField &= ~0x80000000;
 
-			CCharacter			& agent					= *player.Tactical.Army[player.Tactical.Squad.Agents[iAgent]];
+			::klib::CCharacter	& agent					= *player.Tactical.Army[player.Tactical.Squad.Agents[iAgent]];
 			drawAgentResume(instanceGame.EntityTables, display, textAttributes, agent, offsetY, 1, selectedAgentField);
 			if(selectedEquip != -1 && selectedAgent == (int32_t)iAgent) {
-				ENTITY_TYPE			selectedEntityType		= (ENTITY_TYPE)selectedEquip;
+				::klib::ENTITY_TYPE	selectedEntityType		= (::klib::ENTITY_TYPE)selectedEquip;
 				int32_t				tempRow					= processEquipInput(selectedEntityType, instanceGame.FrameInput, player, offsetY);
 
 				drawEquipDetail(instanceGame.EntityTables, selectedEntityType, display, textAttributes, agent, startY, 45+1);
@@ -349,11 +342,11 @@ int32_t drawWelcomeGUI(SGame& instanceGame) {
 
 					if(tempRow & 0x80000000) {
 						switch(selectedEntityType) {
-						case ENTITY_TYPE_CHARACTER	:	player.Tactical.Squad.Agents[iAgent] = int16_t(indexRow); break;
-						case ENTITY_TYPE_PROFESSION	:	equipIfResearchedProfession	(instanceGame, player.Tactical.Squad.Agents[iAgent], (int16_t)indexRow); break;
-						case ENTITY_TYPE_WEAPON		:	equipIfResearchedWeapon		(instanceGame, player.Tactical.Squad.Agents[iAgent], (int16_t)indexRow); break;
-						case ENTITY_TYPE_ARMOR		:	equipIfResearchedArmor		(instanceGame, player.Tactical.Squad.Agents[iAgent], (int16_t)indexRow); break;
-						case ENTITY_TYPE_ACCESSORY	:	equipIfResearchedAccessory	(instanceGame, player.Tactical.Squad.Agents[iAgent], (int16_t)indexRow); break;
+						case ::klib::ENTITY_TYPE_CHARACTER	:	instanceGame.Events.push_back({::klib::GAME_EVENT_CONFIRM, {::klib::GAME_STATE_MENU_EQUIPMENT, ::klib::GAME_SUBSTATE_CHARACTER	}, (uint64_t)iAgent | (((uint64_t)indexRow) << 32)}); break;//player.Tactical.Squad.Agents[iAgent] = int16_t(indexRow); break;
+						case ::klib::ENTITY_TYPE_PROFESSION	:	instanceGame.Events.push_back({::klib::GAME_EVENT_CONFIRM, {::klib::GAME_STATE_MENU_EQUIPMENT, ::klib::GAME_SUBSTATE_PROFESSION	}, (uint64_t)player.Tactical.Squad.Agents[iAgent] | (((uint64_t)indexRow) << 32)}); break;//::klib::equipIfResearchedProfession	(instanceGame.Messages, player, instanceGame.EntityTables, iAgent, (int16_t)indexRow); break;
+						case ::klib::ENTITY_TYPE_WEAPON		:	instanceGame.Events.push_back({::klib::GAME_EVENT_CONFIRM, {::klib::GAME_STATE_MENU_EQUIPMENT, ::klib::GAME_SUBSTATE_WEAPON		}, (uint64_t)player.Tactical.Squad.Agents[iAgent] | (((uint64_t)indexRow) << 32)}); break;//::klib::equipIfResearchedWeapon		(instanceGame.Messages, player, instanceGame.EntityTables, iAgent, (int16_t)indexRow); break;
+						case ::klib::ENTITY_TYPE_ARMOR		:	instanceGame.Events.push_back({::klib::GAME_EVENT_CONFIRM, {::klib::GAME_STATE_MENU_EQUIPMENT, ::klib::GAME_SUBSTATE_ARMOR		}, (uint64_t)player.Tactical.Squad.Agents[iAgent] | (((uint64_t)indexRow) << 32)}); break;//::klib::equipIfResearchedArmor		(instanceGame.Messages, player, instanceGame.EntityTables, iAgent, (int16_t)indexRow); break;
+						case ::klib::ENTITY_TYPE_ACCESSORY	:	instanceGame.Events.push_back({::klib::GAME_EVENT_CONFIRM, {::klib::GAME_STATE_MENU_EQUIPMENT, ::klib::GAME_SUBSTATE_ACCESSORY	}, (uint64_t)player.Tactical.Squad.Agents[iAgent] | (((uint64_t)indexRow) << 32)}); break;//::klib::equipIfResearchedAccessory	(instanceGame.Messages, player, instanceGame.EntityTables, iAgent, (int16_t)indexRow); break;
 						default:
 							break;
 						}
@@ -365,11 +358,11 @@ int32_t drawWelcomeGUI(SGame& instanceGame) {
 						int32_t offsetX = 45*2;
 						const ::gpk::view_const_char			labelSelectedEquip = ::gpk::get_value_label(selectedEntityType);
 						switch(selectedEntityType) {
-						case ENTITY_TYPE_CHARACTER	:	if(player.Tactical.Army[indexRow]) displayDetailedAgentSlot(instanceGame.EntityTables, display, textAttributes, startY, offsetX, *player.Tactical.Army[indexRow], (::klib::ASCII_COLOR_INDEX_YELLOW << 4)| ::klib::ASCII_COLOR_INDEX_BLUE);	break;
-						case ENTITY_TYPE_PROFESSION	:	drawEquipDetail(display, textAttributes, startY, offsetX, labelSelectedEquip, player.Inventory.Profession	[indexRow].Entity, instanceGame.EntityTables.Profession	);	break;
-						case ENTITY_TYPE_WEAPON		:	drawEquipDetail(display, textAttributes, startY, offsetX, labelSelectedEquip, player.Inventory.Weapon		[indexRow].Entity, instanceGame.EntityTables.Weapon		);	break;
-						case ENTITY_TYPE_ARMOR		:	drawEquipDetail(display, textAttributes, startY, offsetX, labelSelectedEquip, player.Inventory.Armor		[indexRow].Entity, instanceGame.EntityTables.Armor		);	break;
-						case ENTITY_TYPE_ACCESSORY	:	drawEquipDetail(display, textAttributes, startY, offsetX, labelSelectedEquip, player.Inventory.Accessory	[indexRow].Entity, instanceGame.EntityTables.Accessory	);	break;
+						case ::klib::ENTITY_TYPE_CHARACTER	:	if(player.Tactical.Army[indexRow]) displayDetailedAgentSlot(instanceGame.EntityTables, display, textAttributes, startY, offsetX, *player.Tactical.Army[indexRow], (::klib::ASCII_COLOR_INDEX_YELLOW << 4)| ::klib::ASCII_COLOR_INDEX_BLUE);	break;
+						case ::klib::ENTITY_TYPE_PROFESSION	:	drawEquipDetail(display, textAttributes, startY, offsetX, labelSelectedEquip, player.Inventory.Profession	[indexRow].Entity, instanceGame.EntityTables.Profession	);	break;
+						case ::klib::ENTITY_TYPE_WEAPON		:	drawEquipDetail(display, textAttributes, startY, offsetX, labelSelectedEquip, player.Inventory.Weapon		[indexRow].Entity, instanceGame.EntityTables.Weapon		);	break;
+						case ::klib::ENTITY_TYPE_ARMOR		:	drawEquipDetail(display, textAttributes, startY, offsetX, labelSelectedEquip, player.Inventory.Armor		[indexRow].Entity, instanceGame.EntityTables.Armor		);	break;
+						case ::klib::ENTITY_TYPE_ACCESSORY	:	drawEquipDetail(display, textAttributes, startY, offsetX, labelSelectedEquip, player.Inventory.Accessory	[indexRow].Entity, instanceGame.EntityTables.Accessory	);	break;
 						default:
 							break;
 						}
@@ -388,7 +381,7 @@ int32_t drawWelcomeGUI(SGame& instanceGame) {
 
 			if(selectedAgent == (int32_t)iAgent) {
 				int32_t								offsetY					= startY + ((agentsDisplayed)*10);
-				drawEquipList(instanceGame.EntityTables, (ENTITY_TYPE)selectedEquip, display, textAttributes, player, offsetY, 1, selectedRow);
+				::drawEquipList(instanceGame.EntityTables, (::klib::ENTITY_TYPE)selectedEquip, display, textAttributes, player, offsetY, 1, selectedRow);
 			}
 
 			++agentsDisplayed;
@@ -400,13 +393,13 @@ int32_t drawWelcomeGUI(SGame& instanceGame) {
 		for(uint32_t iAgent=0; iAgent < player.Tactical.Squad.Size; ++iAgent) {
 			if(player.Tactical.Squad.Agents[iAgent] == -1)
 				continue;
-			CCharacter& agent = *player.Tactical.Army[player.Tactical.Squad.Agents[iAgent]];
+			::klib::CCharacter& agent = *player.Tactical.Army[player.Tactical.Squad.Agents[iAgent]];
 			int32_t								offsetY					= startY + ((agentsDisplayed)*10);
 			int32_t								indexEquip				= mouseOverList(instanceGame.FrameInput, 5, 1, offsetY, AGENT_ROW_WIDTH);	//processAgentInput	(display, instanceGame.FrameInput, agent , offsetY, 1);
 			int32_t								rowIndex				= indexEquip & ~(0x80000000);
 			if(indexEquip != -1) {
 				if(selectedEquip == -1 && selectedAgent == -1)
-					drawEquipDetail(instanceGame.EntityTables, (ENTITY_TYPE)rowIndex, display, textAttributes, agent, startY, 45+1);
+					::drawEquipDetail(instanceGame.EntityTables, (::klib::ENTITY_TYPE)rowIndex, display, textAttributes, agent, startY, 45+1);
 
 				if(indexEquip & 0x80000000) {
 					selectedEquip	= rowIndex;
@@ -418,7 +411,7 @@ int32_t drawWelcomeGUI(SGame& instanceGame) {
 		}
 	}
 
-	drawBalance(display, textAttributes, instanceGame.FrameInput, instanceGame.Players[PLAYER_INDEX_USER], display.metrics().x - 38, display.metrics().y - 14);
+	drawBalance(display, textAttributes, instanceGame.FrameInput, instanceGame.Players[::klib::PLAYER_INDEX_USER], display.metrics().x - 38, display.metrics().y - 14);
 
 	if((!bHandledKey) && instanceGame.FrameInput.Mouse.Buttons[0])
 		selectedEquip = selectedAgent = -1;
@@ -428,11 +421,11 @@ int32_t drawWelcomeGUI(SGame& instanceGame) {
 	return 0;
 }
 
-SGameState								drawWelcome			(SGame& instanceGame, const SGameState& returnValue) {
+::klib::SGameState								drawWelcome			(::klib::SGame& instanceGame, const ::klib::SGameState& returnValue) {
 	instanceGame.GlobalDisplay.Clear();
 
 	::gpk::array_pod<char_t>					textToPrint			= ::gpk::view_const_string{"Welcome back commander "};
-	textToPrint.append(instanceGame.Players[PLAYER_INDEX_USER].Tactical.Name);
+	textToPrint.append(instanceGame.Players[::klib::PLAYER_INDEX_USER].Tactical.Name);
 	textToPrint.append_string(".");
 	::gpk::SRenderTarget<char, uint16_t>		& display			= instanceGame.GlobalDisplay.Screen;
 	int32_t										lineOffset			= (display.metrics().y >> 1) - 1;
@@ -446,9 +439,9 @@ SGameState								drawWelcome			(SGame& instanceGame, const SGameState& returnVa
 		drawWelcomeGUI(instanceGame);
 
 		// Menu
-		static SMenuHeader<SGameState>				menuControlCenter	({GAME_STATE_MENU_MAIN}, ::gpk::view_const_string{"Control Center"}, 28);
-		bool										bInCourse			= ::gpk::bit_true(instanceGame.Flags, GAME_FLAGS_TACTICAL) || ::gpk::bit_true(instanceGame.Flags, GAME_FLAGS_TACTICAL_REMOTE);
-		return drawMenu(display.Color.View, display.DepthStencil.begin(), menuControlCenter, ::gpk::view_array<const ::klib::SMenuItem<SGameState>>{(bInCourse) ? optionsControlCenterMissionInCourse : optionsControlCenter}, instanceGame.FrameInput, returnValue);
+		static ::klib::SMenuHeader<::klib::SGameState>	menuControlCenter	({::klib::GAME_STATE_MENU_MAIN}, ::gpk::view_const_string{"Control Center"}, 28);
+		bool											bInCourse			= ::gpk::bit_true(instanceGame.Flags, ::klib::GAME_FLAGS_TACTICAL) || ::gpk::bit_true(instanceGame.Flags, ::klib::GAME_FLAGS_TACTICAL_REMOTE);
+		return ::klib::drawMenu(display.Color.View, display.DepthStencil.begin(), menuControlCenter, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{(bInCourse) ? ::klib::optionsControlCenterMissionInCourse : ::klib::optionsControlCenter}, instanceGame.FrameInput, returnValue);
 	}
 	return returnValue;
 };

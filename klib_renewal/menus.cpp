@@ -1,9 +1,7 @@
 //#define NOMINMAX
-
 #include "Game.h"
 #include "draw.h"
 #include "tactical_draw.h"
-#include "helper_projects.h"
 
 #include <algorithm>
 
@@ -73,18 +71,6 @@ static	void						drawTacticalMap						(::klib::SGame& instanceGame, ::gpk::view_
 	klib::drawTacticalBoard(instanceGame, instanceGame.TacticalInfo, display, textAttributes, ::klib::PLAYER_INDEX_USER, ::klib::TEAM_TYPE_CIVILIAN, instanceGame.Players[::klib::PLAYER_INDEX_USER].Tactical.Selection, false);
 }
 
-void								handleMissionEnd					(::klib::SGame& instanceGame) {
-	::klib::SGamePlayer						& player							= instanceGame.Players[::klib::PLAYER_INDEX_USER];
-	::klib::SPlayerProjects					& playerProjects					= player.Projects;
-
-	if(playerProjects.QueuedProduction.size())
-		::klib::handleProductionStep(instanceGame.EntityTables, player.Inventory, playerProjects, player.Tactical.Money, player.Tactical.Score, instanceGame.Messages);
-
-	if(playerProjects.QueuedResearch.size())
-		::klib::handleResearchStep(player.Tactical.Research, playerProjects, player.Tactical.Money, player.Tactical.Score, instanceGame.Messages);
-
-	::klib::playerUpdateResearchLists(instanceGame.EntityTables, player);
-}
 
 ::gpk::error_t						handleStateChange					(::klib::SGame& instanceGame, const ::klib::SGameState& newState, const ::klib::SGameState& prevState)	{
 	::klib::clearASCIIBackBuffer(' ', ::klib::ASCII_COLOR_INDEX_WHITE);
@@ -126,7 +112,7 @@ void								handleMissionEnd					(::klib::SGame& instanceGame) {
 		else {
 			instanceGame.Messages.StateMessage	= ::gpk::view_const_string{"Welcome back commander"};
 			if(::gpk::bit_false(instanceGame.Flags, ::klib::GAME_FLAGS_TACTICAL) && (prevState.State == ::klib::GAME_STATE_TACTICAL_CONTROL || prevState.State == ::klib::GAME_STATE_START_MISSION))
-				::handleMissionEnd(instanceGame);
+				::klib::handleMissionEnd(instanceGame);
 		}
 		break;
 	default:
@@ -134,41 +120,6 @@ void								handleMissionEnd					(::klib::SGame& instanceGame) {
 	}
 	//if(prevState.State != GAME_STATE_START_MISSION && prevState.State != GAME_STATE_TACTICAL_CONTROL)
 	//	instanceGame.Messages.UserLog.clear();
-	return 0;
-}
-
-
-static	::gpk::error_t					eventProcess				(::klib::SGame& instanceGame) {
-	::klib::SGamePlayer							& player					= instanceGame.Players[::klib::PLAYER_INDEX_USER];
-
-	instanceGame.Messages.UserSuccess.clear();
-	for(uint32_t iEvent = 0; iEvent < instanceGame.Events.size(); ++iEvent) {
-		::klib::SGameEvent							event						= instanceGame.Events[iEvent];
-		switch(event.GameState.State) {
-		default: break;
-		case ::klib::GAME_STATE_MENU_RESEARCH: {
-			const ::klib::SEntityResearch				& acknowladgedResearch			= player.ResearchablesValue[(int32_t)event.Value];
-			switch(event.Event) {
-			default: break;
-			case ::klib::GAME_EVENT_CONFIRM:
-				::klib::acknowledgeResearch(acknowladgedResearch, player.Projects, instanceGame.Messages.UserSuccess); instanceGame.LogSuccess();
-				break;
-			}
-			::klib::playerUpdateResearchLists(instanceGame.EntityTables, player);
-			break;
-			}
-		case ::klib::GAME_STATE_MENU_FACTORY: {
-			const ::klib::SEntityResearch				& acknowladgedResearch			= player.ResearchedValue[(int32_t)event.Value];
-			switch(event.Event) {
-			default: break;
-			case ::klib::GAME_EVENT_CONFIRM:
-				::klib::acknowledgeProduction(acknowladgedResearch, player.Projects, instanceGame.Messages.UserSuccess); instanceGame.LogSuccess();
-				break;
-			}
-			}
-		}
-	}
-	instanceGame.Events.clear();
 	return 0;
 }
 
@@ -260,7 +211,7 @@ static	void							updateState					(::klib::SGame& instanceGame, const ::klib::SG
 		instanceGame.Messages.StateMessage	= ::gpk::view_const_string{"Unrecognized game state!!"};
 	}
 
-	::eventProcess(instanceGame);
+	::klib::eventProcess(instanceGame);
 	::updateState(instanceGame, newAction);
 	return 0;
 }

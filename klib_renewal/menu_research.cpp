@@ -36,11 +36,11 @@ static	::klib::SGameState				drawResearchMenu				(::klib::SGame& instanceGame, c
 }
 
 static void				drawBubblesBackground		( ::klib::SWeightedDisplay & display, double lastTimeSeconds, uint32_t disturbance=2 ) {
-	uint32_t				displayWidth				= (int32_t)display.Screen.metrics().x;
-	uint32_t				displayDepth				= (int32_t)display.Screen.metrics().y;
+	uint32_t					displayWidth				= (int32_t)display.Screen.metrics().x;
+	uint32_t					displayDepth				= (int32_t)display.Screen.metrics().y;
 
-	uint64_t				seed						= (uint64_t)(disturbance+lastTimeSeconds*100000*(1+(rand()%100)));
-	uint32_t				randBase					= (uint32_t)(lastTimeSeconds*(disturbance+654)*100000			);
+	uint64_t					seed						= (uint64_t)(disturbance+lastTimeSeconds * 100000 * (1 + (rand() % 100)));
+	uint32_t					randBase					= (uint32_t)(lastTimeSeconds * (disturbance + 654) * 100000);
 	for(uint32_t x=0; x < displayWidth; ++x)
 		//if(display.DisplayWeights[displayDepth-1][x] == 0)
 		if(	display.Screen[displayDepth-1][x] != '0' &&
@@ -50,11 +50,11 @@ static void				drawBubblesBackground		( ::klib::SWeightedDisplay & display, doub
 		)
 		{
 			if( rand()%2 ) {
-				display.Screen			[displayDepth-1][x] = (::gpk::noise1D(randBase + x, seed + 1203) > 0.0) ? 'o' : (::gpk::noise1D(randBase+561+x, seed+2135) > 0.0) ? '0' : (::gpk::noise1D(randBase+x+6, seed+103) > 0.0) ? '.' : 'O';
-				display.DisplayWeights	[displayDepth-1][x] = .000001f;
-				display.Speed			[displayDepth-1][x] = rand()*.001f+0.001f;
-				display.SpeedTarget		[displayDepth-1][x] = rand()*.0025f+0.001f;
-				display.Screen.DepthStencil	[displayDepth-1][x] = (rand() % 2) ? ::klib::ASCII_COLOR_INDEX_GREEN : ::klib::ASCII_COLOR_INDEX_DARKGREEN;
+				display.Screen				[displayDepth-1][x]	= (::gpk::noise1D(randBase + x, seed + 1203) > 0.0) ? 'o' : (::gpk::noise1D(randBase + 561 + x, seed + 2135) > 0.0) ? '0' : (::gpk::noise1D(randBase + x + 6, seed + 103) > 0.0) ? '.' : 'O';
+				display.DisplayWeights		[displayDepth-1][x]	= .000001f;
+				display.Speed				[displayDepth-1][x]	= rand()*.001f+0.001f;
+				display.SpeedTarget			[displayDepth-1][x]	= rand()*.0025f+0.001f;
+				display.Screen.DepthStencil	[displayDepth-1][x]	= (rand() % 2) ? ::klib::ASCII_COLOR_INDEX_GREEN : ::klib::ASCII_COLOR_INDEX_DARKGREEN;
 			}
 		}
 
@@ -73,8 +73,8 @@ static void				drawBubblesBackground		( ::klib::SWeightedDisplay & display, doub
 		display.Speed[z][x] *= .999f;
 	}
 
-	for(uint32_t z=1; z<displayDepth; ++z)
-	for(uint32_t x=0; x<displayWidth; ++x) {
+	for(uint32_t z = 1; z < displayDepth; ++z)
+	for(uint32_t x = 0; x < displayWidth; ++x) {
 		if(display.Screen[z][x] == ' ')
 			continue;
 

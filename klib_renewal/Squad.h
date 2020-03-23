@@ -25,7 +25,7 @@ namespace klib
 		::gpk::SCoord3<int32_t>					Position;
 	};
 
-	static constexpr const uint32_t					MAX_AGENT_SQUAD_SLOTS	= 8	;
+	static constexpr const uint32_t					MAX_AGENT_SQUAD_SLOTS	= 3;
 	static constexpr const uint32_t					MAX_TACTICAL_PLAYERS	= 16;
 	static constexpr const uint32_t					MAX_POSSIBLE_AGENTS		= MAX_AGENT_SQUAD_SLOTS * MAX_TACTICAL_PLAYERS;
 
@@ -42,7 +42,7 @@ namespace klib
 	struct SSquad {
 		uint32_t										Size										= ::klib::DEFAULT_SQUAD_SIZE; //MAX_AGENT_SQUAD_SLOTS;
 
-		::gpk::array_static<int16_t						, MAX_AGENT_SQUAD_SLOTS>	Agents			= {-1, -1, -1, -1, -1, -1, -1, -1,};
+		::gpk::array_static<int16_t						, MAX_AGENT_SQUAD_SLOTS>	Agents			= {-1, -1, -1};//, -1, -1, -1, -1, -1,};
 		::gpk::array_static<::klib::STileCharacter		, MAX_AGENT_SQUAD_SLOTS>	TargetAgents	= {};
 		::gpk::array_static<::gpk::SCoord3<int32_t>		, MAX_AGENT_SQUAD_SLOTS>	TargetPositions	= {};
 		::gpk::array_static<::klib::AGENT_STATE			, MAX_AGENT_SQUAD_SLOTS>	AgentStates		= {};

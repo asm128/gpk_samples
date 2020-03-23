@@ -5,12 +5,8 @@
 #include "projects.h"
 #include "helper_projects.h"
 
-using namespace klib;
-
-static	SGameState						drawFactoryMenu				(::klib::SGame& instanceGame, const ::klib::SGameState& returnState)										{
-	::klib::SGamePlayer								& player					= instanceGame.Players[PLAYER_INDEX_USER];
-	::klib::playerUpdateResearchLists(instanceGame.EntityTables, player);
-
+static	::klib::SGameState				drawFactoryMenu				(::klib::SGame& instanceGame, const ::klib::SGameState& returnState)										{
+	::klib::SGamePlayer							& player					= instanceGame.Players[::klib::PLAYER_INDEX_USER];
 	::gpk::array_obj<::klib::SEntityResearch>	& menuItemsValue			= player.ResearchedValue;
 	::gpk::array_obj<::gpk::array_pod<char_t>>	& menuItemsText				= player.ResearchedText;
 
@@ -31,7 +27,7 @@ static	SGameState						drawFactoryMenu				(::klib::SGame& instanceGame, const ::
 		, 50U
 		);
 	if(selectedChoice == (int32_t)menuItemsValue.size())
-		return {GAME_STATE_WELCOME_COMMANDER};
+		return {::klib::GAME_STATE_WELCOME_COMMANDER};
 
 	if(selectedChoice == -1)
 		return returnState;
@@ -40,7 +36,7 @@ static	SGameState						drawFactoryMenu				(::klib::SGame& instanceGame, const ::
 	return returnState;
 }
 
-SGameState								drawFactory					(SGame& instanceGame, const SGameState& returnState)																						{
+::klib::SGameState						drawFactory					(::klib::SGame& instanceGame, const ::klib::SGameState& returnState)																						{
 	const ::gpk::view_const_string				textToPrint					= "Factory.";
 	static ::klib::SMessageSlow					slowMessage;
 	bool										bDonePrinting				= ::klib::getMessageSlow(slowMessage, textToPrint, instanceGame.FrameTimer.LastTimeSeconds);

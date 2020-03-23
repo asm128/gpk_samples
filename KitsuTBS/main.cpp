@@ -8,13 +8,13 @@ int											main							(int /*argc*/, char ** /*argv*/) {
 	// Set the new bits
 	_CrtSetDbgFlag(tmp);
 #endif
-#define DEFAULT_ASCII_DISPLAY_HEIGHT	64//83
-#define DEFAULT_ASCII_DISPLAY_WIDTH		((uint32_t)(DEFAULT_ASCII_DISPLAY_HEIGHT * 2.666666f))
-	::klib::initASCIIScreen(DEFAULT_ASCII_DISPLAY_WIDTH, DEFAULT_ASCII_DISPLAY_HEIGHT);
+	static constexpr	const uint32_t				ASCII_DISPLAY_HEIGHT			= 64;
+	static constexpr	const uint32_t				ASCII_DISPLAY_WIDTH				= ((uint32_t)(ASCII_DISPLAY_HEIGHT * 2.666666f));
+	::klib::initASCIIScreen(ASCII_DISPLAY_WIDTH, ASCII_DISPLAY_HEIGHT);
 
-	::klib::SGame									* pInstancedGame				= new klib::SGame;
+	::klib::SGame									* pInstancedGame				= new klib::SGame();
 	::klib::SGame									& instanceGame					= *pInstancedGame;
-	instanceGame.GlobalDisplay	.Resize({DEFAULT_ASCII_DISPLAY_WIDTH, DEFAULT_ASCII_DISPLAY_HEIGHT});
+	instanceGame.GlobalDisplay	.Resize({ASCII_DISPLAY_WIDTH, ASCII_DISPLAY_HEIGHT});
 	instanceGame.TacticalDisplay.Resize({::klib::GAME_MAP_WIDTH, ::klib::GAME_MAP_DEPTH});
 
 	::klib::initGame(instanceGame);

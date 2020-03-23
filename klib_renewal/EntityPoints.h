@@ -54,6 +54,7 @@ namespace klib
 							SLifePoints					LifeCurrent		;
 							SAttackPoints				Attack			;
 							SFitnessPoints				Fitness			;
+
 							int64_t						Coins			;
 							int64_t						PriceBuy		;
 							int64_t						CostMaintenance	;
@@ -70,13 +71,8 @@ namespace klib
 			printf("- Maintenance Cost..: %i.\n", (int32_t)CostMaintenance);
 		}
 
-		inline constexpr	SEntityPoints				operator+									(const SEntityPoints& other)			const	noexcept	{
-			return { LifeMax+other.LifeMax, LifeCurrent+other.LifeCurrent, Attack+other.Attack, Fitness+other.Fitness, Coins+other.Coins, PriceBuy+other.PriceBuy, CostMaintenance+other.CostMaintenance };
-		}
-
-		inline constexpr	SEntityPoints				operator-									(const SEntityPoints& other)			const	noexcept	{
-			return { LifeMax-other.LifeMax, LifeCurrent-other.LifeCurrent, Attack-other.Attack, Fitness-other.Fitness, Coins-other.Coins, PriceBuy-other.PriceBuy, CostMaintenance-other.CostMaintenance };
-		}
+		inline constexpr	SEntityPoints				operator+									(const SEntityPoints& other)			const	noexcept	{ return { LifeMax + other.LifeMax, LifeCurrent + other.LifeCurrent, Attack + other.Attack, Fitness + other.Fitness, Coins + other.Coins, PriceBuy + other.PriceBuy, CostMaintenance + other.CostMaintenance }; }
+		inline constexpr	SEntityPoints				operator-									(const SEntityPoints& other)			const	noexcept	{ return { LifeMax - other.LifeMax, LifeCurrent - other.LifeCurrent, Attack - other.Attack, Fitness - other.Fitness, Coins - other.Coins, PriceBuy - other.PriceBuy, CostMaintenance - other.CostMaintenance }; }
 
 		inline				SEntityPoints				operator*									(const SEntityPointsMultiplier& other)	const	noexcept	{
 			double												coins										= Coins				*	other.Coins				;

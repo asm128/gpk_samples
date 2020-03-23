@@ -611,6 +611,8 @@ void									klib::displayStatusEffectsAndTechs	(::gpk::view_grid<char> display,
 	iLine									+= displayEntityTechnology	(display, textAttributes, offsetY+iLine, offsetX, character.FinalFlags.Tech		);
 	iLine									+= displayEntityStatus		(display, textAttributes, offsetY+iLine, offsetX, character.FinalFlags.Status	);
 	iLine									+= displayEntityEffect		(display, textAttributes, offsetY+iLine, offsetX, character.FinalFlags.Effect	);
+
+	iLine += displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, character.ActiveBonus.Status.Status, MAX_COMBAT_STATUS_COUNT, ::klib::ASCII_COLOR_INDEX_YELLOW, ::klib::ASCII_COLOR_INDEX_RED, ::gpk::view_const_string{"- Inflicted: %-14.14s"});
 }
 
 static void								displayEmptySlot				(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int32_t offsetY, int32_t offsetX, int32_t agentIndex)																			{
@@ -671,7 +673,7 @@ static void								displayResumedAgentSlot			(const ::klib::SEntityTables & tabl
 	valueToGrid(textAttributes, offsetY, offsetX+23, ::klib::SCREEN_LEFT, &(color = ::klib::ASCII_COLOR_INDEX_ORANGE), 1, 11);
 }
 
-void								klib::displayDetailedAgentSlot		(const ::klib::SEntityTables & tables, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int32_t offsetY, int32_t offsetX, const CCharacter& character, uint16_t color)										{
+void									klib::displayDetailedAgentSlot		(const ::klib::SEntityTables & tables, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int32_t offsetY, int32_t offsetX, const CCharacter& character, uint16_t color)										{
 	static const char							formatAgentTitle	[]			= " - %-34.34s"			;
 	static const char							formatAgentEquip	[]			= "%-36.36s Lv. %i"		;
 	static const char							formatAgentPoints	[]			= "%-21.21s: %-10.10s"	;
@@ -737,8 +739,8 @@ void									klib::drawSquadSlots					(SGame& instanceGame)																					
 	static const int32_t						offsetYBase								= 1;
 	static const int32_t						offsetXBase								= 1;
 
-	SGamePlayer										& player								= instanceGame.Players[PLAYER_INDEX_USER];
-	int32_t										playerOffset							= (player.Tactical.Selection.PlayerUnit != -1) ? ::gpk::min(::gpk::max(0, player.Tactical.Selection.PlayerUnit-5), (int16_t)player.Tactical.Squad.Agents.size() - 6) : 0;
+	SGamePlayer									& player								= instanceGame.Players[PLAYER_INDEX_USER];
+	int32_t										playerOffset							= (player.Tactical.Selection.PlayerUnit != -1) ? ::gpk::min(::gpk::max(0, (int32_t)player.Tactical.Selection.PlayerUnit - 2), (int32_t)player.Tactical.Squad.Agents.size() - 3) : 0;
 
 	bool										bStop									= false;
 	for(uint32_t y = 0, countY = ::klib::MAX_AGENT_ROWS; y < countY; ++y) {

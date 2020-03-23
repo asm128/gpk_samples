@@ -82,7 +82,7 @@ namespace klib
 	GDEFINE_ENUM_VALUE(ENTITY_TECHNOLOGY, SHELL			, 0x4000);
 
 	// ------------------------------------ PROJECTILE_CLASS: Declares values for representing ammunition categories -------------------------------------------------
-#define MAX_PROJECTILE_CLASS_COUNT 19
+#define MAX_PROJECTILE_CLASS_COUNT 20
 	GDEFINE_FLAG_TYPE(PROJECTILE_CLASS, int32_t);
 	// these are the ammo classes that I can think of right now
 	GDEFINE_FLAG_VALUE(PROJECTILE_CLASS,	NONE		,	0x00000UL);	// 0000 0000 0000 0000
