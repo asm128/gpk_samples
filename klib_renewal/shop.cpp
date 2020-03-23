@@ -56,93 +56,56 @@ int32_t												klib::reinitBuyMenus		(const ::klib::SEntityTables & entityTa
 }
 
 ::klib::SGameState									drawBuyMenu					(::klib::SGame& instanceGame, const ::klib::SGameState& returnState) {
-#define MAX_BUY_ITEMS 64
 	::klib::SShopMenus										& menus						= instanceGame.ShopMenus;
-	::klib::SGamePlayer										& player					= instanceGame.Players[::klib::PLAYER_INDEX_USER];
-	static ::klib::SMenuItem<::klib::SBuyable>				menuItems[MAX_BUY_ITEMS+1]	= {};
-	::klib::SBuyable										selectedChoice				= {-1, -1, LLONG_MAX, LLONG_MAX, "Invalid item"};
+	::gpk::view_const_char									menuTitle;
+	static ::klib::SDrawMenuState							menuState;
+	::gpk::array_obj<::gpk::view_const_char>				menuItemsText;
 	switch(instanceGame.State.Substate) {
-	case ::klib::GAME_SUBSTATE_ACCESSORY	: { static ::klib::SDrawMenuState menuState; selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.Color.View, instanceGame.GlobalDisplay.Screen.DepthStencil.begin(), menus.MenuAccessory	, ::gpk::view_array<const ::klib::SMenuItem<::klib::SBuyable>>{menus.MenuItemsAccessory		}, instanceGame.FrameInput, {-1});	} break;
-	case ::klib::GAME_SUBSTATE_STAGEPROP	: { static ::klib::SDrawMenuState menuState; selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.Color.View, instanceGame.GlobalDisplay.Screen.DepthStencil.begin(), menus.MenuStageProp	, ::gpk::view_array<const ::klib::SMenuItem<::klib::SBuyable>>{menus.MenuItemsStageProp		}, instanceGame.FrameInput, {-1});	} break;
-	case ::klib::GAME_SUBSTATE_FACILITY		: { static ::klib::SDrawMenuState menuState; selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.Color.View, instanceGame.GlobalDisplay.Screen.DepthStencil.begin(), menus.MenuFacility		, ::gpk::view_array<const ::klib::SMenuItem<::klib::SBuyable>>{menus.MenuItemsFacility		}, instanceGame.FrameInput, {-1});	} break;
-	case ::klib::GAME_SUBSTATE_VEHICLE		: { static ::klib::SDrawMenuState menuState; selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.Color.View, instanceGame.GlobalDisplay.Screen.DepthStencil.begin(), menus.MenuVehicle		, ::gpk::view_array<const ::klib::SMenuItem<::klib::SBuyable>>{menus.MenuItemsVehicle		}, instanceGame.FrameInput, {-1});	} break;
-	case ::klib::GAME_SUBSTATE_PROFESSION	: { static ::klib::SDrawMenuState menuState; selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.Color.View, instanceGame.GlobalDisplay.Screen.DepthStencil.begin(), menus.MenuProfession	, ::gpk::view_array<const ::klib::SMenuItem<::klib::SBuyable>>{menus.MenuItemsProfession	}, instanceGame.FrameInput, {-1});	} break;
-	case ::klib::GAME_SUBSTATE_WEAPON		: { static ::klib::SDrawMenuState menuState; selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.Color.View, instanceGame.GlobalDisplay.Screen.DepthStencil.begin(), menus.MenuWeapon		, ::gpk::view_array<const ::klib::SMenuItem<::klib::SBuyable>>{menus.MenuItemsWeapon		}, instanceGame.FrameInput, {-1});	} break;
-	case ::klib::GAME_SUBSTATE_ARMOR		: { static ::klib::SDrawMenuState menuState; selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.Color.View, instanceGame.GlobalDisplay.Screen.DepthStencil.begin(), menus.MenuArmor		, ::gpk::view_array<const ::klib::SMenuItem<::klib::SBuyable>>{menus.MenuItemsArmor			}, instanceGame.FrameInput, {-1});	} break;
-	case ::klib::GAME_SUBSTATE_ITEM			: { static ::klib::SDrawMenuState menuState; selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.Color.View, instanceGame.GlobalDisplay.Screen.DepthStencil.begin(), menus.MenuItem			, ::gpk::view_array<const ::klib::SMenuItem<::klib::SBuyable>>{menus.MenuItemsItem			}, instanceGame.FrameInput, {-1});	} break;
-	case ::klib::GAME_SUBSTATE_CHARACTER	: { static ::klib::SDrawMenuState menuState; selectedChoice = ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.Color.View, instanceGame.GlobalDisplay.Screen.DepthStencil.begin(), menus.MenuAgent		, ::gpk::view_array<const ::klib::SMenuItem<::klib::SBuyable>>{menus.MenuItemsAgent	,  4	}, instanceGame.FrameInput, {-1});	} break;
+	case ::klib::GAME_SUBSTATE_ACCESSORY	: { menuTitle = menus.MenuAccessory	.Title; for(uint32_t iItem = 0; iItem < ::gpk::size(menus.NamesAccessory	); ++iItem) { if(0 == menus.MenuItemsAccessory	[iItem].Text.size()) break; menuItemsText.push_back(menus.MenuItemsAccessory	[iItem].Text); } break; }
+	case ::klib::GAME_SUBSTATE_STAGEPROP	: { menuTitle = menus.MenuStageProp	.Title; for(uint32_t iItem = 0; iItem < ::gpk::size(menus.NamesStageProp	); ++iItem) { if(0 == menus.MenuItemsStageProp	[iItem].Text.size()) break; menuItemsText.push_back(menus.MenuItemsStageProp	[iItem].Text); } break; }
+	case ::klib::GAME_SUBSTATE_FACILITY		: { menuTitle = menus.MenuFacility	.Title; for(uint32_t iItem = 0; iItem < ::gpk::size(menus.NamesFacility		); ++iItem) { if(0 == menus.MenuItemsFacility	[iItem].Text.size()) break; menuItemsText.push_back(menus.MenuItemsFacility		[iItem].Text); } break; }
+	case ::klib::GAME_SUBSTATE_VEHICLE		: { menuTitle = menus.MenuVehicle	.Title; for(uint32_t iItem = 0; iItem < ::gpk::size(menus.NamesVehicle		); ++iItem) { if(0 == menus.MenuItemsVehicle	[iItem].Text.size()) break; menuItemsText.push_back(menus.MenuItemsVehicle		[iItem].Text); } break; }
+	case ::klib::GAME_SUBSTATE_PROFESSION	: { menuTitle = menus.MenuProfession.Title; for(uint32_t iItem = 0; iItem < ::gpk::size(menus.NamesProfession	); ++iItem) { if(0 == menus.MenuItemsProfession	[iItem].Text.size()) break; menuItemsText.push_back(menus.MenuItemsProfession	[iItem].Text); } break; }
+	case ::klib::GAME_SUBSTATE_WEAPON		: { menuTitle = menus.MenuWeapon	.Title; for(uint32_t iItem = 0; iItem < ::gpk::size(menus.NamesWeapon		); ++iItem) { if(0 == menus.MenuItemsWeapon		[iItem].Text.size()) break; menuItemsText.push_back(menus.MenuItemsWeapon		[iItem].Text); } break; }
+	case ::klib::GAME_SUBSTATE_ARMOR		: { menuTitle = menus.MenuArmor		.Title; for(uint32_t iItem = 0; iItem < ::gpk::size(menus.NamesArmor		); ++iItem) { if(0 == menus.MenuItemsArmor		[iItem].Text.size()) break; menuItemsText.push_back(menus.MenuItemsArmor		[iItem].Text); } break; }
+	case ::klib::GAME_SUBSTATE_ITEM			: { menuTitle = menus.MenuItem		.Title; for(uint32_t iItem = 0; iItem < ::gpk::size(menus.NamesItem			); ++iItem) { if(0 == menus.MenuItemsItem		[iItem].Text.size()) break; menuItemsText.push_back(menus.MenuItemsItem			[iItem].Text); } break; }
+	case ::klib::GAME_SUBSTATE_CHARACTER	: { menuTitle = menus.MenuAgent		.Title; for(uint32_t iItem = 0; iItem < 4/*::gpk::size(menus.NamesAgent	  )*/; ++iItem) { if(0 == menus.MenuItemsAgent		[iItem].Text.size()) break; menuItemsText.push_back(menus.MenuItemsAgent		[iItem].Text); } break; }
 	default:
 		break;
 	}
+	if(0 == menuTitle.size())
+		return returnState;
+	int32_t													selectedIndex				= ::klib::drawMenu
+		( menuState
+		, instanceGame.GlobalDisplay.Screen.Color.View
+		, instanceGame.GlobalDisplay.Screen.DepthStencil.begin()
+		, menuTitle
+		, menuItemsText
+		, instanceGame.FrameInput
+		, {-1}
+		, 50
+		);
 
-	if(selectedChoice.Definition == ::klib::SHOP_EXIT_VALUE)
+	if(selectedIndex == (int32_t)menuItemsText.size())
 		return {::klib::GAME_STATE_MENU_BUY};
-	else if( selectedChoice.Definition == -1 )
+	else if( selectedIndex == -1 )
 		return returnState;
 
-	::klib::SGameState										retVal						= returnState;
-	instanceGame.ClearMessages();
-	if(selectedChoice.Price > player.Tactical.Money) {
-		instanceGame.Messages.UserError		= ::gpk::view_const_string{"You don't have enough money for "};
-		instanceGame.Messages.UserError.append(selectedChoice.Name);
-		instanceGame.Messages.UserError.append_string("!!");
-		instanceGame.LogError();
-		return retVal;
-	}
-
-	::klib::SCharacterInventory		& playerInventory		= player.Inventory;
-	int32_t							iCharacterInArmy		= 0
-		,							armySize				= player.Tactical.Army.size()
-		;
-	bool							bFoundFreeCharacterSlot	= false;
-	bool							bSold					= false;
 	::gpk::ptr_obj<::klib::CCharacter> newCharacter;
 	switch(instanceGame.State.Substate) {
-	case ::klib::GAME_SUBSTATE_ACCESSORY	:	if(playerInventory.Accessory	.AddElement({selectedChoice.Definition, 0, selectedChoice.Grade, -1})) 	{ instanceGame.Messages.UserSuccess = ::gpk::view_const_string{"You have successfully bought "}; instanceGame.Messages.UserSuccess.append(selectedChoice.Name); instanceGame.Messages.UserSuccess.append_string(" for "				); char price [64]; sprintf_s(price, "%lli", selectedChoice.Price); instanceGame.Messages.UserSuccess.append_string(price); instanceGame.Messages.UserSuccess.append_string(" Coins."); bSold = true; } break;
-	case ::klib::GAME_SUBSTATE_STAGEPROP	:	if(playerInventory.StageProp	.AddElement({selectedChoice.Definition, 0, selectedChoice.Grade, -1})) 	{ instanceGame.Messages.UserSuccess = ::gpk::view_const_string{"You have successfully bought "}; instanceGame.Messages.UserSuccess.append(selectedChoice.Name); instanceGame.Messages.UserSuccess.append_string(" for "				); char price [64]; sprintf_s(price, "%lli", selectedChoice.Price); instanceGame.Messages.UserSuccess.append_string(price); instanceGame.Messages.UserSuccess.append_string(" Coins."); bSold = true; } break;
-	case ::klib::GAME_SUBSTATE_FACILITY		:	if(playerInventory.Facility		.AddElement({selectedChoice.Definition, 0, selectedChoice.Grade, -1})) 	{ instanceGame.Messages.UserSuccess = ::gpk::view_const_string{"You have successfully bought "}; instanceGame.Messages.UserSuccess.append(selectedChoice.Name); instanceGame.Messages.UserSuccess.append_string(" for "				); char price [64]; sprintf_s(price, "%lli", selectedChoice.Price); instanceGame.Messages.UserSuccess.append_string(price); instanceGame.Messages.UserSuccess.append_string(" Coins."); bSold = true; } break;
-	case ::klib::GAME_SUBSTATE_VEHICLE		:	if(playerInventory.Vehicle		.AddElement({selectedChoice.Definition, 0, selectedChoice.Grade, -1})) 	{ instanceGame.Messages.UserSuccess = ::gpk::view_const_string{"You have successfully bought "}; instanceGame.Messages.UserSuccess.append(selectedChoice.Name); instanceGame.Messages.UserSuccess.append_string(" for "				); char price [64]; sprintf_s(price, "%lli", selectedChoice.Price); instanceGame.Messages.UserSuccess.append_string(price); instanceGame.Messages.UserSuccess.append_string(" Coins."); bSold = true; } break;
-	case ::klib::GAME_SUBSTATE_PROFESSION	:	if(playerInventory.Profession	.AddElement({selectedChoice.Definition, 0, selectedChoice.Grade, -1})) 	{ instanceGame.Messages.UserSuccess = ::gpk::view_const_string{"You have successfully bought "}; instanceGame.Messages.UserSuccess.append(selectedChoice.Name); instanceGame.Messages.UserSuccess.append_string(" Job License for "	); char price [64]; sprintf_s(price, "%lli", selectedChoice.Price); instanceGame.Messages.UserSuccess.append_string(price); instanceGame.Messages.UserSuccess.append_string(" Coins."); bSold = true; } break;
-	case ::klib::GAME_SUBSTATE_WEAPON		:	if(playerInventory.Weapon		.AddElement({selectedChoice.Definition, 0, selectedChoice.Grade, -1})) 	{ instanceGame.Messages.UserSuccess = ::gpk::view_const_string{"You have successfully bought "}; instanceGame.Messages.UserSuccess.append(selectedChoice.Name); instanceGame.Messages.UserSuccess.append_string(" for "				); char price [64]; sprintf_s(price, "%lli", selectedChoice.Price); instanceGame.Messages.UserSuccess.append_string(price); instanceGame.Messages.UserSuccess.append_string(" Coins."); bSold = true; } break;
-	case ::klib::GAME_SUBSTATE_ARMOR		:	if(playerInventory.Armor		.AddElement({selectedChoice.Definition, 0, selectedChoice.Grade, -1})) 	{ instanceGame.Messages.UserSuccess = ::gpk::view_const_string{"You have successfully bought "}; instanceGame.Messages.UserSuccess.append(selectedChoice.Name); instanceGame.Messages.UserSuccess.append_string(" for "				); char price [64]; sprintf_s(price, "%lli", selectedChoice.Price); instanceGame.Messages.UserSuccess.append_string(price); instanceGame.Messages.UserSuccess.append_string(" Coins."); bSold = true; } break;
-	case ::klib::GAME_SUBSTATE_ITEM			:	if(playerInventory.Items		.AddElement({selectedChoice.Definition, 0, selectedChoice.Grade, -1})) 	{ instanceGame.Messages.UserSuccess = ::gpk::view_const_string{"You have successfully bought "}; instanceGame.Messages.UserSuccess.append(selectedChoice.Name); instanceGame.Messages.UserSuccess.append_string(" for "				); char price [64]; sprintf_s(price, "%lli", selectedChoice.Price); instanceGame.Messages.UserSuccess.append_string(price); instanceGame.Messages.UserSuccess.append_string(" Coins."); bSold = true; } break;
-	case ::klib::GAME_SUBSTATE_CHARACTER	:
-		newCharacter.create(::klib::enemyDefinitions[selectedChoice.Definition]);
-		for(iCharacterInArmy ; iCharacterInArmy < armySize; ++iCharacterInArmy) {
-			if(0 == player.Tactical.Army[iCharacterInArmy]) {
-				player.Tactical.Army[iCharacterInArmy]		= newCharacter;
-				bFoundFreeCharacterSlot						= true;
-				break;
-			}
-		}
-		if(!bFoundFreeCharacterSlot)
-			player.Tactical.Army.push_back(newCharacter);
-		::klib::setupAgent(instanceGame.EntityTables, *newCharacter, *newCharacter);
-		instanceGame.Messages.UserSuccess = ::gpk::view_const_string{"You have successfully hired "};
-		instanceGame.Messages.UserSuccess.append(selectedChoice.Name);
-		instanceGame.Messages.UserSuccess.append_string(" for ");
-		char						maintCost [64];
-		sprintf_s(maintCost, "%lli", selectedChoice.MaintenanceCost);
-		instanceGame.Messages.UserSuccess.append_string(maintCost);
-		instanceGame.Messages.UserSuccess.append_string(" Coins/Mission.");
-		bSold = true;
-		break;
+	case ::klib::GAME_SUBSTATE_ACCESSORY	: instanceGame.Events.push_back({::klib::GAME_EVENT_CONFIRM, instanceGame.State, selectedIndex}); break;
+	case ::klib::GAME_SUBSTATE_STAGEPROP	: instanceGame.Events.push_back({::klib::GAME_EVENT_CONFIRM, instanceGame.State, selectedIndex}); break;
+	case ::klib::GAME_SUBSTATE_FACILITY		: instanceGame.Events.push_back({::klib::GAME_EVENT_CONFIRM, instanceGame.State, selectedIndex}); break;
+	case ::klib::GAME_SUBSTATE_VEHICLE		: instanceGame.Events.push_back({::klib::GAME_EVENT_CONFIRM, instanceGame.State, selectedIndex}); break;
+	case ::klib::GAME_SUBSTATE_PROFESSION	: instanceGame.Events.push_back({::klib::GAME_EVENT_CONFIRM, instanceGame.State, selectedIndex}); break;
+	case ::klib::GAME_SUBSTATE_WEAPON		: instanceGame.Events.push_back({::klib::GAME_EVENT_CONFIRM, instanceGame.State, selectedIndex}); break;
+	case ::klib::GAME_SUBSTATE_ARMOR		: instanceGame.Events.push_back({::klib::GAME_EVENT_CONFIRM, instanceGame.State, selectedIndex}); break;
+	case ::klib::GAME_SUBSTATE_ITEM			: instanceGame.Events.push_back({::klib::GAME_EVENT_CONFIRM, instanceGame.State, selectedIndex}); break;
+	case ::klib::GAME_SUBSTATE_CHARACTER	: instanceGame.Events.push_back({::klib::GAME_EVENT_CONFIRM, instanceGame.State, selectedIndex}); break;
 	default:
 		break;
 	}
-
-	if(bSold) {
-		instanceGame.LogSuccess();
-		player.Tactical.Money				-= selectedChoice.Price;
-		player.Tactical.Score.MoneySpent	+= selectedChoice.Price;
-		::klib::reinitBuyMenus(instanceGame.EntityTables, player.Inventory, menus);
-	}
-	else {
-		instanceGame.Messages.UserError		= "There is not enough space in your inventory!";
-		instanceGame.LogError();
-	}
-
-	return retVal;
+	return returnState;
 }
 
 ::klib::SGameState							drawBuy								(::klib::SGame& instanceGame, const ::klib::SGameState& returnState) {
@@ -161,7 +124,7 @@ int32_t												klib::reinitBuyMenus		(const ::klib::SEntityTables & entityTa
 		return ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.Color.View, instanceGame.GlobalDisplay.Screen.DepthStencil.begin(), menuBuy, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{::klib::optionsBuy}, instanceGame.FrameInput, instanceGame.State);
 	}
 	else
-		return drawBuyMenu(instanceGame, returnState);
+		return ::drawBuyMenu(instanceGame, returnState);
 };
 
 
