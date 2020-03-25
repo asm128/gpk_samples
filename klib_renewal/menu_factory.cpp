@@ -1,4 +1,3 @@
-//#define NOMINMAX
 #include "Game.h"
 #include "draw.h"
 
@@ -47,5 +46,5 @@ static	::klib::SGameState				drawFactoryMenu				(::klib::SGame& instanceGame, co
 		return returnState;
 
 	::klib::drawFireBackground(instanceGame.TacticalDisplay, instanceGame.FrameTimer.LastTimeSeconds);
-	return drawFactoryMenu(instanceGame, returnState);
+	return ::drawFactoryMenu(instanceGame, returnState);
 };

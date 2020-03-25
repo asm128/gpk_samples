@@ -1,4 +1,3 @@
-//#define NOMINMAX
 #include "Character.h"
 #include "projects.h"
 #include "helper_projects.h"

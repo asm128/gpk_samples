@@ -1,14 +1,11 @@
-﻿//#define NOMINMAX
-#include "Game.h"
+﻿#include "Game.h"
 #include "draw.h"
 
 #include "projects.h"
 #include "helper_projects.h"
 
-using namespace klib;
-
-static	SGameState						drawUpgradeMenu				(::klib::SGame& instanceGame, const ::klib::SGameState& returnState)				{
-	::klib::SGamePlayer								& player					= instanceGame.Players[PLAYER_INDEX_USER];
+static	::klib::SGameState					drawUpgradeMenu				(::klib::SGame& instanceGame, const ::klib::SGameState& returnState)				{
+	::klib::SGamePlayer								& player					= instanceGame.Players[::klib::PLAYER_INDEX_USER];
 	::klib::playerUpdateResearchLists(instanceGame.EntityTables, player);
 
 	::gpk::array_obj<::klib::SEntityResearch>	& menuItemsValue			= player.ResearchablesValue;
@@ -31,28 +28,17 @@ static	SGameState						drawUpgradeMenu				(::klib::SGame& instanceGame, const ::
 		, 50U
 		);
 	if(selectedChoice == (int32_t)menuItemsValue.size())
-		return {GAME_STATE_WELCOME_COMMANDER};
+		return {::klib::GAME_STATE_WELCOME_COMMANDER};
 
 	if(selectedChoice == -1)
 		return returnState;
 
-	instanceGame.Messages.ClearMessages();
-	switch(menuItemsValue[selectedChoice].Type) {
-	case ::klib::ENTITY_TYPE_ACCESSORY	: ::klib::acknowledgeProduction(menuItemsValue[selectedChoice], player.Projects, instanceGame.Messages.UserSuccess); instanceGame.LogSuccess(); break;
-	case ::klib::ENTITY_TYPE_STAGE_PROP	: ::klib::acknowledgeProduction(menuItemsValue[selectedChoice], player.Projects, instanceGame.Messages.UserSuccess); instanceGame.LogSuccess(); break;
-	case ::klib::ENTITY_TYPE_FACILITY	: ::klib::acknowledgeProduction(menuItemsValue[selectedChoice], player.Projects, instanceGame.Messages.UserSuccess); instanceGame.LogSuccess(); break;
-	case ::klib::ENTITY_TYPE_VEHICLE	: ::klib::acknowledgeProduction(menuItemsValue[selectedChoice], player.Projects, instanceGame.Messages.UserSuccess); instanceGame.LogSuccess(); break;
-	case ::klib::ENTITY_TYPE_PROFESSION	: ::klib::acknowledgeProduction(menuItemsValue[selectedChoice], player.Projects, instanceGame.Messages.UserSuccess); instanceGame.LogSuccess(); break;
-	case ::klib::ENTITY_TYPE_WEAPON		: ::klib::acknowledgeProduction(menuItemsValue[selectedChoice], player.Projects, instanceGame.Messages.UserSuccess); instanceGame.LogSuccess(); break;
-	case ::klib::ENTITY_TYPE_ARMOR		: ::klib::acknowledgeProduction(menuItemsValue[selectedChoice], player.Projects, instanceGame.Messages.UserSuccess); instanceGame.LogSuccess(); break;
-	default:
-		break;
-	}
-
+	::klib::acknowledgeProduction(menuItemsValue[selectedChoice], player.Projects, instanceGame.Messages.UserSuccess);
+	instanceGame.LogSuccess(); //break;
 	return returnState;
 }
 
-SGameState								drawUpgrade					(SGame& instanceGame, const SGameState& returnState)																						{
+::klib::SGameState						drawUpgrade					(::klib::SGame& instanceGame, const ::klib::SGameState& returnState)																						{
 	const ::gpk::view_const_string				textToPrint					= "Factory.";
 	static ::klib::SMessageSlow					slowMessage;
 	bool										bDonePrinting				= ::klib::getMessageSlow(slowMessage, textToPrint, instanceGame.FrameTimer.LastTimeSeconds);
@@ -63,5 +49,5 @@ SGameState								drawUpgrade					(SGame& instanceGame, const SGameState& return
 		return returnState;
 
 	::klib::drawFireBackground(instanceGame.TacticalDisplay, instanceGame.FrameTimer.LastTimeSeconds);
-	return drawUpgradeMenu(instanceGame, returnState);
+	return ::drawUpgradeMenu(instanceGame, returnState);
 };

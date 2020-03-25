@@ -1,5 +1,4 @@
-﻿//#define NOMINMAX
-#include "Game.h"
+﻿#include "Game.h"
 #include "StageProp.h"
 
 #include "klib_ascii_reference.h"

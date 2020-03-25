@@ -1,5 +1,3 @@
-// #define NOMINMAX
-
 #include "tactical_gameplay.h"
 #include "draw.h"
 #include "Combat.h"

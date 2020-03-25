@@ -1,5 +1,3 @@
-//#define NOMINMAX
-
 #include "Agent_helper.h"
 #include "draw.h"
 

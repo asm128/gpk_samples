@@ -1,5 +1,3 @@
-//#define NOMINMAX
-
 #include "Game.h"
 #include "draw.h"
 
