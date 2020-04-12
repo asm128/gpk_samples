@@ -2,6 +2,7 @@
 #include "credits.h"
 #include "tactical_draw.h"
 #include "Agent_helper.h"
+#include "klib_timer.h"
 
 using namespace klib;
 
@@ -102,8 +103,7 @@ void													klib::drawFireBackground					( ::klib::SWeightedDisplay& displa
 				display.Speed				[firstRow][x]			= rand()*.001f+0.001f;
 				display.SpeedTarget			[firstRow][x]			= rand()*.0009f+0.001f;
 				display.Screen.DepthStencil	[firstRow][x]			= bReverse ? ((::gpk::noise1D(randBase+321+x, seed+91423) > 0.0)? ::klib::ASCII_COLOR_INDEX_CYAN : ::klib::ASCII_COLOR_INDEX_BLUE) :  (::gpk::noise1D(randBase+32+x, seed<<1) > 0.0) ? ::klib::ASCII_COLOR_INDEX_RED : (::gpk::noise1D(randBase+987429654+x, seed+98234) > 0.0) ? ::klib::ASCII_COLOR_INDEX_ORANGE : ::klib::ASCII_COLOR_INDEX_DARKYELLOW;
-			}
-		}
+			}}
 
 	for(uint32_t z = 0; z < displayDepth; ++z)
 	for(uint32_t x = 0; x < displayWidth; ++x) {
@@ -307,8 +307,8 @@ static	SGameState							drawMemorial			(char* display, uint32_t width, uint32_t 
 
 
 void										klib::drawAndPresentGame		(SGame& instanceGame, ::klib::SASCIITarget& target)																													{
-	static ::klib::STimer							frameMeasure;
-	static ::klib::STimer							animTimer;
+	static ::gpk::STimer							frameMeasure;
+	static ::gpk::STimer							animTimer;
 	static ::klib::SAccumulator<double>				animTimerAccum					= {0.0, 1.00};
 	// increase time
 	animTimer.Frame();

@@ -53,7 +53,7 @@ static	void						handleSubstateChange				(::klib::SGame& instanceGame, const ::k
 	::klib::SGamePlayer						& player							= instanceGame.Players[::klib::PLAYER_INDEX_USER];
 	switch(newState.State) {
 	case ::klib::GAME_STATE_MENU_OPTIONS:
-	case ::klib::GAME_STATE_MENU_SELL:
+	case ::klib::GAME_STATE_MENU_SELL	:
 	case ::klib::GAME_STATE_MENU_UPGRADE:
 	case ::klib::GAME_STATE_MENU_FACTORY:
 		instanceGame.Messages.UserError		= ::gpk::view_const_string{"This function isn't available!"};
@@ -69,7 +69,6 @@ static	void						handleSubstateChange				(::klib::SGame& instanceGame, const ::k
 static	void						drawTacticalMap						(::klib::SGame& instanceGame, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes) {
 	klib::drawTacticalBoard(instanceGame, instanceGame.TacticalInfo, display, textAttributes, ::klib::PLAYER_INDEX_USER, ::klib::TEAM_TYPE_CIVILIAN, instanceGame.Players[::klib::PLAYER_INDEX_USER].Tactical.Selection, false);
 }
-
 
 ::gpk::error_t						handleStateChange					(::klib::SGame& instanceGame, const ::klib::SGameState& newState, const ::klib::SGameState& prevState)	{
 	::klib::clearASCIIBackBuffer(' ', ::klib::ASCII_COLOR_INDEX_WHITE);
@@ -160,8 +159,8 @@ static	void							updateState					(::klib::SGame& instanceGame, const ::klib::SG
 ::gpk::error_t						klib::showMenu		(::klib::SGame& instanceGame)			{
 	SGameState								newAction			= instanceGame.State;
 
-	static ::klib::SMenuHeader<::klib::SGameState>	menuMain			( {::klib::GAME_STATE_EXIT				},	"Main Menu"		, 20, true, "Exit game");
-	static ::klib::SMenuHeader<::klib::SGameState>	menuMainInGame		( {::klib::GAME_STATE_EXIT				},	"Main Menu"		, 20, true, "Exit game");
+	static ::klib::SMenuHeader<::klib::SGameState>	menuMain			( {::klib::GAME_STATE_EXIT				},	"Main Menu"		, 30, true, "Exit game");
+	static ::klib::SMenuHeader<::klib::SGameState>	menuMainInGame		( {::klib::GAME_STATE_EXIT				},	"Main Menu"		, 30, true, "Exit game");
 	static ::klib::SMenuHeader<::klib::SGameState>	menuConfig			( {::klib::GAME_STATE_MENU_MAIN			},	"Options"		, 26);
 	static ::klib::SMenuHeader<::klib::SGameState>	menuSell			( {::klib::GAME_STATE_WELCOME_COMMANDER	},	"Sell"			);
 

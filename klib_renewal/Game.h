@@ -2,6 +2,7 @@
 #include "klib_grid.h"
 #include "menus.h"
 #include "TacticalInfo.h"
+#include "klib_timer.h"
 
 #include "gpk_sync.h"
 
@@ -14,16 +15,16 @@ namespace klib
 {
 	static				double										getFinalSight			(double initialSight, const CCharacter& playerAgent)						{
 		double																finalSight				= initialSight;
-		if(::gpk::bit_true(playerAgent.ActiveBonus.Status.Status, COMBAT_STATUS_SHOCK		))	finalSight *= 1.5	;
-		if(::gpk::bit_true(playerAgent.ActiveBonus.Status.Status, COMBAT_STATUS_BURN		))	finalSight *= 1.3	;
-		if(::gpk::bit_true(playerAgent.ActiveBonus.Status.Status, COMBAT_STATUS_RAGE		))	finalSight *= 1.2	;
-		if(::gpk::bit_true(playerAgent.ActiveBonus.Status.Status, COMBAT_STATUS_BERSERK		))	finalSight *= 1.1	;
-		if(::gpk::bit_true(playerAgent.ActiveBonus.Status.Status, COMBAT_STATUS_CHARMED		))	finalSight *= 0.85	;
-		if(::gpk::bit_true(playerAgent.ActiveBonus.Status.Status, COMBAT_STATUS_FROZEN		))	finalSight *= 0.75	;
-		if(::gpk::bit_true(playerAgent.ActiveBonus.Status.Status, COMBAT_STATUS_DRUNK		))	finalSight *= 0.65	;
-		if(::gpk::bit_true(playerAgent.ActiveBonus.Status.Status, COMBAT_STATUS_BLIND		))	finalSight *= 0.3	;
-		if(::gpk::bit_true(playerAgent.ActiveBonus.Status.Status, COMBAT_STATUS_SLEEP		))	finalSight *= 0.2	;
-		if(::gpk::bit_true(playerAgent.ActiveBonus.Status.Status, COMBAT_STATUS_STUN		))	finalSight *= 0.1	;
+		if(::gpk::bit_true(playerAgent.ActiveBonus.Status.Status, COMBAT_STATUS_SHOCK	))	finalSight *= 1.5	;
+		if(::gpk::bit_true(playerAgent.ActiveBonus.Status.Status, COMBAT_STATUS_BURN	))	finalSight *= 1.3	;
+		if(::gpk::bit_true(playerAgent.ActiveBonus.Status.Status, COMBAT_STATUS_RAGE	))	finalSight *= 1.2	;
+		if(::gpk::bit_true(playerAgent.ActiveBonus.Status.Status, COMBAT_STATUS_BERSERK	))	finalSight *= 1.1	;
+		if(::gpk::bit_true(playerAgent.ActiveBonus.Status.Status, COMBAT_STATUS_CHARMED	))	finalSight *= 0.85	;
+		if(::gpk::bit_true(playerAgent.ActiveBonus.Status.Status, COMBAT_STATUS_FROZEN	))	finalSight *= 0.75	;
+		if(::gpk::bit_true(playerAgent.ActiveBonus.Status.Status, COMBAT_STATUS_DRUNK	))	finalSight *= 0.65	;
+		if(::gpk::bit_true(playerAgent.ActiveBonus.Status.Status, COMBAT_STATUS_BLIND	))	finalSight *= 0.3	;
+		if(::gpk::bit_true(playerAgent.ActiveBonus.Status.Status, COMBAT_STATUS_SLEEP	))	finalSight *= 0.2	;
+		if(::gpk::bit_true(playerAgent.ActiveBonus.Status.Status, COMBAT_STATUS_STUN	))	finalSight *= 0.1	;
 		return finalSight;
 	}
 
@@ -53,13 +54,6 @@ namespace klib
 			::klib::clearGrid(Speed					.View, 0.0f);
 			::klib::clearGrid(SpeedTarget			.View, 0.0f);
 		}
-	};
-
-
-
-	struct SFrameInfo {
-							::klib::SInput								Input			= {};
-							::klib::STimer								Timer			= {};
 	};
 
 	// Game Mode talks about the tactical mode mostly.

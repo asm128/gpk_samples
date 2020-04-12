@@ -59,6 +59,7 @@ namespace klib
 		,	GAME_STATE_START_MISSION
 		,	GAME_STATE_TACTICAL_CONTROL
 		,	GAME_STATE_WELCOME_COMMANDER
+		,	GAME_STATE_MENU_WAN
 		,	GAME_STATE_CREDITS
 		,	GAME_STATE_EXIT
 		};
@@ -68,28 +69,30 @@ namespace klib
 				GAME_SUBSTATE								Substate;
 	};
 
-	// 1
+	// -- 0
 	static	const ::klib::SMenuItem<SGameState>			optionsMain								[] =
-		{	{ { GAME_STATE_WELCOME_COMMANDER	, GAME_SUBSTATE_RESET			}, "Start new game"					}
+		{	{ { GAME_STATE_WELCOME_COMMANDER	, GAME_SUBSTATE_RESET			}, "Start Single Player Game"		}
+		,	{ { GAME_STATE_MENU_WAN				, GAME_SUBSTATE_RESET			}, "Start Online Game"				}
 		,	{ { GAME_STATE_MENU_OPTIONS			, GAME_SUBSTATE_MAIN			}, "Options"						}
 		,	{ { GAME_STATE_CREDITS				, GAME_SUBSTATE_MAIN			}, "Credits"						}
 		};
 
-	// 2
+	// -- 1
 	static	const ::klib::SMenuItem<SGameState>			optionsMainInGame						[] =
-		{	{ { GAME_STATE_WELCOME_COMMANDER	, GAME_SUBSTATE_MAIN			}, "Continue game"					}
-		,	{ { GAME_STATE_WELCOME_COMMANDER	, GAME_SUBSTATE_RESET			}, "Start new game"					}
+		{	{ { GAME_STATE_WELCOME_COMMANDER	, GAME_SUBSTATE_MAIN			}, "Continue Game"					}
+		,	{ { GAME_STATE_WELCOME_COMMANDER	, GAME_SUBSTATE_RESET			}, "Start New Game"					}
+		,	{ { GAME_STATE_MENU_WAN				, GAME_SUBSTATE_RESET			}, "Start Online Game"				}
 		,	{ { GAME_STATE_MENU_OPTIONS			, GAME_SUBSTATE_MAIN			}, "Options"						}
 		,	{ { GAME_STATE_CREDITS				, GAME_SUBSTATE_MAIN			}, "Credits"						}
 		};
 
-	// 3
+	// -- 2
 	static	const ::klib::SMenuItem<SGameState>			optionsConfig							[] =
 		{	{ { GAME_STATE_MENU_OPTIONS			, GAME_SUBSTATE_SCREEN			}, "Screen size"					}
 		,	{ { GAME_STATE_MENU_OPTIONS			, GAME_SUBSTATE_HOTKEY			}, "Keyboard configuration"			}
 		};
 
-	// 5
+	// -- 3
 	static	const ::klib::SMenuItem<SGameState>			optionsInspect							[] =
 		{	{ { GAME_STATE_MENU_INSPECT			, GAME_SUBSTATE_PROFESSION		}, "Inspect job license"			}
 		,	{ { GAME_STATE_MENU_INSPECT			, GAME_SUBSTATE_WEAPON			}, "Inspect weapon"					}
@@ -101,7 +104,7 @@ namespace klib
 		,	{ { GAME_STATE_MENU_INSPECT			, GAME_SUBSTATE_CHARACTER		}, "Inspect general information"	}
 		};
 
-	// 6
+	// -- 4
 	static	const ::klib::SMenuItem<SGameState>			optionsSense							[] =
 		{	{ { GAME_STATE_MENU_SENSE			, GAME_SUBSTATE_PROFESSION		}, "Sense job license"				}
 		,	{ { GAME_STATE_MENU_SENSE			, GAME_SUBSTATE_WEAPON			}, "Sense weapon"					}
@@ -113,7 +116,7 @@ namespace klib
 		,	{ { GAME_STATE_MENU_SENSE			, GAME_SUBSTATE_CHARACTER		}, "Sense general information"		}
 		};
 
-	// 7
+	// -- 5
 	static	const ::klib::SMenuItem<SGameState>			optionsEquip							[] =
 		{	{ { GAME_STATE_MENU_EQUIPMENT		, GAME_SUBSTATE_PROFESSION		}, "Assign job license"				}
 		,	{ { GAME_STATE_MENU_EQUIPMENT		, GAME_SUBSTATE_WEAPON			}, "Equip weapon"					}
@@ -125,7 +128,7 @@ namespace klib
 		,	{ { GAME_STATE_MENU_EQUIPMENT		, GAME_SUBSTATE_CHARACTER		}, "Assign another agent"			}
 		};
 
-	// 8
+	// -- 6
 	static	const ::klib::SMenuItem<SGameState>			optionsBuy								[] =
 		{	{ { GAME_STATE_MENU_BUY				, GAME_SUBSTATE_PROFESSION		}, "Buy job license"				}
 		,	{ { GAME_STATE_MENU_BUY				, GAME_SUBSTATE_WEAPON			}, "Buy weapons"					}
@@ -137,7 +140,7 @@ namespace klib
 		,	{ { GAME_STATE_MENU_BUY				, GAME_SUBSTATE_CHARACTER		}, "Hire agents"					}
 		};
 
-	// ? This isn't used yet but the idea would be to allow different gr	ades of potions and probably we could expand this menu from the option selected by the user. This way we could save some space as the list of items available for buying is huge already.
+	// ? This isn't used yet but the idea would be to allow different grades of potions and probably we could expand this menu from the option selected by the user. This way we could save some space as the list of items available for buying is huge already.
 	static	const ::klib::SMenuItem<SGameState>			optionsBuySize							[] =
 		{	{ { GAME_STATE_MENU_BUY				, GAME_SUBSTATE_ITEM			}, "Small"							}
 		,	{ { GAME_STATE_MENU_BUY				, GAME_SUBSTATE_ITEM			}, "Regular"						}
@@ -145,7 +148,7 @@ namespace klib
 		,	{ { GAME_STATE_MENU_BUY				, GAME_SUBSTATE_ITEM			}, "Huge"							}
 		};
 
-	// 9
+	// -- 8
 	static	const ::klib::SMenuItem<SGameState>			optionsSell								[] =
 		{	{ { GAME_STATE_MENU_SELL			, GAME_SUBSTATE_PROFESSION		}, "Sell job license"				}
 		,	{ { GAME_STATE_MENU_SELL			, GAME_SUBSTATE_WEAPON			}, "Sell weapons"					}
@@ -157,7 +160,7 @@ namespace klib
 		,	{ { GAME_STATE_MENU_SELL			, GAME_SUBSTATE_CHARACTER		}, "Sack agents"					}
 		};
 
-	// 12
+	// -- 9
 	static	const ::klib::SMenuItem<SGameState>			optionsControlCenter					[] =
 		{	{ { GAME_STATE_START_MISSION		}, "Start new Mission"			}
 		//,	{ { GAME_STATE_MENU_LAN_MISSION		}, "Join LAN Mission"			}
@@ -170,7 +173,7 @@ namespace klib
 		,	{ { GAME_STATE_MEMORIAL				}, "Memorial"					}
 		};
 
-	// 13
+	// -- 10
 	static	const ::klib::SMenuItem<SGameState>			optionsControlCenterMissionInCourse		[] =
 		{	{ { GAME_STATE_TACTICAL_CONTROL		}, "Continue Mission"			}
 		,	{ { GAME_STATE_MENU_SQUAD_SETUP		}, "Set up Squad"				}
@@ -200,29 +203,29 @@ namespace klib
 		,	TURN_ACTION_AUTOPLAY
 		};
 
-	// 14
+	// -- 11
 	static	const ::klib::SMenuItem<TURN_ACTION>		optionsCombatTurn						[] =
-		{ { TURN_ACTION_MOVE					, "Move"						}
-		, { TURN_ACTION_ATTACK					, "Attack"						}
-		, { TURN_ACTION_SKILL					, "Skills"						}
-		, { TURN_ACTION_INVENTORY				, "Use items"					}
-		, { TURN_ACTION_EQUIPMENT				, "Equip"						}
-		, { TURN_ACTION_SENSE					, "Sense"						}
-		, { TURN_ACTION_SECURE					, "Secure loot"					}
-		, { TURN_ACTION_CANCEL					, "Cancel turn"					}
-		, { TURN_ACTION_RUN						, "Run"							}
-		, { TURN_ACTION_ABORT_MISSION			, "Abort mission"				}
-		, { TURN_ACTION_AUTOPLAY				, "Autoplay"					}
+		{ { TURN_ACTION_MOVE			, "Move"			}
+		, { TURN_ACTION_ATTACK			, "Attack"			}
+		, { TURN_ACTION_SKILL			, "Skills"			}
+		, { TURN_ACTION_INVENTORY		, "Use items"		}
+		, { TURN_ACTION_EQUIPMENT		, "Equip"			}
+		, { TURN_ACTION_SENSE			, "Sense"			}
+		, { TURN_ACTION_SECURE			, "Secure loot"		}
+		, { TURN_ACTION_CANCEL			, "Cancel turn"		}
+		, { TURN_ACTION_RUN				, "Run"				}
+		, { TURN_ACTION_ABORT_MISSION	, "Abort mission"	}
+		, { TURN_ACTION_AUTOPLAY		, "Autoplay"		}
 		};
 
-	// 15
+	// -- 12
 	static	const ::klib::SMenuItem<SGameState>			optionsCombatTurnEquip					[] =
-		{ {	{ GAME_STATE_TACTICAL_CONTROL, GAME_SUBSTATE_WEAPON					}, "Equip weapon"		}
-		, {	{ GAME_STATE_TACTICAL_CONTROL, GAME_SUBSTATE_ARMOR					}, "Equip armor"		}
-		, {	{ GAME_STATE_TACTICAL_CONTROL, GAME_SUBSTATE_ACCESSORY				}, "Equip accessory"	}
+		{ {	{ GAME_STATE_TACTICAL_CONTROL, GAME_SUBSTATE_WEAPON		}, "Equip weapon"		}
+		, {	{ GAME_STATE_TACTICAL_CONTROL, GAME_SUBSTATE_ARMOR		}, "Equip armor"		}
+		, {	{ GAME_STATE_TACTICAL_CONTROL, GAME_SUBSTATE_ACCESSORY	}, "Equip accessory"	}
 		};
 
-	// 16
+	// -- 13
 	static	const ::klib::SMenuItem<int32_t>			optionsAreYouSure						[] =
 		{	{ 1, "Yes"	}
 		,	{ 0, "No"	}

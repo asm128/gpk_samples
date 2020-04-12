@@ -11,7 +11,7 @@ static	void							completeProduction			(const ::klib::SEntityTables & entityTabl
 	case ::klib::ENTITY_TYPE_PROFESSION	: ::klib::completeProduction(playerInventory.Profession	, product.Entity, messageSuccess, entityTables.Profession	);  break;
 	case ::klib::ENTITY_TYPE_FACILITY	: ::klib::completeProduction(playerInventory.Facility	, product.Entity, messageSuccess, entityTables.Facility		);  break;
 	case ::klib::ENTITY_TYPE_STAGE_PROP	: ::klib::completeProduction(playerInventory.StageProp	, product.Entity, messageSuccess, entityTables.StageProp	);  break;
-	//case ENTITY_TYPE_ITEM		:
+	//case ::klib::ENTITY_TYPE_ITEM		:
 	}
 	char										price		[64]			= {};
 	sprintf_s(price, "%lli", product.PricePaid);
@@ -29,14 +29,13 @@ void									klib::handleProductionStep	(const ::klib::SEntityTables & entityTab
 		::klib::SEntityResearch						& product					= playerProjects.QueuedProduction[iProduct];
 
 		int64_t										assignedFunds				= ::gpk::min(budgetProduction-actualCostProduction, product.PriceUnit - product.PricePaid);
-		//product.PriceUnit						-= assignedFunds;
 		product.PricePaid						+= assignedFunds;
 		actualCostProduction					+= assignedFunds;
 	}
 
-	::gpk::array_obj<::klib::SEntityResearch> remainingProduction;
+	::gpk::array_obj<::klib::SEntityResearch>	remainingProduction;
 	for(uint32_t iProduct = 0, productCount = playerProjects.QueuedProduction.size(); iProduct < productCount; ++iProduct) {
-		const ::klib::SEntityResearch					& product				= playerProjects.QueuedProduction[iProduct];
+		const ::klib::SEntityResearch				& product					= playerProjects.QueuedProduction[iProduct];
 		if((product.PriceUnit - product.PricePaid) > 0) {
 			remainingProduction.push_back(product);
 			continue; // This product is still in production
@@ -232,7 +231,7 @@ int32_t									klib::getResearchableItems
 	,	::gpk::array_obj<::klib::SEntityResearch>				& menuItemsValue
 	,	::gpk::array_obj<::gpk::array_pod<char_t>>				& menuItemsText
 	) {
-	::klib::SCharacterResearch										researchedItems										= {};
+	::klib::SCharacterResearch					researchedItems										= {};
 
 #define GET_RESEARCHED_FOR_ENTITY(EntityToken_, ProgressiveDefinitions_, ProgressiveModifiers_)								\
 		::klib::generateResearchedList(researchedItems.EntityToken_, playerInventory.EntityToken_, researchCompleted.EntityToken_);	\
@@ -254,8 +253,8 @@ int32_t									klib::getResearchableItems
 			::klib::generateResearchedListFromAgentNoEquip(researchedItems.EntityToken_, playerAgent.Goods.Inventory.EntityToken_, researchCompleted.EntityToken_);	\
 		}																															\
 
-	int32_t															iAgent												= 0;
-	const int32_t													armySize											= (int32_t)playerArmy.size();
+	int32_t										iAgent												= 0;
+	const int32_t								armySize											= (int32_t)playerArmy.size();
 	GET_RESEARCHED_FOR_ENTITY			(Accessory	, false, false);
 	GET_RESEARCHED_FOR_ENTITY_NO_EQUIP	(StageProp	, true , false);
 	GET_RESEARCHED_FOR_ENTITY_NO_EQUIP	(Facility	, false, false);
@@ -264,7 +263,7 @@ int32_t									klib::getResearchableItems
 	GET_RESEARCHED_FOR_ENTITY			(Weapon		, false, false);
 	GET_RESEARCHED_FOR_ENTITY			(Armor		, false, false);
 
-	const uint32_t													MAX_RESEARCH_ITEMS
+	const uint32_t								MAX_RESEARCH_ITEMS
 		= entityTables.Accessory	.Definitions.size()
 		+ entityTables.Weapon		.Definitions.size()
 		+ entityTables.Armor		.Definitions.size()
@@ -275,10 +274,10 @@ int32_t									klib::getResearchableItems
 		;
 	menuItemsText	.reserve(MAX_RESEARCH_ITEMS);
 	menuItemsValue	.reserve(MAX_RESEARCH_ITEMS);
-	char										precompose			[256]	= {};
-	::gpk::view_const_char						labelEntityType				= {};
+	char										precompose			[256]							= {};
+	::gpk::view_const_char						labelEntityType										= {};
 
-	::klib::SEntityResearch						menuItemValue				= {};
+	::klib::SEntityResearch						menuItemValue										= {};
 
 	ADD_RESEARCH_DEFINITIONS(researchedItems.Profession	, ENTITY_TYPE_PROFESSION	, entityTables.Profession	.Definitions);
 	ADD_RESEARCH_DEFINITIONS(researchedItems.Weapon		, ENTITY_TYPE_WEAPON		, entityTables.Weapon		.Definitions);

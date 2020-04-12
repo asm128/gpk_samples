@@ -1,7 +1,6 @@
 #include "klib_input.h"
 
 #include "Menu.h"
-#include "klib_timer.h"
 #include "klib_ascii_color.h"
 
 #include "gpk_view_grid.h"
