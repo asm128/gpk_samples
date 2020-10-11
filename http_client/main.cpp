@@ -4,7 +4,6 @@
 // http://beej.us/guide/bgnet/html/single/bgnet.html#simpleclient
 #include "gpk_stdsocket.h"
 #include "gpk_udp_server.h"
-#include "gpk_find.h"
 #include "gpk_parse.h"
 #include "gpk_stdstring.h"
 
@@ -110,7 +109,7 @@ int								main							()						{
 		buf.resize(totalBytes);
 	}
 
-	uint32_t							stopOfHeader					= (uint32_t)::gpk::find_sequence_pod(::gpk::view_const_string{"\r\n\r\n"}, {buf.begin(), buf.size()});
+	uint32_t							stopOfHeader					= (uint32_t)::gpk::find_sequence_pod(::gpk::vcs{"\r\n\r\n"}, {buf.begin(), buf.size()});
 	::gpk::view_const_byte				httpheaderReceived				= buf;
 	::gpk::view_const_byte				contentReceived					= {};
 	if(stopOfHeader >= buf.size() - 4)
@@ -127,7 +126,7 @@ int								main							()						{
 		::gpk::array_pod<char_t>			strLine = headerLines[iLine];
 		strLine.push_back(0);
 		printf("\n%s", strLine.begin());
-		if(0 <= ::gpk::find_sequence_pod(::gpk::view_const_string{"chunked"}, ::gpk::view_const_char{strLine}))
+		if(0 <= ::gpk::find_sequence_pod(::gpk::vcs{"chunked"}, ::gpk::view_const_char{strLine}))
 			bChunked					= true;
 	}
 

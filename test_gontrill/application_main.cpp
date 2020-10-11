@@ -64,10 +64,10 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	::gpk::view_const_string												pathPNGSuite									= {};
 	{
 		const ::gpk::SJSONReader												& jsonReader									= app.Framework.JSONConfig.Reader;
-		gpk_necall(::gpk::jsonExpressionResolve("assets.images.path", jsonReader, 0, pathPNGSuite), "Failed to get path of image files! Last contents found: %s.", pathPNGSuite.begin());
+		gpk_necall(::gpk::jsonExpressionResolve(::gpk::vcs{"assets.images.path"}, jsonReader, 0, pathPNGSuite), "Failed to get path of image files! Last contents found: %s.", pathPNGSuite.begin());
 		info_printf("Path to PNG test files: %s.", pathPNGSuite.begin());
 		::gpk::view_const_string												fileNamePNG										= {};
-		const int32_t															indexJSONNodeArrayPNGFileNames					= ::gpk::jsonExpressionResolve("application.test_gontrill.images", jsonReader, 0, fileNamePNG);
+		const int32_t															indexJSONNodeArrayPNGFileNames					= ::gpk::jsonExpressionResolve(::gpk::vcs{"application.test_gontrill.images"}, jsonReader, 0, fileNamePNG);
 		const uint32_t															countFilesToLoad								= (uint32_t)::gpk::jsonArraySize(*jsonReader.Tree[indexJSONNodeArrayPNGFileNames]);
 		::gpk::SPNGData															pngDataCacheForFasterLoad;
 		::gpk::array_pod<char_t>												fullPathPNG										= {};

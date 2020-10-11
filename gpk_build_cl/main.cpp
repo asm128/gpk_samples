@@ -1,5 +1,5 @@
 //	We need to get this program to call something like: C:\WINDOWS\System32\cmd.exe /d /c msbuild /property:GenerateFullPaths=true /t:build /p:Configuration=Release /p:Platform=x64 -m
-//	For linux builds, however, we need it to call gcc or clang for every file 
+//	For linux builds, however, we need it to call gcc or clang for every file
 #define GPK_CONSOLE_LOG_ENABLED
 #define GPK_ERROR_PRINTF_ENABLED
 #define GPK_WARNING_PRINTF_ENABLED
@@ -7,7 +7,6 @@
 
 #include "gpk_json.h"
 #include "gpk_storage.h"
-#include "gpk_find.h"
 
 struct SConfigBuild {
 	::gpk::array_obj<::gpk::view_const_string>			LibFile;
@@ -34,7 +33,7 @@ static	::gpk::error_t								buildSources					(const ::SBuildConfig & app, const
 static	::gpk::error_t								buildProjects					(const ::SBuildConfig & app, int32_t indexOfBuildObject, const ::gpk::view_const_string & projectCollection, const ::gpk::view_const_string & extension) {
 	::gpk::SPathContents									treeOfSolution;
 	int32_t													indexLibNode					= ::gpk::jsonObjectValueGet(*app.TreeConfigOfBuild[indexOfBuildObject], app.TreeConfigOfBuild.View, projectCollection);
-	if(-1 == indexLibNode) 
+	if(-1 == indexLibNode)
 		info_printf("No projects found for this configuration.");
 	else {
 		info_printf("- * -- Building %s sources with %s extension -- * -", projectCollection.begin(), extension.begin());
