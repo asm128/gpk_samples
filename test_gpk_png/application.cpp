@@ -135,7 +135,6 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 		target->Color.View[y][x].a											= 255;
 	}
 
-
 	for(uint32_t iFile = 0; iFile < app.PNGImages.size(); ++iFile) {
 		const uint32_t															offsetX					= (iFile * 64);
 		::gpk::SCoord2<uint32_t>												position				= {offsetX % (target->Color.View.metrics().x - 64), offsetX / (target->Color.View.metrics().x - 64) * 64};

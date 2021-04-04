@@ -16,7 +16,7 @@ static	int											drawStars			(const ::ssg::SStars & stars, ::gpk::view_grid<
 	for(uint32_t iStar = 0; iStar < stars.Brightness.size(); ++iStar) {
 		::gpk::SCoord2<float>									starPos				= stars.Position[iStar];
 		::gpk::SColorBGRA										starFinalColor		= colors[iStar % ::gpk::size(colors)] * stars.Brightness[iStar];
-		::gpk::setPixel(targetPixels, starPos.Cast<int32_t>(), starFinalColor);
+		::gpk::setPixel(targetPixels, starPos.Cast<int16_t>(), starFinalColor);
 		const	int32_t											brightRadius		= 1 + (iStar % 3) + (rand() % 2);
 		const	double											brightRadiusSquared	= brightRadius * (double)brightRadius;
 		double													brightUnit			= 1.0 / brightRadiusSquared;
@@ -25,7 +25,7 @@ static	int											drawStars			(const ::ssg::SStars & stars, ::gpk::view_grid<
 			::gpk::SCoord2<float>									brightPos			= {(float)x, (float)y};
 			const double											brightDistance		= brightPos.LengthSquared();
 			if(brightDistance <= brightRadiusSquared) {
-				::gpk::SCoord2<int32_t>									pixelPos			= (starPos + brightPos).Cast<int32_t>();
+				::gpk::SCoord2<int16_t>									pixelPos			= (starPos + brightPos).Cast<int16_t>();
 				if( pixelPos.y >= 0 && pixelPos.y < (int32_t)targetPixels.metrics().y
 				 && pixelPos.x >= 0 && pixelPos.x < (int32_t)targetPixels.metrics().x
  				)
@@ -224,7 +224,7 @@ static	int											getLightArrays
 static	int											drawShip
 	( const ::ssg::SSolarSystem							& solarSystem
 	, const ::ssg::SShip								& ship
-	, const ::gpk::SMatrix4<float>						& matrixView
+	, const ::gpk::SMatrix4<float>						& matrixVP
 	, ::gpk::view_grid<::gpk::SColorBGRA>				& targetPixels
 	, ::gpk::view_grid<uint32_t>						depthBuffer
 	, ::ssg::SSolarSystemDrawCache						& drawCache
@@ -241,14 +241,14 @@ static	int											drawShip
 			if(-1 == entityChild.Geometry)
 				continue;
 			::gpk::SMatrix4<float>									matrixTransform				= solarSystem.Scene.ModelMatricesGlobal[entityChild.Transform];
-			::gpk::SMatrix4<float>									matrixTransformView			= matrixTransform * matrixView;
+			::gpk::SMatrix4<float>									matrixTransformVP			= matrixTransform * matrixVP;
 			::getLightArrays(matrixTransform.GetTranslation(), drawCache.LightPointsWorld, drawCache.LightColorsWorld, drawCache.LightPointsModel, drawCache.LightColorsModel);
 			const ::gpk::SGeometryQuads								& mesh						= solarSystem.Scene.Geometry[entityChild.Geometry];
 			const ::gpk::view_grid<const ::gpk::SColorBGRA>			image						= solarSystem.Scene.Image	[entityChild.Image].View;
 			for(uint32_t iTriangle = 0; iTriangle < mesh.Triangles.size(); ++iTriangle) {
 				drawCache.PixelCoords			.clear();
 				drawCache.PixelVertexWeights	.clear();
-				::gpk::drawQuadTriangle(targetPixels, mesh, iTriangle, matrixTransform, matrixTransformView, solarSystem.Scene.LightVector, drawCache.PixelCoords, drawCache.PixelVertexWeights, image, drawCache.LightPointsModel, drawCache.LightColorsModel, depthBuffer);
+				::gpk::drawQuadTriangle(targetPixels, mesh, iTriangle, matrixTransform, matrixTransformVP, solarSystem.Scene.LightVector, drawCache.PixelCoords, drawCache.PixelVertexWeights, image, drawCache.LightPointsModel, drawCache.LightColorsModel, depthBuffer);
 			}
 		}
 	}
@@ -309,6 +309,7 @@ int													ssg::solarSystemDraw		(const ::ssg::SSolarSystem & solarSystem, 
 	//------------------------------------------- Transform and Draw
 	if(0 == targetPixels.size())
 		return 1;
+
 	memset(depthBuffer.begin(), -1, sizeof(uint32_t) * depthBuffer.size());
 	{
 		::std::lock_guard<::std::mutex>							lockUpdate					(mutexUpdate);

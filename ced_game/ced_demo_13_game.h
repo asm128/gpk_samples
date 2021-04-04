@@ -286,7 +286,7 @@ namespace ssg
 	};
 
 	struct SSolarSystemDrawCache {
-		::gpk::array_pod<::gpk::SCoord2<int32_t>>			PixelCoords				;
+		::gpk::array_pod<::gpk::SCoord2<int16_t>>			PixelCoords				;
 		::gpk::array_pod<::gpk::STriangleWeights<float>>	PixelVertexWeights		;
 		::gpk::array_pod<::gpk::SCoord3<float>>				LightPointsWorld		;
 		::gpk::array_pod<::gpk::SColorBGRA>					LightColorsWorld		;

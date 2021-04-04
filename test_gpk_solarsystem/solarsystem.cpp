@@ -2,6 +2,7 @@
 #include "gpk_png.h"
 #include "gpk_image.h"
 #include "gpk_ptr.h"
+#include "gpk_stl.h"
 
 #include <cstring>
 #include <cstdint>
@@ -9,7 +10,19 @@
 
 #include <Windows.h>
 
-																				//	- Mercury	- Venus		- Earth		- Mars		- Jupiter	- Saturn	- Uranus	- Neptune	- Pluto
+
+::gpk::error_t							geometryBuildFromSTL			(const ::gpk::SSTLFile & stlFile, ::gpk::SGeometryTriangles & geometry) {
+	geometry.Triangles		.resize(stlFile.Triangles.size());
+	geometry.Normals		.resize(stlFile.Triangles.size());
+	geometry.TextureCoords	.resize(stlFile.Triangles.size());
+	for(uint32_t iTriangle = 0; iTriangle < stlFile.Triangles.size(); ++iTriangle) {
+		geometry.Normals		[iTriangle] = {stlFile.Triangles[iTriangle].Normal, stlFile.Triangles[iTriangle].Normal, stlFile.Triangles[iTriangle].Normal};
+		geometry.Triangles		[iTriangle] = stlFile.Triangles[iTriangle].Triangle;
+		geometry.TextureCoords	[iTriangle] = {};
+	}
+	return 0;
+}
+																	//	- Mercury	- Venus		- Earth		- Mars		- Jupiter	- Saturn	- Uranus	- Neptune	- Pluto
 static constexpr const double	PLANET_MASSES				[PLANET_COUNT]	=	{	0.330f		, 4.87f		, 5.97f		, 0.642f	, 1899		, 568		, 86.8f		, 102		, 0.0125f	};
 static constexpr const double	PLANET_SCALES				[PLANET_COUNT]	=	{	4879		, 12104		, 12756		, 6792		, 142984	, 120536	, 51118		, 49528		, 2390		};
 static constexpr const double	PLANET_DAY					[PLANET_COUNT]	=	{	4222.6f		, 2802.0f	, 23.9f		, 24.7f		, 9.9f		, 10.7f		, 17.2f		, 16.1f		, 153.3f	};
@@ -72,8 +85,9 @@ static	int											drawDebris			(::gpk::view_grid<::gpk::SColorBGRA> targetPix
 int													setupGame						(SSolarSystem & solarSystem)	{
 	solarSystem.Scene.Geometry.resize(1);
 	::gpk::geometryBuildSphere(solarSystem.Scene.Geometry[0], 20U, 16U, 1, {});
+//	::gpk::geometryBuildFromSTL();
 
-	solarSystem.Scene.Pivot.resize(PLANET_COUNT + 1);
+	solarSystem.Scene.Pivot.resize(PLANET_COUNT + 1); //
 	::gpk::SIntegrator3										& bodies						= solarSystem.Bodies;
 	::SScene												& scene							= solarSystem.Scene;
 	for(uint32_t iModel = 0; iModel < solarSystem.Scene.Pivot.size(); ++iModel) {
@@ -231,7 +245,7 @@ int													updateGame						(SSolarSystem & solarSystem, double secondsLastF
 	matrixView											*= matrixProjection;
 	matrixView											*= matrixViewport;
 
-	::gpk::array_pod<::gpk::SCoord2<int32_t>>				pixelCoords					= {};
+	::gpk::array_pod<::gpk::SCoord2<int16_t>>				pixelCoords					= {};
 	::gpk::array_pod<::gpk::STriangleWeights<float>>		pixelVertexWeights			= {};
 	::gpk::SModelMatrices									matrices					= {};
 	::gpk::view_grid<uint32_t>								depthBuffer					= target->DepthStencil.View;

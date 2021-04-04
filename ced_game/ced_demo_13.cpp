@@ -123,14 +123,14 @@ static	int											drawPixels
 	, const ::gpk::SCoord3		<float>					& normal
 	, const ::gpk::SCoord3		<float>					& lightVector
 	, const ::gpk::SColorFloat							& texelColor
-	, ::gpk::array_pod<::gpk::SCoord2<int32_t>>			& pixelCoords
+	, ::gpk::array_pod<::gpk::SCoord2<int16_t>>			& pixelCoords
 	, ::gpk::array_pod<::gpk::STriangleWeights<float>>	& pixelVertexWeights
 	, double											timeAnimation
 	) {
 	double													lightFactorDirectional		= normal.Dot(lightVector);
 	(void)lightFactorDirectional;
 	for(uint32_t iPixelCoord = 0; iPixelCoord < pixelCoords.size(); ++iPixelCoord) {
-		::gpk::SCoord2<int32_t>									pixelCoord					= pixelCoords		[iPixelCoord];
+		::gpk::SCoord2<int16_t>									pixelCoord					= pixelCoords		[iPixelCoord];
 		const ::gpk::STriangleWeights<float>					& vertexWeights				= pixelVertexWeights[iPixelCoord];
 		const ::gpk::SCoord3<float>								position					= ::gpk::triangleWeight(vertexWeights, triangleWorld);
 		double													factorWave					= (::gpk::max(0.0, sin(- timeAnimation * 4 + position.y * .75))) * .6;

@@ -240,7 +240,7 @@ static				::gpk::error_t										drawTriangles
 	xRotation.Identity();
 	::gpk::SMatrix4<float>														xWorld										= {};
 	xWorld.Identity();
-	const ::gpk::SNearFar													& nearFar									= camera.NearFar;
+	const ::gpk::SNearFar														& nearFar									= camera.NearFar;
 	uint32_t																	& pixelsDrawn								= renderCache.PixelsDrawn	= 0;
 	uint32_t																	& pixelsSkipped								= renderCache.PixelsSkipped	= 0;
 	renderCache.WireframePixelCoords.clear();
