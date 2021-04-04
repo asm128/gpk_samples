@@ -72,6 +72,7 @@ namespace gpk {
 	GDEFINE_ENUM_VALUE(GPRIMITIVE_TYPE, TRIANGLE		, 3);
 	//GDEFINE_ENUM_VALUE(GPRIMITIVE_TYPE, LINESTRIP		, 4);
 	//GDEFINE_ENUM_VALUE(GPRIMITIVE_TYPE, TRIANGLESTRIP	, 5);
+	GDEFINE_ENUM_VALUE(GPRIMITIVE_TYPE, QUAD			, 6);
 
 	// The way the texture wraps an object
 	GDEFINE_FLAG_TYPE(GWRAP_MODE, uint8_t); // bit field
@@ -100,14 +101,14 @@ namespace gpk {
 
 #pragma pack(push, 1)
 	struct SBlendIndices {
-		uint8_t											A							= 0xFF
-			,											B							= 0xFF
-			,											C							= 0xFF
-			,											D							= 0xFF
+		uint8_t											A								= 0xFF
+			,											B								= 0xFF
+			,											C								= 0xFF
+			,											D								= 0xFF
 			;
-		constexpr										SBlendIndices				()												noexcept 	= default;
-		constexpr										SBlendIndices				(uint8_t a, uint8_t b, uint8_t c, uint8_t d)	noexcept	: A(a), B(b), C(c), D(d)	{}
-		constexpr										SBlendIndices				(uint32_t packedValue)							noexcept
+		constexpr										SBlendIndices					()												noexcept 	= default;
+		constexpr										SBlendIndices					(uint8_t a, uint8_t b, uint8_t c, uint8_t d)	noexcept	: A(a), B(b), C(c), D(d)	{}
+		constexpr										SBlendIndices					(uint32_t packedValue)							noexcept
 			: A((uint8_t)((packedValue & 0x000000FF) >>  0))
 			, B((uint8_t)((packedValue & 0x0000FF00) >>  8))
 			, C((uint8_t)((packedValue & 0x00FF0000) >> 16))
@@ -116,117 +117,151 @@ namespace gpk {
 	};
 
 	struct SBoundingVolume {
-		float											Radius						= 0;
-		::gpk::SMinMax<::gpk::SCoord3<float>>			Limits						= {{-1, -1, -1}, {1, 1, 1}};
-		::gpk::SCoord3<float>							Center						= {0, 0, 0};
-		::gpk::BOUNDINGPRIMITIVE_TYPE					Type						= BOUNDINGPRIMITIVE_TYPE_SPHERE;
+		double											Radius							= 0;
+		::gpk::SMinMax<::gpk::SCoord3<float>>			Limits							= {{-1, -1, -1}, {1, 1, 1}};
+		::gpk::SCoord3<float>							Center							= {0, 0, 0};
+		::gpk::BOUNDINGPRIMITIVE_TYPE					Type							= BOUNDINGPRIMITIVE_TYPE_SPHERE;
 	};
 
 	struct SBufferSlice {
-		::gpk::SRange<int32_t>							Indices						= {};
-		::gpk::SRange<int32_t>							Vertices					= {};
+		::gpk::SRange<int32_t>							Indices							= {};
+		::gpk::SRange<int32_t>							Vertices						= {};
 	};
 
 	struct SLight {
-		::gpk::SColorFloat								Ambient						= {};
-		::gpk::SColorFloat								Diffuse						= {};
-		::gpk::SColorFloat								Specular					= {};
-		::gpk::SCoord3<float>							Position					= {};
-		::gpk::SCoord3<float>							Direction					= {};
-		float											Angle						= {};
-		uint32_t										Type						= {};
+		::gpk::SColorFloat								Ambient							= {};
+		::gpk::SColorFloat								Diffuse							= {};
+		::gpk::SColorFloat								Specular						= {};
+		::gpk::SCoord3<float>							Position						= {};
+		::gpk::SCoord3<float>							Direction						= {};
+		double											Angle							= {};
+		float											RangeSquared					= 1;
+		uint32_t										Type							: 3;
+		uint32_t										Disabled						: 1;
 	};
 
 	struct SCamera {
-		::gpk::SCoord3<float>							Position					= {};
-		::gpk::SCoord3<float>							Direction					= {};
-		::gpk::SNearFar									ClipPlanes					= {};
-		float											Angle						= {};
+		::gpk::SCoord3<float>							Position						= {};
+		::gpk::SCoord3<float>							Target							= {};
+		::gpk::SCoord3<float>							Up								= {};
+		::gpk::SNearFar									ClipPlanes						= {};
+		double											Angle							= {};
 	};
 
 	struct SMaterial {
-		::gpk::SColorFloat								Ambient						= {};
-		::gpk::SColorFloat								Diffuse						= {};
-		::gpk::SColorFloat								Specular					= {};
-		::gpk::SColorFloat								Emmissive					= {};
-		float											SpecularFactor				= {};
+		::gpk::SColorFloat								Ambient							= {};
+		::gpk::SColorFloat								Diffuse							= {};
+		::gpk::SColorFloat								Specular						= {};
+		::gpk::SColorFloat								Emissive						= {};
+		double											SpecularFactor					= {};
 	};
-
 	struct SRenderNodeTransform {
-		::gpk::SMatrix4<float>							Matrix						= {};
-		::gpk::SMatrix4<float>							MatrixInverse				= {};
+		::gpk::SMatrix4<float>							Matrix							= {};
+		::gpk::SMatrix4<float>							MatrixInverse					= {};
+
+		inline	void									SetIdentity						()	noexcept {
+			Matrix			.SetIdentity();
+			MatrixInverse	.SetIdentity();
+		}
 	};
 
 	struct SRenderNode {
-		int32_t											BoundingVolume				= -1;
-		int32_t											TexCoordIndices				= -1;
-		int32_t											BlendIndices				= -1;
-		int32_t											Indices						= -1;
-		int32_t											Vertices					= -1;
-		int32_t											Normals						= -1;
-		int32_t											TexCoord					= -1;
-		int32_t											VertexColor					= -1;
-		int32_t											Material					= -1;
-		int32_t											Transform					= -1;
-		::gpk::array_pod<uint32_t>						Lights						= {};
-		::gpk::array_pod<uint32_t>						Textures					= {};
+		int32_t											BoundingVolume					= -1;
+		int32_t											TexCoords						= -1;
+		int32_t											BlendIndices					= -1;
+		int32_t											Indices							= -1;
+		int32_t											Vertices						= -1;
+		int32_t											Normals							= -1;
+		int32_t											VertexColor						= -1;
+		int32_t											Material						= -1;
+		int32_t											Transform						= -1;
+		int32_t											Color							= -1;
 
-		uint64_t										PerFaceNormal				: 1;
-		uint64_t										PerFaceColor				: 1;
-		uint64_t										Transparent					: 1;
-		uint64_t										Hidden						: 1;
-		uint64_t										CullMode					: 2;
+		::gpk::array_pod<uint32_t>						Textures						= {};
+		::gpk::array_pod<uint32_t>						Lights							= {};
+
+		uint32_t										PerFaceNormal					: 1;
+		uint32_t										PerFaceColor					: 1;
+		uint32_t										Transparent						: 1;
+		uint32_t										Hidden							: 1;
+		uint32_t										CullMode						: 2;
+		uint32_t										PrimitiveType					: 3;
+
 	};
 #pragma pack(pop)
 
 	struct SRendererCache {
-		::gpk::array_pod<int32_t>						NodesToRender				= {};
-		::gpk::array_pod<::gpk::SCoord3<float>>			LightTransformedDirections	= {};
-		::gpk::array_pod<::gpk::SCoord3<float>>			LightTransformedPositions 	= {};
-		::gpk::array_pod<::gpk::SCoord3<float>>			CameraTransformedDirections	= {};
-		::gpk::array_pod<::gpk::SCoord3<float>>			CameraTransformedPositions 	= {};
+		::gpk::array_pod<uint32_t>						NodesToRender					= {};
+		::gpk::array_obj<::gpk::array_pod<uint32_t>>	NodeLights						= {};
+		::gpk::array_pod<::gpk::SMatrix4<float>>		NodesWVP						= {};
+
+		::gpk::array_pod<uint32_t>						LightsToRender					= {};
+		::gpk::array_pod<::gpk::SCoord3<float>>			LightTransformedDirections		= {};
+		::gpk::array_pod<::gpk::SCoord3<float>>			LightTransformedPositions 		= {};
+
+		::gpk::array_pod<::gpk::SCoord3<float>>			CameraTransformedDirections		= {};
+		::gpk::array_pod<::gpk::SCoord3<float>>			CameraTransformedPositions 		= {};
 	};
 
 	struct SNodeRenderer {
-		typedef	::gpk::array_pod<::gpk::SCoord3<uint16_t	>>	TIndexBuffer		;
-		typedef	::gpk::array_pod<::gpk::SCoord3<float		>>	TVertexBuffer		, TNormalBuffer,	TTangentBuffer;
-		typedef	::gpk::array_pod<::gpk::SColorBGRA			>	TVertexColorBuffer	;
-		typedef	::gpk::array_pod<::gpk::SCoord2<float		>>	TTexCoordBuffer		;
-		typedef	::gpk::array_pod<::gpk::SBlendIndices		>	TBlendIndicesBuffer	;
+		typedef	::gpk::array_pod<::gpk::SCoord3<uint16_t	>>	TIndexBuffer			;
+		typedef	::gpk::array_pod<::gpk::SCoord3<float		>>	TVertexBuffer			, TNormalBuffer,	TTangentBuffer;
+		typedef	::gpk::array_pod<::gpk::SColorBGRA			>	TVertexColorBuffer		;
+		typedef	::gpk::array_pod<::gpk::SCoord2<float		>>	TTexCoordBuffer			;
+		typedef	::gpk::array_pod<::gpk::SBlendIndices		>	TBlendIndicesBuffer		;
 
-		::gpk::array_obj<TIndexBuffer						>	Indices				= {};
-		::gpk::array_obj<TVertexBuffer						>	Vertices			= {};
-		::gpk::array_obj<TNormalBuffer						>	Normals				= {};
-		::gpk::array_obj<TTangentBuffer						>	Tangents			= {};
-		::gpk::array_obj<TVertexColorBuffer					>	VertexColors		= {};
-		::gpk::array_obj<TTexCoordBuffer					>	TexCoords			= {};
-		::gpk::array_obj<TBlendIndicesBuffer				>	BlendIndices		= {};
-		::gpk::array_pod<::gpk::SMaterial					>	Materials			= {};
-		::gpk::array_pod<::gpk::SLight						>	Lights				= {};
-		::gpk::array_pod<::gpk::SCamera						>	Cameras				= {};
-		::gpk::array_pod<::gpk::SRenderNodeTransform		>	GlobalTransforms	= {};
-		::gpk::array_pod<::gpk::SBoundingVolume				>	BoundingVolumes		= {};
-		::gpk::array_obj<::gpk::SImage<::gpk::SColorBGRA>	>	Textures			= {};
+		::gpk::array_obj<TIndexBuffer						>	Indices					= {};
+		::gpk::array_obj<TVertexBuffer						>	Vertices				= {};
+		::gpk::array_obj<TNormalBuffer						>	Normals					= {};
+		::gpk::array_obj<TTangentBuffer						>	Tangents				= {};
+		::gpk::array_obj<TVertexColorBuffer					>	VertexColors			= {};
+		::gpk::array_obj<TTexCoordBuffer					>	TexCoords				= {};
+		::gpk::array_obj<TBlendIndicesBuffer				>	BlendIndices			= {};
+		::gpk::array_obj<::gpk::SImage<::gpk::SColorBGRA>	>	Textures				= {};
+
+		::gpk::array_pod<::gpk::SColorBGRA					>	Colors					= {};
+		::gpk::array_pod<::gpk::SMaterial					>	Materials				= {};
+		::gpk::array_pod<::gpk::SLight						>	Lights					= {};
+		::gpk::array_pod<::gpk::SCamera						>	Cameras					= {};
+		::gpk::array_pod<::gpk::SRenderNodeTransform		>	Transforms				= {};
+		::gpk::array_pod<::gpk::SBoundingVolume				>	BoundingVolumes			= {};
 		//
-		::gpk::array_obj<::gpk::SRenderNode>					Nodes				= {};
+		::gpk::array_obj<::gpk::SRenderNode>					Nodes					= {};
 		//
-		::gpk::SRendererCache									RenderCache			= {};
+		::gpk::SRendererCache									RenderCache				= {};
 	};
 
+	::gpk::error_t											nodeRendererDrawNode
+		( ::gpk::SNodeRenderer					& renderer
+		, uint32_t								iNode
+		, const ::gpk::SMatrix4<float>			& view
+		, const ::gpk::SMatrix4<float>			& projection
+		, ::gpk::view_grid<::gpk::SColorBGRA>	target_image
+		, ::gpk::view_grid<uint32_t>			target_depth
+		);
+
+	::gpk::error_t											nodeRendererDraw
+		( ::gpk::SNodeRenderer					& renderer
+		, int32_t								iCamera
+		, ::gpk::view_grid<::gpk::SColorBGRA>	target_image
+		, ::gpk::view_grid<uint32_t>			target_depth
+		, bool									drawHidden			= false
+		);
+
 	struct SComponentData {
-		int32_t												IndexParent			= -1;
-		::gpk::array_pod<int32_t>							RenderNodes			= {};
-		::gpk::array_pod<::gpk::SRenderNodeTransform>		LocalTransforms		= {};
+		int32_t													IndexParent				= -1;
+		::gpk::array_pod<int32_t>								RenderNodes				= {};
+		::gpk::array_pod<::gpk::SRenderNodeTransform>			LocalTransforms			= {};
 	};
 
 	struct SComponentScene {
-		::gpk::array_pod<::gpk::view_const_char>			ComponentNames		= {};
-		::gpk::array_obj<::gpk::SComponentData>				Components			= {};
-		::gpk::array_pod<::gpk::array_pod<int32_t>>			Children			= {};	// A children list for each component
+		::gpk::array_pod<::gpk::view_const_char>				ComponentNames			= {};
+		::gpk::array_obj<::gpk::SComponentData>					Components				= {};
+		::gpk::array_pod<::gpk::array_pod<int32_t>>				Children				= {};	// A children list for each component
 
-		::gpk::SNodeRenderer								Renderer			= {};
+		::gpk::SNodeRenderer									Renderer				= {};
 
-		::gpk::error_t										CreateFromFile			(::gpk::view_const_string filename);
+		::gpk::error_t											CreateFromFile			(::gpk::view_const_string filename);
 	};
 } // namespace
 

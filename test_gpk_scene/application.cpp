@@ -5,6 +5,7 @@
 #include "gpk_encoding.h"
 #include "gpk_json_expression.h"
 #include "gpk_storage.h"
+#include "gpk_noise.h"
 
 //#define GPK_AVOID_LOCAL_APPLICATION_MODULE_MODEL_EXECUTABLE_RUNTIME
 #include "gpk_app_impl.h"
@@ -99,6 +100,22 @@ static		::gpk::error_t											loadImages							(::gme::SApplication & app)			
 
 	::loadImages(app);
 
+	// Set up main camera
+	app.Scene.Renderer.Cameras.push_back({});
+	app.Scene.Renderer.Cameras[0].Angle									= ::gpk::math_pi * .25;
+	app.Scene.Renderer.Cameras[0].ClipPlanes							= {.01f, 1000.0f};
+
+	app.Scene.Renderer.Lights.push_back({});
+	app.Scene.Renderer.Lights[0].Ambient								= ::gpk::DARKGRAY;
+	app.Scene.Renderer.Lights[0].Diffuse								= ::gpk::GRAY;
+	app.Scene.Renderer.Lights[0].Specular								= ::gpk::WHITE;
+	app.Scene.Renderer.Lights[0].Position								= {};
+	app.Scene.Renderer.Lights[0].Direction								= {.5, .5, .5};
+	app.Scene.Renderer.Lights[0].Angle									= ::gpk::math_pi * .25;
+	app.Scene.Renderer.Lights[0].RangeSquared							= 10000;
+	app.Scene.Renderer.Lights[0].Type									= ::gpk::GLIGHT_TYPE_DIRECTIONAL;
+	app.Scene.Renderer.Lights[0].Disabled								= false;
+
 	app.IdModel															= app.Scene.CreateFromFile("../gpk_data/scene/icon_home.stl");
 
 	return 0;
@@ -136,19 +153,20 @@ static		::gpk::error_t											loadImages							(::gme::SApplication & app)			
 	app;
 	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>		target;
 	target.create();
-	target->resize(app.Framework.MainDisplay.Size, {}, 0xFFFFFFFFU);
-	for(uint32_t y = 0; y < target->Color.View.metrics().y; ++y)
-	for(uint32_t x = 0; x < target->Color.View.metrics().x; ++x) {
-		target->Color.View[y][x]											= rand();
-		target->Color.View[y][x].a											= 255;
+	target->resize(app.Framework.MainDisplay.Size, 0x00081020U, 0xFFFFFFFFU);
+	for(uint32_t y = 0; y < target->Color.View.metrics().y / 3; ++y)
+	for(uint32_t x = 0; x < target->Color.View.metrics().x / 3; ++x) {
+		target->Color.View[y * 3][x * 3]									= uint32_t(::gpk::noise1DBase(y * target->Color.View.metrics().x + x + app.Framework.FrameInfo.Microseconds.Total) + app.Framework.FrameInfo.Seconds.Total) | 0xFF000000;
 	}
 
-	for(uint32_t iFile = 0; iFile < app.PNGImages.size(); ++iFile) {
-		const uint32_t															offsetX					= (iFile * 64);
-		::gpk::SCoord2<uint32_t>												position				= {offsetX % (target->Color.View.metrics().x - 64), offsetX / (target->Color.View.metrics().x - 64) * 64};
-		::gpk::grid_copy_blend(target->Color.View, app.PNGImages[iFile].View, position);
-		//::gpk::grid_scale_alpha(target->Color.View, app.PNGImages[iFile].View, position.Cast<int32_t>(), app.PNGImages[iFile].View.metrics().Cast<int32_t>() * (1 + (.01 * iFile)));
-	}
+	gerror_if(errored(::gpk::nodeRendererDraw(app.Scene.Renderer, 0, target->Color, target->DepthStencil)), "%s", "Failed to render geometry nodes.");
+
+	//for(uint32_t iFile = 0; iFile < app.PNGImages.size(); ++iFile) {
+	//	const uint32_t															offsetX					= (iFile * 64);
+	//	::gpk::SCoord2<uint32_t>												position				= {offsetX % (target->Color.View.metrics().x - 64), offsetX / (target->Color.View.metrics().x - 64) * 64};
+	//	::gpk::grid_copy_blend(target->Color.View, app.PNGImages[iFile].View, position);
+	//	//::gpk::grid_scale_alpha(target->Color.View, app.PNGImages[iFile].View, position.Cast<int32_t>(), app.PNGImages[iFile].View.metrics().Cast<int32_t>() * (1 + (.01 * iFile)));
+	//}
 
 	//::gpk::array_pod<ubyte_t>												bytesPNG				= 0;
 	//::gpk::pngFileWrite(target->Color.View, bytesPNG);
