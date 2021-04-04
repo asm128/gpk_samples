@@ -104,6 +104,9 @@ static		::gpk::error_t											loadImages							(::gme::SApplication & app)			
 	app.Scene.Renderer.Cameras.push_back({});
 	app.Scene.Renderer.Cameras[0].Angle									= ::gpk::math_pi * .25;
 	app.Scene.Renderer.Cameras[0].ClipPlanes							= {.01f, 1000.0f};
+	app.Scene.Renderer.Cameras[0].Position								= {100, 50, 100};
+	app.Scene.Renderer.Cameras[0].Target								= {};
+	app.Scene.Renderer.Cameras[0].Up									= {0, 1, 0};
 
 	app.Scene.Renderer.Lights.push_back({});
 	app.Scene.Renderer.Lights[0].Ambient								= ::gpk::DARKGRAY;
@@ -117,7 +120,11 @@ static		::gpk::error_t											loadImages							(::gme::SApplication & app)			
 	app.Scene.Renderer.Lights[0].Disabled								= false;
 
 	app.IdModel															= app.Scene.CreateFromFile("../gpk_data/scene/icon_home.stl");
-
+	memset
+		( app.Scene.Renderer.VertexColors[app.Scene.Renderer.Nodes[app.IdModel].VertexColor].begin()
+		, 0xC0
+		, app.Scene.Renderer.VertexColors[app.Scene.Renderer.Nodes[app.IdModel].VertexColor].size() * sizeof(uint32_t)
+		);
 	return 0;
 }
 
@@ -152,10 +159,10 @@ static		::gpk::error_t											loadImages							(::gme::SApplication & app)			
 	//::gpk::STimer															timer;
 	app;
 	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>		target;
-	target->resize(app.Framework.MainDisplay.Size, 0x00081020U, 0xFFFFFFFFU);
+	target->resize(app.Framework.MainDisplay.Size, 0x00102030U, 0xFFFFFFFFU);
 	for(uint32_t y = 0; y < target->Color.View.metrics().y / 3; ++y)
 	for(uint32_t x = 0; x < target->Color.View.metrics().x / 3; ++x) {
-		target->Color.View[y * 3][x * 3]									= uint32_t(::gpk::noise1DBase(y * target->Color.View.metrics().x + x + app.Framework.FrameInfo.Microseconds.Total) + app.Framework.FrameInfo.Seconds.Total) | 0xFF000000;
+		//target->Color.View[y * 3][x * 3]									= uint32_t(::gpk::noise1DBase(y * target->Color.View.metrics().x + x + app.Framework.FrameInfo.Microseconds.Total) + app.Framework.FrameInfo.Seconds.Total) | 0xFF000000;
 	}
 
 	gerror_if(errored(::gpk::nodeRendererDraw(app.Scene.Renderer, 0, target->Color, target->DepthStencil)), "%s", "Failed to render geometry nodes.");

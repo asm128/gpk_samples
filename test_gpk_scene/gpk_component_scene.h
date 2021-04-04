@@ -192,15 +192,16 @@ namespace gpk {
 
 	struct SRendererCache {
 		::gpk::array_pod<uint32_t>						NodesToRender					= {};
-		::gpk::array_obj<::gpk::array_pod<uint32_t>>	NodeLights						= {};
-		::gpk::array_pod<::gpk::SMatrix4<float>>		NodesWVP						= {};
+		::gpk::array_obj<::gpk::SCoord3<float>>			NodeLightPositions				= {};	// an element for each node to render
+		::gpk::array_obj<::gpk::SCoord3<float>>			NodeLightDirections				= {};	// an element for each node to render
+		::gpk::array_obj<::gpk::array_pod<uint32_t>>	NodeLights						= {};	// an element for each node to render
+		::gpk::array_pod<::gpk::SMatrix4<float>>		NodesWVP						= {};	// an element for each node to render
 
-		::gpk::array_pod<uint32_t>						LightsToRender					= {};
-		::gpk::array_pod<::gpk::SCoord3<float>>			LightTransformedDirections		= {};
-		::gpk::array_pod<::gpk::SCoord3<float>>			LightTransformedPositions 		= {};
+		::gpk::array_pod<::gpk::SCoord3<float>>			LightWorldDirections			= {};	// an element for each light in renderer
+		::gpk::array_pod<::gpk::SCoord3<float>>			LightWorldPositions 			= {};	// an element for each light in renderer
 
-		::gpk::array_pod<::gpk::SCoord3<float>>			CameraTransformedDirections		= {};
-		::gpk::array_pod<::gpk::SCoord3<float>>			CameraTransformedPositions 		= {};
+		::gpk::array_pod<::gpk::SCoord3<float>>			CameraWorldDirections			= {};
+		::gpk::array_pod<::gpk::SCoord3<float>>			CameraWorldPositions 			= {};
 	};
 
 	struct SNodeRenderer {
@@ -236,6 +237,7 @@ namespace gpk {
 		, uint32_t								iNode
 		, const ::gpk::SMatrix4<float>			& view
 		, const ::gpk::SMatrix4<float>			& projection
+		, const ::gpk::SMatrix4<float>			& viewProjection
 		, ::gpk::view_grid<::gpk::SColorBGRA>	target_image
 		, ::gpk::view_grid<uint32_t>			target_depth
 		);
