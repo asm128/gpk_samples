@@ -57,7 +57,7 @@ static	::gpk::error_t								buildProjects					(const ::SBuildConfig & app, int3
 				if(offsetExtensionExpected == offsetExtensionFound)
 					listOfSourceFileNames.push_back(fileName);
 			}
-			::buildSources(app, listOfSourceFileNames);
+			e_if(::buildSources(app, listOfSourceFileNames), "%s", "");
 		}
 	}
 	return 0;
@@ -67,34 +67,43 @@ static	::gpk::error_t								buildConfig						(const SBuildConfig & app) {
 	const ::gpk::view_const_string							extension						= ".cpp";
 	::gpk::ptr_nco<::gpk::SJSONNode>						rootJSONArray					= app.TreeConfigOfBuild[0];
 	for(uint32_t iBuild = 0, countBuilds = ::gpk::jsonArraySize(*rootJSONArray); iBuild < countBuilds; ++iBuild) {
-		int32_t													indexOfBuildObject				= ::gpk::jsonArrayValueGet(*rootJSONArray, iBuild);
-		::buildProjects(app, indexOfBuildObject, "libs", extension);
-		::buildProjects(app, indexOfBuildObject, "dlls", extension);
-		::buildProjects(app, indexOfBuildObject, "exes", extension);
+		const int32_t											indexOfBuildObject				= ::gpk::jsonArrayValueGet(*rootJSONArray, iBuild);
+		e_if(::gpk::failed(::buildProjects(app, indexOfBuildObject, "libs", extension)), "%s", "");
+		e_if(::gpk::failed(::buildProjects(app, indexOfBuildObject, "dlls", extension)), "%s", "");
+		e_if(::gpk::failed(::buildProjects(app, indexOfBuildObject, "exes", extension)), "%s", "");
 	}
 	return 0;
 }
 
 static	int											appMain						(::gpk::view_const_string filenameConfig)			{
 	{ // Build single configuration
-		::gpk::array_pod<char>									bufferFormat				= {};	// this is for logging the string whatever the size might be. Sadly, sprintf currently doesn't support reading from ::gpk::view_const_string or ::gpk::view_array<char_t> yet.
 		SBuildConfig											configBuild					= {};
 		configBuild.FilenameConfig							= filenameConfig;
 		{	// load file.
-			gpk_necall	(bufferFormat.resize(1024 + 2 * configBuild.FilenameConfig.size()), "FileNameConfig.size() : %u.", (uint32_t)configBuild.FilenameConfig.size());
 			ree_if		(::gpk::fileToMemory(configBuild.FilenameConfig, configBuild.JsonConfigOfBuild), "Failed to open build file: '%s'.", configBuild.FilenameConfig.begin());
 		}
 		{	// process json
-			gpk_necall	(bufferFormat.resize(1024 + 2 * configBuild.JsonConfigOfBuild.size() + 2 * configBuild.FilenameConfig.size()), "JsonConfigOfBuild.size() : %u.", (uint32_t)configBuild.JsonConfigOfBuild.size());
-			sprintf_s	(bufferFormat.begin(), bufferFormat.size(), "Failed to process configuration file: %%.%us. Path: %%.%us. Contents:\n%%.%us", configBuild.FilenameConfig.size(), configBuild.PathConfig.size(), configBuild.JsonConfigOfBuild.size());
-			ree_if		(::gpk::jsonParse(configBuild.TreeConfigOfBuild, {configBuild.JsonConfigOfBuild.begin(), configBuild.JsonConfigOfBuild.size()}), bufferFormat.begin(), configBuild.FilenameConfig.begin(), configBuild.PathConfig.begin(), configBuild.JsonConfigOfBuild.begin());
+			ree_if		(::gpk::jsonParse(configBuild.TreeConfigOfBuild, {configBuild.JsonConfigOfBuild.begin(), configBuild.JsonConfigOfBuild.size()})
+				, "Failed to process configuration file: %s. Path: %s. Contents:\n%s"
+				, ::gpk::toString(configBuild.FilenameConfig	).begin()
+				, ::gpk::toString(configBuild.PathConfig		).begin()
+				, ::gpk::toString(configBuild.JsonConfigOfBuild	).begin()
+			);
 		}
 		{	// build selected config
-			sprintf_s	(bufferFormat.begin(), bufferFormat.size(), "Using configuration file: %%.%us. Path: %%.%us. Contents:\n%%.%us", configBuild.FilenameConfig.size(), configBuild.PathConfig.size(), configBuild.JsonConfigOfBuild.size());
-			info_printf	(bufferFormat.begin(), configBuild.FilenameConfig.begin(), configBuild.PathConfig.begin(), configBuild.JsonConfigOfBuild.begin());
-			int32_t												indexOfLastSlash			= ::gpk::findLastSlash(configBuild.FilenameConfig);
-			configBuild.PathConfig							= (-1 == indexOfLastSlash) ? "./" : ::gpk::view_const_string{configBuild.FilenameConfig.begin(), (uint32_t)indexOfLastSlash};
-			gpk_necall	(::buildConfig(configBuild), bufferFormat.begin(), configBuild.FilenameConfig.begin(), configBuild.PathConfig.begin(), configBuild.JsonConfigOfBuild.begin());
+			info_printf	("Using configuration file: %s. Path: %s. Contents:\n%s"
+				, ::gpk::toString(configBuild.FilenameConfig	).begin()
+				, ::gpk::toString(configBuild.PathConfig		).begin()
+				, ::gpk::toString(configBuild.JsonConfigOfBuild	).begin()
+			);
+			int32_t													indexOfLastSlash			= ::gpk::findLastSlash(configBuild.FilenameConfig);
+			configBuild.PathConfig								= (-1 == indexOfLastSlash) ? "./" : ::gpk::view_const_string{configBuild.FilenameConfig.begin(), (uint32_t)indexOfLastSlash};
+			gpk_necall	(::buildConfig(configBuild)
+				, "Build failed. Configuration file: %s. Path: %s. Contents:\n%s"
+				, ::gpk::toString(configBuild.FilenameConfig	).begin()
+				, ::gpk::toString(configBuild.PathConfig		).begin()
+				, ::gpk::toString(configBuild.JsonConfigOfBuild	).begin()
+			);
 		}
 	}
 	return 0;

@@ -22,7 +22,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	gui.ColorModeDefault											= ::gpk::GUI_COLOR_MODE_3D;
 	int32_t																controlTestRoot			= ::gpk::controlCreate(gui);
 	const ::gpk::SColorBGRA												colorBase				= gui.Palette[gui.ThemeDefault];
-	::gpk::memcpy_s(app.Palettes, gui.DefaultColors);
+	::gpk::memcpy_s(app.Palettes, gui.DefaultColors.Storage);
 	app.Palettes[::gpk::GUI_CONTROL_PALETTE_NORMAL				]	= gui.Palettes.push_back({colorBase, {}, {}, {}, {}, {}, ::gpk::RED, {}, {}, {}, });// gui.DefaultColors.CONTROL_NORMAL				;
 	app.Palettes[::gpk::GUI_CONTROL_PALETTE_HOVER				]	= gui.Palettes.push_back({colorBase, {}, {}, {}, {}, {}, ::gpk::RED, {}, {}, {}, });// gui.DefaultColors.CONTROL_HOVER				;
 	app.Palettes[::gpk::GUI_CONTROL_PALETTE_PRESSED				]	= gui.Palettes.push_back({colorBase, {}, {}, {}, {}, {}, ::gpk::RED, {}, {}, {}, });// gui.DefaultColors.CONTROL_PRESSED			;
@@ -37,7 +37,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	controlRoot.Margin												= {20, 20, 20, 10};
 	controlRoot.Align												= ::gpk::ALIGN_CENTER					;
 	//gui.Controls.Modes[controlTestRoot].UseNewPalettes				= 1;
-	memcpy(controlRoot.Palettes, app.Palettes, sizeof(app.Palettes));
+	::gpk::memcpy_s(controlRoot.Palettes.Storage, app.Palettes);
 
 	gui.Controls.Constraints[controlTestRoot].AttachSizeToControl	= {controlTestRoot, controlTestRoot};
 	//gui.Controls.Modes	[controlTestRoot].Design				= true;
@@ -48,7 +48,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 		::gpk::SControl													& control				= gui.Controls.Controls	[controlTestChild0];
 		::gpk::SControlText												& controlText			= gui.Controls.Text		[controlTestChild0];
 		//gui.Controls.Modes[controlTestChild0].UseNewPalettes				= 1;
-		memcpy(control.Palettes, app.Palettes, sizeof(app.Palettes));
+		::gpk::memcpy_s(control.Palettes.Storage, app.Palettes);
 
 
 		control		.Area											= {{0, 0}, {(int16_t)(800 / 3 / (1 + iChild / 9)), (int16_t)(600 / 3 / (1 + iChild / 9))}}; // {32, 32}};//
@@ -119,7 +119,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 		control.Border												= {1, 1, 1, 1};
 		control.Margin												= {1, 1, 1, 1};
 		controlText.Align											= ::gpk::ALIGN_CENTER;
-		memcpy(control.Palettes, app.Palettes, sizeof(app.Palettes));
+		::gpk::memcpy_s(control.Palettes.Storage, app.Palettes);
 	}
 
 	gui.Controls.Constraints[app.IdMode			].AttachSizeToText.x	= true;

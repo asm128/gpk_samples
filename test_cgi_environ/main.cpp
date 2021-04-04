@@ -139,7 +139,7 @@ static ::gpk::error_t								cgiMain							(int argc, char** argv, char**envv)		
 	(void)(envv);
 	::gpk::SCGIRuntimeValues								runtimeValues;
 	::gpk::cgiRuntimeValuesLoad(runtimeValues, {(const char**)argv, (uint32_t)argc});
-	::gpk::array_pod<char_t>								output							= ::gpk::view_const_string{"Content-type: application/json\r\n"};
+	::gpk::array_pod<char_t>								output							= ::gpk::vcs{"Content-type: application/json\r\n"};
 	::generate_output(runtimeValues, output);
 	printf("%s", output.begin());
 	return 0;

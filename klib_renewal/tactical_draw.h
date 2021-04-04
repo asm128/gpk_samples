@@ -93,7 +93,7 @@ namespace klib
 		int32_t										nBitIndex;
 		// Stun
 		nBitIndex			= ::klib::getBitIndex(COMBAT_STATUS_FROZEN		, MAX_COMBAT_STATUS_COUNT); statusColors[nBitIndex] = {::klib::ASCII_COLOR_INDEX_DARKGREY		, ::klib::ASCII_COLOR_INDEX_WHITE		};
-		nBitIndex			= ::klib::getBitIndex(COMBAT_STATUS_PANIC		, MAX_COMBAT_STATUS_COUNT); statusColors[nBitIndex] = {::klib::ASCII_COLOR_INDEX_DARKGREY		, ::klib::ASCII_COLOR_INDEX_ORANGE		};
+		nBitIndex			= ::klib::getBitIndex(COMBAT_STATUS_PANIC		, MAX_COMBAT_STATUS_COUNT); statusColors[nBitIndex] = {::klib::ASCII_COLOR_INDEX_DARKGREY		, (int8_t)::klib::ASCII_COLOR_INDEX_ORANGE		};
 		nBitIndex			= ::klib::getBitIndex(COMBAT_STATUS_SLEEP		, MAX_COMBAT_STATUS_COUNT); statusColors[nBitIndex] = {::klib::ASCII_COLOR_INDEX_DARKGREY		, ::klib::ASCII_COLOR_INDEX_BLACK		};
 		nBitIndex			= ::klib::getBitIndex(COMBAT_STATUS_STUN		, MAX_COMBAT_STATUS_COUNT); statusColors[nBitIndex] = {::klib::ASCII_COLOR_INDEX_DARKGREY		, ::klib::ASCII_COLOR_INDEX_DARKRED		};
 		nBitIndex			= ::klib::getBitIndex(COMBAT_STATUS_SHOCK		, MAX_COMBAT_STATUS_COUNT); statusColors[nBitIndex] = {::klib::ASCII_COLOR_INDEX_DARKGREY		, ::klib::ASCII_COLOR_INDEX_CYAN		};
@@ -113,8 +113,8 @@ namespace klib
 		nBitIndex			= ::klib::getBitIndex(COMBAT_STATUS_DRUNK		, MAX_COMBAT_STATUS_COUNT); statusColors[nBitIndex] = {::klib::ASCII_COLOR_INDEX_BLUE			, ::klib::ASCII_COLOR_INDEX_GREEN		};
 		nBitIndex			= ::klib::getBitIndex(COMBAT_STATUS_BLIND		, MAX_COMBAT_STATUS_COUNT); statusColors[nBitIndex] = {::klib::ASCII_COLOR_INDEX_BLUE			, ::klib::ASCII_COLOR_INDEX_WHITE		};
 		//
-		nBitIndex			= ::klib::getBitIndex(COMBAT_STATUS_RAGE		, MAX_COMBAT_STATUS_COUNT); statusColors[nBitIndex] = {::klib::ASCII_COLOR_INDEX_ORANGE			, ::klib::ASCII_COLOR_INDEX_GREEN		};
-		nBitIndex			= ::klib::getBitIndex(COMBAT_STATUS_INVISIBLE	, MAX_COMBAT_STATUS_COUNT); statusColors[nBitIndex] = {::klib::ASCII_COLOR_INDEX_ORANGE			, ::klib::ASCII_COLOR_INDEX_WHITE		};
+		nBitIndex			= ::klib::getBitIndex(COMBAT_STATUS_RAGE		, MAX_COMBAT_STATUS_COUNT); statusColors[nBitIndex] = {(int8_t)::klib::ASCII_COLOR_INDEX_ORANGE			, ::klib::ASCII_COLOR_INDEX_GREEN		};
+		nBitIndex			= ::klib::getBitIndex(COMBAT_STATUS_INVISIBLE	, MAX_COMBAT_STATUS_COUNT); statusColors[nBitIndex] = {(int8_t)::klib::ASCII_COLOR_INDEX_ORANGE			, ::klib::ASCII_COLOR_INDEX_WHITE		};
 
 		nBitIndex			= ::klib::getBitIndex(COMBAT_STATUS_BLACKOUT	, MAX_COMBAT_STATUS_COUNT); statusColors[nBitIndex] = {::klib::ASCII_COLOR_INDEX_WHITE			, ::klib::ASCII_COLOR_INDEX_BLACK		};
 		return 0;
