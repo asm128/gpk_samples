@@ -101,25 +101,27 @@ static		::gpk::error_t											loadImages							(::gme::SApplication & app)			
 	::loadImages(app);
 
 	// Set up main camera
-	app.Scene.Renderer.Cameras.push_back({});
+	app.Scene.Renderer.Cameras.push_back(::gpk::vcs("0"), {});
 	app.Scene.Renderer.Cameras[0].Angle									= ::gpk::math_pi * .25;
 	app.Scene.Renderer.Cameras[0].ClipPlanes							= {.01f, 1000.0f};
-	app.Scene.Renderer.Cameras[0].Position								= {100, 50, 100};
-	app.Scene.Renderer.Cameras[0].Target								= {};
+	app.Scene.Renderer.Cameras[0].Position								= {200, 75, 200};
+	app.Scene.Renderer.Cameras[0].Target								= {-15, 0, 0};
 	app.Scene.Renderer.Cameras[0].Up									= {0, 1, 0};
 
-	app.Scene.Renderer.Lights.push_back({});
+	app.Scene.Renderer.Lights.push_back(::gpk::vcs("0"), {});
 	app.Scene.Renderer.Lights[0].Ambient								= ::gpk::DARKGRAY;
 	app.Scene.Renderer.Lights[0].Diffuse								= ::gpk::GRAY;
 	app.Scene.Renderer.Lights[0].Specular								= ::gpk::WHITE;
 	app.Scene.Renderer.Lights[0].Position								= {};
-	app.Scene.Renderer.Lights[0].Direction								= {.5, .5, .5};
+	app.Scene.Renderer.Lights[0].Direction								= {.5, .5, -.5};
+	app.Scene.Renderer.Lights[0].Direction.Normalize();
 	app.Scene.Renderer.Lights[0].Angle									= ::gpk::math_pi * .25;
 	app.Scene.Renderer.Lights[0].RangeSquared							= 10000;
 	app.Scene.Renderer.Lights[0].Type									= ::gpk::GLIGHT_TYPE_DIRECTIONAL;
 	app.Scene.Renderer.Lights[0].Disabled								= false;
 
 	app.IdModel															= app.Scene.CreateFromFile("../gpk_data/scene/icon_home.stl");
+	app.IdModel															= app.Scene.CreateFromFile("../gpk_data/scene/icon_home/tinker.obj");
 	memset
 		( app.Scene.Renderer.VertexColors[app.Scene.Renderer.Nodes[app.IdModel].VertexColor].begin()
 		, 0xC0
@@ -150,6 +152,7 @@ static		::gpk::error_t											loadImages							(::gme::SApplication & app)			
 				return 1;
 		}
 	}
+	app.Scene.Renderer.Cameras[0].Position.RotateY(app.Framework.FrameInfo.Seconds.LastFrame);
 	//timer.Frame();
 	//warning_printf("Update time: %f.", (float)timer.LastTimeSeconds);
 	return 0;

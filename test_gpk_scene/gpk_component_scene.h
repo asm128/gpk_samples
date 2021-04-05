@@ -153,7 +153,9 @@ namespace gpk {
 		::gpk::SColorFloat								Diffuse							= {};
 		::gpk::SColorFloat								Specular						= {};
 		::gpk::SColorFloat								Emissive						= {};
-		double											SpecularFactor					= {};
+		float											SpecularFactor					= {};
+		float											Transparency					= {};
+
 	};
 	struct SRenderNodeTransform {
 		::gpk::SMatrix4<float>							Matrix							= {};
@@ -204,6 +206,24 @@ namespace gpk {
 		::gpk::array_pod<::gpk::SCoord3<float>>			CameraWorldPositions 			= {};
 	};
 
+	template<typename _tContainer, typename _tValue>
+	struct SKeyedArray {
+		::gpk::array_obj<::gpk::view_const_char>			Names	;
+		_tContainer											Values	;
+
+		_tValue &											operator[]					(uint32_t index)				{ return Values[index]; }
+		const _tValue &										operator[]					(uint32_t index)	const		{ return Values[index]; }
+
+		const uint32_t &									size						()				const noexcept	{ return Names.size(); }
+		::gpk::error_t										push_back					(::gpk::view_const_char name, const _tValue& value) {
+			gpk_necall(Names.push_back(name), "%s", "");
+			return Values.push_back(value);
+		}
+	};
+
+	template<typename _tValue>	struct SKeyedArrayPOD : public ::gpk::SKeyedArray<::gpk::array_pod<_tValue>, _tValue> {};
+	template<typename _tValue>	struct SKeyedArrayOBJ : public ::gpk::SKeyedArray<::gpk::array_obj<_tValue>, _tValue> {};
+
 	struct SNodeRenderer {
 		typedef	::gpk::array_pod<::gpk::SCoord3<uint16_t	>>	TIndexBuffer			;
 		typedef	::gpk::array_pod<::gpk::SCoord3<float		>>	TVertexBuffer			, TNormalBuffer,	TTangentBuffer;
@@ -211,25 +231,25 @@ namespace gpk {
 		typedef	::gpk::array_pod<::gpk::SCoord2<float		>>	TTexCoordBuffer			;
 		typedef	::gpk::array_pod<::gpk::SBlendIndices		>	TBlendIndicesBuffer		;
 
-		::gpk::array_obj<TIndexBuffer						>	Indices					= {};
-		::gpk::array_obj<TVertexBuffer						>	Vertices				= {};
-		::gpk::array_obj<TNormalBuffer						>	Normals					= {};
-		::gpk::array_obj<TTangentBuffer						>	Tangents				= {};
-		::gpk::array_obj<TVertexColorBuffer					>	VertexColors			= {};
-		::gpk::array_obj<TTexCoordBuffer					>	TexCoords				= {};
-		::gpk::array_obj<TBlendIndicesBuffer				>	BlendIndices			= {};
-		::gpk::array_obj<::gpk::SImage<::gpk::SColorBGRA>	>	Textures				= {};
+		::gpk::SKeyedArrayOBJ<TIndexBuffer						>	Indices					= {};
+		::gpk::SKeyedArrayOBJ<TVertexBuffer						>	Vertices				= {};
+		::gpk::SKeyedArrayOBJ<TNormalBuffer						>	Normals					= {};
+		::gpk::SKeyedArrayOBJ<TTangentBuffer					>	Tangents				= {};
+		::gpk::SKeyedArrayOBJ<TVertexColorBuffer				>	VertexColors			= {};
+		::gpk::SKeyedArrayOBJ<TTexCoordBuffer					>	TexCoords				= {};
+		::gpk::SKeyedArrayOBJ<TBlendIndicesBuffer				>	BlendIndices			= {};
+		::gpk::SKeyedArrayOBJ<::gpk::SImage<::gpk::SColorBGRA>	>	Textures				= {};
 
-		::gpk::array_pod<::gpk::SColorBGRA					>	Colors					= {};
-		::gpk::array_pod<::gpk::SMaterial					>	Materials				= {};
-		::gpk::array_pod<::gpk::SLight						>	Lights					= {};
-		::gpk::array_pod<::gpk::SCamera						>	Cameras					= {};
-		::gpk::array_pod<::gpk::SRenderNodeTransform		>	Transforms				= {};
-		::gpk::array_pod<::gpk::SBoundingVolume				>	BoundingVolumes			= {};
+		::gpk::SKeyedArrayPOD<::gpk::SColorBGRA					>	Colors					= {};
+		::gpk::SKeyedArrayPOD<::gpk::SMaterial					>	Materials				= {};
+		::gpk::SKeyedArrayPOD<::gpk::SLight						>	Lights					= {};
+		::gpk::SKeyedArrayPOD<::gpk::SCamera					>	Cameras					= {};
+		::gpk::SKeyedArrayPOD<::gpk::SRenderNodeTransform		>	Transforms				= {};
+		::gpk::SKeyedArrayPOD<::gpk::SBoundingVolume			>	BoundingVolumes			= {};
 		//
-		::gpk::array_obj<::gpk::SRenderNode>					Nodes					= {};
+		::gpk::SKeyedArrayOBJ<::gpk::SRenderNode>					Nodes					= {};
 		//
-		::gpk::SRendererCache									RenderCache				= {};
+		::gpk::SRendererCache										RenderCache				= {};
 	};
 
 	::gpk::error_t											nodeRendererDrawNode
@@ -257,12 +277,12 @@ namespace gpk {
 	};
 
 	struct SComponentScene {
-		::gpk::array_pod<::gpk::view_const_char>				ComponentNames			= {};
-		::gpk::array_obj<::gpk::SComponentData>					Components				= {};
+		::gpk::SKeyedArrayOBJ<::gpk::SComponentData>			Components				= {};
 		::gpk::array_pod<::gpk::array_pod<int32_t>>				Children				= {};	// A children list for each component
 
 		::gpk::SNodeRenderer									Renderer				= {};
 
+		::gpk::error_t											Create					(::gpk::view_const_string name);
 		::gpk::error_t											CreateFromFile			(::gpk::view_const_string filename);
 	};
 } // namespace
