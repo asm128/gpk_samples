@@ -13,8 +13,10 @@
 	if(0 == target_image.size())
 		return 1;
 	const ::gpk::SRenderNode					& nodeToDraw			= renderer.Nodes[iNode];
-	const ::gpk::SMatrix4<float>				& matrixWorld			= renderer.Transforms[nodeToDraw.Transform].Matrix;
-	const ::gpk::SMatrix4<float>				& matrixWorldInverse	= renderer.Transforms[nodeToDraw.Transform].MatrixInverse;
+	rvw_if(2, -1 == nodeToDraw.Vertices, "No vertices to draw for node %i. Better skip this call for invisible nodes.", iNode);
+
+	const ::gpk::SMatrix4<float>				& matrixWorld			= (-1 == nodeToDraw.Transform) ? ::gpk::SMatrix4<float>::GetIdentity() : renderer.Transforms[nodeToDraw.Transform].Matrix;
+	const ::gpk::SMatrix4<float>				& matrixWorldInverse	= (-1 == nodeToDraw.Transform) ? ::gpk::SMatrix4<float>::GetIdentity() : renderer.Transforms[nodeToDraw.Transform].MatrixInverse;
 	::gpk::array_pod<::gpk::SCoord2<int32_t>>	pixelCoords;
 	::gpk::SMatrix4<float>						matrixWVP				= matrixWorld * viewProjection;
 	if(nodeToDraw.Indices >= 0) { // draw indexed triangles
@@ -92,7 +94,7 @@
 		if(drawHidden || false == nodeToRender.Hidden) {
 			renderer.RenderCache.NodesToRender.push_back(iNode);
 			::gpk::array_pod<uint32_t>					& nodeLights			= renderer.RenderCache.NodeLights[renderer.RenderCache.NodeLights.push_back({})];
-			::gpk::SCoord3<float>						nodePosition			= renderer.Transforms[nodeToRender.Transform].Matrix.GetTranslation();
+			::gpk::SCoord3<float>						nodePosition			= (-1 == nodeToRender.Transform) ? ::gpk::SCoord3<float>{} : renderer.Transforms[nodeToRender.Transform].Matrix.GetTranslation();
 			for(uint32_t iLight = 0; iLight < renderer.Lights.size(); ++iLight) {
 				const ::gpk::SLight							& light					= renderer.Lights[iLight];
 				if(light.Type & ::gpk::GLIGHT_STATE_ENABLED) {
@@ -105,7 +107,7 @@
 	}
 	for(uint32_t iNode = 0; iNode < renderer.RenderCache.NodesToRender.size(); ++iNode) {
 		const uint32_t												indexNode				= renderer.RenderCache.NodesToRender[iNode];
-		e_if(::gpk::nodeRendererDrawNode(renderer, indexNode, matrixView, matrixProjection, matrixVP, target_image, target_depth), "Failed to render node %i", indexNode);
+		e_if(errored(::gpk::nodeRendererDrawNode(renderer, indexNode, matrixView, matrixProjection, matrixVP, target_image, target_depth)), "Failed to render node %i", indexNode);
 	}
 	return 0;
 }
