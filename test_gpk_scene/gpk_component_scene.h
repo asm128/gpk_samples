@@ -192,6 +192,14 @@ namespace gpk {
 	};
 #pragma pack(pop)
 
+	typedef	::gpk::array_pod<::gpk::SCoord3<uint16_t		>>	TIndexBuffer			;
+	typedef	::gpk::array_pod<::gpk::SCoord3<float			>>	TVertexBuffer			, TNormalBuffer,	TTangentBuffer;
+	typedef	::gpk::array_pod<::gpk::SColorBGRA				>	TVertexColorBuffer		;
+	typedef	::gpk::array_pod<::gpk::SCoord2<float			>>	TTexCoordBuffer			;
+	typedef	::gpk::array_pod<::gpk::SBlendIndices			>	TBlendIndicesBuffer		;
+	typedef	::gpk::array_pod<::gpk::SCoord2<int16_t>		>	TPixelCoordBuffer		;
+	typedef	::gpk::array_pod<::gpk::STriangleWeights<float>	>	TTriangleWeightBuffer	;
+
 	struct SRendererCache {
 		::gpk::array_pod<uint32_t>						NodesToRender					= {};
 		::gpk::array_obj<::gpk::SCoord3<float>>			NodeLightPositions				= {};	// an element for each node to render
@@ -204,6 +212,14 @@ namespace gpk {
 
 		::gpk::array_pod<::gpk::SCoord3<float>>			CameraWorldDirections			= {};
 		::gpk::array_pod<::gpk::SCoord3<float>>			CameraWorldPositions 			= {};
+
+		TIndexBuffer									IndexBuffer						= {};
+		TVertexBuffer									VertexBuffer					= {};
+		TVertexColorBuffer								VertexColorBuffer				= {};
+		TTexCoordBuffer									TexCoordBuffer					= {};
+		TBlendIndicesBuffer								BlendIndicesBuffer				= {};
+		TPixelCoordBuffer								PixelCoordBuffer				= {};
+		TTriangleWeightBuffer							TriangleWeightBuffer			= {};
 	};
 
 	template<typename _tContainer, typename _tValue>

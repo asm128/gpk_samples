@@ -44,11 +44,13 @@
 					matrixViewport.ViewportLH(target_image.metrics());
 					::gpk::transform(triangleTransformed, matrixViewport);
 
-					triangleFinal.A		= {(int16_t)triangleTransformed.A.x, (int16_t)triangleTransformed.A.y};
-					triangleFinal.B		= {(int16_t)triangleTransformed.B.x, (int16_t)triangleTransformed.B.y};
-					triangleFinal.C		= {(int16_t)triangleTransformed.C.x, (int16_t)triangleTransformed.C.y};
-
-					::gpk::drawTriangle(target_image, triangleFinal, triangleColor * nodeNormals[iTriangle].Dot(renderer.Lights[0].Direction));
+					renderer.RenderCache.PixelCoordBuffer.clear();
+					::gpk::drawTriangle(target_image.metrics(), triangleTransformed, renderer.RenderCache.PixelCoordBuffer, renderer.RenderCache.TriangleWeightBuffer, target_depth);
+					triangleColor							= triangleColor * nodeNormals[iTriangle].Dot(renderer.Lights[0].Direction);
+					for(uint32_t iPixelCoord = 0; iPixelCoord < renderer.RenderCache.PixelCoordBuffer.size(); ++iPixelCoord) {
+						const ::gpk::SCoord2<int16_t>				pixelCoord				= renderer.RenderCache.PixelCoordBuffer[iPixelCoord];
+						target_image[pixelCoord.y][pixelCoord.x]	= triangleColor;
+					}
 				}
 			}
 			else {
