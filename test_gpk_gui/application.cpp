@@ -135,9 +135,9 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 			control.Area												= {{(int16_t)(256 - iShade * 16), (int16_t)(iTone * 16)}, {16, 16}};
 			//control.Area.Offset											+= {mainWi, 0};
 			//control.Area.Offset											-= {iShades * iShadesHalf - 8, iShades * iShadesHalf - 8};
-			control.Border												=
+			control.Border												= {1, 1, 1, 1};
 			control.Margin												= {1, 1, 1, 1};
-			control.ColorTheme											= iTone * iShades + iShade + 1;
+			control.ColorTheme											= int16_t(iTone * iShades + iShade + 1);
 			controlText.Text											= ".";
 			::gpk::controlSetParent(gui, idPaletteItem, 0);
 		}
@@ -148,9 +148,9 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 		::gpk::SControlText												& controlRowText	= gui.Controls.Text[idPaletteRow];
 		controlRow.Align											= ::gpk::ALIGN_TOP_RIGHT;
 		controlRow.Area												= {{(int16_t)(256 - iShade * 16), -16}, {16, 16}};
-		controlRow.Border											=
+		controlRow.Border											= {1, 1, 1, 1};
 		controlRow.Margin											= {1, 1, 1, 1};
-		controlRow.ColorTheme										= iShade + 1;
+		controlRow.ColorTheme										= int16_t(iShade + 1);
 		controlRowText.Text											= app.RowText[iShade];
 		//gui.Controls.Constraints[idPaletteRow].AttachSizeToText.x	= true;
 		::gpk::controlSetParent(gui, idPaletteRow, 0);
@@ -163,9 +163,9 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 		controlRow.Area												= {{(int16_t)256+16, (int16_t)(iTone * 16)}, {16, 16}};
 		//control.Area.Offset										+= {mainWi, 0};
 		//control.Area.Offset										-= {iShades * iShadesHalf - 8, iShades * iShadesHalf - 8};
-		controlRow.Border											=
+		controlRow.Border											= {1, 1, 1, 1};
 		controlRow.Margin											= {1, 1, 1, 1};
-		controlRow.ColorTheme										= iTone * iShades + 0 + 1;
+		controlRow.ColorTheme										= int16_t(iTone * iShades + 0 + 1);
 		controlRowText.Text											= app.RowText[iTone];
 		gui.Controls.Constraints[idPaletteRow].AttachSizeToText.x	= true;
 		::gpk::controlSetParent(gui, idPaletteRow, 0);
@@ -262,7 +262,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 						gui.Controls.Modes[iChild].UseNewPalettes						= gui.Controls.Modes[iChild].UseNewPalettes ? 0 : 1;
 				}
 				else if(iControl > (uint32_t)app.IdMode) {
-					gui.Controls.Controls[5].ColorTheme								= iControl - app.IdNewPalette;
+					gui.Controls.Controls[5].ColorTheme								= int16_t(iControl - app.IdNewPalette);
 					if(gui.Controls.Controls[5].ColorTheme >= (int32_t)gui.Palette.size())
 						gui.Controls.Controls[5].ColorTheme								= 10;
 					for(uint32_t iChild = 0; iChild < gui.Controls.Children[5].size(); ++iChild)

@@ -288,11 +288,11 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	app.DialogMain.Controls[app.SliderH].as(slider);
 	::gpk::ptr_obj<::gpk::SDialogViewport>									viewport									= {};
 	app.DialogMain.Controls[app.ViewportMinimap].as(viewport);
-	gui.Controls.Controls[viewport->IdClient].ImageOffset.x				= (int32_t)slider->ValueCurrent;
+	gui.Controls.Controls[viewport->IdClient].ImageOffset.x				= (int16_t)slider->ValueCurrent;
 	::gpk::controlMetricsInvalidate(gui, slider->IdGUIControl);
 
 	app.DialogMain.Controls[app.SliderV].as(slider);
-	gui.Controls.Controls[viewport->IdClient].ImageOffset.y				= (int32_t)slider->ValueCurrent;
+	gui.Controls.Controls[viewport->IdClient].ImageOffset.y				= (int16_t)slider->ValueCurrent;
 	::gpk::controlMetricsInvalidate(gui, slider->IdGUIControl);
 
 
