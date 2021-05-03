@@ -63,22 +63,22 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	app.NumericTuner													= ::gpk::tunerCreate(app.DialogMain, tuner);
 	tuner->ValueLimits.Min												= 100;
 	tuner->ValueLimits.Max												= 200;
-	::gpk::SGUIControlTable    & controlTable = gui.Controls;
-	controlTable.Controls[tuner->IdGUIControl].Area.Offset	= {128, 192};
-	controlTable.Controls[tuner->IdGUIControl].Area.Size.x	= 128;
-	controlTable.Controls[tuner->IdGUIControl].Area.Size.y	=  20;
+	::gpk::SGUIControlTable													& controlTable				= gui.Controls;
+	controlTable.Controls[tuner->IdGUIControl].Area.Offset				= {128, 192};
+	controlTable.Controls[tuner->IdGUIControl].Area.Size.x				= 128;
+	controlTable.Controls[tuner->IdGUIControl].Area.Size.y				=  20;
 	::gpk::tunerSetValue(*tuner, 0);
 
 	::gpk::ptr_obj<::gpk::SDialogCheckBox>									checkbox					= {};
 	app.CheckBox														= ::gpk::checkBoxCreate(app.DialogMain, checkbox);
-	controlTable.Controls[checkbox->IdGUIControl].Area.Offset	= {128, 256};
+	controlTable.Controls[checkbox->IdGUIControl].Area.Offset			= {128, 256};
 
 
 	::gpk::ptr_obj<::gpk::SDialogViewport>									viewport					= {};
 	app.Viewport														= ::gpk::viewportCreate(app.DialogMain, viewport);
-	controlTable.Controls	[viewport->IdGUIControl].Area.Offset	= {320, 128};
-	controlTable.Controls	[viewport->IdGUIControl].Area.Size		= {640, 480};
-	controlTable.States		[viewport->IdClient].ImageInvertY		= true;
+	controlTable.Controls	[viewport->IdGUIControl].Area.Offset		= {320, 128};
+	controlTable.Controls	[viewport->IdGUIControl].Area.Size			= {640, 480};
+	controlTable.States		[viewport->IdClient].ImageInvertY			= true;
 
 
 	//---------------------------
@@ -192,7 +192,8 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	controlTable.Controls	[viewport->IdGUIControl].Align			= ::gpk::ALIGN_RIGHT;
 	controlTable.States		[viewport->IdClient].ImageInvertY		= true;
 	::gpk::viewportAdjustSize(controlTable.Controls[viewport->IdGUIControl].Area.Size, minimapTemp.metrics().Cast<int16_t>() * 2);
-	controlTable.Controls[viewport->IdClient].Image					= app.TextureMinimap.View;
+	controlTable.Controls	[viewport->IdClient].Image				= app.TextureMinimap.View;
+	controlTable.Controls	[viewport->IdClient].ImageAlign			= ::gpk::ALIGN_TOP_LEFT;
 
 	::gpk::ptr_obj<::gpk::SDialogSlider>									sliderH						= {};
 	app.SliderH															= ::gpk::sliderCreate(app.DialogMain, sliderH);
