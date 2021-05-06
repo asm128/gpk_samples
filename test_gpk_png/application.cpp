@@ -17,7 +17,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 	::gpk::SDisplay															& mainWindow						= framework.MainDisplay;
 	framework.Input.create();
 	mainWindow.Size														= {1280, 720};
-	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window. %s.", "why?????!?!?!?!?");
+	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window. %s.", "why?!");
 	{ // Build the exit button
 		::gpk::SGUI																& gui								= *framework.GUI;
 		gui.ColorModeDefault												= ::gpk::GUI_COLOR_MODE_3D;
@@ -42,7 +42,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 		{
 			const ::gpk::SJSONReader												& jsonReader						= framework.JSONConfig.Reader;
 			gpk_necall(::gpk::jsonExpressionResolve(::gpk::vcs{"assets.pngsuite.path"}, jsonReader, 0, pathPNGSuite), "Failed to get path of PNG files! Last contents found: %s.", pathPNGSuite.begin());
-			info_printf("Path to PNG test files: %s.", pathPNGSuite.begin());
+			info_printf("Path to PNG test files: %s.", ::gpk::toString(pathPNGSuite).begin());
 			::gpk::view_const_string												fileNamePNG							= {};
 			const int32_t															indexJSONNodeArrayPNGFileNames		= ::gpk::jsonExpressionResolve(::gpk::vcs{"application.gpk_test_png.images"}, jsonReader, 0, fileNamePNG);
 			const uint32_t															countFilesToLoad					= (uint32_t)::gpk::jsonArraySize(*jsonReader.Tree[indexJSONNodeArrayPNGFileNames]);
@@ -51,7 +51,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 			::gpk::array_pod<char_t>												fullPathPNG							= {};
 			char																	subscriptExpression	[64]			= {};
 			for(uint32_t iFile = 0; iFile < countFilesToLoad; ++iFile) {
-				const uint32_t															lenExpression						= sprintf_s(subscriptExpression, "['%u']", iFile);
+				const uint32_t															lenExpression						= snprintf(subscriptExpression, 62, "['%u']", iFile);
 				::gpk::jsonExpressionResolve({subscriptExpression, lenExpression}, jsonReader, indexJSONNodeArrayPNGFileNames, fileNamePNG);
 				fullPathPNG.clear();
 				::gpk::pathNameCompose(pathPNGSuite, fileNamePNG, fullPathPNG);
@@ -71,26 +71,26 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 				::gpk::rleEncode(viewToRLE, rleBuffer);
 				sizesRLE.push_back(rleBuffer.size());
 				const uint32_t															sizePNGInBytes			= viewToRLE.size() * sizeof(::gpk::SColorBGRA);
-				info_printf("--- RLE compression stats:"
-					"\nsizePNGRLE          : %u"
-					"\nsizePNGUncompressed : %u"
-					"\nratio               : %f"
-					, rleBuffer.size()
-					, sizePNGInBytes
-					, (float)rleBuffer.size() / sizePNGInBytes
-					);
+				//info_printf("--- RLE compression stats:"
+				//	"\nsizePNGRLE          : %u"
+				//	"\nsizePNGUncompressed : %u"
+				//	"\nratio               : %f"
+				//	, rleBuffer.size()
+				//	, sizePNGInBytes
+				//	, (float)rleBuffer.size() / sizePNGInBytes
+				//	);
 				sizeTotalRLE														+= rleBuffer.size();
 				sizeTotalUncompressed												+= sizePNGInBytes;
 				rleBuffer.clear();
 			}
-			info_printf("--- RLE compression stats:"
-				"\nsizeTotalRLE          : %u"
-				"\nsizeTotalUncompressed : %u"
-				"\nratio                 : %f"
-				, sizeTotalRLE
-				, sizeTotalUncompressed
-				, (float)sizeTotalRLE / sizeTotalUncompressed
-				);
+			//info_printf("--- RLE compression stats:"
+			//	"\nsizeTotalRLE          : %u"
+			//	"\nsizeTotalUncompressed : %u"
+			//	"\nratio                 : %f"
+			//	, sizeTotalRLE
+			//	, sizeTotalUncompressed
+			//	, (float)sizeTotalRLE / sizeTotalUncompressed
+			//	);
 		}
 	}
 	return 0;
@@ -125,7 +125,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 
 			::gpk::error_t											draw					(::gme::SApplication & app)							{
 	//::gpk::STimer															timer;
-	app;
+	(void)app;
 	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>		target;
 	target.create();
 	target->resize(app.Framework.MainDisplay.Size, {}, 0xFFFFFFFFU);

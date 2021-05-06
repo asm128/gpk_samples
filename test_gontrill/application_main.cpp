@@ -65,7 +65,7 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	{
 		const ::gpk::SJSONReader												& jsonReader									= app.Framework.JSONConfig.Reader;
 		gpk_necall(::gpk::jsonExpressionResolve(::gpk::vcs{"assets.images.path"}, jsonReader, 0, pathPNGSuite), "Failed to get path of image files! Last contents found: %s.", pathPNGSuite.begin());
-		info_printf("Path to PNG test files: %s.", pathPNGSuite.begin());
+		info_printf("Path to PNG test files: %s.", ::gpk::toString(pathPNGSuite).begin());
 		::gpk::view_const_string												fileNamePNG										= {};
 		const int32_t															indexJSONNodeArrayPNGFileNames					= ::gpk::jsonExpressionResolve(::gpk::vcs{"application.test_gontrill.images"}, jsonReader, 0, fileNamePNG);
 		const uint32_t															countFilesToLoad								= (uint32_t)::gpk::jsonArraySize(*jsonReader.Tree[indexJSONNodeArrayPNGFileNames]);
@@ -106,7 +106,7 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	g_ApplicationInstance													= &applicationInstance;
 	::gpk::SFramework															& framework									= applicationInstance.Framework;
 	framework.MainDisplay.Size												= {1280, 720};
-	gerror_if(errored(::gpk::mainWindowCreate(framework.MainDisplay, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?????!?!?!?!?");
+	gerror_if(errored(::gpk::mainWindowCreate(framework.MainDisplay, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?!");
 	::setupParticles();
 	ree_if	(errored(::updateSizeDependentResources	(applicationInstance)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
 	ree_if	(errored(::setupSprites					(applicationInstance)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");

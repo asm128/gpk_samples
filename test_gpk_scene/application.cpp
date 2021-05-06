@@ -19,7 +19,7 @@ static		::gpk::error_t											loadImages							(::gme::SApplication & app)			
 	{
 		const ::gpk::SJSONReader												& jsonReader						= framework.JSONConfig.Reader;
 		gpk_necall(::gpk::jsonExpressionResolve(::gpk::vcs{"assets.pngsuite.path"}, jsonReader, 0, pathPNGSuite), "Failed to get path of PNG files! Last contents found: %s.", pathPNGSuite.begin());
-		info_printf("Path to PNG test files: %s.", pathPNGSuite.begin());
+		info_printf("Path to PNG test files: %s.", ::gpk::toString(pathPNGSuite).begin());
 		::gpk::view_const_string												fileNamePNG							= {};
 		const int32_t															indexJSONNodeArrayPNGFileNames		= ::gpk::jsonExpressionResolve(::gpk::vcs{"application.gpk_test_png.images"}, jsonReader, 0, fileNamePNG);
 		const uint32_t															countFilesToLoad					= (uint32_t)::gpk::jsonArraySize(*jsonReader.Tree[indexJSONNodeArrayPNGFileNames]);
@@ -79,7 +79,7 @@ static		::gpk::error_t											loadImages							(::gme::SApplication & app)			
 	::gpk::SDisplay															& mainWindow						= framework.MainDisplay;
 	framework.Input.create();
 	mainWindow.Size														= {1280, 720};
-	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window. %s.", "why?????!?!?!?!?");
+	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window. %s.", "why?!");
 	{ // Build the exit button
 		::gpk::SGUI																& gui								= *framework.GUI;
 		gui.ColorModeDefault												= ::gpk::GUI_COLOR_MODE_3D;
