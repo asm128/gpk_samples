@@ -38,5 +38,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="solarsystem.json" />
+    <None Include="Makefile" />
   </ItemGroup>
 </Project>

@@ -8,8 +8,9 @@
 #include <cstdint>
 #include <algorithm>
 
-#include <Windows.h>
-
+#if defined(GPK_WINDOWS)
+#	include <Windows.h>
+#endif
 
 ::gpk::error_t							geometryBuildFromSTL			(const ::gpk::SSTLFile & stlFile, ::gpk::SGeometryTriangles & geometry) {
 	geometry.Triangles		.resize(stlFile.Triangles.size());
@@ -164,7 +165,6 @@ int													setupGame						(SSolarSystem & solarSystem)	{
 
 int													updateEntityTransforms		(uint32_t iEntity, ::gpk::array_obj<::SEntity> & entities, SScene & scene, ::gpk::SIntegrator3 & bodies)	{
 	const SEntity											& entity					= entities[iEntity];
-	::gpk::SModelMatrices									matrices					= {};
 	if(-1 == entity.IndexBody)
 		scene.Transform[iEntity]							= (-1 == entity.IndexParent) ? bodies.MatrixIdentity4 : scene.Transform[entity.IndexParent];
 	else {
@@ -188,7 +188,6 @@ int													updateGame						(SSolarSystem & solarSystem, double secondsLastF
 	::gpk::SIntegrator3										& bodies						= solarSystem.Bodies;
 	::SScene												& scene							= solarSystem.Scene;
 
-	::gpk::SMatrix4<float>									matrixBody						= {};
 	scene.Transform.resize(solarSystem.Entities.size());
 	for(uint32_t iEntity = 0; iEntity < solarSystem.Entities.size(); ++iEntity) {
 		const ::SEntity											& entity					= solarSystem.Entities[iEntity];
@@ -201,6 +200,7 @@ int													updateGame						(SSolarSystem & solarSystem, double secondsLastF
 
 	// ------------------------------------------- Handle input
 	::gpk::SCamera											& camera					= solarSystem.Scene.Camera;
+#if defined(GPK_WINDOWS)
 	if(GetAsyncKeyState('Q')) camera.Position.z				-= (float)secondsLastFrame * (GetAsyncKeyState(VK_SHIFT) ? 100 : 10);
 	if(GetAsyncKeyState('E')) camera.Position.z				+= (float)secondsLastFrame * (GetAsyncKeyState(VK_SHIFT) ? 100 : 10);
 	if(GetAsyncKeyState('S')) camera.Position				+= camera.Position / camera.Position.Length() * (GetAsyncKeyState(VK_SHIFT) ? 100 : 2) * secondsLastFrame;
@@ -217,7 +217,7 @@ int													updateGame						(SSolarSystem & solarSystem, double secondsLastF
 	if(GetAsyncKeyState('7')) { ; camera.Target = scene.Transform[7 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::SCoord3<float>{scene.Pivot[solarSystem.Entities[7 * 2].IndexModel].Scale.x * 10, 0, 0}; }
 	if(GetAsyncKeyState('8')) { ; camera.Target = scene.Transform[8 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::SCoord3<float>{scene.Pivot[solarSystem.Entities[8 * 2].IndexModel].Scale.x * 10, 0, 0}; }
 	if(GetAsyncKeyState('9')) { ; camera.Target = scene.Transform[9 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::SCoord3<float>{scene.Pivot[solarSystem.Entities[9 * 2].IndexModel].Scale.x * 10, 0, 0}; }
-
+#endif
 	solarSystem.SunFire.SpawnSpherical(100, {}, 5, 1, 10);
 
 	// Update physics
@@ -226,8 +226,8 @@ int													updateGame						(SSolarSystem & solarSystem, double secondsLastF
 
 	//------------------------------------------- Transform and Draw
 	::gpk::view_grid<::gpk::SColorBGRA>						targetPixels				= target->Color.View;
-	memset(targetPixels.begin(), 0, sizeof(::gpk::SColorBGRA) * targetPixels.size());
-		::gpk::SColorBGRA										colorBackground		= {0x20, 0x8, 0x4};
+	targetPixels.fill(::gpk::SColorBGRA{0, 0, 0, 0});
+	::gpk::SColorBGRA										colorBackground		= {0x20, 0x8, 0x4};
 	//colorBackground									+= (colorBackground * (0.5 + (0.5 / 65535 * rand())) * ((rand() % 2) ? -1 : 1)) ;
 	for(uint32_t y = 0; y < targetPixels.metrics().y; ++y) // Generate noise color for planet texture
 	for(uint32_t x = 0; x < targetPixels.metrics().x; ++x)
