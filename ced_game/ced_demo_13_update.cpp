@@ -61,7 +61,9 @@ static	int											collisionDetect		(::ssg::SShots & shots, const ::gpk::SCoor
 }
 
 static	int											handleCollisionPoint	(::ssg::SSolarSystem & solarSystem, int32_t weaponDamage, ::ssg::SShipPart& damagedPart, ::ssg::SShip & damagedShip, const ::gpk::SCoord3<float> & sphereCenter, const ::gpk::SCoord3<float> & collisionPoint, void* soundAlias)	{
+#if defined(GPK_WINDOWS)
 	PlaySound((LPCTSTR)soundAlias, GetModuleHandle(0), SND_ALIAS_ID | SND_ASYNC);
+#endif
 	const ::gpk::SCoord3<float>								bounceVector				= (collisionPoint - sphereCenter).Normalize();
 	solarSystem.Debris.SpawnDirected(5, 0.3, bounceVector, collisionPoint, 50, 1);
 	solarSystem.Score									+= 1;
@@ -230,21 +232,55 @@ int													ssg::solarSystemUpdate				(::ssg::SSolarSystem & solarSystem, do
 
 	::gpk::SCamera											& camera				= solarSystem.Scene.Camera[solarSystem.Scene.CameraMode];
 
-	if(GetAsyncKeyState('Q')) camera.Position.y	-= (float)secondsLastFrame * (GetAsyncKeyState(VK_SHIFT) ? 8 : 2);
-	if(GetAsyncKeyState('E')) camera.Position.y	+= (float)secondsLastFrame * (GetAsyncKeyState(VK_SHIFT) ? 8 : 2);
+#if defined(GPK_WINDOWS)
+	const bool												key_up					= GetAsyncKeyState('W') || GetAsyncKeyState(VK_UP	);
+	const bool												key_down				= GetAsyncKeyState('S') || GetAsyncKeyState(VK_DOWN	);
+	const bool												key_left				= GetAsyncKeyState('A') || GetAsyncKeyState(VK_LEFT	);
+	const bool												key_right				= GetAsyncKeyState('D') || GetAsyncKeyState(VK_RIGHT);
+	const bool												key_turbo				= GetAsyncKeyState(VK_SHIFT);
+	const bool												key_rotate_left			= GetAsyncKeyState(VK_NUMPAD8);
+	const bool												key_rotate_right		= GetAsyncKeyState(VK_NUMPAD2);
+	const bool												key_rotate_front		= GetAsyncKeyState(VK_NUMPAD6);
+	const bool												key_rotate_back			= GetAsyncKeyState(VK_NUMPAD4);
+	const bool												key_rotate_reset		= GetAsyncKeyState(VK_NUMPAD5);
+	const bool												key_camera_switch		= GetAsyncKeyState('C');
+	const bool												key_camera_move_front	= GetAsyncKeyState(VK_HOME);
+	const bool												key_camera_move_back	= GetAsyncKeyState(VK_END);
+	const bool												key_camera_move_up		= GetAsyncKeyState('E');
+	const bool												key_camera_move_down	= GetAsyncKeyState('Q');
+#else
+	const bool												key_up					= false;
+	const bool												key_down				= false;
+	const bool												key_left				= false;
+	const bool												key_right				= false;
+	const bool												key_turbo				= false;
+	const bool												key_rotate_left			= false;
+	const bool												key_rotate_right		= false;
+	const bool												key_rotate_front		= false;
+	const bool												key_rotate_back			= false;
+	const bool												key_rotate_reset		= false;
+	const bool												key_camera_switch		= false;
+	const bool												key_camera_move_up		= false;
+	const bool												key_camera_move_down	= false;
+	const bool												key_camera_move_front	= false;
+	const bool												key_camera_move_back	= false;
+#endif
+	if(key_camera_move_up	) camera.Position.y	+= (float)secondsLastFrame * (key_turbo ? 8 : 2);
+	if(key_camera_move_down	) camera.Position.y	-= (float)secondsLastFrame * (key_turbo ? 8 : 2);
 	::gpk::STransform3										& playerBody			= solarSystem.ShipPhysics.Transforms[solarSystem.Entities[0].Body];
+
 	{
-			 if(GetAsyncKeyState('W') || GetAsyncKeyState(VK_UP		)) { playerBody.Position.x			+= (float)(secondsLastFrame * speed * (GetAsyncKeyState(VK_SHIFT) ? 2 : 8)); solarSystem.AccelerationControl	= +1; }
-		else if(GetAsyncKeyState('S') || GetAsyncKeyState(VK_DOWN	)) { playerBody.Position.x			-= (float)(secondsLastFrame * speed * (GetAsyncKeyState(VK_SHIFT) ? 2 : 8)); solarSystem.AccelerationControl	= -1; }
+			 if(key_up	) { playerBody.Position.x			+= (float)(secondsLastFrame * speed * (key_turbo ? 2 : 8)); solarSystem.AccelerationControl	= +1; }
+		else if(key_down) { playerBody.Position.x			-= (float)(secondsLastFrame * speed * (key_turbo ? 2 : 8)); solarSystem.AccelerationControl	= -1; }
 		else
 			solarSystem.AccelerationControl	= 0;
 
-		if(GetAsyncKeyState('A') || GetAsyncKeyState(VK_LEFT	)) { playerBody.Position.z			+= (float)(secondsLastFrame * speed * (GetAsyncKeyState(VK_SHIFT) ? 2 : 8)); }
-		if(GetAsyncKeyState('D') || GetAsyncKeyState(VK_RIGHT	)) { playerBody.Position.z			-= (float)(secondsLastFrame * speed * (GetAsyncKeyState(VK_SHIFT) ? 2 : 8)); }
+		if(key_left	) { playerBody.Position.z			+= (float)(secondsLastFrame * speed * (key_turbo ? 2 : 8)); }
+		if(key_right) { playerBody.Position.z			-= (float)(secondsLastFrame * speed * (key_turbo ? 2 : 8)); }
 	}
 
 	solarSystem.CameraSwitchDelay									+= actualSecondsLastFrame;
-	if(GetAsyncKeyState('C') && solarSystem.CameraSwitchDelay > .2) {
+	if(key_camera_switch && solarSystem.CameraSwitchDelay > .2) {
 		solarSystem.CameraSwitchDelay									= 0;
 		solarSystem.Scene.Camera[CAMERA_MODE_SKY].Target				= {};
 		solarSystem.Scene.Camera[CAMERA_MODE_SKY].Position				= {-0.000001f, 250, 0};
@@ -263,24 +299,23 @@ int													ssg::solarSystemUpdate				(::ssg::SSolarSystem & solarSystem, do
 		solarSystem.Scene.Camera[CAMERA_MODE_FOLLOW].Up					= {0, 1, 0};
 	}
 
-
 	if(camera.Position.y > 0.001f)
-	if(camera.Position.y > 0.001f) if(GetAsyncKeyState(VK_HOME)) camera.Position.RotateZ(::gpk::math_pi * secondsLastFrame);
+	if(camera.Position.y > 0.001f) if(key_camera_move_front) camera.Position.RotateZ(::gpk::math_pi * secondsLastFrame);
 	if(camera.Position.x < 0.001f)
-	if(camera.Position.x < 0.001f) if(GetAsyncKeyState(VK_END	)) camera.Position.RotateZ(::gpk::math_pi * -secondsLastFrame);
+	if(camera.Position.x < 0.001f) if(key_camera_move_back) camera.Position.RotateZ(::gpk::math_pi * -secondsLastFrame);
 
 	if(camera.Position.y < 0) camera.Position.y = 0.0001f;
 	if(camera.Position.y < 0) camera.Position.y = 0.0001f;
 	if(camera.Position.x > 0) camera.Position.x = -0.0001f;
 	if(camera.Position.x > 0) camera.Position.x = -0.0001f;
 
-	if(GetAsyncKeyState(VK_NUMPAD5))
+	if(key_rotate_reset)
 		playerBody.Orientation.MakeFromEulerTaitBryan({0, 0, (float)-::gpk::math_pi_2});
 	else {
-		if(GetAsyncKeyState(VK_NUMPAD8)) playerBody.Orientation.z		-= (float)(secondsLastFrame * (GetAsyncKeyState(VK_SHIFT) ? 8 : 2));
-		if(GetAsyncKeyState(VK_NUMPAD2)) playerBody.Orientation.z		+= (float)(secondsLastFrame * (GetAsyncKeyState(VK_SHIFT) ? 8 : 2));
-		if(GetAsyncKeyState(VK_NUMPAD6)) playerBody.Orientation.x		-= (float)(secondsLastFrame * (GetAsyncKeyState(VK_SHIFT) ? 8 : 2));
-		if(GetAsyncKeyState(VK_NUMPAD4)) playerBody.Orientation.x		+= (float)(secondsLastFrame * (GetAsyncKeyState(VK_SHIFT) ? 8 : 2));
+		if(key_rotate_left	) playerBody.Orientation.z		-= (float)(secondsLastFrame * (key_turbo ? 8 : 2));
+		if(key_rotate_right	) playerBody.Orientation.z		+= (float)(secondsLastFrame * (key_turbo ? 8 : 2));
+		if(key_rotate_front	) playerBody.Orientation.x		-= (float)(secondsLastFrame * (key_turbo ? 8 : 2));
+		if(key_rotate_back	) playerBody.Orientation.x		+= (float)(secondsLastFrame * (key_turbo ? 8 : 2));
 	}
 	playerBody.Orientation.Normalize();
 

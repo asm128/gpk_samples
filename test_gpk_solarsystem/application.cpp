@@ -82,13 +82,14 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Solar System Test");
 	//::gpk::grid_scale(target->Color.View, targetGame->Color.View);
 
 	{
-		//::gpk::mutex_guard														lock					(app.LockGUI);
-		//::gpk::controlDrawHierarchy(*app.Framework.GUI, 0, target->Color.View);
+		::gpk::mutex_guard														lock					(app.LockGUI);
+		::gpk::controlDrawHierarchy(*app.Framework.GUI, 0, target->Color.View);
 	}
 	{
 		::gpk::mutex_guard														lock					(app.LockRender);
 		app.Offscreen														= target;
 	}
+	app.Framework.MainDisplay.Repaint									= true;
 	//timer.Frame();
 	//warning_printf("Draw time: %f.", (float)timer.LastTimeSeconds);
 	return 0;

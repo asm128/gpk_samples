@@ -97,7 +97,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\gpk\llc; ..\..\gpk\gpk; </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\gpk\llc;</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -106,7 +106,7 @@
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>$(OutDir); </AdditionalLibraryDirectories>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
-      <AdditionalDependencies>llc.lib; gpk.lib; user32.lib; gdi32.lib; zlibvc.lib; shcore.lib; </AdditionalDependencies>
+      <AdditionalDependencies>llc.lib; user32.lib; gdi32.lib; zlibvc.lib; shcore.lib; </AdditionalDependencies>
       <ModuleDefinitionFile>..\..\gpk\llc\gpk_module_exports.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
@@ -117,7 +117,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\gpk\llc; ..\..\gpk\gpk; </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\gpk\llc;</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -126,7 +126,7 @@
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>$(OutDir); </AdditionalLibraryDirectories>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
-      <AdditionalDependencies>llc.lib; gpk.lib; user32.lib; gdi32.lib; zlibvc.lib; shcore.lib; </AdditionalDependencies>
+      <AdditionalDependencies>llc.lib; user32.lib; gdi32.lib; zlibvc.lib; shcore.lib; </AdditionalDependencies>
       <ModuleDefinitionFile>..\..\gpk\llc\gpk_module_exports.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
@@ -139,7 +139,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\gpk\llc; ..\..\gpk\gpk; </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\gpk\llc;</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -150,7 +150,7 @@
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>$(OutDir); </AdditionalLibraryDirectories>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
-      <AdditionalDependencies>llc.lib; gpk.lib; user32.lib; gdi32.lib; zlibvc.lib; shcore.lib; </AdditionalDependencies>
+      <AdditionalDependencies>llc.lib; user32.lib; gdi32.lib; zlibvc.lib; shcore.lib; </AdditionalDependencies>
       <ModuleDefinitionFile>..\..\gpk\llc\gpk_module_exports.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
@@ -163,7 +163,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\gpk\llc; ..\..\gpk\gpk; </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\gpk\llc;</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -174,7 +174,7 @@
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>$(OutDir); </AdditionalLibraryDirectories>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
-      <AdditionalDependencies>llc.lib; gpk.lib; user32.lib; gdi32.lib; zlibvc.lib; shcore.lib; </AdditionalDependencies>
+      <AdditionalDependencies>llc.lib; user32.lib; gdi32.lib; zlibvc.lib; shcore.lib; </AdditionalDependencies>
       <ModuleDefinitionFile>..\..\gpk\llc\gpk_module_exports.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
@@ -183,6 +183,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Makefile" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

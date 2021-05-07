@@ -249,7 +249,9 @@ int													ssg::stageSetup							(::ssg::SSolarSystem & solarSystem)	{	// S
 
 	++solarSystem.Stage;
 	solarSystem.Slowing									= true;
+#if defined(GPK_WINDOWS)
 	PlaySoundA((LPCSTR)SND_ALIAS_SYSTEMSTART, GetModuleHandle(0), SND_ALIAS_ID | SND_ASYNC);
+#endif
 	return 0;
 }
 

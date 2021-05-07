@@ -6,7 +6,7 @@
 #include "gpk_matrix.h"
 #include "gpk_bitmap_target.h"
 
-#define GPK_AVOID_LOCAL_APPLICATION_MODULE_MODEL_EXECUTABLE_RUNTIME
+//#define GPK_AVOID_LOCAL_APPLICATION_MODULE_MODEL_EXECUTABLE_RUNTIME
 #include "gpk_app_impl.h"
 
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
@@ -221,7 +221,7 @@ template<typename _tIndex, typename _tValue>
 	}
 
 	timer.Frame();
-	sprintf_s(app.StringFrameRateUpdate, "Last frame time (update): %fs.", (float)timer.LastTimeSeconds);
+	snprintf(app.StringFrameRateUpdate, ::gpk::size(app.StringFrameRateUpdate) - 2, "Last frame time (update): %fs.", (float)timer.LastTimeSeconds);
 	//warning_printf("Update time: %f.", (float)timer.LastTimeSeconds);
 	gui.Controls.Text[app.IdFrameRateUpdate].Text							= app.StringFrameRateUpdate;
 	::gpk::controlMetricsInvalidate(gui, app.IdFrameRateUpdate);
@@ -296,7 +296,7 @@ template<typename _tIndex, typename _tValue>
 		transformedTriangle3D.A												= {(float)triangle2dList[iTriangle].A.x, (float)triangle2dList[iTriangle].A.y, triangle3dList[iTriangle].A.z};
 		transformedTriangle3D.B												= {(float)triangle2dList[iTriangle].B.x, (float)triangle2dList[iTriangle].B.y, triangle3dList[iTriangle].B.z};
 		transformedTriangle3D.C												= {(float)triangle2dList[iTriangle].C.x, (float)triangle2dList[iTriangle].C.y, triangle3dList[iTriangle].C.z};
-		gerror_if(errored(::gpk::drawTriangle(buffer3d->DepthStencil.View, camera.NearFar, transformedTriangle3D, trianglePixelCoords, triangleWeights)), "Not sure if these functions could ever fail");
+		gerror_if(errored(::gpk::drawTriangle(buffer3d->DepthStencil.View, camera.NearFar, transformedTriangle3D, trianglePixelCoords, triangleWeights)), "s", "Not sure if these functions could ever fail");
 		for(uint32_t iCoord = 0; iCoord < trianglePixelCoords.size(); ++iCoord)
 			buffer3d->Color.View[trianglePixelCoords[iCoord].y][trianglePixelCoords[iCoord].x] = triangle3dColorList[iTriangle * 3];
 
@@ -322,7 +322,7 @@ template<typename _tIndex, typename _tValue>
 		app.Offscreen														= target;
 	}
 	timer.Frame();
-	sprintf_s(app.StringFrameRateRender, "Last frame time (render): %fs.", (float)timer.LastTimeSeconds);
+	snprintf(app.StringFrameRateRender, ::gpk::size(app.StringFrameRateRender), "Last frame time (render): %fs.", (float)timer.LastTimeSeconds);
 	gui.Controls.Text[app.IdFrameRateRender].Text							= app.StringFrameRateRender;
 	::gpk::controlMetricsInvalidate(gui, app.IdFrameRateRender);
 	return 0;
