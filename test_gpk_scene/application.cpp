@@ -126,5 +126,6 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 	}
 	//timer.Frame();
 	//warning_printf("Draw time: %f.", (float)timer.LastTimeSeconds);
+	app.Framework.MainDisplay.Repaint									= true;
 	return 0;
 }

@@ -59,7 +59,7 @@ static ::gpk::error_t					createFromSTL			(::gpk::SComponentScene & scene, ::gpk
 	newNode.PerFaceColor					= 1;
 	newNode.PerFaceNormal					= 1;
 	for(uint32_t iTriangle = 0; iTriangle < stlFile.Triangles.size(); ++iTriangle) {
-		const ::gpk::SSTLTriangle					& triangle				= stlFile.Triangles[iTriangle];
+		const ::gpk::SSTLTriangle					triangle				= stlFile.Triangles[iTriangle];
 		bufferVertices		[iTriangle * 3 + 0]	= {triangle.Triangle.A.x, triangle.Triangle.A.z, triangle.Triangle.A.y};
 		bufferVertices		[iTriangle * 3 + 2]	= {triangle.Triangle.B.x, triangle.Triangle.B.z, triangle.Triangle.B.y};
 		bufferVertices		[iTriangle * 3 + 1]	= {triangle.Triangle.C.x, triangle.Triangle.C.z, triangle.Triangle.C.y};
