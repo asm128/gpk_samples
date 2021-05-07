@@ -107,7 +107,7 @@ template<typename _tIndex, typename _tValue>
 		controlExit.Area													= {{}, {384, 20}};
 		controlExit.Border													= {10, 10, 10, 10};
 		controlExit.Margin													= {1, 1, 1, 1};
-		controlExit.Align													= ::gpk::ALIGN_BOTTOM_LEFT;
+		controlExit.Align													= ::gpk::ALIGN_TOP_LEFT;
 		::gpk::SControlText														& controlText								= gui.Controls.Text[app.IdFrameRateUpdate];
 		controlText.Align													= ::gpk::ALIGN_CENTER;
 		::gpk::controlSetParent(gui, app.IdFrameRateUpdate, -1);
@@ -119,7 +119,7 @@ template<typename _tIndex, typename _tValue>
 		controlExit.Area													= {{}, {384, 20}};
 		controlExit.Border													= {10, 10, 10, 10};
 		controlExit.Margin													= {1, 1, 1, 1};
-		controlExit.Align													= ::gpk::ALIGN_BOTTOM_RIGHT;
+		controlExit.Align													= ::gpk::ALIGN_TOP_RIGHT;
 		::gpk::SControlText														& controlText								= gui.Controls.Text[app.IdFrameRateRender];
 		controlText.Align													= ::gpk::ALIGN_CENTER;
 		::gpk::controlSetParent(gui, app.IdFrameRateRender, -1);
@@ -325,5 +325,6 @@ template<typename _tIndex, typename _tValue>
 	snprintf(app.StringFrameRateRender, ::gpk::size(app.StringFrameRateRender), "Last frame time (render): %fs.", (float)timer.LastTimeSeconds);
 	gui.Controls.Text[app.IdFrameRateRender].Text							= app.StringFrameRateRender;
 	::gpk::controlMetricsInvalidate(gui, app.IdFrameRateRender);
+	framework.MainDisplay.Repaint										= true;
 	return 0;
 }
