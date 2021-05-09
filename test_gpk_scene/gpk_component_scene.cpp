@@ -3,40 +3,28 @@
 #include "gpk_stdstring.h"
 #include "gpk_json.h"
 
-static ::gpk::error_t	floatRead		(::gpk::SJSONReader & readerCache, ::gpk::vcc in_string, float & out_value){
-	readerCache				= {};
+template<typename _tNumber>
+static ::gpk::error_t					jsonNumberLoad			(::gpk::SJSONReader & readerCache, ::gpk::vcc in_string, _tNumber & out_value){
+	readerCache								= {};
 	gpk_necall(::gpk::jsonParse(readerCache, in_string), "%s", "");
-	const ::gpk::SJSONToken		& jsonValue		= *readerCache[1]->Token;
+	const ::gpk::SJSONToken						& jsonValue				= *readerCache[1]->Token;
 	if(readerCache[1]->Token->Type == ::gpk::JSON_TYPE_INTEGER) {
-		out_value				= (float)jsonValue.Value; }
+		out_value								= (_tNumber)jsonValue.Value; }
 	else {
-		double						temp			= 0;
+		double										temp					= 0;
 		memcpy(&temp, (const double*)&jsonValue.Value, sizeof(double));
-		out_value				= (float)temp;
+		out_value								= (_tNumber)temp;
 	}
 	return 0;
 }
 
-static ::gpk::error_t	integerRead		(::gpk::SJSONReader & readerCache, ::gpk::vcc in_string, int32_t & out_value){
-	readerCache				= {};
-	gpk_necall(::gpk::jsonParse(readerCache, in_string), "%s", "");
-	const ::gpk::SJSONToken		& jsonValue		= *readerCache[1]->Token;
-	if(readerCache[1]->Token->Type == ::gpk::JSON_TYPE_INTEGER) {
-		out_value				= (int32_t)jsonValue.Value; }
-	else {
-		double						temp			= 0;
-		memcpy(&temp, (const double*)&jsonValue.Value, sizeof(double));
-		out_value				= (int32_t)temp;
-	}
-	return 0;
-}
+static inline	::gpk::error_t			floatRead				(::gpk::SJSONReader & readerCache, ::gpk::vcc in_string, float	 & out_value) { return ::jsonNumberLoad(readerCache, in_string, out_value); }
+static inline	::gpk::error_t			integerRead				(::gpk::SJSONReader & readerCache, ::gpk::vcc in_string, int32_t & out_value) { return ::jsonNumberLoad(readerCache, in_string, out_value); }
 
 static ::gpk::error_t					createFromSTL			(::gpk::SComponentScene & scene, ::gpk::SSTLFile & stlFile, ::gpk::view_const_string componentName)  {
 	::gpk::SNodeRenderer						& renderer				= scene.Renderer;
 	int32_t										indexNewNode			= renderer.Nodes.push_back(componentName, {});
 	::gpk::SRenderNode							& newNode				= renderer.Nodes[indexNewNode];
-
-	//::gpk::array_pod<char_t>					propertyName;
 
 	::gpk::SNodeRenderer::TVertexBuffer			& bufferVertices		= renderer.Vertices			[newNode.Vertices		= renderer.Vertices			.push_back(componentName, {})];
 	::gpk::SNodeRenderer::TNormalBuffer			& bufferNormals			= renderer.Normals			[newNode.Normals		= renderer.Normals			.push_back(componentName, {})];
@@ -177,15 +165,16 @@ static ::gpk::error_t					createFromOBJ			(::gpk::SComponentScene & scene, ::gpk
 	::gpk::array_obj<::gpk::view_const_char>	objFileLines			= {};
 	::gpk::split(::gpk::vcc{rawObj}, '\n', objFileLines);
 	::gpk::SJSONReader							numberReader			= {};
+	info_printf("%s", "Preloading materials...");
 	for(uint32_t iLine = 0; iLine < objFileLines.size(); ++iLine) {
 		::gpk::view_const_char						& line					= objFileLines[iLine];
 		::gpk::trim(line, line);
 		if(0 == line.size() || line[0] == '#')
 			continue;
 		info_printf("Line %u: '%s'.", iLine, ::gpk::toString(line).begin());
-
 		::gpk::array_obj<::gpk::view_const_char>	lineValues				= {};
 		::gpk::split(line, ::gpk::vcs{" \t"}, lineValues);
+
 		for(uint32_t iValue = 0; iValue < lineValues.size(); ++iValue) {
 			::gpk::view_const_char						& value					= lineValues[iValue];
 			::gpk::ltrim(value, value);
@@ -210,31 +199,50 @@ static ::gpk::error_t					createFromOBJ			(::gpk::SComponentScene & scene, ::gpk
 			}
 			e_if(::createFromMTL(scene, matFilename, materialIndices), "Failed to load material file '%s'.", ::gpk::toString(matFilename).begin());
 		}
-		else if(command == ::gpk::vcs{"o"}) {
+	}
+
+	for(uint32_t iLine = 0; iLine < objFileLines.size(); ++iLine) {
+		::gpk::view_const_char						& line					= objFileLines[iLine];
+		::gpk::trim(line, line);
+		if(0 == line.size() || line[0] == '#')
+			continue;
+		info_printf("Line %u: '%s'.", iLine, ::gpk::toString(line).begin());
+
+		::gpk::array_obj<::gpk::view_const_char>	lineValues				= {};
+		::gpk::split(line, ::gpk::vcs{" \t"}, lineValues);
+		for(uint32_t iValue = 0; iValue < lineValues.size(); ++iValue) {
+			::gpk::view_const_char						& value					= lineValues[iValue];
+			::gpk::ltrim(value, value);
+			::gpk::rtrim(value, value);
+			if(0 == value.size())
+				lineValues.remove(iValue--);
+		}
+		const ::gpk::vcc							command					= lineValues[0];
+		if(command == ::gpk::vcs{"o"}) {
 			if(countObjects) {
-				objectPath = filename;
+				objectPath								= filename;
 				objectPath.push_back('/');
 				objectPath.append(objectName);
 				objectIndices.push_back((int16_t)scene.Components.push_back(::gpk::label(::gpk::vcc{objectPath}), newObject));
 			}
-			objectName = {lineValues[1].begin(), lineValues[1].size()};
+			objectName								= {lineValues[1].begin(), lineValues[1].size()};
 			++countObjects;
 			info_printf("Object #%i found: '%s'.", countObjects, ::gpk::toString(objectName).begin());
 		}
 		else if(command == ::gpk::vcs{"g"}) {
 			if(countGroups) {
-				groupPath = filename;
+				groupPath								= filename;
 				groupPath.push_back('/');
 				groupPath.append(groupName);
 				objectIndices.push_back((int16_t)scene.Components.push_back(::gpk::label(::gpk::vcc{groupPath}), newGroup));
 			}
-			groupName = {lineValues[1].begin(), lineValues[1].size()};
+			groupName								= {lineValues[1].begin(), lineValues[1].size()};
 			newGroup.RenderNodes.push_back(scene.Renderer.Nodes.push_back(groupName, {}));
 			++countGroups;
 			info_printf("Group #%i found: '%s'.", countGroups, ::gpk::toString(groupName).begin());
 		}
 		else if(command == ::gpk::vcs{"usemtl"}) {
-			::gpk::vcc materialName = lineValues[1];
+			::gpk::vcc									materialName	= lineValues[1];
 			for(uint32_t iMaterial = 0; iMaterial < materialIndices.size(); ++iMaterial)
 				if(materialIndices.Names[iMaterial] == materialName) {
 					scene.Renderer.Nodes[newGroup.RenderNodes[0]].Material = materialIndices.Values[iMaterial];
@@ -242,36 +250,34 @@ static ::gpk::error_t					createFromOBJ			(::gpk::SComponentScene & scene, ::gpk
 				}
 		}
 		else if(command == ::gpk::vcs{"v"}) {
-			::gpk::SCoord3<float>	vertex			= {};
+			::gpk::SCoord3<float>						vertex			= {};
 			for(uint32_t iAxis = 0; iAxis < 3; ++iAxis)
 				e_if(errored(::floatRead(numberReader, lineValues[1 + iAxis], (&vertex.x)[iAxis])), "%s", "");
 			info_printf("Vertex found: [%f, %f, %f].", vertex.x, vertex.y, vertex.z);
 			//scene.Renderer.Vertices[scene.Renderer.Nodes[newGroup.RenderNodes[0]].Vertices].push_back(vertex);
 		}
 		else if(command == ::gpk::vcs{"vt"}) {
-			::gpk::SCoord2<float>	texCoord = {};
+			::gpk::SCoord2<float>						texCoord		= {};
 			for(uint32_t iAxis = 0; iAxis < 2; ++iAxis)
 				e_if(errored(::floatRead(numberReader, lineValues[1 + iAxis], (&texCoord.x)[iAxis])), "%s", "");
 			info_printf("TexCoord found: [%f, %f, %f].", texCoord.x, texCoord.y);
 		}
 		else if(command == ::gpk::vcs{"vn"}) {
-			::gpk::SCoord3<float>	vertex			= {};
+			::gpk::SCoord3<float>						vertex			= {};
 			for(uint32_t iAxis = 0; iAxis < 3; ++iAxis)
 				e_if(errored(::floatRead(numberReader, lineValues[1 + iAxis], (&vertex.x)[iAxis])), "%s", "");
 			info_printf("Normal found: [%f, %f, %f].", vertex.x, vertex.y, vertex.z);
 		}
-		else if(command == ::gpk::vcs{"vp"}) {
-
-		}
 		else if(command == ::gpk::vcs{"f"}) {
-			::gpk::SCoord3<int32_t>	indices		= {};
+			::gpk::SCoord3<int32_t>						indices			= {};
 			for(uint32_t iAxis = 0; iAxis < 3; ++iAxis)
 				e_if(errored(::integerRead(numberReader, lineValues[1 + iAxis], (&indices.x)[iAxis])), "%s", "");
 			info_printf("Face found: [%i, %i, %i].", indices.x, indices.y, indices.z);
 		}
+		else if(command == ::gpk::vcs{"vp"}) {
 
+		}
 	}
-	(void)scene;
 	return 0;
 }
 
