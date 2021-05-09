@@ -168,12 +168,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
-    <ClInclude Include="gpk_component_scene.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="application.cpp" />
-    <ClCompile Include="gpk_component_scene_draw.cpp" />
-    <ClCompile Include="gpk_component_scene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />
