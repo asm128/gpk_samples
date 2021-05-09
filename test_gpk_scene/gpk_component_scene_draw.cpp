@@ -1,6 +1,57 @@
 #include "gpk_component_scene.h"
 #include "gpk_raster_lh.h"
 
+static	::gpk::error_t					drawOrderedVertices
+	( ::gpk::SNodeRenderer					& renderer
+	, const ::gpk::SRenderNode				& nodeToDraw
+	, ::gpk::SMatrix4<float>				matrixWVP
+	, ::gpk::view_grid<::gpk::SColorBGRA>	target_image
+	, ::gpk::view_grid<uint32_t>			target_depth
+	) {
+
+	::gpk::STriangle3<float>					triangleTransformed		= {};
+	::gpk::STriangle2<int16_t>					triangleFinal			= {};
+	::gpk::SColorBGRA							nodeColor				= (nodeToDraw.Color >= 0) ? renderer.Colors[nodeToDraw.Color] : ::gpk::SColorBGRA{0xFFFF00FF};
+	if(nodeToDraw.PerFaceNormal) {
+		if(nodeToDraw.VertexColor < 0) {
+			::gpk::drawTriangle(target_image, triangleFinal, nodeColor);
+		}
+		else if(nodeToDraw.PerFaceColor) {
+			::gpk::array_pod<::gpk::SCoord3<float>>		& nodeVertices			= renderer.Vertices[nodeToDraw.Vertices];
+			::gpk::array_pod<::gpk::SCoord3<float>>		& nodeNormals			= renderer.Normals [nodeToDraw.Normals];
+			for(uint32_t iTriangle = 0; iTriangle < nodeVertices.size() / 3; ++iTriangle) {
+				::gpk::SColorBGRA							triangleColor			= (nodeToDraw.VertexColor >= 0) ? renderer.VertexColors[nodeToDraw.VertexColor][iTriangle] : nodeColor;
+				;
+				triangleTransformed.A = nodeVertices[iTriangle * 3 + 0];
+				triangleTransformed.B = nodeVertices[iTriangle * 3 + 1];
+				triangleTransformed.C = nodeVertices[iTriangle * 3 + 2];
+				::gpk::transform(triangleTransformed, matrixWVP);
+
+				::gpk::SMatrix4<float>						matrixViewport			= {};
+				matrixViewport.ViewportLH(target_image.metrics());
+				::gpk::transform(triangleTransformed, matrixViewport);
+
+				renderer.RenderCache.PixelCoordBuffer.clear();
+				renderer.RenderCache.TriangleWeightBuffer.clear();
+				ree_if(::gpk::drawTriangle(target_image.metrics(), triangleTransformed, renderer.RenderCache.PixelCoordBuffer, renderer.RenderCache.TriangleWeightBuffer, target_depth), "%s", "Maybe the pixel caches weren't cleared properly");
+				triangleColor							= triangleColor * nodeNormals[iTriangle].Dot(renderer.Lights[0].Direction);
+				for(uint32_t iPixelCoord = 0; iPixelCoord < renderer.RenderCache.PixelCoordBuffer.size(); ++iPixelCoord) {
+					const ::gpk::SCoord2<int16_t>				pixelCoord				= renderer.RenderCache.PixelCoordBuffer[iPixelCoord];
+					target_image[pixelCoord.y][pixelCoord.x]	= triangleColor;
+				}
+			}
+		}
+		else {
+		}
+	}
+	else {
+		if(nodeToDraw.VertexColor < 0) {}
+		else if(nodeToDraw.PerFaceColor) {}
+		else {}
+	}
+	return 0;
+}
+
 ::gpk::error_t							gpk::nodeRendererDrawNode
 	( ::gpk::SNodeRenderer					& renderer
 	, uint32_t								iNode
@@ -17,50 +68,12 @@
 
 	const ::gpk::SMatrix4<float>				& matrixWorld			= (-1 == nodeToDraw.Transform) ? ::gpk::SMatrix4<float>::GetIdentity() : renderer.Transforms[nodeToDraw.Transform].Matrix;
 	const ::gpk::SMatrix4<float>				& matrixWorldInverse	= (-1 == nodeToDraw.Transform) ? ::gpk::SMatrix4<float>::GetIdentity() : renderer.Transforms[nodeToDraw.Transform].MatrixInverse;
-	::gpk::array_pod<::gpk::SCoord2<int32_t>>	pixelCoords;
 	::gpk::SMatrix4<float>						matrixWVP				= matrixWorld * viewProjection;
 	if(nodeToDraw.Indices >= 0) { // draw indexed triangles
+
 	}
 	else { // draw ordered vertices
-		::gpk::STriangle3<float>					triangleTransformed		= {};
-		::gpk::STriangle2<int16_t>					triangleFinal			= {};
-		::gpk::SColorBGRA							nodeColor				= (nodeToDraw.Color >= 0) ? renderer.Colors[nodeToDraw.Color] : ::gpk::SColorBGRA{0xFFFF00FF};
-		if(nodeToDraw.PerFaceNormal) {
-			if(nodeToDraw.VertexColor < 0) {
-				::gpk::drawTriangle(target_image, triangleFinal, nodeColor);
-			}
-			else if(nodeToDraw.PerFaceColor) {
-				::gpk::array_pod<::gpk::SCoord3<float>>		& nodeVertices			= renderer.Vertices[nodeToDraw.Vertices];
-				::gpk::array_pod<::gpk::SCoord3<float>>		& nodeNormals			= renderer.Normals [nodeToDraw.Normals];
-				for(uint32_t iTriangle = 0; iTriangle < nodeVertices.size() / 3; ++iTriangle) {
-					::gpk::SColorBGRA							triangleColor			= (nodeToDraw.VertexColor >= 0) ? renderer.VertexColors[nodeToDraw.VertexColor][iTriangle] : nodeColor;
-					;
-					triangleTransformed.A = nodeVertices[iTriangle * 3 + 0];
-					triangleTransformed.B = nodeVertices[iTriangle * 3 + 1];
-					triangleTransformed.C = nodeVertices[iTriangle * 3 + 2];
-					::gpk::transform(triangleTransformed, matrixWVP);
-
-					::gpk::SMatrix4<float>						matrixViewport			= {};
-					matrixViewport.ViewportLH(target_image.metrics());
-					::gpk::transform(triangleTransformed, matrixViewport);
-
-					renderer.RenderCache.PixelCoordBuffer.clear();
-					::gpk::drawTriangle(target_image.metrics(), triangleTransformed, renderer.RenderCache.PixelCoordBuffer, renderer.RenderCache.TriangleWeightBuffer, target_depth);
-					triangleColor							= triangleColor * nodeNormals[iTriangle].Dot(renderer.Lights[0].Direction);
-					for(uint32_t iPixelCoord = 0; iPixelCoord < renderer.RenderCache.PixelCoordBuffer.size(); ++iPixelCoord) {
-						const ::gpk::SCoord2<int16_t>				pixelCoord				= renderer.RenderCache.PixelCoordBuffer[iPixelCoord];
-						target_image[pixelCoord.y][pixelCoord.x]	= triangleColor;
-					}
-				}
-			}
-			else {
-			}
-		}
-		else {
-			if(nodeToDraw.VertexColor < 0) {}
-			else if(nodeToDraw.PerFaceColor) {}
-			else {}
-		}
+		::drawOrderedVertices(renderer, nodeToDraw, matrixWVP, target_image, target_depth);
 	}
 	(void)nodeToDraw		;
 	(void)matrixWorld		;
