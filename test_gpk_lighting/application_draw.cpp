@@ -177,7 +177,7 @@
 			//gerror_if(errored(::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{renderCache.Triangle3dToDraw[iTriangle].C, renderCache.Triangle3dToDraw[iTriangle].C + (renderCache.TransformedNormalsTriangle[iTriangle])}, renderCache.WireframePixelCoords)), "Not sure if these functions could ever fail");
 		}
 	}
-	static constexpr const ::gpk::SColorBGRA									color										= ::gpk::YELLOW;
+	static	const ::gpk::SColorBGRA												color										= ::gpk::YELLOW;
 	for(uint32_t iPixel = 0, pixCount = renderCache.WireframePixelCoords.size(); iPixel < pixCount; ++iPixel) {
 		const ::gpk::SCoord2<int32_t>												& pixelCoord								= renderCache.WireframePixelCoords[iPixel];
 		if( offscreen.View[pixelCoord.y][pixelCoord.x] != color ) {

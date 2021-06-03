@@ -215,7 +215,7 @@ static				const ::gpk::array_static<::gpk::SColorBGRA, WEAPON_TYPE_COUNT>	weapon
 	return 0;
 }
 
-static constexpr	const ::gpk::SColorBGRA								powerupFamilyColorPalette []				=
+static				const ::gpk::SColorBGRA								powerupFamilyColorPalette []				=
 	{ ::gpk::LIGHTYELLOW
 	, ::gpk::LIGHTGREEN
 	, ::gpk::LIGHTCYAN

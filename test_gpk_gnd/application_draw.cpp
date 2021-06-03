@@ -269,7 +269,7 @@ static				::gpk::error_t										drawTriangles
 		}
 	}
 
-	static constexpr	const ::gpk::SColorBGRA									color										= ::gpk::YELLOW;
+	static	const ::gpk::SColorBGRA												color										= ::gpk::YELLOW;
 	for(uint32_t iPixel = 0, pixCount = renderCache.WireframePixelCoords.size(); iPixel < pixCount; ++iPixel) {
 		const ::gpk::SCoord2<int32_t>												& pixelCoord								= renderCache.WireframePixelCoords[iPixel];
 		if( offscreen[pixelCoord.y][pixelCoord.x] != color ) {

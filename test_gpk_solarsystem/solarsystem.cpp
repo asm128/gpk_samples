@@ -226,7 +226,7 @@ int													updateGame						(SSolarSystem & solarSystem, double secondsLastF
 
 	//------------------------------------------- Transform and Draw
 	::gpk::view_grid<::gpk::SColorBGRA>						targetPixels				= target->Color.View;
-	targetPixels.fill(::gpk::SColorBGRA{0, 0, 0, 0});
+	memset((void*)targetPixels.begin(), 0, sizeof(::gpk::SColorBGRA) * targetPixels.size());
 	::gpk::SColorBGRA										colorBackground		= {0x20, 0x8, 0x4};
 	//colorBackground									+= (colorBackground * (0.5 + (0.5 / 65535 * rand())) * ((rand() % 2) ? -1 : 1)) ;
 	for(uint32_t y = 0; y < targetPixels.metrics().y; ++y) // Generate noise color for planet texture
