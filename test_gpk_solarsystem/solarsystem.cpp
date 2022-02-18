@@ -76,7 +76,7 @@ static	int											drawDebris			(::gpk::view_grid<::gpk::SColorBGRA> targetPix
 				double													finalBrightness					= 1.0-(brightDistance * brightUnit);
 				::gpk::SColorBGRA										& pixelVal						= targetPixels[blendPos.y][blendPos.x];
 				::gpk::SColorFloat										pixelColor						= starFinalColor * finalBrightness + pixelVal;
-				pixelVal											= pixelColor;
+				pixelVal											= pixelColor.Clamp();
 			}
 		}
 	}
@@ -151,7 +151,7 @@ int													setupGame						(SSolarSystem & solarSystem)	{
 			const double															ecuatorialShade			= cos(y * (1.0 / solarSystem.Image[iImage].metrics().y * ::gpk::math_2pi)) + 1.5;
 			uint32_t																rowOffset				= y * solarSystem.Image[iImage].metrics().x;
 			for(uint32_t x = 0; x < solarSystem.Image[iImage].metrics().x; ++x) {
-				solarSystem.Image[iImage].Texels[rowOffset + x]	= colors[iImage % ::gpk::size(colors)] * ecuatorialShade * (1.0 - (rand() / 3.0 / (double)RAND_MAX));
+				solarSystem.Image[iImage].Texels[rowOffset + x]	= (colors[iImage % ::gpk::size(colors)] * ecuatorialShade * (1.0 - (rand() / 3.0 / (double)RAND_MAX))).Clamp();
 			}
 		}
 	}

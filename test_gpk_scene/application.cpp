@@ -57,13 +57,13 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 	app.Scene.Renderer.Lights[0].Type									= ::gpk::GLIGHT_TYPE_DIRECTIONAL;
 	app.Scene.Renderer.Lights[0].Disabled								= false;
 
-	app.IdModel															= app.Scene.CreateFromFile("../gpk_data/scene/icon_home.stl");
-	app.IdModel															= app.Scene.CreateFromFile("../gpk_data/scene/icon_home/tinker.obj");
+	gpk_necall(app.IdModel = app.Scene.CreateFromFile("../gpk_data/scene/icon_home.stl"), "%s", "");
 	memset
 		( (void*)app.Scene.Renderer.VertexColors[app.Scene.Renderer.Nodes[app.IdModel].VertexColor].begin()
 		, 0xC0
 		, app.Scene.Renderer.VertexColors[app.Scene.Renderer.Nodes[app.IdModel].VertexColor].size() * sizeof(uint32_t)
 		);
+	gpk_necall(app.IdModel = app.Scene.CreateFromFile("../gpk_data/scene/icon_home/tinker.obj"), "%s", "");
 	return 0;
 }
 

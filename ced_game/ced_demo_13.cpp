@@ -15,34 +15,34 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "PNG Test");
 	::gpk::SFramework										& framework						= app.Framework;
 	::gpk::SDisplay											& mainWindow					= framework.MainDisplay;
 	framework.Input.create();
-	mainWindow.Size														= {1280, 720};
+	mainWindow.Size										= {1280, 720};
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window. %s.", "why?!");
 	{ // Build the exit button
-		::gpk::SGUI																& gui								= *framework.GUI;
-		gui.ColorModeDefault												= ::gpk::GUI_COLOR_MODE_3D;
-		gui.ThemeDefault													= ::gpk::ASCII_COLOR_DARKGREEN * 16 + 7;
-		app.IdExit															= ::gpk::controlCreate(gui);
-		::gpk::SControl															& controlExit						= gui.Controls.Controls[app.IdExit];
-		controlExit.Area													= {{}, {64, 20}};
-		controlExit.Border													= {10, 10, 10, 10};
-		controlExit.Margin													= {1, 1, 1, 1};
-		controlExit.Align													= ::gpk::ALIGN_BOTTOM_RIGHT;
-		::gpk::SControlText														& controlText						= gui.Controls.Text[app.IdExit];
-		controlText.Text													= "Exit";
-		controlText.Align													= ::gpk::ALIGN_CENTER;
-		::gpk::SControlConstraints												& controlConstraints				= gui.Controls.Constraints[app.IdExit];
-		controlConstraints.AttachSizeToControl								= {app.IdExit, -1};
+		::gpk::SGUI												& gui								= *framework.GUI;
+		gui.ColorModeDefault								= ::gpk::GUI_COLOR_MODE_3D;
+		gui.ThemeDefault									= ::gpk::ASCII_COLOR_DARKGREEN * 16 + 7;
+		app.IdExit											= ::gpk::controlCreate(gui);
+		::gpk::SControl											& controlExit						= gui.Controls.Controls[app.IdExit];
+		controlExit.Area									= {{}, {64, 20}};
+		controlExit.Border									= {10, 10, 10, 10};
+		controlExit.Margin									= {1, 1, 1, 1};
+		controlExit.Align									= ::gpk::ALIGN_BOTTOM_RIGHT;
+		::gpk::SControlText										& controlText						= gui.Controls.Text[app.IdExit];
+		controlText.Text									= "Exit";
+		controlText.Align									= ::gpk::ALIGN_CENTER;
+		::gpk::SControlConstraints								& controlConstraints				= gui.Controls.Constraints[app.IdExit];
+		controlConstraints.AttachSizeToControl				= {app.IdExit, -1};
 		::gpk::controlSetParent(gui, app.IdExit, -1);
 	}
 	//framework.UseDoubleBuffer							= true;
 	srand((uint32_t)time(0));
 	::ssg::solarSystemSetup(app.SolarSystem, framework.MainDisplay.Size);
 
-	const ::gpk::SCoord2<uint32_t>											metricsMap			= app.TextOverlay.MetricsMap;
-	const ::gpk::SCoord2<uint32_t>											metricsLetter		= app.TextOverlay.MetricsLetter;
-	//::gpk::SImage<::gpk::SColorBGRA>										fontImagePre;
+	const ::gpk::SCoord2<uint32_t>							metricsMap			= app.TextOverlay.MetricsMap;
+	const ::gpk::SCoord2<uint32_t>							metricsLetter		= app.TextOverlay.MetricsLetter;
+	//::gpk::SImage<::gpk::SColorBGRA>						fontImagePre;
 	//::gpk::pngFileLoad(::gpk::view_const_string{"../gpk_data/images/dos_8x8_font_white.png"}, fontImagePre);//Codepage_437_24_12x12.png"}, fontImage);
-	::gpk::SImage<::gpk::SColorBGRA>										fontImage;
+	::gpk::SImage<::gpk::SColorBGRA>						fontImage;
 	::gpk::pngFileLoad(::gpk::view_const_string{"../gpk_data/images/Codepage_437_24_12x12.png"}, fontImage);
 	//fontImage.resize(::gpk::SCoord2<uint32_t>{app.TextOverlay.MetricsMap}.InPlaceScale(app.TextOverlay.MetricsLetter));
 	//for(uint32_t y = 0; y < metricsMap.y; ++y)
@@ -55,10 +55,10 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "PNG Test");
 	//	//::gpk::grid_copy_ex(fontImage.View, fontImagePre.View, metricsLetter.Cast<int32_t>(), dstRect.Offset.Cast<int32_t>(), srcRect.Offset.Cast<int32_t>());
 	//	::gpk::grid_copy(fontImage.View, fontImagePre.View, dstRect.Offset, srcRect);
 	//}
-	::gpk::view_grid<::gpk::SGeometryQuads>									viewGeometries		= {app.TextOverlay.GeometryLetters, {16, 16}};
-	const uint32_t															imagePitch			= metricsLetter.x * metricsMap.x;
+	::gpk::view_grid<::gpk::SGeometryQuads>					viewGeometries		= {app.TextOverlay.GeometryLetters, {16, 16}};
+	const uint32_t											imagePitch			= metricsLetter.x * metricsMap.x;
 
-	::gpk::array_pod<::gpk::STile>											tiles;
+	::gpk::array_pod<::gpk::STile>							tiles;
 	for(uint32_t y = 0; y < metricsMap.y; ++y)
 	for(uint32_t x = 0; x < metricsMap.x; ++x) {
 		tiles.clear();
@@ -135,7 +135,7 @@ static	int											drawPixels
 		const ::gpk::SCoord3<float>								position					= ::gpk::triangleWeight(vertexWeights, triangleWorld);
 		double													factorWave					= (::gpk::max(0.0, sin(- timeAnimation * 4 + position.y * .75))) * .6;
 		double													factorWave2					= (::gpk::max(0.0, sin(- timeAnimation + position.x * .0125 + position.z * .125))) * .5;
-		::gpk::setPixel(targetPixels, pixelCoord, targetPixels[pixelCoord.y][pixelCoord.x] * .25 + (texelColor * (lightFactorDirectional * 2) + texelColor * factorWave + texelColor * factorWave2));
+		::gpk::setPixel(targetPixels, pixelCoord, targetPixels[pixelCoord.y][pixelCoord.x] * .25 + ((texelColor * (lightFactorDirectional * 2) + texelColor * factorWave + texelColor * factorWave2)).Clamp());
 	}
 	return 0;
 }

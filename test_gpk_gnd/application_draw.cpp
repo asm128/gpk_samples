@@ -30,7 +30,7 @@
 		{ uvs.A.x * pixelWeights.A + uvs.B.x * pixelWeights.B + uvs.C.x * pixelWeights.C
 		, uvs.A.y * pixelWeights.A + uvs.B.y * pixelWeights.B + uvs.C.y * pixelWeights.C
 		};
-	const ::gpk::STriangle3<double>											weightedPositions							=
+	const ::gpk::STriangle3<double>												weightedPositions							=
 		{ positions.A.Cast<double>() * pixelWeights.A
 		, positions.B.Cast<double>() * pixelWeights.B
 		, positions.C.Cast<double>() * pixelWeights.C
@@ -47,7 +47,7 @@
 			::gpk::SCoord3<float>														rswColor									= rswLight.Color * (1.0 - (rswLight.Position.Cast<double>() - interpolatedPosition).Length() / 10.0);
 			lightColor																+= ::gpk::SColorFloat(rswColor.x, rswColor.y, rswColor.z, 1.0f) / 2.0;
 		}
-		interpolatedBGRA														= directionalColor + lightColor + (ambientColor / 2.0);
+		interpolatedBGRA														= (directionalColor + lightColor + (ambientColor / 2.0)).Clamp();
 	}
 	else {
 		const ::gpk::SCoord2<int32_t>												uvcoords									=
@@ -65,7 +65,7 @@
 				lightColor																+= srcTexel * ::gpk::SColorFloat(rswColor.x, rswColor.y, rswColor.z, 1.0f) / 2.0;
 			}
 		}
-		interpolatedBGRA														= srcTexel * directionalColor + lightColor + srcTexel * (ambientColor / 2.0);
+		interpolatedBGRA														= (srcTexel * directionalColor + lightColor + srcTexel * (ambientColor / 2.0)).Clamp();
 	}
 	if( targetColorCell == interpolatedBGRA )
 		return 1;

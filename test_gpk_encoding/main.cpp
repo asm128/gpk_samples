@@ -1,4 +1,4 @@
-#define GPK_CONSOLE_LOG_ENABLED
+#define GPK_STDOUT_LOG_ENABLED
 
 #include "gpk_aes.h"
 #include "gpk_rsa.h"
@@ -48,7 +48,7 @@ int													main						()			{
 		gerror_if(errored(::gpk::fileToMemorySecure		(loadedBytes, fileName, key, true)			), "Failed to read secure file: %s.", ::gpk::toString(fileName).begin());
 		gerror_if(loadedBytes != testBytes, "Test failed: %s - %s.", "", "");//::gpk::toString(loadedBytes).begin(), signatureToEncode[0].begin());
 	}
-	const char  a[ ] = "TGFzdCBDaGFuY2UhIC0gQ0dJIEludGVyY2VwdG9yIC0gYXNtMTI4IChjKSAyMDA5LTIwMTkA";
+	//const char  a[ ] = "TGFzdCBDaGFuY2UhIC0gQ0dJIEludGVyY2VwdG9yIC0gYXNtMTI4IChjKSAyMDA5LTIwMTkA";
 	::gpk::array_pod<char_t> signaturesEncoded [::gpk::size(signatureToEncode)]	= {};
 
 	for(uint32_t iSign = 0; iSign < ::gpk::size(signatureToEncode); ++iSign) {

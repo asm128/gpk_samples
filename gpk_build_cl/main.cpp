@@ -1,6 +1,6 @@
 //	We need to get this program to call something like: C:\WINDOWS\System32\cmd.exe /d /c msbuild /property:GenerateFullPaths=true /t:build /p:Configuration=Release /p:Platform=x64 -m
 //	For linux builds, however, we need it to call gcc or clang for every file
-#define GPK_CONSOLE_LOG_ENABLED
+#define GPK_STDOUT_LOG_ENABLED
 #define GPK_ERROR_PRINTF_ENABLED
 #define GPK_WARNING_PRINTF_ENABLED
 #define GPK_INFO_PRINTF_ENABLED

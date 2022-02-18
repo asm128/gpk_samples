@@ -279,7 +279,7 @@ template<typename _tIndex, typename _tValue>
 	::gpk::view_array<::gpk::SCoord3<float>>								normals										= {(::gpk::SCoord3<float>*)app.ModelGeometry.NormalsVertex.Values.begin(), app.ModelGeometry.NormalsVertex.Values.size() * 3};
 	for(uint32_t iVertex = 0; iVertex < app.ModelGeometry.Positions.Indices.size(); ++iVertex) {
 		double																	lightFactor									= normals[iVertex].Dot(lightPos);
-		triangle3dColorList[iVertex]										= ::gpk::RED * lightFactor;
+		triangle3dColorList[iVertex]										= (::gpk::RED * lightFactor).Clamp();
 	}
 	::gpk::array_pod<::gpk::SCoord2<int32_t>>								wireframePixelCoords;
 	::gpk::array_pod<::gpk::SCoord2<int32_t>>								trianglePixelCoords;

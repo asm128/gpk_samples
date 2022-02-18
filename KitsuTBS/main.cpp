@@ -12,24 +12,24 @@ int											main							(int /*argc*/, char ** /*argv*/) {
 	static constexpr	const uint32_t				ASCII_DISPLAY_WIDTH				= ((uint32_t)(ASCII_DISPLAY_HEIGHT * 2.666666f));
 	::klib::initASCIIScreen(ASCII_DISPLAY_WIDTH, ASCII_DISPLAY_HEIGHT);
 
-	::klib::SGame									* pInstancedGame				= new klib::SGame();
-	::klib::SGame									& instanceGame					= *pInstancedGame;
-	instanceGame.GlobalDisplay	.Resize({ASCII_DISPLAY_WIDTH, ASCII_DISPLAY_HEIGHT});
-	instanceGame.TacticalDisplay.Resize({::klib::GAME_MAP_WIDTH, ::klib::GAME_MAP_DEPTH});
+	::gpk::ptr_obj<::klib::SGame>					pInstancedGame					= {};
+	pInstancedGame->GlobalDisplay	.Resize({ASCII_DISPLAY_WIDTH, ASCII_DISPLAY_HEIGHT});
+	pInstancedGame->TacticalDisplay	.Resize({::klib::GAME_MAP_WIDTH, ::klib::GAME_MAP_DEPTH});
 
 	// --- L
-	::klib::initGame(instanceGame);
-	while(instanceGame.Flags & ::klib::GAME_FLAGS_RUNNING) {
-		::klib::pollInput(instanceGame.FrameInput);
+	::klib::initGame(*pInstancedGame);
+
+	::klib::SGame									& instancedGame					= *pInstancedGame;
+	while(instancedGame.Flags & ::klib::GAME_FLAGS_RUNNING) {
+		::klib::pollInput(instancedGame.FrameInput);
 		::klib::SASCIITarget							target							= {};
 		::klib::getASCIIBackBuffer(target);
 		::klib::clearASCIIBackBuffer(' ', ::klib::ASCII_COLOR_INDEX_WHITE);
- 		::klib::drawAndPresentGame(instanceGame, target);
+ 		::klib::drawAndPresentGame(instancedGame, target);
 		::klib::presentASCIIBackBuffer();
 	}
 
-	if(pInstancedGame)
-		delete(pInstancedGame);
+	pInstancedGame								= {};
 
 	::klib::shutdownASCIIScreen();
 	return 0;

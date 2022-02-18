@@ -31,7 +31,7 @@ static	int											shipCreate			(::ssg::SSolarSystem & solarSystem, int32_t te
 		entity.Body											= solarSystem.ShipPhysics.Spawn();
 		ship.Entity											= solarSystem.Entities.push_back(entity);
 		ship.Team											= teamId;
-		const int32_t											indexBody			= solarSystem.ShipPhysics.Spawn();
+		const int32_t											indexBody			= solarSystem.ShipPhysics.Spawn(); (void)indexBody;
 	}
 	const int32_t											indexShip			= solarSystem.Ships.push_back(ship);
 	//ship.Parts.reserve(countParts);
@@ -151,7 +151,7 @@ static	int											modelsSetup				(::ssg::SShipScene & scene)			{
 				bool													xAffect						= (y % 2);
 				::gpk::SColorFloat										lineColor					= baseColor[(iImage + (rand() % 4)) % (::gpk::size(baseColor) - 4)];
 				for(uint32_t x = 0; x < image.metrics().x; ++x) {
-					image.Texels[y * image.metrics().x + x]				= lineColor * (xAffect ? ::gpk::max(.25, ::std::sin(x * (1.0 / image.metrics().x * ::gpk::math_pi))) : 1);
+					image.Texels[y * image.metrics().x + x]				= (lineColor * (xAffect ? ::gpk::max(.25, ::gpk::sin(x * (1.0 / image.metrics().x * ::gpk::math_pi))) : 1)).Clamp();
 				}
 			}
 		}

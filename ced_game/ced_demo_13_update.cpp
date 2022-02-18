@@ -5,11 +5,13 @@
 #include <Windows.h>
 #include <mmsystem.h>
 
+static constexpr int								MAX_SLICE_TRIANGLES	= 32;
+
 static	int											explosionAdd		(::gpk::array_obj<::ssg::SExplosion> & explosions, int32_t indexMesh, uint32_t triangleCount, const ::gpk::SCoord3<float> &collisionPoint, double debrisSpeed) {
 	::ssg::SExplosion										newExplosion		= {};
 	newExplosion.IndexMesh								= indexMesh;
 	for(uint32_t iTriangle = 0; iTriangle < triangleCount; ) {
-		const	uint32_t										sliceTriangleCount	= ::gpk::min((uint32_t)(rand() % 32), (uint32_t)(triangleCount - iTriangle));
+		const	uint32_t										sliceTriangleCount	= ::gpk::min((uint32_t)(rand() % MAX_SLICE_TRIANGLES), (uint32_t)(triangleCount - iTriangle));
 		newExplosion.Slices.push_back({(uint16_t)iTriangle, (uint16_t)sliceTriangleCount});
 		iTriangle											+= sliceTriangleCount;
 
@@ -101,6 +103,7 @@ static	int											updateEntityTransforms		(uint32_t iEntity, ::gpk::array_obj
 		if(-1 != entity.Parent)
 			matrixGlobal										*= scene.ModelMatricesGlobal[entity.Parent];
 	}
+
 	for(uint32_t iChild = 0; iChild < entity.Children.size(); ++iChild) {
 		const uint32_t											iChildEntity				= entity.Children[iChild];
 		::updateEntityTransforms(iChildEntity, entities, scene, bodies);
@@ -120,8 +123,9 @@ static	int											updateShots				(::ssg::SSolarSystem & solarSystem, double s
 		::ssg::SShip											& ship					= solarSystem.Ships[iShip];
 		for(uint32_t iShip2 = 0; iShip2 < solarSystem.Ships.size(); ++iShip2) {
 			::ssg::SShip											& ship2					= solarSystem.Ships[iShip2];
-			if(ship2.Health <= 0 || ship.Team == ship2.Team)
+			if(ship2.Health <= 0 || ship.Team == ship2.Team) // avoid dead ships and ships of the same team
 				continue;
+
 			for(uint32_t iPart = 0; iPart < ship.Parts.size(); ++iPart) {
 				::ssg::SShipPart										& shipPart				= ship.Parts[iPart];
 				void													* soundAlias			= (iShip2 ? (void*)SND_ALIAS_SYSTEMHAND : (void*)SND_ALIAS_SYSTEMEXCLAMATION);
@@ -142,8 +146,10 @@ static	int											updateShots				(::ssg::SSolarSystem & solarSystem, double s
 						::ssg::SEntity											& entityChild				= solarSystem.Entities[entity.Children[iEntity]];
 						if(-1 == entityChild.Parent)
 							continue;
+
 						if(-1 == entityChild.Geometry)
 							continue;
+
 						const ::gpk::SMatrix4<float>							matrixTransform			= solarSystem.Scene.ModelMatricesGlobal[entity.Children[iEntity]];
 						const ::gpk::SCoord3<float>								entityPosition			= matrixTransform.GetTranslation();
 						::collisionDetect(shipPart.Shots, entityPosition, collisionPoints);
@@ -454,6 +460,7 @@ int													ssg::solarSystemUpdate				(::ssg::SSolarSystem & solarSystem, do
 		if(-1 == entity.Parent)	// process root entities
 			updateEntityTransforms(iEntity, solarSystem.Entities, solarSystem.Scene, solarSystem.ShipPhysics);
 	}
+	solarSystem.Scene.LightVector.Normalize();
 	//solarSystem.Scene.LightVector									= solarSystem.Scene.LightVector.RotateY(secondsLastFrame * 2);
 	return 0;
 }

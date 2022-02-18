@@ -126,7 +126,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	gui.Controls.Constraints[app.IdMode			].AttachSizeToText.x	= true;
 	gui.Controls.Constraints[app.IdNewPalette	].AttachSizeToText.x	= true;
 
-	const int32_t													iShadesHalf				= iShades / 2;
+	//const int32_t													iShadesHalf				= iShades / 2;
 	for(uint32_t iTone = 0, countTones = gui.Palette.size() / iShades; iTone < countTones; ++iTone) {
 		for(uint32_t iShade = 0; iShade < iShades; ++iShade) {
 			const int32_t													idPaletteItem			= ::gpk::controlCreate(gui);

@@ -160,7 +160,7 @@ struct SCamera {
 
 	for(uint32_t iTriangle = 0; iTriangle < applicationInstance.CubePositions.size(); ++iTriangle) {
 		double																		lightFactor									= stlFile.Triangles[iTriangle].Normal.Dot(lightPos);
-		triangle3dColorList[iTriangle]											= ::gpk::RED * lightFactor;
+		triangle3dColorList[iTriangle]											= (::gpk::RED * lightFactor).Clamp();
 	}
 	::gpk::array_pod<::gpk::SCoord2<int32_t>>									trianglePixelCoords;
 	::gpk::array_pod<::gpk::SCoord2<int32_t>>									wireframePixelCoords;

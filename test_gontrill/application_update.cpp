@@ -375,7 +375,7 @@ static				::gpk::error_t										updateSpawnShots
 	)
 {
 	::gpk::SFramework															& framework									= applicationInstance.Framework;
-	::gpk::SFramework::TOffscreen												& offscreen									= framework.MainDisplayOffscreen->Color;
+	auto																		& offscreen									= framework.MainDisplayOffscreen->Color;
 	// Add some effect particles
 	applicationInstance.EffectsDelay.Thrust									+= framework.FrameInfo.Seconds.LastFrame;
 	::SGame																		& gameInstance								= applicationInstance.Game;

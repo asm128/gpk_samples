@@ -76,7 +76,7 @@ struct SEffectsDelay {
 						double																						Star;
 };
 
-static constexpr	const ::gpk::SCoord2<uint32_t>																GAME_SCREEN_SIZE							= {640, 360};
+static constexpr	const ::gpk::SCoord2<uint32_t>																GAME_SCREEN_SIZE							= {640 / 2 * 3, 360 / 2 * 3};
 
 struct SLevelState {
 	int32_t							Number;

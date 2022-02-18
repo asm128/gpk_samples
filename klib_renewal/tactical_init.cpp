@@ -152,9 +152,9 @@ void												deployCampaignAgents
 }
 
 void												generateTopology									(::gpk::view_grid<::klib::STopologyDetail>	terrainTopology, int64_t seed )		{
-	const uint32_t											terrainWidth										= terrainTopology.metrics().x
-		,													terrainDepth										= terrainTopology.metrics().y
-		;
+	//const uint32_t											terrainWidth										= terrainTopology.metrics().x
+	//	,													terrainDepth										= terrainTopology.metrics().y
+	//	;
 	::fillCellsFromNoise(terrainTopology, {- 1,  0}, (int32_t)(seed +  987 + 1), 200);
 	::fillCellsFromNoise(terrainTopology, {-15,  0}, (int32_t)(seed + 7331 + 5), 200);
 

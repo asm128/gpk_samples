@@ -51,7 +51,7 @@
 }
 
 					::gpk::error_t										drawGrids									(::gme::SApplication& applicationInstance, ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>& target)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
-	::gpk::SFramework::TOffscreen												& offscreen									= target.Color;
+	auto																		& offscreen									= target.Color;
 	::gpk::SImage<uint32_t>														& offscreenDepth							= target.DepthStencil;
 	const ::gpk::SCoord2<uint32_t>												& offscreenMetrics							= offscreen.View.metrics();
 	::SRenderCache																& renderCache								= applicationInstance.RenderCache;

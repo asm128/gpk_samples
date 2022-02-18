@@ -1,4 +1,4 @@
-#define GPK_CONSOLE_LOG_ENABLED
+#define GPK_STDOUT_LOG_ENABLED
 
 // client.c -- a stream socket client demo
 // http://beej.us/guide/bgnet/html/single/bgnet.html#simpleclient

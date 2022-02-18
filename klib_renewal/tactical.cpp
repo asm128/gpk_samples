@@ -220,7 +220,7 @@ void																	drawTileInfo
 	::klib::printfToGridColored(globalDisplay.Color.View, globalDisplay.DepthStencil, bInTacticalMap ? messageColor : ::klib::ASCII_COLOR_INDEX_DARKGREY, tacticalDisplayStop + 1, tacticalDisplayX	+ 1, ::klib::SCREEN_LEFT, "%i, %i", mouseX-tacticalDisplayX, mouseY-TACTICAL_DISPLAY_POSY);
 }
 
-void																	drawPlayerInfo									(::klib::SGame& instanceGame)																{
+void																drawPlayerInfo									(::klib::SGame& instanceGame)																{
 	static bool																	bSwap											= false;
 	static ::klib::STimer														animationTimer;
 	static ::klib::SAccumulator<double>											animationAccum									= {0.0, 0.1};
@@ -235,7 +235,7 @@ void																	drawPlayerInfo									(::klib::SGame& instanceGame)							
 
 	const ::gpk::SCoord2<uint32_t>												& metricsDisplayGlobal							= displayGlobal  .metrics();
 	const ::gpk::SCoord2<uint32_t>												& metricsDisplayTactical						= displayTactical.metrics();
-	const int32_t																tacticalDisplayStop								= TACTICAL_DISPLAY_POSY			+ (metricsDisplayTactical.y);
+	//const int32_t																tacticalDisplayStop								= TACTICAL_DISPLAY_POSY			+ (metricsDisplayTactical.y);
 	const int32_t																tacticalDisplayX								= (metricsDisplayGlobal.x >> 1)	- (metricsDisplayTactical.x >> 1);
 	const ::klib::STacticalInfo													& tacticalInfo									= instanceGame.TacticalInfo;
 

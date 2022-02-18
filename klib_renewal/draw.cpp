@@ -927,7 +927,7 @@ int32_t												klib::drawMenu											(::klib::SDrawMenuState	& localPersi
 	const uint32_t												itemOffset											= localPersistentState.CurrentPage * 9;
 	const uint32_t												actualOptionCount									= ::gpk::min(9U, (uint32_t)(optionCount - (localPersistentState.CurrentPage * 9)));
 	int32_t														lineOffset											= (int32_t)(targetHeight - MENU_ROFFSET - 4 - ::gpk::min((int32_t)optionCount, 9));
-	const int32_t												optionsOffset										= lineOffset;
+	//const int32_t												optionsOffset										= lineOffset;
 	const uint32_t												numberCharsAvailable								= rowWidth - 4;	// 4 is for "%2.2s: "
 	int32_t														menuOffsetX											= (int32_t)(targetWidth / 2 - numberCharsAvailable / 2);
 

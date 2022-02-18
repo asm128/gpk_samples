@@ -80,7 +80,7 @@ static	int											drawDebris
 				blendVal											= depth;
 				double													finalBrightness					= 1.0-(brightDistance * brightUnit);
 				::gpk::SColorBGRA										& pixelVal						= targetPixels[blendPos.y][blendPos.x];
-				pixelVal											= starFinalColor * finalBrightness + pixelVal;
+				pixelVal											= (starFinalColor * finalBrightness + pixelVal).Clamp();
 			}
 		}
 	}
@@ -146,7 +146,7 @@ static	int											drawShots			(::gpk::view_grid<::gpk::SColorBGRA> targetPixe
 						? (		 (brightDistance * brightUnit)) * (pixelCoordUnit * (countPixelCoords - 1 - iPixelCoord))
 						: (1.0 - (brightDistance * brightUnit));
 					::gpk::SColorFloat										pixelColor						= ::gpk::interpolate_linear(::gpk::SColorFloat{pixelVal}, colorShot, finalBrightness * intensity);
-					pixelVal											= pixelColor;
+					pixelVal											= pixelColor.Clamp();
 				}
 			}
 		}
@@ -313,7 +313,7 @@ int													ssg::solarSystemDraw		(const ::ssg::SSolarSystem & solarSystem, 
 	memset(depthBuffer.begin(), -1, sizeof(uint32_t) * depthBuffer.size());
 	{
 		::std::lock_guard<::std::mutex>							lockUpdate					(mutexUpdate);
-		memcpy(targetPixels.begin(), solarSystem.BackgroundImage.Texels.begin(), sizeof(::gpk::SColorBGRA) * targetPixels.size());
+		memcpy(targetPixels.begin(), solarSystem.BackgroundImage.Texels.begin(), sizeof(::gpk::SColorBGRA) * ::gpk::min(targetPixels.size(), solarSystem.BackgroundImage.Texels.size()));
 		::drawStars(solarSystem.Stars, targetPixels);
 	}
 	::gpk::SMatrix4<float>									matrixView			= {};
