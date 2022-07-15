@@ -570,7 +570,7 @@ void																					klib::determineOutcome													(const ::klib::SEnti
 			if(currentPlayer.Tactical.Squad.Agents[iAgent] == -1)
 				continue;
 
-			if(0 == currentPlayer.Tactical.Army[currentPlayer.Tactical.Squad.Agents[iAgent]])
+			if(0 == currentPlayer.Tactical.Army[currentPlayer.Tactical.Squad.Agents[iAgent]].get_ref())
 				continue;
 
 			const ::klib::CCharacter																	& deadCharacter															= *currentPlayer.Tactical.Army[currentPlayer.Tactical.Squad.Agents[iAgent]];

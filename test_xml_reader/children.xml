@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<my_node>
+	some text first
+	<my_nested_node my_nested_attr="success">
+	some text
+	</my_nested_node>
+	some text last
+</my_node>
+

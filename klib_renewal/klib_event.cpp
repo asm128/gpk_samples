@@ -102,7 +102,7 @@ static	::gpk::error_t					eventProcessBuy				(const ::klib::SGameEvent & event, 
 		newCharacter.create(menuCharacters[item]);
 		bool										bFoundFreeCharacterSlot		= false;
 		for(uint32_t iAgent = 0, countAgents = player.Tactical.Army.size(); iAgent < countAgents; ++iAgent) {
-			if(0 == player.Tactical.Army[iAgent]) {
+			if(0 == player.Tactical.Army[iAgent].get_ref()) {
 				player.Tactical.Army[iAgent]		= newCharacter;
 				bFoundFreeCharacterSlot				= true;
 				break;

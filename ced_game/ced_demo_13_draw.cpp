@@ -195,8 +195,7 @@ static	int											getLightArrays
 	, ::gpk::array_pod<::gpk::SCoord3<float>>				& lightPointsModel
 	, ::gpk::array_pod<::gpk::SColorBGRA>					& lightColorsModel
 	) {
-	lightPointsModel.clear();
-	lightColorsModel.clear();
+	::gpk::clear(lightPointsModel, lightColorsModel);
 	for(uint32_t iLightPoint = 0; iLightPoint < lightPointsWorld.size(); ++iLightPoint) {
 		const ::gpk::SCoord3<float>								& lightPoint		=	lightPointsWorld[iLightPoint];
 		if((lightPoint - modelPosition).LengthSquared() < (MAX_LIGHT_RANGE * MAX_LIGHT_RANGE)) {
@@ -246,8 +245,7 @@ static	int											drawShip
 			const ::gpk::SGeometryQuads								& mesh						= solarSystem.Scene.Geometry[entityChild.Geometry];
 			const ::gpk::view_grid<const ::gpk::SColorBGRA>			image						= solarSystem.Scene.Image	[entityChild.Image].View;
 			for(uint32_t iTriangle = 0; iTriangle < mesh.Triangles.size(); ++iTriangle) {
-				drawCache.PixelCoords			.clear();
-				drawCache.PixelVertexWeights	.clear();
+				::gpk::clear(drawCache.PixelCoords, drawCache.PixelVertexWeights);
 				::gpk::drawQuadTriangle(targetPixels, mesh, iTriangle, matrixTransform, matrixTransformVP, solarSystem.Scene.LightVector, drawCache.PixelCoords, drawCache.PixelVertexWeights, image, drawCache.LightPointsModel, drawCache.LightColorsModel, depthBuffer);
 			}
 		}

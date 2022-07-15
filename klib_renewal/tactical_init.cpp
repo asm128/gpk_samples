@@ -432,7 +432,7 @@ bool												initCampaignPlayers									(::klib::SGame & instanceGame)						
 
 		bool													bHeroSet											= true;
 		for(uint32_t iSquadAgentSlot=0, squadAgentCount=tacticalSetup.SquadSize[iPlayer]; iSquadAgentSlot<squadAgentCount; ++iSquadAgentSlot) {
-			if( playerUser.Squad.Agents[iSquadAgentSlot] == -1 || 0 == playerUser.Army[playerUser.Squad.Agents[iSquadAgentSlot]] ) {
+			if( playerUser.Squad.Agents[iSquadAgentSlot] == -1 || 0 == playerUser.Army[playerUser.Squad.Agents[iSquadAgentSlot]].get_ref()) {
 				playerAI.Squad.Agents[iSquadAgentSlot]				= -1;
 				continue;
 			}

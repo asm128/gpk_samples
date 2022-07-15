@@ -68,7 +68,7 @@ static	::klib::SGameState					drawEquipMenu						(::klib::SGame& instanceGame, c
 	case ::klib::GAME_SUBSTATE_CHARACTER	: {
 		static ::klib::SDrawMenuState					menuState;
 		for(iCharacter = 0, count = player.Tactical.Army.size(); iCharacter < count; ++iCharacter) {
-			if(0 == player.Tactical.Army[iCharacter])
+			if(0 == player.Tactical.Army[iCharacter].get_ref())
 				continue;
 
 			if(player.Tactical.Squad.IsAgentAssigned((int32_t)iCharacter))

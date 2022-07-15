@@ -55,7 +55,7 @@
 			, (int32_t)((uint32_t)(uv.y * textureMetrics.y) % textureMetrics.y)
 			};
 		const ::gpk::SColorFloat													& srcTexel									= textureColors[uvcoords.y][uvcoords.x];
-		if(srcTexel == ::gpk::SColorBGRA{0xFF, 0, 0xFF, 0xFF})
+		if (srcTexel == ::gpk::SColorFloat{ ::gpk::SColorBGRA{0xFF, 0, 0xFF, 0xFF} })
 			return 1;
 		for(uint32_t iLight = 0, lightCount = lights.size(); iLight < lightCount; ++iLight) {
 			const ::gpk::SLightInfoRSW													& rswLight									= lights[rand() % lights.size()];

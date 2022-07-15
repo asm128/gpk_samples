@@ -64,7 +64,7 @@ int32_t processEquipAgentInput(const ::klib::SInput& frameInput, const ::klib::S
 	offsetY += 1;
 	int32_t actualAgentsProcessed = 0;
 	for(uint32_t iRow = 0; iRow < rowCount; ++iRow) {
-		if(0 == player.Army[iRow] || player.Squad.IsAgentAssigned((int32_t)iRow))
+		if(0 == player.Army[iRow].get_ref() || player.Squad.IsAgentAssigned((int32_t)iRow))
 			continue;
 
 		if(::klib::mouseOver({mouseX, mouseY}, {offsetX, offsetY+actualAgentsProcessed}, AGENT_ROW_WIDTH)) { indexEquip = iRow | (frameInput.Mouse.Buttons[0] ? 0x80000000 : 0); break; }
@@ -225,7 +225,7 @@ int32_t drawAgentList
 	int32_t											actualRowsDisplayed				= 0;
 	selectedRow									&= ~0x80000000;
 	for(uint32_t iEntity = 0, entityCount = army.size(); iEntity < entityCount; ++iEntity) {
-		if(0 == army[iEntity] || player.Tactical.Squad.IsAgentAssigned(iEntity))
+		if(0 == army[iEntity].get_ref() || player.Tactical.Squad.IsAgentAssigned(iEntity))
 			continue;
 
 		const ::klib::CCharacter						& agent							= *army[iEntity];
@@ -376,7 +376,7 @@ int32_t drawWelcomeGUI(::klib::SGame& instanceGame) {
 	if(selectedEquip != -1) {
 		agentsDisplayed = 0;
 		for(uint32_t iAgent=0; iAgent < player.Tactical.Squad.Size; ++iAgent) {
-			if(player.Tactical.Squad.Agents[iAgent] == -1 || 0 == player.Tactical.Army[player.Tactical.Squad.Agents[iAgent]])
+			if(player.Tactical.Squad.Agents[iAgent] == -1 || 0 == player.Tactical.Army[player.Tactical.Squad.Agents[iAgent]].get_ref())
 				continue;
 
 			if(selectedAgent == (int32_t)iAgent) {
