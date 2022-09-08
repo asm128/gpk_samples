@@ -30,7 +30,7 @@ static	void							selectAITarget											(::klib::STacticalInfo & tacticalInfo
 	}
 
 	//CCharacter								& playerCharacter										= *currentPlayer.Army[currentPlayer.Squad.Agents[currentPlayer.Selection.PlayerUnit]];
-	::klib::PLAYER_INDEX						targetPlayerIndex										= ::klib::PLAYER_INDEX_INVALID;
+	::klib::PLAYER_INDEX						targetPlayerIndex										= (::klib::PLAYER_INDEX)-1;
 	::klib::SPlayerSelection					& playerSelection										= currentPlayer.Tactical.Selection;
 	playerSelection.TargetPlayer			= -1;
 	playerSelection.TargetUnit				= -1;

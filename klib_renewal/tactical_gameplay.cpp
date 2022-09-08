@@ -16,7 +16,7 @@ static int32_t												getAgentsInTeamSight								(::klib::SAgentsReference&
 static int32_t												getAgentsInRange									(::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players, const ::gpk::SCoord3<int32_t>& origin, double range, ::klib::SAgentsReference& agentsInRange)	{
 	agentsInRange												= {};
 	for(uint32_t iPlayer = 0, playerCount = tacticalInfo.Setup.TotalPlayers; iPlayer < playerCount; ++iPlayer) {
-		if(tacticalInfo.Setup.Players[iPlayer] == ::klib::PLAYER_INDEX_INVALID)
+		if(tacticalInfo.Setup.Players[iPlayer] == (::klib::PLAYER_INDEX)-1)
 			continue;
 
 		::klib::SGamePlayer												& currentPlayer										= players[tacticalInfo.Setup.Players[iPlayer]];
@@ -47,7 +47,7 @@ static int32_t												getAgentsInRange									(::klib::STacticalInfo & tact
 void														recalculateAgentsInRangeAndSight					(::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players)																	{
 	::memset(&tacticalInfo.AgentsInTeamSight[0], 0, sizeof(tacticalInfo.AgentsInTeamSight));
 	for(uint32_t iPlayer=0; iPlayer < tacticalInfo.Setup.TotalPlayers; ++iPlayer) 	{
-		if(tacticalInfo.Setup.Players[iPlayer] == ::klib::PLAYER_INDEX_INVALID)
+		if(tacticalInfo.Setup.Players[iPlayer] == (::klib::PLAYER_INDEX)-1)
 			continue;
 
 		::klib::SGamePlayer												& player											= players[tacticalInfo.Setup.Players[iPlayer]];

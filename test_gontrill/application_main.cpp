@@ -100,7 +100,7 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	return 0;
 }
 
-					::gpk::error_t										mainWindowCreate							(::gpk::SDisplay& mainWindow, HINSTANCE hInstance);
+					::gpk::error_t										mainWindowCreate							(::gpk::SWindow& mainWindow, HINSTANCE hInstance);
 					::gpk::error_t										setup										(::SApplication& applicationInstance)											{
 	//_CrtSetBreakAlloc(120);
 	g_ApplicationInstance													= &applicationInstance;
@@ -173,7 +173,7 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	::gpk::textLineDrawAlignedFixedSizeLit(offscreenView, applicationInstance.TextureFontMonochrome.View, fontAtlasView.metrics(), --lineOffset, offscreenMetrics, sizeCharCell, weaponProperties[applicationInstance.Game.Ships.Weapon[0].IndexProperties].Name, ::gpk::SColorBGRA{applicationInstance.Framework.FrameInfo.FrameNumber % 0xFFU, 0xFFU, 0, 0xFFU});
 	if(applicationInstance.Debugging) {
 		::gpk::STimer																& timer										= framework.Timer;
-		::gpk::SDisplay																& mainWindow								= framework.MainDisplay;
+		::gpk::SWindow																& mainWindow								= framework.MainDisplay;
 		char																		buffer		[512]							= {};
 		int32_t																		lineLen										= sprintf_s(buffer, "[%u x %u]. Projecitle fx count: %u. Thrust fx count: %u."
 			, mainWindow.Size.x, mainWindow.Size.y

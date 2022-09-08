@@ -13,7 +13,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 			::gpk::error_t											cleanup						(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.MainDisplay); }
 			::gpk::error_t											setup						(::gme::SApplication & app)						{
 	::gpk::SFramework														& framework					= app.Framework;
-	::gpk::SDisplay															& mainWindow				= framework.MainDisplay;
+	::gpk::SWindow															& mainWindow				= framework.MainDisplay;
 	framework.Settings.GUIZoom											= false;
 	app.Framework.GUI													= app.DialogMain.GUI;
 	app.DialogMain.Input												= framework.Input;

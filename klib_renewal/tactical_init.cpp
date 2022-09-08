@@ -291,7 +291,7 @@ static	void										initTacticalPlayer									(::klib::SGame& instanceGame, in
 		player.Tactical.Squad.ActionsLeft		[iAgent].Moves		= (int8_t)agentPoints.Fitness.Movement;
 		player.Tactical.Squad.ActionsLeft		[iAgent].Actions	= 1;
 		player.Tactical.Squad.TargetPositions	[iAgent]			= playerAgent.Position;
-		player.Tactical.Squad.TargetAgents		[iAgent]			= {::klib::TEAM_TYPE_INVALID, -1, -1, -1};
+		player.Tactical.Squad.TargetAgents		[iAgent]			= {(::klib::TEAM_TYPE)-1, -1, -1, -1};
 	}
 }
 
@@ -419,7 +419,7 @@ bool												initCampaignPlayers									(::klib::SGame & instanceGame)						
 	::klib::STacticalPlayer										& playerUser										= instanceGame.Players[::klib::PLAYER_INDEX_USER].Tactical;
 	// Set up AI player's agents using the main human player as reference in order to determine the level and equipment.
 	for(uint32_t iPlayer = 0; iPlayer<tacticalSetup.TotalPlayers; ++iPlayer) {
-		if(tacticalSetup.Players[iPlayer] == ::klib::PLAYER_INDEX_INVALID || tacticalSetup.Players[iPlayer] == ::klib::PLAYER_INDEX_USER)
+		if(tacticalSetup.Players[iPlayer] == (::klib::PLAYER_INDEX)-1 || tacticalSetup.Players[iPlayer] == ::klib::PLAYER_INDEX_USER)
 			continue;
 
 		// Set up AI squads

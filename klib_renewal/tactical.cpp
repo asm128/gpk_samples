@@ -240,7 +240,7 @@ void																drawPlayerInfo									(::klib::SGame& instanceGame)								
 	const ::klib::STacticalInfo													& tacticalInfo									= instanceGame.TacticalInfo;
 
 	const ::klib::PLAYER_INDEX													currentPlayerIndex								= ::klib::getCurrentPlayerIndex(tacticalInfo);
-	if(currentPlayerIndex == ::klib::PLAYER_INDEX_INVALID)
+	if(currentPlayerIndex == (::klib::PLAYER_INDEX)-1)
 		return;
 
 #define PLAYER_INFO_POSY 1
@@ -452,7 +452,7 @@ static CHARACTER_TURN_ACTION											characterTurn									(const ::klib::SEnt
 			}
 		}
 		else if(::gpk::bit_true(currentAgent.FinalFlags.Tech.AttackType, ::klib::ATTACK_TYPE_MELEE)) {
-			if(currentPlayer.Tactical.Selection.TargetPlayer == -1 || tacticalInfo.Setup.Players[currentPlayer.Tactical.Selection.TargetPlayer] == ::klib::PLAYER_INDEX_INVALID || currentPlayer.Tactical.Selection.TargetUnit == -1) {
+			if(currentPlayer.Tactical.Selection.TargetPlayer == -1 || tacticalInfo.Setup.Players[currentPlayer.Tactical.Selection.TargetPlayer] == (::klib::PLAYER_INDEX)-1 || currentPlayer.Tactical.Selection.TargetUnit == -1) {
 				messages.UserMiss													= ::gpk::view_const_string{"You need to select a valid target in order to attack!"};
 				messages.LogMiss();
 			}
@@ -738,7 +738,7 @@ static	void															updateBullets									(::klib::SGame & instanceGame, d
 				int32_t																		newz											= newBulletPos.Cell.z;
 				if(tacticalInfo.Board.Tiles.Entities.Agents	[newz][newx].AgentIndex	!= -1	&& tacticalInfo.Board.Tiles.Entities.Agents	[newz][newx].PlayerIndex != -1 ) {
 					bImpact																	= true;
-					if(tacticalInfo.Setup.Players[tacticalInfo.Board.Tiles.Entities.Agents[newz][newx].PlayerIndex] != ::klib::PLAYER_INDEX_INVALID) {
+					if(tacticalInfo.Setup.Players[tacticalInfo.Board.Tiles.Entities.Agents[newz][newx].PlayerIndex] != (::klib::PLAYER_INDEX)-1) {
 						::klib::SGamePlayer																& playerHit										= instanceGame.Players[tacticalInfo.Setup.Players[tacticalInfo.Board.Tiles.Entities.Agents[newz][newx].PlayerIndex]];
 						::klib::SGamePlayer																& playerShooter									= instanceGame.Players[tacticalInfo.Setup.Players[newBullet.Shooter.PlayerIndex]];
 						if( playerHit.Tactical.Squad.Agents[tacticalInfo.Setup.Players[tacticalInfo.Board.Tiles.Entities.Agents[newz][newx].AgentIndex]] != -1 ) {
@@ -758,7 +758,7 @@ static	void															updateBullets									(::klib::SGame & instanceGame, d
 								if(0 >= agentHit		.Points.LifeCurrent.Health)	::klib::handleAgentDeath(tacticalInfo, instanceGame.Players, agentHit		, agentShooter	, tacticalInfo.Setup.TeamPerPlayer[tacticalInfo.Board.Tiles.Entities.Agents[newz][newx].PlayerIndex], instanceGame.Messages);
 							}
 							else
-								tacticalInfo.Board.Tiles.Entities.Agents[newz][newx]					= {::klib::TEAM_TYPE_INVALID, -1, -1, -1};
+								tacticalInfo.Board.Tiles.Entities.Agents[newz][newx]					= {(::klib::TEAM_TYPE)-1, -1, -1, -1};
 						}
 					}
 				}
