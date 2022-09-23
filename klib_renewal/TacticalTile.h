@@ -53,12 +53,12 @@ namespace klib
 				::gpk::SImage<int64_t		>						Coins	;
 
 		inline	int32_t												Resize			(::gpk::SCoord2<uint32_t> newSize)											{
-			Agents	.resize(newSize, {TEAM_TYPE_INVALID, -1, -1, -1} );
+			Agents	.resize(newSize, {(::klib::TEAM_TYPE)-1, -1, -1, -1} );
 			Props	.resize(newSize, {-1, -1, -1, -1});
 			return Coins	.resize(newSize, 0);
 		}
 		inline	void												Clear			()											{
-			::klib::clearGrid(Agents.View, {TEAM_TYPE_INVALID, -1, -1, -1} );
+			::klib::clearGrid(Agents.View, {(::klib::TEAM_TYPE)-1, -1, -1, -1} );
 			::klib::clearGrid(Props	.View, {-1, -1, -1, -1} );
 			::klib::clearGrid(Coins	.View, 0LL);
 		}

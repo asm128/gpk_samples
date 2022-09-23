@@ -225,7 +225,7 @@ namespace klib
 						::gpk::error_t							initTacticalMap					(::klib::SGame & instanceGame);
 						::gpk::error_t							handleMissionEnd				(::klib::SGame & instanceGame);
 						::gpk::error_t							showMenu						(::klib::SGame & instanceGame);
-	static inline		::klib::PLAYER_INDEX					getCurrentPlayerIndex			(const ::klib::STacticalInfo& tacticalInfo)				{ return ( tacticalInfo.CurrentPlayer == -1) ? ::klib::PLAYER_INDEX_INVALID : tacticalInfo.Setup.Players[tacticalInfo.CurrentPlayer]; }
+	static inline		::klib::PLAYER_INDEX					getCurrentPlayerIndex			(const ::klib::STacticalInfo& tacticalInfo)				{ return ( tacticalInfo.CurrentPlayer == -1) ? (::klib::PLAYER_INDEX)-1 : tacticalInfo.Setup.Players[tacticalInfo.CurrentPlayer]; }
 						int64_t									missionCost						(const ::klib::SGamePlayer& player, const SSquad& squadSetup, uint32_t maxAgents = ::klib::MAX_AGENT_SQUAD_SLOTS);
 } // namespace
 

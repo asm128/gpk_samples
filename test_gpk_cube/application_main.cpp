@@ -26,7 +26,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 
 // --- Cleanup application resources.
 					::gpk::error_t										cleanup										(::SApplication& applicationInstance)											{
-	::gpk::SDisplayPlatformDetail												& displayDetail								= applicationInstance.Framework.MainDisplay.PlatformDetail;
+	::gpk::SWindowPlatformDetail												& displayDetail								= applicationInstance.Framework.MainDisplay.PlatformDetail;
 	::gpk::mainWindowDestroy(applicationInstance.Framework.MainDisplay);
 	::UnregisterClass(displayDetail.WindowClassName, displayDetail.WindowClass.hInstance);
 	g_ApplicationInstance													= 0;
@@ -57,8 +57,7 @@ static constexpr const ::gpk::STriangle3<float>						geometryCube	[12]						=
 					::gpk::error_t										setup										(::SApplication& applicationInstance)											{
 	g_ApplicationInstance													= &applicationInstance;
 	::gpk::SFramework															& framework									= applicationInstance.Framework;
-	::gpk::SDisplay																& mainWindow								= framework.MainDisplay;
-	framework.Input.create();
+	::gpk::SWindow																& mainWindow								= framework.MainDisplay;
 	mainWindow.Size														= {640, 480};
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?!");
 
@@ -82,7 +81,7 @@ static constexpr const ::gpk::STriangle3<float>						geometryCube	[12]						=
 	ree_if(errored(::updateSizeDependentResources(applicationInstance)), "Cannot update offscreen and this could cause an invalid memory access later on.");
 	//-----------------------------
 	::gpk::STimer																& timer										= applicationInstance.Framework.Timer;
-	::gpk::SDisplay																& mainWindow								= applicationInstance.Framework.MainDisplay;
+	::gpk::SWindow																& mainWindow								= applicationInstance.Framework.MainDisplay;
 	char																		buffer		[256]							= {};
 	sprintf_s(buffer, "[%u x %u]. FPS: %g. Last frame seconds: %g.", mainWindow.Size.x, mainWindow.Size.y, 1 / timer.LastTimeSeconds, timer.LastTimeSeconds);
 	::HWND																		windowHandle								= mainWindow.PlatformDetail.WindowHandle;

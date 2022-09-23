@@ -80,7 +80,7 @@ template<typename _tIndex, typename _tValue>
 					::gpk::error_t									setup										(::gme::SApplication & app)						{
 	app.Buffer3D.create();
 	::gpk::SFramework														& framework									= app.Framework;
-	::gpk::SDisplay															& mainWindow								= framework.MainDisplay;
+	::gpk::SWindow															& mainWindow								= framework.MainDisplay;
 	app.Framework.GUI													= app.DialogMain.GUI;
 	app.DialogMain.Input												= framework.Input;
 	framework.MainDisplay.Size												= {1280, 720};

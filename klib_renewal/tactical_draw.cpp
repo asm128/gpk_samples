@@ -24,7 +24,7 @@ void									klib::boardToDisplay			(::klib::SGame& instanceGame, const STactica
 			bInRange								= true;
 		else {
 			for(uint32_t iTacticalPlayer = 0, playerCount = tacticalInfo.Setup.TotalPlayers; iTacticalPlayer < playerCount; ++iTacticalPlayer) {
-				if(tacticalSetup.Players[iTacticalPlayer] == PLAYER_INDEX_INVALID)
+				if(tacticalSetup.Players[iTacticalPlayer] == (::klib::PLAYER_INDEX)-1)
 					continue;
 
 				if(tacticalSetup.TeamPerPlayer[iTacticalPlayer] != teamId)

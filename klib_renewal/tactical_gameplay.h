@@ -17,7 +17,7 @@ namespace klib
 	static int32_t												getAgentsInSight									(::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<const ::klib::SGamePlayer> players, const ::gpk::SCoord3<int32_t>& origin, double range, SAgentsReference& agentsInRange)	{
 		agentsInRange												= {};
 		for(uint32_t iPlayer = 0, playerCount = tacticalInfo.Setup.TotalPlayers; iPlayer < playerCount; ++iPlayer) {
-			if(tacticalInfo.Setup.Players[iPlayer] == PLAYER_INDEX_INVALID)
+			if(tacticalInfo.Setup.Players[iPlayer] == (::klib::PLAYER_INDEX)-1)
 				continue;
 
 			const ::klib::SGamePlayer											& currentPlayer										= players[tacticalInfo.Setup.Players[iPlayer]];
