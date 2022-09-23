@@ -3,9 +3,18 @@
 ################################################################################
 
 .vs/
+<<<<<<< HEAD
 x64/
 Win32/
 Release/
 Debug/
 .vscode/ipch/
 
+=======
+x64/Release/
+x64/Debug/
+Release/
+Debug/
+ipch/
+x64/Debug/
+>>>>>>> 998caccade4eb1e608f72093c13cc0b910d9ff86
