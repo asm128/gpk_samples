@@ -1,4 +1,4 @@
-#include "application.h"
+#include "gpk_lobby_client.h"
 #include "gpk_bitmap_file.h"
 #include "gpk_parse.h"
 
@@ -11,8 +11,9 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 
 			::gpk::error_t											cleanup					(::gme::SApplication & app)							{
 	::gpk::mainWindowDestroy(app.Framework.MainDisplay);
-	::gpk::clientDisconnect(app.Client);
+	::gpk::clientDisconnect(app.LobbyClient.Client);
 	::gpk::tcpipShutdown();
+	::gpk::sleep(100);
 	return 0;
 }
 			::gpk::error_t											setup						(::gme::SApplication & app)						{
@@ -35,8 +36,8 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	::gpk::controlSetParent(gui, app.IdExit, -1);
 	gpk_necall(::gpk::tcpipInitialize(), "Failed to initialize network subsystem: '%s'.", "Unknown error");
 
-	app.Client.AddressConnect											= {};
-	::gpk::tcpipAddress(9998, 0, ::gpk::TRANSPORT_PROTOCOL_UDP, app.Client.AddressConnect);	// If loading the remote IP from the json fails, we fall back to the local address.
+	app.LobbyClient.Client.AddressConnect											= {};
+	::gpk::tcpipAddress(9998, 0, ::gpk::TRANSPORT_PROTOCOL_UDP, app.LobbyClient.Client.AddressConnect);	// If loading the remote IP from the json fails, we fall back to the local address.
 	{ // attempt to load address from config file.
 		const ::gpk::SJSONReader												& jsonReader						= framework.JSONConfig.Reader;
 		{ //
@@ -44,7 +45,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 			gwarn_if(errored(::gpk::jsonExpressionResolve(::gpk::vcs{"application.test_udp_client.remote_ip"}, jsonReader, 0, jsonIP)), "Failed to load config from json! Last contents found: %s.", jsonIP.begin())
 			else {
 				info_printf("Remote IP: %s.", jsonIP.begin());
-				gerror_if(errored(::gpk::tcpipAddress(jsonIP, {}, app.Client.AddressConnect)), "Failed to read IP address from JSON config file: %s.", jsonIP.begin());	// turn the string into a SIPv4 struct.
+				gerror_if(errored(::gpk::tcpipAddress(jsonIP, {}, app.LobbyClient.Client.AddressConnect)), "Failed to read IP address from JSON config file: %s.", jsonIP.begin());	// turn the string into a SIPv4 struct.
 			}
 		}
 		{ // load port from config file
@@ -53,12 +54,12 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 			else {
 				uint64_t																port;
 				::gpk::parseIntegerDecimal(jsonPort, &port);
-				app.Client.AddressConnect.Port										= (uint16_t)port;
+				app.LobbyClient.Client.AddressConnect.Port										= (uint16_t)port;
 				info_printf("Remote port: %u.", (uint32_t)port);
 			}
 		}
 	} 
-	::gpk::clientConnect(app.Client);
+	//::gpk::clientConnect(app.LobbyClient.Client);
 	return 0;
 }
 			::gpk::error_t											update						(::gme::SApplication & app, bool exitSignal)	{
@@ -69,6 +70,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 		app.Framework.MainDisplayOffscreen									= app.Offscreen;
 	}
 	::gpk::SFramework														& framework					= app.Framework;
+	app.LobbyClient.Update(framework.Input, framework.MainDisplay.EventQueue);
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework), "Exit requested by framework update.");
 
 	::gpk::SGUI																& gui						= *framework.GUI;
@@ -85,36 +87,32 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	}
 
 	//static bool bSend = true;
-	reterr_gerror_if(app.Client.State != ::gpk::UDP_CONNECTION_STATE_IDLE, "Failed to connect to server.")
-	else {
-		{
-			::gpk::mutex_guard														lockRecv					(app.Client.Queue.MutexReceive);
-			for(uint32_t iMessage = 0; iMessage < app.Client.Queue.Received.size(); ++iMessage) {
-				//gpk_necall(app.MessagesToProcess.push_back(client->Queue.Received[iMessage]), "%s", "Out of memory?");
-				::gpk::view_const_byte													viewPayload					= app.Client.Queue.Received[iMessage]->Payload;
-				info_printf("Client received: %s.", viewPayload.begin());
-			}
-			app.Client.Queue.Received.clear();
-		}
-
+	//reterr_gerror_if(app.LobbyClient.Client.State != ::gpk::UDP_CONNECTION_STATE_IDLE, "Failed to connect to server.")
+	//else 
+	if(false)
+	{
 		//if(bSend) {
-			::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived!", true, true	  , 32);
+			::gpk::connectionPushData(app.LobbyClient.Client, app.LobbyClient.Client.Queue, "Message arrived!", true, true	  , 32);
 		//	bSend = false;
 		//}
-		::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! 2", false, true , 0);
-		::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! 3", true, false , 0);
-		::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! 4", false, false, 0);
-		::gpk::clientUpdate(app.Client);
-		::gpk::sleep(10);
+		::gpk::connectionPushData(app.LobbyClient.Client, app.LobbyClient.Client.Queue, "Message arrived! 2", false, true , 0);
+		::gpk::connectionPushData(app.LobbyClient.Client, app.LobbyClient.Client.Queue, "Message arrived! 3", true, false , 0);
+		::gpk::connectionPushData(app.LobbyClient.Client, app.LobbyClient.Client.Queue, "Message arrived! 4", false, false, 0);
+		::gpk::clientUpdate(app.LobbyClient.Client);
+		::gpk::sleep(1);
 		//
-		::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! x1", true, true, 4);
-		::gpk::clientUpdate(app.Client);
-		::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! x2", false, true, 4);
-		::gpk::clientUpdate(app.Client);
-		::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! x3", true, false, 4);
-		::gpk::clientUpdate(app.Client);
-		::gpk::connectionPushData(app.Client, app.Client.Queue, "Message arrived! x4", false, false, 4);
-		::gpk::clientUpdate(app.Client);
+		::gpk::connectionPushData(app.LobbyClient.Client, app.LobbyClient.Client.Queue, "Message arrived! x1", true, true, 4);
+		::gpk::clientUpdate(app.LobbyClient.Client);
+		::gpk::sleep(1);
+		::gpk::connectionPushData(app.LobbyClient.Client, app.LobbyClient.Client.Queue, "Message arrived! x2", false, true, 4);
+		::gpk::clientUpdate(app.LobbyClient.Client);
+		::gpk::sleep(1);
+		::gpk::connectionPushData(app.LobbyClient.Client, app.LobbyClient.Client.Queue, "Message arrived! x3", true, false, 4);
+		::gpk::clientUpdate(app.LobbyClient.Client);
+		::gpk::sleep(1);
+		::gpk::connectionPushData(app.LobbyClient.Client, app.LobbyClient.Client.Queue, "Message arrived! x4", false, false, 4);
+		::gpk::clientUpdate(app.LobbyClient.Client); 
+		::gpk::sleep(1);
 
 	}
 	//::gpk::sleep(1000);
@@ -134,7 +132,8 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	::gpk::STimer																timer;
 	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>			target;
 	target.create();
-	target->resize(app.Framework.MainDisplay.Size, {0xFF, 0x40, 0x7F, 0xFF}, (uint32_t)-1);
+	target->resize(app.Framework.MainDisplay.Size, {0xFF, 0x20, 0x6F, 0xCF}, (uint32_t)-1);
+	app.LobbyClient.Draw(target->Color);
 	//::gpk::clearTarget(*target);
 	{
 		::gpk::mutex_guard															lock					(app.LockGUI);
