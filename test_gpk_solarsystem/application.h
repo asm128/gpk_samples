@@ -22,7 +22,7 @@ namespace gme // I'm gonna use a different namespace in order to test a few thin
 					::std::mutex														LockGUI;
 					::std::mutex														LockRender;
 
-					::SSolarSystem														SolarSystem					= {};
+					::ssg::SSolarSystemGame												SolarSystemGame				= {};
 
 																						SApplication				(::gpk::SRuntimeValues& runtimeValues)	: Framework(runtimeValues)		{}
 	};

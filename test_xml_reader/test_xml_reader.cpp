@@ -21,10 +21,10 @@ int xmlTestDoc(::gpk::vcc xmlDoc) {
 		printf("\nValue: '%s'"			, ::gpk::toString({&xmlDoc[token.Range.Offset], token.Range.Count}).begin());
 		printf("\nOffset: %i"			, token.Range.Offset);
 		printf("\nLength: %i"			, token.Range.Count);
-		printf("\nParent: %i"			, token.IndexParent);
+		printf("\nParent: %i"			, token.Parent);
 		printf("\nParent type: %i (%s)"
-			, (-1 != token.IndexParent) ? reader.Token[token.IndexParent].Type : -1
-			, (-1 != token.IndexParent) ? ::gpk::get_value_label(reader.Token[token.IndexParent].Type).begin() : ""
+			, (-1 != token.Parent) ? reader.Token[token.Parent].Type : -1
+			, (-1 != token.Parent) ? ::gpk::get_value_label(reader.Token[token.Parent].Type).begin() : ""
 			);
 	}
 	return 0;

@@ -23,20 +23,8 @@
 	}
 	return 0;
 }
-																	//	- Mercury	- Venus		- Earth		- Mars		- Jupiter	- Saturn	- Uranus	- Neptune	- Pluto
-static constexpr const double	PLANET_MASSES				[PLANET_COUNT]	=	{	0.330f		, 4.87f		, 5.97f		, 0.642f	, 1899		, 568		, 86.8f		, 102		, 0.0125f	};
-static constexpr const double	PLANET_SCALES				[PLANET_COUNT]	=	{	4879		, 12104		, 12756		, 6792		, 142984	, 120536	, 51118		, 49528		, 2390		};
-static constexpr const double	PLANET_DAY					[PLANET_COUNT]	=	{	4222.6f		, 2802.0f	, 23.9f		, 24.7f		, 9.9f		, 10.7f		, 17.2f		, 16.1f		, 153.3f	};
-static constexpr const double	PLANET_AXIALTILT			[PLANET_COUNT]	=	{	0.01f		, 177.4f	, 23.4f		, 25.2f		, 3.1f		, 26.7f		, 97.8f		, 28.3f		, 122.5f	};
-static constexpr const double	PLANET_DISTANCE				[PLANET_COUNT]	=	{	57.9f		, 108.2f	, 149.6f	, 227.9f	, 778.6f	, 1433.5f	, 2872.5f	, 4495.1f	, 5870.0f	};
 
-static constexpr const double	PLANET_ORBITALPERIOD		[PLANET_COUNT]	=	{	88.0f	, 224.7f	, 365.2f	, 687.0f	, 4331		, 10747		, 30589		, 59800		, 90588		};
-static constexpr const double	PLANET_ORBITALVELOCITY		[PLANET_COUNT]	=	{	47.9f	, 35.0f		, 29.8f		, 24.1f		, 13.1f		, 9.7f		, 6.8f		, 5.4f		, 4.7f		};
-static constexpr const double	PLANET_ORBITALINCLINATION	[PLANET_COUNT]	=	{	7.0		, 3.4f		, 0.0f		, 1.9f		, 1.3f		, 2.5f		, 0.8f		, 1.8f		, 17.2f		};
-static constexpr const double	PLANET_ORBITALECCENTRICITY	[PLANET_COUNT]	=	{	0.205f	, 0.007f	, 0.017f	, 0.094f	, 0.049f	, 0.057f	, 0.046f	, 0.011f	, 0.244f	};
-static constexpr const char*	PLANET_IMAGE				[PLANET_COUNT]	=	{	"mercury_color.bmp"	, "venus_color.bmp"	, "earth_color.bmp"	, "mars_color.bmp"	, "jupiter_color.bmp"	, "saturn_color.bmp"	, "uranus_color.bmp"	, "neptune_color.bmp"	, "pluto_color.bmp"	};
-
-static	int											drawDebris			(::gpk::view_grid<::gpk::SColorBGRA> targetPixels, SDebris & debris, const ::gpk::SMatrix4<float> & matrixVPV, ::gpk::view_grid<uint32_t> depthBuffer)	{
+static	int											drawDebris			(::gpk::view_grid<::gpk::SColorBGRA> targetPixels, ::ssg::SDebris & debris, const ::gpk::SMatrix4<float> & matrixVPV, ::gpk::view_grid<uint32_t> depthBuffer)	{
 	::gpk::array_pod<::gpk::SCoord2<int32_t>>				pixelCoords;
 	for(uint32_t iParticle = 0; iParticle < debris.Brightness.size(); ++iParticle) {
 		::gpk::SColorFloat										colorShot			= debris.Colors[iParticle % ::gpk::size(debris.Colors)];
@@ -83,115 +71,35 @@ static	int											drawDebris			(::gpk::view_grid<::gpk::SColorBGRA> targetPix
 	return 0;
 }
 
-int													setupGame						(SSolarSystem & solarSystem)	{
-	solarSystem.Scene.Geometry.resize(1);
-	::gpk::geometryBuildSphere(solarSystem.Scene.Geometry[0], 20U, 16U, 1, {});
-//	::gpk::geometryBuildFromSTL();
-
-	solarSystem.Scene.Pivot.resize(PLANET_COUNT + 1); //
-	::gpk::SIntegrator3										& bodies						= solarSystem.Bodies;
-	::SScene												& scene							= solarSystem.Scene;
-	for(uint32_t iModel = 0; iModel < solarSystem.Scene.Pivot.size(); ++iModel) {
-		int32_t													iPlanet							= iModel - 1;
-		{ // Set up rigid body
-			::SModelPivot											& model							= scene.Pivot[iModel];
-			const float												scale							= (0 == iModel) ? 10.0f : float(1.0 / PLANET_SCALES[PLANET_EARTH] * PLANET_SCALES[iPlanet]) * 2;
-			model.Scale											= {scale, scale, scale};
-			model.Position										= {0, 0.5f};
-		}
-		if(iModel) { // Set up rigid body
-			::gpk::createOrbiter(bodies
-				, PLANET_MASSES				[iPlanet]
-				, PLANET_DISTANCE			[iPlanet]
-				, PLANET_AXIALTILT			[iPlanet]
-				, PLANET_DAY				[iPlanet]
-				, PLANET_DAY				[PLANET_EARTH]
-				, PLANET_ORBITALPERIOD		[iPlanet]
-				, PLANET_ORBITALINCLINATION	[iPlanet]
-				, 1.0 / PLANET_DISTANCE		[PLANET_COUNT - 1] * 2500
-				);
-		}
-	}
-	solarSystem.Entities.push_back({-1, 0, 0, 0, -1});
-	for(uint32_t iPlanet = 0; iPlanet < PLANET_COUNT; ++iPlanet) {
-		const uint32_t											iBodyOrbit					= iPlanet * 2;
-		const uint32_t											iBodyPlanet					= iBodyOrbit + 1;
-		int32_t													iEntityOrbit				= solarSystem.Entities.push_back({0, -1, -1, -1, (int32_t)iBodyOrbit});
-		solarSystem.Entities[0].IndexChild.push_back(iEntityOrbit);
-		int32_t													iEntityPlanet				= solarSystem.Entities.push_back({iEntityOrbit, 0, (int32_t)iPlanet + 1, (int32_t)iPlanet + 1, (int32_t)iBodyPlanet});
-		solarSystem.Entities[iEntityOrbit].IndexChild.push_back(iEntityPlanet);
-	}
-
-	::gpk::SColorFloat										colors []						=
-		{ ::gpk::YELLOW
-		, ::gpk::DARKRED
-		, ::gpk::ORANGE
-		, ::gpk::BLUE
-		, ::gpk::LIGHTRED
-		, ::gpk::LIGHTGRAY
-		, ::gpk::LIGHTYELLOW
-		, ::gpk::GREEN
-		, ::gpk::DARKGRAY
-		, ::gpk::YELLOW
-		};
-
-	solarSystem.Image.resize(PLANET_COUNT + 1);
-	//::gpk::bmpFileLoad("../gpk_data/sun_color.bmp", solarSystem.Image[0], true);
-	//for(uint32_t iPlanet = 0; iPlanet < PLANET_COUNT; ++iPlanet) {
-	//	char														finalPath[256] = {};
-	//	sprintf_s(finalPath, "../gpk_data/%s", PLANET_IMAGE[iPlanet]);
-	//	::gpk::bmpFileLoad(finalPath, solarSystem.Image[iPlanet + 1], true);
-	//}
-
-	for(uint32_t iImage = 0; iImage < solarSystem.Image.size(); ++iImage) {
-		if(solarSystem.Image[iImage].Texels.size())
-			continue;
-		solarSystem.Image[iImage].resize({512, 512});
-		for(uint32_t y = 0; y < solarSystem.Image[iImage].metrics().y; ++y) { // Generate noise color for planet texture
-			const double															ecuatorialShade			= cos(y * (1.0 / solarSystem.Image[iImage].metrics().y * ::gpk::math_2pi)) + 1.5;
-			uint32_t																rowOffset				= y * solarSystem.Image[iImage].metrics().x;
-			for(uint32_t x = 0; x < solarSystem.Image[iImage].metrics().x; ++x) {
-				solarSystem.Image[iImage].Texels[rowOffset + x]	= (colors[iImage % ::gpk::size(colors)] * ecuatorialShade * (1.0 - (rand() / 3.0 / (double)RAND_MAX))).Clamp();
-			}
-		}
-	}
-	bodies.Integrate((365 * 4 + 1) * 10);	// Update physics
-
-	solarSystem.Scene.Camera.Target					= {};
-	solarSystem.Scene.Camera.Position				= {-0.000001f, 500, -1000};
-	solarSystem.Scene.Camera.Up						= {0, 1, 0};
-	return 0;
-}
-
-int													updateEntityTransforms		(uint32_t iEntity, ::gpk::array_obj<::SEntity> & entities, SScene & scene, ::gpk::SIntegrator3 & bodies)	{
-	const SEntity											& entity					= entities[iEntity];
-	if(-1 == entity.IndexBody)
-		scene.Transform[iEntity]							= (-1 == entity.IndexParent) ? bodies.MatrixIdentity4 : scene.Transform[entity.IndexParent];
+int													updateEntityTransforms		(uint32_t iEntity, ::gpk::array_obj<::ssg::SEntity> & entities, ssg::SScene & scene, ::gpk::SIntegrator3 & bodies)	{
+	const ssg::SEntity										& entity					= entities[iEntity];
+	if(-1 == entity.Body)
+		scene.Transform[iEntity]							= (-1 == entity.Parent) ? bodies.MatrixIdentity4 : scene.Transform[entity.Parent];
 	else {
-		if(-1 == entity.IndexParent)
-			bodies.GetTransform(entity.IndexBody, scene.Transform[iEntity]);
+		if(-1 == entity.Parent)
+			bodies.GetTransform(entity.Body, scene.Transform[iEntity]);
 		else {
 			::gpk::SMatrix4<float>									matrixBody					= {};
-			bodies.GetTransform(entity.IndexBody, matrixBody);
-			scene.Transform[iEntity]							= matrixBody * scene.Transform[entity.IndexParent];
+			bodies.GetTransform(entity.Body, matrixBody);
+			scene.Transform[iEntity]							= matrixBody * scene.Transform[entity.Parent];
 		}
 	}
-	for(uint32_t iChild = 0; iChild < entity.IndexChild.size(); ++iChild) {
-		const uint32_t											iChildEntity				= entity.IndexChild[iChild];
+	for(uint32_t iChild = 0; iChild < entity.Children.size(); ++iChild) {
+		const uint32_t											iChildEntity				= entity.Children[iChild];
 		::updateEntityTransforms(iChildEntity, entities, scene, bodies);
 	}
 	return 0;
 }
 
-int													updateGame						(SSolarSystem & solarSystem, double secondsLastFrame, ::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>> & target)	{
+int													ssg::solarSystemUpdate			(ssg::SSolarSystemGame & solarSystem, double secondsLastFrame, ::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>> & target)	{
 	// ------------------------------------------- Handle input
 	::gpk::SIntegrator3										& bodies						= solarSystem.Bodies;
-	::SScene												& scene							= solarSystem.Scene;
+	::ssg::SScene											& scene							= solarSystem.Scene;
 
 	scene.Transform.resize(solarSystem.Entities.size());
 	for(uint32_t iEntity = 0; iEntity < solarSystem.Entities.size(); ++iEntity) {
-		const ::SEntity											& entity					= solarSystem.Entities[iEntity];
-		if(-1 != entity.IndexParent)	// process root entities
+		const ::ssg::SEntity								& entity					= solarSystem.Entities[iEntity];
+		if(-1 != entity.Parent)	// process root entities
 			::updateEntityTransforms(iEntity, solarSystem.Entities, scene, bodies);
 		else
 			solarSystem.Scene.Transform[iEntity].Identity();
@@ -207,16 +115,16 @@ int													updateGame						(SSolarSystem & solarSystem, double secondsLastF
 	if(GetAsyncKeyState('W')) camera.Position				-= camera.Position / camera.Position.Length() * (GetAsyncKeyState(VK_SHIFT) ? 100 : 2) * secondsLastFrame;
 	if(GetAsyncKeyState('A')) camera.Position.RotateY( (GetAsyncKeyState(VK_SHIFT) ? 100 : 2) * secondsLastFrame);
 	if(GetAsyncKeyState('D')) camera.Position.RotateY(-(GetAsyncKeyState(VK_SHIFT) ? 100 : 2) * secondsLastFrame);
-	if(GetAsyncKeyState('0')) { ; camera.Target = scene.Transform[0 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::SCoord3<float>{scene.Pivot[solarSystem.Entities[0 * 2].IndexModel].Scale.x * 10, 0, 0}; }
-	if(GetAsyncKeyState('1')) { ; camera.Target = scene.Transform[1 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::SCoord3<float>{scene.Pivot[solarSystem.Entities[1 * 2].IndexModel].Scale.x * 10, 0, 0}; }
-	if(GetAsyncKeyState('2')) { ; camera.Target = scene.Transform[2 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::SCoord3<float>{scene.Pivot[solarSystem.Entities[2 * 2].IndexModel].Scale.x * 10, 0, 0}; }
-	if(GetAsyncKeyState('3')) { ; camera.Target = scene.Transform[3 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::SCoord3<float>{scene.Pivot[solarSystem.Entities[3 * 2].IndexModel].Scale.x * 10, 0, 0}; }
-	if(GetAsyncKeyState('4')) { ; camera.Target = scene.Transform[4 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::SCoord3<float>{scene.Pivot[solarSystem.Entities[4 * 2].IndexModel].Scale.x * 10, 0, 0}; }
-	if(GetAsyncKeyState('5')) { ; camera.Target = scene.Transform[5 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::SCoord3<float>{scene.Pivot[solarSystem.Entities[5 * 2].IndexModel].Scale.x * 10, 0, 0}; }
-	if(GetAsyncKeyState('6')) { ; camera.Target = scene.Transform[6 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::SCoord3<float>{scene.Pivot[solarSystem.Entities[6 * 2].IndexModel].Scale.x * 10, 0, 0}; }
-	if(GetAsyncKeyState('7')) { ; camera.Target = scene.Transform[7 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::SCoord3<float>{scene.Pivot[solarSystem.Entities[7 * 2].IndexModel].Scale.x * 10, 0, 0}; }
-	if(GetAsyncKeyState('8')) { ; camera.Target = scene.Transform[8 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::SCoord3<float>{scene.Pivot[solarSystem.Entities[8 * 2].IndexModel].Scale.x * 10, 0, 0}; }
-	if(GetAsyncKeyState('9')) { ; camera.Target = scene.Transform[9 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::SCoord3<float>{scene.Pivot[solarSystem.Entities[9 * 2].IndexModel].Scale.x * 10, 0, 0}; }
+	if(GetAsyncKeyState('0')) { ; camera.Target = scene.Transform[0 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::SCoord3<float>{scene.Pivot[solarSystem.Entities[0 * 2].Model].Scale.x * 10, 0, 0}; }
+	if(GetAsyncKeyState('1')) { ; camera.Target = scene.Transform[1 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::SCoord3<float>{scene.Pivot[solarSystem.Entities[1 * 2].Model].Scale.x * 10, 0, 0}; }
+	if(GetAsyncKeyState('2')) { ; camera.Target = scene.Transform[2 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::SCoord3<float>{scene.Pivot[solarSystem.Entities[2 * 2].Model].Scale.x * 10, 0, 0}; }
+	if(GetAsyncKeyState('3')) { ; camera.Target = scene.Transform[3 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::SCoord3<float>{scene.Pivot[solarSystem.Entities[3 * 2].Model].Scale.x * 10, 0, 0}; }
+	if(GetAsyncKeyState('4')) { ; camera.Target = scene.Transform[4 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::SCoord3<float>{scene.Pivot[solarSystem.Entities[4 * 2].Model].Scale.x * 10, 0, 0}; }
+	if(GetAsyncKeyState('5')) { ; camera.Target = scene.Transform[5 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::SCoord3<float>{scene.Pivot[solarSystem.Entities[5 * 2].Model].Scale.x * 10, 0, 0}; }
+	if(GetAsyncKeyState('6')) { ; camera.Target = scene.Transform[6 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::SCoord3<float>{scene.Pivot[solarSystem.Entities[6 * 2].Model].Scale.x * 10, 0, 0}; }
+	if(GetAsyncKeyState('7')) { ; camera.Target = scene.Transform[7 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::SCoord3<float>{scene.Pivot[solarSystem.Entities[7 * 2].Model].Scale.x * 10, 0, 0}; }
+	if(GetAsyncKeyState('8')) { ; camera.Target = scene.Transform[8 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::SCoord3<float>{scene.Pivot[solarSystem.Entities[8 * 2].Model].Scale.x * 10, 0, 0}; }
+	if(GetAsyncKeyState('9')) { ; camera.Target = scene.Transform[9 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::SCoord3<float>{scene.Pivot[solarSystem.Entities[9 * 2].Model].Scale.x * 10, 0, 0}; }
 #endif
 	solarSystem.SunFire.SpawnSpherical(100, {}, 5, 1, 10);
 
@@ -251,25 +159,25 @@ int													updateGame						(SSolarSystem & solarSystem, double secondsLastF
 	::gpk::view_grid<uint32_t>								depthBuffer					= target->DepthStencil.View;
 	memset(depthBuffer.begin(), -1, sizeof(uint32_t) * depthBuffer.size());
 	::gpk::array_pod<::gpk::SLight3>						lightPoints;
-	::gpk::array_pod<::gpk::SColorBGRA>						lightColors;
+	::gpk::array_pod<::gpk::SColorFloat>					lightColors;
 	lightPoints.push_back({{0,0,0}, 10000});
 	lightColors.push_back(::gpk::WHITE);
 
 	for(uint32_t iEntity = 0; iEntity < solarSystem.Entities.size(); ++iEntity) {
 		::gpk::SMatrix4<float>									matrixTransform				= scene.Transform[iEntity];
-		const ::SEntity											& entity					= solarSystem.Entities[iEntity];
-		if(-1 == entity.IndexModel)
+		const ::ssg::SEntity									& entity					= solarSystem.Entities[iEntity];
+		if(-1 == entity.Model)
 			continue;
-		if(-1 == entity.IndexImage)
+		if(-1 == entity.Images)
 			continue;
 
-		matrices.Scale		.Scale			(scene.Pivot[entity.IndexModel].Scale		, true);
-		matrices.Position	.SetTranslation	(scene.Pivot[entity.IndexModel].Position	, true);
-		::gpk::view_grid<::gpk::SColorBGRA>						entityImage					= solarSystem.Image[entity.IndexImage];
-		::gpk::SGeometryTriangles								& entityGeometry			= scene.Geometry[entity.IndexGeometry];
+		matrices.Scale		.Scale			(scene.Pivot[entity.Model].Scale		, true);
+		matrices.Position	.SetTranslation	(scene.Pivot[entity.Model].Position	, true);
+		::gpk::view_grid<::gpk::SColorBGRA>						entityImage					= solarSystem.Images[entity.Images];
+		::gpk::SGeometryIndexedTriangles						& entityGeometry			= solarSystem.Geometries[entity.Geometry];
 		matrixTransform										= matrices.Scale * matrices.Position * matrixTransform;
 		::gpk::SMatrix4<float>									matrixTransformView			= matrixTransform * matrixView;
-		for(uint32_t iTriangle = 0; iTriangle < entityGeometry.Triangles.size(); ++iTriangle) {
+		for(uint32_t iTriangle = 0; iTriangle < entityGeometry.PositionIndices.size(); ++iTriangle) {
 			pixelCoords			.clear();
 			pixelVertexWeights	.clear();
 			::gpk::drawTriangle(targetPixels, entityGeometry, iTriangle, matrixTransform, matrixTransformView, lightVector, iEntity ? ::gpk::BLACK : ::gpk::WHITE, pixelCoords, pixelVertexWeights, entityImage, lightPoints, lightColors, depthBuffer);

@@ -106,7 +106,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
-      <AdditionalDependencies>llc.lib; gpk.lib; </AdditionalDependencies>
+      <AdditionalDependencies>llc.lib; gpk.lib; zlibvc.lib; user32.lib; gdi32.lib; shcore.lib; winmm.lib; xaudio2.lib; comctl32.lib; ole32.lib; dxguid.lib; ws2_32.lib; </AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -126,7 +126,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
-      <AdditionalDependencies>llc.lib; gpk.lib; </AdditionalDependencies>
+      <AdditionalDependencies>llc.lib; gpk.lib; zlibvc.lib; user32.lib; gdi32.lib; shcore.lib; winmm.lib; xaudio2.lib; comctl32.lib; ole32.lib; dxguid.lib; ws2_32.lib; </AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -150,7 +150,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
-      <AdditionalDependencies>llc.lib; gpk.lib; </AdditionalDependencies>
+      <AdditionalDependencies>llc.lib; gpk.lib; zlibvc.lib; user32.lib; gdi32.lib; shcore.lib; winmm.lib; xaudio2.lib; comctl32.lib; ole32.lib; dxguid.lib; ws2_32.lib; </AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -174,7 +174,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
-      <AdditionalDependencies>llc.lib; gpk.lib; </AdditionalDependencies>
+      <AdditionalDependencies>llc.lib; gpk.lib; zlibvc.lib; user32.lib; gdi32.lib; shcore.lib; winmm.lib; xaudio2.lib; comctl32.lib; ole32.lib; dxguid.lib; ws2_32.lib; </AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>

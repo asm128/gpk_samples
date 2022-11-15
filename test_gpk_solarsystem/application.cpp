@@ -12,7 +12,6 @@
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Solar System Test");
 
 			::gpk::error_t											cleanup								(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.MainDisplay); }
-			int														setupGame							(SSolarSystem & sunsystem);
 
 			::gpk::error_t											setup								(::gme::SApplication & app)						{
 	::gpk::SFramework														& framework							= app.Framework;
@@ -36,7 +35,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Solar System Test");
 		controlConstraints.AttachSizeToControl								= {app.IdExit, -1};
 		::gpk::controlSetParent(gui, app.IdExit, -1);
 	}
-	::setupGame(app.SolarSystem);
+	gpk_necs(::ssg::solarSystemSetup(app.SolarSystemGame, "solarsystem.json"));
 	return 0;
 }
 
@@ -68,7 +67,6 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Solar System Test");
 	return 0;
 }
 
-				int													updateGame				(SSolarSystem & sunsystem, double secondsLastFrame, ::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>> & target);
 			::gpk::error_t											draw					(::gme::SApplication & app)							{
 	//::gpk::STimer															timer;
 	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>		target;
@@ -76,7 +74,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Solar System Test");
 	//::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>		targetGame;
 	//targetGame->resize(app.Framework.MainDisplay.Size / 2, {}, (uint32_t)-1);
 
-	::updateGame(app.SolarSystem, app.Framework.Timer.LastTimeSeconds, target);
+	::ssg::solarSystemUpdate(app.SolarSystemGame, app.Framework.Timer.LastTimeSeconds, target);
 
 	//::gpk::grid_scale(target->Color.View, targetGame->Color.View);
 

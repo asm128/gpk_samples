@@ -106,7 +106,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OutDir);</AdditionalLibraryDirectories>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
-      <AdditionalDependencies>llc.lib; user32.lib; gdi32.lib; zlibvc.lib; shcore.lib; </AdditionalDependencies>
+      <AdditionalDependencies>llc.lib; gpk.lib; zlibvc.lib; user32.lib; gdi32.lib; shcore.lib; winmm.lib; xaudio2.lib; comctl32.lib; ole32.lib; dxguid.lib; ws2_32.lib; </AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -125,7 +125,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OutDir);</AdditionalLibraryDirectories>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
-      <AdditionalDependencies>llc.lib; user32.lib; gdi32.lib; zlibvc.lib; shcore.lib; </AdditionalDependencies>
+      <AdditionalDependencies>llc.lib; gpk.lib; zlibvc.lib; user32.lib; gdi32.lib; shcore.lib; winmm.lib; xaudio2.lib; comctl32.lib; ole32.lib; dxguid.lib; ws2_32.lib; </AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -144,7 +144,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OutDir);</AdditionalLibraryDirectories>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
-      <AdditionalDependencies>llc.lib; user32.lib; gdi32.lib; zlibvc.lib; shcore.lib; </AdditionalDependencies>
+      <AdditionalDependencies>llc.lib; gpk.lib; zlibvc.lib; user32.lib; gdi32.lib; shcore.lib; winmm.lib; xaudio2.lib; comctl32.lib; ole32.lib; dxguid.lib; ws2_32.lib; </AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -167,22 +167,25 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OutDir);</AdditionalLibraryDirectories>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
-      <AdditionalDependencies>llc.lib; user32.lib; gdi32.lib; zlibvc.lib; shcore.lib; </AdditionalDependencies>
+      <AdditionalDependencies>llc.lib; gpk.lib; zlibvc.lib; user32.lib; gdi32.lib; shcore.lib; winmm.lib; xaudio2.lib; comctl32.lib; ole32.lib; dxguid.lib; ws2_32.lib; </AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
     <ClInclude Include="ced_model.h" />
-    <ClInclude Include="ced_particles.h" />
     <ClInclude Include="solarsystem.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="application.cpp" />
+    <ClCompile Include="gpk_solarsystem_setup.cpp" />
     <ClCompile Include="solarsystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />
     <None Include="solarsystem.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Text.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

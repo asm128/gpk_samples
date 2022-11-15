@@ -104,7 +104,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OutDir);</AdditionalLibraryDirectories>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
-      <AdditionalDependencies>klib_renewal.lib; user32.lib; winmm.lib; llc.lib; gpk.lib; </AdditionalDependencies>
+      <AdditionalDependencies>llc.lib; gpk.lib; zlibvc.lib; user32.lib; gdi32.lib; shcore.lib; winmm.lib; xaudio2.lib; comctl32.lib; ole32.lib; dxguid.lib; ws2_32.lib; klib_renewal.lib; </AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -126,7 +126,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OutDir);</AdditionalLibraryDirectories>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
-      <AdditionalDependencies>klib_renewal.lib; user32.lib; winmm.lib; llc.lib; gpk.lib; </AdditionalDependencies>
+      <AdditionalDependencies>llc.lib; gpk.lib; zlibvc.lib; user32.lib; gdi32.lib; shcore.lib; winmm.lib; xaudio2.lib; comctl32.lib; ole32.lib; dxguid.lib; ws2_32.lib; klib_renewal.lib; </AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -152,7 +152,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OutDir);</AdditionalLibraryDirectories>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
-      <AdditionalDependencies>klib_renewal.lib; user32.lib; winmm.lib; llc.lib; gpk.lib; </AdditionalDependencies>
+      <AdditionalDependencies>llc.lib; gpk.lib; zlibvc.lib; user32.lib; gdi32.lib; shcore.lib; winmm.lib; xaudio2.lib; comctl32.lib; ole32.lib; dxguid.lib; ws2_32.lib; klib_renewal.lib; </AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -178,7 +178,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OutDir);</AdditionalLibraryDirectories>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
-      <AdditionalDependencies>klib_renewal.lib; user32.lib; winmm.lib; llc.lib; gpk.lib; </AdditionalDependencies>
+      <AdditionalDependencies>llc.lib; gpk.lib; zlibvc.lib; user32.lib; gdi32.lib; shcore.lib; winmm.lib; xaudio2.lib; comctl32.lib; ole32.lib; dxguid.lib; ws2_32.lib; klib_renewal.lib; </AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

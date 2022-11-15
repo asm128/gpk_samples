@@ -21,9 +21,6 @@
     <ClInclude Include="ced_model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ced_particles.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="solarsystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -35,9 +32,15 @@
     <ClCompile Include="solarsystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="gpk_solarsystem_setup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="solarsystem.json" />
     <None Include="Makefile" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Text.txt" />
   </ItemGroup>
 </Project>
