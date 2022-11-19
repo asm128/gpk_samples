@@ -238,6 +238,10 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_gpk_mashup", "test_gpk_mashup\test_gpk_mashup.vcxproj", "{5F811411-56CD-4BCC-9DA3-566AC8C2C6DE}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_gpk_vox", "test_gpk_vox\test_gpk_vox.vcxproj", "{C5F3C662-75FD-45A3-8263-DD320AED8432}"
+	ProjectSection(ProjectDependencies) = postProject
+		{830AB681-B788-47D4-9767-BA4E0792F682} = {830AB681-B788-47D4-9767-BA4E0792F682}
+		{8FD826F8-3739-44E6-8CC8-997122E53B8D} = {8FD826F8-3739-44E6-8CC8-997122E53B8D}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_vox_loader", "test_vox_loader\test_vox_loader.vcxproj", "{6693CAD7-AB1A-4B48-A053-597CAAED9013}"
 	ProjectSection(ProjectDependencies) = postProject
