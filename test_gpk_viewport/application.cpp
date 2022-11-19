@@ -282,7 +282,7 @@ template<typename _tIndex, typename _tValue>
 		triangle3dColorList[iVertex]										= (::gpk::RED * lightFactor).Clamp();
 	}
 	::gpk::array_pod<::gpk::SCoord2<int32_t>>								wireframePixelCoords;
-	::gpk::array_pod<::gpk::SCoord2<int32_t>>								trianglePixelCoords;
+	::gpk::array_pod<::gpk::SCoord2<int16_t>>								trianglePixelCoords;
 	::gpk::SCoord3<float>													cameraFront										= (camera.Target - camera.Position).Normalize();
 	::gpk::array_pod<::gpk::STriangleWeights<double>>						triangleWeights;
 

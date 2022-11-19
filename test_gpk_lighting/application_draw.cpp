@@ -159,7 +159,7 @@
 			const int32_t																iGridTri										= renderCache.Triangle3dIndices[iTriangle];
 			const ::gpk::STriangle2<float>												& uvGrid										= applicationInstance.Grid.UVs[iGridTri];
 			for(uint32_t iPixel = 0, pixCount = renderCache.TrianglePixelCoords.size(); iPixel < pixCount; ++iPixel) {
-				const ::gpk::SCoord2<int32_t>												& pixelCoord								= renderCache.TrianglePixelCoords	[iPixel];
+				const ::gpk::SCoord2<int16_t>												& pixelCoord								= renderCache.TrianglePixelCoords	[iPixel];
 				const ::gpk::STriangleWeights<double>										& pixelWeights								= renderCache.TrianglePixelWeights	[iPixel];
 				if(0 == ::drawPixel(renderCache, offscreen.View[pixelCoord.y][pixelCoord.x], pixelWeights, uvGrid, applicationInstance.TextureGrid.View, iTriangle, lightDir.Cast<double>()))
 					++pixelsDrawn;

@@ -9,13 +9,42 @@
 namespace gpk
 {
 #pragma pack(push, 1)
-	//static constexpr	uint32_t						VOXEL_CHUNK_WIDTH							= 64;
-	//static constexpr	uint32_t						VOXEL_CHUNK_DEPTH							= VOXEL_CHUNK_WIDTH;
-	//static constexpr	uint32_t						VOXEL_CHUNK_HEIGHT							= VOXEL_CHUNK_WIDTH;
+	static constexpr ::gpk::SCoord3<float>				VOXEL_VERTICES		[]			= 
+			{ {0, 1, 0}, {1, 1, 0}, {0, 1, 1}, {1, 1, 1}
+			, {0, 0, 0}, {1, 0, 0}, {0, 0, 1}, {1, 0, 1}
+			}; 
 
-	template<typename _tCell>
+	GDEFINE_ENUM_TYPE(VOXEL_FACE, uint8_t);
+	GDEFINE_ENUM_VALUE(VOXEL_FACE, TOP		, 0);
+	GDEFINE_ENUM_VALUE(VOXEL_FACE, FRONT	, 1);
+	GDEFINE_ENUM_VALUE(VOXEL_FACE, RIGHT	, 2);
+	GDEFINE_ENUM_VALUE(VOXEL_FACE, BOTTOM	, 3);
+	GDEFINE_ENUM_VALUE(VOXEL_FACE, BACK		, 4);
+	GDEFINE_ENUM_VALUE(VOXEL_FACE, LEFT		, 5);
+
+	static constexpr ::gpk::SQuad3<float>				VOXEL_FACE_VERTICES		[]	= 
+		{ {{0, 1, 0}, {1, 1, 0}, {0, 1, 1}, {1, 1, 1}}
+		, {{1, 0, 0}, {1, 1, 0}, {1, 0, 1}, {1, 1, 1}}
+		, {{0, 0, 1}, {1, 0, 1}, {0, 1, 1}, {1, 1, 1}}
+		, {{0, 0, 0}, {1, 0, 0}, {0, 0, 1}, {1, 0, 1}}
+		, {{0, 0, 0}, {0, 1, 0}, {0, 0, 1}, {0, 1, 1}}
+		, {{0, 0, 0}, {1, 0, 0}, {0, 1, 0}, {1, 1, 0}}
+		}; 
+
+	constexpr ::gpk::SCoord3<float>						VOXEL_FACE_NORMALS			[6]	= {{0, 1, 0}, {1, 0, 0}, {0, 0, 1}, {0, -1, 0}, {-1, 0, 0}, {0, 0, -1}};	// top, front, right, bottom, back, left
+
+	constexpr uint8_t									VOXEL_FACE_INDICES			[6][6]	= 
+		{ {0, 2, 1, 1, 2, 3}
+		, {0, 1, 2, 1, 3, 2}
+		, {0, 1, 2, 1, 3, 2}
+		, {0, 1, 2, 1, 3, 2}
+		, {0, 2, 1, 1, 2, 3}
+		, {0, 2, 1, 1, 2, 3}
+		}; 
+
+	template<typename _tCell, uint16_t _width = 16>
 	struct SVoxelLayer {
-		static constexpr	uint32_t					WIDTH						= 16;
+		static constexpr	uint32_t					WIDTH						= _width;
 		static constexpr	uint32_t					DEPTH						= WIDTH;
 
 		uint16_t										Y							= {};
@@ -315,18 +344,18 @@ static const ::gpk::vcs								fileNames []								=
 	//, "obj_house1b.vox"
 	//, "obj_house1c.vox"
 	//, "obj_house2.vox"
-	//, "obj_house2a.vox"
+	, "obj_house2a.vox"
 	//, "obj_house2b.vox"
 	//, "obj_house2c.vox"
 	//, "obj_house2d.vox"
 	//, "obj_house3.vox"
 	//, "obj_house3a.vox"
-	//, "obj_house3b.vox"
+	, "obj_house3b.vox"
 	//, "obj_house3c.vox"
 	//, "obj_house4.vox"
 	//, "obj_house4a.vox"
 	//, "obj_house4b.vox"
-	//, "obj_house4c.vox"
+	, "obj_house4c.vox"
 	//, "obj_house4d.vox"
 	//, "obj_house5.vox"
 	//, "obj_house5a.vox"
@@ -336,7 +365,7 @@ static const ::gpk::vcs								fileNames []								=
 	//, "obj_house6a.vox"
 	//, "obj_house6b.vox"
 	//, "obj_house6c.vox"
-	//, "obj_house6d.vox"
+	, "obj_house6d.vox"
 	//, "obj_house7.vox"
 	//, "obj_house7a.vox"
 	//, "obj_house7b.vox"
@@ -405,7 +434,7 @@ static const ::gpk::vcs								fileNames []								=
 	, "obj_store01.vox"
 	//, "obj_store02.vox"
 	//, "obj_store03.vox"
-	//, "obj_store03a.vox"
+	, "obj_store03a.vox"
 	//, "obj_store04.vox"
 	//, "obj_store05.vox"
 	//, "obj_store06.vox"
@@ -420,7 +449,7 @@ static const ::gpk::vcs								fileNames []								=
 	//, "obj_store15.vox"
 	//, "obj_store16.vox"
 	//, "obj_store16a.vox"
-	//, "obj_store16b.vox"
+	, "obj_store16b.vox"
 	//, "obj_store17.vox"
 	//, "obj_store17a.vox"
 	, "obj_story01.vox"
@@ -428,13 +457,13 @@ static const ::gpk::vcs								fileNames []								=
 	//, "obj_story01b.vox"
 	//, "obj_story02.vox"
 	//, "obj_story03.vox"
-	//, "obj_story03a.vox"
+	, "obj_story03a.vox"
 	//, "obj_story03b.vox"
 	//, "obj_story03c.vox"
 	//, "obj_story03d.vox"
 	//, "obj_story04.vox"
 	//, "obj_story04a.vox"
-	//, "obj_story04b.vox"
+	, "obj_story04b.vox"
 	//, "obj_story04c.vox"
 	//, "obj_story04d.vox"
 	//, "obj_story05.vox"
@@ -442,7 +471,7 @@ static const ::gpk::vcs								fileNames []								=
 	//, "obj_story06.vox"
 	//, "obj_story06a.vox"
 	//, "obj_story06b.vox"
-	//, "obj_story06c.vox"
+	, "obj_story06c.vox"
 	//, "obj_story06d.vox"
 	, "obj_street1.vox"
 	//, "obj_street2.vox"
@@ -559,17 +588,17 @@ static const ::gpk::vcs								fileNames []								=
 	//, "veh_suv2.vox"
 	//, "veh_suv3.vox"
 	, "veh_tank1.vox"
-	//, "veh_train.vox"
+	, "veh_train.vox"
 	//, "veh_train2.vox"
 	//, "veh_train3.vox"
-	//, "veh_truck1.vox"
+	, "veh_truck1.vox"
 	//, "veh_truck2.vox"
 	//, "veh_truck3.vox"
 	//, "veh_truck4.vox"
 	//, "veh_truck5.vox"
 	//, "veh_truck6.vox"
 	//, "veh_truck7.vox"
-	//, "veh_wagon1.vox"
+	, "veh_wagon1.vox"
 	//, "veh_wagon2.vox"
 	//, "veh_wagon3.vox"
 	//, "veh_wagon4.vox"

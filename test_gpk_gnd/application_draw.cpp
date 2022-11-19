@@ -177,7 +177,7 @@ static				::gpk::error_t										drawTriangles
 				};
 
 			for(uint32_t iPixel = 0, pixCount = renderCache.TrianglePixelCoords.size(); iPixel < pixCount; ++iPixel) {
-				const ::gpk::SCoord2<int32_t>												& pixelCoord								= renderCache.TrianglePixelCoords	[iPixel];
+				const ::gpk::SCoord2<int16_t>												& pixelCoord								= renderCache.TrianglePixelCoords	[iPixel];
 				const ::gpk::STriangleWeights<double>										& pixelWeights								= renderCache.TrianglePixelWeights	[iPixel];
 				if(false == wireframe) {
 					if(0 == ::drawPixelGND(renderCache, targetView[pixelCoord.y][pixelCoord.x], pixelWeights, triangle3DPositions, triangle3DUVs, textureView, iTriangle, lightDir.Cast<double>(), diffuseColor, ambientColor, ::gpk::view_array<const ::gpk::SLightInfoRSW>{lights.begin(), ::gpk::min(lights.size(), 8U)}))

@@ -36,7 +36,7 @@ struct STiledTerrainCounters {
 };
 
 struct SRenderCache {
-						::gpk::array_pod<::gpk::SCoord2<int32_t>>							TrianglePixelCoords							= {};
+						::gpk::array_pod<::gpk::SCoord2<int16_t>>							TrianglePixelCoords							= {};
 						::gpk::array_pod<::gpk::STriangleWeights<double>>					TrianglePixelWeights						= {};
 						::gpk::array_pod<::gpk::SCoord2<int32_t>>							WireframePixelCoords						= {};
 
