@@ -110,6 +110,10 @@ struct SApplication {
 	int32_t																IdViewport									= -1;
 	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>	BackBuffer;
 
+	HDC																	DrawingContext								= {};
+	HGLRC																GLRenderContext								= {}; 
+ 
+
 																		SApplication								(::gpk::SRuntimeValues& runtimeValues)			noexcept	: Framework(runtimeValues) {}
 };
 

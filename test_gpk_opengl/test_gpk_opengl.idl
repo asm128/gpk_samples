@@ -1,0 +1,9 @@
+namespace testgpkopengl
+{
+    [default_interface]
+    runtimeclass test_gpk_opengl : Windows.UI.Xaml.Controls.Page
+    {
+        test_gpk_opengl();
+        Int32 MyProperty;
+    }
+}

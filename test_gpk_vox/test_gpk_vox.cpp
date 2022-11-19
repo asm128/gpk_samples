@@ -12,14 +12,22 @@
 #include "gpk_app_impl.h"
 #include "gpk_bitmap_target.h"
 
+#include <GL\Gl.h>
+
 static constexpr	const uint32_t										ASCII_SCREEN_WIDTH							= 132	;
 static constexpr	const uint32_t										ASCII_SCREEN_HEIGHT							= 50	;
 
-GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "Title");
+GPK_DEFINE_APPLICATION_ENTRY_POINT_MT(::SApplication, "Title");
 
 // --- Cleanup application resources.
 					::gpk::error_t										cleanup										(::SApplication& app)											{
 	::gpk::SWindowPlatformDetail												& displayDetail								= app.Framework.MainDisplay.PlatformDetail;
+	// --- when the rendering context is no longer needed ...   
+ 	// make the rendering context not current  
+	if(app.GLRenderContext) {
+		wglMakeCurrent		(NULL, NULL) ; 
+		wglDeleteContext	(app.GLRenderContext);	// delete the rendering context  
+	}
 	::gpk::mainWindowDestroy(app.Framework.MainDisplay);
 	::UnregisterClass(displayDetail.WindowClassName, displayDetail.WindowClass.hInstance);
 	return 0;
@@ -32,7 +40,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "Title");
 	mainWindow.Size														= {1280, 720};
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?!");
 
-
+	framework.MainDisplayOffscreen->resize(mainWindow.Size);
 
 	::gpk::array_pod<byte_t>			fileBytes;
 	::gpk::array_static<char, 256>		pathNameData		= {"../gpk_data"};
@@ -67,6 +75,15 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "Title");
 	}
 	uint64_t							timeStop			= ::gpk::timeCurrentInMs();
 	info_printf("Total time: %llu ms", timeStop - timeStart);
+
+
+	// create a rendering context  
+	app.DrawingContext				= GetDC(framework.MainDisplay.PlatformDetail.WindowHandle);
+	app.GLRenderContext				= wglCreateContext(app.DrawingContext); 
+ 
+	// make it the calling thread's current rendering context 
+	wglMakeCurrent (app.DrawingContext, app.GLRenderContext);
+ 
 	return 0;
 }
 
@@ -86,6 +103,8 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "Title");
 				if(GetAsyncKeyState(VK_MENU) & 0xFFF0)
 					gpk_necs(::gpk::fullScreenToggle(mainWindow));
 				break;
+			case VK_F4:
+				return 1;
 			}
 		}
 	}
@@ -99,6 +118,20 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "Title");
 	sprintf_s(buffer, "[%u x %u]. FPS: %g. Last frame seconds: %g.", mainWindow.Size.x, mainWindow.Size.y, 1 / timer.LastTimeSeconds, timer.LastTimeSeconds);
 	::HWND																		windowHandle								= mainWindow.PlatformDetail.WindowHandle;
 	SetWindowTextA(windowHandle, buffer);
+	::gpk::sleep(1);
+    /* rotate a triangle around */
+    glClear(GL_COLOR_BUFFER_BIT);
+    glBegin(GL_TRIANGLES);
+    glColor3f(1.0f, 0.0f, 0.0f);
+    glVertex2i(0,  1);
+    glColor3f(0.0f, 1.0f, 0.0f);
+    glVertex2i(-1, -1);
+    glColor3f(0.0f, 0.0f, 1.0f);
+    glVertex2i(1, -1);
+    glEnd();
+    glFlush();
+
+
 	return 0;
 }
 
@@ -132,8 +165,10 @@ struct SCamera {
 	::gpk::SFramework										& framework							= app.Framework;
 
 	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>	backBuffer							= app.BackBuffer;
-	backBuffer->resize(framework.MainDisplayOffscreen->metrics());
-	framework.MainDisplayOffscreen->resize(framework.MainDisplay.Size);
+	if(backBuffer.get_ref() && backBuffer.get_ref()->References > 2)
+		return 0;
+
+	backBuffer->resize(framework.MainDisplay.Size);
 	backBuffer->Color.View.fill(0x3060C0);
 	memset(backBuffer->DepthStencil.begin(), (uint32_t)-1, backBuffer->DepthStencil.View.byte_count());
 
@@ -147,18 +182,19 @@ struct SCamera {
 	::gpk::SNearFar											nearFar										= {0.1f , 1000.0f};
 
 	static constexpr const ::gpk::SCoord3<float>			cameraUp									= {0, 1, 0};	// ? cam't remember what is this. Radians? Eulers?
-	::SCamera												camera										= {{350, 50, 0}, {}};
+	::SCamera												camera										= {{350, 100, 0}, {}};
 	//camera.Position *= 2.0f;
 	::gpk::SCoord3<float>									lightPos									= {150, 50, 0};
 	static float											cameraRotation								= 0;
 	cameraRotation										+= (float)framework.Input->MouseCurrent.Deltas.x / 5.0f;
 	//camera.Position	.RotateY(cameraRotation);
 	camera.Position	.RotateY(frameInfo.Seconds.Total * 0.1f);
+	camera.Position.y *= (float)fabs(sin(frameInfo.Seconds.Total * .1f));
 	//camera.Position	.RotateX(frameInfo.Microseconds.Total / 10000000.0f);
 	lightPos		.RotateY(frameInfo.Seconds.Total * -1.f);
-	camera.Target.z = camera.Target.x = 75;
+	camera.Target.z = camera.Target.x = 250;
 	viewMatrix.LookAt(camera.Position, camera.Target, cameraUp);
-	const ::gpk::SCoord2<uint32_t>							& offscreenMetrics							= backBuffer->Color.View.metrics();
+	const ::gpk::SCoord2<uint32_t>							& offscreenMetrics							= backBuffer->metrics();
 	projection.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, nearFar.Near, nearFar.Far );
 	projection											= viewMatrix * projection;
 	lightPos.x += 100;
@@ -177,8 +213,8 @@ struct SCamera {
 
 	::gpk::array_pod<::gpk::SCoord2<int16_t>>				out_Points			[6]		= {};
 	::gpk::array_pod<::gpk::STriangleWeights<double>>		triangleWeights		[6]		= {};	
-	uint32_t												zOffset						= 0;
-	uint32_t												xOffset						= 0;
+	int32_t													zOffset						= 0;
+	int32_t													xOffset						= 0;
 	::gpk::SRange<uint32_t>									faceMaterialRange	[6]		= {};
 
 	for(uint32_t iModel = 0; iModel < app.VOXModels.size(); ++iModel) {
@@ -191,7 +227,7 @@ struct SCamera {
 
 		const ::gpk::SVoxelMap<uint8_t>							& voxelMap					= app.VOXModelMaps[iModel];
 
-		if(zOffset > 100) {
+		if(zOffset > 300) {
 			xOffset												+= ::gpk::max(uint16_t(dimensions.x), uint16_t(30));
 			zOffset												= 0;
 		}
@@ -203,9 +239,10 @@ struct SCamera {
 		for(uint32_t i = 0; i < 8; ++i) {
 			vertices[i]											= ::gpk::VOXEL_VERTICES[i];
 			vertices[i].Scale(dimensions.Cast<float>());
-			vertices[i].x										+= xOffset;
-			vertices[i].z										+= zOffset;
-			if((vertices[i] - camera.Position).Normalize().Dot(cameraFront) > 0) {
+			vertices[i].x										+= xOffset - 150;
+			vertices[i].z										+= zOffset - 150;
+			double cameraDot = (vertices[i] - camera.Position).Normalize().Dot(cameraFront);
+			if(cameraDot > 0.01) {
 				culled = false;
 				break;
 			}
@@ -230,7 +267,7 @@ struct SCamera {
 			if(0 == cellValue)
 				continue;
 
-			if((voxelPos - camera.Position).Normalize().Dot(cameraFront) < .5)
+			if((voxelPos - camera.Position).Normalize().Dot(cameraFront) <= 0.5)
 				continue;
 
 			const ::gpk::SColorFloat				cellColor					= {rgba[voxel.i ? voxel.i - 1 : 0]};
@@ -239,11 +276,11 @@ struct SCamera {
 			for(uint32_t iFace = 0; iFace < 6; ++iFace) {
 				faceColor[iFace]					= {rgba[cellValues[iFace] ? cellValues[iFace] - 1 : 0]};
 				if(0 == cellValues[iFace])
-					renderFaces[iFace] = ::gpk::VOXEL_FACE_NORMALS[iFace].Dot(cameraFront) <= 0; 
+					renderFaces[iFace] = cameraFront.Dot(::gpk::VOXEL_FACE_NORMALS[iFace]) <= 0.5; 
 			}
 
 			const double							lightFactorDistance			= ::gpk::clamp(1.0 - (lightPos - voxelPos).Length() * .001, 0.0, 1.0);
-			const double							lightFactorAmbient			= .4;
+			const double							lightFactorAmbient			= .075;
 			const ::gpk::SColorFloat				colorAmbient				= cellColor * lightFactorAmbient;
 			for(uint32_t iFace = 0; iFace < 6; ++iFace) {
 				if(false == renderFaces[iFace]) 
@@ -253,24 +290,22 @@ struct SCamera {
 				triangleWeights	[iFace].clear();
 				::drawVoxelFace(backBuffer->DepthStencil.View, out_Points[iFace], voxelPos, screenCenter.Cast<uint16_t>(), projection, nearFar, ::gpk::view_array<const ::gpk::SCoord3<float>>{&::gpk::VOXEL_FACE_VERTICES[iFace].A, 4}, ::gpk::VOXEL_FACE_INDICES[iFace]); 
 
-				if(lightFactorDistance <= 0) {
-					faceColor[iFace]					= colorAmbient * lightFactorDistance;
-					continue;
+				faceColor[iFace]					= colorAmbient * lightFactorDistance;
+				if(lightFactorDistance > 0) {
+					const double							lightFactorDirectional		= ::gpk::max(0.0, (lightPos - voxelPos).Normalize().Dot(::gpk::VOXEL_FACE_NORMALS[iFace]));	
+					::gpk::SColorFloat						colorDiffuse				= cellColor * lightFactorDirectional;
+					(faceColor[iFace] += colorDiffuse * lightFactorDistance).Clamp(); 
 				}
-
-				const double							lightFactorDirectional		= ::gpk::max(0.0, (lightPos - voxelPos).Normalize().Dot(::gpk::VOXEL_FACE_NORMALS[iFace]));	
-				::gpk::SColorFloat						colorDiffuse				= cellColor * lightFactorDirectional;
-				faceColor[iFace]					= (colorAmbient + colorDiffuse).Clamp() * lightFactorDistance; 
 				for(uint32_t iPoint = 0; iPoint < out_Points[iFace].size(); ++iPoint) {
 					::gpk::SCoord2<int16_t>					point					= out_Points[iFace][iPoint];
 					::gpk::SColorFloat						finalColor				= faceColor[iFace];
-					backBuffer->Color[point.y][point.x]	= finalColor;
+					backBuffer->Color[backBuffer->metrics().y - 1 - point.y][point.x]	= finalColor;
 				}
 			}		
 		}
 	}
-	::gpk::grid_mirror_y(framework.MainDisplayOffscreen->Color.View, backBuffer->Color.View);
-	//framework.MainDisplayOffscreen = backBuffer;
+	//::gpk::grid_mirror_y(framework.MainDisplayOffscreen->Color.View, backBuffer->Color.View);
+	::std::swap(framework.MainDisplayOffscreen, app.BackBuffer);
 	//------------------------------------------------
 	return 0;
 }
