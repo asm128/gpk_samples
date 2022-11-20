@@ -11,7 +11,6 @@ struct SApplication {
 	::gpk::SFramework													Framework									;
 
 	::gpk::array_obj<::gpk::SVoxelMap<uint8_t>>							VOXModelMaps								= {};
-	::gpk::array_pobj<::gpk::SVOXData>									VOXModels									= {};
 	::gpk::array_obj<::gpk::vcc>										VOXModelNames								= {};
 	int32_t																IdViewport									= -1;
 	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>	BackBuffer;

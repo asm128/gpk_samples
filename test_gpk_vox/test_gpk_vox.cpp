@@ -48,34 +48,35 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT_MT(::SApplication, "Title");
 	::gpk::array_static<char, 256>		folderNameVox		= {"vox"};
 
 	uint64_t							timeStart			= ::gpk::timeCurrentInMs();
+	::gpk::array_pobj<::gpk::SVOXData>	voxModels									= {};
 	for(uint32_t iModel = 0; iModel < ::gpk::size(fileNames); ++iModel) {
 		gpk::vcc							fileName			= fileNames[iModel];
 		char								pathToLoad[4096]	= {};
 		sprintf_s(pathToLoad, "%s/%s/%s", pathNameData.Storage, folderNameVox.Storage, fileName.begin());
 		gpk_necs(::gpk::fileToMemory(pathToLoad, fileBytes));
 		::gpk::vcc							viewBytes			= fileBytes;
-		gpk_necs(app.VOXModels[app.VOXModels.push_back({})]->Load(viewBytes));
+		gpk_necs(voxModels[voxModels.push_back({})]->Load(viewBytes));
 		app.VOXModelNames.push_back(fileName);
 		gpk_vox_info_printf("Loaded %s.", pathToLoad);
 	}
 
-	app.VOXModelMaps.resize(app.VOXModels.size());
-	for(uint32_t iModel = 0; iModel < app.VOXModels.size(); ++iModel) {
-		const ::gpk::ptr_obj<::gpk::SVOXData>		& voxFile			= app.VOXModels[iModel];
+	app.VOXModelMaps.resize(voxModels.size());
+	for(uint32_t iModel = 0; iModel < voxModels.size(); ++iModel) {
+		const ::gpk::ptr_obj<::gpk::SVOXData>		& voxFile			= voxModels[iModel];
 		::gpk::SVoxelMap<uint8_t>					& chunkMap			= app.VOXModelMaps[iModel];
 		auto										coord				= voxFile->GetDimensions();
 		gpk_vox_info_printf("Constructing %s.", app.VOXModelNames[iModel].begin());
 		gpk_vox_info_printf("Model size: %i, %i, %i.", coord.x, coord.y, coord.z);
+		chunkMap.Palette						= voxFile->GetBGRA();
+		chunkMap.Dimensions						= voxFile->GetDimensions();
 		::gpk::view_array<const ::gpk::SVOXVoxel>	voxels				= voxFile->GetXYZI();
 		for(uint32_t iVoxel = 0; iVoxel < voxels.size(); ++iVoxel) {
 			const ::gpk::SVOXVoxel						voxel				= voxels[iVoxel];
 			chunkMap.SetValue({voxel.x, voxel.y, voxel.z}, voxel.i);
 		}
-
 	}
 	uint64_t							timeStop			= ::gpk::timeCurrentInMs();
 	info_printf("Total time: %llu ms", timeStop - timeStart);
-
 
 	// create a rendering context  
 	app.DrawingContext				= GetDC(framework.MainDisplay.PlatformDetail.WindowHandle);
@@ -171,9 +172,6 @@ struct SFragmentCache {
 	( ::gpk::view_grid<::gpk::SColorBGRA>				targetPixels
 	, ::gpk::view_grid<uint32_t>						targetDepth
 	, const ::gpk::SCoord2<uint16_t>					screenCenter
-	, const ::gpk::SCoord3<uint16_t>					dimensions		
-	, ::gpk::view_array<const ::gpk::SVOXVoxel>			voxels			
-	, ::gpk::view_array<const uint32_t>					rgba			
 	, const ::gpk::SVoxelMap<uint8_t>					& voxelMap	
 	, const ::gpk::SMatrix4<float>						& mVP
 	, const ::gpk::SNearFar								& nearFar
@@ -183,6 +181,9 @@ struct SFragmentCache {
 	, const ::gpk::SCoord3<float>						& lightPosition
 	, ::SFragmentCache									& pixelCache
 	) {	
+	const ::gpk::view_array<const ::gpk::SVoxel<uint8_t>>	voxels						= voxelMap.Voxels;
+	::gpk::view_array<const ::gpk::SColorBGRA>				rgba						= voxelMap.Palette;
+	const ::gpk::SCoord3<uint8_t>							dimensions					= voxelMap.Dimensions;
 	if(0 == rgba.size())
 		rgba												= ::gpk::VOX_PALETTE_DEFAULT;
 
@@ -204,17 +205,17 @@ struct SFragmentCache {
 		return 0;
 
 	for(uint32_t iVoxel = 0; iVoxel < voxels.size(); ++iVoxel) {
-		const ::gpk::SVOXVoxel					voxel						= voxels[iVoxel];
-		const ::gpk::SCoord3<float>				voxelPos					= position + ::gpk::SCoord3<float>{(float)voxel.x, (float)voxel.y, (float)voxel.z};
+		const ::gpk::SVoxel<uint8_t>			voxel						= voxels[iVoxel];
+		const ::gpk::SCoord3<float>				voxelPos					= position + voxel.Position.Cast<float>();
 		uint8_t									cellValue					= 0;
 		uint8_t									cellValues	[6]				= {};
-		voxelMap.GetValue({voxel.x, voxel.y, voxel.z}, cellValue);
-		voxelMap.GetValue({voxel.x, uint32_t(voxel.y + 1), voxel.z}, cellValues[::gpk::VOXEL_FACE_TOP	]);
-		voxelMap.GetValue({uint32_t(voxel.x + 1), voxel.y, voxel.z}, cellValues[::gpk::VOXEL_FACE_FRONT	]);
-		voxelMap.GetValue({voxel.x, voxel.y, uint32_t(voxel.z + 1)}, cellValues[::gpk::VOXEL_FACE_RIGHT	]);
-		if(voxel.y) voxelMap.GetValue({voxel.x, uint32_t(voxel.y - 1), voxel.z}, cellValues[::gpk::VOXEL_FACE_BOTTOM]);
-		if(voxel.x) voxelMap.GetValue({uint32_t(voxel.x - 1), voxel.y, voxel.z}, cellValues[::gpk::VOXEL_FACE_BACK	]);
-		if(voxel.z) voxelMap.GetValue({voxel.x, voxel.y, uint32_t(voxel.z - 1)}, cellValues[::gpk::VOXEL_FACE_LEFT	]);
+		voxelMap.GetValue({voxel.Position.x, voxel.Position.y, voxel.Position.z}, cellValue);
+		if(voxel.Position.y < 255) voxelMap.GetValue({voxel.Position.x, uint8_t(voxel.Position.y + 1), voxel.Position.z}, cellValues[::gpk::VOXEL_FACE_Top		]);
+		if(voxel.Position.y < 255) voxelMap.GetValue({uint8_t(voxel.Position.x + 1), voxel.Position.y, voxel.Position.z}, cellValues[::gpk::VOXEL_FACE_Front	]);
+		if(voxel.Position.y < 255) voxelMap.GetValue({voxel.Position.x, voxel.Position.y, uint8_t(voxel.Position.z + 1)}, cellValues[::gpk::VOXEL_FACE_Right	]);
+		if(voxel.Position.y >   0) voxelMap.GetValue({voxel.Position.x, uint8_t(voxel.Position.y - 1), voxel.Position.z}, cellValues[::gpk::VOXEL_FACE_Bottom	]);
+		if(voxel.Position.x >   0) voxelMap.GetValue({uint8_t(voxel.Position.x - 1), voxel.Position.y, voxel.Position.z}, cellValues[::gpk::VOXEL_FACE_Back		]);
+		if(voxel.Position.z >   0) voxelMap.GetValue({voxel.Position.x, voxel.Position.y, uint8_t(voxel.Position.z - 1)}, cellValues[::gpk::VOXEL_FACE_Left		]);
 
 		if(0 == cellValue)
 			continue;
@@ -222,7 +223,7 @@ struct SFragmentCache {
 		if((voxelPos - cameraPos).Normalize().Dot(cameraFront) <= 0.5)
 			continue;
 
-		const ::gpk::SColorFloat				cellColor					= {rgba[voxel.i ? voxel.i - 1 : 0]};
+		const ::gpk::SColorFloat				cellColor					= {rgba[voxel.ColorIndex ? voxel.ColorIndex - 1 : 0]};
 		bool									renderFaces	[6]				= {};
 		::gpk::SColorFloat						faceColor	[6]				= {};
 		bool									hasFace						= false;
@@ -258,7 +259,7 @@ struct SFragmentCache {
 				::gpk::SColorFloat						finalColor				= faceColor[iFace];
 				targetPixels[targetPixels.metrics().y - 1 - point.y][point.x]	= finalColor;
 			}
-		}		
+		}
 	}
 	return 0;
 }
@@ -323,19 +324,15 @@ struct SFragmentCache {
 	int32_t													xOffset						= 0;
 
 	::SFragmentCache										pixelCache;
-	for(uint32_t iModel = 0; iModel < app.VOXModels.size(); ++iModel) {
-		::gpk::ptr_obj<::gpk::SVOXData>							voxFile						= app.VOXModels[iModel];
-		const ::gpk::SCoord3<uint16_t>							dimensions					= voxFile->GetDimensions();
-		::gpk::view_array<const ::gpk::SVOXVoxel>				voxels						= voxFile->GetXYZI();
-		::gpk::view_array<const uint32_t>						rgba						= voxFile->GetRGBA();
+	for(uint32_t iModel = 0; iModel < app.VOXModelMaps.size(); ++iModel) {
 		const ::gpk::SVoxelMap<uint8_t>							& voxelMap					= app.VOXModelMaps[iModel];
 
-		::drawVoxelModel(backBuffer->Color, backBuffer->DepthStencil, screenCenter, dimensions, voxels, rgba, voxelMap, projection, nearFar, {(float)xOffset, 0.0f, (float)zOffset}, camera.Position, cameraFront, lightPos, pixelCache);
+		::drawVoxelModel(backBuffer->Color, backBuffer->DepthStencil, screenCenter, voxelMap, projection, nearFar, {(float)xOffset, 0.0f, (float)zOffset}, camera.Position, cameraFront, lightPos, pixelCache);
 
 		if(zOffset < 300) 
-			zOffset												+= dimensions.z + 4;
+			zOffset												+= voxelMap.Dimensions.z + 4;
 		else {
-			xOffset												+= ::gpk::max(uint16_t(dimensions.x), uint16_t(30));
+			xOffset												+= ::gpk::max(uint16_t(voxelMap.Dimensions.x), uint16_t(30));
 			zOffset												= 0;
 		}
 	}
