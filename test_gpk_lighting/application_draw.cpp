@@ -5,7 +5,7 @@
 					::gpk::error_t										drawPixel
 	( ::SRenderCache															& renderCache
 	, ::gpk::SColorBGRA															& targetColorCell
-	, const ::gpk::STriangleWeights<double>										& pixelWeights
+	, const ::gpk::STriangle<double>										& pixelWeights
 	, const ::gpk::STriangle2<float>											& uvGrid
 	, const ::gpk::view_grid<::gpk::SColorBGRA>									& textureColors
 	, int32_t																	iTriangle
@@ -160,7 +160,7 @@
 			const ::gpk::STriangle2<float>												& uvGrid										= applicationInstance.Grid.UVs[iGridTri];
 			for(uint32_t iPixel = 0, pixCount = renderCache.TrianglePixelCoords.size(); iPixel < pixCount; ++iPixel) {
 				const ::gpk::SCoord2<int16_t>												& pixelCoord								= renderCache.TrianglePixelCoords	[iPixel];
-				const ::gpk::STriangleWeights<double>										& pixelWeights								= renderCache.TrianglePixelWeights	[iPixel];
+				const ::gpk::STriangle<double>										& pixelWeights								= renderCache.TrianglePixelWeights	[iPixel];
 				if(0 == ::drawPixel(renderCache, offscreen.View[pixelCoord.y][pixelCoord.x], pixelWeights, uvGrid, applicationInstance.TextureGrid.View, iTriangle, lightDir.Cast<double>()))
 					++pixelsDrawn;
 				else

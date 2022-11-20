@@ -42,7 +42,7 @@ int													ssg::solarSystemSetup				(::ssg::SSolarSystemGame & solarSystem,
 	::gpk::SIntegrator3										& bodies						= solarSystem.Bodies;
 	::ssg::SScene											& scene							= solarSystem.Scene;
 	//if constexpr(false && filename.size()) {
-	if (filename.size()) {
+	if (filename.size() && 0 == filename.size()) {
 		::gpk::SJSONFile					solarSystemFile	= {};
 		::gpk::jsonFileRead(solarSystemFile, filename);
 		::gpk::array_pod<int32_t>			stellarBodyIndices;

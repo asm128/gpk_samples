@@ -284,7 +284,7 @@ template<typename _tIndex, typename _tValue>
 	::gpk::array_pod<::gpk::SCoord2<int32_t>>								wireframePixelCoords;
 	::gpk::array_pod<::gpk::SCoord2<int16_t>>								trianglePixelCoords;
 	::gpk::SCoord3<float>													cameraFront										= (camera.Target - camera.Position).Normalize();
-	::gpk::array_pod<::gpk::STriangleWeights<double>>						triangleWeights;
+	::gpk::array_pod<::gpk::STriangle<double>>						triangleWeights;
 
 	for(uint32_t iTriangle = 0; iTriangle < 12; ++iTriangle) {
 		double																	lightFactor									= normals[iTriangle * 3].Dot(cameraFront);

@@ -154,7 +154,7 @@ int													ssg::solarSystemUpdate			(ssg::SSolarSystemGame & solarSystem, d
 	matrixView											*= matrixViewport;
 
 	::gpk::array_pod<::gpk::SCoord2<int16_t>>				pixelCoords					= {};
-	::gpk::array_pod<::gpk::STriangleWeights<float>>		pixelVertexWeights			= {};
+	::gpk::array_pod<::gpk::STriangle<float>>		pixelVertexWeights			= {};
 	::gpk::SModelMatrices									matrices					= {};
 	::gpk::view_grid<uint32_t>								depthBuffer					= target->DepthStencil.View;
 	memset(depthBuffer.begin(), -1, sizeof(uint32_t) * depthBuffer.size());
@@ -177,7 +177,7 @@ int													ssg::solarSystemUpdate			(ssg::SSolarSystemGame & solarSystem, d
 		::gpk::SGeometryIndexedTriangles						& entityGeometry			= solarSystem.Geometries[entity.Geometry];
 		matrixTransform										= matrices.Scale * matrices.Position * matrixTransform;
 		::gpk::SMatrix4<float>									matrixTransformView			= matrixTransform * matrixView;
-		for(uint32_t iTriangle = 0; iTriangle < entityGeometry.PositionIndices.size(); ++iTriangle) {
+		for(uint32_t iTriangle = 0; iTriangle < entityGeometry.PositionIndices.size() / 3; ++iTriangle) {
 			pixelCoords			.clear();
 			pixelVertexWeights	.clear();
 			::gpk::drawTriangle(targetPixels, entityGeometry, iTriangle, matrixTransform, matrixTransformView, lightVector, iEntity ? ::gpk::BLACK : ::gpk::WHITE, pixelCoords, pixelVertexWeights, entityImage, lightPoints, lightColors, depthBuffer);
