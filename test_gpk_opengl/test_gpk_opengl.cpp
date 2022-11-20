@@ -3,8 +3,8 @@
 
 #include "test_gpk_opengl.h"	//
 
-#include <GL/gl.h>			/* OpenGL header file */
-#include <GL/glu.h>			/* OpenGL utilities header file */
+#include <GL/GL.h>			/* OpenGL header file */
+#include <GL/GLU.h>			/* OpenGL utilities header file */
 #include <stdio.h>
 
 
@@ -123,10 +123,10 @@ LRESULT WINAPI WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 	case WM_LBUTTONUP:
 	case WM_RBUTTONUP:
-	/* remember to release the capture when we are finished. */
-	ReleaseCapture();
-	state = 0;
-	return 0;
+		/* remember to release the capture when we are finished. */
+		ReleaseCapture();
+		state = 0;
+		return 0;
 
 	case WM_MOUSEMOVE:
 	if (state) {
@@ -295,7 +295,7 @@ static constexpr const ::gpk::STriangle3<float>						geometryCube	[12]						=
 	::HWND																		windowHandle								= mainWindow.PlatformDetail.WindowHandle;
 	SetWindowTextA(windowHandle, buffer);
 	
-
+	//glVertexAttribPointer();
 	HDC hDC = GetDC(mainWindow.PlatformDetail.WindowHandle);
 	display(hDC);
 	ReleaseDC(mainWindow.PlatformDetail.WindowHandle, hDC);
