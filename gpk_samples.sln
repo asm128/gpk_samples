@@ -178,7 +178,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_gpk_nn", "test_gpk_nn\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_gpk_solarsystem", "test_gpk_solarsystem\test_gpk_solarsystem.vcxproj", "{0944F2B3-1738-4D82-B990-4FE260BD37B3}"
 	ProjectSection(ProjectDependencies) = postProject
-		{39953D8D-A830-46BD-917E-1A96C8BDADC6} = {39953D8D-A830-46BD-917E-1A96C8BDADC6}
 		{830AB681-B788-47D4-9767-BA4E0792F682} = {830AB681-B788-47D4-9767-BA4E0792F682}
 		{8FD826F8-3739-44E6-8CC8-997122E53B8D} = {8FD826F8-3739-44E6-8CC8-997122E53B8D}
 	EndProjectSection
@@ -236,6 +235,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_xml_reader", "test_xml
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_gpk_mashup", "test_gpk_mashup\test_gpk_mashup.vcxproj", "{5F811411-56CD-4BCC-9DA3-566AC8C2C6DE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{830AB681-B788-47D4-9767-BA4E0792F682} = {830AB681-B788-47D4-9767-BA4E0792F682}
+		{8FD826F8-3739-44E6-8CC8-997122E53B8D} = {8FD826F8-3739-44E6-8CC8-997122E53B8D}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_gpk_vox", "test_gpk_vox\test_gpk_vox.vcxproj", "{C5F3C662-75FD-45A3-8263-DD320AED8432}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -269,6 +272,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_gpk_opengl", "test_gpk
 		{830AB681-B788-47D4-9767-BA4E0792F682} = {830AB681-B788-47D4-9767-BA4E0792F682}
 		{8FD826F8-3739-44E6-8CC8-997122E53B8D} = {8FD826F8-3739-44E6-8CC8-997122E53B8D}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_gpk_mesh", "test_gpk_mesh\test_gpk_mesh.vcxproj", "{C79289F8-61F7-404F-A032-78757CFAA7FA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -638,6 +643,14 @@ Global
 		{D50FD490-D3AF-4DA8-9666-738FAB616DD4}.Release|x64.Build.0 = Release|x64
 		{D50FD490-D3AF-4DA8-9666-738FAB616DD4}.Release|x86.ActiveCfg = Release|Win32
 		{D50FD490-D3AF-4DA8-9666-738FAB616DD4}.Release|x86.Build.0 = Release|Win32
+		{C79289F8-61F7-404F-A032-78757CFAA7FA}.Debug|x64.ActiveCfg = Debug|x64
+		{C79289F8-61F7-404F-A032-78757CFAA7FA}.Debug|x64.Build.0 = Debug|x64
+		{C79289F8-61F7-404F-A032-78757CFAA7FA}.Debug|x86.ActiveCfg = Debug|Win32
+		{C79289F8-61F7-404F-A032-78757CFAA7FA}.Debug|x86.Build.0 = Debug|Win32
+		{C79289F8-61F7-404F-A032-78757CFAA7FA}.Release|x64.ActiveCfg = Release|x64
+		{C79289F8-61F7-404F-A032-78757CFAA7FA}.Release|x64.Build.0 = Release|x64
+		{C79289F8-61F7-404F-A032-78757CFAA7FA}.Release|x86.ActiveCfg = Release|Win32
+		{C79289F8-61F7-404F-A032-78757CFAA7FA}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

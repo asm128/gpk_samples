@@ -49,6 +49,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT_MT(::SApplication, "Title");
 		char								pathToLoad[4096]	= {};
 		sprintf_s(pathToLoad, "%s/%s/%s", pathNameData.Storage, folderNameVox.Storage, fileName.begin());
 		gpk_necs(::gpk::fileToMemory(pathToLoad, fileBytes));
+
 		::gpk::vcc							viewBytes			= fileBytes;
 		gpk_necs(voxModels[voxModels.push_back({})]->Load(viewBytes));
 		app.VOXModelNames.push_back(fileName);
@@ -57,11 +58,11 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT_MT(::SApplication, "Title");
 
 	app.VOXModelMaps.resize(voxModels.size());
 	for(uint32_t iModel = 0; iModel < voxModels.size(); ++iModel) {
+		gpk_vox_info_printf("Constructing %s.", app.VOXModelNames[iModel].begin());
+
 		const ::gpk::ptr_obj<::gpk::SVOXData>		& voxFile			= voxModels[iModel];
 		::gpk::SVoxelMap<uint8_t>					& chunkMap			= app.VOXModelMaps[iModel];
 		auto										coord				= voxFile->GetDimensions();
-		gpk_vox_info_printf("Constructing %s.", app.VOXModelNames[iModel].begin());
-		gpk_vox_info_printf("Model size: %i, %i, %i.", coord.x, coord.y, coord.z);
 		chunkMap.Palette						= voxFile->GetBGRA();
 		chunkMap.Dimensions						= voxFile->GetDimensions();
 		::gpk::view_array<const ::gpk::SVOXVoxel>	voxels				= voxFile->GetXYZI();
