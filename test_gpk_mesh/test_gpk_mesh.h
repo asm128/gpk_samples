@@ -110,6 +110,11 @@ struct SApplication {
 	int32_t									IdViewport									= -1;
 
 	::gpk::SEngine							Engine										= {};
+	int32_t									EntityCamera								= -1;
+	int32_t									EntityLightDirectional						= -1;
+	int32_t									EntityLightPoint							= -1;
+	int32_t									EntityLightSpot								= -1;
+	int32_t									EntityBox									= -1;
 
 											SApplication								(::gpk::SRuntimeValues& runtimeValues)			noexcept	: Framework(runtimeValues) {}
 };

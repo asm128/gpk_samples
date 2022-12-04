@@ -66,11 +66,10 @@ namespace gpk
 		::gpk::array_obj<::gpk::vcc>				MeshNames		= {};
 		::gpk::array_obj<::gpk::vcc>				SkinNames		= {};
 
-		::gpk::error_t								CreateMesh		()	{ MeshNames.push_back({}); return Meshes .push_back({}); }
-		::gpk::error_t								CreateSkin		()	{ SkinNames.push_back({}); return Skins  .push_back({}); }
-
-		::gpk::error_t								DeleteMesh		(uint32_t index)	{ MeshNames.remove_unordered(index); return Meshes .remove_unordered(index); }
-		::gpk::error_t								DeleteSkin		(uint32_t index)	{ SkinNames.remove_unordered(index); return Skins  .remove_unordered(index); }
+		::gpk::error_t								CreateMesh		()					{ MeshNames.push_back({});				return Meshes .push_back({}); }
+		::gpk::error_t								CreateSkin		()					{ SkinNames.push_back({});				return Skins  .push_back({}); }
+		::gpk::error_t								DeleteMesh		(uint32_t index)	{ MeshNames.remove_unordered(index);	return Meshes .remove_unordered(index); }
+		::gpk::error_t								DeleteSkin		(uint32_t index)	{ SkinNames.remove_unordered(index);	return Skins  .remove_unordered(index); }
 	};
 } // namespace
 

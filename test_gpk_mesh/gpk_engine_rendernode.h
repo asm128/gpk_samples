@@ -22,7 +22,7 @@ namespace gpk
 	struct SRenderNode {
 		uint32_t									Mesh;
 		uint32_t									Slice;
-		uint32_t									Transform;
+		uint32_t									Shader;
 	};
 	
 	GDEFINE_ENUM_TYPE(LIGHT_TYPE, uint8_t);
@@ -72,15 +72,15 @@ namespace gpk
 		::gpk::array_pobj<::gpk::array_pod<::gpk::SLightPoint		>>	LightsPoint				= {};
 		::gpk::array_pobj<::gpk::array_pod<::gpk::SLightSpot		>>	LightsSpot				= {};
 
-		::gpk::error_t											CreateRenderNode		()	{
-			RenderNodeTransforms	.push_back({});
+		::gpk::error_t											Create		()	{
+			RenderNodeTransforms[RenderNodeTransforms.push_back({})].Identity();
 			RenderNodeLights		.push_back({});
 			RenderNodeCameras		.push_back({});
 			RenderNodeFlags			.push_back({});
 			return RenderNodes		.push_back({});
 		}
 
-		::gpk::error_t											DeleteRenderNode		(uint32_t indexNode)	{
+		::gpk::error_t											Delete		(uint32_t indexNode)	{
 			RenderNodeTransforms	.remove_unordered(indexNode);
 			RenderNodeLights		.remove_unordered(indexNode);
 			RenderNodeCameras		.remove_unordered(indexNode);

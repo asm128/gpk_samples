@@ -22,6 +22,9 @@ namespace gpk
 		::gpk::SVirtualEntityManager	ManagedEntities		;
 		::gpk::SRigidBodyIntegrator		Integrator			;
 
+		::gpk::error_t					CreateLight			(::gpk::LIGHT_TYPE type);
+		::gpk::error_t					CreateCamera		();
+
 		::gpk::error_t					CreateSphere		();
 		::gpk::error_t					CreateCylinder		();
 		::gpk::error_t					CreateBox			();

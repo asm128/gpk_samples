@@ -167,7 +167,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="gpk_engine_namedresource.h" />
     <ClInclude Include="gpk_engine.h" />
     <ClInclude Include="gpk_engine_renderbuffer.h" />
     <ClInclude Include="gpk_engine_rendercolor.h" />
