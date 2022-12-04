@@ -50,41 +50,41 @@
 	return 0;
 }
 
-					::gpk::error_t										drawGrids									(::gme::SApplication& applicationInstance, ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>& target)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
+					::gpk::error_t										drawGrids									(::gme::SApplication& app, ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>& target)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	auto																		& offscreen									= target.Color;
 	::gpk::SImage<uint32_t>														& offscreenDepth							= target.DepthStencil;
 	const ::gpk::SCoord2<uint32_t>												& offscreenMetrics							= offscreen.View.metrics();
-	::SRenderCache																& renderCache								= applicationInstance.RenderCache;
-	const ::gpk::SMatrix4<float>												& projection								= applicationInstance.Scene.Transforms.FinalProjection	;
-	const ::gpk::SMatrix4<float>												& viewMatrix								= applicationInstance.Scene.Transforms.View				;
+	::SRenderCache																& renderCache								= app.RenderCache;
+	const ::gpk::SMatrix4<float>												& projection								= app.Scene.Transforms.FinalProjection	;
+	const ::gpk::SMatrix4<float>												& viewMatrix								= app.Scene.Transforms.View				;
 
 	::gpk::SMatrix4<float>														xViewProjection								= viewMatrix * projection;
 	::gpk::SMatrix4<float>														xWorld										= {};
 	::gpk::SMatrix4<float>														xRotation									= {};
-	const double																& fFar										= applicationInstance.Scene.Camera.NearFar.Far	;
-	const double																& fNear										= applicationInstance.Scene.Camera.NearFar.Near	;
-	int32_t																		& pixelsDrawn								= applicationInstance.RenderCache.PixelsDrawn	= 0;
-	int32_t																		& pixelsSkipped								= applicationInstance.RenderCache.PixelsSkipped	= 0;
+	const double																& fFar										= app.Scene.Camera.NearFar.Far	;
+	const double																& fNear										= app.Scene.Camera.NearFar.Near	;
+	int32_t																		& pixelsDrawn								= app.RenderCache.PixelsDrawn	= 0;
+	int32_t																		& pixelsSkipped								= app.RenderCache.PixelsSkipped	= 0;
 	renderCache.WireframePixelCoords.clear();
 	renderCache.TrianglesDrawn												= 0;
 	const ::gpk::SCoord2<int32_t>												offscreenMetricsI							= offscreenMetrics.Cast<int32_t>();
 	const ::gpk::SCoord3<float>													screenCenter								= {offscreenMetricsI.x / 2.0f, offscreenMetricsI.y / 2.0f, };
 	for(uint32_t iGrid = 0; iGrid < 1; ++iGrid) {
-		xWorld		.Scale			(applicationInstance.GridPivot.Scale, true);
-		//xRotation	.SetOrientation	((applicationInstance.GridPivot.Orientation + ::gpk::SQuaternion<float>{0, (float)(iGrid / ::gpk::math_2pi), 0, 0}).Normalize());
-		xRotation	.SetOrientation	(applicationInstance.GridPivot.Orientation.Normalize());
+		xWorld		.Scale			(app.GridPivot.Scale, true);
+		//xRotation	.SetOrientation	((app.GridPivot.Orientation + ::gpk::SQuaternion<float>{0, (float)(iGrid / ::gpk::math_2pi), 0, 0}).Normalize());
+		xRotation	.SetOrientation	(app.GridPivot.Orientation.Normalize());
 		xWorld																	= xWorld * xRotation;
-		xWorld		.SetTranslation	(applicationInstance.GridPivot.Position, false);
+		xWorld		.SetTranslation	(app.GridPivot.Position, false);
 		::gpk::clear
 			( renderCache.Triangle3dWorld
 			, renderCache.Triangle3dToDraw
 			, renderCache.Triangle3dIndices
 			);
 		const ::gpk::SMatrix4<float>												xWV											= xWorld * viewMatrix;
-		//const ::gpk::SCoord3<float>													& cameraFront								= applicationInstance.Scene.Camera.Vectors.Front;
+		//const ::gpk::SCoord3<float>													& cameraFront								= app.Scene.Camera.Vectors.Front;
 		//const ::gpk::SMatrix4<float>												finalTransform								= xWorld * xViewProjection;
-		for(uint32_t iTriangle = 0, triCount = applicationInstance.Grid.Positions.size(); iTriangle < triCount; ++iTriangle) {
-			::gpk::STriangle3<float>													triangle3DWorld								= applicationInstance.Grid.Positions[iTriangle];
+		for(uint32_t iTriangle = 0, triCount = app.Grid.Positions.size(); iTriangle < triCount; ++iTriangle) {
+			::gpk::STriangle3<float>													triangle3DWorld								= app.Grid.Positions[iTriangle];
 			::gpk::STriangle3<float>													transformedTriangle3D						= triangle3DWorld;
 			::gpk::transform(transformedTriangle3D, xWV);
 			if( transformedTriangle3D.A.z >= fFar
@@ -130,13 +130,13 @@
 			, renderCache.Triangle3dColorList
 			), "Out of memory?");
 
-		const ::gpk::SCoord3<float>													& lightDir									= applicationInstance.LightDirection;
+		const ::gpk::SCoord3<float>													& lightDir									= app.LightDirection;
 		for(uint32_t iTriangle = 0, triCount = renderCache.Triangle3dIndices.size(); iTriangle < triCount; ++iTriangle) { // transform normals
 			::gpk::SCoord3<float>														& transformedNormalTri						= renderCache.TransformedNormalsTriangle[iTriangle];
-			transformedNormalTri													= xWorld.TransformDirection(applicationInstance.Grid.NormalsTriangle[renderCache.Triangle3dIndices[iTriangle]]).Normalize();
+			transformedNormalTri													= xWorld.TransformDirection(app.Grid.NormalsTriangle[renderCache.Triangle3dIndices[iTriangle]]).Normalize();
 			const double																lightFactor									= fabs(transformedNormalTri.Dot(lightDir));
 			renderCache.Triangle3dColorList[iTriangle]								= ::gpk::LIGHTGRAY * lightFactor;
-			const ::gpk::STriangle3<float>												& vertNormalsTriOrig						= applicationInstance.Grid.NormalsVertex[renderCache.Triangle3dIndices[iTriangle]];
+			const ::gpk::STriangle3<float>												& vertNormalsTriOrig						= app.Grid.NormalsVertex[renderCache.Triangle3dIndices[iTriangle]];
 			::gpk::STriangle3<float>													& vertNormalsTri							= renderCache.TransformedNormalsVertex[iTriangle];
 			vertNormalsTri.A														= xWorld.TransformDirection(vertNormalsTriOrig.A).Normalize();
 			vertNormalsTri.B														= xWorld.TransformDirection(vertNormalsTriOrig.B).Normalize();
@@ -144,24 +144,24 @@
 		}
 
 		for(uint32_t iTriangle = 0, triCount = renderCache.Triangle3dIndices.size(); iTriangle < triCount; ++iTriangle) { //
-			const double																cameraFactor								= renderCache.TransformedNormalsTriangle[iTriangle].Dot(applicationInstance.Scene.Camera.Vectors.Front);
+			const double																cameraFactor								= renderCache.TransformedNormalsTriangle[iTriangle].Dot(app.Scene.Camera.Vectors.Front);
 			if(cameraFactor > .65)
 				continue;
 			renderCache.TrianglePixelCoords.clear();
 			renderCache.TrianglePixelWeights.clear();
 			offscreenDepth;
 			::gpk::ptr_obj<::gpk::SDialogCheckBox>			checkbox;
-			applicationInstance.DialogMain.Controls[applicationInstance.CheckBox].as(checkbox);
+			app.DialogMain.Controls[app.CheckBox].as(checkbox);
 			if(false == checkbox->Checked)
 				gerror_if(errored(::gpk::drawTriangle(offscreenDepth.View, {fNear, fFar}, renderCache.Triangle3dToDraw[iTriangle], renderCache.TrianglePixelCoords, renderCache.TrianglePixelWeights)), "Not sure if these functions could ever fail");
 			//if(0 != renderCache.TrianglePixelCoords.size())
 			++renderCache.TrianglesDrawn;
 			const int32_t																iGridTri										= renderCache.Triangle3dIndices[iTriangle];
-			const ::gpk::STriangle2<float>												& uvGrid										= applicationInstance.Grid.UVs[iGridTri];
+			const ::gpk::STriangle2<float>												& uvGrid										= app.Grid.UVs[iGridTri];
 			for(uint32_t iPixel = 0, pixCount = renderCache.TrianglePixelCoords.size(); iPixel < pixCount; ++iPixel) {
 				const ::gpk::SCoord2<int16_t>												& pixelCoord								= renderCache.TrianglePixelCoords	[iPixel];
 				const ::gpk::STriangle<double>										& pixelWeights								= renderCache.TrianglePixelWeights	[iPixel];
-				if(0 == ::drawPixel(renderCache, offscreen.View[pixelCoord.y][pixelCoord.x], pixelWeights, uvGrid, applicationInstance.TextureGrid.View, iTriangle, lightDir.Cast<double>()))
+				if(0 == ::drawPixel(renderCache, offscreen.View[pixelCoord.y][pixelCoord.x], pixelWeights, uvGrid, app.TextureGrid.View, iTriangle, lightDir.Cast<double>()))
 					++pixelsDrawn;
 				else
 					++pixelsSkipped;

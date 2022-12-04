@@ -38,16 +38,16 @@ static				void												setupParticles								()																				{
 
 					::SApplication										* g_ApplicationInstance						= 0;
 
-static				::gpk::error_t										updateSizeDependentResources				(::SApplication& applicationInstance)											{
+static				::gpk::error_t										updateSizeDependentResources				(::SApplication& app)											{
 	//static constexpr	const ::gpk::SCoord2<uint32_t>							GAME_SCREEN_SIZE							= {640, 360};
-	::gpk::updateSizeDependentTarget(applicationInstance.Framework.MainDisplayOffscreen->Color.Texels, applicationInstance.Framework.MainDisplayOffscreen->Color.View, GAME_SCREEN_SIZE);
+	::gpk::updateSizeDependentTarget(app.Framework.MainDisplayOffscreen->Color.Texels, app.Framework.MainDisplayOffscreen->Color.View, GAME_SCREEN_SIZE);
 	return 0;
 }
 
 // --- Cleanup application resources.
-					::gpk::error_t										cleanup										(::SApplication& applicationInstance)											{
+					::gpk::error_t										cleanup										(::SApplication& app)											{
 
-	applicationInstance;
+	app;
 	g_ApplicationInstance													= 0;
 	//error_printf("Error message test. Press F5 to continue if the debugger breaks execution at this point.");
 	return 0;
@@ -101,16 +101,16 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 }
 
 					::gpk::error_t										mainWindowCreate							(::gpk::SWindow& mainWindow, HINSTANCE hInstance);
-					::gpk::error_t										setup										(::SApplication& applicationInstance)											{
+					::gpk::error_t										setup										(::SApplication& app)											{
 	//_CrtSetBreakAlloc(120);
-	g_ApplicationInstance													= &applicationInstance;
-	::gpk::SFramework															& framework									= applicationInstance.Framework;
+	g_ApplicationInstance													= &app;
+	::gpk::SFramework															& framework									= app.Framework;
 	framework.MainDisplay.Size												= {1280, 720};
 	gerror_if(errored(::gpk::mainWindowCreate(framework.MainDisplay, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?!");
 	::setupParticles();
-	ree_if	(errored(::updateSizeDependentResources	(applicationInstance)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
-	ree_if	(errored(::setupSprites					(applicationInstance)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
-	::gpk::view_grid<::gpk::SColorBGRA>											& fontAtlasView								= applicationInstance.Textures[GAME_TEXTURE_FONT_ATLAS].Processed.View;
+	ree_if	(errored(::updateSizeDependentResources	(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
+	ree_if	(errored(::setupSprites					(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
+	::gpk::view_grid<::gpk::SColorBGRA>											& fontAtlasView								= app.Textures[GAME_TEXTURE_FONT_ATLAS].Processed.View;
 	const ::gpk::SCoord2<uint32_t>												& fontAtlasMetrics							= fontAtlasView.metrics();
 	for(uint32_t y = 0, yMax = fontAtlasMetrics.y; y < yMax; ++y)
 	for(uint32_t x = 0, xMax = fontAtlasMetrics.x; x < xMax; ++x) {
@@ -120,8 +120,8 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	}
 
 	::gpk::SCoord2<uint32_t>													metricsScreen								= framework.MainDisplayOffscreen->Color.View.metrics();
-	::SGame																		& gameInstance								= applicationInstance.Game;
-	for(uint32_t iShip = 0, shipCount = applicationInstance.Game.ShipsPlaying; iShip < shipCount; ++iShip) {
+	::SGame																		& gameInstance								= app.Game;
+	for(uint32_t iShip = 0, shipCount = app.Game.ShipsPlaying; iShip < shipCount; ++iShip) {
 		gameInstance.Ships.Alive		[iShip]									= 1;
 		gameInstance.Ships.Position		[iShip]									= metricsScreen.Cast<float>() / 4 + ::gpk::SCoord2<float>{0, (float)iShip * 64};
 		gameInstance.Ships.Weapon		[iShip]									= {(int32_t)iShip};
@@ -138,59 +138,59 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 		++gameInstance.CountPowerups;
 	}
 	//gameInstance.PositionPowerup											= framework.Offscreen.View.metrics().Cast<float>() / 4U * 3U;
-	applicationInstance.PSOffsetFromShipCenter								= {-applicationInstance.TextureCenters[GAME_TEXTURE_SHIP0].x};
+	app.PSOffsetFromShipCenter								= {-app.TextureCenters[GAME_TEXTURE_SHIP0].x};
 	return 0;
 }
 
-					::gpk::error_t										drawBackground								(::SApplication& applicationInstance);
-					::gpk::error_t										drawShots									(::SApplication& applicationInstance);
-					::gpk::error_t										drawThrust									(::SApplication& applicationInstance);
-					::gpk::error_t										drawPowerups								(::SApplication& applicationInstance);
-					::gpk::error_t										drawShips									(::SApplication& applicationInstance);
-					::gpk::error_t										drawCrosshair								(::SApplication& applicationInstance);
-					::gpk::error_t										drawCollisions								(::SApplication& applicationInstance);
-					::gpk::error_t										draw										(::SApplication& applicationInstance)											{
-	gerror_if(errored(::drawBackground	(applicationInstance)), "Why??");	// --- Draw stars
-	gerror_if(errored(::drawPowerups	(applicationInstance)), "Why??");	// --- Draw powerups
-	gerror_if(errored(::drawShips		(applicationInstance)), "Why??");	// --- Draw ship
-	gerror_if(errored(::drawCrosshair	(applicationInstance)), "Why??");	// --- Draw crosshair
-	gerror_if(errored(::drawThrust		(applicationInstance)), "Why??");	// --- Draw propulsion engine
-	gerror_if(errored(::drawShots		(applicationInstance)), "Why??");	// --- Draw lasers
-	gerror_if(errored(::drawCollisions	(applicationInstance)), "Why??");	// --- Draw debris particles
+					::gpk::error_t										drawBackground								(::SApplication& app);
+					::gpk::error_t										drawShots									(::SApplication& app);
+					::gpk::error_t										drawThrust									(::SApplication& app);
+					::gpk::error_t										drawPowerups								(::SApplication& app);
+					::gpk::error_t										drawShips									(::SApplication& app);
+					::gpk::error_t										drawCrosshair								(::SApplication& app);
+					::gpk::error_t										drawCollisions								(::SApplication& app);
+					::gpk::error_t										draw										(::SApplication& app)											{
+	gerror_if(errored(::drawBackground	(app)), "Why??");	// --- Draw stars
+	gerror_if(errored(::drawPowerups	(app)), "Why??");	// --- Draw powerups
+	gerror_if(errored(::drawShips		(app)), "Why??");	// --- Draw ship
+	gerror_if(errored(::drawCrosshair	(app)), "Why??");	// --- Draw crosshair
+	gerror_if(errored(::drawThrust		(app)), "Why??");	// --- Draw propulsion engine
+	gerror_if(errored(::drawShots		(app)), "Why??");	// --- Draw lasers
+	gerror_if(errored(::drawCollisions	(app)), "Why??");	// --- Draw debris particles
 
 	static constexpr	const ::gpk::SCoord2<int32_t>							sizeCharCell								= {9, 16};
 	uint32_t																	lineOffset									= 0;
 	static	const ::gpk::view_const_string										textLine0									= "W: Up, S: Down, A: Left, D: Right";
 	static	const ::gpk::view_const_string										textLine1									= "T: Shoot. Y: Thrust. U: Handbrake.";
 	static	const ::gpk::view_const_string										textLine2									= "Press ESC to exit or P to (un)pause.";
-	::gpk::SFramework															& framework									= applicationInstance.Framework;
+	::gpk::SFramework															& framework									= app.Framework;
 	::gpk::view_grid<::gpk::SColorBGRA>											& offscreenView								= framework.MainDisplayOffscreen->Color.View;
-	::gpk::view_grid<::gpk::SColorBGRA>											& fontAtlasView								= applicationInstance.Textures[GAME_TEXTURE_FONT_ATLAS].Processed.View;
+	::gpk::view_grid<::gpk::SColorBGRA>											& fontAtlasView								= app.Textures[GAME_TEXTURE_FONT_ATLAS].Processed.View;
 	const ::gpk::SCoord2<uint32_t>												& offscreenMetrics							= offscreenView.metrics();
-	::gpk::textLineDrawAlignedFixedSizeLit(offscreenView, applicationInstance.TextureFontMonochrome.View, fontAtlasView.metrics(), lineOffset++, offscreenMetrics, sizeCharCell, textLine0, ::gpk::SColorBGRA{0, applicationInstance.Framework.FrameInfo.FrameNumber % 0xFF, 0xFFU, 0xFFU});
-	::gpk::textLineDrawAlignedFixedSizeLit(offscreenView, applicationInstance.TextureFontMonochrome.View, fontAtlasView.metrics(), lineOffset++, offscreenMetrics, sizeCharCell, textLine1, ::gpk::SColorBGRA{applicationInstance.Framework.FrameInfo.FrameNumber % 0xFFU, 0xFFU, 0, 0xFFU});
+	::gpk::textLineDrawAlignedFixedSizeLit(offscreenView, app.TextureFontMonochrome.View, fontAtlasView.metrics(), lineOffset++, offscreenMetrics, sizeCharCell, textLine0, ::gpk::SColorBGRA{0, app.Framework.FrameInfo.FrameNumber % 0xFF, 0xFFU, 0xFFU});
+	::gpk::textLineDrawAlignedFixedSizeLit(offscreenView, app.TextureFontMonochrome.View, fontAtlasView.metrics(), lineOffset++, offscreenMetrics, sizeCharCell, textLine1, ::gpk::SColorBGRA{app.Framework.FrameInfo.FrameNumber % 0xFFU, 0xFFU, 0, 0xFFU});
 	::gpk::textLineDrawAlignedFixedSizeRGBA(offscreenView, fontAtlasView, lineOffset = offscreenMetrics.y / 16 - 1, offscreenMetrics, sizeCharCell, textLine2);
-	::gpk::textLineDrawAlignedFixedSizeLit(offscreenView, applicationInstance.TextureFontMonochrome.View, fontAtlasView.metrics(), --lineOffset, offscreenMetrics, sizeCharCell, weaponProperties[applicationInstance.Game.Ships.Weapon[0].IndexProperties].Name, ::gpk::SColorBGRA{applicationInstance.Framework.FrameInfo.FrameNumber % 0xFFU, 0xFFU, 0, 0xFFU});
-	if(applicationInstance.Debugging) {
+	::gpk::textLineDrawAlignedFixedSizeLit(offscreenView, app.TextureFontMonochrome.View, fontAtlasView.metrics(), --lineOffset, offscreenMetrics, sizeCharCell, weaponProperties[app.Game.Ships.Weapon[0].IndexProperties].Name, ::gpk::SColorBGRA{app.Framework.FrameInfo.FrameNumber % 0xFFU, 0xFFU, 0, 0xFFU});
+	if(app.Debugging) {
 		::gpk::STimer																& timer										= framework.Timer;
 		::gpk::SWindow																& mainWindow								= framework.MainDisplay;
 		char																		buffer		[512]							= {};
 		int32_t																		lineLen										= sprintf_s(buffer, "[%u x %u]. Projecitle fx count: %u. Thrust fx count: %u."
 			, mainWindow.Size.x, mainWindow.Size.y
-			, applicationInstance.ParticleSystemProjectiles	.Instances.size()
-			, applicationInstance.ParticleSystemThrust		.Instances.size()
+			, app.ParticleSystemProjectiles	.Instances.size()
+			, app.ParticleSystemThrust		.Instances.size()
 			);
 		::gpk::textLineDrawAlignedFixedSizeRGBA(offscreenView, fontAtlasView, --lineOffset, offscreenMetrics, sizeCharCell, {buffer, (uint32_t)lineLen});
 		lineLen																	= sprintf_s(buffer, "Stars fx count: %u. Debris fx count: %u. Projectiles fx count: %u."
-			, applicationInstance.ParticleSystemStars		.Instances.size()
-			, applicationInstance.ParticleSystemDebris		.Instances.size()
-			, applicationInstance.ParticleSystemProjectiles	.Instances.size()
+			, app.ParticleSystemStars		.Instances.size()
+			, app.ParticleSystemDebris		.Instances.size()
+			, app.ParticleSystemProjectiles	.Instances.size()
 			);
 		::gpk::textLineDrawAlignedFixedSizeRGBA(offscreenView, fontAtlasView, --lineOffset, offscreenMetrics, sizeCharCell, {buffer, (uint32_t)lineLen});
 		lineLen																	= sprintf_s(buffer, "Enemy count: %u. Projectile count: %u. Powerup count: %u."
-			, applicationInstance.Game.CountEnemies
-			, applicationInstance.Game.CountProjectiles
-			, applicationInstance.Game.CountPowerups
+			, app.Game.CountEnemies
+			, app.Game.CountProjectiles
+			, app.Game.CountPowerups
 			);
 		::gpk::textLineDrawAlignedFixedSizeRGBA(offscreenView, fontAtlasView, --lineOffset, offscreenMetrics, sizeCharCell, {buffer, (uint32_t)lineLen});
 		lineLen																	= sprintf_s(buffer, "FPS: %g. Last frame seconds: %g.", 1 / timer.LastTimeSeconds, timer.LastTimeSeconds);
@@ -199,37 +199,37 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	return 0;
 }
 
-					::gpk::error_t										removeDeadStuff								(::SApplication& applicationInstance);
-					::gpk::error_t										updateInput									(::SApplication& applicationInstance);
-					::gpk::error_t										updateShots									(::SApplication& applicationInstance, const ::gpk::view_array<::SApplication::TParticleSystem::TIntegrator::TParticle> & particleDefinitions);
-					::gpk::error_t										updateSpawn									(::SApplication& applicationInstance, const ::gpk::view_array<::SApplication::TParticleSystem::TIntegrator::TParticle> & particleDefinitions);
-					::gpk::error_t										updateShips									(::SApplication& applicationInstance);
-					::gpk::error_t										updateEnemies								(::SApplication& applicationInstance);
-					::gpk::error_t										updateParticles								(::SApplication& applicationInstance);
- 					::gpk::error_t										updateGUI									(::SApplication& applicationInstance);
-					::gpk::error_t										update										(::SApplication& applicationInstance, bool systemRequestedExit)					{
+					::gpk::error_t										removeDeadStuff								(::SApplication& app);
+					::gpk::error_t										updateInput									(::SApplication& app);
+					::gpk::error_t										updateShots									(::SApplication& app, const ::gpk::view_array<::SApplication::TParticleSystem::TIntegrator::TParticle> & particleDefinitions);
+					::gpk::error_t										updateSpawn									(::SApplication& app, const ::gpk::view_array<::SApplication::TParticleSystem::TIntegrator::TParticle> & particleDefinitions);
+					::gpk::error_t										updateShips									(::SApplication& app);
+					::gpk::error_t										updateEnemies								(::SApplication& app);
+					::gpk::error_t										updateParticles								(::SApplication& app);
+ 					::gpk::error_t										updateGUI									(::SApplication& app);
+					::gpk::error_t										update										(::SApplication& app, bool systemRequestedExit)					{
 	retval_ginfo_if(1, systemRequestedExit, "Exiting because the runtime asked for close. We could also ignore this value and just continue execution if we don't want to exit.");
-	::gpk::SFramework															& framework									= applicationInstance.Framework;
+	::gpk::SFramework															& framework									= app.Framework;
 	::gpk::error_t																frameworkResult								= ::gpk::updateFramework(framework);
 	ree_if	(errored(frameworkResult), "Unknown error.");
 	rvi_if	(1, frameworkResult == 1, "Framework requested close. Terminating execution.");
 
-	ree_if	(errored(::updateSizeDependentResources	(applicationInstance)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
-	gerror_if(errored(::updateInput					(applicationInstance)), "Unknown error.");
-	if(applicationInstance.Paused)
+	ree_if	(errored(::updateSizeDependentResources	(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
+	gerror_if(errored(::updateInput					(app)), "Unknown error.");
+	if(app.Paused)
 		return 0;
 
 	// update background
 	const float																	windDirection								= (float)(sin(framework.FrameInfo.Seconds.Total / 10.0) * .5 + .5);
-	applicationInstance.ColorBackground.g									= (uint8_t)(windDirection * (applicationInstance.ColorBackground.b / 3.0));
-	applicationInstance.ColorBackground.r									= (uint8_t)(windDirection * (applicationInstance.ColorBackground.b / 3.0));
+	app.ColorBackground.g									= (uint8_t)(windDirection * (app.ColorBackground.b / 3.0));
+	app.ColorBackground.r									= (uint8_t)(windDirection * (app.ColorBackground.b / 3.0));
 
-	gerror_if(errored(::removeDeadStuff	(applicationInstance)), "Unknown error.");
-	gerror_if(errored(::updateParticles	(applicationInstance)), "Unknown error.");
-	gerror_if(errored(::updateSpawn		(applicationInstance, particleDefinitions)), "Unknown error.");
-	gerror_if(errored(::updateShips		(applicationInstance)), "Unknown error.");
-	gerror_if(errored(::updateEnemies	(applicationInstance)), "Unknown error.");
-	gerror_if(errored(::updateShots		(applicationInstance, particleDefinitions)), "Unknown error.");
-	gerror_if(errored(::updateGUI		(applicationInstance)), "Unknown error.");
+	gerror_if(errored(::removeDeadStuff	(app)), "Unknown error.");
+	gerror_if(errored(::updateParticles	(app)), "Unknown error.");
+	gerror_if(errored(::updateSpawn		(app, particleDefinitions)), "Unknown error.");
+	gerror_if(errored(::updateShips		(app)), "Unknown error.");
+	gerror_if(errored(::updateEnemies	(app)), "Unknown error.");
+	gerror_if(errored(::updateShots		(app, particleDefinitions)), "Unknown error.");
+	gerror_if(errored(::updateGUI		(app)), "Unknown error.");
 	return 0;
 }

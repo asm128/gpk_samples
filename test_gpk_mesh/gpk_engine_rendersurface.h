@@ -9,9 +9,8 @@ namespace gpk
 {
 #pragma pack(push, 1)
 	struct SSurfaceDescription {
-		::gpk::COLOR_TYPE							Format;
+		::gpk::COLOR_TYPE							ColorType			;
 		int8_t										BitDepth			;
-		int8_t										ColorType			;
 		int8_t										MethodCompression	;
 		int8_t										MethodFilter		;
 		int8_t										MethodInterlace		;
@@ -22,6 +21,15 @@ namespace gpk
 	struct SSurface {
 		::gpk::SSurfaceDescription					Desc;
 		::gpk::array_pod<uint8_t>					Data;
+	};
+
+	struct SSurfaceManager {
+		::gpk::array_pobj<::gpk::SSurface>			Surfaces;
+		::gpk::array_obj<::gpk::vcc>				SurfaceNames;
+
+		::gpk::error_t								Create				()					{ SurfaceNames.push_back({});				return Surfaces .push_back({}); }
+		::gpk::error_t								Delete				(uint32_t index)	{ SurfaceNames.remove_unordered(index);		return Surfaces .remove_unordered(index); }
+
 	};
 } // namespace
 

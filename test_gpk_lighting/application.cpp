@@ -255,7 +255,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	return 0;
 }
 
-			::gpk::error_t											drawGrids									(::gme::SApplication& applicationInstance, ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>& target);
+			::gpk::error_t											drawGrids									(::gme::SApplication& app, ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>& target);
 			::gpk::error_t											draw										(::gme::SApplication & app)							{
 	::gpk::STimer															timer;
 	::gpk::SFramework														& framework									= app.Framework;

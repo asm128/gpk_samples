@@ -83,7 +83,7 @@
 
 	//---------------------------
 
-	static constexpr const char													ragnaPath	[]								= "..\\data_2006\\data\\";
+	static constexpr const char													ragnaPath	[]								= "\\data_2005\\data\\";
 
 	char																		temp		[512]							= {};
 	::gpk::SRSWFileContents														& rswData									= app.RSWData;

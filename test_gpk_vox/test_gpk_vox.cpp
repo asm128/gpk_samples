@@ -168,7 +168,7 @@ static	::gpk::error_t						drawVoxelFace
 	::gpk::SColorFloat							faceColor	[6]				= {};
 	faceColor[iFace]						= colorAmbient * lightFactorDistance;
 	if(lightFactorDistance > 0) {
-		const double							lightFactorDirectional		= ::gpk::max(0.0, (lightPosition - voxelCenter).Normalize().Dot(::gpk::VOXEL_FACE_NORMALS[iFace]));	
+		const double							lightFactorDirectional		= ::gpk::max(0.0, (lightPosition - voxelCenter).Normalize().Dot(::gpk::VOXEL_NORMALS[iFace]));	
 		::gpk::SColorFloat						colorDiffuse				= cellColor * lightFactorDirectional;
 		(faceColor[iFace] += colorDiffuse * lightFactorDistance).Clamp(); 
 	}
@@ -241,7 +241,7 @@ static	::gpk::error_t						drawVoxelFace
 					const double							lightFactorDistance			= ::gpk::clamp(1.0 - lightDistance.Length() * .001, 0.0, 1.0);
 					::gpk::SColorFloat						faceColor					= colorAmbient * lightFactorDistance;
 					if(lightFactorDistance > 0 && lightFactorDistance < 0) {
-						const double							lightFactorDirectional		= ::gpk::max(0.0, lightDistance.Normalize().Dot(::gpk::VOXEL_FACE_NORMALS[iFace]));	
+						const double							lightFactorDirectional		= ::gpk::max(0.0, lightDistance.Normalize().Dot(::gpk::VOXEL_NORMALS[iFace]));	
 						::gpk::SColorFloat						colorDiffuse				= sliceMaterial.Diffuse * lightFactorDirectional;
 						(faceColor += colorDiffuse * lightFactorDistance).Clamp(); 
 					}
@@ -321,7 +321,7 @@ static	::gpk::error_t						drawVoxelFace
 		for(uint32_t iFace = 0; iFace < 6; ++iFace) {
 			::gpk::SColorBGRA						color						= rgba[cellValues[iFace] ? cellValues[iFace] - 1 : 0];
 			if(0 == cellValues[iFace] || color.a < 0xFF)
-				hasFace = (renderFaces[iFace] = cameraFront.Dot(::gpk::VOXEL_FACE_NORMALS[iFace]) <= 0.35) || hasFace;
+				hasFace = (renderFaces[iFace] = cameraFront.Dot(::gpk::VOXEL_NORMALS[iFace]) <= 0.35) || hasFace;
 		}
 
 		if(false == hasFace)
@@ -367,7 +367,7 @@ struct SCamera {
 	::gpk::SNearFar											nearFar										= {0.1f , 1000.0f};
 
 	static constexpr const ::gpk::SCoord3<float>			cameraUp									= {0, 1, 0};	// ? cam't remember what is this. Radians? Eulers?
-	::SCamera												camera										= {{350, 100, 0}, {25, 0, 25}};
+	::SCamera												camera										= {{100, 50, 0}, {25, 0, 25}};
 	//camera.Position *= 2.0f;
 	::gpk::SCoord3<float>									lightPos									= {150, 50, 0};
 	static float											cameraRotation								= 0;
@@ -404,7 +404,7 @@ struct SCamera {
 	::SFragmentCache										pixelCache;
 	pixelCache.TargetPixels								= backBuffer->Color;
 	pixelCache.TargetDepth								= backBuffer->DepthStencil;
-	bool													drawFromSource				= false;
+	bool													drawFromSource				= true;
 	for(uint32_t iModel = 0; iModel < app.VOXModelMaps.size(); ++iModel) {
 		const ::gpk::SVoxelMap<uint8_t>							& voxelMap					= app.VOXModelMaps[iModel];
 		const ::gpk::SCoord3<float>								position					= {(float)xOffset, 0.0f, (float)zOffset};

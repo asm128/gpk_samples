@@ -30,18 +30,24 @@
     <ClInclude Include="gpk_engine_renderbuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="gpk_engine_renderimage.h">
+    <ClInclude Include="gpk_engine_rendersurface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="gpk_engine_scene.h">
+    <ClInclude Include="gpk_engine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="gpk_engine_entity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="gpk_engine_namedresource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test_gpk_mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpk_engine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

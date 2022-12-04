@@ -4,9 +4,9 @@
 #include "application.h"
 #include "gpk_collision.h"
 
-					::gpk::error_t										updateInput									(::SApplication& applicationInstance)											{
-	::gpk::SInput																& inputSystem								= *applicationInstance.Framework.Input;
-	::SGame																		& gameInstance								= applicationInstance.Game;
+					::gpk::error_t										updateInput									(::SApplication& app)											{
+	::gpk::SInput																& inputSystem								= *app.Framework.Input;
+	::SGame																		& gameInstance								= app.Game;
 	::SShipState																& ship0State								= gameInstance.Ships.States[0];
 	ship0State.Firing														= inputSystem.KeyboardCurrent.KeyState['T'] != 0;
 	ship0State.Thrust														= inputSystem.KeyboardCurrent.KeyState['Y'] != 0;
@@ -39,9 +39,9 @@
 	}
 
 	if(inputSystem.KeyDown('P'))
-		applicationInstance.Paused												= !applicationInstance.Paused;
+		app.Paused												= !app.Paused;
 	if(inputSystem.KeyDown(VK_F2))
-		applicationInstance.Debugging											= !applicationInstance.Debugging;
+		app.Debugging											= !app.Debugging;
 
 	for(uint32_t iShip = 0, shipCount = gameInstance.ShipsPlaying; iShip < shipCount; ++iShip)
 		gameInstance.Ships.Direction[iShip].InPlaceNormalize();
@@ -92,20 +92,20 @@ static				::gpk::error_t										checkLaserCollision
 }
 
 template <size_t _sizeAlive>
-					::gpk::error_t										updateLineOfFire							(::SApplication & applicationInstance, ::SAABBCache& aabbCache, uint32_t iShip, float halfSizeBox, const ::gpk::SLine2<float>& projectilePath, const ::gpk::array_static<::gpk::SCoord2<float>, _sizeAlive>& positions, const ::SArrayElementState<_sizeAlive>& alive)	{
-	::SGame																		& gameInstance								= applicationInstance.Game;
+					::gpk::error_t										updateLineOfFire							(::SApplication & app, ::SAABBCache& aabbCache, uint32_t iShip, float halfSizeBox, const ::gpk::SLine2<float>& projectilePath, const ::gpk::array_static<::gpk::SCoord2<float>, _sizeAlive>& positions, const ::SArrayElementState<_sizeAlive>& alive)	{
+	::SGame																		& gameInstance								= app.Game;
 	for(uint32_t iEnemy = 0; iEnemy < alive.size(); ++iEnemy) {
 		if(0 == alive[iEnemy])
 			continue;
 		const ::gpk::SCoord2<float>													& posEnemy									= positions[iEnemy];
-		if(1 == ::checkLaserCollision(projectilePath, aabbCache, posEnemy, halfSizeBox, applicationInstance.StuffToDraw.CollisionPoints))
+		if(1 == ::checkLaserCollision(projectilePath, aabbCache, posEnemy, halfSizeBox, app.StuffToDraw.CollisionPoints))
 			gameInstance.Ships.LineOfFire[iShip]										= true;
 	}
 	return 0;
 }
-					::gpk::error_t										updateShips									(::SApplication & applicationInstance)			{
-	::gpk::SFramework															& framework									= applicationInstance.Framework;
-	::SGame																		& gameInstance			 					= applicationInstance.Game;
+					::gpk::error_t										updateShips									(::SApplication & app)			{
+	::gpk::SFramework															& framework									= app.Framework;
+	::SGame																		& gameInstance			 					= app.Game;
 	const ::gpk::SCoord2<uint32_t>												& offscreenMetrics							= framework.MainDisplayOffscreen->Color.View.metrics();
 	for(uint32_t iShip = 0, shipCount = gameInstance.ShipsPlaying; iShip < shipCount; ++iShip) { // Update ship positions
 		if(0 == gameInstance.Ships.Alive[iShip])
@@ -131,8 +131,8 @@ template <size_t _sizeAlive>
 		projectilePath.A.y														-= 1;
 		projectilePath.B.y														-= 1;
 		gameInstance.Ships.LineOfFire[iShip]										= false;
-		::updateLineOfFire(applicationInstance, aabbCache, iShip, gameInstance.HalfWidthEnemy	, projectilePath, gameInstance.Enemies	.Position, gameInstance.Enemies	.Alive);
-		::updateLineOfFire(applicationInstance, aabbCache, iShip, gameInstance.HalfWidthPowerup	, projectilePath, gameInstance.Powerups	.Position, gameInstance.Powerups.Alive);
+		::updateLineOfFire(app, aabbCache, iShip, gameInstance.HalfWidthEnemy	, projectilePath, gameInstance.Enemies	.Position, gameInstance.Enemies	.Alive);
+		::updateLineOfFire(app, aabbCache, iShip, gameInstance.HalfWidthPowerup	, projectilePath, gameInstance.Powerups	.Position, gameInstance.Powerups.Alive);
 	}
 
 	// Pick up powerups
@@ -143,7 +143,7 @@ template <size_t _sizeAlive>
 			if(0 == gameInstance.Powerups.Alive[iPow])
 				continue;
 
-			float																		collisionDistance							= (applicationInstance.Game.HalfWidthShip + applicationInstance.Game.HalfWidthPowerup);
+			float																		collisionDistance							= (app.Game.HalfWidthShip + app.Game.HalfWidthPowerup);
 			if((gameInstance.Powerups.Position[iPow] - gameInstance.Ships.Position[iShip]).LengthSquared() > (collisionDistance * collisionDistance))
 				continue;
 			::SPowerup																	& powerup									= gameInstance.Powerups.Type[iPow];
@@ -177,8 +177,8 @@ template <size_t _sizeAlive>
 		projectilePath.A.y														-= 1;
 		projectilePath.B.y														-= 1;
 		gameInstance.Ships.LineOfFire[iShip]										= false;
-		::updateLineOfFire(applicationInstance, aabbCache, iShip, gameInstance.HalfWidthEnemy	, projectilePath, gameInstance.Enemies	.Position, gameInstance.Enemies	.Alive);
-		::updateLineOfFire(applicationInstance, aabbCache, iShip, gameInstance.HalfWidthPowerup	, projectilePath, gameInstance.Powerups	.Position, gameInstance.Powerups.Alive);
+		::updateLineOfFire(app, aabbCache, iShip, gameInstance.HalfWidthEnemy	, projectilePath, gameInstance.Enemies	.Position, gameInstance.Enemies	.Alive);
+		::updateLineOfFire(app, aabbCache, iShip, gameInstance.HalfWidthPowerup	, projectilePath, gameInstance.Powerups	.Position, gameInstance.Powerups.Alive);
 	}
 	return 0;
 }
@@ -225,39 +225,39 @@ static				::gpk::error_t										updateEffectParticles						(float lastFrameSec
 	return 0;
 }
 
-static				::gpk::error_t										integrateParticleVelocity					(::SApplication& applicationInstance)											{
-	::gpk::SFramework															& framework									= applicationInstance.Framework;
+static				::gpk::error_t										integrateParticleVelocity					(::SApplication& app)											{
+	::gpk::SFramework															& framework									= app.Framework;
 	const float																	lastFrameSeconds							= (float)framework.FrameInfo.Seconds.LastFrame;
-	ree_if(errored(applicationInstance.ParticleSystemThrust			.Integrator.Integrate(lastFrameSeconds, framework.FrameInfo.Seconds.LastFrameHalfSquared)), "Not sure why would this fail.");
-	ree_if(errored(applicationInstance.ParticleSystemDebris			.Integrator.Integrate(lastFrameSeconds, framework.FrameInfo.Seconds.LastFrameHalfSquared)), "Not sure why would this fail.");
-	ree_if(errored(applicationInstance.ParticleSystemProjectiles	.Integrator.Integrate(lastFrameSeconds, framework.FrameInfo.Seconds.LastFrameHalfSquared)), "Not sure why would this fail.");
-	ree_if(errored(applicationInstance.ParticleSystemStars			.Integrator.Integrate(lastFrameSeconds, framework.FrameInfo.Seconds.LastFrameHalfSquared)), "Not sure why would this fail.");
+	ree_if(errored(app.ParticleSystemThrust			.Integrator.Integrate(lastFrameSeconds, framework.FrameInfo.Seconds.LastFrameHalfSquared)), "Not sure why would this fail.");
+	ree_if(errored(app.ParticleSystemDebris			.Integrator.Integrate(lastFrameSeconds, framework.FrameInfo.Seconds.LastFrameHalfSquared)), "Not sure why would this fail.");
+	ree_if(errored(app.ParticleSystemProjectiles	.Integrator.Integrate(lastFrameSeconds, framework.FrameInfo.Seconds.LastFrameHalfSquared)), "Not sure why would this fail.");
+	ree_if(errored(app.ParticleSystemStars			.Integrator.Integrate(lastFrameSeconds, framework.FrameInfo.Seconds.LastFrameHalfSquared)), "Not sure why would this fail.");
 	return 0;
 }
 
-					::gpk::error_t										updateParticles								(::SApplication& applicationInstance)											{
-	gpk_necall(::integrateParticleVelocity(applicationInstance), "???");
-	::gpk::SFramework															& framework									= applicationInstance.Framework;
+					::gpk::error_t										updateParticles								(::SApplication& app)											{
+	gpk_necall(::integrateParticleVelocity(app), "???");
+	::gpk::SFramework															& framework									= app.Framework;
 	::gpk::clear
-		( applicationInstance.StuffToDraw.ProjectilePaths
-		, applicationInstance.StuffToDraw.CollisionPoints
-		, applicationInstance.StuffToDraw.Debris
-		, applicationInstance.StuffToDraw.Thrust
-		, applicationInstance.StuffToDraw.Stars
+		( app.StuffToDraw.ProjectilePaths
+		, app.StuffToDraw.CollisionPoints
+		, app.StuffToDraw.Debris
+		, app.StuffToDraw.Thrust
+		, app.StuffToDraw.Stars
 		);
 	const ::gpk::SCoord2<uint32_t>												& offscreenViewMetrics						= framework.MainDisplayOffscreen->Color.View.metrics();
-	gpk_necall(::removeDeadParticles(applicationInstance.ParticleSystemThrust		.Integrator, applicationInstance.ParticleSystemThrust		.Instances, offscreenViewMetrics), "???");
-	gpk_necall(::removeDeadParticles(applicationInstance.ParticleSystemDebris		.Integrator, applicationInstance.ParticleSystemDebris		.Instances, offscreenViewMetrics), "???");
-	gpk_necall(::removeDeadParticles(applicationInstance.ParticleSystemProjectiles	.Integrator, applicationInstance.ParticleSystemProjectiles	.Instances, offscreenViewMetrics), "???");
-	gpk_necall(::removeDeadParticles(applicationInstance.ParticleSystemStars		.Integrator, applicationInstance.ParticleSystemStars		.Instances, offscreenViewMetrics), "???");
+	gpk_necall(::removeDeadParticles(app.ParticleSystemThrust		.Integrator, app.ParticleSystemThrust		.Instances, offscreenViewMetrics), "???");
+	gpk_necall(::removeDeadParticles(app.ParticleSystemDebris		.Integrator, app.ParticleSystemDebris		.Instances, offscreenViewMetrics), "???");
+	gpk_necall(::removeDeadParticles(app.ParticleSystemProjectiles	.Integrator, app.ParticleSystemProjectiles	.Instances, offscreenViewMetrics), "???");
+	gpk_necall(::removeDeadParticles(app.ParticleSystemStars		.Integrator, app.ParticleSystemStars		.Instances, offscreenViewMetrics), "???");
 	const float																	lastFrameSeconds							= (float)framework.FrameInfo.Seconds.LastFrame;
-	::updateEffectParticles(lastFrameSeconds, applicationInstance.ParticleSystemThrust.Integrator, applicationInstance.ParticleSystemThrust.Instances, applicationInstance.StuffToDraw.Thrust);
-	::updateEffectParticles(lastFrameSeconds, applicationInstance.ParticleSystemDebris.Integrator, applicationInstance.ParticleSystemDebris.Instances, applicationInstance.StuffToDraw.Debris);
-	::updateEffectParticles(lastFrameSeconds, applicationInstance.ParticleSystemStars .Integrator, applicationInstance.ParticleSystemStars .Instances, applicationInstance.StuffToDraw.Stars );
+	::updateEffectParticles(lastFrameSeconds, app.ParticleSystemThrust.Integrator, app.ParticleSystemThrust.Instances, app.StuffToDraw.Thrust);
+	::updateEffectParticles(lastFrameSeconds, app.ParticleSystemDebris.Integrator, app.ParticleSystemDebris.Instances, app.StuffToDraw.Debris);
+	::updateEffectParticles(lastFrameSeconds, app.ParticleSystemStars .Integrator, app.ParticleSystemStars .Instances, app.StuffToDraw.Stars );
 	{ // Projectiles
 		typedef	::SApplication::TParticleInstance									TParticleInstance;
-		::SApplication::TIntegrator													& particleIntegrator						= applicationInstance.ParticleSystemProjectiles.Integrator;
-		::gpk::array_pod<TParticleInstance>											& particleInstances							= applicationInstance.ParticleSystemProjectiles.Instances;
+		::SApplication::TIntegrator													& particleIntegrator						= app.ParticleSystemProjectiles.Integrator;
+		::gpk::array_pod<TParticleInstance>											& particleInstances							= app.ParticleSystemProjectiles.Instances;
 		for(uint32_t iParticle = 0; iParticle < particleInstances.size(); ++iParticle) {
 			TParticleInstance															& particleInstance							= particleInstances[iParticle];
 			int32_t																		physicsId									= particleInstance.IndexParticlePhysics;
@@ -265,14 +265,14 @@ static				::gpk::error_t										integrateParticleVelocity					(::SApplication&
 			TParticle																	& particleNext								= particleIntegrator.ParticleNext	[physicsId];
 			TParticle																	& particleCurrent							= particleIntegrator.Particle		[physicsId];
 			const ::SLaserToDraw														laserToDraw									= {physicsId, (int32_t)iParticle, ::gpk::SLine2<float>{particleCurrent.Position, particleNext.Position}};
-			applicationInstance.StuffToDraw.ProjectilePaths.push_back(laserToDraw);
+			app.StuffToDraw.ProjectilePaths.push_back(laserToDraw);
 			particleInstance.Binding.TimeLived										+= lastFrameSeconds;
 		}
 	}
-	memcpy(applicationInstance.ParticleSystemThrust			.Integrator.Particle.begin(), applicationInstance.ParticleSystemThrust		.Integrator.ParticleNext.begin(), sizeof(::SApplication::TParticle) * applicationInstance.ParticleSystemThrust		.Integrator.ParticleState.size());
-	memcpy(applicationInstance.ParticleSystemDebris			.Integrator.Particle.begin(), applicationInstance.ParticleSystemDebris		.Integrator.ParticleNext.begin(), sizeof(::SApplication::TParticle) * applicationInstance.ParticleSystemDebris		.Integrator.ParticleState.size());
-	memcpy(applicationInstance.ParticleSystemProjectiles	.Integrator.Particle.begin(), applicationInstance.ParticleSystemProjectiles	.Integrator.ParticleNext.begin(), sizeof(::SApplication::TParticle) * applicationInstance.ParticleSystemProjectiles	.Integrator.ParticleState.size());
-	memcpy(applicationInstance.ParticleSystemStars			.Integrator.Particle.begin(), applicationInstance.ParticleSystemStars		.Integrator.ParticleNext.begin(), sizeof(::SApplication::TParticle) * applicationInstance.ParticleSystemStars		.Integrator.ParticleState.size());
+	memcpy(app.ParticleSystemThrust			.Integrator.Particle.begin(), app.ParticleSystemThrust		.Integrator.ParticleNext.begin(), sizeof(::SApplication::TParticle) * app.ParticleSystemThrust		.Integrator.ParticleState.size());
+	memcpy(app.ParticleSystemDebris			.Integrator.Particle.begin(), app.ParticleSystemDebris		.Integrator.ParticleNext.begin(), sizeof(::SApplication::TParticle) * app.ParticleSystemDebris		.Integrator.ParticleState.size());
+	memcpy(app.ParticleSystemProjectiles	.Integrator.Particle.begin(), app.ParticleSystemProjectiles	.Integrator.ParticleNext.begin(), sizeof(::SApplication::TParticle) * app.ParticleSystemProjectiles	.Integrator.ParticleState.size());
+	memcpy(app.ParticleSystemStars			.Integrator.Particle.begin(), app.ParticleSystemStars		.Integrator.ParticleNext.begin(), sizeof(::SApplication::TParticle) * app.ParticleSystemStars		.Integrator.ParticleState.size());
 	return 0;
 }
 
@@ -322,7 +322,7 @@ static				::gpk::error_t										addProjectile								(::SGame & gameInstance, 
 
 template <size_t _sizeAlive>
 static				::gpk::error_t										updateSpawnShots
-	( ::SApplication												& applicationInstance
+	( ::SApplication												& app
 	, const ::gpk::view_array<::SApplication::TParticle>			& particleDefinitions
 	, uint32_t														maxShips
 	, const ::gpk::array_static<::gpk::SCoord2<float>, _sizeAlive>	& positions
@@ -333,10 +333,10 @@ static				::gpk::error_t										updateSpawnShots
 	, PLAYER_TYPE													playerType
 	)
 {
-	::gpk::SFramework															& framework									= applicationInstance.Framework;
-	::SGame																		& gameInstance								= applicationInstance.Game;
-	::gpk::array_pod<::SApplication::TParticleInstance>							& particleInstances							= applicationInstance.ParticleSystemProjectiles.Instances;
-	::SApplication::TIntegrator													& particleIntegrator						= applicationInstance.ParticleSystemProjectiles.Integrator;
+	::gpk::SFramework															& framework									= app.Framework;
+	::SGame																		& gameInstance								= app.Game;
+	::gpk::array_pod<::SApplication::TParticleInstance>							& particleInstances							= app.ParticleSystemProjectiles.Instances;
+	::SApplication::TIntegrator													& particleIntegrator						= app.ParticleSystemProjectiles.Integrator;
 	for(uint32_t iShip = 0, shipCount = maxShips; iShip < shipCount; ++iShip) {
 		if(0 == alive[iShip])
 			continue;
@@ -355,8 +355,8 @@ static				::gpk::error_t										updateSpawnShots
 				gameParticle.TypePlayer													= playerType;
 				gameParticle.IndexWeapon												= (int8_t)weapons[iShip].IndexProperties;
 				gameParticle.TypeWeapon													= ::weaponProperties[gameParticle.IndexWeapon].TypeWeapon;
-				const ::gpk::SCoord2<float>													textureShipMetrics							= applicationInstance.Textures[textureIndex].Processed.View.metrics().Cast<float>();
-				const ::gpk::SCoord2<float>													weaponParticleOffset						= {textureShipMetrics.x - (textureShipMetrics.x - applicationInstance.TextureCenters[textureIndex].x), -1};
+				const ::gpk::SCoord2<float>													textureShipMetrics							= app.Textures[textureIndex].Processed.View.metrics().Cast<float>();
+				const ::gpk::SCoord2<float>													weaponParticleOffset						= {textureShipMetrics.x - (textureShipMetrics.x - app.TextureCenters[textureIndex].x), -1};
 				const ::gpk::SCoord2<float>													shotDirection								= (playerType == PLAYER_TYPE_PLAYER) ? ::gpk::SCoord2<float>{1.0f, 0.0f} :
 					(gameInstance.Ships.Position[rand() % gameInstance.ShipsPlaying] - gameInstance.Enemies.Position[iShip]).InPlaceNormalize();
 				int32_t																		projectileIndex								= ::addProjectile(gameInstance, iShip, gameParticle.TypePlayer, gameParticle.TypeWeapon, weaponProp.Speed);
@@ -370,22 +370,22 @@ static				::gpk::error_t										updateSpawnShots
 }
 
 					::gpk::error_t										updateSpawn
-	( ::SApplication										& applicationInstance
+	( ::SApplication										& app
 	, const ::gpk::view_array<::SApplication::TParticle>	& particleDefinitions
 	)
 {
-	::gpk::SFramework															& framework									= applicationInstance.Framework;
+	::gpk::SFramework															& framework									= app.Framework;
 	auto																		& offscreen									= framework.MainDisplayOffscreen->Color;
 	// Add some effect particles
-	applicationInstance.EffectsDelay.Thrust									+= framework.FrameInfo.Seconds.LastFrame;
-	::SGame																		& gameInstance								= applicationInstance.Game;
+	app.EffectsDelay.Thrust									+= framework.FrameInfo.Seconds.LastFrame;
+	::SGame																		& gameInstance								= app.Game;
 	{
-		::gpk::array_pod<::SApplication::TParticleInstance>							& particleInstances							= applicationInstance.ParticleSystemThrust.Instances;
-		::SApplication::TIntegrator													& particleIntegrator						= applicationInstance.ParticleSystemThrust.Integrator;
+		::gpk::array_pod<::SApplication::TParticleInstance>							& particleInstances							= app.ParticleSystemThrust.Instances;
+		::SApplication::TIntegrator													& particleIntegrator						= app.ParticleSystemThrust.Integrator;
 		for(uint32_t iShip = 0, shipCount = gameInstance.ShipsPlaying; iShip < shipCount; ++iShip) {
 			if(0 == gameInstance.Ships.Alive[iShip])
 				continue;
-			if(applicationInstance.EffectsDelay.Thrust > .01) { // Add thrust particles.
+			if(app.EffectsDelay.Thrust > .01) { // Add thrust particles.
 				for(int32_t i = 0, particleCountToSpawn = 1 + rand() % 4; i < particleCountToSpawn; ++i) {
 					::SGameParticle																gameParticle;
 					gameParticle.OwnerIndex													= iShip;
@@ -393,17 +393,17 @@ static				::gpk::error_t										updateSpawnShots
 					gameParticle.Type														= PARTICLE_TYPE_SHIP_THRUST;
 					gameParticle.TypePlayer													= PLAYER_TYPE_PLAYER;
 					gameParticle.Lit														= 0 == (rand() % 2);
-					::addParticle(gameParticle, particleInstances, particleIntegrator, gameInstance.Ships.Position[iShip] + applicationInstance.PSOffsetFromShipCenter.Cast<float>(), gameInstance.Ships.Direction[iShip] * -1.0, (float)(rand() % 400) + (gameInstance.Ships.States[iShip].Thrust ? 400 : 0), particleDefinitions);
+					::addParticle(gameParticle, particleInstances, particleIntegrator, gameInstance.Ships.Position[iShip] + app.PSOffsetFromShipCenter.Cast<float>(), gameInstance.Ships.Direction[iShip] * -1.0, (float)(rand() % 400) + (gameInstance.Ships.States[iShip].Thrust ? 400 : 0), particleDefinitions);
 				}
 			}
 		}
 	}
 	{
-		::gpk::array_pod<::SApplication::TParticleInstance>							& particleInstances							= applicationInstance.ParticleSystemStars.Instances;
-		::SApplication::TIntegrator													& particleIntegrator						= applicationInstance.ParticleSystemStars.Integrator;
-		applicationInstance.EffectsDelay.Star									+= framework.FrameInfo.Seconds.LastFrame;
-		if( applicationInstance.EffectsDelay.Star > .1 ) {
-			applicationInstance.EffectsDelay.Star									= 0;
+		::gpk::array_pod<::SApplication::TParticleInstance>							& particleInstances							= app.ParticleSystemStars.Instances;
+		::SApplication::TIntegrator													& particleIntegrator						= app.ParticleSystemStars.Integrator;
+		app.EffectsDelay.Star									+= framework.FrameInfo.Seconds.LastFrame;
+		if( app.EffectsDelay.Star > .1 ) {
+			app.EffectsDelay.Star									= 0;
 			bool																		bFastStarFromThrust							= false;
 			for(uint32_t iShip = 0, shipCount = gameInstance.ShipsPlaying; iShip < shipCount; ++iShip) {
 				if(0 == gameInstance.Ships.Alive[iShip])
@@ -420,18 +420,18 @@ static				::gpk::error_t										updateSpawnShots
 			::addParticle(gameParticle, particleInstances, particleIntegrator, {offscreen.View.metrics().x - 1.0f, (float)(rand() % offscreen.View.metrics().y)}, {-1, 0}, (float)(rand() % (bFastStarFromThrust ? 400 : 75)) + 25, particleDefinitions);
 		}
 	}
-	::updateSpawnShots(applicationInstance, particleDefinitions, gameInstance.ShipsPlaying			, gameInstance.Ships	.Position, gameInstance.Ships	.WeaponDelay, gameInstance.Ships	.Weapon, gameInstance.Ships		.States, gameInstance.Ships		.Alive, PLAYER_TYPE_PLAYER	);
-	::updateSpawnShots(applicationInstance, particleDefinitions, gameInstance.Enemies.Alive.size()	, gameInstance.Enemies	.Position, gameInstance.Enemies	.WeaponDelay, gameInstance.Enemies	.Weapon, gameInstance.Enemies	.States, gameInstance.Enemies	.Alive, PLAYER_TYPE_ENEMY	);
+	::updateSpawnShots(app, particleDefinitions, gameInstance.ShipsPlaying			, gameInstance.Ships	.Position, gameInstance.Ships	.WeaponDelay, gameInstance.Ships	.Weapon, gameInstance.Ships		.States, gameInstance.Ships		.Alive, PLAYER_TYPE_PLAYER	);
+	::updateSpawnShots(app, particleDefinitions, gameInstance.Enemies.Alive.size()	, gameInstance.Enemies	.Position, gameInstance.Enemies	.WeaponDelay, gameInstance.Enemies	.Weapon, gameInstance.Enemies	.States, gameInstance.Enemies	.Alive, PLAYER_TYPE_ENEMY	);
 	return 0;
 }
 
-					::gpk::error_t										removeDeadStuff								(::SApplication& applicationInstance)					{
-	::SGame																		& gameInstance								= applicationInstance.Game;
+					::gpk::error_t										removeDeadStuff								(::SApplication& app)					{
+	::SGame																		& gameInstance								= app.Game;
 	::gpk::view_bit<uint64_t>												& projectilesAlive							= gameInstance.Projectiles.Alive;
 	for(uint32_t iProjectile = 0, projectileCount = projectilesAlive.size(); iProjectile < projectileCount; ++iProjectile) {
 		if(projectilesAlive[iProjectile]) {
 			::SProjectile																& projectile								= gameInstance.Projectiles.Projectiles[iProjectile];
-			projectile.TimeLived													+= applicationInstance.Framework.FrameInfo.Seconds.LastFrame;
+			projectile.TimeLived													+= app.Framework.FrameInfo.Seconds.LastFrame;
 			if(projectile.TimeLived > 0.1) {
 				projectilesAlive[iProjectile]											= 0;
 				--gameInstance.CountProjectiles;
@@ -461,23 +461,23 @@ static				::gpk::error_t										spawnPowOfRandomType						(::SGame & gameInsta
 }
 
 					::gpk::error_t										updateShots
-	( ::SApplication										& applicationInstance
+	( ::SApplication										& app
 	, const ::gpk::view_array<::SApplication::TParticle>	& particleDefinitions
 	)
 {
-	::SGame																		& gameInstance								= applicationInstance.Game;
-	applicationInstance.StuffToDraw.CollisionPoints.clear();
+	::SGame																		& gameInstance								= app.Game;
+	app.StuffToDraw.CollisionPoints.clear();
 	::SAABBCache																aabbCache;
-	::gpk::array_pod<::SApplication::TParticleInstance>							& particleInstances							= applicationInstance.ParticleSystemProjectiles.Instances;
-	for(uint32_t iProjectilePath = 0, projectilePathCount = applicationInstance.StuffToDraw.ProjectilePaths.size(); iProjectilePath < projectilePathCount; ++iProjectilePath) {
-		const ::SLaserToDraw														& laserToDraw								= applicationInstance.StuffToDraw.ProjectilePaths[iProjectilePath];
+	::gpk::array_pod<::SApplication::TParticleInstance>							& particleInstances							= app.ParticleSystemProjectiles.Instances;
+	for(uint32_t iProjectilePath = 0, projectilePathCount = app.StuffToDraw.ProjectilePaths.size(); iProjectilePath < projectilePathCount; ++iProjectilePath) {
+		const ::SLaserToDraw														& laserToDraw								= app.StuffToDraw.ProjectilePaths[iProjectilePath];
 		const ::gpk::SLine2<float>													& projectilePath							= laserToDraw.Segment;
 		for(uint32_t iPow = 0; iPow < gameInstance.Powerups.Alive.size(); ++iPow) { // Check powerup
 			if(0 == gameInstance.Powerups.Alive[iPow])
 				continue;
 			const ::gpk::SCoord2<float>													& posPowerup								= gameInstance.Powerups.Position[iPow];
-			float																		halfSizeBox									= (float)applicationInstance.TextureCenters[GAME_TEXTURE_POWCORESQUARE].x;
-			if(1 == ::checkLaserCollision(projectilePath, aabbCache, posPowerup, halfSizeBox, applicationInstance.StuffToDraw.CollisionPoints)) {
+			float																		halfSizeBox									= (float)app.TextureCenters[GAME_TEXTURE_POWCORESQUARE].x;
+			if(1 == ::checkLaserCollision(projectilePath, aabbCache, posPowerup, halfSizeBox, app.StuffToDraw.CollisionPoints)) {
 
 			}
 		}
@@ -491,9 +491,9 @@ static				::gpk::error_t										spawnPowOfRandomType						(::SGame & gameInsta
 				if(0 == gameInstance.Enemies.Alive[iEnemy])
 					continue;
 				const ::gpk::SCoord2<float>													& posEnemy									= gameInstance.Enemies.Position[iEnemy];
-				const float																	halfSizeBox									= (float)applicationInstance.TextureCenters[GAME_TEXTURE_ENEMY].x;
+				const float																	halfSizeBox									= (float)app.TextureCenters[GAME_TEXTURE_ENEMY].x;
 				::SHealthPoints																& enemyHealth								= gameInstance.Enemies.Health[iEnemy];
-				if(1 == ::checkLaserCollision(projectilePath, aabbCache, posEnemy, halfSizeBox, applicationInstance.StuffToDraw.CollisionPoints)) {
+				if(1 == ::checkLaserCollision(projectilePath, aabbCache, posEnemy, halfSizeBox, app.StuffToDraw.CollisionPoints)) {
 					float																		damegePorportion							= ::gpk::max(.5f, (rand() % 0x7FFF) / (65535.0f/2));
 					enemyHealth.Health														-= (int32_t)(::weaponProperties[weapon.IndexProperties].Damage * (1.0f - damegePorportion));
 					enemyHealth.Shield														-= (int32_t)(::weaponProperties[weapon.IndexProperties].Damage * damegePorportion);
@@ -511,9 +511,9 @@ static				::gpk::error_t										spawnPowOfRandomType						(::SGame & gameInsta
 				static constexpr const ::gpk::SCoord2<float>								reference									= {1, 0};
 				::gpk::SCoord2<float>														vector;
 				for(uint32_t iGhost = 0; iGhost < 5; ++iGhost) {
-					vector																	= reference * (64 * sin(applicationInstance.Framework.FrameInfo.Seconds.Total));
+					vector																	= reference * (64 * sin(app.Framework.FrameInfo.Seconds.Total));
 					vector.Rotate(::gpk::math_2pi / 5 * iGhost + gameInstance.Enemies.TimeLived[iEnemy]);
-					if(1 == ::checkLaserCollision(projectilePath, aabbCache, posEnemy + vector, halfSizeBox, applicationInstance.StuffToDraw.CollisionPoints)) {
+					if(1 == ::checkLaserCollision(projectilePath, aabbCache, posEnemy + vector, halfSizeBox, app.StuffToDraw.CollisionPoints)) {
 						particleInstance.Binding.TimeLived										= 9999999.f;
 					}
 				}
@@ -524,9 +524,9 @@ static				::gpk::error_t										spawnPowOfRandomType						(::SGame & gameInsta
 				if(0 == gameInstance.Ships.Alive[iShip])
 					continue;
 				const ::gpk::SCoord2<float>													& posEnemy									= gameInstance.Ships.Position[iShip];
-				const float																	halfSizeBox									= (float)applicationInstance.TextureCenters[GAME_TEXTURE_SHIP0 + iShip].x;
+				const float																	halfSizeBox									= (float)app.TextureCenters[GAME_TEXTURE_SHIP0 + iShip].x;
 				::SHealthPoints																& enemyHealth								= gameInstance.Ships.Health[iShip];
-				if(1 == ::checkLaserCollision(projectilePath, aabbCache, posEnemy, halfSizeBox, applicationInstance.StuffToDraw.CollisionPoints)) {
+				if(1 == ::checkLaserCollision(projectilePath, aabbCache, posEnemy, halfSizeBox, app.StuffToDraw.CollisionPoints)) {
 					float																		damegePorportion							= ::gpk::max(.5f, (rand() % 5001) / 5000.0f);
 					enemyHealth.Health														-= (int32_t)(weaponProperties[weapon.IndexProperties].Speed * (1.0f - damegePorportion));
 					enemyHealth.Shield														-= (int32_t)(weaponProperties[weapon.IndexProperties].Speed * damegePorportion);
@@ -541,7 +541,7 @@ static				::gpk::error_t										spawnPowOfRandomType						(::SGame & gameInsta
 		}
 	}
 
-	for(uint32_t iCollision = 0, collisionCount = applicationInstance.StuffToDraw.CollisionPoints.size(); iCollision < collisionCount; ++iCollision)
+	for(uint32_t iCollision = 0, collisionCount = app.StuffToDraw.CollisionPoints.size(); iCollision < collisionCount; ++iCollision)
 		for(uint32_t i=0; i < 10; ++i) {
 			::gpk::SCoord2<float>	angle	= {(float)-(rand() % 20) - 10, (float)(rand() % 20 - 1 - 10)};
 			angle.InPlaceNormalize();
@@ -550,20 +550,20 @@ static				::gpk::error_t										spawnPowOfRandomType						(::SGame & gameInsta
 			gameParticle.Type														= PARTICLE_TYPE_DEBRIS;
 			gameParticle.Lit														= 0 == (rand()% 2);
 			gameParticle.TypePlayer													= PLAYER_TYPE_PLAYER;
-			::addParticle(gameParticle, applicationInstance.ParticleSystemDebris.Instances, applicationInstance.ParticleSystemDebris.Integrator, applicationInstance.StuffToDraw.CollisionPoints[iCollision], angle, (float)(rand() % 400) + 100, particleDefinitions);
+			::addParticle(gameParticle, app.ParticleSystemDebris.Instances, app.ParticleSystemDebris.Integrator, app.StuffToDraw.CollisionPoints[iCollision], angle, (float)(rand() % 400) + 100, particleDefinitions);
 		}
 	return 0;
 }
 
-					::gpk::error_t										updateGUI									(::SApplication& applicationInstance)					{
-	::SGame																		& gameInstance								= applicationInstance.Game;
+					::gpk::error_t										updateGUI									(::SApplication& app)					{
+	::SGame																		& gameInstance								= app.Game;
 	for(uint32_t iShip = 0, shipCount = gameInstance.ShipsPlaying; iShip < shipCount; ++iShip) {	//  ------ update crosshair collision points with lasers
 		if(0 == gameInstance.Ships.Alive[iShip])
 			continue;
 		const ::gpk::SCoord2<float>													& posXHair									= gameInstance.PositionCrosshair[iShip];
-		for(uint32_t iProjectilePath = 0, projectilePathCount = applicationInstance.StuffToDraw.ProjectilePaths.size(); iProjectilePath < projectilePathCount; ++iProjectilePath) {
-			const ::SLaserToDraw														& laserToDraw								= applicationInstance.StuffToDraw.ProjectilePaths[iProjectilePath];
-			const ::SApplication::TParticleInstance										& particleInstance							= applicationInstance.ParticleSystemProjectiles.Instances[laserToDraw.IndexParticleInstance];
+		for(uint32_t iProjectilePath = 0, projectilePathCount = app.StuffToDraw.ProjectilePaths.size(); iProjectilePath < projectilePathCount; ++iProjectilePath) {
+			const ::SLaserToDraw														& laserToDraw								= app.StuffToDraw.ProjectilePaths[iProjectilePath];
+			const ::SApplication::TParticleInstance										& particleInstance							= app.ParticleSystemProjectiles.Instances[laserToDraw.IndexParticleInstance];
 			if(particleInstance.Binding.OwnerIndex != iShip || particleInstance.Binding.TypePlayer != PLAYER_TYPE_PLAYER)
 				continue;
 			float																		halfSizeBox									= gameInstance.HalfWidthCrosshair;
@@ -586,7 +586,7 @@ static				::gpk::error_t										spawnPowOfRandomType						(::SGame & gameInsta
 						}
 					}
 					if(false == bFound)
- 						applicationInstance.StuffToDraw.CollisionPoints.push_back(collision);
+ 						app.StuffToDraw.CollisionPoints.push_back(collision);
 				}
 			}
 		}
@@ -635,10 +635,10 @@ static				::gpk::error_t												spawnEnemy										(::SGame & gameInstance,
 	return 0;
 }
 
-					::gpk::error_t												updateEnemies									(::SApplication & applicationInstance)			{
-	::gpk::SFramework																	& framework										= applicationInstance.Framework;
+					::gpk::error_t												updateEnemies									(::SApplication & app)			{
+	::gpk::SFramework																	& framework										= app.Framework;
 	const ::gpk::SCoord2<uint32_t>														& offscreenMetrics								= framework.MainDisplayOffscreen->Color.View.metrics();
-	::SGame																				& gameInstance									= applicationInstance.Game;
+	::SGame																				& gameInstance									= app.Game;
 	gameInstance.GhostTimer															+= framework.FrameInfo.Seconds.LastFrame;
 	static float																		timerSpawn										= 0;
 	timerSpawn																		+= (float)framework.FrameInfo.Seconds.LastFrame;
@@ -671,7 +671,7 @@ static				::gpk::error_t												spawnEnemy										(::SGame & gameInstance,
 			}
 			else {
 				directionEnemy.InPlaceNormalize();
-				enemyPosition															+= directionEnemy * (float)(framework.FrameInfo.Seconds.LastFrame * 100);// * (applicationInstance.ShipState.Brakes ? .25f : (applicationInstance.ShipState.Thrust ? 2 : 1));
+				enemyPosition															+= directionEnemy * (float)(framework.FrameInfo.Seconds.LastFrame * 100);// * (app.ShipState.Brakes ? .25f : (app.ShipState.Thrust ? 2 : 1));
 			}
 		}
 	}

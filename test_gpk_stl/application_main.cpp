@@ -18,36 +18,36 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "Title");
 
 					::SApplication										* g_ApplicationInstance						= 0;
 
-static				::gpk::error_t										updateSizeDependentResources				(::SApplication& applicationInstance)											{
-	const ::gpk::SCoord2<uint32_t>												newSize										= applicationInstance.Framework.MainDisplay.Size;
-	::gpk::updateSizeDependentTarget(applicationInstance.Framework.MainDisplayOffscreen->Color, newSize);
+static				::gpk::error_t										updateSizeDependentResources				(::SApplication& app)											{
+	const ::gpk::SCoord2<uint32_t>												newSize										= app.Framework.MainDisplay.Size;
+	::gpk::updateSizeDependentTarget(app.Framework.MainDisplayOffscreen->Color, newSize);
 	return 0;
 }
 
 // --- Cleanup application resources.
-					::gpk::error_t										cleanup										(::SApplication& applicationInstance)											{
-	::gpk::SWindowPlatformDetail												& displayDetail								= applicationInstance.Framework.MainDisplay.PlatformDetail;
-	::gpk::mainWindowDestroy(applicationInstance.Framework.MainDisplay);
+					::gpk::error_t										cleanup										(::SApplication& app)											{
+	::gpk::SWindowPlatformDetail												& displayDetail								= app.Framework.MainDisplay.PlatformDetail;
+	::gpk::mainWindowDestroy(app.Framework.MainDisplay);
 	::UnregisterClass(displayDetail.WindowClassName, displayDetail.WindowClass.hInstance);
 	g_ApplicationInstance													= 0;
 	return 0;
 }
 
 
-					::gpk::error_t										setup										(::SApplication& applicationInstance)											{
-	g_ApplicationInstance													= &applicationInstance;
-	::gpk::SFramework															& framework									= applicationInstance.Framework;
+					::gpk::error_t										setup										(::SApplication& app)											{
+	g_ApplicationInstance													= &app;
+	::gpk::SFramework															& framework									= app.Framework;
 	::gpk::SWindow																& mainWindow								= framework.MainDisplay;
 	mainWindow.Size														= {640, 480};
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?!");
 
-	::gpk::SSTLFile																& stlFile									= applicationInstance.STLFile;
+	::gpk::SSTLFile																& stlFile									= app.STLFile;
 	::gpk::stlFileLoad("Base Flat v5.stl", stlFile);
-	applicationInstance.CubePositions.resize(stlFile.Triangles.size());
+	app.CubePositions.resize(stlFile.Triangles.size());
 
 	static constexpr const ::gpk::SCoord3<float>								cubeCenter									= {0.5f, 0.5f, 0.5f};
-	for(uint32_t iTriangle = 0; iTriangle < applicationInstance.CubePositions.size(); ++iTriangle) {
-		::gpk::STriangle3<float>													& transformedTriangle						= applicationInstance.CubePositions[iTriangle];
+	for(uint32_t iTriangle = 0; iTriangle < app.CubePositions.size(); ++iTriangle) {
+		::gpk::STriangle3<float>													& transformedTriangle						= app.CubePositions[iTriangle];
 		transformedTriangle														= stlFile.Triangles[iTriangle].Triangle;
 
 		float a = transformedTriangle.A.z
@@ -72,19 +72,19 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 		//transformedTriangle.B.Scale(.05);
 		//transformedTriangle.C.Scale(.05);
 	}
-	ree_if	(errored(::updateSizeDependentResources	(applicationInstance)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
+	ree_if	(errored(::updateSizeDependentResources	(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
 	return 0;
 }
 
-					::gpk::error_t										update										(::SApplication& applicationInstance, bool systemRequestedExit)					{
+					::gpk::error_t										update										(::SApplication& app, bool systemRequestedExit)					{
 	retval_ginfo_if(1, systemRequestedExit, "Exiting because the runtime asked for close. We could also ignore this value and just continue execution if we don't want to exit.");
-	::gpk::error_t																frameworkResult								= ::gpk::updateFramework(applicationInstance.Framework);
+	::gpk::error_t																frameworkResult								= ::gpk::updateFramework(app.Framework);
 	ree_if(errored(frameworkResult), "Unknown error.");
 	rvi_if(1, frameworkResult == 1, "Framework requested close. Terminating execution.");
-	ree_if(errored(::updateSizeDependentResources(applicationInstance)), "Cannot update offscreen and this could cause an invalid memory access later on.");
+	ree_if(errored(::updateSizeDependentResources(app)), "Cannot update offscreen and this could cause an invalid memory access later on.");
 	//-----------------------------
-	::gpk::STimer																& timer										= applicationInstance.Framework.Timer;
-	::gpk::SWindow																& mainWindow								= applicationInstance.Framework.MainDisplay;
+	::gpk::STimer																& timer										= app.Framework.Timer;
+	::gpk::SWindow																& mainWindow								= app.Framework.MainDisplay;
 	char																		buffer		[256]							= {};
 	sprintf_s(buffer, "[%u x %u]. FPS: %g. Last frame seconds: %g.", mainWindow.Size.x, mainWindow.Size.y, 1 / timer.LastTimeSeconds, timer.LastTimeSeconds);
 	::HWND																		windowHandle								= mainWindow.PlatformDetail.WindowHandle;
@@ -97,19 +97,19 @@ struct SCamera {
 						::gpk::SCoord3<float>								Position, Target;
 };
 
-					::gpk::error_t										draw										(::SApplication& applicationInstance)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
-	::gpk::SFramework															& framework									= applicationInstance.Framework;
+					::gpk::error_t										draw										(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
+	::gpk::SFramework															& framework									= app.Framework;
 
 	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>			backBuffer;
 	backBuffer->resize(framework.MainDisplayOffscreen->Color.metrics(), 0xFF000080, (uint32_t)-1);
 
-	::gpk::SSTLFile																& stlFile									= applicationInstance.STLFile;
+	::gpk::SSTLFile																& stlFile									= app.STLFile;
 
 	//------------------------------------------------
 	::gpk::array_pod<::gpk::STriangle3<float>>									triangle3dList								= {};
 	::gpk::array_pod<::gpk::SColorBGRA>											triangle3dColorList							= {};
-	triangle3dList.resize(applicationInstance.CubePositions.size());
-	triangle3dColorList.resize(applicationInstance.CubePositions.size());
+	triangle3dList.resize(app.CubePositions.size());
+	triangle3dColorList.resize(app.CubePositions.size());
 	::gpk::SMatrix4<float>														projection									= {};
 	::gpk::SMatrix4<float>														viewMatrix									= {};
 	projection.Identity();
@@ -140,15 +140,15 @@ struct SCamera {
 	viewport._43															= (float)(-nearFar.Near * ( 1.0f / (nearFar.Far - nearFar.Near) ));
 	viewport._44															= 1.0f;
 	projection																= projection * viewport.GetInverse();
-	for(uint32_t iTriangle = 0; iTriangle < applicationInstance.CubePositions.size(); ++iTriangle) {
+	for(uint32_t iTriangle = 0; iTriangle < app.CubePositions.size(); ++iTriangle) {
 		::gpk::STriangle3<float>													& transformedTriangle						= triangle3dList[iTriangle];
-		transformedTriangle														= applicationInstance.CubePositions[iTriangle];
+		transformedTriangle														= app.CubePositions[iTriangle];
 		::gpk::transform(transformedTriangle, projection);
 	}
 	::gpk::array_pod<::gpk::STriangle2<int32_t>>								triangle2dList								= {};
-	triangle2dList.resize(applicationInstance.CubePositions.size());
+	triangle2dList.resize(app.CubePositions.size());
 	const ::gpk::SCoord2<int32_t>												screenCenter								= {(int32_t)offscreenMetrics.x / 2, (int32_t)offscreenMetrics.y / 2};
-	for(uint32_t iTriangle = 0; iTriangle < applicationInstance.CubePositions.size(); ++iTriangle) { // Maybe the scale
+	for(uint32_t iTriangle = 0; iTriangle < app.CubePositions.size(); ++iTriangle) { // Maybe the scale
 		::gpk::STriangle3<float>													& transformedTriangle3D						= triangle3dList[iTriangle];
 		::gpk::STriangle2<int32_t>													& transformedTriangle2D						= triangle2dList[iTriangle];
 		transformedTriangle2D.A													= {(int32_t)transformedTriangle3D.A.x, (int32_t)transformedTriangle3D.A.y};
@@ -157,14 +157,14 @@ struct SCamera {
 		::gpk::translate(transformedTriangle2D, screenCenter);
 	}
 
-	for(uint32_t iTriangle = 0; iTriangle < applicationInstance.CubePositions.size(); ++iTriangle) {
+	for(uint32_t iTriangle = 0; iTriangle < app.CubePositions.size(); ++iTriangle) {
 		double																		lightFactor									= stlFile.Triangles[iTriangle].Normal.Dot(lightPos);
 		triangle3dColorList[iTriangle]											= (::gpk::RED * lightFactor).Clamp();
 	}
 	::gpk::array_pod<::gpk::SCoord2<int32_t>>									trianglePixelCoords;
 	::gpk::array_pod<::gpk::SCoord2<int32_t>>									wireframePixelCoords;
 	::gpk::SCoord3<float> cameraFront = (camera.Target - camera.Position).Normalize();
-	for(uint32_t iTriangle = 0; iTriangle < applicationInstance.CubePositions.size(); ++iTriangle) {
+	for(uint32_t iTriangle = 0; iTriangle < app.CubePositions.size(); ++iTriangle) {
 		//double																		lightFactor									= stlFile.Triangles[iTriangle].Normal.Dot(cameraFront);
 		//if(lightFactor > 0)
 		//	continue;

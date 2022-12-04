@@ -43,6 +43,7 @@ namespace gpk
 	struct SRenderMesh {
 		::gpk::SMeshDescription						Desc;
 		::gpk::array_pod<uint32_t>					GeometryBuffers;
+		::gpk::array_pod<uint32_t>					ConstantBuffers;
 		::gpk::array_pod<::gpk::SGeometrySlice>		GeometrySlices;
 	};	
 
@@ -59,8 +60,17 @@ namespace gpk
 	};
 
 	struct SMeshManager {
-		::gpk::array_pobj<::gpk::SRenderMesh>		Meshes;
-		::gpk::array_pobj<::gpk::SSkin>				Skins;
+		::gpk::array_pobj<::gpk::SRenderMesh>		Meshes			= {};
+		::gpk::array_pobj<::gpk::SSkin>				Skins			= {};
+
+		::gpk::array_obj<::gpk::vcc>				MeshNames		= {};
+		::gpk::array_obj<::gpk::vcc>				SkinNames		= {};
+
+		::gpk::error_t								CreateMesh		()	{ MeshNames.push_back({}); return Meshes .push_back({}); }
+		::gpk::error_t								CreateSkin		()	{ SkinNames.push_back({}); return Skins  .push_back({}); }
+
+		::gpk::error_t								DeleteMesh		(uint32_t index)	{ MeshNames.remove_unordered(index); return Meshes .remove_unordered(index); }
+		::gpk::error_t								DeleteSkin		(uint32_t index)	{ SkinNames.remove_unordered(index); return Skins  .remove_unordered(index); }
 	};
 } // namespace
 

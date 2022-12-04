@@ -1,4 +1,4 @@
-#include "gpk_engine_scene.h"
+#include "gpk_engine.h"
 
 #include "gpk_view_grid.h"
 
@@ -108,6 +108,8 @@ struct SApplication {
 	::gpk::SGUI								GUI											= {};
 	::gpk::STriangle3	<float>				CubePositions[12]							= {};
 	int32_t									IdViewport									= -1;
+
+	::gpk::SEngine							Engine										= {};
 
 											SApplication								(::gpk::SRuntimeValues& runtimeValues)			noexcept	: Framework(runtimeValues) {}
 };
