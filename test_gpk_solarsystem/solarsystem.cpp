@@ -71,7 +71,7 @@ static	int											drawDebris			(::gpk::view_grid<::gpk::SColorBGRA> targetPix
 	return 0;
 }
 
-int													updateEntityTransforms		(uint32_t iEntity, ::gpk::array_obj<::ssg::SEntity> & entities, ssg::SScene & scene, ::gpk::SIntegrator3 & bodies)	{
+int													updateEntityTransforms		(uint32_t iEntity, ::gpk::array_obj<::ssg::SEntity> & entities, ssg::SScene & scene, ::gpk::SRigidBodyIntegrator & bodies)	{
 	const ssg::SEntity										& entity					= entities[iEntity];
 	if(-1 == entity.Body)
 		scene.Transform[iEntity]							= (-1 == entity.Parent) ? bodies.MatrixIdentity4 : scene.Transform[entity.Parent];
@@ -93,7 +93,7 @@ int													updateEntityTransforms		(uint32_t iEntity, ::gpk::array_obj<::ss
 
 int													ssg::solarSystemUpdate			(ssg::SSolarSystemGame & solarSystem, double secondsLastFrame, ::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>> & target)	{
 	// ------------------------------------------- Handle input
-	::gpk::SIntegrator3										& bodies						= solarSystem.Bodies;
+	::gpk::SRigidBodyIntegrator								& bodies						= solarSystem.Bodies;
 	::ssg::SScene											& scene							= solarSystem.Scene;
 
 	scene.Transform.resize(solarSystem.Entities.size());

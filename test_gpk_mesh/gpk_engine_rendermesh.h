@@ -1,5 +1,4 @@
 #include "gpk_engine_rendercolor.h"
-#include "gpk_engine_renderbuffer.h"
 #include "gpk_matrix.h"
 #include "gpk_ptr.h"
 
@@ -35,26 +34,32 @@ namespace gpk
 
 #pragma pack(push, 1)
 	struct SMeshDescription {
-		GEOMETRY_TYPE								Type;
-		MESH_MODE									Mode;
-		NORMAL_MODE									NormalMode;
+		::gpk::GEOMETRY_TYPE						Type;
+		::gpk::MESH_MODE							Mode;
+		::gpk::NORMAL_MODE							NormalMode;
 	};
 #pragma pack(pop)
 
-	struct SMesh {
-		SMeshDescription							Desc;
+	struct SRenderMesh {
+		::gpk::SMeshDescription						Desc;
 		::gpk::array_pod<uint32_t>					GeometryBuffers;
-		::gpk::array_pod<SGeometrySlice>			GeometrySlices;
+		::gpk::array_pod<::gpk::SGeometrySlice>		GeometrySlices;
 	};	
-	
+
+#pragma pack(push, 1)
+	struct SRenderMaterial {
+		::gpk::SRenderColor							Color;
+		float										SpecularPower;
+	};
+#pragma pack(pop)
+
 	struct SSkin {
-		::gpk::SMaterial							Material;
+		::gpk::SRenderMaterial						Material;
 		::gpk::array_pod<uint32_t>					Textures;
 	};
 
 	struct SMeshManager {
-		::gpk::array_pobj<::gpk::SRenderBuffer>		Buffers;
-		::gpk::array_pobj<::gpk::SMesh>				Meshes;
+		::gpk::array_pobj<::gpk::SRenderMesh>		Meshes;
 		::gpk::array_pobj<::gpk::SSkin>				Skins;
 	};
 } // namespace

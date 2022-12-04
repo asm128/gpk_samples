@@ -1,6 +1,4 @@
-#include "gpk_engine_renderimage.h"
-#include "gpk_engine_rendernode.h"
-#include "gpk_engine_rendermesh.h"
+#include "gpk_engine_scene.h"
 
 #include "gpk_view_grid.h"
 

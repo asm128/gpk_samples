@@ -167,11 +167,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="gpk_engine_scene.h" />
     <ClInclude Include="gpk_engine_renderbuffer.h" />
     <ClInclude Include="gpk_engine_rendercolor.h" />
     <ClInclude Include="gpk_engine_renderimage.h" />
     <ClInclude Include="gpk_engine_rendermesh.h" />
     <ClInclude Include="gpk_engine_rendernode.h" />
+    <ClInclude Include="gpk_engine_entity.h" />
     <ClInclude Include="test_gpk_mesh.h" />
   </ItemGroup>
   <ItemGroup>

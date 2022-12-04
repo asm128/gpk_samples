@@ -11,11 +11,6 @@ namespace gpk
 		::gpk::SColorFloat							Diffuse;
 		::gpk::SColorFloat							Specular;
 	};
-
-	struct SMaterial {
-		::gpk::SRenderColor							Color;
-		float										SpecularPower;
-	};
 #pragma pack(pop)
 
 } // namespace

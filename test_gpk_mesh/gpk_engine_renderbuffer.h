@@ -45,6 +45,11 @@ namespace gpk
 			return 0;
 		}
 	};
+
+	struct SRenderBufferManager {
+		::gpk::array_pobj<::gpk::SRenderBuffer>		Buffers;
+	};
+
 } // namespace
 
 #endif

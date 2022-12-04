@@ -210,7 +210,7 @@ namespace ssg
 		::ssg::SSolarSystem										SolarSystem						= {};
 		::ssg::SDebris											SunFire							= {};
 		::ssg::SScene											Scene							= {};
-		::gpk::SIntegrator3										Bodies							= {};
+		::gpk::SRigidBodyIntegrator								Bodies							= {};
 		::gpk::array_obj<::ssg::SEntity>						Entities						= {};
 		::gpk::array_obj<::gpk::SImage<::gpk::SColorBGRA>>		Images							= {};
 		::gpk::array_obj<::gpk::SGeometryIndexedTriangles>		Geometries						= {};

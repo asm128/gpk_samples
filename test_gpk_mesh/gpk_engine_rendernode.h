@@ -11,9 +11,12 @@ namespace gpk
 #pragma pack(push, 1)
 	// ------------------ Render Node
 	struct SRenderNodeFlags {
-		bool										Ambient;
-		bool										Diffuse;
-		bool										Specular;
+		bool										NoAmbient		: 1;
+		bool										NoDiffuse		: 1;
+		bool										NoSpecular		: 1;
+		bool										NoAlphaTest		: 1;
+		bool										NoAlphaBlend	: 1;
+		bool										NoDraw			: 1;
 	};
 
 	struct SRenderNode {
@@ -27,25 +30,25 @@ namespace gpk
 	GDEFINE_ENUM_VALUE(LIGHT_TYPE, Point		, 1);
 	GDEFINE_ENUM_VALUE(LIGHT_TYPE, Spot			, 2);
 
-	struct SSpotLight {
+	struct SLightSpot {
 		::gpk::SCoord3<float>						Direction;
 		::gpk::SRenderColor							Color;
 		float										SpotPower;
 		float										Range;
 	};
 
-	struct SPointLight {
+	struct SLightPoint {
 		::gpk::SRenderColor							Color;
 		float										Range;
 	};
 
-	struct SDirectionalLight {
+	struct SLightDirectional {
 		::gpk::SCoord3<float>						Direction;
 		::gpk::SRenderColor							Color;
 	};
 
 	struct SLight {
-		LIGHT_TYPE									Type;
+		::gpk::LIGHT_TYPE							Type;
 		uint16_t									Index;
 	};
 
@@ -57,11 +60,33 @@ namespace gpk
 	};
 #pragma pack(pop)
 
-	struct SNodeRenderer {
-		::gpk::array_pod<::gpk::SRenderNode		>				RenderNodes;
-		::gpk::array_pod<::gpk::SMatrix4<float>	>				RenderNodeTransforms;
-		::gpk::array_pobj<::gpk::array_pod<::gpk::SLight	>>	RenderNodeLights;
-		::gpk::array_pobj<::gpk::array_pod<::gpk::SCamera	>>	RenderNodeCameras;
+	struct SRenderNodeManager {
+		::gpk::array_pod <::gpk::SRenderNode						>	RenderNodes				= {};
+		::gpk::array_pod <::gpk::SRenderNodeFlags					>	RenderNodeFlags			= {};
+		::gpk::array_pod <::gpk::SMatrix4<float>					>	RenderNodeTransforms	= {};
+		::gpk::array_pobj<::gpk::array_pod<::gpk::SLight	>		>	RenderNodeLights		= {};
+		::gpk::array_pobj<::gpk::array_pod<::gpk::SCamera	>		>	RenderNodeCameras		= {};
+
+		// 
+		::gpk::array_pobj<::gpk::array_pod<::gpk::SLightDirectional	>>	LightsDirectional		= {};
+		::gpk::array_pobj<::gpk::array_pod<::gpk::SLightPoint		>>	LightsPoint				= {};
+		::gpk::array_pobj<::gpk::array_pod<::gpk::SLightSpot		>>	LightsSpot				= {};
+
+		::gpk::error_t											CreateRenderNode		()	{
+			RenderNodeTransforms	.push_back({});
+			RenderNodeLights		.push_back({});
+			RenderNodeCameras		.push_back({});
+			RenderNodeFlags			.push_back({});
+			return RenderNodes		.push_back({});
+		}
+
+		::gpk::error_t											DeleteRenderNode		(uint32_t indexNode)	{
+			RenderNodeTransforms	.remove_unordered(indexNode);
+			RenderNodeLights		.remove_unordered(indexNode);
+			RenderNodeCameras		.remove_unordered(indexNode);
+			RenderNodeFlags			.remove_unordered(indexNode);
+			return RenderNodes		.remove_unordered(indexNode);
+		}
 	};
 } // namespace
 

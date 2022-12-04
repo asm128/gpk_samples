@@ -34,16 +34,16 @@ int													ssg::solarSystemSetup				(::ssg::SSolarSystemGame & solarSystem,
 	::gpk::geometryBuildSphere(solarSystem.Geometries[0], 16U, 16U, 1, {});
 //	::gpk::geometryBuildFromSTL();
 
-	SPlanet				planet			= {};
-	SPlanetDetail		planetdetail	= {};
-	SStar				star			= {};
-	SStarDetail			stardetail		= {};
+	SPlanet													planet								= {};
+	SPlanetDetail											planetdetail						= {};
+	SStar													star								= {};
+	SStarDetail												stardetail							= {};
 
-	::gpk::SIntegrator3										& bodies						= solarSystem.Bodies;
-	::ssg::SScene											& scene							= solarSystem.Scene;
+	::gpk::SRigidBodyIntegrator								& bodies							= solarSystem.Bodies;
+	::ssg::SScene											& scene								= solarSystem.Scene;
 	//if constexpr(false && filename.size()) {
 	if (filename.size() && 0 == filename.size()) {
-		::gpk::SJSONFile					solarSystemFile	= {};
+		::gpk::SJSONFile					solarSystemFile			= {};
 		::gpk::jsonFileRead(solarSystemFile, filename);
 		::gpk::array_pod<int32_t>			stellarBodyIndices;
 		const uint32_t						stellarBodyCount		= ::gpk::jsonObjectKeyList(solarSystemFile.Reader, 0, stellarBodyIndices);
