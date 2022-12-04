@@ -1,102 +1,15 @@
-#include "gpk_enum.h"
-#include "gpk_array.h"
-#include "gpk_coord.h"
-#include "gpk_datatype.h"
-#include "gpk_ptr.h"
+#include "gpk_engine_renderimage.h"
+#include "gpk_engine_rendernode.h"
+#include "gpk_engine_rendermesh.h"
+
+#include "gpk_view_grid.h"
 
 #ifndef GPK_MESH_H_324234234
 #define GPK_MESH_H_324234234
 
+
 namespace gpk
 {
-	GDEFINE_ENUM_TYPE(BUFFER_USAGE, uint8_t);
-	GDEFINE_ENUM_VALUE(BUFFER_USAGE, Position		,  0);
-	GDEFINE_ENUM_VALUE(BUFFER_USAGE, Index			,  1);
-	GDEFINE_ENUM_VALUE(BUFFER_USAGE, Color			,  2);
-	GDEFINE_ENUM_VALUE(BUFFER_USAGE, ColorIndex		,  3);
-	GDEFINE_ENUM_VALUE(BUFFER_USAGE, Normal			,  4);
-	GDEFINE_ENUM_VALUE(BUFFER_USAGE, UV				,  5);
-	GDEFINE_ENUM_VALUE(BUFFER_USAGE, Shadow			,  6);
-	GDEFINE_ENUM_VALUE(BUFFER_USAGE, Light			,  7);
-	GDEFINE_ENUM_VALUE(BUFFER_USAGE, BlendIndex		,  8);
-	GDEFINE_ENUM_VALUE(BUFFER_USAGE, BlendWeight	,  9);
-	GDEFINE_ENUM_VALUE(BUFFER_USAGE, ImageColors	, 10);
-	GDEFINE_ENUM_VALUE(BUFFER_USAGE, ImageIndices	, 11);
-	GDEFINE_ENUM_VALUE(BUFFER_USAGE, Palette		, 12);
-
-#pragma pack(push, 1)
-	struct SRenderBufferDesc {
-		::gpk::DATA_TYPE							Format	= {};
-		BUFFER_USAGE								Usage	= {};
-		uint8_t										Stride	= {};
-		uint16_t									Width	= {};
-	};
-#pragma pack(pop)
-
-	struct SRenderBuffer {
-		SRenderBufferDesc							Desc	= {};
-		::gpk::array_pod<uint8_t>					Data	= {};
-
-		::gpk::error_t								Save	(::gpk::array_pod<byte_t> & output)		{ 			
-			gpk_necs(::gpk::viewWrite(::gpk::view_array<const ::gpk::SRenderBufferDesc>{&Desc, 1}, output));
-			gpk_necs(::gpk::viewWrite(::gpk::view_const_uint8{Data}, output));
-			return 0; 
-		}
-
-		::gpk::error_t								Load	(::gpk::view_array<const byte_t> & input)	{ 
-			gpk_necs(::gpk::loadPOD (input, Desc));
-			gpk_necs(::gpk::loadView(input, Data));
-			return 0;
-		}
-	};
-
-#pragma pack(push, 1)
-	struct SGeometrySlice {
-		::gpk::SRange<uint32_t>						Slice;
-		uint32_t									Skin;
-	};
-#pragma pack(pop)
-
-	GDEFINE_ENUM_TYPE(NORMAL_MODE, uint8_t);
-	GDEFINE_ENUM_VALUE(NORMAL_MODE, Point			, 0);
-	GDEFINE_ENUM_VALUE(NORMAL_MODE, Line			, 1);
-	GDEFINE_ENUM_VALUE(NORMAL_MODE, Triangle		, 2);
-	GDEFINE_ENUM_VALUE(NORMAL_MODE, Quad			, 3);
-
-	GDEFINE_ENUM_TYPE(MESH_MODE, uint8_t);
-	GDEFINE_ENUM_VALUE(MESH_MODE, List				, 0);
-	GDEFINE_ENUM_VALUE(MESH_MODE, Strip				, 1);
-	GDEFINE_ENUM_VALUE(MESH_MODE, Fan				, 2);
-
-	GDEFINE_ENUM_TYPE(GEOMETRY_TYPE, uint8_t);
-	GDEFINE_ENUM_VALUE(GEOMETRY_TYPE, Point			, 0);
-	GDEFINE_ENUM_VALUE(GEOMETRY_TYPE, Line			, 1);
-	GDEFINE_ENUM_VALUE(GEOMETRY_TYPE, Triangle		, 2);
-	GDEFINE_ENUM_VALUE(GEOMETRY_TYPE, Quad			, 3);
-
-	struct SMesh {
-		GEOMETRY_TYPE								Type;
-		MESH_MODE									Mode;
-		NORMAL_MODE									NormalMode;
-		::gpk::array_pod<uint32_t>					GeometryBuffers;
-		::gpk::array_pod<uint32_t>					GeometrySlices;
-	};	
-	
-	struct SMeshManager {
-		::gpk::array_pobj<::gpk::SRenderBuffer>		Buffers;
-		::gpk::array_pobj<::gpk::SMesh>				Meshes;
-		::gpk::array_pod<::gpk::SGeometrySlice>		Geometries;
-
-		::gpk::error_t								CreateTriangle	()	{ return 0; }
-		::gpk::error_t								CreateRectangle	()	{ return 0; }
-		::gpk::error_t								CreateCircle	()	{ return 0; }
-		::gpk::error_t								CreateRing		()	{ return 0; }
-		::gpk::error_t								CreateBox		()	{ return 0; }
-		::gpk::error_t								CreateGrid		()	{ return 0; }
-		::gpk::error_t								CreateCylinder	()	{ return 0; }
-	};
-
-
 	GDEFINE_ENUM_TYPE(SHAPE_TYPE, uint8_t);
 	GDEFINE_ENUM_VALUE(SHAPE_TYPE, Custom		, 0);
 	GDEFINE_ENUM_VALUE(SHAPE_TYPE, Rectangle	, 1);

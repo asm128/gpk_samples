@@ -1,0 +1,68 @@
+#include "gpk_engine_rendercolor.h"
+#include "gpk_ptr.h"
+#include "gpk_view_grid.h"
+#include "gpk_matrix.h"
+
+#ifndef GPK_ENGINE_RENDERNODE_H
+#define GPK_ENGINE_RENDERNODE_H
+
+namespace gpk 
+{
+#pragma pack(push, 1)
+	// ------------------ Render Node
+	struct SRenderNodeFlags {
+		bool										Ambient;
+		bool										Diffuse;
+		bool										Specular;
+	};
+
+	struct SRenderNode {
+		uint32_t									Mesh;
+		uint32_t									Slice;
+		uint32_t									Transform;
+	};
+	
+	GDEFINE_ENUM_TYPE(LIGHT_TYPE, uint8_t);
+	GDEFINE_ENUM_VALUE(LIGHT_TYPE, Directional	, 0);
+	GDEFINE_ENUM_VALUE(LIGHT_TYPE, Point		, 1);
+	GDEFINE_ENUM_VALUE(LIGHT_TYPE, Spot			, 2);
+
+	struct SSpotLight {
+		::gpk::SCoord3<float>						Direction;
+		::gpk::SRenderColor							Color;
+		float										SpotPower;
+		float										Range;
+	};
+
+	struct SPointLight {
+		::gpk::SRenderColor							Color;
+		float										Range;
+	};
+
+	struct SDirectionalLight {
+		::gpk::SCoord3<float>						Direction;
+		::gpk::SRenderColor							Color;
+	};
+
+	struct SLight {
+		LIGHT_TYPE									Type;
+		uint16_t									Index;
+	};
+
+	struct SCamera {
+		::gpk::SCoord3<float>						Front;
+		::gpk::SCoord3<float>						Up;
+		::gpk::SCoord3<float>						Right;
+		double										Angle;
+	};
+#pragma pack(pop)
+
+	struct SNodeRenderer {
+		::gpk::array_pod<::gpk::SRenderNode		>				RenderNodes;
+		::gpk::array_pod<::gpk::SMatrix4<float>	>				RenderNodeTransforms;
+		::gpk::array_pobj<::gpk::array_pod<::gpk::SLight	>>	RenderNodeLights;
+		::gpk::array_pobj<::gpk::array_pod<::gpk::SCamera	>>	RenderNodeCameras;
+	};
+} // namespace
+
+#endif

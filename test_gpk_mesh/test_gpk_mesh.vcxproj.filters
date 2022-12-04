@@ -18,6 +18,21 @@
     <ClInclude Include="test_gpk_mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="gpk_engine_rendernode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gpk_engine_rendercolor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gpk_engine_rendermesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gpk_engine_renderbuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gpk_engine_renderimage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test_gpk_mesh.cpp">
