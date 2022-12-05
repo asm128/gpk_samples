@@ -100,30 +100,34 @@ namespace gpk
 #ifndef APPLICATION_H_098273498237423
 #define APPLICATION_H_098273498237423
 
+struct SVSCache {
+	::gpk::array_pod<::gpk::STriangle<float>>		TriangleWeights			= {};
+	::gpk::array_pod<::gpk::SCoord2<int16_t>>		SolidPixelCoords		= {};
+	::gpk::array_pod<::gpk::SCoord2<int16_t>>		WireframePixelCoords	= {};
+};
+
 struct SVSOutput {
-	::gpk::array_pod<::gpk::STriangle3<float>>			Positions								= {};
-	::gpk::array_pod<::gpk::STriangle3<float>>			Normals									= {};
+	::gpk::array_pod<::gpk::STriangle3<float>>		Positions				= {};
+	::gpk::array_pod<::gpk::STriangle3<float>>		Normals					= {};
 };
 
 struct SApplication {
-	::gpk::SFramework						Framework									;
+	::gpk::SFramework								Framework				;
 
-	::gpk::SImage<::gpk::SColorBGRA>		TextureFont									= {};
-	::gpk::SImageMonochrome<uint32_t>		TextureFontMonochrome						= {};
-	::gpk::SGUI								GUI											= {};
-	::gpk::STriangle3	<float>				CubePositions[12]							= {};
-	int32_t									IdViewport									= -1;
+	::gpk::SGUI										GUI						= {};
+	int32_t											IdViewport				= -1;
 
-	::gpk::SEngine							Engine										= {};
-	int32_t									EntityCamera								= -1;
-	int32_t									EntityLightDirectional						= -1;
-	int32_t									EntityLightPoint							= -1;
-	int32_t									EntityLightSpot								= -1;
-	int32_t									EntityBox									= -1;
+	::gpk::SEngine									Engine					= {};
+	int32_t											EntityCamera			= -1;
+	int32_t											EntityLightDirectional	= -1;
+	int32_t											EntityLightPoint		= -1;
+	int32_t											EntityLightSpot			= -1;
+	int32_t											EntityBox				= -1;
 
-	::SVSOutput								OutputVertexShader							= {};
+	::SVSOutput										OutputVertexShader		= {};
+	::SVSCache										CacheVertexShader		= {};
 
-											SApplication								(::gpk::SRuntimeValues& runtimeValues)			noexcept	: Framework(runtimeValues) {}
+													SApplication			(::gpk::SRuntimeValues& runtimeValues)			noexcept	: Framework(runtimeValues) {}
 };
 
 #endif // APPLICATION_H_098273498237423

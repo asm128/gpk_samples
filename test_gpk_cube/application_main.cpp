@@ -142,7 +142,7 @@ struct SCamera {
 	camera.Position	.RotateY(frameInfo.Microseconds.Total / 1000000.0f);
 	lightPos		.RotateY(frameInfo.Microseconds.Total /  500000.0f * -2);
 	viewMatrix.LookAt(camera.Position, camera.Target, cameraUp);
-	const ::gpk::SCoord2<uint32_t>												& offscreenMetrics							= backBuffer->Color.View.metrics();
+	const ::gpk::SCoord2<uint16_t>												& offscreenMetrics							= backBuffer->Color.View.metrics().Cast<uint16_t>();
 	projection.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, nearFar.Near, nearFar.Far );
 	projection																= viewMatrix * projection;
 	lightPos.Normalize();
@@ -175,8 +175,8 @@ struct SCamera {
 		double																		lightFactor									= geometryCubeNormals[iTriangle].Dot(lightPos);
 		triangle3dColorList[iTriangle]											= (::gpk::RED * lightFactor).Clamp();
 	}
-	::gpk::array_pod<::gpk::SCoord2<int32_t>>									trianglePixelCoords;
-	::gpk::array_pod<::gpk::SCoord2<int32_t>>									wireframePixelCoords;
+	::gpk::array_pod<::gpk::SCoord2<int16_t>>									trianglePixelCoords;
+	::gpk::array_pod<::gpk::SCoord2<int16_t>>									wireframePixelCoords;
 	::gpk::SCoord3<float> cameraFront = (camera.Target - camera.Position).Normalize();
 	for(uint32_t iTriangle = 0; iTriangle < 12; ++iTriangle) {
 		double																		lightFactor									= geometryCubeNormals[iTriangle].Dot(cameraFront);

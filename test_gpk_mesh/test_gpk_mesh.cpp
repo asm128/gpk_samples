@@ -31,41 +31,12 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	return 0;
 }
 
-// Vertex coordinates for cube faces
-static constexpr const ::gpk::STriangle3<float>						geometryCube	[12]						=
-	{ {{1.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}}	// Right	- first			?? I have no idea if this is correct lol
-	, {{1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 0.0f}}	// Right	- second		?? I have no idea if this is correct lol
-
-	, {{0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 0.0f}}	// Back		- first			?? I have no idea if this is correct lol
-	, {{0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}}	// Back		- second		?? I have no idea if this is correct lol
-
-	, {{1.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 0.0f}}	// Bottom	- first			?? I have no idea if this is correct lol
-	, {{1.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}}	// Bottom	- second		?? I have no idea if this is correct lol
-
-	, {{1.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}}	// Left		- first
-	, {{1.0f, 0.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 1.0f}}	// Left		- second
-
-	, {{1.0f, 0.0f, 1.0f}, {1.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}}	// Front	- first
-	, {{1.0f, 0.0f, 1.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 0.0f}}	// Front	- second
-
-	, {{1.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}}	// Top		- first
-	, {{1.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 1.0f}}	// Top		- second
-	};
-
 					::gpk::error_t										setup										(::SApplication& app)											{
 	::gpk::SFramework															& framework									= app.Framework;
 	::gpk::SWindow																& mainWindow								= framework.MainDisplay;
 	mainWindow.Size															= {640, 480};
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?!");
 
-	static constexpr const ::gpk::SCoord3<float>								cubeCenter									= {0.5f, 0.5f, 0.5f};
-	for(uint32_t iTriangle = 0; iTriangle < 12; ++iTriangle) {
-		::gpk::STriangle3<float>													& transformedTriangle						= app.CubePositions[iTriangle];
-		transformedTriangle														= geometryCube[iTriangle];
-		transformedTriangle.A													-= cubeCenter;
-		transformedTriangle.B													-= cubeCenter;
-		transformedTriangle.C													-= cubeCenter;
-	}
 	app.EntityCamera				= app.Engine.CreateCamera	();
 	app.EntityLightDirectional		= app.Engine.CreateLight	(::gpk::LIGHT_TYPE_Directional	);
 	app.EntityLightPoint			= app.Engine.CreateLight	(::gpk::LIGHT_TYPE_Point		);
@@ -98,28 +69,8 @@ static constexpr const ::gpk::STriangle3<float>						geometryCube	[12]						=
 	return 0;
 }
 
-static constexpr const ::gpk::SCoord3<float>						geometryCubeNormals	[12]						=
-	{ {0.0f, 0.0f, -1.0f}	// Right	- first			?? I have no idea if this is correct lol
-	, {0.0f, 0.0f, -1.0f}	// Right	- second		?? I have no idea if this is correct lol
-
-	, {-1.0f, 0.0f, 0.0f}	// Back		- first			?? I have no idea if this is correct lol
-	, {-1.0f, 0.0f, 0.0f}	// Back		- second		?? I have no idea if this is correct lol
-
-	, {0.0f, -1.0f, 0.0f}	// Bottom	- first			?? I have no idea if this is correct lol
-	, {0.0f, -1.0f, 0.0f}	// Bottom	- second		?? I have no idea if this is correct lol
-
-	, {0.0f, 0.0f, 1.0f}	// Left		- first
-	, {0.0f, 0.0f, 1.0f}	// Left		- second
-
-	, {1.0f, 0.0f, 0.0f}	// Front	- first
-	, {1.0f, 0.0f, 0.0f}	// Front	- second
-
-	, {0.0f, 1.0f, 0.0f}	// Top		- first
-	, {0.0f, 1.0f, 0.0f}	// Top		- second
-	};
-
 struct SCamera {
-						::gpk::SCoord3<float>								Position, Target;
+	::gpk::SCoord3<float>								Position, Target;
 };
 
 ::gpk::error_t										transformTriangles						
@@ -155,9 +106,58 @@ struct SCamera {
 }
 ::gpk::error_t										transformFragments						()	{ return 0; }
 
-					::gpk::error_t										drawIndexed								(::SApplication& app, ::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>	backBuffer)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
+::gpk::error_t										drawBuffers								
+	( ::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>	backBuffer
+	, ::SVSOutput											& outVS
+	, ::SVSCache											& cacheVS
+	, ::gpk::view_array<const uint16_t>						indices		
+	, ::gpk::view_array<const ::gpk::SCoord3<float>>		positions	
+	, ::gpk::view_array<const ::gpk::SCoord3<float>>		normals		
+	, ::gpk::view_array<const ::gpk::SCoord2<float>>		uv			
+	, const ::gpk::SRenderMaterial							& material	
+	, const ::gpk::SMatrix4<float>							& projection		
+	, const ::gpk::SNearFar									& nearFar 
+	, const ::gpk::SMatrix4<float>							& worldTransform	 
+	, const ::gpk::SCoord3<float>							& cameraFront
+	, const ::gpk::SCoord3<float>							& lightPos
+	) {	// 
+	(void)uv;
+	outVS												= {};
+	::transformTriangles(outVS, indices, positions, normals, projection, worldTransform, cameraFront);
+	::gpk::array_pod<::gpk::STriangle<float>>									& triangleWeights			= cacheVS.TriangleWeights		;
+	::gpk::array_pod<::gpk::SCoord2<int16_t>>									& trianglePixelCoords		= cacheVS.SolidPixelCoords		;
+	//::gpk::array_pod<::gpk::SCoord2<int16_t>>									& wireframePixelCoords		= cacheVS.WireframePixelCoords	;
+	for(uint32_t iTriangle = 0; iTriangle < outVS.Positions.size(); ++iTriangle) {
+		::gpk::STriangle3<float>													& triNormals								= outVS.Normals		[iTriangle];
+		::gpk::STriangle3<float>													& triPositions								= outVS.Positions	[iTriangle];
+		double																		directionFactor								= triNormals.A.Dot(cameraFront);
+		if(directionFactor > 0)
+			continue;
 
-	
+		double																		lightFactor									= triNormals.A.Dot(lightPos);
+		::gpk::SColorBGRA															color										= (material.Color.Ambient + material.Color.Diffuse * lightFactor).Clamp();
+		trianglePixelCoords.clear();
+		triangleWeights.clear();
+		gerror_if(errored(::gpk::drawTriangle(backBuffer->DepthStencil.View, nearFar, triPositions, trianglePixelCoords, triangleWeights)), "Not sure if these functions could ever fail");
+		for(uint32_t iCoord = 0; iCoord < trianglePixelCoords.size(); ++iCoord) {
+			::gpk::SCoord2<int16_t>								coord		= trianglePixelCoords[iCoord];
+			backBuffer->Color.View[coord.y][coord.x]		= color;
+		}
+
+		//wireframePixelCoords.clear();
+		//::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<int32_t>{triPositions.A.Cast<int32_t>(), triPositions.B.Cast<int32_t>()}, wireframePixelCoords);
+		//::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<int32_t>{triPositions.B.Cast<int32_t>(), triPositions.C.Cast<int32_t>()}, wireframePixelCoords);
+		//::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<int32_t>{triPositions.C.Cast<int32_t>(), triPositions.A.Cast<int32_t>()}, wireframePixelCoords);
+		//const ::gpk::SColorBGRA wireColor = ::gpk::ASCII_PALETTE[iTriangle % ::gpk::size(::gpk::ASCII_PALETTE)];
+		//for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord) {
+		//	::gpk::SCoord2<int16_t>								coord		= wireframePixelCoords[iCoord];
+		//	backBuffer->Color.View[coord.y][coord.x]		= wireColor;
+		//}
+	}
+	return 0;
+}
+
+					::gpk::error_t										drawIndexed								(::SApplication& app, ::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>	backBuffer)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	::gpk::SFramework															& framework									= app.Framework;
 	::gpk::SMatrix4<float>														projection									= {};
 	::gpk::SMatrix4<float>														viewMatrix									= {};
@@ -205,39 +205,7 @@ struct SCamera {
 	::gpk::view_array<const uint16_t>					indices					= {::gpk::VOXEL_FACE_INDICES_16	[0], 36};
 	::gpk::SRenderMaterial								material				= {::gpk::MAGENTA * .1, ::gpk::MAGENTA, ::gpk::DARKGREEN};
 
-	app.OutputVertexShader							= {};
-	::transformTriangles(app.OutputVertexShader, indices, positions, normals, projection, worldTransform, cameraFront);
-
-
-	::gpk::array_pod<::gpk::STriangle<float>>									triangleWeights;
-	::gpk::array_pod<::gpk::SCoord2<int16_t>>									trianglePixelCoords;
-	::gpk::array_pod<::gpk::SCoord2<int16_t>>									wireframePixelCoords;
-	for(uint32_t iTriangle = 0; iTriangle < app.OutputVertexShader.Positions.size(); ++iTriangle) {
-		::gpk::STriangle3<float>													& triNormals								= app.OutputVertexShader.Normals[iTriangle];
-		::gpk::STriangle3<float>													& triPositions								= app.OutputVertexShader.Positions[iTriangle];
-		double																		directionFactor								= triNormals.A.Dot(cameraFront);
-		if(directionFactor > 0)
-			continue;
-
-		double																		lightFactor									= triNormals.A.Dot(lightPos);
-		::gpk::SColorBGRA															color										= (material.Color.Ambient + material.Color.Diffuse * lightFactor).Clamp();
-		trianglePixelCoords.clear();
-		gerror_if(errored(::gpk::drawTriangle(backBuffer->DepthStencil.View, nearFar, triPositions, trianglePixelCoords, triangleWeights)), "Not sure if these functions could ever fail");
-		for(uint32_t iCoord = 0; iCoord < trianglePixelCoords.size(); ++iCoord) {
-			::gpk::SCoord2<int16_t>								coord		= trianglePixelCoords[iCoord];
-			backBuffer->Color.View[coord.y][coord.x]		= color;
-		}
-
-		wireframePixelCoords.clear();
-		::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<int32_t>{triPositions.A.Cast<int32_t>(), triPositions.B.Cast<int32_t>()}, wireframePixelCoords);
-		::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<int32_t>{triPositions.B.Cast<int32_t>(), triPositions.C.Cast<int32_t>()}, wireframePixelCoords);
-		::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<int32_t>{triPositions.C.Cast<int32_t>(), triPositions.A.Cast<int32_t>()}, wireframePixelCoords);
-		const ::gpk::SColorBGRA wireColor = ::gpk::ASCII_PALETTE[iTriangle % ::gpk::size(::gpk::ASCII_PALETTE)];
-		for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord) {
-			::gpk::SCoord2<int16_t>								coord		= wireframePixelCoords[iCoord];
-			backBuffer->Color.View[coord.y][coord.x]		= wireColor;
-		}
-	}
+	drawBuffers(backBuffer, app.OutputVertexShader, app.CacheVertexShader, indices, positions, normals, uv, material, projection, nearFar, worldTransform, cameraFront, lightPos);
 	return 0;
 }
 					::gpk::error_t										drawScene									(::SApplication& app, ::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>	backBuffer)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
@@ -275,6 +243,7 @@ struct SCamera {
 	//}
 
 
+	//memcpy(framework.MainDisplayOffscreen->Color.View.begin(), backBuffer->Color.View.begin(), backBuffer->Color.View.byte_count());
 	::gpk::grid_mirror_y(framework.MainDisplayOffscreen->Color.View, backBuffer->Color.View);
 	//framework.MainDisplayOffscreen = backBuffer;
 	//------------------------------------------------
