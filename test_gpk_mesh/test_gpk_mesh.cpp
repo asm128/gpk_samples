@@ -257,19 +257,24 @@ struct SCamera {
 
 	::gpk::SCoord3<float>								cameraFront				= (camera.Target - camera.Position).Normalize();
 
-	app.Engine.Update(frameInfo.Seconds.LastFrame);
 	{
 		::gpk::STimer	timer;
-		//::drawIndexed(app, backBuffer, projection, nearFar, worldTransform, cameraFront, lightPos);
+		app.Engine.Update(frameInfo.Seconds.LastFrame);
 		timer.Frame();
-		always_printf("Render indexed in %f seconds", timer.LastTimeSeconds);
+		always_printf("Update engine in %f seconds", timer.LastTimeSeconds);
 	}
 	//{
 	//	::gpk::STimer	timer;
-		::drawScene(app, backBuffer, projection, nearFar, cameraFront, lightPos);
+	//	//::drawIndexed(app, backBuffer, projection, nearFar, worldTransform, cameraFront, lightPos);
 	//	timer.Frame();
-	//	always_printf("Render scene in %f seconds", timer.LastTimeSeconds);
+	//	always_printf("Render indexed in %f seconds", timer.LastTimeSeconds);
 	//}
+	{
+		::gpk::STimer	timer;
+		::drawScene(app, backBuffer, projection, nearFar, cameraFront, lightPos);
+		timer.Frame();
+		always_printf("Render scene in %f seconds", timer.LastTimeSeconds);
+	}
 
 
 	//memcpy(framework.MainDisplayOffscreen->Color.View.begin(), backBuffer->Color.View.begin(), backBuffer->Color.View.byte_count());
