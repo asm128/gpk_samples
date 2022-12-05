@@ -140,7 +140,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT_MT(::SApplication, "Title");
 
 struct SFragmentCache {
 	::gpk::array_pod<::gpk::SCoord2<int16_t>>			Points				[6]	= {};
-	::gpk::array_pod<::gpk::STriangle<double>>			TriangleWeights		[6]	= {};	
+	::gpk::array_pod<::gpk::STriangle<float>>			TriangleWeights		[6]	= {};	
 	::gpk::view_grid<::gpk::SColorBGRA>					TargetPixels;
 	::gpk::view_grid<uint32_t>							TargetDepth	;
 };
@@ -196,7 +196,7 @@ static	::gpk::error_t						drawVoxelFace
 		for(uint32_t iSlice = 0, countSlices = faceSlices.size(); iSlice < countSlices; ++iSlice) {
 			// Clear out output
 			::gpk::array_pod<::gpk::SCoord2<int16_t>>			& facePixelCoords		= pixelCache.Points[iFace];
-			::gpk::array_pod<::gpk::STriangle<double>>			& faceTriangleWeights	= pixelCache.TriangleWeights[iFace];
+			::gpk::array_pod<::gpk::STriangle<float>>			& faceTriangleWeights	= pixelCache.TriangleWeights[iFace];
 			::gpk::array_pod<::gpk::STriangle3<float>>			trianglePositions		= {};
 			::gpk::array_pod<::gpk::SRange<uint32_t>>			triangleSlices			= {};
 			::gpk::array_pod<uint32_t>							triangleIndices			= {};
@@ -229,7 +229,7 @@ static	::gpk::error_t						drawVoxelFace
 				// Process pixel fragments
 				for(uint32_t iPoint = slice.Offset, pixelCount = slice.Count + slice.Offset; iPoint < pixelCount; ++iPoint) {
 					const ::gpk::STriangle3<float>			& triangle					= trianglePositions[iTriangle];
-					const ::gpk::STriangle<double>			& triangleWeights			= faceTriangleWeights[iPoint];
+					const ::gpk::STriangle<float>			& triangleWeights			= faceTriangleWeights[iPoint];
 					const ::gpk::SCoord2<int16_t>			pixelPosIn2DSpace			= facePixelCoords[iPoint];
 					const ::gpk::SCoord3<float>				pixelPosIn3DSpace			
 						= triangle.A * triangleWeights.A

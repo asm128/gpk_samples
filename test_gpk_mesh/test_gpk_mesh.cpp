@@ -66,7 +66,6 @@ static constexpr const ::gpk::STriangle3<float>						geometryCube	[12]						=
 		transformedTriangle.B													-= cubeCenter;
 		transformedTriangle.C													-= cubeCenter;
 	}
-
 	app.EntityCamera				= app.Engine.CreateCamera	();
 	app.EntityLightDirectional		= app.Engine.CreateLight	(::gpk::LIGHT_TYPE_Directional	);
 	app.EntityLightPoint			= app.Engine.CreateLight	(::gpk::LIGHT_TYPE_Point		);
@@ -123,105 +122,48 @@ struct SCamera {
 						::gpk::SCoord3<float>								Position, Target;
 };
 
-					::gpk::error_t										drawReference								(::SApplication& app, ::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>	backBuffer)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
-	::gpk::SFramework															& framework									= app.Framework;
-	::gpk::SMatrix4<float>														projection									= {};
-	::gpk::SMatrix4<float>														viewMatrix									= {};
-	projection.Identity();
-	::gpk::SFrameInfo															& frameInfo									= framework.FrameInfo;
-	const ::gpk::SCoord3<float>													tilt										= {10, };	// ? cam't remember what is this. Radians? Eulers?
-	const ::gpk::SCoord3<float>													rotation									= {0, (float)frameInfo.FrameNumber / 100, 0};
+::gpk::error_t										transformTriangles						
+	( ::SVSOutput										& output
+	, ::gpk::view_array<const uint16_t>					indices			
+	, ::gpk::view_array<const ::gpk::SCoord3<float>>	positions	
+	, ::gpk::view_array<const ::gpk::SCoord3<float>>	normals		
+	, const ::gpk::SMatrix4<float>						& projection		
+	, const ::gpk::SMatrix4<float>						& worldTransform	
+	, const ::gpk::SCoord3<float>						& cameraFront
+)	{ 
+	::gpk::view_array<const ::gpk::STriangle<uint16_t>>		view_indices		= {(const ::gpk::STriangle<uint16_t>*)indices.begin(), indices.size() / 3};
 
-	::gpk::SNearFar																nearFar										= {0.01f , 1000.0f};
-
-	static constexpr const ::gpk::SCoord3<float>								cameraUp									= {0, 1, 0};	// ? cam't remember what is this. Radians? Eulers?
-	::SCamera																	camera										= {{10, 5, 0}, {}};
-	::gpk::SCoord3<float>														lightPos									= {10, 5, 0};
-	static float																cameraRotation								= 0;
-	cameraRotation															+= (float)framework.Input->MouseCurrent.Deltas.x / 5.0f;
-	//camera.Position	.RotateY(cameraRotation);
-	camera.Position	.RotateY(frameInfo.Microseconds.Total / 1000000.0f);
-	lightPos		.RotateY(frameInfo.Microseconds.Total /  500000.0f * -2);
-	viewMatrix.LookAt(camera.Position, camera.Target, cameraUp);
-	const ::gpk::SCoord2<uint32_t>												& offscreenMetrics							= backBuffer->Color.View.metrics();
-	projection.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, nearFar.Near, nearFar.Far );
-	projection																= viewMatrix * projection;
-	lightPos.Normalize();
-
-	::gpk::SMatrix4<float>														viewport									= {};
-	viewport._11										= 2.0f / offscreenMetrics.x;
-	viewport._22										= 2.0f / offscreenMetrics.y;
-	viewport._33										= 1.0f / (float)(nearFar.Far - nearFar.Near);
-	viewport._41										= -1.0f;
-	viewport._42										= -1.0f;
-	viewport._43										= (float)(-nearFar.Near * ( 1.0f / (nearFar.Far - nearFar.Near) ));
-	viewport._44										= 1.0f;
-	projection																= projection * viewport.GetInverse();
-
-
-	//------------------------------------------------
-	::gpk::array_pod<::gpk::STriangle3<float>>									triangle3dList								= {};
-	::gpk::array_pod<::gpk::SColorBGRA>											triangle3dColorList							= {};
-	triangle3dList.resize(12);
-	triangle3dColorList.resize(12);
-
-	for(uint32_t iTriangle = 0; iTriangle < 12; ++iTriangle) {
-		::gpk::STriangle3<float>													& transformedTriangle						= triangle3dList[iTriangle];
-		transformedTriangle														= app.CubePositions[iTriangle];
-		::gpk::transform(transformedTriangle, projection);
-	}
-	::gpk::array_pod<::gpk::STriangle2<int32_t>>								triangle2dList								= {};
-	triangle2dList.resize(12);
-	const ::gpk::SCoord2<int32_t>												screenCenter								= {(int32_t)offscreenMetrics.x / 2, (int32_t)offscreenMetrics.y / 2};
-	for(uint32_t iTriangle = 0; iTriangle < 12; ++iTriangle) { // Maybe the scale
-		::gpk::STriangle3<float>													& transformedTriangle3D						= triangle3dList[iTriangle];
-		::gpk::STriangle2<int32_t>													& transformedTriangle2D						= triangle2dList[iTriangle];
-		transformedTriangle2D.A													= {(int32_t)transformedTriangle3D.A.x, (int32_t)transformedTriangle3D.A.y};
-		transformedTriangle2D.B													= {(int32_t)transformedTriangle3D.B.x, (int32_t)transformedTriangle3D.B.y};
-		transformedTriangle2D.C													= {(int32_t)transformedTriangle3D.C.x, (int32_t)transformedTriangle3D.C.y};
-	}
-
-	for(uint32_t iTriangle = 0; iTriangle < 12; ++iTriangle) {
-		double																		lightFactor									= geometryCubeNormals[iTriangle].Dot(lightPos);
-		triangle3dColorList[iTriangle]											= (::gpk::RED * lightFactor).Clamp();
-	}
-	::gpk::array_pod<::gpk::SCoord2<int32_t>>									trianglePixelCoords;
-	::gpk::array_pod<::gpk::SCoord2<int32_t>>									wireframePixelCoords;
-	::gpk::SCoord3<float> cameraFront = (camera.Target - camera.Position).Normalize();
-	for(uint32_t iTriangle = 0; iTriangle < 12; ++iTriangle) {
-		double																		directionFactor									= geometryCubeNormals[iTriangle].Dot(cameraFront);
-		if(directionFactor > 0)
+	const ::gpk::SMatrix4<float>							mWVP				= worldTransform * projection;
+	for(uint32_t iTriangle = 0; iTriangle < view_indices.size(); ++iTriangle) {
+		const ::gpk::STriangle<uint16_t>											vertexIndices								= view_indices[iTriangle];
+		::gpk::STriangle3<float>													transformedNormals							= {normals[vertexIndices.A], normals[vertexIndices.B], normals[vertexIndices.C]};
+		transformedNormals.A = worldTransform.TransformDirection(transformedNormals.A);
+		transformedNormals.B = worldTransform.TransformDirection(transformedNormals.B);
+		transformedNormals.C = worldTransform.TransformDirection(transformedNormals.C);
+		double																		directionFactorA							= transformedNormals.A.Dot(cameraFront);
+		double																		directionFactorB							= transformedNormals.B.Dot(cameraFront);
+		double																		directionFactorC							= transformedNormals.C.Dot(cameraFront);
+		if(directionFactorA > 0 && directionFactorB > 0 && directionFactorC > 0)
 			continue;
-		gerror_if(errored(::gpk::drawTriangle(backBuffer->Color.View, triangle3dColorList[iTriangle], triangle2dList[iTriangle])), "Not sure if these functions could ever fail");
-		//::gpk::drawLine(backBuffer->Color.View, (::gpk::SColorBGRA)::gpk::GREEN	, ::gpk::SLine2<int32_t>{triangle2dList[iTriangle].A, triangle2dList[iTriangle].B});
-		//::gpk::drawLine(backBuffer->Color.View, (::gpk::SColorBGRA)::gpk::BLUE	, ::gpk::SLine2<int32_t>{triangle2dList[iTriangle].B, triangle2dList[iTriangle].C});
-		//::gpk::drawLine(backBuffer->Color.View, (::gpk::SColorBGRA)::gpk::RED	, ::gpk::SLine2<int32_t>{triangle2dList[iTriangle].C, triangle2dList[iTriangle].A});
-		//trianglePixelCoords.clear(); ::gpk::drawTriangle(offscreenMetrics, triangle2dList[iTriangle], trianglePixelCoords);
-		//for(uint32_t iCoord = 0; iCoord < trianglePixelCoords.size(); ++iCoord)
-		//	::gpk::drawPixelLight(backBuffer->Color.View, trianglePixelCoords[iCoord], (::gpk::SColorBGRA)::gpk::BLUE, 0.05f, 2.5);
-		//wireframePixelCoords.clear(); ::gpk::drawLine(offscreenMetrics, ::gpk::SLine2<int32_t>{triangle2dList[iTriangle].A, triangle2dList[iTriangle].B}, wireframePixelCoords);
-		//for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord)
-		//	::gpk::drawPixelLight(backBuffer->Color.View, wireframePixelCoords[iCoord], (::gpk::SColorBGRA)::gpk::GREEN, 0.05f, 1.5);
-		//wireframePixelCoords.clear(); ::gpk::drawLine(offscreenMetrics, ::gpk::SLine2<int32_t>{triangle2dList[iTriangle].B, triangle2dList[iTriangle].C}, wireframePixelCoords);
-		//for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord)
-		//	::gpk::drawPixelLight(backBuffer->Color.View, wireframePixelCoords[iCoord], (::gpk::SColorBGRA)::gpk::CYAN, 0.05f, 1.5);
-		//wireframePixelCoords.clear(); ::gpk::drawLine(offscreenMetrics, ::gpk::SLine2<int32_t>{triangle2dList[iTriangle].C, triangle2dList[iTriangle].A}, wireframePixelCoords);
-		//for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord)
-		//	::gpk::drawPixelLight(backBuffer->Color.View, wireframePixelCoords[iCoord], (::gpk::SColorBGRA)::gpk::RED, 0.05f, 1.5);
-		::gpk::drawLine(offscreenMetrics, ::gpk::SLine2<int32_t>{triangle2dList[iTriangle].A, triangle2dList[iTriangle].B}, wireframePixelCoords);
-		::gpk::drawLine(offscreenMetrics, ::gpk::SLine2<int32_t>{triangle2dList[iTriangle].B, triangle2dList[iTriangle].C}, wireframePixelCoords);
-		::gpk::drawLine(offscreenMetrics, ::gpk::SLine2<int32_t>{triangle2dList[iTriangle].C, triangle2dList[iTriangle].A}, wireframePixelCoords);
-	}
-	for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord)
-		::gpk::drawPixelLight(backBuffer->Color.View, wireframePixelCoords[iCoord], (::gpk::SColorBGRA)::gpk::GREEN, 0.05f, 1.5);
-	return 0;
-}
 
+		::gpk::STriangle3<float>													transformedPositions						= {positions[vertexIndices.A], positions[vertexIndices.B], positions[vertexIndices.C]};
+		::gpk::transform(transformedPositions, mWVP);
+		output.Positions.push_back(transformedPositions);
+		output.Normals	.push_back(transformedNormals);
+	}
+	return 0; 
+}
+::gpk::error_t										transformFragments						()	{ return 0; }
 
 					::gpk::error_t										drawIndexed								(::SApplication& app, ::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>	backBuffer)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
+
+	
 	::gpk::SFramework															& framework									= app.Framework;
 	::gpk::SMatrix4<float>														projection									= {};
 	::gpk::SMatrix4<float>														viewMatrix									= {};
+	::gpk::SMatrix4<float>														worldTransform								= {};
+	worldTransform.Identity();
+	worldTransform.SetTranslation({-.5f, -.5f, -.5f}, false);
 	projection.Identity();
 	::gpk::SFrameInfo															& frameInfo									= framework.FrameInfo;
 	const ::gpk::SCoord3<float>													tilt										= {10, };	// ? cam't remember what is this. Radians? Eulers?
@@ -238,7 +180,7 @@ struct SCamera {
 	camera.Position	.RotateY(frameInfo.Microseconds.Total / 1000000.0f);
 	lightPos		.RotateY(frameInfo.Microseconds.Total /  500000.0f * -2);
 	viewMatrix.LookAt(camera.Position, camera.Target, cameraUp);
-	const ::gpk::SCoord2<uint32_t>												& offscreenMetrics							= backBuffer->Color.View.metrics();
+	const ::gpk::SCoord2<uint16_t>												offscreenMetrics							= backBuffer->Color.View.metrics().Cast<uint16_t>();
 	projection.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, nearFar.Near, nearFar.Far );
 	projection																= viewMatrix * projection;
 	lightPos.Normalize();
@@ -253,71 +195,49 @@ struct SCamera {
 	viewport._44										= 1.0f;
 	projection																= projection * viewport.GetInverse();
 
+	::gpk::SCoord3<float>								cameraFront				= (camera.Target - camera.Position).Normalize();
+
 
 	//------------------------------------------------
-	::gpk::view_array<const ::gpk::SCoord3<float>>		positions	= {&::gpk::VOXEL_FACE_VERTICES	[0].A, 24};
-	::gpk::view_array<const ::gpk::SCoord3<float>>		normals		= {&::gpk::VOXEL_FACE_NORMALS	[0].A, 24};
-	::gpk::view_array<const ::gpk::SCoord2<float>>		uv			= {&::gpk::VOXEL_FACE_UV		[0].A, 24};
-	::gpk::view_array<const uint16_t>					indices		= {::gpk::VOXEL_FACE_INDICES_16	[0], 36};
+	::gpk::view_array<const ::gpk::SCoord3<float>>		positions				= {&::gpk::VOXEL_FACE_VERTICES	[0].A, 24};
+	::gpk::view_array<const ::gpk::SCoord3<float>>		normals					= {&::gpk::VOXEL_FACE_NORMALS	[0].A, 24};
+	::gpk::view_array<const ::gpk::SCoord2<float>>		uv						= {&::gpk::VOXEL_FACE_UV		[0].A, 24};
+	::gpk::view_array<const uint16_t>					indices					= {::gpk::VOXEL_FACE_INDICES_16	[0], 36};
+	::gpk::SRenderMaterial								material				= {::gpk::MAGENTA * .1, ::gpk::MAGENTA, ::gpk::DARKGREEN};
 
-	::gpk::array_pod<::gpk::STriangle3<float>>									triangle3dList								= {};
-	triangle3dList.resize(indices.size() / 3);
+	app.OutputVertexShader							= {};
+	::transformTriangles(app.OutputVertexShader, indices, positions, normals, projection, worldTransform, cameraFront);
 
-	for(uint32_t index = 0; index < indices.size(); index += 3) {
-	
+
+	::gpk::array_pod<::gpk::STriangle<float>>									triangleWeights;
+	::gpk::array_pod<::gpk::SCoord2<int16_t>>									trianglePixelCoords;
+	::gpk::array_pod<::gpk::SCoord2<int16_t>>									wireframePixelCoords;
+	for(uint32_t iTriangle = 0; iTriangle < app.OutputVertexShader.Positions.size(); ++iTriangle) {
+		::gpk::STriangle3<float>													& triNormals								= app.OutputVertexShader.Normals[iTriangle];
+		::gpk::STriangle3<float>													& triPositions								= app.OutputVertexShader.Positions[iTriangle];
+		double																		directionFactor								= triNormals.A.Dot(cameraFront);
+		if(directionFactor > 0)
+			continue;
+
+		double																		lightFactor									= triNormals.A.Dot(lightPos);
+		::gpk::SColorBGRA															color										= (material.Color.Ambient + material.Color.Diffuse * lightFactor).Clamp();
+		trianglePixelCoords.clear();
+		gerror_if(errored(::gpk::drawTriangle(backBuffer->DepthStencil.View, nearFar, triPositions, trianglePixelCoords, triangleWeights)), "Not sure if these functions could ever fail");
+		for(uint32_t iCoord = 0; iCoord < trianglePixelCoords.size(); ++iCoord) {
+			::gpk::SCoord2<int16_t>								coord		= trianglePixelCoords[iCoord];
+			backBuffer->Color.View[coord.y][coord.x]		= color;
+		}
+
+		wireframePixelCoords.clear();
+		::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<int32_t>{triPositions.A.Cast<int32_t>(), triPositions.B.Cast<int32_t>()}, wireframePixelCoords);
+		::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<int32_t>{triPositions.B.Cast<int32_t>(), triPositions.C.Cast<int32_t>()}, wireframePixelCoords);
+		::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<int32_t>{triPositions.C.Cast<int32_t>(), triPositions.A.Cast<int32_t>()}, wireframePixelCoords);
+		const ::gpk::SColorBGRA wireColor = ::gpk::ASCII_PALETTE[iTriangle % ::gpk::size(::gpk::ASCII_PALETTE)];
+		for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord) {
+			::gpk::SCoord2<int16_t>								coord		= wireframePixelCoords[iCoord];
+			backBuffer->Color.View[coord.y][coord.x]		= wireColor;
+		}
 	}
-
-	for(uint32_t iTriangle = 0; iTriangle < triangle3dList.size(); ++iTriangle) {
-		::gpk::STriangle<uint16_t>													triangle									= {indices[iTriangle * 3 + 0], indices[iTriangle * 3 + 1], indices[iTriangle * 3 + 2]};
-		::gpk::STriangle3<float>													& transformedTriangle						= triangle3dList[iTriangle];
-		transformedTriangle														= {positions[triangle.A], positions[triangle.B], positions[triangle.C]};
-		::gpk::transform(transformedTriangle, projection);
-	}
-	::gpk::array_pod<::gpk::STriangle2<int32_t>>								triangle2dList								= {};
-	triangle2dList.resize(triangle3dList.size());
-	//const ::gpk::SCoord2<int32_t>												screenCenter								= {(int32_t)offscreenMetrics.x / 2, (int32_t)offscreenMetrics.y / 2};
-	for(uint32_t iTriangle = 0; iTriangle < triangle3dList.size(); ++iTriangle) { // Maybe the scale
-		::gpk::STriangle3<float>													& transformedTriangle3D						= triangle3dList[iTriangle];
-		::gpk::STriangle2<int32_t>													& transformedTriangle2D						= triangle2dList[iTriangle];
-		transformedTriangle2D.A													= {(int32_t)transformedTriangle3D.A.x, (int32_t)transformedTriangle3D.A.y};
-		transformedTriangle2D.B													= {(int32_t)transformedTriangle3D.B.x, (int32_t)transformedTriangle3D.B.y};
-		transformedTriangle2D.C													= {(int32_t)transformedTriangle3D.C.x, (int32_t)transformedTriangle3D.C.y};
-	}
-
-	//for(uint32_t iTriangle = 0; iTriangle < triangle3dList.size(); ++iTriangle) {
-	//	double																		lightFactor									= normals[iTriangle].Dot(lightPos);
-	//	triangle3dColorList[iTriangle]											= (::gpk::RED * lightFactor).Clamp();
-	//}
-
-	//::gpk::array_pod<::gpk::SCoord2<int32_t>>									trianglePixelCoords;
-	//::gpk::array_pod<::gpk::SCoord2<int32_t>>									wireframePixelCoords;
-	//::gpk::SCoord3<float> cameraFront = (camera.Target - camera.Position).Normalize();
-	//for(uint32_t iTriangle = 0; iTriangle < triangle3dList.size(); ++iTriangle) {
-	//	double																		directionFactor									= geometryCubeNormals[iTriangle].Dot(cameraFront);
-	//	if(directionFactor > 0)
-	//		continue;
-	//	gerror_if(errored(::gpk::drawTriangle(backBuffer->Color.View, triangle3dColorList[iTriangle], triangle2dList[iTriangle])), "Not sure if these functions could ever fail");
-	//	//::gpk::drawLine(backBuffer->Color.View, (::gpk::SColorBGRA)::gpk::GREEN	, ::gpk::SLine2<int32_t>{triangle2dList[iTriangle].A, triangle2dList[iTriangle].B});
-	//	//::gpk::drawLine(backBuffer->Color.View, (::gpk::SColorBGRA)::gpk::BLUE	, ::gpk::SLine2<int32_t>{triangle2dList[iTriangle].B, triangle2dList[iTriangle].C});
-	//	//::gpk::drawLine(backBuffer->Color.View, (::gpk::SColorBGRA)::gpk::RED	, ::gpk::SLine2<int32_t>{triangle2dList[iTriangle].C, triangle2dList[iTriangle].A});
-	//	//trianglePixelCoords.clear(); ::gpk::drawTriangle(offscreenMetrics, triangle2dList[iTriangle], trianglePixelCoords);
-	//	//for(uint32_t iCoord = 0; iCoord < trianglePixelCoords.size(); ++iCoord)
-	//	//	::gpk::drawPixelLight(backBuffer->Color.View, trianglePixelCoords[iCoord], (::gpk::SColorBGRA)::gpk::BLUE, 0.05f, 2.5);
-	//	//wireframePixelCoords.clear(); ::gpk::drawLine(offscreenMetrics, ::gpk::SLine2<int32_t>{triangle2dList[iTriangle].A, triangle2dList[iTriangle].B}, wireframePixelCoords);
-	//	//for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord)
-	//	//	::gpk::drawPixelLight(backBuffer->Color.View, wireframePixelCoords[iCoord], (::gpk::SColorBGRA)::gpk::GREEN, 0.05f, 1.5);
-	//	//wireframePixelCoords.clear(); ::gpk::drawLine(offscreenMetrics, ::gpk::SLine2<int32_t>{triangle2dList[iTriangle].B, triangle2dList[iTriangle].C}, wireframePixelCoords);
-	//	//for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord)
-	//	//	::gpk::drawPixelLight(backBuffer->Color.View, wireframePixelCoords[iCoord], (::gpk::SColorBGRA)::gpk::CYAN, 0.05f, 1.5);
-	//	//wireframePixelCoords.clear(); ::gpk::drawLine(offscreenMetrics, ::gpk::SLine2<int32_t>{triangle2dList[iTriangle].C, triangle2dList[iTriangle].A}, wireframePixelCoords);
-	//	//for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord)
-	//	//	::gpk::drawPixelLight(backBuffer->Color.View, wireframePixelCoords[iCoord], (::gpk::SColorBGRA)::gpk::RED, 0.05f, 1.5);
-	//	::gpk::drawLine(offscreenMetrics, ::gpk::SLine2<int32_t>{triangle2dList[iTriangle].A, triangle2dList[iTriangle].B}, wireframePixelCoords);
-	//	::gpk::drawLine(offscreenMetrics, ::gpk::SLine2<int32_t>{triangle2dList[iTriangle].B, triangle2dList[iTriangle].C}, wireframePixelCoords);
-	//	::gpk::drawLine(offscreenMetrics, ::gpk::SLine2<int32_t>{triangle2dList[iTriangle].C, triangle2dList[iTriangle].A}, wireframePixelCoords);
-	//}
-	//for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord)
-	//	::gpk::drawPixelLight(backBuffer->Color.View, wireframePixelCoords[iCoord], (::gpk::SColorBGRA)::gpk::GREEN, 0.05f, 1.5);
 	return 0;
 }
 					::gpk::error_t										drawScene									(::SApplication& app, ::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>	backBuffer)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
@@ -341,9 +261,19 @@ struct SCamera {
 
 	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>			backBuffer;
 	backBuffer->resize(framework.MainDisplayOffscreen->Color.metrics(), 0xFF000080, (uint32_t)-1);
-	::drawReference(app, backBuffer);
-	::drawIndexed(app, backBuffer);
-	::drawScene(app, backBuffer);
+	{
+		::gpk::STimer	timer;
+		::drawIndexed(app, backBuffer);
+		timer.Frame();
+		always_printf("Render indexed in %f seconds", timer.LastTimeSeconds);
+	}
+	//{
+	//	::gpk::STimer	timer;
+	//	//::drawScene(app, backBuffer);
+	//	timer.Frame();
+	//	always_printf("Render scene in %f seconds", timer.LastTimeSeconds);
+	//}
+
 
 	::gpk::grid_mirror_y(framework.MainDisplayOffscreen->Color.View, backBuffer->Color.View);
 	//framework.MainDisplayOffscreen = backBuffer;

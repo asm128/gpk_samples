@@ -237,8 +237,8 @@ template<typename _tIndex, typename _tValue>
 	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>		buffer3d									= app.Buffer3D;
 	::gpk::ptr_obj<::gpk::SDialogViewport>									viewport									= {};
 	app.DialogMain.Controls[app.Viewport].as(viewport);
-	const ::gpk::SCoord2<uint32_t>											& offscreenMetrics							= gui.Controls.Controls[viewport->IdClient].Area.Size.Cast<uint32_t>();
-	buffer3d->resize(offscreenMetrics, {0, 0, 0, 0}, (uint32_t)-1);
+	const ::gpk::SCoord2<uint16_t>											& offscreenMetrics							= gui.Controls.Controls[viewport->IdClient].Area.Size.Cast<uint16_t>();
+	buffer3d->resize(offscreenMetrics.Cast<uint32_t>(), {0, 0, 0, 0}, (uint32_t)-1);
 
 	::gpk::array_pod<::gpk::STriangle3<float>>								& triangle3dList							= app.VertexCache.Triangle3dTransformed	;
 	::gpk::array_pod<::gpk::SColorBGRA>										& triangle3dColorList						= app.VertexCache.Triangle3dColorList	;
@@ -281,10 +281,10 @@ template<typename _tIndex, typename _tValue>
 		double																	lightFactor									= normals[iVertex].Dot(lightPos);
 		triangle3dColorList[iVertex]										= (::gpk::RED * lightFactor).Clamp();
 	}
-	::gpk::array_pod<::gpk::SCoord2<int32_t>>								wireframePixelCoords;
+	::gpk::array_pod<::gpk::SCoord2<int16_t>>								wireframePixelCoords;
 	::gpk::array_pod<::gpk::SCoord2<int16_t>>								trianglePixelCoords;
 	::gpk::SCoord3<float>													cameraFront										= (camera.Target - camera.Position).Normalize();
-	::gpk::array_pod<::gpk::STriangle<double>>						triangleWeights;
+	::gpk::array_pod<::gpk::STriangle<float>>								triangleWeights;
 
 	for(uint32_t iTriangle = 0; iTriangle < 12; ++iTriangle) {
 		double																	lightFactor									= normals[iTriangle * 3].Dot(cameraFront);

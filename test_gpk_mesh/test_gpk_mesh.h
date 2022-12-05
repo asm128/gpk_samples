@@ -100,6 +100,11 @@ namespace gpk
 #ifndef APPLICATION_H_098273498237423
 #define APPLICATION_H_098273498237423
 
+struct SVSOutput {
+	::gpk::array_pod<::gpk::STriangle3<float>>			Positions								= {};
+	::gpk::array_pod<::gpk::STriangle3<float>>			Normals									= {};
+};
+
 struct SApplication {
 	::gpk::SFramework						Framework									;
 
@@ -115,6 +120,8 @@ struct SApplication {
 	int32_t									EntityLightPoint							= -1;
 	int32_t									EntityLightSpot								= -1;
 	int32_t									EntityBox									= -1;
+
+	::SVSOutput								OutputVertexShader							= {};
 
 											SApplication								(::gpk::SRuntimeValues& runtimeValues)			noexcept	: Framework(runtimeValues) {}
 };

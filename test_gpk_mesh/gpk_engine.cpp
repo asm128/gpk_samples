@@ -40,7 +40,6 @@
 	return iEntity;
 }
 
-
 ::gpk::error_t						gpk::SEngine::CreateBox				()	{
 	int32_t									iEntity								= this->ManagedEntities.Create();
 	::gpk::SVirtualEntity					& entity							= ManagedEntities.Entities[iEntity];
