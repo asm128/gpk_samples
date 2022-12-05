@@ -11,27 +11,27 @@
 namespace gpk 
 {
 	struct SEngineScene {
-		::gpk::SMeshManager				ManagedMeshes		;
-		::gpk::SRenderBufferManager		ManagedBuffers		;
-		::gpk::SRenderNodeManager		ManagedRenderNodes	;
-		::gpk::SSurfaceManager			ManagedSurfaces		;
+		::gpk::SRenderBufferManager			ManagedBuffers		;
+		::gpk::SRenderNodeManager			ManagedRenderNodes	;
+		::gpk::SSurfaceManager				ManagedSurfaces		;
+		::gpk::SMeshManager					ManagedMeshes		;
 	};
 
 	struct SEngine {
-		::gpk::SEngineScene				Scene				;
-		::gpk::SVirtualEntityManager	ManagedEntities		;
-		::gpk::SRigidBodyIntegrator		Integrator			;
+		::gpk::ptr_obj<::gpk::SEngineScene>	Scene				;
+		::gpk::SVirtualEntityManager		ManagedEntities		;
+		::gpk::SRigidBodyIntegrator			Integrator			;
 
-		::gpk::error_t					CreateLight			(::gpk::LIGHT_TYPE type);
-		::gpk::error_t					CreateCamera		();
+		::gpk::error_t						CreateLight			(::gpk::LIGHT_TYPE type);
+		::gpk::error_t						CreateCamera		();
 
-		::gpk::error_t					CreateSphere		();
-		::gpk::error_t					CreateCylinder		();
-		::gpk::error_t					CreateBox			();
-		::gpk::error_t					CreateCircle		();
-		::gpk::error_t					CreateRing			();
-		::gpk::error_t					CreateSquare		();
-		::gpk::error_t					CreateTriangle		();
+		::gpk::error_t						CreateSphere		();
+		::gpk::error_t						CreateCylinder		();
+		::gpk::error_t						CreateBox			();
+		::gpk::error_t						CreateCircle		();
+		::gpk::error_t						CreateRing			();
+		::gpk::error_t						CreateSquare		();
+		::gpk::error_t						CreateTriangle		();
 	};
 
 } // namespace

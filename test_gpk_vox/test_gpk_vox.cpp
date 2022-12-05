@@ -205,7 +205,7 @@ static	::gpk::error_t						drawVoxelFace
 
 			// Raster triangles
 			const ::gpk::SGeometryGroup							& faceSlice				= faceSlices[iSlice];
-			const ::gpk::SRenderMaterial						& sliceMaterial			= voxelGeometry.Materials[faceSlice.Material];
+			const ::gpk::SRenderMaterialPaletted				& sliceMaterial			= voxelGeometry.Materials[faceSlice.Material];
 			for(uint32_t iIndex = 0, countIndices = faceSlice.Slice.Count; iIndex < countIndices; ++iIndex) {
 				uint32_t											offsetPositionIndex		= voxelGeometry.Geometry.PositionIndices[iIndex];
 				const ::gpk::STriangle3<float>						triangle				= 

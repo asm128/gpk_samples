@@ -110,7 +110,7 @@ struct SApplication {
 						::gpk::SImageMonochrome<uint32_t>															TextureFontMonochrome						= {};
 
 						::SStuffToDraw																				StuffToDraw									= {};
-						::gpk::array_pod<::gpk::SCoord2<int32_t>>													CacheLinePoints								= {};
+						::gpk::array_pod<::gpk::SCoord2<int16_t>>													CacheLinePoints								= {};
 						::SEffectsDelay																				EffectsDelay								= {};
 
 																													SApplication								(::gpk::SRuntimeValues& runtimeValues)			noexcept	: Framework(runtimeValues) {}

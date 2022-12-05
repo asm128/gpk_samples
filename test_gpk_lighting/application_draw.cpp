@@ -5,7 +5,7 @@
 					::gpk::error_t										drawPixel
 	( ::SRenderCache															& renderCache
 	, ::gpk::SColorBGRA															& targetColorCell
-	, const ::gpk::STriangle<double>										& pixelWeights
+	, const ::gpk::STriangle<float>												& pixelWeights
 	, const ::gpk::STriangle2<float>											& uvGrid
 	, const ::gpk::view_grid<::gpk::SColorBGRA>									& textureColors
 	, int32_t																	iTriangle
@@ -159,17 +159,17 @@
 			const int32_t																iGridTri										= renderCache.Triangle3dIndices[iTriangle];
 			const ::gpk::STriangle2<float>												& uvGrid										= app.Grid.UVs[iGridTri];
 			for(uint32_t iPixel = 0, pixCount = renderCache.TrianglePixelCoords.size(); iPixel < pixCount; ++iPixel) {
-				const ::gpk::SCoord2<int16_t>												& pixelCoord								= renderCache.TrianglePixelCoords	[iPixel];
-				const ::gpk::STriangle<double>										& pixelWeights								= renderCache.TrianglePixelWeights	[iPixel];
+				const ::gpk::SCoord2<int16_t>										& pixelCoord								= renderCache.TrianglePixelCoords	[iPixel];
+				const ::gpk::STriangle<float>										& pixelWeights								= renderCache.TrianglePixelWeights	[iPixel];
 				if(0 == ::drawPixel(renderCache, offscreen.View[pixelCoord.y][pixelCoord.x], pixelWeights, uvGrid, app.TextureGrid.View, iTriangle, lightDir.Cast<double>()))
 					++pixelsDrawn;
 				else
 					++pixelsSkipped;
 			}
 			if(checkbox->Checked) {
-				gerror_if(errored(::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{renderCache.Triangle3dToDraw[iTriangle].A, renderCache.Triangle3dToDraw[iTriangle].B}, renderCache.WireframePixelCoords)), "Not sure if these functions could ever fail");
-				gerror_if(errored(::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{renderCache.Triangle3dToDraw[iTriangle].B, renderCache.Triangle3dToDraw[iTriangle].C}, renderCache.WireframePixelCoords)), "Not sure if these functions could ever fail");
-				gerror_if(errored(::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{renderCache.Triangle3dToDraw[iTriangle].C, renderCache.Triangle3dToDraw[iTriangle].A}, renderCache.WireframePixelCoords)), "Not sure if these functions could ever fail");
+				gerror_if(errored(::gpk::drawLine(offscreenMetrics.Cast<uint16_t>(), ::gpk::SLine3<float>{renderCache.Triangle3dToDraw[iTriangle].A, renderCache.Triangle3dToDraw[iTriangle].B}, renderCache.WireframePixelCoords)), "Not sure if these functions could ever fail");
+				gerror_if(errored(::gpk::drawLine(offscreenMetrics.Cast<uint16_t>(), ::gpk::SLine3<float>{renderCache.Triangle3dToDraw[iTriangle].B, renderCache.Triangle3dToDraw[iTriangle].C}, renderCache.WireframePixelCoords)), "Not sure if these functions could ever fail");
+				gerror_if(errored(::gpk::drawLine(offscreenMetrics.Cast<uint16_t>(), ::gpk::SLine3<float>{renderCache.Triangle3dToDraw[iTriangle].C, renderCache.Triangle3dToDraw[iTriangle].A}, renderCache.WireframePixelCoords)), "Not sure if these functions could ever fail");
 			}
 			// draw normals
 			//gerror_if(errored(::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{renderCache.Triangle3dToDraw[iTriangle].A, renderCache.Triangle3dToDraw[iTriangle].A + (renderCache.TransformedNormalsTriangle[iTriangle])}, renderCache.WireframePixelCoords)), "Not sure if these functions could ever fail");
@@ -179,7 +179,7 @@
 	}
 	static	const ::gpk::SColorBGRA												color										= ::gpk::YELLOW;
 	for(uint32_t iPixel = 0, pixCount = renderCache.WireframePixelCoords.size(); iPixel < pixCount; ++iPixel) {
-		const ::gpk::SCoord2<int32_t>												& pixelCoord								= renderCache.WireframePixelCoords[iPixel];
+		const ::gpk::SCoord2<int16_t>												& pixelCoord								= renderCache.WireframePixelCoords[iPixel];
 		if( offscreen.View[pixelCoord.y][pixelCoord.x] != color ) {
 			offscreen.View[pixelCoord.y][pixelCoord.x]								= color;
 			++pixelsDrawn;

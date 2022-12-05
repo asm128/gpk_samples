@@ -8,6 +8,7 @@
 #include "gpk_view_bit.h"
 #include "gpk_matrix.h"
 #include "gpk_png.h"
+#include "gpk_geometry_lh.h"
 
 #include "gpk_app_impl.h"
 #include "gpk_voxel.h"
@@ -42,6 +43,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	app.EntityLightPoint			= app.Engine.CreateLight	(::gpk::LIGHT_TYPE_Point		);
 	app.EntityLightSpot				= app.Engine.CreateLight	(::gpk::LIGHT_TYPE_Spot			);
 	app.EntityBox					= app.Engine.CreateBox		();
+	app.EntitySphere				= app.Engine.CreateSphere	();
 
 	app.Engine.Integrator.Centers[app.Engine.ManagedEntities.Entities[app.EntityCamera				].RigidBody].Position = {0, 0, 0};
 	app.Engine.Integrator.Centers[app.Engine.ManagedEntities.Entities[app.EntityLightDirectional	].RigidBody].Position = {0, 0, 0};
@@ -68,10 +70,6 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	SetWindowTextA(windowHandle, buffer);
 	return 0;
 }
-
-struct SCamera {
-	::gpk::SCoord3<float>								Position, Target;
-};
 
 ::gpk::error_t										transformTriangles						
 	( ::SVSOutput										& output
@@ -126,7 +124,8 @@ struct SCamera {
 	::transformTriangles(outVS, indices, positions, normals, projection, worldTransform, cameraFront);
 	::gpk::array_pod<::gpk::STriangle<float>>									& triangleWeights			= cacheVS.TriangleWeights		;
 	::gpk::array_pod<::gpk::SCoord2<int16_t>>									& trianglePixelCoords		= cacheVS.SolidPixelCoords		;
-	//::gpk::array_pod<::gpk::SCoord2<int16_t>>									& wireframePixelCoords		= cacheVS.WireframePixelCoords	;
+	::gpk::array_pod<::gpk::SCoord2<int16_t>>									& wireframePixelCoords		= cacheVS.WireframePixelCoords	;
+	const ::gpk::SCoord2<uint16_t>												offscreenMetrics			= backBuffer->Color.View.metrics().Cast<uint16_t>();
 	for(uint32_t iTriangle = 0; iTriangle < outVS.Positions.size(); ++iTriangle) {
 		::gpk::STriangle3<float>													& triNormals								= outVS.Normals		[iTriangle];
 		::gpk::STriangle3<float>													& triPositions								= outVS.Positions	[iTriangle];
@@ -140,25 +139,99 @@ struct SCamera {
 		triangleWeights.clear();
 		gerror_if(errored(::gpk::drawTriangle(backBuffer->DepthStencil.View, nearFar, triPositions, trianglePixelCoords, triangleWeights)), "Not sure if these functions could ever fail");
 		for(uint32_t iCoord = 0; iCoord < trianglePixelCoords.size(); ++iCoord) {
-			::gpk::SCoord2<int16_t>								coord		= trianglePixelCoords[iCoord];
+			//const ::gpk::STriangle<float>						& vertexWeights	= triangleWeights[iCoord];
+			const ::gpk::SCoord2<int16_t>						coord			= trianglePixelCoords[iCoord];
 			backBuffer->Color.View[coord.y][coord.x]		= color;
 		}
 
-		//wireframePixelCoords.clear();
-		//::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<int32_t>{triPositions.A.Cast<int32_t>(), triPositions.B.Cast<int32_t>()}, wireframePixelCoords);
-		//::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<int32_t>{triPositions.B.Cast<int32_t>(), triPositions.C.Cast<int32_t>()}, wireframePixelCoords);
-		//::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<int32_t>{triPositions.C.Cast<int32_t>(), triPositions.A.Cast<int32_t>()}, wireframePixelCoords);
-		//const ::gpk::SColorBGRA wireColor = ::gpk::ASCII_PALETTE[iTriangle % ::gpk::size(::gpk::ASCII_PALETTE)];
-		//for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord) {
-		//	::gpk::SCoord2<int16_t>								coord		= wireframePixelCoords[iCoord];
-		//	backBuffer->Color.View[coord.y][coord.x]		= wireColor;
-		//}
+		wireframePixelCoords.clear();
+		::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<int32_t>{triPositions.A.Cast<int32_t>(), triPositions.B.Cast<int32_t>()}, wireframePixelCoords);
+		::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<int32_t>{triPositions.B.Cast<int32_t>(), triPositions.C.Cast<int32_t>()}, wireframePixelCoords);
+		::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<int32_t>{triPositions.C.Cast<int32_t>(), triPositions.A.Cast<int32_t>()}, wireframePixelCoords);
+		const ::gpk::SColorBGRA wireColor = ::gpk::ASCII_PALETTE[iTriangle % ::gpk::size(::gpk::ASCII_PALETTE)];
+		for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord) {
+			::gpk::SCoord2<int16_t>								coord		= wireframePixelCoords[iCoord];
+			backBuffer->Color.View[coord.y][coord.x]		= wireColor;
+		}
 	}
 	return 0;
 }
 
-					::gpk::error_t										drawIndexed								(::SApplication& app, ::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>	backBuffer)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
+::gpk::error_t										drawIndexed								
+	( ::SApplication					& app
+	, ::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>	backBuffer
+	, const ::gpk::SMatrix4<float>		& projection		
+	, const ::gpk::SNearFar				& nearFar 
+	, const ::gpk::SMatrix4<float>		& worldTransform	 
+	, const ::gpk::SCoord3<float>		& cameraFront
+	, const ::gpk::SCoord3<float>		& lightPos
+	) {	//
+	//------------------------------------------------
+	::gpk::view_array<const ::gpk::SCoord3<float>>		positions				= {&::gpk::VOXEL_FACE_VERTICES	[0].A, 24};
+	::gpk::view_array<const ::gpk::SCoord3<float>>		normals					= {&::gpk::VOXEL_FACE_NORMALS	[0].A, 24};
+	::gpk::view_array<const ::gpk::SCoord2<float>>		uv						= {&::gpk::VOXEL_FACE_UV		[0].A, 24};
+	::gpk::view_array<const uint16_t>					indices					= {::gpk::VOXEL_FACE_INDICES_16	[0], 36};
+	::gpk::SRenderMaterial								material				= {::gpk::MAGENTA * .1, ::gpk::MAGENTA, ::gpk::DARKGREEN};
+
+	drawBuffers(backBuffer, app.OutputVertexShader, app.CacheVertexShader, indices, positions, normals, uv, material, projection, nearFar, worldTransform, cameraFront, lightPos);
+	return 0;
+}
+
+					::gpk::error_t										drawScene									(::SApplication& app, ::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>	backBuffer)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
+	for(uint32_t iRenderNode = 0; iRenderNode < app.Engine.Scene->ManagedRenderNodes.RenderNodes.size(); ++iRenderNode) {
+		::gpk::SRenderNode													& renderNode	= app.Engine.Scene->ManagedRenderNodes.RenderNodes[iRenderNode];
+		if((uint32_t)renderNode.Mesh >= app.Engine.Scene->ManagedMeshes.Meshes.size())
+			continue;
+
+		::gpk::SRenderMesh													& mesh			= *app.Engine.Scene->ManagedMeshes.Meshes[renderNode.Mesh];
+		::gpk::SGeometrySlice												& slice			= mesh.GeometrySlices[renderNode.Slice];
+		slice.Slice.Offset;
+		slice.Slice.Count;
+		
+	}
+	(void)app, (void)backBuffer;
+	return 0;
+}
+
+static	int										updateEntityTransforms			
+	( uint32_t							iEntity
+	, ::gpk::SVirtualEntityManager		& managedEntities	
+	, ::gpk::SRigidBodyIntegrator		& integrator		
+	, ::gpk::SRenderNodeManager			& renderNodes
+)	{
+	const ::gpk::SVirtualEntity							& entity						= managedEntities.Entities[iEntity];
+	const ::gpk::ptr_obj<::gpk::array_pod<uint32_t>>	& children						= managedEntities.EntityChildren[iEntity];
+	if(-1 != entity.RenderNode) {
+		::gpk::SMatrix4<float>								& worldTransform				= renderNodes.RenderNodeTransforms[entity.RenderNode];
+		if(-1 == entity.RigidBody)
+			worldTransform									= ::gpk::SMatrix4<float>::GetIdentity();
+		else
+			integrator.GetTransform(entity.RigidBody, worldTransform);
+	
+		if(-1 != entity.Parent) {
+			const ::gpk::SVirtualEntity							& entityParent					= managedEntities.Entities[entity.Parent];
+			if(-1 != entityParent.RenderNode) 
+				worldTransform			= renderNodes.RenderNodeTransforms[entityParent.RenderNode] * worldTransform;
+		}
+	}
+	if(children) {
+		for(uint32_t iChild = 0; iChild < children->size(); ++iChild) {
+			updateEntityTransforms((*children)[iChild], managedEntities, integrator, renderNodes);
+		}
+	}
+
+	return 0;
+}
+
+struct SCamera {
+	::gpk::SCoord3<float>								Position, Target;
+};
+
+					::gpk::error_t										draw										(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	::gpk::SFramework															& framework									= app.Framework;
+	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>			backBuffer;
+	backBuffer->resize(framework.MainDisplayOffscreen->Color.metrics(), 0xFF000080, (uint32_t)-1);
+
 	::gpk::SMatrix4<float>														projection									= {};
 	::gpk::SMatrix4<float>														viewMatrix									= {};
 	::gpk::SMatrix4<float>														worldTransform								= {};
@@ -197,41 +270,16 @@ struct SCamera {
 
 	::gpk::SCoord3<float>								cameraFront				= (camera.Target - camera.Position).Normalize();
 
-
-	//------------------------------------------------
-	::gpk::view_array<const ::gpk::SCoord3<float>>		positions				= {&::gpk::VOXEL_FACE_VERTICES	[0].A, 24};
-	::gpk::view_array<const ::gpk::SCoord3<float>>		normals					= {&::gpk::VOXEL_FACE_NORMALS	[0].A, 24};
-	::gpk::view_array<const ::gpk::SCoord2<float>>		uv						= {&::gpk::VOXEL_FACE_UV		[0].A, 24};
-	::gpk::view_array<const uint16_t>					indices					= {::gpk::VOXEL_FACE_INDICES_16	[0], 36};
-	::gpk::SRenderMaterial								material				= {::gpk::MAGENTA * .1, ::gpk::MAGENTA, ::gpk::DARKGREEN};
-
-	drawBuffers(backBuffer, app.OutputVertexShader, app.CacheVertexShader, indices, positions, normals, uv, material, projection, nearFar, worldTransform, cameraFront, lightPos);
-	return 0;
-}
-					::gpk::error_t										drawScene									(::SApplication& app, ::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>	backBuffer)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
-	for(uint32_t iRenderNode = 0; iRenderNode < app.Engine.Scene.ManagedRenderNodes.RenderNodes.size(); ++iRenderNode) {
-		::gpk::SRenderNode													& renderNode	= app.Engine.Scene.ManagedRenderNodes.RenderNodes[iRenderNode];
-		if((uint32_t)renderNode.Mesh >= app.Engine.Scene.ManagedMeshes.Meshes.size())
+	for(uint32_t iEntity = 0; iEntity < app.Engine.ManagedEntities.Entities.size(); ++iEntity) {
+		::gpk::SVirtualEntity	& entity = app.Engine.ManagedEntities.Entities[iEntity];
+		if(entity.Parent != -1)
 			continue;
-
-		::gpk::SRenderMesh													& mesh			= *app.Engine.Scene.ManagedMeshes.Meshes[renderNode.Mesh];
-		::gpk::SGeometrySlice												& slice			= mesh.GeometrySlices[renderNode.Slice];
-		slice.Slice.Offset;
-		slice.Slice.Count;
-		
+		::updateEntityTransforms(iEntity, app.Engine.ManagedEntities, app.Engine.Integrator, app.Engine.Scene->ManagedRenderNodes);
 	}
-	(void)app, (void)backBuffer;
-	return 0;
-}
-
-					::gpk::error_t										draw										(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
-	::gpk::SFramework															& framework									= app.Framework;
-
-	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>			backBuffer;
-	backBuffer->resize(framework.MainDisplayOffscreen->Color.metrics(), 0xFF000080, (uint32_t)-1);
+	
 	{
 		::gpk::STimer	timer;
-		::drawIndexed(app, backBuffer);
+		::drawIndexed(app, backBuffer, projection, nearFar, worldTransform, cameraFront, lightPos);
 		timer.Frame();
 		always_printf("Render indexed in %f seconds", timer.LastTimeSeconds);
 	}

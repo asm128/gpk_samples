@@ -17,7 +17,7 @@ static				::gpk::error_t										drawShipHealthBar							(::SApplication& app, 
 	double																		enemyHealthProportion						= health / 5000.0;
 	healthBar.B.x															= ::gpk::interpolate_linear(healthBar.A.x, healthBar.B.x, enemyHealthProportion);
 	app.CacheLinePoints.clear();
-	::gpk::drawLine(viewOffscreen.metrics(), healthBar, app.CacheLinePoints);
+	::gpk::drawLine(viewOffscreen.metrics().Cast<uint16_t>(), healthBar, app.CacheLinePoints);
 	for(uint32_t iLinePoint = 0, pointCount = app.CacheLinePoints.size(); iLinePoint < pointCount; ++iLinePoint) {
 		const ::gpk::SCoord2<float>													& pointToDraw								= app.CacheLinePoints[iLinePoint].Cast<float>();
 		::gpk::drawPixelLight(viewOffscreen, pointToDraw, finalColor, .2f, 1.5f);
@@ -136,7 +136,7 @@ static				const ::gpk::array_static<::gpk::SColorBGRA, WEAPON_TYPE_COUNT>	weapon
 	for(uint32_t iRay = 0, rayCount = app.StuffToDraw.ProjectilePaths.size(); iRay < rayCount; ++iRay) {
 		const ::SLaserToDraw														& laserToDraw								= app.StuffToDraw.ProjectilePaths[iRay];
 		app.CacheLinePoints.clear();
-		::gpk::drawLine(viewOffscreen.metrics(), laserToDraw.Segment, app.CacheLinePoints);
+		::gpk::drawLine(viewOffscreen.metrics().Cast<uint16_t>(), laserToDraw.Segment, app.CacheLinePoints);
 		const ::gpk::SParticleBinding<::SGameParticle>								& gameParticle								= app.ParticleSystemProjectiles.Instances[laserToDraw.IndexParticleInstance];
 		const float																	lightRange									= (gameParticle.Binding.TypePlayer == PLAYER_TYPE_PLAYER) ? 3.0f : 2.5f;
 		const float																	lightValue									= (gameParticle.Binding.TypePlayer == PLAYER_TYPE_PLAYER) ? .15f : 1.0f;

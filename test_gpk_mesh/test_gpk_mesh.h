@@ -123,6 +123,10 @@ struct SApplication {
 	int32_t											EntityLightPoint		= -1;
 	int32_t											EntityLightSpot			= -1;
 	int32_t											EntityBox				= -1;
+	int32_t											EntitySphere			= -1;
+
+	::gpk::SImage<::gpk::SColorBGR>					Image;
+	::gpk::SImage<::gpk::SColorBGRA>				ImageAlpha;
 
 	::SVSOutput										OutputVertexShader		= {};
 	::SVSCache										CacheVertexShader		= {};
