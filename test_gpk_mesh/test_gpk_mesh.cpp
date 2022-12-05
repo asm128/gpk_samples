@@ -35,7 +35,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 					::gpk::error_t										setup										(::SApplication& app)											{
 	::gpk::SFramework															& framework									= app.Framework;
 	::gpk::SWindow																& mainWindow								= framework.MainDisplay;
-	mainWindow.Size															= {640, 480};
+	mainWindow.Size															= {1280, 720};
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?!");
 	//app.EntitySphere				= app.Engine.CreateSphere	();
 
@@ -96,7 +96,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 
 	for(uint32_t iBall = 0; iBall < 16; ++iBall) {
 		app.Balls[iBall]				= app.Engine.CreateSphere();
-		app.Engine.SetDampingLinear(app.Balls[iBall], .90f);
+		app.Engine.SetDampingLinear(app.Balls[iBall], 1.0);
 		const ::gpk::SVirtualEntity			& entity		= app.Engine.ManagedEntities.Entities[app.Balls[iBall]];
 		const ::gpk::SRenderNode			& renderNode	= app.Engine.Scene->ManagedRenderNodes.RenderNodes[entity.RenderNode];
 		const ::gpk::SRenderMesh			& mesh			= *app.Engine.Scene->ManagedMeshes.Meshes[renderNode.Mesh];
@@ -108,7 +108,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	}
 
 	app.Engine.SetPosition(app.Balls[0], {-5, 0.5f, 0});
-	::gpk::SCoord3<float>	velocity{20.f, 0, 0};
+	::gpk::SCoord3<float>	velocity{30.f, 0, 0};
 	velocity.RotateY((rand() % RAND_MAX) / (65535.0f * 3)* ((rand() % 2) ? -1 : 1));
 	app.Engine.SetVelocity(app.Balls[0], velocity);
 	uint8_t rowLen = 5;
@@ -342,15 +342,41 @@ struct SCamera {
 
 	{
 		::gpk::STimer										timer;
-		app.Engine.Update(frameInfo.Seconds.LastFrame);
+		app.Engine.Update(frameInfo.Seconds.LastFrame * .25);
+
+		::gpk::array_pod<::gpk::SCoord2<int16_t>>			& wireframePixelCoords		= app.CacheVertexShader.WireframePixelCoords;
+
 		for(uint32_t iBall = 0; iBall < 16; ++iBall) {
 			::gpk::SCoord3<float>			& positionA			= app.Engine.Integrator.Centers[app.Engine.ManagedEntities.Entities[app.Balls[iBall]].RigidBody].Position;
 			::gpk::SCoord3<float>			& velocityA			= app.Engine.Integrator.Forces[app.Engine.ManagedEntities.Entities[app.Balls[iBall]].RigidBody].Velocity;
+			::gpk::SCoord3<float>			screemPositionA		= positionA;
+			::gpk::SCoord3<float>			screemPelocityA		= positionA + velocityA * 2;
+			screemPositionA				= projection.Transform(screemPositionA);
+			screemPelocityA				= projection.Transform(screemPelocityA);
+			wireframePixelCoords.clear();
+			::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{screemPositionA, screemPelocityA}, wireframePixelCoords);
+			for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord) {
+				::gpk::SCoord2<int16_t>								coord		= wireframePixelCoords[iCoord];
+				backBuffer->Color.View[coord.y][coord.x]		= ::gpk::MAGENTA;
+			}
 			for(uint32_t iBall2 = iBall + 1; iBall2 < 16; ++iBall2) {
-				const ::gpk::SCoord3<float>		& positionB			= app.Engine.Integrator.Centers[app.Engine.ManagedEntities.Entities[app.Balls[iBall2]].RigidBody].Position;
+				::gpk::SCoord3<float>			& positionB			= app.Engine.Integrator.Centers[app.Engine.ManagedEntities.Entities[app.Balls[iBall2]].RigidBody].Position;
 				::gpk::SCoord3<float>			distance			= positionB - positionA;
 				::gpk::SCoord3<float>			distanceDirection	= distance;
 				distanceDirection.Normalize();
+
+				if(iBall == 0 && iBall2 == 15) {
+					::gpk::SCoord3<float>			perpendicular		= positionA + distanceDirection.Cross({0, (distanceDirection.z > 0) ? -1 : 1.0f, 0}) * 2;
+					perpendicular				= projection.Transform(perpendicular);
+
+					wireframePixelCoords.clear();
+					::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{screemPositionA, perpendicular}, wireframePixelCoords);
+					for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord) {
+						::gpk::SCoord2<int16_t>								coord		= wireframePixelCoords[iCoord];
+						backBuffer->Color.View[coord.y][coord.x]		= ::gpk::GREEN;
+					}
+				}
+
 				if(distance.LengthSquared() < 1) {
 					::gpk::SCoord3<float>			& velocityB			= app.Engine.Integrator.Forces[app.Engine.ManagedEntities.Entities[app.Balls[iBall2]].RigidBody].Velocity;
 					const ::gpk::SCoord3<float>		prevA				= velocityA;
@@ -362,7 +388,7 @@ struct SCamera {
 						directionA.Normalize();
 						float							factorA				= ::gpk::max(0.0f, (float)distanceDirection.Dot(directionA));
 						velocityB					+= distanceDirection * prevA.Length() * factorA;//::gpk::interpolate_linear(directionA, distanceDirection, factorA) * prevA.Length() * factorA;
-						velocityA					+= distanceDirection.Cross({0, 1, 0}).Normalize() * prevA.Length() * (1.0f - factorA);
+						velocityA					+= distanceDirection.Cross({0, (distanceDirection.z > 0) ? -1 : 1.0f, 0}).Normalize() * prevA.Length() * (1.0f - factorA);
 					}
 					if(prevB.LengthSquared()) {
 						distanceDirection			*= -1;
@@ -370,8 +396,12 @@ struct SCamera {
 						directionB.Normalize();
 						float							factorB				= ::gpk::max(0.0f, (float)distanceDirection.Dot(directionB));
 						velocityA					+= distanceDirection * prevB.Length() * factorB;//::gpk::interpolate_linear(directionA, distanceDirection, factorA) * prevA.Length() * factorA;
-						velocityB					+= distanceDirection.Cross({0, 1, 0}).Normalize() * prevB.Length() * (1.0f - factorB);
+						velocityB					+= distanceDirection.Cross({0, (distanceDirection.z > 0) ? -1 : 1.0f, 0}).Normalize() * prevB.Length() * (1.0f - factorB);
 					}
+					//velocityA					*= .9f;
+					//velocityB					*= .9f;
+					positionB += ::gpk::SCoord3<float>{velocityB}.Normalize() * ::gpk::max(1.0f - distance.Length(), 0.0);
+					positionA += ::gpk::SCoord3<float>{velocityA}.Normalize() * ::gpk::max(1.0f - distance.Length(), 0.0);
 				}
 			}
 			if(positionA.x	< -20) {
