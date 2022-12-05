@@ -42,14 +42,15 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	app.EntityLightDirectional		= app.Engine.CreateLight	(::gpk::LIGHT_TYPE_Directional	);
 	app.EntityLightPoint			= app.Engine.CreateLight	(::gpk::LIGHT_TYPE_Point		);
 	app.EntityLightSpot				= app.Engine.CreateLight	(::gpk::LIGHT_TYPE_Spot			);
-	app.EntityBox					= app.Engine.CreateBox		();
+	//app.EntityBox					= app.Engine.CreateBox		();
 	app.EntitySphere				= app.Engine.CreateSphere	();
 
-	app.Engine.Integrator.Centers[app.Engine.ManagedEntities.Entities[app.EntityCamera				].RigidBody].Position = {0, 0, 0};
-	app.Engine.Integrator.Centers[app.Engine.ManagedEntities.Entities[app.EntityLightDirectional	].RigidBody].Position = {0, 0, 0};
-	app.Engine.Integrator.Centers[app.Engine.ManagedEntities.Entities[app.EntityLightPoint			].RigidBody].Position = {0, 0, 0};
-	app.Engine.Integrator.Centers[app.Engine.ManagedEntities.Entities[app.EntityLightSpot			].RigidBody].Position = {0, 0, 0};
-	app.Engine.Integrator.Centers[app.Engine.ManagedEntities.Entities[app.EntityBox					].RigidBody].Position = {-.5, -.5, -.5};
+	if(-1 != app.EntityCamera				)	app.Engine.Integrator.SetPosition(app.Engine.ManagedEntities.Entities[app.EntityCamera				].RigidBody, {0, 0, 0});
+	if(-1 != app.EntityLightDirectional		)	app.Engine.Integrator.SetPosition(app.Engine.ManagedEntities.Entities[app.EntityLightDirectional	].RigidBody, {0, 0, 0});
+	if(-1 != app.EntityLightPoint			)	app.Engine.Integrator.SetPosition(app.Engine.ManagedEntities.Entities[app.EntityLightPoint			].RigidBody, {0, 0, 0});
+	if(-1 != app.EntityLightSpot			)	app.Engine.Integrator.SetPosition(app.Engine.ManagedEntities.Entities[app.EntityLightSpot			].RigidBody, {0, 0, 0});
+	if(-1 != app.EntityBox					)	app.Engine.Integrator.SetPosition(app.Engine.ManagedEntities.Entities[app.EntityBox					].RigidBody, {-.5, -.5, -.5});
+	if(-1 != app.EntitySphere				)	app.Engine.Integrator.SetPosition(app.Engine.ManagedEntities.Entities[app.EntitySphere				].RigidBody, {-.5, -.5, -.5});
 
 	ree_if	(errored(::updateSizeDependentResources	(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
 	return 0;
@@ -177,49 +178,35 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	return 0;
 }
 
-					::gpk::error_t										drawScene									(::SApplication& app, ::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>	backBuffer)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
+::gpk::error_t										drawScene									
+	( ::SApplication					& app
+	, ::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>	backBuffer
+	, const ::gpk::SMatrix4<float>		& projection		
+	, const ::gpk::SNearFar				& nearFar 
+	, const ::gpk::SMatrix4<float>		& worldTransform	 
+	, const ::gpk::SCoord3<float>		& cameraFront
+	, const ::gpk::SCoord3<float>		& lightPos
+	) {	//
 	for(uint32_t iRenderNode = 0; iRenderNode < app.Engine.Scene->ManagedRenderNodes.RenderNodes.size(); ++iRenderNode) {
-		::gpk::SRenderNode													& renderNode	= app.Engine.Scene->ManagedRenderNodes.RenderNodes[iRenderNode];
+		::gpk::SRenderNode										& renderNode			= app.Engine.Scene->ManagedRenderNodes.RenderNodes[iRenderNode];
 		if((uint32_t)renderNode.Mesh >= app.Engine.Scene->ManagedMeshes.Meshes.size())
 			continue;
 
-		::gpk::SRenderMesh													& mesh			= *app.Engine.Scene->ManagedMeshes.Meshes[renderNode.Mesh];
-		::gpk::SGeometrySlice												& slice			= mesh.GeometrySlices[renderNode.Slice];
-		slice.Slice.Offset;
-		slice.Slice.Count;
+		::gpk::SRenderMesh										& mesh					= *app.Engine.Scene->ManagedMeshes.Meshes[renderNode.Mesh];
+		::gpk::vcc												& meshName				= app.Engine.Scene->ManagedMeshes.MeshNames[renderNode.Mesh];
+		::gpk::SGeometrySlice									& slice					= mesh.GeometrySlices[renderNode.Slice];
+
+		info_printf("Drawing node %i, mesh %i, slice %i, mesh name: %s", iRenderNode, renderNode.Mesh, renderNode.Slice, meshName.begin());
+
+		::gpk::view_array<const uint16_t>						indices					= (mesh.GeometryBuffers.size() > 0) ? ::gpk::view_array<const uint16_t>					{(const uint16_t				*)app.Engine.Scene->ManagedBuffers.Buffers[mesh.GeometryBuffers[0]]->Data.begin(), app.Engine.Scene->ManagedBuffers.Buffers[mesh.GeometryBuffers[0]]->Data.size() / sizeof(const uint16_t)}					: ::gpk::view_array<const uint16_t>					{};
+		::gpk::view_array<const ::gpk::SCoord3<float>>			positions				= (mesh.GeometryBuffers.size() > 1) ? ::gpk::view_array<const ::gpk::SCoord3<float>>	{(const ::gpk::SCoord3<float>	*)app.Engine.Scene->ManagedBuffers.Buffers[mesh.GeometryBuffers[1]]->Data.begin(), app.Engine.Scene->ManagedBuffers.Buffers[mesh.GeometryBuffers[1]]->Data.size() / sizeof(const ::gpk::SCoord3<float>)}	: ::gpk::view_array<const ::gpk::SCoord3<float>>	{};
+		::gpk::view_array<const ::gpk::SCoord3<float>>			normals					= (mesh.GeometryBuffers.size() > 2) ? ::gpk::view_array<const ::gpk::SCoord3<float>>	{(const ::gpk::SCoord3<float>	*)app.Engine.Scene->ManagedBuffers.Buffers[mesh.GeometryBuffers[2]]->Data.begin(), app.Engine.Scene->ManagedBuffers.Buffers[mesh.GeometryBuffers[2]]->Data.size() / sizeof(const ::gpk::SCoord3<float>)}	: ::gpk::view_array<const ::gpk::SCoord3<float>>	{};
+		::gpk::view_array<const ::gpk::SCoord2<float>>			uv						= (mesh.GeometryBuffers.size() > 3) ? ::gpk::view_array<const ::gpk::SCoord2<float>>	{(const ::gpk::SCoord2<float>	*)app.Engine.Scene->ManagedBuffers.Buffers[mesh.GeometryBuffers[3]]->Data.begin(), app.Engine.Scene->ManagedBuffers.Buffers[mesh.GeometryBuffers[3]]->Data.size() / sizeof(const ::gpk::SCoord2<float>)}	: ::gpk::view_array<const ::gpk::SCoord2<float>>	{};
+		const ::gpk::SRenderMaterial							& material				= app.Engine.Scene->ManagedMeshes.Skins[slice.Skin]->Material;
+		drawBuffers(backBuffer, app.OutputVertexShader, app.CacheVertexShader, {&indices[slice.Slice.Offset], slice.Slice.Count}, positions, normals, uv, material, projection, nearFar, worldTransform, cameraFront, lightPos);
 		
 	}
 	(void)app, (void)backBuffer;
-	return 0;
-}
-
-static	int										updateEntityTransforms			
-	( uint32_t							iEntity
-	, ::gpk::SVirtualEntityManager		& managedEntities	
-	, ::gpk::SRigidBodyIntegrator		& integrator		
-	, ::gpk::SRenderNodeManager			& renderNodes
-)	{
-	const ::gpk::SVirtualEntity							& entity						= managedEntities.Entities[iEntity];
-	const ::gpk::ptr_obj<::gpk::array_pod<uint32_t>>	& children						= managedEntities.EntityChildren[iEntity];
-	if(-1 != entity.RenderNode) {
-		::gpk::SMatrix4<float>								& worldTransform				= renderNodes.RenderNodeTransforms[entity.RenderNode];
-		if(-1 == entity.RigidBody)
-			worldTransform									= ::gpk::SMatrix4<float>::GetIdentity();
-		else
-			integrator.GetTransform(entity.RigidBody, worldTransform);
-	
-		if(-1 != entity.Parent) {
-			const ::gpk::SVirtualEntity							& entityParent					= managedEntities.Entities[entity.Parent];
-			if(-1 != entityParent.RenderNode) 
-				worldTransform			= renderNodes.RenderNodeTransforms[entityParent.RenderNode] * worldTransform;
-		}
-	}
-	if(children) {
-		for(uint32_t iChild = 0; iChild < children->size(); ++iChild) {
-			updateEntityTransforms((*children)[iChild], managedEntities, integrator, renderNodes);
-		}
-	}
-
 	return 0;
 }
 
@@ -270,22 +257,16 @@ struct SCamera {
 
 	::gpk::SCoord3<float>								cameraFront				= (camera.Target - camera.Position).Normalize();
 
-	for(uint32_t iEntity = 0; iEntity < app.Engine.ManagedEntities.Entities.size(); ++iEntity) {
-		::gpk::SVirtualEntity	& entity = app.Engine.ManagedEntities.Entities[iEntity];
-		if(entity.Parent != -1)
-			continue;
-		::updateEntityTransforms(iEntity, app.Engine.ManagedEntities, app.Engine.Integrator, app.Engine.Scene->ManagedRenderNodes);
-	}
-	
+	app.Engine.Update(frameInfo.Seconds.LastFrame);
 	{
 		::gpk::STimer	timer;
-		::drawIndexed(app, backBuffer, projection, nearFar, worldTransform, cameraFront, lightPos);
+		//::drawIndexed(app, backBuffer, projection, nearFar, worldTransform, cameraFront, lightPos);
 		timer.Frame();
 		always_printf("Render indexed in %f seconds", timer.LastTimeSeconds);
 	}
 	//{
 	//	::gpk::STimer	timer;
-	//	//::drawScene(app, backBuffer);
+		::drawScene(app, backBuffer, projection, nearFar, worldTransform, cameraFront, lightPos);
 	//	timer.Frame();
 	//	always_printf("Render scene in %f seconds", timer.LastTimeSeconds);
 	//}

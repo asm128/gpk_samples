@@ -17,6 +17,14 @@ namespace gpk
 		::gpk::SMeshManager					ManagedMeshes		;
 	};
 
+	::gpk::error_t						updateEntityTransforms			
+		( uint32_t								iEntity
+		, const ::gpk::SVirtualEntity			& entity
+		, const ::gpk::SVirtualEntityManager	& managedEntities	
+		, ::gpk::SRigidBodyIntegrator			& integrator		
+		, ::gpk::SRenderNodeManager				& renderNodes
+		);
+
 	struct SEngine {
 		::gpk::ptr_obj<::gpk::SEngineScene>	Scene				;
 		::gpk::SVirtualEntityManager		ManagedEntities		;
@@ -32,6 +40,17 @@ namespace gpk
 		::gpk::error_t						CreateRing			();
 		::gpk::error_t						CreateSquare		();
 		::gpk::error_t						CreateTriangle		();
+		::gpk::error_t						Update				(double secondsLastFrame)			{
+			Integrator.Integrate(secondsLastFrame);
+			for(uint32_t iEntity = 0; iEntity < ManagedEntities.Entities.size(); ++iEntity) {
+				::gpk::SVirtualEntity	& entity = ManagedEntities.Entities[iEntity];
+				if(entity.Parent != -1)
+					continue;
+
+				::gpk::updateEntityTransforms(iEntity, entity, ManagedEntities, Integrator, Scene->ManagedRenderNodes);
+			}
+			return 0;
+		}
 	};
 
 } // namespace

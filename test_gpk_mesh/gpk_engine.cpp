@@ -3,6 +3,41 @@
 #include "gpk_ascii_color.h"
 #include "gpk_geometry_lh.h"
 
+int												gpk::updateEntityTransforms			
+	( uint32_t								iEntity
+	, const ::gpk::SVirtualEntity			& entity
+	, const ::gpk::SVirtualEntityManager	& managedEntities	
+	, ::gpk::SRigidBodyIntegrator			& integrator		
+	, ::gpk::SRenderNodeManager				& renderNodes
+	)
+{
+	const ::gpk::ptr_obj<::gpk::array_pod<uint32_t>>	& children						= managedEntities.EntityChildren[iEntity];
+	if(-1 != entity.RenderNode) {
+		::gpk::SMatrix4<float>								& worldTransform				= renderNodes.RenderNodeTransforms[entity.RenderNode];
+		if(-1 == entity.RigidBody)
+			worldTransform									= ::gpk::SMatrix4<float>::GetIdentity();
+		else
+			integrator.GetTransform(entity.RigidBody, worldTransform);
+	
+		if(-1 != entity.Parent) {
+			const ::gpk::SVirtualEntity			& entityParent					= managedEntities.Entities[entity.Parent];
+			if(-1 != entityParent.RenderNode) 
+				worldTransform					= renderNodes.RenderNodeTransforms[entityParent.RenderNode] * worldTransform;
+			else if(-1 != entityParent.RigidBody) {
+				worldTransform					= integrator.TransformsLocal[entityParent.RigidBody] * worldTransform;
+			}
+		}
+	}
+	if(children) {
+		for(uint32_t iChild = 0; iChild < children->size(); ++iChild) {
+			const uint32_t iChildEntity = (*children)[iChild];
+			::gpk::updateEntityTransforms(iChildEntity, managedEntities.Entities[iChildEntity], managedEntities, integrator, renderNodes);
+		}
+	}
+
+	return 0;
+}
+
 ::gpk::error_t						gpk::SEngine::CreateLight			(::gpk::LIGHT_TYPE type) {
 	int32_t									iEntity								= this->ManagedEntities.Create();
 	::gpk::SVirtualEntity					& entity							= ManagedEntities.Entities[iEntity];
@@ -45,13 +80,16 @@
 	int32_t									iEntity								= this->ManagedEntities.Create();
 	::gpk::SVirtualEntity					& entity							= ManagedEntities.Entities[iEntity];
 	entity.Parent						= -1;
-	entity.RenderNode					= -1;
+	entity.RenderNode					= Scene->ManagedRenderNodes.Create();
 	entity.RigidBody					= this->Integrator.Create();
 
+	::gpk::ptr_obj<::gpk::SRenderBuffer>	pIndicesVertex;
 	::gpk::ptr_obj<::gpk::SRenderBuffer>	pVertices;
 	::gpk::ptr_obj<::gpk::SRenderBuffer>	pNormals;
 	::gpk::ptr_obj<::gpk::SRenderBuffer>	pUV;
-	::gpk::ptr_obj<::gpk::SRenderBuffer>	pIndicesVertex;
+	pIndicesVertex	->Desc.Format	= ::gpk::DATA_TYPE_UINT16;
+	pIndicesVertex	->Desc.Usage	= ::gpk::BUFFER_USAGE_Index;
+
 	pVertices		->Desc.Format	= ::gpk::DATA_TYPE_FLOAT32_3;
 	pVertices		->Desc.Usage	= ::gpk::BUFFER_USAGE_Position;
 
@@ -61,8 +99,6 @@
 	pUV				->Desc.Format	= ::gpk::DATA_TYPE_FLOAT32_2;
 	pUV				->Desc.Usage	= ::gpk::BUFFER_USAGE_UV;
 
-	pIndicesVertex	->Desc.Format	= ::gpk::DATA_TYPE_UINT16;
-	pIndicesVertex	->Desc.Usage	= ::gpk::BUFFER_USAGE_Index;
 
 	uint32_t							iVertices				= (uint32_t)Scene->ManagedBuffers.Buffers.push_back(pVertices);
 	uint32_t							iNormals				= (uint32_t)Scene->ManagedBuffers.Buffers.push_back(pNormals);
@@ -111,8 +147,9 @@
 		*(::gpk::SColorBGRA*)&surface->Data[0]	= ::gpk::SColorRGBA{::gpk::VOXEL_PALETTE[iFace]};
 
 		::gpk::SGeometrySlice				& slice					= mesh->GeometrySlices[iFace];
-		slice.Skin						= iSkin;
-		slice.Slice						= {offsetIndex, offsetIndex += 6};
+		slice.Skin							= iSkin;
+		slice.Slice							= {offsetIndex, 6};
+		offsetIndex						+= slice.Slice.Count;
 
 		int32_t								iFaceEntity						= this->ManagedEntities.Create();
 		uint32_t							iFaceRenderNode					= Scene->ManagedRenderNodes.Create();
@@ -143,11 +180,13 @@
 	entity.RenderNode					= Scene->ManagedRenderNodes.Create();;
 	entity.RigidBody					= this->Integrator.Create();
 
+	::gpk::ptr_obj<::gpk::SRenderBuffer>	pIndicesVertex;
 	::gpk::ptr_obj<::gpk::SRenderBuffer>	pVertices;
 	::gpk::ptr_obj<::gpk::SRenderBuffer>	pNormals;
 	::gpk::ptr_obj<::gpk::SRenderBuffer>	pUV;
-	::gpk::ptr_obj<::gpk::SRenderBuffer>	pIndicesVertex;
 
+	pIndicesVertex	->Desc.Format		= ::gpk::DATA_TYPE_UINT16;
+	pIndicesVertex	->Desc.Usage		= ::gpk::BUFFER_USAGE_Index;
 
 	pVertices		->Desc.Format		= ::gpk::DATA_TYPE_FLOAT32_3;
 	pVertices		->Desc.Usage		= ::gpk::BUFFER_USAGE_Position;
@@ -158,15 +197,17 @@
 	pUV				->Desc.Format		= ::gpk::DATA_TYPE_FLOAT32_2;
 	pUV				->Desc.Usage		= ::gpk::BUFFER_USAGE_UV;
 
-	pIndicesVertex	->Desc.Format		= ::gpk::DATA_TYPE_UINT16;
-	pIndicesVertex	->Desc.Usage		= ::gpk::BUFFER_USAGE_Index;
+	pIndicesVertex	->Data.resize(geometry.PositionIndices	.byte_count() / 2);
+	::gpk::view_array<uint16_t> viewIndices = {(uint16_t*)pIndicesVertex->Data.begin(), geometry.PositionIndices.size()};
+	for(uint32_t index = 0; index < geometry.PositionIndices.size(); ++index) {
+		viewIndices[index] = (uint16_t)geometry.PositionIndices[index];
+	}
+	//memcpy(&pIndicesVertex	->Data[0], geometry.PositionIndices	.begin(), pIndicesVertex	->Data.size());
 
 	pVertices		->Data.resize(geometry.Positions		.byte_count());
-	pNormals		->Data.resize(geometry.PositionIndices	.byte_count());
-	pUV				->Data.resize(geometry.Normals			.byte_count());
-	pIndicesVertex	->Data.resize(geometry.TextureCoords	.byte_count());
+	pNormals		->Data.resize(geometry.Normals			.byte_count());
+	pUV				->Data.resize(geometry.TextureCoords	.byte_count());
 	memcpy(&pVertices		->Data[0], geometry.Positions		.begin(), pVertices			->Data.size());
-	memcpy(&pIndicesVertex	->Data[0], geometry.PositionIndices	.begin(), pIndicesVertex	->Data.size());
 	memcpy(&pNormals		->Data[0], geometry.Normals			.begin(), pNormals			->Data.size());
 	memcpy(&pUV				->Data[0], geometry.TextureCoords	.begin(), pUV				->Data.size());
 
