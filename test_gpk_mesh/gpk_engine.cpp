@@ -78,6 +78,7 @@ int												gpk::updateEntityTransforms
 
 ::gpk::error_t						gpk::SEngine::CreateBox				()	{
 	int32_t									iEntity								= this->ManagedEntities.Create();
+	ManagedEntities.EntityNames[iEntity]	= ::gpk::vcs{"Box"};
 	::gpk::SVirtualEntity					& entity							= ManagedEntities.Entities[iEntity];
 	entity.Parent						= -1;
 	entity.RenderNode					= Scene->ManagedRenderNodes.Create();
@@ -106,6 +107,7 @@ int												gpk::updateEntityTransforms
 	uint32_t							iIndicesVertex			= (uint32_t)Scene->ManagedBuffers.Buffers.push_back(pIndicesVertex);
 
 	uint32_t							iMesh					= (uint32_t)Scene->ManagedMeshes.CreateMesh();
+	Scene->ManagedMeshes.MeshNames[iMesh]	= ::gpk::vcs{"Box"};
 	::gpk::ptr_obj<::gpk::SRenderMesh>	& mesh					= Scene->ManagedMeshes.Meshes[iMesh];
 
 	mesh->GeometryBuffers.append({iIndicesVertex, iVertices, iNormals, iUV});
@@ -123,6 +125,11 @@ int												gpk::updateEntityTransforms
 	memcpy(&pIndicesVertex	->Data[0], ::gpk::VOXEL_FACE_INDICES_16	, pIndicesVertex	->Data.size());
 	memcpy(&pNormals		->Data[0], ::gpk::VOXEL_FACE_NORMALS	, pNormals			->Data.size());
 	memcpy(&pUV				->Data[0], ::gpk::VOXEL_FACE_UV			, pUV				->Data.size());
+
+	::gpk::view_array<::gpk::SCoord3<float>> viewPositions = {(::gpk::SCoord3<float>*)pVertices->Data.begin(), pVertices->Data.size() / sizeof(::gpk::SCoord3<float>)};
+	for(uint32_t index = 0; index < viewPositions.size(); ++index) {
+		viewPositions[index] -= {.5f, .5f, .5f};
+	}
 
 	uint32_t							offsetIndex				= 0;
 	for(uint32_t iFace = 0; iFace < 6; ++iFace) {
@@ -175,6 +182,7 @@ int												gpk::updateEntityTransforms
 	::gpk::geometryBuildSphere(geometry, 16, 16, .5f, {});
 
 	int32_t									iEntity								= this->ManagedEntities.Create();
+	ManagedEntities.EntityNames[iEntity]	= ::gpk::vcs{"Sphere"};
 	::gpk::SVirtualEntity					& entity							= ManagedEntities.Entities[iEntity];
 	entity.Parent						= -1;
 	entity.RenderNode					= Scene->ManagedRenderNodes.Create();;
@@ -218,12 +226,12 @@ int												gpk::updateEntityTransforms
 
 	uint32_t									iMesh					= (uint32_t)Scene->ManagedMeshes.CreateMesh();
 	::gpk::ptr_obj<::gpk::SRenderMesh>			& mesh					= Scene->ManagedMeshes.Meshes[iMesh];
+	Scene->ManagedMeshes.MeshNames[iMesh]	= ::gpk::vcs{"Sphere"};
 	mesh->GeometryBuffers.append({iIndicesVertex, iVertices, iNormals, iUV});
 
 	mesh->Desc.Mode							= ::gpk::MESH_MODE_List;
 	mesh->Desc.Type							= ::gpk::GEOMETRY_TYPE_Triangle;
 	mesh->Desc.NormalMode					= ::gpk::NORMAL_MODE_Point;
-	mesh->GeometrySlices.resize(1);	// one per face
 	uint32_t									iSkin					= (uint32_t)Scene->ManagedMeshes.CreateSkin();
 	uint32_t									iSurface				= (uint32_t)Scene->ManagedSurfaces.Create();
 	::gpk::ptr_obj<::gpk::SSkin>				& skin					= Scene->ManagedMeshes.Skins[iSkin];
@@ -244,9 +252,14 @@ int												gpk::updateEntityTransforms
 	surface->Data.resize(1 * sizeof(::gpk::SColorBGRA));
 	*(::gpk::SColorBGRA*)&surface->Data[0]	= ::gpk::SColorRGBA{::gpk::VOXEL_PALETTE[3]};
 
+	mesh->GeometrySlices.resize(1);	// one per face
 	::gpk::SGeometrySlice						& slice					= mesh->GeometrySlices[0];
 	slice.Skin								= iSkin;
 	slice.Slice								= {0, geometry.PositionIndices.size()};
+
+	Scene->ManagedRenderNodes.RenderNodes[entity.RenderNode].Mesh	= iMesh;
+	Scene->ManagedRenderNodes.RenderNodes[entity.RenderNode].Slice	= 0;
+
 	return iEntity;
 }
 
