@@ -30,6 +30,26 @@ namespace gpk
 		::gpk::SVirtualEntityManager		ManagedEntities		;
 		::gpk::SRigidBodyIntegrator			Integrator			;
 
+		::gpk::error_t						SetPosition			(uint32_t iEntity, const ::gpk::SCoord3<float> & position) {
+			Integrator.SetPosition(ManagedEntities.Entities[iEntity].RigidBody, position);
+			return 0;
+		}
+
+		::gpk::error_t						SetVelocity			(uint32_t iEntity, const ::gpk::SCoord3<float> & velocity) {
+			Integrator.Forces[ManagedEntities.Entities[iEntity].RigidBody].Velocity = velocity;
+			return 0;
+		}
+
+		::gpk::error_t						SetDampingLinear		(uint32_t iEntity, float damping) {
+			Integrator.Masses[ManagedEntities.Entities[iEntity].RigidBody].LinearDamping = damping;
+			return 0;
+		}
+
+		::gpk::error_t						SetOrientation			(uint32_t iEntity, const ::gpk::SQuaternion<float> & orientation) {
+			Integrator.SetOrientation(ManagedEntities.Entities[iEntity].RigidBody, orientation);
+			return 0;
+		}
+
 		::gpk::error_t						CreateLight			(::gpk::LIGHT_TYPE type);
 		::gpk::error_t						CreateCamera		();
 
@@ -43,7 +63,7 @@ namespace gpk
 		::gpk::error_t						Update				(double secondsLastFrame)			{
 			Integrator.Integrate(secondsLastFrame);
 			for(uint32_t iEntity = 0; iEntity < ManagedEntities.Entities.size(); ++iEntity) {
-				::gpk::SVirtualEntity	& entity = ManagedEntities.Entities[iEntity];
+				::gpk::SVirtualEntity					& entity			= ManagedEntities.Entities[iEntity];
 				if(entity.Parent != -1)
 					continue;
 

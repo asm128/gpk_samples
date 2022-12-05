@@ -77,7 +77,7 @@ namespace gpk
 			RenderNodeLights		.push_back({});
 			RenderNodeCameras		.push_back({});
 			RenderNodeFlags			.push_back({});
-			return RenderNodes		.push_back({(uint32_t)-1, (uint32_t)-1, (uint32_t)-1});
+			return RenderNodes		.push_back({(uint32_t)-1});
 		}
 
 		::gpk::error_t											Delete		(uint32_t indexNode)	{

@@ -16,7 +16,7 @@
 static constexpr	const uint32_t										ASCII_SCREEN_WIDTH							= 132	;
 static constexpr	const uint32_t										ASCII_SCREEN_HEIGHT							= 50	;
 
-GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "Title");
+GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "The One");
 
 static				::gpk::error_t										updateSizeDependentResources				(::SApplication& app)											{
 	const ::gpk::SCoord2<uint32_t>												newSize										= app.Framework.MainDisplay.Size;
@@ -37,20 +37,103 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	::gpk::SWindow																& mainWindow								= framework.MainDisplay;
 	mainWindow.Size															= {640, 480};
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?!");
-	app.EntitySphere				= app.Engine.CreateSphere	();
-	app.EntityBox					= app.Engine.CreateBox		();
+	//app.EntitySphere				= app.Engine.CreateSphere	();
 
-	//app.EntityCamera				= app.Engine.CreateCamera	();
+
+	::gpk::SColorFloat					ballColors[16]	= 
+		{ ::gpk::WHITE
+		, ::gpk::LIGHTYELLOW
+		, ::gpk::LIGHTBLUE
+		, ::gpk::LIGHTRED
+		, ::gpk::PURPLE * 1.25
+		, ::gpk::LIGHTORANGE
+		, ::gpk::LIGHTGREEN
+		, ::gpk::LIGHTRED
+		, ::gpk::BLACK
+		, ::gpk::DARKYELLOW
+		, ::gpk::DARKBLUE
+		, ::gpk::DARKRED
+		, ::gpk::PURPLE * .5
+		, ::gpk::DARKORANGE
+		, ::gpk::DARKGREEN
+		, ::gpk::DARKRED
+		};
+
+	srand((int)time(0));
+
+	::gpk::array_pod<uint32_t>			ballPool		= {};
+	uint32_t							ball1			= 1 + rand() % 7;
+	uint32_t							ball5			= 9 + rand() % 7;
+	for(uint32_t iBall = 0; ballPool.size() < 12; ++iBall) {
+		if(iBall == 8)
+			continue;
+		if(iBall == 0)
+			continue;
+		if(iBall == ball1)
+			continue;
+		if(iBall == ball5)
+			continue;
+		ballPool.push_back(iBall);
+	}
+	uint32_t							ballOrder[]		= 
+		{ 0
+		, ball1
+		, ballPool[0]
+		, ballPool[ballPool.size() - 1]
+		, ballPool[1]
+		, ball5
+		, ballPool[ballPool.size() - 2]
+		, ballPool[2]
+		, ballPool[ballPool.size() - 3]
+		, ballPool[3]
+		, ballPool[ballPool.size() - 4]
+		, 8
+		, ballPool[4]
+		, ballPool[ballPool.size() - 5]
+		, ballPool[5]
+		, ballPool[ballPool.size() - 6]
+		};
+
+	for(uint32_t iBall = 0; iBall < 16; ++iBall) {
+		app.Balls[iBall]				= app.Engine.CreateSphere();
+		app.Engine.SetDampingLinear(app.Balls[iBall], .90f);
+		const ::gpk::SVirtualEntity			& entity		= app.Engine.ManagedEntities.Entities[app.Balls[iBall]];
+		const ::gpk::SRenderNode			& renderNode	= app.Engine.Scene->ManagedRenderNodes.RenderNodes[entity.RenderNode];
+		const ::gpk::SRenderMesh			& mesh			= *app.Engine.Scene->ManagedMeshes.Meshes[renderNode.Mesh];
+		const ::gpk::SGeometrySlice			& slice			= mesh.GeometrySlices[renderNode.Slice];
+		::gpk::SSkin						& skin			= *app.Engine.Scene->ManagedMeshes.Skins[slice.Skin];
+		::gpk::SRenderMaterial				& material		= skin.Material;
+		material.Color.Specular = material.Color.Diffuse = ballColors[ballOrder[iBall]];
+  		material.Color.Ambient = material.Color.Diffuse *.1f;
+	}
+
+	app.Engine.SetPosition(app.Balls[0], {-5, 0.5f, 0});
+	::gpk::SCoord3<float>	velocity{20.f, 0, 0};
+	velocity.RotateY((rand() % RAND_MAX) / (65535.0f * 3)* ((rand() % 2) ? -1 : 1));
+	app.Engine.SetVelocity(app.Balls[0], velocity);
+	uint8_t rowLen = 5;
+	::gpk::SCoord3<float>	diagonal = {1, 0, 1};
+	//diagonal.Normalize();
+	for(uint32_t iRow = 0, iBall = 1; iRow < 5; ++iRow, --rowLen) {
+		::gpk::SCoord3<float>					offsetZ			= {0, 0, -(rowLen / 2.0f) + .5f};
+		for(uint32_t iColumn = 0; iColumn < rowLen; ++iColumn) {
+			::gpk::SCoord3<float> position = offsetZ + ::gpk::SCoord3<float>{(+5.f + diagonal.x * 5) - iRow * diagonal.x, 0.5f, iColumn * 1.f};
+			uint32_t iEntity = app.Balls[iBall++];
+			app.Engine.SetPosition(iEntity, position);
+		}
+	}
+	//app.EntityCamera					= app.Engine.CreateCamera	();
 	//app.EntityLightDirectional		= app.Engine.CreateLight	(::gpk::LIGHT_TYPE_Directional	);
-	//app.EntityLightPoint			= app.Engine.CreateLight	(::gpk::LIGHT_TYPE_Point		);
+	//app.EntityLightPoint				= app.Engine.CreateLight	(::gpk::LIGHT_TYPE_Point		);
 	//app.EntityLightSpot				= app.Engine.CreateLight	(::gpk::LIGHT_TYPE_Spot			);
+	//app.EntityBox					= app.Engine.CreateBox		();
 
-	if(-1 != app.EntityCamera				)	app.Engine.Integrator.SetPosition(app.Engine.ManagedEntities.Entities[app.EntityCamera				].RigidBody, {0, 0, 0});
-	if(-1 != app.EntityLightDirectional		)	app.Engine.Integrator.SetPosition(app.Engine.ManagedEntities.Entities[app.EntityLightDirectional	].RigidBody, {0, 0, 0});
-	if(-1 != app.EntityLightPoint			)	app.Engine.Integrator.SetPosition(app.Engine.ManagedEntities.Entities[app.EntityLightPoint			].RigidBody, {0, 0, 0});
-	if(-1 != app.EntityLightSpot			)	app.Engine.Integrator.SetPosition(app.Engine.ManagedEntities.Entities[app.EntityLightSpot			].RigidBody, {0, 0, 0});
-	if(-1 != app.EntityBox					)	app.Engine.Integrator.SetPosition(app.Engine.ManagedEntities.Entities[app.EntityBox					].RigidBody, {0, 0.5f, 0});
-	if(-1 != app.EntitySphere				)	app.Engine.Integrator.SetPosition(app.Engine.ManagedEntities.Entities[app.EntitySphere				].RigidBody, {0, 0.5f, 2});
+	if(-1 != app.EntityCamera				)	app.Engine.SetPosition(app.EntityCamera				, {0, 0, 0});
+	if(-1 != app.EntityLightDirectional		)	app.Engine.SetPosition(app.EntityLightDirectional	, {0, 0, 0});
+	if(-1 != app.EntityLightPoint			)	app.Engine.SetPosition(app.EntityLightPoint			, {0, 0, 0});
+	if(-1 != app.EntityLightSpot			)	app.Engine.SetPosition(app.EntityLightSpot			, {0, 0, 0});
+	if(-1 != app.EntityBox					)	app.Engine.SetPosition(app.EntityBox				, {0, 0.5f, 0});
+	if(-1 != app.EntitySphere				)	app.Engine.SetPosition(app.EntitySphere				, {0, 0.5f, 2});
 
 	ree_if	(errored(::updateSizeDependentResources	(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
 	return 0;
@@ -87,13 +170,14 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	for(uint32_t iTriangle = 0; iTriangle < view_indices.size(); ++iTriangle) {
 		const ::gpk::STriangle<uint16_t>											vertexIndices								= view_indices[iTriangle];
 		::gpk::STriangle3<float>													transformedNormals							= {normals[vertexIndices.A], normals[vertexIndices.B], normals[vertexIndices.C]};
-		transformedNormals.A = worldTransform.TransformDirection(transformedNormals.A);
-		transformedNormals.B = worldTransform.TransformDirection(transformedNormals.B);
-		transformedNormals.C = worldTransform.TransformDirection(transformedNormals.C);
+		transformedNormals.A = worldTransform.TransformDirection(transformedNormals.A); transformedNormals.A.Normalize();
+		transformedNormals.B = worldTransform.TransformDirection(transformedNormals.B); transformedNormals.B.Normalize();
+		transformedNormals.C = worldTransform.TransformDirection(transformedNormals.C); transformedNormals.C.Normalize();
+		(void)cameraFront;
 		double																		directionFactorA							= transformedNormals.A.Dot(cameraFront);
 		double																		directionFactorB							= transformedNormals.B.Dot(cameraFront);
 		double																		directionFactorC							= transformedNormals.C.Dot(cameraFront);
-		if(directionFactorA > 0 && directionFactorB > 0 && directionFactorC > 0)
+		if(directionFactorA > .1 && directionFactorB > .1 && directionFactorC > .1)
 			continue;
 
 		::gpk::STriangle3<float>													transformedPositions						= {positions[vertexIndices.A], positions[vertexIndices.B], positions[vertexIndices.C]};
@@ -125,35 +209,34 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	::transformTriangles(outVS, indices, positions, normals, projection, worldTransform, cameraFront);
 	::gpk::array_pod<::gpk::STriangle<float>>									& triangleWeights			= cacheVS.TriangleWeights		;
 	::gpk::array_pod<::gpk::SCoord2<int16_t>>									& trianglePixelCoords		= cacheVS.SolidPixelCoords		;
-	::gpk::array_pod<::gpk::SCoord2<int16_t>>									& wireframePixelCoords		= cacheVS.WireframePixelCoords	;
+	//::gpk::array_pod<::gpk::SCoord2<int16_t>>									& wireframePixelCoords		= cacheVS.WireframePixelCoords	;
 	const ::gpk::SCoord2<uint16_t>												offscreenMetrics			= backBuffer->Color.View.metrics().Cast<uint16_t>();
 	for(uint32_t iTriangle = 0; iTriangle < outVS.Positions.size(); ++iTriangle) {
 		::gpk::STriangle3<float>													& triNormals								= outVS.Normals		[iTriangle];
 		::gpk::STriangle3<float>													& triPositions								= outVS.Positions	[iTriangle];
-		double																		directionFactor								= triNormals.A.Dot(cameraFront);
-		if(directionFactor > 0)
-			continue;
 
-		double																		lightFactor									= triNormals.A.Dot(lightPos);
-		::gpk::SColorBGRA															color										= (material.Color.Ambient + material.Color.Diffuse * lightFactor).Clamp();
+
+
 		trianglePixelCoords.clear();
 		triangleWeights.clear();
 		gerror_if(errored(::gpk::drawTriangle(backBuffer->DepthStencil.View, nearFar, triPositions, trianglePixelCoords, triangleWeights)), "Not sure if these functions could ever fail");
 		for(uint32_t iCoord = 0; iCoord < trianglePixelCoords.size(); ++iCoord) {
-			//const ::gpk::STriangle<float>						& vertexWeights	= triangleWeights[iCoord];
+			const ::gpk::STriangle<float>						& vertexWeights	= triangleWeights[iCoord];
+			double												lightFactor		= (triNormals.A * vertexWeights.A + triNormals.B * vertexWeights.B + triNormals.C * vertexWeights.C).Dot(lightPos);
+			const ::gpk::SColorBGRA								color			= (material.Color.Ambient + material.Color.Diffuse * lightFactor).Clamp();
 			const ::gpk::SCoord2<int16_t>						coord			= trianglePixelCoords[iCoord];
 			backBuffer->Color.View[coord.y][coord.x]		= color;
 		}
 
-		wireframePixelCoords.clear();
-		::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<int32_t>{triPositions.A.Cast<int32_t>(), triPositions.B.Cast<int32_t>()}, wireframePixelCoords);
-		::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<int32_t>{triPositions.B.Cast<int32_t>(), triPositions.C.Cast<int32_t>()}, wireframePixelCoords);
-		::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<int32_t>{triPositions.C.Cast<int32_t>(), triPositions.A.Cast<int32_t>()}, wireframePixelCoords);
-		const ::gpk::SColorBGRA wireColor = ::gpk::ASCII_PALETTE[iTriangle % ::gpk::size(::gpk::ASCII_PALETTE)];
-		for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord) {
-			::gpk::SCoord2<int16_t>								coord		= wireframePixelCoords[iCoord];
-			backBuffer->Color.View[coord.y][coord.x]		= wireColor;
-		}
+		//wireframePixelCoords.clear();
+		//::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<int32_t>{triPositions.A.Cast<int32_t>(), triPositions.B.Cast<int32_t>()}, wireframePixelCoords);
+		//::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<int32_t>{triPositions.B.Cast<int32_t>(), triPositions.C.Cast<int32_t>()}, wireframePixelCoords);
+		//::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<int32_t>{triPositions.C.Cast<int32_t>(), triPositions.A.Cast<int32_t>()}, wireframePixelCoords);
+		//const ::gpk::SColorBGRA wireColor = ::gpk::ASCII_PALETTE[iTriangle % ::gpk::size(::gpk::ASCII_PALETTE)];
+		//for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord) {
+		//	::gpk::SCoord2<int16_t>								coord		= wireframePixelCoords[iCoord];
+		//	backBuffer->Color.View[coord.y][coord.x]		= wireColor;
+		//}
 	}
 	return 0;
 }
@@ -232,13 +315,13 @@ struct SCamera {
 	::gpk::SNearFar																nearFar										= {0.01f , 1000.0f};
 
 	static constexpr const ::gpk::SCoord3<float>								cameraUp									= {0, 1, 0};	// ? cam't remember what is this. Radians? Eulers?
-	::SCamera																	camera										= {{10, 5, 0}, {}};
+	::SCamera																	camera										= {{-30, 25, 0}, {}};
 	::gpk::SCoord3<float>														lightPos									= {10, 5, 0};
 	static float																cameraRotation								= 0;
 	cameraRotation															+= (float)framework.Input->MouseCurrent.Deltas.x / 5.0f;
 	//camera.Position	.RotateY(cameraRotation);
-	camera.Position	.RotateY(frameInfo.Microseconds.Total / 1000000.0f);
-	lightPos		.RotateY(frameInfo.Microseconds.Total /  500000.0f * -2);
+	//camera.Position	.RotateY(frameInfo.Seconds.Total * .25f);
+	lightPos		.RotateY(-frameInfo.Seconds.Total);
 	viewMatrix.LookAt(camera.Position, camera.Target, cameraUp);
 	const ::gpk::SCoord2<uint16_t>												offscreenMetrics							= backBuffer->Color.View.metrics().Cast<uint16_t>();
 	projection.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, nearFar.Near, nearFar.Far );
@@ -253,13 +336,68 @@ struct SCamera {
 	viewport._42										= -1.0f;
 	viewport._43										= (float)(-nearFar.Near * ( 1.0f / (nearFar.Far - nearFar.Near) ));
 	viewport._44										= 1.0f;
-	projection																= projection * viewport.GetInverse();
+	projection											= projection * viewport.GetInverse();
 
 	::gpk::SCoord3<float>								cameraFront				= (camera.Target - camera.Position).Normalize();
 
 	{
-		::gpk::STimer	timer;
+		::gpk::STimer										timer;
 		app.Engine.Update(frameInfo.Seconds.LastFrame);
+		for(uint32_t iBall = 0; iBall < 16; ++iBall) {
+			::gpk::SCoord3<float>			& positionA			= app.Engine.Integrator.Centers[app.Engine.ManagedEntities.Entities[app.Balls[iBall]].RigidBody].Position;
+			::gpk::SCoord3<float>			& velocityA			= app.Engine.Integrator.Forces[app.Engine.ManagedEntities.Entities[app.Balls[iBall]].RigidBody].Velocity;
+			for(uint32_t iBall2 = iBall + 1; iBall2 < 16; ++iBall2) {
+				const ::gpk::SCoord3<float>		& positionB			= app.Engine.Integrator.Centers[app.Engine.ManagedEntities.Entities[app.Balls[iBall2]].RigidBody].Position;
+				::gpk::SCoord3<float>			distance			= positionB - positionA;
+				::gpk::SCoord3<float>			distanceDirection	= distance;
+				distanceDirection.Normalize();
+				if(distance.LengthSquared() < 1) {
+					::gpk::SCoord3<float>			& velocityB			= app.Engine.Integrator.Forces[app.Engine.ManagedEntities.Entities[app.Balls[iBall2]].RigidBody].Velocity;
+					const ::gpk::SCoord3<float>		prevA				= velocityA;
+					const ::gpk::SCoord3<float>		prevB				= velocityB;
+					velocityB					= {};
+					velocityA					= {};
+					if(prevA.LengthSquared()) {
+						::gpk::SCoord3<float>			directionA			= prevA;	
+						directionA.Normalize();
+						float							factorA				= ::gpk::max(0.0f, (float)distanceDirection.Dot(directionA));
+						velocityB					+= distanceDirection * prevA.Length() * factorA;//::gpk::interpolate_linear(directionA, distanceDirection, factorA) * prevA.Length() * factorA;
+						velocityA					+= distanceDirection.Cross({0, 1, 0}).Normalize() * prevA.Length() * (1.0f - factorA);
+					}
+					if(prevB.LengthSquared()) {
+						distanceDirection			*= -1;
+						::gpk::SCoord3<float>			directionB			= prevB;	
+						directionB.Normalize();
+						float							factorB				= ::gpk::max(0.0f, (float)distanceDirection.Dot(directionB));
+						velocityA					+= distanceDirection * prevB.Length() * factorB;//::gpk::interpolate_linear(directionA, distanceDirection, factorA) * prevA.Length() * factorA;
+						velocityB					+= distanceDirection.Cross({0, 1, 0}).Normalize() * prevB.Length() * (1.0f - factorB);
+					}
+				}
+			}
+			if(positionA.x	< -20) {
+				positionA.x = -20;
+				velocityA.x *= -1;
+				velocityA *= .9f;
+			}
+			if(positionA.x	> 20) {
+				positionA.x = 20;
+				velocityA.x *= -1;
+				velocityA *= .9f;
+			}
+			if(positionA.z	< -10) {
+				positionA.z = -10;
+				velocityA.z *= -1;
+				velocityA *= .9f;
+			}
+			if(positionA.z	> 10) {
+				positionA.z = 10;
+				velocityA.z *= -1;
+				velocityA *= .9f;
+			}
+
+		}
+
+
 		timer.Frame();
 		always_printf("Update engine in %f seconds", timer.LastTimeSeconds);
 	}
