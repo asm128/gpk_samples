@@ -62,12 +62,12 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	ree_if(errored(frameworkResult), "Unknown error.");
 	rvi_if(1, frameworkResult == 1, "Framework requested close. Terminating execution.");
 	ree_if(errored(::updateSizeDependentResources(app)), "Cannot update offscreen and this could cause an invalid memory access later on.");
-
+	static float timeScale = 1;
 	{
 		::gpk::SFramework									& framework									= app.Framework;
 		::gpk::SFrameInfo									& frameInfo									= framework.FrameInfo;
 		::gpk::STimer										timer;
-		::the1::poolGameUpdate(app.Pool, frameInfo.Seconds.LastFrame);
+		::the1::poolGameUpdate(app.Pool, frameInfo.Seconds.LastFrame * timeScale);
 
 		timer.Frame();
 		always_printf("Update engine in %f seconds", timer.LastTimeSeconds);
@@ -84,6 +84,11 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	if(GetAsyncKeyState('R')) 
 		::the1::poolGameReset(app.Pool);
 
+	if(GetAsyncKeyState(VK_ADD)) 
+		timeScale	+= .1f;
+	if(GetAsyncKeyState(VK_SUBTRACT)) 
+		timeScale	+= -.1f;
+	
 	return 0;
 }
 

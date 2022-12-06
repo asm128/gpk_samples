@@ -124,13 +124,6 @@ struct SCamera {
 	::gpk::SCoord3<float>						Position, Target;
 };
 
-bool										the1::revert				(const ::gpk::SCoord3<float> & distanceDirection, const ::gpk::SCoord3<float> & initialVelocity)	{
-	(void)distanceDirection;
-	//return false;
-	return (distanceDirection.z > 0) || initialVelocity.x < 0;
-	//return (distanceDirection.z > 0) || (distanceDirection.x < 0);
-}
-
 ::gpk::error_t								the1::poolGameDraw			(::the1::SPoolGame & pool, ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t> & backBuffer, double totalSeconds, uint64_t frameNumber)	{
 	::gpk::SMatrix4<float>							projection				= {};
 	::gpk::SMatrix4<float>							viewMatrix				= {};
