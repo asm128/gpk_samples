@@ -60,6 +60,17 @@ namespace gpk
 	};
 #pragma pack(pop)
 
+	struct SVSCache {
+		::gpk::array_pod<::gpk::STriangle<float>>		TriangleWeights			= {};
+		::gpk::array_pod<::gpk::SCoord2<int16_t>>		SolidPixelCoords		= {};
+		::gpk::array_pod<::gpk::SCoord2<int16_t>>		WireframePixelCoords	= {};
+	};
+
+	struct SVSOutput {
+		::gpk::array_pod<::gpk::STriangle3<float>>		Positions				= {};
+		::gpk::array_pod<::gpk::STriangle3<float>>		Normals					= {};
+	};
+
 	struct SRenderNodeManager {
 		::gpk::array_pod <::gpk::SRenderNode						>	RenderNodes				= {};
 		::gpk::array_pod <::gpk::SRenderNodeFlags					>	RenderNodeFlags			= {};

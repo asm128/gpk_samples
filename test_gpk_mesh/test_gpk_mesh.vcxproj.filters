@@ -39,12 +39,24 @@
     <ClInclude Include="gpk_engine_entity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="gpk_the_one.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test_gpk_mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="gpk_engine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpk_the_one_setup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpk_the_one_update.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpk_the_one_draw.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

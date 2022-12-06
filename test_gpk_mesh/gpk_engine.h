@@ -10,11 +10,17 @@
 
 namespace gpk 
 {
+	struct SEngineRenderCache {
+		::gpk::SVSOutput					OutputVertexShader		= {};
+		::gpk::SVSCache						CacheVertexShader		= {};
+	};
+
 	struct SEngineScene {
-		::gpk::SRenderBufferManager			ManagedBuffers		;
-		::gpk::SRenderNodeManager			ManagedRenderNodes	;
-		::gpk::SSurfaceManager				ManagedSurfaces		;
-		::gpk::SMeshManager					ManagedMeshes		;
+		::gpk::SRenderBufferManager			ManagedBuffers			= {};
+		::gpk::SRenderNodeManager			ManagedRenderNodes		= {};
+		::gpk::SSurfaceManager				ManagedSurfaces			= {};
+		::gpk::SMeshManager					ManagedMeshes			= {};
+		::gpk::SEngineRenderCache			RenderCache				= {};
 	};
 
 	::gpk::error_t						updateEntityTransforms			
