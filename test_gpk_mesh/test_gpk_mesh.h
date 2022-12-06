@@ -40,7 +40,7 @@ struct SApplication {
 	::gpk::SImage<::gpk::SColorBGR>					Image;
 	::gpk::SImage<::gpk::SColorBGRA>				ImageAlpha;
 
-	::SPoolGame										Pool					= {};
+	::the1::SPoolGame								 Pool					= {};
 
 													SApplication			(::gpk::SRuntimeValues& runtimeValues)			noexcept	: Framework(runtimeValues) {}
 };

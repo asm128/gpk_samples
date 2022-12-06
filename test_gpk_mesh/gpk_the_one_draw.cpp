@@ -124,7 +124,14 @@ struct SCamera {
 	::gpk::SCoord3<float>						Position, Target;
 };
 
-::gpk::error_t								poolGameDraw			(::SPoolGame & pool, ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t> & backBuffer, double totalSeconds, uint64_t frameNumber)	{
+bool										the1::revert				(const ::gpk::SCoord3<float> & distanceDirection, const ::gpk::SCoord3<float> & initialVelocity)	{
+	(void)distanceDirection;
+	//return false;
+	return (distanceDirection.z > 0) || initialVelocity.x < 0;
+	//return (distanceDirection.z > 0) || (distanceDirection.x < 0);
+}
+
+::gpk::error_t								the1::poolGameDraw			(::the1::SPoolGame & pool, ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t> & backBuffer, double totalSeconds, uint64_t frameNumber)	{
 	::gpk::SMatrix4<float>							projection				= {};
 	::gpk::SMatrix4<float>							viewMatrix				= {};
 	::gpk::SMatrix4<float>							worldTransform			= {};
@@ -166,39 +173,45 @@ struct SCamera {
 	::gpk::SEngine									& engine				= pool.Engine;
 
 	::gpk::array_pod<::gpk::SCoord2<int16_t>>		& wireframePixelCoords	= engine.Scene->RenderCache.CacheVertexShader.WireframePixelCoords;
-	for(uint32_t iBall = 0; iBall < 16; ++iBall) {
-		const ::gpk::SCoord3<float>						& positionA				= engine.Integrator.Centers[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Position;
-		::gpk::SCoord3<float>							velocityA				= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Velocity;
-		::gpk::SCoord3<float>							screemPositionA			= positionA;
-		::gpk::SCoord3<float>							screemPelocityA			= positionA + velocityA * 2;
-		screemPositionA								= projection.Transform(screemPositionA);
-		screemPelocityA								= projection.Transform(screemPelocityA);
-		wireframePixelCoords.clear();
-		::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{screemPositionA, screemPelocityA}, wireframePixelCoords);
-		for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord) {
-			::gpk::SCoord2<int16_t>							coord					= wireframePixelCoords[iCoord];
-			backBuffer.Color.View[coord.y][coord.x]		= ::gpk::MAGENTA;
-		}
-		for(uint32_t iBall2 = iBall + 1; iBall2 < 16; ++iBall2) {
-			::gpk::SCoord3<float>							& positionB				= engine.Integrator.Centers[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall2].Entity].RigidBody].Position;
-			::gpk::SCoord3<float>							distance				= positionB - positionA;
-			::gpk::SCoord3<float>							distanceDirection		= distance;
-			distanceDirection.Normalize();
-
-			if(iBall == 0 && iBall2 == 15) {
-				bool											revert					= (distanceDirection.z > 0) || (distanceDirection.x < 0);
-				::gpk::SCoord3<float>							perpendicular			= positionA + distanceDirection.Cross({0, revert ? -1 : 1.0f, 0}).Normalize() * 2;
-				perpendicular								= projection.Transform(perpendicular);
-
-				wireframePixelCoords.clear();
-				::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{screemPositionA, perpendicular}, wireframePixelCoords);
-				for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord) {
-					::gpk::SCoord2<int16_t>							coord					= wireframePixelCoords[iCoord];
-					backBuffer.Color.View[coord.y][coord.x]		= ::gpk::GREEN;
-				}
+	for(uint32_t iBall = 0; iBall < pool.StartState.BallCount; ++iBall) {
+		for(uint32_t iDelta = ::gpk::max(0, (int32_t)pool.PositionDeltas[iBall].size() - 20); iDelta < pool.PositionDeltas[iBall].size(); ++iDelta) {
+			::gpk::SLine3<float>							screenDelta				= pool.PositionDeltas[iBall][iDelta];
+			screenDelta.A								= projection.Transform(screenDelta.A);
+			screenDelta.B								= projection.Transform(screenDelta.B);
+			wireframePixelCoords.clear();
+			::gpk::drawLine(offscreenMetrics, screenDelta, wireframePixelCoords);
+			for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord) {
+				::gpk::SCoord2<int16_t>							coord					= wireframePixelCoords[iCoord];
+				backBuffer.Color.View[coord.y][coord.x]		= pool.StartState.BallColors[pool.StartState.BallOrder[iBall]];
 			}
+			//::gpk::SCoord3<float>							velocityA				= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Velocity;
+			//velocityA									= screenDelta.A + velocityA * 2;
+			//screemPelocityA								= projection.Transform(screemPelocityA);
+
 		}
 	}
+			//	const ::gpk::SCoord3<float>						& positionA				= engine.Integrator.Centers[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Position;
+	//	::gpk::SCoord3<float>							velocityA				= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Velocity;
+	//	for(uint32_t iBall2 = iBall + 1; iBall2 < pool.StartState.BallCount; ++iBall2) {
+	//		::gpk::SCoord3<float>							& positionB				= engine.Integrator.Centers[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall2].Entity].RigidBody].Position;
+	//		::gpk::SCoord3<float>							distance				= positionB - positionA;
+	//		::gpk::SCoord3<float>							distanceDirection		= distance;
+	//		distanceDirection.Normalize();
+
+	//		if(iBall == 0 && iBall2 == 15) {
+	//			bool											revert					= ::the1::revert(distanceDirection, velocityA);
+	//			::gpk::SCoord3<float>							perpendicular			= positionA + distanceDirection.Cross({0, revert ? -1 : 1.0f, 0}).Normalize() * 2;
+	//			perpendicular								= projection.Transform(perpendicular);
+
+	//			wireframePixelCoords.clear();
+	//			::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{screemPositionA, perpendicular}, wireframePixelCoords);
+	//			for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord) {
+	//				::gpk::SCoord2<int16_t>							coord					= wireframePixelCoords[iCoord];
+	//				backBuffer.Color.View[coord.y][coord.x]		= ::gpk::GREEN;
+	//			}
+	//		}
+	//	}
+	//}
 
 	::drawScene(backBuffer, engine.Scene->RenderCache, *engine.Scene, projection, nearFar, cameraFront, lightPos);
 	timer.Frame();

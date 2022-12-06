@@ -36,7 +36,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	mainWindow.Size															= {1280, 720};
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?!");
 
-	::poolGameSetup(app.Pool);
+	::the1::poolGameSetup(app.Pool);
 
 	//app.EntityCamera					= app.Engine.CreateCamera	();
 	//app.EntityLightDirectional		= app.Engine.CreateLight	(::gpk::LIGHT_TYPE_Directional	);
@@ -67,7 +67,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 		::gpk::SFramework									& framework									= app.Framework;
 		::gpk::SFrameInfo									& frameInfo									= framework.FrameInfo;
 		::gpk::STimer										timer;
-		::poolGameUpdate(app.Pool, frameInfo.Seconds.LastFrame);
+		::the1::poolGameUpdate(app.Pool, frameInfo.Seconds.LastFrame);
 
 		timer.Frame();
 		always_printf("Update engine in %f seconds", timer.LastTimeSeconds);
@@ -82,7 +82,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	SetWindowTextA(windowHandle, buffer);
 
 	if(GetAsyncKeyState('R')) 
-		::poolGameReset(app.Pool);
+		::the1::poolGameReset(app.Pool);
 
 	return 0;
 }
@@ -92,7 +92,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>			backBuffer;
 	backBuffer->resize(framework.MainDisplayOffscreen->Color.metrics(), 0xFF008000, (uint32_t)-1);
 
-	::poolGameDraw(app.Pool, *backBuffer, framework.FrameInfo.Seconds.Total, framework.FrameInfo.FrameNumber);
+	::the1::poolGameDraw(app.Pool, *backBuffer, framework.FrameInfo.Seconds.Total, framework.FrameInfo.FrameNumber);
 
 	//memcpy(framework.MainDisplayOffscreen->Color.View.begin(), backBuffer->Color.View.begin(), backBuffer->Color.View.byte_count());
 	::gpk::grid_mirror_y(framework.MainDisplayOffscreen->Color.View, backBuffer->Color.View);

@@ -1,8 +1,11 @@
 #include "gpk_the_one.h"
 #include "gpk_noise.h"
 
-::gpk::error_t							poolGameReset			(::SPoolGame & pool) {
-	pool.StartState.Seed = ::gpk::timeCurrentInUs();
+::gpk::error_t							the1::poolGameReset		(::the1::SPoolGame & pool) {
+	pool.StartState.Seed					= ::gpk::timeCurrentInUs();
+	for(uint32_t iBall = 0; iBall < ::the1::MAX_BALLS; ++iBall)
+		pool.PositionDeltas[iBall].clear();
+
 	::gpk::array_pod<uint32_t>					ballPool				= {};
 	uint32_t									ball1					= 1 + ::gpk::noise1DBase(pool.StartState.Seed + 1) % 7;
 	uint32_t									ball5					= 9 + ::gpk::noise1DBase(pool.StartState.Seed + 2) % 7;
@@ -35,7 +38,7 @@
 	pool.StartState.BallOrder[15] = ballPool[ballPool.size() - 6];
 
 	pool.Engine.Integrator.ZeroForces();
-	for(uint32_t iBall = 0; iBall < 16; ++iBall) {
+	for(uint32_t iBall = 0; iBall < ::the1::MAX_BALLS; ++iBall) {
 		pool.Engine.SetDampingLinear(pool.StartState.Balls[iBall].Entity, 1.0);
 		const ::gpk::SVirtualEntity					& entity				= pool.Engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity];
 		const ::gpk::SRenderNode					& renderNode			= pool.Engine.Scene->ManagedRenderNodes.RenderNodes[entity.RenderNode];
@@ -64,10 +67,11 @@
 	}
 	return 0;
 }
-::gpk::error_t							poolGameSetup			(::SPoolGame & pool) {
-	for(uint32_t iBall = 0; iBall < 16; ++iBall) {
+
+::gpk::error_t							the1::poolGameSetup			(::the1::SPoolGame & pool) {
+	for(uint32_t iBall = 0; iBall < ::the1::MAX_BALLS; ++iBall) {
 		gpk_necs(pool.StartState.Balls[iBall].Entity = pool.Engine.CreateSphere());
 	}
-	::poolGameReset(pool);
+	::the1::poolGameReset(pool);
 	return 0;
 }

@@ -1,6 +1,6 @@
 #include "gpk_the_one.h"
 
-static	::gpk::error_t						resolveCollision							
+static	::gpk::error_t		resolveCollision							
 	( const ::gpk::SCoord3<float>	& initialVelocity
 	, const ::gpk::SCoord3<float>	& distanceDirection
 	, ::gpk::SCoord3<float>			& out_finalVelocityA
@@ -10,7 +10,7 @@ static	::gpk::error_t						resolveCollision
 	directionA.Normalize();
 	float							factorB				= ::gpk::max(0.0f, (float)distanceDirection.Dot(directionA));
 
-	bool							revert				= (distanceDirection.z > 0) || (distanceDirection.x < 0);
+	bool							revert				= ::the1::revert(distanceDirection, initialVelocity);
 	::gpk::SCoord3<float>			finalVelocityA		= distanceDirection.Cross({0, revert ? -1 : 1.0f, 0}).Normalize() * initialVelocity.Length() * (1.0f - factorB);
 	::gpk::SCoord3<float>			finalVelocityB		= distanceDirection * initialVelocity.Length() * factorB;
 
@@ -19,14 +19,22 @@ static	::gpk::error_t						resolveCollision
 	return 0;
 }
 
-::gpk::error_t								poolGameUpdate			(::SPoolGame & pool, double secondsElapsed) {
-	::gpk::SEngine										& engine					= pool.Engine;
+::gpk::error_t				the1::poolGameUpdate			(::the1::SPoolGame & pool, double secondsElapsed) {
+	::gpk::SEngine					& engine						= pool.Engine;
+	for(uint32_t iBall = 0; iBall < pool.StartState.BallCount; ++iBall) {
+		pool.PositionDeltas[iBall].push_back({engine.Integrator.Centers[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Position, });
+	}
+
 	engine.Update(secondsElapsed);
 
-	for(uint32_t iBall = 0; iBall < 16; ++iBall) {
+	for(uint32_t iBall = 0; iBall < pool.StartState.BallCount; ++iBall) {
+		pool.PositionDeltas[iBall][pool.PositionDeltas[iBall].size() - 1].B = engine.Integrator.Centers[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Position;
+	}
+
+	for(uint32_t iBall = 0; iBall < pool.StartState.BallCount; ++iBall) {
 		::gpk::SCoord3<float>			& positionA			= engine.Integrator.Centers[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Position;
 		::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Velocity;
-		for(uint32_t iBall2 = iBall + 1; iBall2 < 16; ++iBall2) {
+		for(uint32_t iBall2 = iBall + 1; iBall2 < pool.StartState.BallCount; ++iBall2) {
 			::gpk::SCoord3<float>			& positionB			= engine.Integrator.Centers[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall2].Entity].RigidBody].Position;
 			::gpk::SCoord3<float>			distance			= positionB - positionA;
 			::gpk::SCoord3<float>			distanceDirection	= distance;
