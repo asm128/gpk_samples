@@ -47,7 +47,7 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 	}
 
 	pool.Engine.SetPosition(pool.StartState.Balls[0].Entity, {-5, 0.5f, 0});
-	::gpk::SCoord3<float>					velocity		= {30.f, 0, 0};
+	::gpk::SCoord3<float>					velocity		= {40.f, 0, 0};
 	velocity.RotateY(::gpk::noiseNormal1D(pool.StartState.Seed + 2) / 10 * ((rand() % 2) ? -1 : 1));
 	pool.Engine.SetVelocity(pool.StartState.Balls[0].Entity, velocity);
 	uint8_t									rowLen			= 5;

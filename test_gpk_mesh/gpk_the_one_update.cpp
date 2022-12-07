@@ -26,7 +26,7 @@ static	::gpk::error_t		resolveCollision
 		return 0;
 	}
 
-	always_printf("Total initial speed: %f", (float)(initialVelocityA.Length()));
+	info_printf("Total initial speed: %f", (float)(initialVelocityA.Length()));
 
 	bool							revert				= ::revertCross(distanceDirection);
 
@@ -36,7 +36,7 @@ static	::gpk::error_t		resolveCollision
 	::gpk::SCoord3<double>			finalVelocityA		= distanceDirection.Cross(vUp).Normalize() * speedA * (1.0f - out_forceTransferRatioB);
 	double finalSpeedA = finalVelocityB.Length();
 	double finalSpeedB = finalVelocityA.Length();
-	always_printf("Total final speed: %f", (float)(finalSpeedA + finalSpeedB));
+	info_printf("Total final speed: %f", (float)(finalSpeedA + finalSpeedB));
 	out_finalVelocityA			+= finalVelocityA.Cast<float>();
 	out_finalVelocityB			+= finalVelocityB.Cast<float>();
 	return 0;
@@ -102,10 +102,10 @@ static	::gpk::error_t		resolveCollision
 				double totalFinalSpeed	= lvelocityA.Length() + lvelocityB.Length();
 				double totalInitialSpeed = contact.Result.InitialVelocityA.Length();
 				if ((totalFinalSpeed - totalInitialSpeed) > 0.0001f) {
-					always_printf("Invalid resulting force: initial: %f, final: %f, gained: %f", totalInitialSpeed, totalFinalSpeed, (totalFinalSpeed - totalInitialSpeed));
+					warning_printf("Invalid resulting force: initial: %f, final: %f, gained: %f", totalInitialSpeed, totalFinalSpeed, (totalFinalSpeed - totalInitialSpeed));
 				}
 				if ((totalFinalSpeed - totalInitialSpeed) < -0.0001f) {
-					always_printf("Invalid resulting force: initial: %f, final: %f, lost: %f", totalInitialSpeed, totalFinalSpeed, (totalFinalSpeed - totalInitialSpeed) * -1);
+					warning_printf("Invalid resulting force: initial: %f, final: %f, lost: %f", totalInitialSpeed, totalFinalSpeed, (totalFinalSpeed - totalInitialSpeed) * -1);
 				}			
 				velocityB					+= lvelocityB;
 				velocityA					+= lvelocityA;
@@ -119,10 +119,10 @@ static	::gpk::error_t		resolveCollision
 					double							totalFinalSpeed				= lvelocityA.Length() + lvelocityB.Length();
 					double							totalInitialSpeed			= contact.Result.InitialVelocityB.Length();
 					if ((totalFinalSpeed - totalInitialSpeed) > 0.0001f) {
-						always_printf("Invalid resulting force: initial: %f, final: %f, gained: %f", totalInitialSpeed, totalFinalSpeed, (totalFinalSpeed - totalInitialSpeed));
+						warning_printf("Invalid resulting force: initial: %f, final: %f, gained: %f", totalInitialSpeed, totalFinalSpeed, (totalFinalSpeed - totalInitialSpeed));
 					}
 					if ((totalFinalSpeed - totalInitialSpeed) < -0.0001f) {
-						always_printf("Invalid resulting force: initial: %f, final: %f, lost: %f", totalInitialSpeed, totalFinalSpeed, (totalFinalSpeed - totalInitialSpeed) * -1);
+						warning_printf("Invalid resulting force: initial: %f, final: %f, lost: %f", totalInitialSpeed, totalFinalSpeed, (totalFinalSpeed - totalInitialSpeed) * -1);
 					}			
 				}
 				velocityB					+= lvelocityB;
@@ -131,10 +131,10 @@ static	::gpk::error_t		resolveCollision
 					double							totalFinalSpeed				= velocityA.Length() + velocityB.Length();
 					double							totalInitialSpeed			= contact.Result.InitialVelocityA.Length() + contact.Result.InitialVelocityB.Length();
 					if ((totalFinalSpeed - totalInitialSpeed) / totalInitialSpeed > 0.01f) {
-						always_printf("Invalid resulting force: initial: %f, final: %f, gained: %f", totalInitialSpeed, totalFinalSpeed, (totalFinalSpeed - totalInitialSpeed));
+						warning_printf("Invalid resulting force: initial: %f, final: %f, gained: %f", totalInitialSpeed, totalFinalSpeed, (totalFinalSpeed - totalInitialSpeed));
 					}
 					if ((totalFinalSpeed - totalInitialSpeed) / totalInitialSpeed < -0.01f) {
-						always_printf("Invalid resulting force: initial: %f, final: %f, lost: %f", totalInitialSpeed, totalFinalSpeed, (totalFinalSpeed - totalInitialSpeed) * -1);
+						warning_printf("Invalid resulting force: initial: %f, final: %f, lost: %f", totalInitialSpeed, totalFinalSpeed, (totalFinalSpeed - totalInitialSpeed) * -1);
 					}
 				}
 			}

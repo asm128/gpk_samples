@@ -247,6 +247,6 @@ struct SCamera {
 
 	::drawScene(backBuffer, engine.Scene->RenderCache, *engine.Scene, projection, nearFar, cameraFront, lightPos);
 	timer.Frame();
-	always_printf("Render scene in %f seconds", timer.LastTimeSeconds);
+	info_printf("Render scene in %f seconds", timer.LastTimeSeconds);
 	return 0;
 }

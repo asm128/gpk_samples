@@ -70,7 +70,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 		::the1::poolGameUpdate(app.Pool, frameInfo.Seconds.LastFrame * timeScale);
 
 		timer.Frame();
-		always_printf("Update engine in %f seconds", timer.LastTimeSeconds);
+		info_printf("Update engine in %f seconds", timer.LastTimeSeconds);
 	}
 
 	//-----------------------------
