@@ -82,12 +82,18 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	SetWindowTextA(windowHandle, buffer);
 
 	if(GetAsyncKeyState('R')) 
-		::the1::poolGameReset(app.Pool);
+		::the1::poolGameReset(app.Pool, app.Pool.StartState.Mode);
+	else if(GetAsyncKeyState('8')) 
+		::the1::poolGameReset(app.Pool, ::the1::POOL_GAME_MODE_8Ball);
+	else if(GetAsyncKeyState('9')) 
+		::the1::poolGameReset(app.Pool, ::the1::POOL_GAME_MODE_9Ball);
+	else if(GetAsyncKeyState('0')) 
+		::the1::poolGameReset(app.Pool, ::the1::POOL_GAME_MODE_10Ball);
 
 	if(GetAsyncKeyState(VK_ADD)) 
 		timeScale	+= .1f;
 	if(GetAsyncKeyState(VK_SUBTRACT)) 
-		timeScale	+= -.1f;
+		timeScale	= ::gpk::max(0.f, timeScale - .1f);
 	
 	return 0;
 }

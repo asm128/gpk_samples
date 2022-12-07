@@ -42,6 +42,9 @@
     <ClInclude Include="gpk_the_one.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="gpk_pool_game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test_gpk_mesh.cpp">

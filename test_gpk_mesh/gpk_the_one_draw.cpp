@@ -88,6 +88,16 @@ static	::gpk::error_t							transformTriangles
 	return 0;
 }
 
+namespace gpk
+{
+	template<typename _tCoord>
+	static					::gpk::error_t									drawLine									(const ::gpk::SCoord2<uint16_t>& targetMetrics, const ::gpk::SLine3<_tCoord>& line, const ::gpk::SMatrix4<float> & mWVP, ::gpk::array_pod<::gpk::SCoord2<int16_t>>& out_Points)				{
+		::gpk::SCoord3<_tCoord>		vA		= mWVP.Transform(line.A); 
+		::gpk::SCoord3<_tCoord>		vB		= mWVP.Transform(line.B);
+		return ::gpk::drawLine(targetMetrics, ::gpk::SLine2<_tCoord>{{vA.x, vA.y}, {vB.x, vB.y}}, out_Points);
+	}
+}
+
 ::gpk::error_t										drawScene									
 	( ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>					& backBuffer
 	, ::gpk::SEngineRenderCache											& renderCache
@@ -117,6 +127,35 @@ static	::gpk::error_t							transformTriangles
 		drawBuffers(backBuffer, renderCache.OutputVertexShader, renderCache.CacheVertexShader, {&indices[slice.Slice.Offset], slice.Slice.Count}, positions, normals, uv, material, projection, nearFar, worldTransform, cameraFront, lightPos);
 		
 	}
+
+	const ::gpk::SCoord2<uint16_t>					offscreenMetrics		= backBuffer.Color.View.metrics().Cast<uint16_t>();
+	::gpk::array_pod<::gpk::SCoord2<int16_t>>		& wireframePixelCoords	= renderCache.CacheVertexShader.WireframePixelCoords;
+
+	const ::gpk::SColorBGRA colorX = ::gpk::RED;
+	const ::gpk::SColorBGRA colorY = ::gpk::GREEN;
+	const ::gpk::SColorBGRA colorZ = ::gpk::BLUE;
+
+	wireframePixelCoords.clear();
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{{}, {1, }}, projection, wireframePixelCoords);
+	for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord) {
+		::gpk::SCoord2<int16_t>								coord		= wireframePixelCoords[iCoord];
+		backBuffer.Color.View[coord.y][coord.x]		= colorX;
+	}
+
+	wireframePixelCoords.clear();
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{{}, {0, 1, }}, projection, wireframePixelCoords);
+	for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord) {
+		::gpk::SCoord2<int16_t>								coord		= wireframePixelCoords[iCoord];
+		backBuffer.Color.View[coord.y][coord.x]		= colorY;
+	}
+
+	wireframePixelCoords.clear();
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{{}, {0, 0, 1}}, projection, wireframePixelCoords);
+	for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord) {
+		::gpk::SCoord2<int16_t>								coord		= wireframePixelCoords[iCoord];
+		backBuffer.Color.View[coord.y][coord.x]		= colorZ;
+	}
+
 	return 0;
 }
 

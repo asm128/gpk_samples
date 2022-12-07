@@ -1,11 +1,7 @@
 #include "gpk_the_one.h"
 #include "gpk_noise.h"
 
-::gpk::error_t							the1::poolGameReset		(::the1::SPoolGame & pool) {
-	pool.StartState.Seed					= ::gpk::timeCurrentInUs();
-	for(uint32_t iBall = 0; iBall < ::the1::MAX_BALLS; ++iBall)
-		pool.PositionDeltas[iBall].clear();
-
+static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 	::gpk::array_pod<uint32_t>					ballPool				= {};
 	uint32_t									ball1					= 1 + ::gpk::noise1DBase(pool.StartState.Seed + 1) % 7;
 	uint32_t									ball5					= 9 + ::gpk::noise1DBase(pool.StartState.Seed + 2) % 7;
@@ -68,10 +64,24 @@
 	return 0;
 }
 
-::gpk::error_t							the1::poolGameSetup			(::the1::SPoolGame & pool) {
+::gpk::error_t							the1::poolGameReset		(::the1::SPoolGame & pool, POOL_GAME_MODE mode) {
+	pool.StartState.Mode					= mode;
+	pool.StartState.Seed					= ::gpk::timeCurrentInUs();
+	for(uint32_t iBall = 0; iBall < ::the1::MAX_BALLS; ++iBall)
+		pool.PositionDeltas[iBall].clear();
+	switch(mode) {
+	default:
+	case POOL_GAME_MODE_8Ball:
+		gpk_necs(poolGameResetBall8(pool));
+		break;
+	}
+	return 0;
+}
+
+::gpk::error_t							the1::poolGameSetup			(::the1::SPoolGame & pool, POOL_GAME_MODE mode) {
 	for(uint32_t iBall = 0; iBall < ::the1::MAX_BALLS; ++iBall) {
 		gpk_necs(pool.StartState.Balls[iBall].Entity = pool.Engine.CreateSphere());
 	}
-	::the1::poolGameReset(pool);
+	::the1::poolGameReset(pool, mode);
 	return 0;
 }
