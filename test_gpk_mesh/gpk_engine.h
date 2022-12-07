@@ -42,7 +42,7 @@ namespace gpk
 		}
 
 		::gpk::error_t						SetVelocity			(uint32_t iEntity, const ::gpk::SCoord3<float> & velocity) {
-			Integrator.Forces[ManagedEntities.Entities[iEntity].RigidBody].Velocity = velocity;
+			Integrator.SetVelocity(ManagedEntities.Entities[iEntity].RigidBody, velocity);
 			return 0;
 		}
 

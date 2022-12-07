@@ -35,7 +35,7 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 
 	pool.Engine.Integrator.ZeroForces();
 	for(uint32_t iBall = 0; iBall < ::the1::MAX_BALLS; ++iBall) {
-		pool.Engine.SetDampingLinear(pool.StartState.Balls[iBall].Entity, 1.0);
+		pool.Engine.SetDampingLinear(pool.StartState.Balls[iBall].Entity, 0.8f);
 		const ::gpk::SVirtualEntity					& entity				= pool.Engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity];
 		const ::gpk::SRenderNode					& renderNode			= pool.Engine.Scene->ManagedRenderNodes.RenderNodes[entity.RenderNode];
 		const ::gpk::SRenderMesh					& mesh					= *pool.Engine.Scene->ManagedMeshes.Meshes[renderNode.Mesh];

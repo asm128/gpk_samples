@@ -107,6 +107,30 @@ namespace gpk
 	, const ::gpk::SCoord3<float>										& cameraFront
 	, const ::gpk::SCoord3<float>										& lightPos
 	) {	//
+	const ::gpk::SCoord2<uint16_t>					offscreenMetrics		= backBuffer.Color.View.metrics().Cast<uint16_t>();
+	::gpk::array_pod<::gpk::SCoord2<int16_t>>		& wireframePixelCoords	= renderCache.CacheVertexShader.WireframePixelCoords;
+
+	wireframePixelCoords.clear();
+	float length		= 20.5;
+	float width			= 10.5;
+
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{{-length, 0, -width}, { length, 0, -width}}, projection, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{{-length, 0, -width}, {-length, 0,  width}}, projection, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{{ length, 0,  width}, {-length, 0,  width}}, projection, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{{ length, 0,  width}, { length, 0, -width}}, projection, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{{-length, .5f, -width}, { length, .5f, -width}}, projection, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{{-length, .5f, -width}, {-length, .5f,  width}}, projection, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{{ length, .5f,  width}, {-length, .5f,  width}}, projection, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{{ length, .5f,  width}, { length, .5f, -width}}, projection, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{{-length, 0, -width}, {-length, .5f,-width}}, projection, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{{ length, 0,  width}, { length, .5f, width}}, projection, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{{-length, 0,  width}, {-length, .5f, width}}, projection, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{{ length, 0, -width}, { length, .5f,-width}}, projection, wireframePixelCoords);
+	for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord) {
+		::gpk::SCoord2<int16_t>								coord		= wireframePixelCoords[iCoord];
+		backBuffer.Color.View[coord.y][coord.x]		= ::gpk::MAGENTA;
+	}
+
 	for(uint32_t iRenderNode = 0, countNodes = scene.ManagedRenderNodes.RenderNodes.size(); iRenderNode < countNodes; ++iRenderNode) {
 		::gpk::SRenderNode										& renderNode			= scene.ManagedRenderNodes.RenderNodes[iRenderNode];
 		if((uint32_t)renderNode.Mesh >= scene.ManagedMeshes.Meshes.size())
@@ -128,8 +152,6 @@ namespace gpk
 		
 	}
 
-	const ::gpk::SCoord2<uint16_t>					offscreenMetrics		= backBuffer.Color.View.metrics().Cast<uint16_t>();
-	::gpk::array_pod<::gpk::SCoord2<int16_t>>		& wireframePixelCoords	= renderCache.CacheVertexShader.WireframePixelCoords;
 
 	const ::gpk::SColorBGRA colorX = ::gpk::RED;
 	const ::gpk::SColorBGRA colorY = ::gpk::GREEN;
@@ -176,7 +198,7 @@ struct SCamera {
 	::gpk::SNearFar									nearFar					= {0.01f , 1000.0f};
 
 	static constexpr const ::gpk::SCoord3<float>	cameraUp				= {0, 1, 0};	// ? cam't remember what is this. Radians? Eulers?
-	::SCamera										camera					= {{-30, 25, 0}, {}};
+	::SCamera										camera					= {{-40, 25, 0}, {}};
 	::gpk::SCoord3<float>							lightPos				= {10, 5, 0};
 	//static float									cameraRotation			= 0;
 	//cameraRotation								+= (float)framework.Input->MouseCurrent.Deltas.x / 5.0f;

@@ -96,6 +96,7 @@ static	::gpk::error_t		resolveCollision
 			velocityB					= {};
 			velocityA					= {};
 			if(contact.Result.InitialVelocityA.LengthSquared()) {
+				engine.Integrator.BodyFlags[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall2].Entity].RigidBody].Active = true;
 				::gpk::SCoord3<float>			lvelocityB					= {};
 				::gpk::SCoord3<float>			lvelocityA					= {};
 				::resolveCollision(contact.Result.InitialVelocityA.Cast<double>(), contact.Result.DistanceDirection.Cast<double>(), contact.Result.ForceTransferRatioB, lvelocityA, lvelocityB);
@@ -112,6 +113,7 @@ static	::gpk::error_t		resolveCollision
 			}
 
 			if(contact.Result.InitialVelocityB.LengthSquared()) {
+				engine.Integrator.BodyFlags[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Active = true;
 				::gpk::SCoord3<float>			lvelocityB					= {};
 				::gpk::SCoord3<float>			lvelocityA					= {};
 				::resolveCollision(contact.Result.InitialVelocityB.Cast<double>(), contact.Result.DistanceDirection.Cast<double>() * -1, contact.Result.ForceTransferRatioA, lvelocityB, lvelocityA);
@@ -139,38 +141,38 @@ static	::gpk::error_t		resolveCollision
 				}
 			}
 
-			contact.Result.FinalVelocityA	= velocityA;
-			contact.Result.FinalVelocityB	= velocityB;
+			contact.Result.FinalVelocityA	= (velocityA *= .9);
+			contact.Result.FinalVelocityB	= (velocityB *= .9);
 	}
 
 		for(uint32_t iBall = 0; iBall < pool.StartState.BallCount; ++iBall) {
 			::gpk::SCoord3<float>			& positionA			= engine.Integrator.Centers[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Position;
 			if(positionA.x	< -20) {
-				positionA.x = -20;
+				positionA.x = (-20) - (positionA.x+20);
 				::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Velocity;
 				velocityA.x *= -1;
 				//velocityA *= .9f;
 			}
 			if(positionA.x	> 20) {
-				positionA.x = 20;
+				positionA.x = 20 - (positionA.x-20);
 				::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Velocity;
 				velocityA.x *= -1;
 				//velocityA *= .9f;
 			}
 			if(positionA.z	< -10) {
-				positionA.z = -10;
+				positionA.z = (-10) - (positionA.z+10);
 				::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Velocity;
 				velocityA.z *= -1;
 				//velocityA *= .9f;
 			}
 			if(positionA.z	> 10) {
-				positionA.z = 10;
+				positionA.z = 10 - (positionA.z-10);
 				::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Velocity;
 				velocityA.z *= -1;
 				//velocityA *= .9f;
 			}
 			if(positionA.y	< 0) {
-				positionA.y = 0;
+				positionA.y *= -1;
 				::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Velocity;
 				velocityA.y *= -1;
 				//velocityA *= .9f;
