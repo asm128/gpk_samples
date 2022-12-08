@@ -200,7 +200,7 @@ static				::gpk::error_t										drawTriangles
 	::gpk::SMatrix4<float>														& fieldOfView								= transforms.FieldOfView		;
 	::gpk::SMatrix4<float>														& mviewport									= transforms.Viewport			;
 	fieldOfView.FieldOfView(camera.Angle * ::gpk::math_pi, targetMetrics.x / (double)targetMetrics.y, camera.NearFar.Near, camera.NearFar.Far);
-	mviewport.ViewportRH(targetMetrics);
+	mviewport.ViewportRH(targetMetrics.Cast<uint16_t>());
 	const ::gpk::SCoord2<int32_t>												screenCenter								= {(int32_t)targetMetrics.x / 2, (int32_t)targetMetrics.y / 2};
 	finalProjection															= fieldOfView * mviewport;
 	transforms.FinalProjectionInverse										= finalProjection.GetInverse();

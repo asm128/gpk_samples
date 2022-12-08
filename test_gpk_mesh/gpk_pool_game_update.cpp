@@ -1,10 +1,18 @@
-#include "gpk_the_one.h"
+#include "gpk_pool_game.h"
 
 static	bool				revertCross				(const ::gpk::SCoord3<double> & distanceDirection)	{
-	if(distanceDirection.x > 0)
-		return (distanceDirection.z > 0);
-	else 
-		return (distanceDirection.z < 0);
+	if(fabs(distanceDirection.x) > fabs(distanceDirection.z)) {
+		if(distanceDirection.x > 0)
+			return (distanceDirection.z >= 0);
+		else 
+			return (distanceDirection.z < 0);
+	}
+	else {
+		if(distanceDirection.x > 0)
+			return (distanceDirection.z >= 0);
+		else 
+			return (distanceDirection.z < 0);
+	}
 }
 
 static	::gpk::error_t		resolveCollision							
@@ -50,30 +58,38 @@ static	::gpk::error_t		resolveCollision
 	}
 
 	double							step							= .01f;
+	pool.LastFrameContactsBall		.clear();
+	pool.LastFrameContactsCushion	.clear();
+	::gpk::array_pod<::the1::SContactBall>	lastFrameContactsBatchBall;
+	::gpk::array_pod<::the1::SContactBall>	lastFrameContactsBatchCushion;
 	while(secondsElapsed > 0) { 
 		double							secondsThisStep					= ::gpk::min(step, secondsElapsed);
 		secondsElapsed				-= secondsThisStep;
 
 		engine.Update(secondsThisStep);
 
-		pool.Contacts.clear();
+		lastFrameContactsBatchBall		.clear();
+		lastFrameContactsBatchCushion	.clear();
+		const float						collisionThreshold				= (pool.StartState.BallRadius * 2) * (pool.StartState.BallRadius * 2);
 		for(uint32_t iBall = 0; iBall < pool.StartState.BallCount; ++iBall) {
 			const ::gpk::SCoord3<float>		& positionA			= engine.Integrator.Centers[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Position;
-			::the1::SBallContact			contact				= {};
-			contact.BallA				= iBall;
+			::the1::SContactBall			contactBall			= {};
+			::the1::SContactCushion			contactCushion		= {};
+			contactBall.BallA			= iBall;
+			contactCushion.BallA		= iBall;
 			for(uint32_t iBall2 = iBall + 1; iBall2 < pool.StartState.BallCount; ++iBall2) {
 				const ::gpk::SCoord3<float>		& positionB			= engine.Integrator.Centers[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall2].Entity].RigidBody].Position;
-				contact.BallB				= iBall2;
-				contact.Distance			= positionB - positionA;
-				if(contact.Distance.LengthSquared() >= 1) 
+				contactBall.BallB				= iBall2;
+				contactBall.Distance			= positionB - positionA;
+				if(contactBall.Distance.LengthSquared() >= collisionThreshold) 
 					continue;
 
-				pool.Contacts.push_back(contact);
+				lastFrameContactsBatchBall.push_back(contactBall);
 			}
 		}
 
-		for(uint32_t iContact = 0; iContact < pool.Contacts.size(); ++iContact) {
-			::the1::SBallContact			& contact			= pool.Contacts[iContact];
+		for(uint32_t iContact = 0; iContact < lastFrameContactsBatchBall.size(); ++iContact) {
+			::the1::SContactBall			& contact			= lastFrameContactsBatchBall[iContact];
 			uint32_t						iBall				= contact.BallA;
 			uint32_t						iBall2				= contact.BallB;
 
@@ -141,47 +157,56 @@ static	::gpk::error_t		resolveCollision
 				}
 			}
 
-			contact.Result.FinalVelocityA	= (velocityA *= .9);
-			contact.Result.FinalVelocityB	= (velocityB *= .9);
-	}
+			contact.Result.FinalVelocityA	= (velocityA *= pool.StartState.DampingCollision);
+			contact.Result.FinalVelocityB	= (velocityB *= pool.StartState.DampingCollision);
+			pool.LastFrameContactsBall.append(lastFrameContactsBatchBall);
+		}
 
+		const gpk::SCoord3<float> halfDimensions = pool.StartState.TableDimensions * .5 - ::gpk::SCoord3<float>{pool.StartState.BallRadius, 0, pool.StartState.BallRadius};
 		for(uint32_t iBall = 0; iBall < pool.StartState.BallCount; ++iBall) {
 			::gpk::SCoord3<float>			& positionA			= engine.Integrator.Centers[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Position;
-			if(positionA.x	< -20) {
-				positionA.x = (-20) - (positionA.x+20);
+			if(positionA.x	< -halfDimensions.x) {
+				positionA.x = (-halfDimensions.x) - (positionA.x + halfDimensions.x);
 				::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Velocity;
 				velocityA.x *= -1;
-				//velocityA *= .9f;
+				velocityA *= pool.StartState.DampingCushion;
 			}
-			if(positionA.x	> 20) {
-				positionA.x = 20 - (positionA.x-20);
+			if(positionA.x	> halfDimensions.x) {
+				positionA.x = halfDimensions.x - (positionA.x - halfDimensions.x);
 				::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Velocity;
 				velocityA.x *= -1;
-				//velocityA *= .9f;
+				velocityA *= pool.StartState.DampingCushion;
 			}
-			if(positionA.z	< -10) {
-				positionA.z = (-10) - (positionA.z+10);
+			if(positionA.z	< -halfDimensions.z) {
+				positionA.z = (-halfDimensions.z) - (positionA.z + halfDimensions.z);
 				::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Velocity;
 				velocityA.z *= -1;
-				//velocityA *= .9f;
+				velocityA *= pool.StartState.DampingCushion;
 			}
-			if(positionA.z	> 10) {
-				positionA.z = 10 - (positionA.z-10);
+			if(positionA.z	> halfDimensions.z) {
+				positionA.z = halfDimensions.z - (positionA.z-halfDimensions.z);
 				::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Velocity;
 				velocityA.z *= -1;
-				//velocityA *= .9f;
+				velocityA *= pool.StartState.DampingCushion;
 			}
 			if(positionA.y	< 0) {
 				positionA.y *= -1;
 				::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Velocity;
 				velocityA.y *= -1;
-				//velocityA *= .9f;
+				velocityA *= pool.StartState.DampingGround;
 			}
 		}
 	}
 
 	for(uint32_t iBall = 0; iBall < pool.StartState.BallCount; ++iBall) {
-		pool.GetBallPosition(iBall, pool.PositionDeltas[iBall][pool.PositionDeltas[iBall].size() - 1].B);
+		::gpk::SLine3<float> & delta = pool.PositionDeltas[iBall][pool.PositionDeltas[iBall].size() - 1];
+		pool.GetBallPosition(iBall, delta.B);
+		if(pool.PositionDeltas[iBall].size() > 10)
+			for(uint32_t iDelta = 0; iDelta < pool.PositionDeltas[iBall].size(); ++iDelta) {
+				if((delta.B - delta.A).LengthSquared() < 0.00001f) {
+					pool.PositionDeltas[iBall].remove_unordered(iDelta--);
+				}
+			}
 	}
 
 	return 0;

@@ -174,15 +174,17 @@
     <ClInclude Include="gpk_engine_rendermesh.h" />
     <ClInclude Include="gpk_engine_rendernode.h" />
     <ClInclude Include="gpk_engine_entity.h" />
+    <ClInclude Include="gpk_engine_scene.h" />
     <ClInclude Include="gpk_pool_game.h" />
     <ClInclude Include="gpk_the_one.h" />
     <ClInclude Include="test_gpk_mesh.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="gpk_engine.cpp" />
-    <ClCompile Include="gpk_the_one_draw.cpp" />
-    <ClCompile Include="gpk_the_one_setup.cpp" />
-    <ClCompile Include="gpk_the_one_update.cpp" />
+    <ClCompile Include="gpk_engine_scene.cpp" />
+    <ClCompile Include="gpk_pool_game_draw.cpp" />
+    <ClCompile Include="gpk_pool_game_setup.cpp" />
+    <ClCompile Include="gpk_pool_game_update.cpp" />
     <ClCompile Include="test_gpk_mesh.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

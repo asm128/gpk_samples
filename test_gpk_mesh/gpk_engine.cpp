@@ -133,9 +133,9 @@ int												gpk::updateEntityTransforms
 
 	uint32_t							offsetIndex				= 0;
 	for(uint32_t iFace = 0; iFace < 6; ++iFace) {
-		uint32_t							iSkin					= (uint32_t)Scene->ManagedMeshes.CreateSkin();
+		uint32_t							iSkin					= (uint32_t)Scene->ManagedRenderNodes.CreateSkin();
 		uint32_t							iSurface				= (uint32_t)Scene->ManagedSurfaces.Create();
-		::gpk::ptr_obj<::gpk::SSkin>		& skin					= Scene->ManagedMeshes.Skins[iSkin];
+		::gpk::ptr_obj<::gpk::SSkin>		& skin					= Scene->ManagedRenderNodes.Skins[iSkin];
 		skin->Textures.push_back(iSurface);
 		skin->Material.Color.Ambient	= ::gpk::SColorBGRA(::gpk::ASCII_PALETTE[1 + iFace]);
 		skin->Material.Color.Diffuse	= ::gpk::SColorBGRA(::gpk::ASCII_PALETTE[1 + iFace]);
@@ -154,7 +154,6 @@ int												gpk::updateEntityTransforms
 		*(::gpk::SColorBGRA*)&surface->Data[0]	= ::gpk::SColorRGBA{::gpk::VOXEL_PALETTE[iFace]};
 
 		::gpk::SGeometrySlice				& slice					= mesh->GeometrySlices[iFace];
-		slice.Skin							= iSkin;
 		slice.Slice							= {offsetIndex, 6};
 		offsetIndex						+= slice.Slice.Count;
 
@@ -165,6 +164,7 @@ int												gpk::updateEntityTransforms
 
 		faceRenderNode.Mesh				= iMesh;
 		faceRenderNode.Slice			= iFace;
+		faceRenderNode.Skin				= iSkin;
 
 		faceEntity.RigidBody			= -1;
 		faceEntity.Parent				= iEntity;
@@ -232,9 +232,9 @@ int												gpk::updateEntityTransforms
 	mesh->Desc.Mode							= ::gpk::MESH_MODE_List;
 	mesh->Desc.Type							= ::gpk::GEOMETRY_TYPE_Triangle;
 	mesh->Desc.NormalMode					= ::gpk::NORMAL_MODE_Point;
-	uint32_t									iSkin					= (uint32_t)Scene->ManagedMeshes.CreateSkin();
+	uint32_t									iSkin					= (uint32_t)Scene->ManagedRenderNodes.CreateSkin();
 	uint32_t									iSurface				= (uint32_t)Scene->ManagedSurfaces.Create();
-	::gpk::ptr_obj<::gpk::SSkin>				& skin					= Scene->ManagedMeshes.Skins[iSkin];
+	::gpk::ptr_obj<::gpk::SSkin>				& skin					= Scene->ManagedRenderNodes.Skins[iSkin];
 	skin->Textures.push_back(iSurface);
 	skin->Material.Color.Ambient			= ::gpk::SColorBGRA(::gpk::ASCII_PALETTE[3]);
 	skin->Material.Color.Diffuse			= ::gpk::SColorBGRA(::gpk::ASCII_PALETTE[3]);
@@ -254,9 +254,9 @@ int												gpk::updateEntityTransforms
 
 	mesh->GeometrySlices.resize(1);	// one per face
 	::gpk::SGeometrySlice						& slice					= mesh->GeometrySlices[0];
-	slice.Skin								= iSkin;
 	slice.Slice								= {0, geometry.PositionIndices.size()};
 
+	Scene->ManagedRenderNodes.RenderNodes[entity.RenderNode].Skin	= iSkin;
 	Scene->ManagedRenderNodes.RenderNodes[entity.RenderNode].Mesh	= iMesh;
 	Scene->ManagedRenderNodes.RenderNodes[entity.RenderNode].Slice	= 0;
 
@@ -284,3 +284,4 @@ int												gpk::updateEntityTransforms
 	int32_t									iEntity								= this->ManagedEntities.Create();
 	return iEntity;
  }
+

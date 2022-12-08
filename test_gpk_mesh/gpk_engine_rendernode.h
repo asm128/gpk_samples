@@ -1,6 +1,5 @@
 #include "gpk_engine_rendercolor.h"
 #include "gpk_ptr.h"
-#include "gpk_view_grid.h"
 #include "gpk_matrix.h"
 
 #ifndef GPK_ENGINE_RENDERNODE_H
@@ -23,6 +22,7 @@ namespace gpk
 		uint32_t									Mesh;
 		uint32_t									Slice;
 		uint32_t									Shader;
+		uint32_t									Skin;
 	};
 	
 	GDEFINE_ENUM_TYPE(LIGHT_TYPE, uint8_t);
@@ -71,6 +71,19 @@ namespace gpk
 		::gpk::array_pod<::gpk::STriangle3<float>>		Normals					= {};
 	};
 
+
+#pragma pack(push, 1)
+	struct SRenderMaterial {
+		::gpk::SRenderColor							Color;
+		float										SpecularPower;
+	};
+#pragma pack(pop)
+
+	struct SSkin {
+		::gpk::SRenderMaterial						Material;
+		::gpk::array_pod<uint32_t>					Textures;
+	};
+
 	struct SRenderNodeManager {
 		::gpk::array_pod <::gpk::SRenderNode						>	RenderNodes				= {};
 		::gpk::array_pod <::gpk::SRenderNodeFlags					>	RenderNodeFlags			= {};
@@ -91,6 +104,14 @@ namespace gpk
 			return RenderNodes		.push_back({(uint32_t)-1});
 		}
 
+		::gpk::error_t											Clone		(uint32_t iNode)	{
+			RenderNodeTransforms	.push_back(::gpk::SMatrix4<float>								{RenderNodeTransforms	[iNode]});
+			RenderNodeLights		.push_back(::gpk::ptr_obj<::gpk::array_pod<::gpk::SLight	>>	{RenderNodeLights		[iNode]});
+			RenderNodeCameras		.push_back(::gpk::ptr_obj<::gpk::array_pod<::gpk::SCamera	>>	{RenderNodeCameras		[iNode]});
+			RenderNodeFlags			.push_back(::gpk::SRenderNodeFlags								{RenderNodeFlags		[iNode]});
+			return RenderNodes		.push_back(::gpk::SRenderNode									{RenderNodes			[iNode]});
+		}
+
 		::gpk::error_t											Delete		(uint32_t indexNode)	{
 			RenderNodeTransforms	.remove_unordered(indexNode);
 			RenderNodeLights		.remove_unordered(indexNode);
@@ -98,6 +119,14 @@ namespace gpk
 			RenderNodeFlags			.remove_unordered(indexNode);
 			return RenderNodes		.remove_unordered(indexNode);
 		}
+
+
+		::gpk::array_pobj<::gpk::SSkin>				Skins			= {};
+		::gpk::array_obj<::gpk::vcc>				SkinNames		= {};
+		::gpk::error_t								CreateSkin		()					{ SkinNames.push_back({});				return Skins  .push_back({}); }
+		::gpk::error_t								DeleteSkin		(uint32_t index)	{ SkinNames.remove_unordered(index);	return Skins  .remove_unordered(index); }
+		::gpk::error_t								CloneSkin		(uint32_t index)	{ Skins		.push_back(::gpk::ptr_obj<::gpk::SSkin			>{Skins	[index]}); return SkinNames.push_back(::gpk::vcc{SkinNames[index]}); }
+
 	};
 } // namespace
 

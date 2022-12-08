@@ -1,7 +1,7 @@
 #include "gpk_the_one.h"
-#ifndef GPK_MESH_H_324234234
-#define GPK_MESH_H_324234234
 
+#ifndef TEST_GPK_MESH_H_324234234
+#define TEST_GPK_MESH_H_324234234
 
 namespace gpk
 {
@@ -30,7 +30,6 @@ struct SApplication {
 	::gpk::SGUI										GUI						= {};
 	int32_t											IdViewport				= -1;
 
-	int32_t											EntityCamera			= -1;
 	int32_t											EntityLightDirectional	= -1;
 	int32_t											EntityLightPoint		= -1;
 	int32_t											EntityLightSpot			= -1;
@@ -40,7 +39,7 @@ struct SApplication {
 	::gpk::SImage<::gpk::SColorBGR>					Image;
 	::gpk::SImage<::gpk::SColorBGRA>				ImageAlpha;
 
-	::the1::SPoolGame								 Pool					= {};
+	::the1::SPoolGame								Pool					= {};
 
 													SApplication			(::gpk::SRuntimeValues& runtimeValues)			noexcept	: Framework(runtimeValues) {}
 };

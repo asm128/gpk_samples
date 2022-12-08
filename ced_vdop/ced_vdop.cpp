@@ -103,7 +103,7 @@ int													update				(SApplication & app, bool exitSignal)	{
 		::gpk::SMatrix4<float>									& matrixProjection			= app.TextOverlay.MatrixProjection;
 		matrixProjection.FieldOfView(::gpk::math_pi * .25, framework.MainDisplay.Size.x / (double)framework.MainDisplay.Size.y, 0.01, 500);
 		::gpk::SMatrix4<float>									matrixViewport				= {};
-		matrixViewport.ViewportLH(framework.MainDisplay.Size);
+		matrixViewport.ViewportLH(framework.MainDisplay.Size.Cast<uint16_t>());
 		matrixProjection									*= matrixViewport;
 	}
 	::klib::pollInput(app.Game.FrameInput);
@@ -217,7 +217,7 @@ int													draw					(SApplication & app) {
 	matrixViewport	.Identity();
 
 	matrixProjection.FieldOfView(::gpk::math_pi * .25, targetPixels.metrics().x / (double)targetPixels.metrics().y, 0.01, 5000);
-	matrixViewport.ViewportLH(targetPixels.metrics());
+	matrixViewport.ViewportLH(targetPixels.metrics().Cast<uint16_t>());
 	matrixView											*= matrixProjection;
 	matrixView											*= matrixViewport;
 

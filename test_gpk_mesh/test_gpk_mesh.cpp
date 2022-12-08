@@ -63,9 +63,9 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	rvi_if(1, frameworkResult == 1, "Framework requested close. Terminating execution.");
 	ree_if(errored(::updateSizeDependentResources(app)), "Cannot update offscreen and this could cause an invalid memory access later on.");
 	static float timeScale = 1;
+	::gpk::SFramework									& framework									= app.Framework;
+	::gpk::SFrameInfo									& frameInfo									= framework.FrameInfo;
 	{
-		::gpk::SFramework									& framework									= app.Framework;
-		::gpk::SFrameInfo									& frameInfo									= framework.FrameInfo;
 		::gpk::STimer										timer;
 		::the1::poolGameUpdate(app.Pool, frameInfo.Seconds.LastFrame * timeScale);
 
@@ -81,15 +81,23 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	::HWND																		windowHandle								= mainWindow.PlatformDetail.WindowHandle;
 	SetWindowTextA(windowHandle, buffer);
 
-	if(GetAsyncKeyState('R')) 
-		::the1::poolGameReset(app.Pool, app.Pool.StartState.Mode);
-	else if(GetAsyncKeyState('8')) 
-		::the1::poolGameReset(app.Pool, ::the1::POOL_GAME_MODE_8Ball);
-	else if(GetAsyncKeyState('9')) 
-		::the1::poolGameReset(app.Pool, ::the1::POOL_GAME_MODE_9Ball);
-	else if(GetAsyncKeyState('0')) 
-		::the1::poolGameReset(app.Pool, ::the1::POOL_GAME_MODE_10Ball);
+		 if(GetAsyncKeyState('R')) ::the1::poolGameReset(app.Pool, app.Pool.StartState.Mode);
+	else if(GetAsyncKeyState('8')) ::the1::poolGameReset(app.Pool, ::the1::POOL_GAME_MODE_8Ball);
+	else if(GetAsyncKeyState('9')) ::the1::poolGameReset(app.Pool, ::the1::POOL_GAME_MODE_9Ball);
+	else if(GetAsyncKeyState('0')) ::the1::poolGameReset(app.Pool, ::the1::POOL_GAME_MODE_10Ball);
+	else if(GetAsyncKeyState('2')) ::the1::poolGameReset(app.Pool, ::the1::POOL_GAME_MODE_Test2Balls);
 
+	bool reverse = GetAsyncKeyState(VK_SHIFT);
+	if(GetAsyncKeyState(VK_CONTROL)) {
+			 if(GetAsyncKeyState('Z')) app.Pool.Camera.Position.z += float(frameInfo.Seconds.LastFrame * (reverse ? -1 : 1));
+		else if(GetAsyncKeyState('X')) app.Pool.Camera.Position.x += float(frameInfo.Seconds.LastFrame * (reverse ? -1 : 1));
+		else if(GetAsyncKeyState('Y')) app.Pool.Camera.Position.y += float(frameInfo.Seconds.LastFrame * (reverse ? -1 : 1));
+	}
+	else {
+			 if(GetAsyncKeyState('Z')) app.Pool.Camera.Position.z += float(frameInfo.Seconds.LastFrame * (reverse ? -1 : 1));
+		else if(GetAsyncKeyState('X')) app.Pool.Camera.Position.x += float(frameInfo.Seconds.LastFrame * (reverse ? -1 : 1));
+		else if(GetAsyncKeyState('Y')) app.Pool.Camera.Position.y += float(frameInfo.Seconds.LastFrame * (reverse ? -1 : 1));
+	}
 	if(GetAsyncKeyState(VK_ADD)) 
 		timeScale	+= .1f;
 	if(GetAsyncKeyState(VK_SUBTRACT)) 
@@ -103,7 +111,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>			backBuffer;
 	backBuffer->resize(framework.MainDisplayOffscreen->Color.metrics(), 0xFF008000, (uint32_t)-1);
 
-	::the1::poolGameDraw(app.Pool, *backBuffer, framework.FrameInfo.Seconds.Total, framework.FrameInfo.FrameNumber);
+	::the1::poolGameDraw(app.Pool, *backBuffer, framework.FrameInfo.Seconds.Total);
 
 	//memcpy(framework.MainDisplayOffscreen->Color.View.begin(), backBuffer->Color.View.begin(), backBuffer->Color.View.byte_count());
 	::gpk::grid_mirror_y(framework.MainDisplayOffscreen->Color.View, backBuffer->Color.View);

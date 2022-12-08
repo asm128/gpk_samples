@@ -1,28 +1,13 @@
 #include "gpk_engine_entity.h"
-#include "gpk_engine_rendermesh.h"
-#include "gpk_engine_renderbuffer.h"
-#include "gpk_engine_rendersurface.h"
-#include "gpk_engine_rendernode.h"
+#include "gpk_engine_scene.h"
 #include "gpk_rigidbody.h"
+#include "gpk_view_grid.h"
 
 #ifndef GPK_ENGINE_H
 #define GPK_ENGINE_H
 
 namespace gpk 
 {
-	struct SEngineRenderCache {
-		::gpk::SVSOutput					OutputVertexShader		= {};
-		::gpk::SVSCache						CacheVertexShader		= {};
-	};
-
-	struct SEngineScene {
-		::gpk::SRenderBufferManager			ManagedBuffers			= {};
-		::gpk::SRenderNodeManager			ManagedRenderNodes		= {};
-		::gpk::SSurfaceManager				ManagedSurfaces			= {};
-		::gpk::SMeshManager					ManagedMeshes			= {};
-		::gpk::SEngineRenderCache			RenderCache				= {};
-	};
-
 	::gpk::error_t						updateEntityTransforms			
 		( uint32_t								iEntity
 		, const ::gpk::SVirtualEntity			& entity
@@ -35,6 +20,26 @@ namespace gpk
 		::gpk::ptr_obj<::gpk::SEngineScene>	Scene				;
 		::gpk::SVirtualEntityManager		ManagedEntities		;
 		::gpk::SRigidBodyIntegrator			Integrator			;
+
+		::gpk::error_t						Clone				(uint32_t iEntitySource) {
+			const ::gpk::SVirtualEntity				entitySource		= ManagedEntities.Entities[iEntitySource];
+			int32_t									iEntityNew			= ManagedEntities.Create();
+			::gpk::SVirtualEntity					& entityNew			= ManagedEntities.Entities[iEntityNew];
+			entityNew.RenderNode				= Scene->ManagedRenderNodes	.Clone(entitySource.RenderNode);
+			entityNew.RigidBody					= Integrator				.Clone(entitySource.RigidBody);
+			entityNew.Parent					= entitySource.Parent;
+
+			const ::gpk::ptr_obj<::gpk::array_pod<uint32_t>>	childrenSource	= ManagedEntities.EntityChildren[iEntitySource];
+			if(childrenSource && childrenSource->size()) {
+				::gpk::ptr_obj<::gpk::array_pod<uint32_t>>			childrenNew		= ManagedEntities.EntityChildren[iEntityNew];
+				for(uint32_t iChild = 0; iChild < childrenSource->size(); ++iChild) {
+					uint32_t entityChild = Clone((*childrenSource)[iChild]);
+					ManagedEntities.Entities[entityChild].Parent	= iEntityNew;
+					childrenNew->push_back(entityChild);
+				}
+			}
+			return iEntityNew;
+		}
 
 		::gpk::error_t						SetPosition			(uint32_t iEntity, const ::gpk::SCoord3<float> & position) {
 			Integrator.SetPosition(ManagedEntities.Entities[iEntity].RigidBody, position);
@@ -53,6 +58,17 @@ namespace gpk
 
 		::gpk::error_t						SetOrientation			(uint32_t iEntity, const ::gpk::SQuaternion<float> & orientation) {
 			Integrator.SetOrientation(ManagedEntities.Entities[iEntity].RigidBody, orientation);
+			return 0;
+		}
+
+		::gpk::error_t						SetHidden				(uint32_t iEntity, bool hidden) {
+			Scene->ManagedRenderNodes.RenderNodeFlags[ManagedEntities.Entities[iEntity].RenderNode].NoDraw = hidden;
+			return 0;
+		}
+
+		::gpk::error_t						ToggleHidden			(uint32_t iEntity) {
+			::gpk::SRenderNodeFlags					& flags					= Scene->ManagedRenderNodes.RenderNodeFlags[ManagedEntities.Entities[iEntity].RenderNode];
+			flags.NoDraw						= !flags.NoDraw;
 			return 0;
 		}
 
