@@ -81,28 +81,28 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	::HWND																		windowHandle								= mainWindow.PlatformDetail.WindowHandle;
 	SetWindowTextA(windowHandle, buffer);
 
-		 if(app.Framework.Input->KeyDown('R')) ::the1::poolGameReset(app.TheOne.MainGame.Game, app.TheOne.MainGame.Game.StartState.Mode);
-	else if(app.Framework.Input->KeyDown('8')) ::the1::poolGameReset(app.TheOne.MainGame.Game, ::the1::POOL_GAME_MODE_8Ball);
-	else if(app.Framework.Input->KeyDown('9')) ::the1::poolGameReset(app.TheOne.MainGame.Game, ::the1::POOL_GAME_MODE_9Ball);
-	else if(app.Framework.Input->KeyDown('0')) ::the1::poolGameReset(app.TheOne.MainGame.Game, ::the1::POOL_GAME_MODE_10Ball);
-	else if(app.Framework.Input->KeyDown('2')) ::the1::poolGameReset(app.TheOne.MainGame.Game, ::the1::POOL_GAME_MODE_Test2Balls);
+		 if(app.Framework.Input->KeyboardCurrent.KeyState['R']) ::the1::poolGameReset(app.TheOne.MainGame.Game, app.TheOne.MainGame.Game.StartState.Mode);
+	else if(app.Framework.Input->KeyboardCurrent.KeyState['8']) ::the1::poolGameReset(app.TheOne.MainGame.Game, ::the1::POOL_GAME_MODE_8Ball);
+	else if(app.Framework.Input->KeyboardCurrent.KeyState['9']) ::the1::poolGameReset(app.TheOne.MainGame.Game, ::the1::POOL_GAME_MODE_9Ball);
+	else if(app.Framework.Input->KeyboardCurrent.KeyState['0']) ::the1::poolGameReset(app.TheOne.MainGame.Game, ::the1::POOL_GAME_MODE_10Ball);
+	else if(app.Framework.Input->KeyboardCurrent.KeyState['2']) ::the1::poolGameReset(app.TheOne.MainGame.Game, ::the1::POOL_GAME_MODE_Test2Balls);
 
-	bool reverse = app.Framework.Input->KeyDown(VK_SHIFT);
-	float scale = 10.0f * (reverse ? -1 : 1);
-	if(app.Framework.Input->KeyDown(VK_CONTROL)) {
-			 if(app.Framework.Input->KeyDown('Z')) app.TheOne.MainGame.Game.Camera.Position.z += float(frameInfo.Seconds.LastFrame * scale);
-		else if(app.Framework.Input->KeyDown('X')) app.TheOne.MainGame.Game.Camera.Position.x += float(frameInfo.Seconds.LastFrame * scale);
-		else if(app.Framework.Input->KeyDown('Y')) app.TheOne.MainGame.Game.Camera.Position.y += float(frameInfo.Seconds.LastFrame * scale);
+	bool					reverse					= app.Framework.Input->KeyboardCurrent.KeyState[VK_SHIFT];
+	float					scale					= 10.0f * (reverse ? -1 : 1);
+	if(app.Framework.Input->KeyboardCurrent.KeyState[VK_CONTROL]) {
+			 if(app.Framework.Input->KeyboardCurrent.KeyState['Z']) app.TheOne.MainGame.Game.Camera.Position.z += float(frameInfo.Seconds.LastFrame * scale);
+		else if(app.Framework.Input->KeyboardCurrent.KeyState['X']) app.TheOne.MainGame.Game.Camera.Position.x += float(frameInfo.Seconds.LastFrame * scale);
+		else if(app.Framework.Input->KeyboardCurrent.KeyState['Y']) app.TheOne.MainGame.Game.Camera.Position.y += float(frameInfo.Seconds.LastFrame * scale);
 	}
 	else {
-			 if(app.Framework.Input->KeyDown('Z')) app.TheOne.MainGame.Game.Camera.Position.z += float(frameInfo.Seconds.LastFrame * scale);
-		else if(app.Framework.Input->KeyDown('X')) app.TheOne.MainGame.Game.Camera.Position.x += float(frameInfo.Seconds.LastFrame * scale);
-		else if(app.Framework.Input->KeyDown('Y')) app.TheOne.MainGame.Game.Camera.Position.y += float(frameInfo.Seconds.LastFrame * scale);
+			 if(app.Framework.Input->KeyboardCurrent.KeyState['Z']) app.TheOne.MainGame.Game.Camera.Position.z += float(frameInfo.Seconds.LastFrame * scale);
+		else if(app.Framework.Input->KeyboardCurrent.KeyState['X']) app.TheOne.MainGame.Game.Camera.Position.x += float(frameInfo.Seconds.LastFrame * scale);
+		else if(app.Framework.Input->KeyboardCurrent.KeyState['Y']) app.TheOne.MainGame.Game.Camera.Position.y += float(frameInfo.Seconds.LastFrame * scale);
 	}
-	if(app.Framework.Input->KeyDown(VK_ADD)) 
-		timeScale	+= .1f;
-	if(app.Framework.Input->KeyDown(VK_SUBTRACT)) 
-		timeScale	= ::gpk::max(0.f, timeScale - .1f);
+	if(app.Framework.Input->KeyboardCurrent.KeyState[VK_ADD]) 
+		timeScale			+= .1f;
+	if(app.Framework.Input->KeyboardCurrent.KeyState[VK_SUBTRACT]) 
+		timeScale			= ::gpk::max(0.f, timeScale - .1f);
 	
 	return 0;
 }
