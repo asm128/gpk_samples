@@ -6,7 +6,8 @@ static	::gpk::error_t					poolGameResetTest2Balls	(::the1::SPoolGame & pool) {
 	pool.Engine.SetPosition(pool.StartState.Balls[0].Entity, {0, pool.StartState.BallRadius,-5});
 	pool.Engine.SetPosition(pool.StartState.Balls[1].Entity, {0, pool.StartState.BallRadius, 5});
 	for(uint32_t iBall = 0; iBall < pool.StartState.BallCount; ++iBall) {
-		pool.Engine.SetDampingLinear(pool.StartState.Balls[iBall].Entity, pool.StartState.DampingRoll);
+		pool.Engine.SetDampingLinear(pool.StartState.Balls[iBall].Entity, pool.StartState.DampingRollDisplacement);
+		pool.Engine.SetDampingAngular(pool.StartState.Balls[iBall].Entity, pool.StartState.DampingRollRotation);
 		pool.Engine.SetHidden(pool.StartState.Balls[iBall].Entity, false);
 	}
 	::gpk::SCoord3<float>						velocity				= {0, 0, -50.f};
@@ -55,7 +56,8 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 	for(uint32_t iBall = 0; iBall < pool.StartState.BallCount; ++iBall) {
 		const uint32_t							ballNumber			= pool.StartState.BallOrder[iBall];
 		const bool								stripped			= ballNumber > 7;
-		pool.Engine.SetDampingLinear(pool.StartState.Balls[iBall].Entity, pool.StartState.DampingRoll);
+		pool.Engine.SetDampingLinear(pool.StartState.Balls[iBall].Entity, pool.StartState.DampingRollDisplacement);
+		pool.Engine.SetDampingAngular(pool.StartState.Balls[iBall].Entity, pool.StartState.DampingRollRotation);
 		pool.Engine.SetHidden(pool.StartState.Balls[iBall].Entity, false);
 		pool.Engine.SetOrientation(pool.StartState.Balls[iBall].Entity, {0, 0, 1, 1});
 		const ::gpk::SVirtualEntity				& entity			= pool.Engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity];
@@ -84,7 +86,7 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 	::gpk::SCoord3<float>					velocity			= {50.f, 0, 0};
 	velocity.RotateY(::gpk::noiseNormal1D(pool.StartState.Seed + 2) / 10 * ((rand() % 2) ? -1 : 1));
 	pool.Engine.SetVelocity(pool.StartState.Balls[0].Entity, velocity);
-	pool.Engine.SetRotation(pool.StartState.Balls[0].Entity, {0, 0, 10});
+	//pool.Engine.SetRotation(pool.StartState.Balls[0].Entity, {0, 0, 10});
 	uint8_t									rowLen				= 5;
 	::gpk::SCoord3<float>					diagonal			= {1, 0, 1};
 	diagonal = diagonal.Normalize() * 1.22f; 

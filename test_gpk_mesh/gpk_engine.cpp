@@ -21,7 +21,7 @@ int												gpk::updateEntityTransforms
 	
 		if(-1 != entity.Parent) {
 			const ::gpk::SVirtualEntity			& entityParent					= managedEntities.Entities[entity.Parent];
-			if(-1 != entityParent.RenderNode) 
+			if(-1 != entityParent.RenderNode)
 				worldTransform					= renderNodes.RenderNodeTransforms[entityParent.RenderNode] * worldTransform;
 			else if(-1 != entityParent.RigidBody) {
 				worldTransform					= integrator.TransformsLocal[entityParent.RigidBody] * worldTransform;

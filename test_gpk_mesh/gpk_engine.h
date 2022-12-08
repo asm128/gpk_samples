@@ -74,6 +74,11 @@ namespace gpk
 			return 0;
 		}
 
+		::gpk::error_t						SetDampingAngular		(uint32_t iEntity, float damping) {
+			Integrator.Masses[ManagedEntities.Entities[iEntity].RigidBody].AngularDamping = damping;
+			return 0;
+		}
+
 		::gpk::error_t						SetOrientation			(uint32_t iEntity, const ::gpk::SQuaternion<float> & orientation) {
 			Integrator.SetOrientation(ManagedEntities.Entities[iEntity].RigidBody, orientation);
 			return 0;

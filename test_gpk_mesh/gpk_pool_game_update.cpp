@@ -9,8 +9,11 @@ static	bool				revertCross				(const ::gpk::SCoord3<double> & distanceDirection)
 
 static	::gpk::error_t		resolveCollision							
 	( const ::gpk::SCoord3<double>	& initialVelocityA
+	, const ::gpk::SCoord3<double>	& initialRotationA
 	, const ::gpk::SCoord3<double>	& distanceDirection
 	, float							& out_forceTransferRatioB	
+	, ::gpk::SCoord3<float>			& out_finalRotationA
+	, ::gpk::SCoord3<float>			& out_finalRotationB
 	, ::gpk::SCoord3<float>			& out_finalVelocityA
 	, ::gpk::SCoord3<float>			& out_finalVelocityB
 	) {
@@ -19,18 +22,20 @@ static	::gpk::error_t		resolveCollision
 	out_forceTransferRatioB		= ::gpk::max(0.0f, (float)distanceDirection.Dot(directionA));
 	if(0 >= out_forceTransferRatioB) {
 		out_finalVelocityA			+= initialVelocityA.Cast<float>();
+		out_finalRotationA			+= initialRotationA.Cast<float>();
 		return 0;
 	}
 	if(0.9999 <= out_forceTransferRatioB) {
 		out_finalVelocityB			+= initialVelocityA.Cast<float>();
+		out_finalRotationB			+= initialRotationA.Cast<float>();
 		return 0;
 	}
-
-	info_printf("Total initial speed: %f", (float)(initialVelocityA.Length()));
 
 	bool							revert				= ::revertCross(distanceDirection);
 	if(fabs(initialVelocityA.x) < fabs(initialVelocityA.z))
 		revert = !revert;
+
+	info_printf("Total initial speed: %f", (float)(initialVelocityA.Length()));
 
 	double							speedA				= initialVelocityA.Length();
 	const ::gpk::SCoord3<double>	vUp					= {0, revert ? -1 : 1.0f, 0};
@@ -41,6 +46,17 @@ static	::gpk::error_t		resolveCollision
 	info_printf("Total final speed: %f", (float)(finalSpeedA + finalSpeedB));
 	out_finalVelocityA			+= finalVelocityA.Cast<float>();
 	out_finalVelocityB			+= finalVelocityB.Cast<float>();
+
+	info_printf("Total initial rotation: %f", (float)(initialRotationA.Length()));
+
+	double							rotA				= initialRotationA.Length();
+	::gpk::SCoord3<double>			finalRotationB		= initialRotationA.Cast<double>().Normalize() * rotA * out_forceTransferRatioB;
+	::gpk::SCoord3<double>			finalRotationA		= initialRotationA.Cast<double>().Normalize() * rotA * (1.0f - out_forceTransferRatioB);
+	double finalRotA = finalRotationB.Length();
+	double finalRotB = finalRotationA.Length();
+	info_printf("Total final rotation: %f", (float)(finalRotA + finalRotB));
+	out_finalRotationA			+= finalRotationA.Cast<float>();
+	out_finalRotationB			+= finalRotationB.Cast<float>();
 	return 0;
 }
 
@@ -101,15 +117,23 @@ static	::gpk::error_t		resolveCollision
 			// Calculate force transfer
 			::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Velocity;
 			::gpk::SCoord3<float>			& velocityB			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall2].Entity].RigidBody].Velocity;
+
+			::gpk::SCoord3<float>			& rotationA			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Rotation;
+			::gpk::SCoord3<float>			& rotationB			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall2].Entity].RigidBody].Rotation;
+
 			contact.Result.InitialVelocityA	= velocityA;
 			contact.Result.InitialVelocityB	= velocityB;
+			contact.Result.InitialRotationA	= rotationA;
+			contact.Result.InitialRotationB	= rotationB;
 			velocityB					= {};
 			velocityA					= {};
+			rotationB					= {};
+			rotationA					= {};
 			if(contact.Result.InitialVelocityA.LengthSquared()) {
 				engine.Integrator.BodyFlags[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall2].Entity].RigidBody].Active = true;
 				::gpk::SCoord3<float>			lvelocityB					= {};
 				::gpk::SCoord3<float>			lvelocityA					= {};
-				::resolveCollision(contact.Result.InitialVelocityA.Cast<double>(), contact.Result.DistanceDirection.Cast<double>(), contact.Result.ForceTransferRatioB, lvelocityA, lvelocityB);
+				::resolveCollision(contact.Result.InitialVelocityA.Cast<double>(), contact.Result.InitialRotationA.Cast<double>(), contact.Result.DistanceDirection.Cast<double>(), contact.Result.ForceTransferRatioB, rotationA, rotationB, lvelocityA, lvelocityB);
 				double totalFinalSpeed	= lvelocityA.Length() + lvelocityB.Length();
 				double totalInitialSpeed = contact.Result.InitialVelocityA.Length();
 				if ((totalFinalSpeed - totalInitialSpeed) > 0.0001f) {
@@ -126,7 +150,7 @@ static	::gpk::error_t		resolveCollision
 				engine.Integrator.BodyFlags[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Active = true;
 				::gpk::SCoord3<float>			lvelocityB					= {};
 				::gpk::SCoord3<float>			lvelocityA					= {};
-				::resolveCollision(contact.Result.InitialVelocityB.Cast<double>(), contact.Result.DistanceDirection.Cast<double>() * -1, contact.Result.ForceTransferRatioA, lvelocityB, lvelocityA);
+				::resolveCollision(contact.Result.InitialVelocityB.Cast<double>(), contact.Result.InitialRotationB.Cast<double>(), contact.Result.DistanceDirection.Cast<double>() * -1, contact.Result.ForceTransferRatioA, rotationA, rotationB, lvelocityB, lvelocityA);
 				{
 					double							totalFinalSpeed				= lvelocityA.Length() + lvelocityB.Length();
 					double							totalInitialSpeed			= contact.Result.InitialVelocityB.Length();
@@ -153,6 +177,8 @@ static	::gpk::error_t		resolveCollision
 
 			contact.Result.FinalVelocityA	= (velocityA *= pool.StartState.DampingCollision);
 			contact.Result.FinalVelocityB	= (velocityB *= pool.StartState.DampingCollision);
+			contact.Result.FinalRotationA	= (rotationA *= pool.StartState.DampingCollision);
+			contact.Result.FinalRotationB	= (rotationB *= pool.StartState.DampingCollision);
 			pool.LastFrameContactsBall.append(lastFrameContactsBatchBall);
 		}
 
@@ -195,6 +221,11 @@ static	::gpk::error_t		resolveCollision
 	for(uint32_t iBall = 0; iBall < pool.StartState.BallCount; ++iBall) {
 		::gpk::SLine3<float> & delta = pool.PositionDeltas[iBall][pool.PositionDeltas[iBall].size() - 1];
 		pool.GetBallPosition(iBall, delta.B);
+		if((delta.B - delta.A).LengthSquared() > 0.00001) {
+			::gpk::SCoord3<float>			& rotationA			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Rotation;
+			::gpk::SCoord3<float>			rotationResult		= (delta.B - delta.A) * ::gpk::math_2pi;
+			rotationA	+= {rotationResult.z, 0, -rotationResult.x};
+		}
 		if(pool.PositionDeltas[iBall].size() > 10)
 			for(uint32_t iDelta = 0; iDelta < pool.PositionDeltas[iBall].size(); ++iDelta) {
 				if((delta.B - delta.A).LengthSquared() < 0.00001f) {

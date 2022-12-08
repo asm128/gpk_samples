@@ -23,7 +23,8 @@ namespace the1
 		POOL_GAME_MODE								Mode							= POOL_GAME_MODE_8Ball;
 		uint64_t									Seed							= (uint64_t)::gpk::timeCurrentInUs();
 		uint32_t									BallCount						= 16;
-		float										DampingRoll						= .85f;
+		float										DampingRollDisplacement			= .85f;
+		float										DampingRollRotation				= .005f;
 		float										DampingCollision				= .975f;
 		float										DampingCushion					= .95f;
 		float										DampingGround					= .5f;
@@ -55,15 +56,21 @@ namespace the1
 
 	struct SContactResultBall {
 		::gpk::SCoord3<float>						ContactPosition					= {};
-		::gpk::SCoord3<float>						InitialVelocityA				= {};
-		::gpk::SCoord3<float>						InitialVelocityB				= {};
 		::gpk::SCoord3<float>						DistanceDirection				= {};
-		::gpk::SCoord3<float>						FinalVelocityA					= {};
-		::gpk::SCoord3<float>						FinalVelocityB					= {};
-		::gpk::SCoord3<float>						FinalRotationA					= {};
-		::gpk::SCoord3<float>						FinalRotationB					= {};
 		float										ForceTransferRatioA				= 0;
 		float										ForceTransferRatioB				= 0;
+
+		::gpk::SCoord3<float>						InitialVelocityA				= {};
+		::gpk::SCoord3<float>						InitialVelocityB				= {};
+		::gpk::SCoord3<float>						FinalVelocityA					= {};
+		::gpk::SCoord3<float>						FinalVelocityB					= {};
+
+		::gpk::SCoord3<float>						InitialRotationA				= {};
+		::gpk::SCoord3<float>						InitialRotationB				= {};
+		::gpk::SCoord3<float>						FinalRotationA					= {};
+		::gpk::SCoord3<float>						FinalRotationB					= {};
+
+
 	};
 
 	struct SContactBall {
