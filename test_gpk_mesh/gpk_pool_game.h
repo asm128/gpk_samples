@@ -35,21 +35,21 @@ namespace the1
 		uint32_t									BallOrder		[MAX_BALLS]		= {};
 		::gpk::SColorFloat							BallColors		[MAX_BALLS]		= 
 			{ ::gpk::WHITE
-			, ::gpk::LIGHTYELLOW
-			, ::gpk::LIGHTBLUE
-			, ::gpk::LIGHTRED
-			, ::gpk::PURPLE * 1.25
-			, ::gpk::LIGHTORANGE
-			, ::gpk::LIGHTGREEN
-			, ::gpk::LIGHTRED
+			, ::gpk::YELLOW
+			, ::gpk::BLUE
+			, ::gpk::RED
+			, ::gpk::PURPLE 
+			, ::gpk::ORANGE
+			, ::gpk::GREEN
+			, ::gpk::RED
 			, ::gpk::BLACK
-			, ::gpk::DARKYELLOW
-			, ::gpk::DARKBLUE
-			, ::gpk::DARKRED
-			, ::gpk::PURPLE * .5
-			, ::gpk::DARKORANGE
-			, ::gpk::DARKGREEN
-			, ::gpk::DARKRED
+			, ::gpk::YELLOW
+			, ::gpk::BLUE
+			, ::gpk::RED
+			, ::gpk::PURPLE 
+			, ::gpk::ORANGE
+			, ::gpk::GREEN
+			, ::gpk::RED
 			};
 	};
 

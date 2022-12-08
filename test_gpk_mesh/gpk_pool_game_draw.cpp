@@ -47,25 +47,38 @@
 	const gpk::SCoord3<float>						halfDimensions			= pool.StartState.TableDimensions * .5;
 
 	wireframePixelCoords.clear();
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{{-halfDimensions.x, .0f, -halfDimensions.z}, { halfDimensions.x, .0f, -halfDimensions.z}}, mViewPerspectiveScreen, wireframePixelCoords);
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{{-halfDimensions.x, .0f, -halfDimensions.z}, {-halfDimensions.x, .0f,  halfDimensions.z}}, mViewPerspectiveScreen, wireframePixelCoords);
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{{ halfDimensions.x, .0f,  halfDimensions.z}, {-halfDimensions.x, .0f,  halfDimensions.z}}, mViewPerspectiveScreen, wireframePixelCoords);
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{{ halfDimensions.x, .0f,  halfDimensions.z}, { halfDimensions.x, .0f, -halfDimensions.z}}, mViewPerspectiveScreen, wireframePixelCoords);
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{{-halfDimensions.x, pool.StartState.TableDimensions.y, -halfDimensions.z}, { halfDimensions.x, pool.StartState.TableDimensions.y, -halfDimensions.z}}, mViewPerspectiveScreen, wireframePixelCoords);
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{{-halfDimensions.x, pool.StartState.TableDimensions.y, -halfDimensions.z}, {-halfDimensions.x, pool.StartState.TableDimensions.y,  halfDimensions.z}}, mViewPerspectiveScreen, wireframePixelCoords);
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{{ halfDimensions.x, pool.StartState.TableDimensions.y,  halfDimensions.z}, {-halfDimensions.x, pool.StartState.TableDimensions.y,  halfDimensions.z}}, mViewPerspectiveScreen, wireframePixelCoords);
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{{ halfDimensions.x, pool.StartState.TableDimensions.y,  halfDimensions.z}, { halfDimensions.x, pool.StartState.TableDimensions.y, -halfDimensions.z}}, mViewPerspectiveScreen, wireframePixelCoords);
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{{-halfDimensions.x, .0f, -halfDimensions.z}, {-halfDimensions.x, pool.StartState.TableDimensions.y, -halfDimensions.z}}, mViewPerspectiveScreen, wireframePixelCoords);
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{{ halfDimensions.x, .0f,  halfDimensions.z}, { halfDimensions.x, pool.StartState.TableDimensions.y,  halfDimensions.z}}, mViewPerspectiveScreen, wireframePixelCoords);
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{{-halfDimensions.x, .0f,  halfDimensions.z}, {-halfDimensions.x, pool.StartState.TableDimensions.y,  halfDimensions.z}}, mViewPerspectiveScreen, wireframePixelCoords);
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{{ halfDimensions.x, .0f, -halfDimensions.z}, { halfDimensions.x, pool.StartState.TableDimensions.y, -halfDimensions.z}}, mViewPerspectiveScreen, wireframePixelCoords);
+	const	::gpk::SCoord3<float>	limitsBottom[4]	= 
+		{ { halfDimensions.x, .0f,  halfDimensions.z}
+		, {-halfDimensions.x, .0f,  halfDimensions.z}
+		, { halfDimensions.x, .0f, -halfDimensions.z}
+		, {-halfDimensions.x, .0f, -halfDimensions.z}
+		};
+	const	::gpk::SCoord3<float>	limitsTop	[4]	= 
+		{ limitsBottom[0] + ::gpk::SCoord3<float>{0, pool.StartState.TableDimensions.y, 0}
+		, limitsBottom[1] + ::gpk::SCoord3<float>{0, pool.StartState.TableDimensions.y, 0}
+		, limitsBottom[2] + ::gpk::SCoord3<float>{0, pool.StartState.TableDimensions.y, 0}
+		, limitsBottom[3] + ::gpk::SCoord3<float>{0, pool.StartState.TableDimensions.y, 0}
+		};
+
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[3], limitsBottom[2]}, mViewPerspectiveScreen, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[3], limitsBottom[1]}, mViewPerspectiveScreen, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[0], limitsBottom[1]}, mViewPerspectiveScreen, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[0], limitsBottom[2]}, mViewPerspectiveScreen, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsTop[3], limitsTop[2]}, mViewPerspectiveScreen, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsTop[3], limitsTop[1]}, mViewPerspectiveScreen, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsTop[0], limitsTop[1]}, mViewPerspectiveScreen, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsTop[0], limitsTop[2]}, mViewPerspectiveScreen, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[0], limitsTop[0]}, mViewPerspectiveScreen, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[1], limitsTop[1]}, mViewPerspectiveScreen, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[2], limitsTop[2]}, mViewPerspectiveScreen, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[3], limitsTop[3]}, mViewPerspectiveScreen, wireframePixelCoords);
 
 	for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord) {
 		::gpk::SCoord2<int16_t>								coord		= wireframePixelCoords[iCoord];
 		::gpk::SColorFloat									color		= 
-			{ (float)(totalSeconds - iCoord / 1 / totalSeconds)
-			, (float)(totalSeconds - iCoord / 2 / totalSeconds)
-			, (float)(totalSeconds - iCoord / 3 / totalSeconds)
+			{ (float)(totalSeconds - iCoord / 1.0f / totalSeconds)
+			, (float)(totalSeconds - iCoord / 2.0f / totalSeconds)
+			, (float)(totalSeconds - iCoord / 3.0f / totalSeconds)
 			};
 		backBuffer.Color.View[coord.y][coord.x]		= color;
 	}

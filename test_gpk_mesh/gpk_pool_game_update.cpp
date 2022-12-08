@@ -1,18 +1,10 @@
 #include "gpk_pool_game.h"
 
 static	bool				revertCross				(const ::gpk::SCoord3<double> & distanceDirection)	{
-	if(fabs(distanceDirection.x) > fabs(distanceDirection.z)) {
-		if(distanceDirection.x > 0)
-			return (distanceDirection.z >= 0);
-		else 
-			return (distanceDirection.z < 0);
-	}
-	else {
-		if(distanceDirection.x > 0)
-			return (distanceDirection.z >= 0);
-		else 
-			return (distanceDirection.z < 0);
-	}
+	if(distanceDirection.x >= 0)
+		return (distanceDirection.z >= 0);
+	else 
+		return (distanceDirection.z < 0);
 }
 
 static	::gpk::error_t		resolveCollision							

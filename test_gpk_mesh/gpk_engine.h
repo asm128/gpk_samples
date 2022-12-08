@@ -21,7 +21,7 @@ namespace gpk
 		::gpk::SVirtualEntityManager		ManagedEntities		;
 		::gpk::SRigidBodyIntegrator			Integrator			;
 
-		::gpk::error_t						Clone				(uint32_t iEntitySource) {
+		::gpk::error_t						Clone				(uint32_t iEntitySource, bool cloneSkin, bool cloneSurfaces) {
 			const ::gpk::SVirtualEntity				entitySource		= ManagedEntities.Entities[iEntitySource];
 			int32_t									iEntityNew			= ManagedEntities.Create();
 			::gpk::SVirtualEntity					& entityNew			= ManagedEntities.Entities[iEntityNew];
@@ -29,11 +29,24 @@ namespace gpk
 			entityNew.RigidBody					= Integrator				.Clone(entitySource.RigidBody);
 			entityNew.Parent					= entitySource.Parent;
 
+			if(cloneSkin) {
+				uint32_t								idSkin						= Scene->ManagedRenderNodes.CloneSkin(Scene->ManagedRenderNodes.RenderNodes[entityNew.RenderNode].Skin);
+				Scene->ManagedRenderNodes.RenderNodes[entityNew.RenderNode].Skin	= idSkin;
+				if(cloneSurfaces) {
+					if(Scene->ManagedRenderNodes.Skins[idSkin]) {
+						::gpk::SSkin							& newSkin					= *Scene->ManagedRenderNodes.Skins[idSkin];
+						for(uint32_t iTexture = 0; iTexture < newSkin.Textures.size(); ++iTexture) {
+							newSkin.Textures[iTexture]			= Scene->ManagedSurfaces.Clone(newSkin.Textures[iTexture]);
+						}
+					}
+				}
+			}
+
 			const ::gpk::ptr_obj<::gpk::array_pod<uint32_t>>	childrenSource	= ManagedEntities.EntityChildren[iEntitySource];
 			if(childrenSource && childrenSource->size()) {
 				::gpk::ptr_obj<::gpk::array_pod<uint32_t>>			childrenNew		= ManagedEntities.EntityChildren[iEntityNew];
 				for(uint32_t iChild = 0; iChild < childrenSource->size(); ++iChild) {
-					uint32_t entityChild = Clone((*childrenSource)[iChild]);
+					uint32_t entityChild = Clone((*childrenSource)[iChild], cloneSkin, cloneSurfaces);
 					ManagedEntities.Entities[entityChild].Parent	= iEntityNew;
 					childrenNew->push_back(entityChild);
 				}
@@ -48,6 +61,11 @@ namespace gpk
 
 		::gpk::error_t						SetVelocity			(uint32_t iEntity, const ::gpk::SCoord3<float> & velocity) {
 			Integrator.SetVelocity(ManagedEntities.Entities[iEntity].RigidBody, velocity);
+			return 0;
+		}
+
+		::gpk::error_t						SetRotation			(uint32_t iEntity, const ::gpk::SCoord3<float> & velocity) {
+			Integrator.SetRotation(ManagedEntities.Entities[iEntity].RigidBody, velocity);
 			return 0;
 		}
 

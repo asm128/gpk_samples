@@ -69,6 +69,7 @@ namespace gpk
 	struct SVSOutput {
 		::gpk::array_pod<::gpk::STriangle3<float>>		Positions				= {};
 		::gpk::array_pod<::gpk::STriangle3<float>>		Normals					= {};
+		::gpk::array_pod<::gpk::STriangle2<float>>		UVs						= {};
 	};
 
 
@@ -123,9 +124,17 @@ namespace gpk
 
 		::gpk::array_pobj<::gpk::SSkin>				Skins			= {};
 		::gpk::array_obj<::gpk::vcc>				SkinNames		= {};
-		::gpk::error_t								CreateSkin		()					{ SkinNames.push_back({});				return Skins  .push_back({}); }
-		::gpk::error_t								DeleteSkin		(uint32_t index)	{ SkinNames.remove_unordered(index);	return Skins  .remove_unordered(index); }
-		::gpk::error_t								CloneSkin		(uint32_t index)	{ Skins		.push_back(::gpk::ptr_obj<::gpk::SSkin			>{Skins	[index]}); return SkinNames.push_back(::gpk::vcc{SkinNames[index]}); }
+
+		::gpk::error_t								CreateSkin		()					{ SkinNames.push_back({});				return Skins.push_back({}); }
+		::gpk::error_t								DeleteSkin		(uint32_t index)	{ SkinNames.remove_unordered(index);	return Skins.remove_unordered(index); }
+		::gpk::error_t								CloneSkin		(uint32_t index)	{ 
+			::gpk::ptr_obj<::gpk::SSkin>					& newSkin		= Skins[Skins.push_back({})]; 
+			const ::gpk::ptr_obj<::gpk::SSkin>				& srcSkin		= Skins[index];
+			if(srcSkin) {
+				*newSkin.create() = *srcSkin;
+			}
+			return SkinNames.push_back(::gpk::vcc{SkinNames[index]}); 
+		}
 
 	};
 } // namespace

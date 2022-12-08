@@ -233,13 +233,14 @@ int												gpk::updateEntityTransforms
 	mesh->Desc.Type							= ::gpk::GEOMETRY_TYPE_Triangle;
 	mesh->Desc.NormalMode					= ::gpk::NORMAL_MODE_Point;
 	uint32_t									iSkin					= (uint32_t)Scene->ManagedRenderNodes.CreateSkin();
-	uint32_t									iSurface				= (uint32_t)Scene->ManagedSurfaces.Create();
 	::gpk::ptr_obj<::gpk::SSkin>				& skin					= Scene->ManagedRenderNodes.Skins[iSkin];
-	skin->Textures.push_back(iSurface);
 	skin->Material.Color.Ambient			= ::gpk::SColorBGRA(::gpk::ASCII_PALETTE[3]);
 	skin->Material.Color.Diffuse			= ::gpk::SColorBGRA(::gpk::ASCII_PALETTE[3]);
 	skin->Material.Color.Specular			= ::gpk::SColorBGRA(::gpk::ASCII_PALETTE[3]);
 	skin->Material.SpecularPower			= 0.5f;
+
+	uint32_t									iSurface				= (uint32_t)Scene->ManagedSurfaces.Create();
+	skin->Textures.push_back(iSurface);
 
 	skin->Material.Color.Ambient			*= .1f;
 
@@ -248,9 +249,14 @@ int												gpk::updateEntityTransforms
 	surface->Desc.MethodCompression			= 0;
 	surface->Desc.MethodFilter				= 0;
 	surface->Desc.MethodInterlace			= 0;
-	surface->Desc.Dimensions				= {1, 1};
-	surface->Data.resize(1 * sizeof(::gpk::SColorBGRA));
-	*(::gpk::SColorBGRA*)&surface->Data[0]	= ::gpk::SColorRGBA{::gpk::VOXEL_PALETTE[3]};
+	surface->Desc.Dimensions				= {16, 16};
+	surface->Data.resize(surface->Desc.Dimensions.Area() * sizeof(::gpk::SColorBGRA));
+	memset(surface->Data.begin(), 0xFF, surface->Data.size());
+	::gpk::view_grid<::gpk::SColorBGRA>			view	= {(::gpk::SColorBGRA*)surface->Data.begin(), surface->Desc.Dimensions.Cast<uint32_t>()};
+	::gpk::SColorRGBA							color	= {::gpk::ASCII_PALETTE[rand() % 16]};
+	for(uint32_t y = 6; y < 10; ++y)
+	for(uint32_t x = 0; x < 16; ++x)
+		view[y][x]	= color;
 
 	mesh->GeometrySlices.resize(1);	// one per face
 	::gpk::SGeometrySlice						& slice					= mesh->GeometrySlices[0];
