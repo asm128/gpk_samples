@@ -8,24 +8,26 @@
 namespace gpk 
 {
 	GDEFINE_ENUM_TYPE(BUFFER_USAGE, uint8_t);
-	GDEFINE_ENUM_VALUE(BUFFER_USAGE, Position		,  0);
-	GDEFINE_ENUM_VALUE(BUFFER_USAGE, Index			,  1);
-	GDEFINE_ENUM_VALUE(BUFFER_USAGE, Color			,  2);
-	GDEFINE_ENUM_VALUE(BUFFER_USAGE, ColorIndex		,  3);
-	GDEFINE_ENUM_VALUE(BUFFER_USAGE, Normal			,  4);
-	GDEFINE_ENUM_VALUE(BUFFER_USAGE, UV				,  5);
-	GDEFINE_ENUM_VALUE(BUFFER_USAGE, Shadow			,  6);
-	GDEFINE_ENUM_VALUE(BUFFER_USAGE, Light			,  7);
-	GDEFINE_ENUM_VALUE(BUFFER_USAGE, BlendIndex		,  8);
-	GDEFINE_ENUM_VALUE(BUFFER_USAGE, BlendWeight	,  9);
-	GDEFINE_ENUM_VALUE(BUFFER_USAGE, Palette		, 10);
+	GDEFINE_ENUM_VALUE(BUFFER_USAGE, Position			,  0);
+	GDEFINE_ENUM_VALUE(BUFFER_USAGE, Index				,  1);
+	GDEFINE_ENUM_VALUE(BUFFER_USAGE, Color				,  2);
+	GDEFINE_ENUM_VALUE(BUFFER_USAGE, ColorIndex			,  3);
+	GDEFINE_ENUM_VALUE(BUFFER_USAGE, Normal				,  4);
+	GDEFINE_ENUM_VALUE(BUFFER_USAGE, UV					,  5);
+	GDEFINE_ENUM_VALUE(BUFFER_USAGE, Shadow				,  6);
+	GDEFINE_ENUM_VALUE(BUFFER_USAGE, Light				,  7);
+	GDEFINE_ENUM_VALUE(BUFFER_USAGE, BlendIndex			,  8);
+	GDEFINE_ENUM_VALUE(BUFFER_USAGE, BlendWeight		,  9);
+	GDEFINE_ENUM_VALUE(BUFFER_USAGE, Palette			, 10);
+	GDEFINE_ENUM_VALUE(BUFFER_USAGE, RasterSource		, 11);
+	GDEFINE_ENUM_VALUE(BUFFER_USAGE, RasterDestination	, 12);
 
 #pragma pack(push, 1)
 	struct SRenderBufferDescription {
 		::gpk::DATA_TYPE							Format			= {};
 		BUFFER_USAGE								Usage			= {};
 		uint8_t										Stride			= {};
-		uint16_t									Width			= {};
+		uint16_t									Pitch			= {};
 	};
 #pragma pack(pop)
 

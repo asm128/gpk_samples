@@ -36,7 +36,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	mainWindow.Size															= {1280, 720};
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?!");
 
-	::the1::poolGameSetup(app.Pool);
+	::the1::theOneSetup(app.TheOne);
 
 	//app.EntityCamera					= app.Engine.CreateCamera	();
 	//app.EntityLightDirectional		= app.Engine.CreateLight	(::gpk::LIGHT_TYPE_Directional	);
@@ -67,7 +67,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	::gpk::SFrameInfo									& frameInfo									= framework.FrameInfo;
 	{
 		::gpk::STimer										timer;
-		::the1::poolGameUpdate(app.Pool, frameInfo.Seconds.LastFrame * timeScale);
+		::the1::theOneUpdate(app.TheOne, frameInfo.Seconds.LastFrame * timeScale);
 
 		timer.Frame();
 		info_printf("Update engine in %f seconds", timer.LastTimeSeconds);
@@ -81,26 +81,27 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	::HWND																		windowHandle								= mainWindow.PlatformDetail.WindowHandle;
 	SetWindowTextA(windowHandle, buffer);
 
-		 if(GetAsyncKeyState('R')) ::the1::poolGameReset(app.Pool, app.Pool.StartState.Mode);
-	else if(GetAsyncKeyState('8')) ::the1::poolGameReset(app.Pool, ::the1::POOL_GAME_MODE_8Ball);
-	else if(GetAsyncKeyState('9')) ::the1::poolGameReset(app.Pool, ::the1::POOL_GAME_MODE_9Ball);
-	else if(GetAsyncKeyState('0')) ::the1::poolGameReset(app.Pool, ::the1::POOL_GAME_MODE_10Ball);
-	else if(GetAsyncKeyState('2')) ::the1::poolGameReset(app.Pool, ::the1::POOL_GAME_MODE_Test2Balls);
+		 if(app.Framework.Input->KeyDown('R')) ::the1::poolGameReset(app.TheOne.MainGame.Game, app.TheOne.MainGame.Game.StartState.Mode);
+	else if(app.Framework.Input->KeyDown('8')) ::the1::poolGameReset(app.TheOne.MainGame.Game, ::the1::POOL_GAME_MODE_8Ball);
+	else if(app.Framework.Input->KeyDown('9')) ::the1::poolGameReset(app.TheOne.MainGame.Game, ::the1::POOL_GAME_MODE_9Ball);
+	else if(app.Framework.Input->KeyDown('0')) ::the1::poolGameReset(app.TheOne.MainGame.Game, ::the1::POOL_GAME_MODE_10Ball);
+	else if(app.Framework.Input->KeyDown('2')) ::the1::poolGameReset(app.TheOne.MainGame.Game, ::the1::POOL_GAME_MODE_Test2Balls);
 
-	bool reverse = GetAsyncKeyState(VK_SHIFT);
-	if(GetAsyncKeyState(VK_CONTROL)) {
-			 if(GetAsyncKeyState('Z')) app.Pool.Camera.Position.z += float(frameInfo.Seconds.LastFrame * (reverse ? -1 : 1));
-		else if(GetAsyncKeyState('X')) app.Pool.Camera.Position.x += float(frameInfo.Seconds.LastFrame * (reverse ? -1 : 1));
-		else if(GetAsyncKeyState('Y')) app.Pool.Camera.Position.y += float(frameInfo.Seconds.LastFrame * (reverse ? -1 : 1));
+	bool reverse = app.Framework.Input->KeyDown(VK_SHIFT);
+	float scale = 10.0f * (reverse ? -1 : 1);
+	if(app.Framework.Input->KeyDown(VK_CONTROL)) {
+			 if(app.Framework.Input->KeyDown('Z')) app.TheOne.MainGame.Game.Camera.Position.z += float(frameInfo.Seconds.LastFrame * scale);
+		else if(app.Framework.Input->KeyDown('X')) app.TheOne.MainGame.Game.Camera.Position.x += float(frameInfo.Seconds.LastFrame * scale);
+		else if(app.Framework.Input->KeyDown('Y')) app.TheOne.MainGame.Game.Camera.Position.y += float(frameInfo.Seconds.LastFrame * scale);
 	}
 	else {
-			 if(GetAsyncKeyState('Z')) app.Pool.Camera.Position.z += float(frameInfo.Seconds.LastFrame * (reverse ? -1 : 1));
-		else if(GetAsyncKeyState('X')) app.Pool.Camera.Position.x += float(frameInfo.Seconds.LastFrame * (reverse ? -1 : 1));
-		else if(GetAsyncKeyState('Y')) app.Pool.Camera.Position.y += float(frameInfo.Seconds.LastFrame * (reverse ? -1 : 1));
+			 if(app.Framework.Input->KeyDown('Z')) app.TheOne.MainGame.Game.Camera.Position.z += float(frameInfo.Seconds.LastFrame * scale);
+		else if(app.Framework.Input->KeyDown('X')) app.TheOne.MainGame.Game.Camera.Position.x += float(frameInfo.Seconds.LastFrame * scale);
+		else if(app.Framework.Input->KeyDown('Y')) app.TheOne.MainGame.Game.Camera.Position.y += float(frameInfo.Seconds.LastFrame * scale);
 	}
-	if(GetAsyncKeyState(VK_ADD)) 
+	if(app.Framework.Input->KeyDown(VK_ADD)) 
 		timeScale	+= .1f;
-	if(GetAsyncKeyState(VK_SUBTRACT)) 
+	if(app.Framework.Input->KeyDown(VK_SUBTRACT)) 
 		timeScale	= ::gpk::max(0.f, timeScale - .1f);
 	
 	return 0;
@@ -111,7 +112,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>			backBuffer;
 	backBuffer->resize(framework.MainDisplayOffscreen->Color.metrics(), 0xFF008000, (uint32_t)-1);
 
-	::the1::poolGameDraw(app.Pool, *backBuffer, framework.FrameInfo.Seconds.Total);
+	::the1::theOneDraw(app.TheOne, *backBuffer, framework.FrameInfo.Seconds.Total);
 
 	//memcpy(framework.MainDisplayOffscreen->Color.View.begin(), backBuffer->Color.View.begin(), backBuffer->Color.View.byte_count());
 	::gpk::grid_mirror_y(framework.MainDisplayOffscreen->Color.View, backBuffer->Color.View);

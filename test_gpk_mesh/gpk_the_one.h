@@ -27,22 +27,22 @@ namespace the1
 
 	typedef ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t> TRenderTarget;
 	struct STheOneGame {
-		::the1::SPoolGame								Game				= {};
-		::gpk::SDesktop									Desktop				= {};
-		::the1::TRenderTarget							GameRenderTarget	= {};
-		::gpk::array_pod<::the1::SContactBall>			ContactsToDraw		= {};
+		::the1::SPoolGame									Game				= {};
+		::gpk::SDesktop										Desktop				= {};
+		::the1::TRenderTarget								GameRenderTarget	= {};
+		::gpk::array_pod<::the1::SContactBall>				ContactsToDraw		= {};
 	};
 
 	struct STheOne {
-		::the1::STheOneGame								MainGame			= {};
-		::gpk::array_static<::the1::STheOneGame, 64>	TestGames			= {};
+		::the1::STheOneGame									MainGame			= {};
+		::gpk::array_static<::the1::STheOneGame, 64>		TestGames			= {};
 
-		APP_STATE										ActiveState			= {};
+		APP_STATE											ActiveState			= {};
 	};
 
-	::gpk::error_t									theOneSetup			(::the1::STheOne & app, the1::POOL_GAME_MODE mode = the1::POOL_GAME_MODE_8Ball);
-	::gpk::error_t									theOneUpdate		(::the1::STheOne & app, double secondsElapsed);
-	::gpk::error_t									theOneDraw			(::the1::STheOne & app, ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t> & backBuffer, double totalSeconds, uint64_t frameNumber);
+	::gpk::error_t										theOneSetup			(::the1::STheOne & app, the1::POOL_GAME_MODE mode = the1::POOL_GAME_MODE_8Ball);
+	::gpk::error_t										theOneUpdate		(::the1::STheOne & app, double secondsElapsed);
+	::gpk::error_t										theOneDraw			(::the1::STheOne & app, ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t> & backBuffer, double totalSeconds);
 
 } // namespace
 

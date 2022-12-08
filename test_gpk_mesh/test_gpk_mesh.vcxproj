@@ -185,6 +185,7 @@
     <ClCompile Include="gpk_pool_game_draw.cpp" />
     <ClCompile Include="gpk_pool_game_setup.cpp" />
     <ClCompile Include="gpk_pool_game_update.cpp" />
+    <ClCompile Include="gpk_the_one.cpp" />
     <ClCompile Include="test_gpk_mesh.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

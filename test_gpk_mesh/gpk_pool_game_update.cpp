@@ -29,6 +29,8 @@ static	::gpk::error_t		resolveCollision
 	info_printf("Total initial speed: %f", (float)(initialVelocityA.Length()));
 
 	bool							revert				= ::revertCross(distanceDirection);
+	if(fabs(initialVelocityA.x) < fabs(initialVelocityA.z))
+		revert = !revert;
 
 	double							speedA				= initialVelocityA.Length();
 	const ::gpk::SCoord3<double>	vUp					= {0, revert ? -1 : 1.0f, 0};

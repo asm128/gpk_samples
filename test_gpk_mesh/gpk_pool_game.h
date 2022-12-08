@@ -60,6 +60,8 @@ namespace the1
 		::gpk::SCoord3<float>						DistanceDirection				= {};
 		::gpk::SCoord3<float>						FinalVelocityA					= {};
 		::gpk::SCoord3<float>						FinalVelocityB					= {};
+		::gpk::SCoord3<float>						FinalRotationA					= {};
+		::gpk::SCoord3<float>						FinalRotationB					= {};
 		float										ForceTransferRatioA				= 0;
 		float										ForceTransferRatioB				= 0;
 	};
@@ -99,7 +101,7 @@ namespace the1
 			ballPosition = Engine.Integrator.Centers[Engine.ManagedEntities.Entities[StartState.Balls[iBall].Entity].RigidBody].Position;
 			return 0;
 		}
-		SCamera										Camera							= {{-40, 25, 0}, {}};
+		SCamera										Camera							= {{-10, 30, -25}, {}};
 	};
 
 	::gpk::error_t								poolGameReset					(::the1::SPoolGame & pool, POOL_GAME_MODE mode);

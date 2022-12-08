@@ -9,9 +9,9 @@ static	::gpk::error_t					poolGameResetTest2Balls	(::the1::SPoolGame & pool) {
 		pool.Engine.SetDampingLinear(pool.StartState.Balls[iBall].Entity, pool.StartState.DampingRoll);
 		pool.Engine.SetHidden(pool.StartState.Balls[iBall].Entity, false);
 	}
-	::gpk::SCoord3<float>						velocity				= {0, 0, 50.f};
+	::gpk::SCoord3<float>						velocity				= {0, 0, -50.f};
 	velocity.RotateY(::gpk::noiseNormal1D(pool.StartState.Seed + 2) / 20 * ((rand() % 2) ? -1 : 1));
-	pool.Engine.SetVelocity(pool.StartState.Balls[0].Entity, velocity);
+	pool.Engine.SetVelocity(pool.StartState.Balls[1].Entity, velocity);
 	return 0; 
 }
 
@@ -57,6 +57,7 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 		const bool								stripped			= ballNumber > 7;
 		pool.Engine.SetDampingLinear(pool.StartState.Balls[iBall].Entity, pool.StartState.DampingRoll);
 		pool.Engine.SetHidden(pool.StartState.Balls[iBall].Entity, false);
+		pool.Engine.SetOrientation(pool.StartState.Balls[iBall].Entity, {0, 0, 1, 1});
 		const ::gpk::SVirtualEntity				& entity			= pool.Engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity];
 		const ::gpk::SRenderNode				& renderNode		= pool.Engine.Scene->ManagedRenderNodes.RenderNodes[entity.RenderNode];
 		::gpk::SSkin							& skin				= *pool.Engine.Scene->ManagedRenderNodes.Skins[renderNode.Skin];
@@ -86,6 +87,7 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 	pool.Engine.SetRotation(pool.StartState.Balls[0].Entity, {0, 0, 10});
 	uint8_t									rowLen				= 5;
 	::gpk::SCoord3<float>					diagonal			= {1, 0, 1};
+	diagonal = diagonal.Normalize() * 1.22f; 
 	for(uint32_t iRow = 0, iBall = 1; iRow < 5; ++iRow, --rowLen) {
 		::gpk::SCoord3<float>					offsetZ				= {0, 0, -(rowLen / 2.0f) + .5f};
 		for(uint32_t iColumn = 0; iColumn < rowLen; ++iColumn) {
