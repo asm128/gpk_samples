@@ -22,6 +22,7 @@ static	::gpk::error_t							transformTriangles
 )	{ 
 	::gpk::view_array<const ::gpk::STriangle<uint16_t>>		view_indices		= {(const ::gpk::STriangle<uint16_t>*)indices.begin(), indices.size() / 3};
 
+	const ::gpk::SMatrix4<float>							mWorldInverse		= worldTransform.GetInverse();
 	const ::gpk::SMatrix4<float>							mWVP				= worldTransform * projection;
 	for(uint32_t iTriangle = 0; iTriangle < view_indices.size(); ++iTriangle) {
 		const ::gpk::STriangle<uint16_t>											vertexIndices								= view_indices[iTriangle];
@@ -30,7 +31,6 @@ static	::gpk::error_t							transformTriangles
 		transformedNormals.A.Normalize();
 		transformedNormals.B.Normalize();
 		transformedNormals.C.Normalize();
-		(void)cameraFront;
 		double																		directionFactorA							= transformedNormals.A.Dot(cameraFront);
 		double																		directionFactorB							= transformedNormals.B.Dot(cameraFront);
 		double																		directionFactorC							= transformedNormals.C.Dot(cameraFront);

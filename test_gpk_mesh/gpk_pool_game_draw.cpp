@@ -17,7 +17,7 @@
 	lightPos.RotateY(-totalSeconds);
 
 	const ::gpk::SCoord2<uint16_t>					offscreenMetrics				= backBuffer.Color.View.metrics().Cast<uint16_t>();
-	::gpk::SNearFar									nearFar							= {0.01f , 500.0f};
+	::gpk::SNearFar									nearFar							= {0.1f , 200.0f};
 
 	::gpk::SCoord3<float>							cameraFront						= (cameraTarget - cameraPosition).Normalize();
 
@@ -43,7 +43,7 @@
 			::gpk::drawLine(offscreenMetrics, screenDelta, wireframePixelCoords);
 			for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord) {
 				::gpk::SCoord2<int16_t>							coord					= wireframePixelCoords[iCoord];
-				backBuffer.Color.View[coord.y][coord.x]		= pool.StartState.BallColors[pool.StartState.BallOrder[iBall]];
+				backBuffer.Color.View[coord.y][coord.x]		= pool.StartState.BallColors[iBall];
 			}
 		}
 	}

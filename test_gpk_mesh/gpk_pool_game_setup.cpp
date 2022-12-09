@@ -21,6 +21,34 @@ static	::gpk::error_t					poolGameResetBall9		(::the1::SPoolGame & pool) { (void
 static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 	pool.StartState.BallCount				= 16;
 
+	for(uint32_t iBall = 0; iBall < pool.StartState.BallCount; ++iBall) {
+		const bool								stripped			= iBall > 0 && iBall < 8;
+		pool.Engine.SetDampingLinear	(pool.StartState.Balls[iBall].Entity, pool.StartState.DampingRollDisplacement);
+		pool.Engine.SetDampingAngular	(pool.StartState.Balls[iBall].Entity, pool.StartState.DampingRollRotation);
+		pool.Engine.SetHidden			(pool.StartState.Balls[iBall].Entity, false);
+		pool.Engine.SetOrientation		(pool.StartState.Balls[iBall].Entity, {0, 0, 1, 1});
+		const ::gpk::SVirtualEntity				& entity			= pool.Engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity];
+		const ::gpk::SRenderNode				& renderNode		= pool.Engine.Scene->ManagedRenderNodes.RenderNodes[entity.RenderNode];
+		::gpk::SSkin							& skin				= *pool.Engine.Scene->ManagedRenderNodes.Skins[renderNode.Skin];
+		::gpk::SSurface							& surface			= *pool.Engine.Scene->ManagedSurfaces.Surfaces[skin.Textures[0]];
+		::gpk::SRenderMaterial					& material			= skin.Material;
+		::gpk::SColorFloat						color				= pool.StartState.BallColors[iBall];
+		material.Color.Specular	= material.Color.Diffuse = color;
+  		material.Color.Ambient	= material.Color.Diffuse *.1f;
+		::gpk::view_grid<::gpk::SColorBGRA>		view				= {(::gpk::SColorBGRA*)surface.Data.begin(), surface.Desc.Dimensions.Cast<uint32_t>()};
+		if(stripped) {
+			memset(surface.Data.begin(), 0xFF, surface.Data.size());
+			for(uint32_t y = 5; y < 11; ++y)
+			for(uint32_t x = 0; x < 16; ++x)
+				view[y][x]	= color;
+		}
+		else {
+			for(uint32_t y = 0; y < surface.Desc.Dimensions.x; ++y)
+			for(uint32_t x = 0; x < surface.Desc.Dimensions.y; ++x)
+				view[y][x]	= color;
+		}
+	}
+
 	::gpk::array_pod<uint32_t>					ballPool				= {};
 	uint32_t									ball1					= 1 + ::gpk::noise1DBase(pool.StartState.Seed + 1) % 7;
 	uint32_t									ball5					= 9 + ::gpk::noise1DBase(pool.StartState.Seed + 2) % 7;
@@ -53,35 +81,6 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 	{ uint32_t index = ::gpk::noise1DBase32(11, (uint32_t)pool.StartState.Seed) % ballPool.size(); pool.StartState.BallOrder[14] = ballPool[index]; ballPool.remove_unordered(index); }
 	{ uint32_t index = ::gpk::noise1DBase32(12, (uint32_t)pool.StartState.Seed) % ballPool.size(); pool.StartState.BallOrder[15] = ballPool[index]; ballPool.remove_unordered(index); }
 
-	for(uint32_t iBall = 0; iBall < pool.StartState.BallCount; ++iBall) {
-		const uint32_t							ballNumber			= pool.StartState.BallOrder[iBall];
-		const bool								stripped			= ballNumber > 0 && ballNumber < 8;
-		pool.Engine.SetDampingLinear(pool.StartState.Balls[iBall].Entity, pool.StartState.DampingRollDisplacement);
-		pool.Engine.SetDampingAngular(pool.StartState.Balls[iBall].Entity, pool.StartState.DampingRollRotation);
-		pool.Engine.SetHidden(pool.StartState.Balls[iBall].Entity, false);
-		pool.Engine.SetOrientation(pool.StartState.Balls[iBall].Entity, {0, 0, 1, 1});
-		const ::gpk::SVirtualEntity				& entity			= pool.Engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity];
-		const ::gpk::SRenderNode				& renderNode		= pool.Engine.Scene->ManagedRenderNodes.RenderNodes[entity.RenderNode];
-		::gpk::SSkin							& skin				= *pool.Engine.Scene->ManagedRenderNodes.Skins[renderNode.Skin];
-		::gpk::SSurface							& surface			= *pool.Engine.Scene->ManagedSurfaces.Surfaces[skin.Textures[0]];
-		::gpk::SRenderMaterial					& material			= skin.Material;
-		::gpk::SColorFloat						color				= pool.StartState.BallColors[ballNumber];
-		material.Color.Specular	= material.Color.Diffuse = color;
-  		material.Color.Ambient	= material.Color.Diffuse *.1f;
-		::gpk::view_grid<::gpk::SColorBGRA>		view				= {(::gpk::SColorBGRA*)surface.Data.begin(), surface.Desc.Dimensions.Cast<uint32_t>()};
-		if(stripped) {
-			memset(surface.Data.begin(), 0xFF, surface.Data.size());
-			for(uint32_t y = 5; y < 11; ++y)
-			for(uint32_t x = 0; x < 16; ++x)
-				view[y][x]	= color;
-		}
-		else {
-			for(uint32_t y = 0; y < surface.Desc.Dimensions.x; ++y)
-			for(uint32_t x = 0; x < surface.Desc.Dimensions.y; ++x)
-				view[y][x]	= color;
-		}
-	}
-
 	pool.Engine.SetPosition(pool.StartState.Balls[0].Entity, {-10, pool.StartState.BallRadius, 0});
 	::gpk::SCoord3<float>					velocity			= {40.0f + (rand() % 90), 0, 0};
 	velocity.RotateY(::gpk::noiseNormal1D(pool.StartState.Seed + 2) / 10 * ((rand() % 2) ? -1 : 1));
@@ -94,7 +93,7 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 		::gpk::SCoord3<float>					offsetZ				= {0, 0, -(rowLen / 2.0f) + .5f};
 		for(uint32_t iColumn = 0; iColumn < rowLen; ++iColumn) {
 			::gpk::SCoord3<float>					position			= offsetZ + ::gpk::SCoord3<float>{(10.f + diagonal.x * 5) - iRow * diagonal.x, pool.StartState.BallRadius, (float)iColumn};
-			uint32_t								iEntity				= pool.StartState.Balls[iBall++].Entity;
+			uint32_t								iEntity				= pool.StartState.Balls[pool.StartState.BallOrder[iBall++]].Entity;
 			pool.Engine.SetPosition(iEntity, position);
 		}
 	}
