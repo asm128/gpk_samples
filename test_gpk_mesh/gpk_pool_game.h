@@ -15,45 +15,6 @@ namespace the1
 	static constexpr	uint8_t					MAX_BALLS					= 32;
 
 #pragma pack(push, 1)
-	struct SPoolBall {
-		uint32_t									Entity;
-	};
-
-	struct SPoolStartState {
-		POOL_GAME_MODE								Mode							= POOL_GAME_MODE_8Ball;
-		uint64_t									Seed							= (uint64_t)::gpk::timeCurrentInUs();
-		uint32_t									BallCount						= 16;
-		float										DampingRollDisplacement			= .85f;
-		float										DampingRollRotation				= .005f;
-		float										DampingCollision				= .975f;
-		float										DampingCushion					= .95f;
-		float										DampingGround					= .5f;
-
-		float										BallRadius						= .5f;
-		::gpk::SCoord3<float>						TableDimensions					= {44, .65f, 22};
-		::the1::SPoolBall							Balls			[MAX_BALLS]		= {};
-		::gpk::SCoord3<float>						BallPositions	[MAX_BALLS]		= {};
-		uint32_t									BallOrder		[MAX_BALLS]		= {};
-		::gpk::SColorFloat							BallColors		[MAX_BALLS]		= 
-			{ ::gpk::WHITE
-			, ::gpk::YELLOW
-			, ::gpk::BLUE
-			, ::gpk::RED
-			, ::gpk::PURPLE 
-			, ::gpk::ORANGE
-			, ::gpk::GREEN
-			, ::gpk::RED
-			, ::gpk::BLACK
-			, ::gpk::YELLOW
-			, ::gpk::BLUE
-			, ::gpk::RED
-			, ::gpk::PURPLE 
-			, ::gpk::ORANGE
-			, ::gpk::GREEN
-			, ::gpk::RED
-			};
-	};
-
 	struct SContactResultBall {
 		::gpk::SCoord3<float>						ContactPosition					= {};
 		::gpk::SCoord3<float>						DistanceDirection				= {};
@@ -92,31 +53,72 @@ namespace the1
 		::gpk::SCoord3<float>						Distance						= {};
 		::the1::SContactResultCushion				Result							= {};
 	};
-#pragma pack(pop)
-	struct SCamera {
-		::gpk::SCoord3<float>						Position, Target;
+
+	struct SPoolBall {
+		uint32_t									Entity;
 	};
+
+	struct SPoolStartState {
+		POOL_GAME_MODE								Mode							= POOL_GAME_MODE_8Ball;
+		uint64_t									Seed							= (uint64_t)::gpk::timeCurrentInUs();
+		uint32_t									BallCount						= 16;
+		float										DampingRollDisplacement			= .8f;
+		float										DampingRollRotation				= .005f;
+		float										DampingCollision				= .975f;
+		float										DampingCushion					= .95f;
+		float										DampingGround					= .5f;
+
+		float										BallRadius						= .5f;
+		::gpk::SCoord3<float>						TableDimensions					= {44, .65f, 22};
+		::the1::SPoolBall							Balls			[MAX_BALLS]		= {};
+		::gpk::SCoord3<float>						BallPositions	[MAX_BALLS]		= {};
+		uint32_t									BallOrder		[MAX_BALLS]		= {};
+		::gpk::SColorFloat							BallColors		[MAX_BALLS]		= 
+			{ ::gpk::WHITE
+			, ::gpk::YELLOW
+			, ::gpk::BLUE
+			, ::gpk::RED
+			, ::gpk::PURPLE 
+			, ::gpk::ORANGE
+			, ::gpk::GREEN
+			, ::gpk::DARKRED * .5f
+			, ::gpk::BLACK
+			, ::gpk::YELLOW
+			, ::gpk::BLUE
+			, ::gpk::RED
+			, ::gpk::PURPLE 
+			, ::gpk::ORANGE
+			, ::gpk::GREEN
+			, ::gpk::DARKRED * .5f
+			};
+	};
+#pragma pack(pop)
 
 	struct SPoolGame {
 		::the1::SPoolStartState						StartState						= {};
-		::gpk::SEngine								Engine							= {};
 		::gpk::array_pod<::gpk::SLine3<float>>		PositionDeltas	[MAX_BALLS]		= {};
 		::gpk::array_pod<::the1::SContactBall>		LastFrameContactsBall			= {};
 		::gpk::array_pod<::the1::SContactCushion>	LastFrameContactsCushion		= {};
+		::gpk::SEngine								Engine							= {};
 
 		::gpk::error_t								GetBallPosition					(uint32_t iBall, ::gpk::SCoord3<float> & ballPosition) {
 			ballPosition = Engine.Integrator.Centers[Engine.ManagedEntities.Entities[StartState.Balls[iBall].Entity].RigidBody].Position;
 			return 0;
 		}
-		SCamera										Camera							= {{-10, 30, -25}, {}};
 	};
 
 	::gpk::error_t								poolGameReset					(::the1::SPoolGame & pool, POOL_GAME_MODE mode);
 	::gpk::error_t								poolGameSetup					(::the1::SPoolGame & pool, POOL_GAME_MODE mode = POOL_GAME_MODE_8Ball);
 	::gpk::error_t								poolGameUpdate					(::the1::SPoolGame & pool, double secondsElapsed);
-	::gpk::error_t								poolGameDraw					(::the1::SPoolGame & pool, ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t> & backBuffer, double totalSeconds);
-
-}
+	::gpk::error_t								poolGameDraw
+		( ::the1::SPoolGame									& pool
+		, ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>	& backBuffer
+		, const ::gpk::SCoord3<float>						& cameraPosition
+		, const ::gpk::SCoord3<float>						& cameraTarget
+		, const ::gpk::SCoord3<float>						& cameraUp
+		, double											totalSeconds
+		);
+} // namespace
 
 #endif // GPK_POOL_GAME_H_098273498237423
 

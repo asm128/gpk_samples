@@ -23,14 +23,16 @@ namespace gpk
 	};
 
 	::gpk::error_t						drawScene									
-		( ::gpk::view_grid<::gpk::SColorBGRA>				& backBufferColors
-		, ::gpk::view_grid<uint32_t>						& backBufferDepth
-		, ::gpk::SEngineRenderCache							& renderCache
-		, ::gpk::SEngineScene								& scene
-		, const ::gpk::SMatrix4<float>						& projection		
-		, const ::gpk::SNearFar								& nearFar 
-		, const ::gpk::SCoord3<float>						& cameraFront
-		, const ::gpk::SCoord3<float>						& lightPos
+		( ::gpk::view_grid<::gpk::SColorBGRA>	& backBufferColors
+		, ::gpk::view_grid<uint32_t>			& backBufferDepth
+		, ::gpk::SEngineRenderCache				& renderCache
+		, ::gpk::SEngineScene					& scene
+		, const ::gpk::SMatrix4<float>			& projection		
+		, const ::gpk::SNearFar					& nearFar 
+		, const ::gpk::SCoord3<float>			& cameraPosition
+		, const ::gpk::SCoord3<float>			& cameraFront
+		, const ::gpk::SCoord3<float>			& lightPosition
+		, const ::gpk::SCoord3<float>			& lightDirection
 		);
 
 	template<typename _tCoord>

@@ -24,13 +24,20 @@ namespace the1
 	GDEFINE_ENUM_VALUE(APP_STATE, Quit		, 13);
 	GDEFINE_ENUM_VALUE(APP_STATE, Load		, 14);
 	GDEFINE_ENUM_VALUE(APP_STATE, COUNT		, 15);
+	struct SCamera {
+		::gpk::SCoord3<float>						Position, Target;
+	};
 
 	typedef ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t> TRenderTarget;
 	struct STheOneGame {
-		::the1::SPoolGame									Game				= {};
-		::gpk::SDesktop										Desktop				= {};
-		::the1::TRenderTarget								GameRenderTarget	= {};
-		::gpk::array_pod<::the1::SContactBall>				ContactsToDraw		= {};
+		::the1::SPoolGame						Game							= {};
+		::gpk::SDesktop							Desktop							= {};
+		::the1::TRenderTarget					GameRenderTarget				= {};
+		::gpk::array_pod<::the1::SContactBall>	ContactsToDraw					= {};
+
+		SCamera									CameraPlayer					= {{0, 40, -35}, {}};
+		SCamera									CameraBalls[::the1::MAX_BALLS]	= {{0, 40, -35}, {}};
+		uint32_t								Camera							= 1;
 	};
 
 	struct STheOne {

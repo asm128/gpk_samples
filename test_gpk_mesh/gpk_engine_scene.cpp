@@ -1,5 +1,14 @@
 #include "gpk_engine_scene.h"
 
+::gpk::SColorFloat								lightCalcSpecular		(::gpk::SCoord3<float> gEyePosW, float specularPower, ::gpk::SColorFloat specularLight, ::gpk::SColorFloat specularMaterial, ::gpk::SCoord3<float> posW, ::gpk::SCoord3<float> normalW, ::gpk::SCoord3<float> lightVecW) {
+	const ::gpk::SCoord3<float>							pointToEye				= (gEyePosW - posW).Normalize();
+	const ::gpk::SCoord3<float>							reflected				= normalW.Reflect(-lightVecW);
+	const float											factor					= powf((float)::gpk::max(reflected.Dot(pointToEye), 0.0), specularPower);
+	::gpk::SColorFloat									result					= specularMaterial * specularLight * factor;
+	result.a										= specularMaterial.a;
+	return result;
+}
+
 
 static	::gpk::error_t							transformTriangles						
 	( ::gpk::SVSOutput									& output
@@ -17,9 +26,10 @@ static	::gpk::error_t							transformTriangles
 	for(uint32_t iTriangle = 0; iTriangle < view_indices.size(); ++iTriangle) {
 		const ::gpk::STriangle<uint16_t>											vertexIndices								= view_indices[iTriangle];
 		::gpk::STriangle3<float>													transformedNormals							= {normals[vertexIndices.A], normals[vertexIndices.B], normals[vertexIndices.C]};
-		transformedNormals.A = worldTransform.TransformDirection(transformedNormals.A); transformedNormals.A.Normalize();
-		transformedNormals.B = worldTransform.TransformDirection(transformedNormals.B); transformedNormals.B.Normalize();
-		transformedNormals.C = worldTransform.TransformDirection(transformedNormals.C); transformedNormals.C.Normalize();
+		::gpk::transformDirection(transformedNormals, worldTransform);
+		transformedNormals.A.Normalize();
+		transformedNormals.B.Normalize();
+		transformedNormals.C.Normalize();
 		(void)cameraFront;
 		double																		directionFactorA							= transformedNormals.A.Dot(cameraFront);
 		double																		directionFactorB							= transformedNormals.B.Dot(cameraFront);
@@ -27,10 +37,15 @@ static	::gpk::error_t							transformTriangles
 		if(directionFactorA > .1 && directionFactorB > .1 && directionFactorC > .1)
 			continue;
 
+		output.Normals.push_back(transformedNormals);
+
 		::gpk::STriangle3<float>													transformedPositions						= {positions[vertexIndices.A], positions[vertexIndices.B], positions[vertexIndices.C]};
-		::gpk::transform(transformedPositions, mWVP);
-		output.Positions.push_back(transformedPositions);
-		output.Normals	.push_back(transformedNormals);
+		::gpk::transform(transformedPositions, worldTransform);
+		output.PositionsWorld.push_back(transformedPositions);
+		
+		::gpk::transform(transformedPositions, projection);
+		output.PositionsScreen.push_back(transformedPositions);
+		
 		::gpk::STriangle2<float>													transformedUVs								= {uv[vertexIndices.A], uv[vertexIndices.B], uv[vertexIndices.C]};
 		if( transformedUVs.A.x > 1.0f
 		 || transformedUVs.A.y > 1.0f
@@ -59,8 +74,10 @@ static	::gpk::error_t								drawBuffers
 	, const ::gpk::SMatrix4<float>							& projection		
 	, const ::gpk::SNearFar									& nearFar 
 	, const ::gpk::SMatrix4<float>							& worldTransform	 
+	, const ::gpk::SCoord3<float>							& cameraPosition
 	, const ::gpk::SCoord3<float>							& cameraFront
-	, const ::gpk::SCoord3<float>							& lightPos
+	, const ::gpk::SCoord3<float>							& lightPosition
+	, const ::gpk::SCoord3<float>							& lightDirection
 	) {	// 
 	(void)uv;(void)surface;
 	inVS												= {};
@@ -70,24 +87,34 @@ static	::gpk::error_t								drawBuffers
 	::gpk::array_pod<::gpk::SCoord2<int16_t>>					& trianglePixelCoords		= cacheVS.SolidPixelCoords		;
 	//::gpk::array_pod<::gpk::SCoord2<int16_t>>					& wireframePixelCoords		= cacheVS.WireframePixelCoords	;
 	const ::gpk::SCoord2<uint16_t>								offscreenMetrics			= backBufferColors.metrics().Cast<uint16_t>();
-	for(uint32_t iTriangle = 0; iTriangle < inVS.Positions.size(); ++iTriangle) {
-		const ::gpk::STriangle3<float>								& triPositions				= inVS.Positions	[iTriangle];
-		const ::gpk::STriangle3<float>								& triNormals				= inVS.Normals		[iTriangle];
-		const ::gpk::STriangle2<float>								& triUVs					= inVS.UVs			[iTriangle];
+	const ::gpk::SCoord3<float>									lightDirectionNormalized	= ::gpk::SCoord3<float>{lightDirection}.Normalize();
+	for(uint32_t iTriangle = 0; iTriangle < inVS.PositionsScreen.size(); ++iTriangle) {
+		const ::gpk::STriangle3<float>								& triPositions				= inVS.PositionsScreen	[iTriangle];
+		const ::gpk::STriangle3<float>								& triPositionsWorld			= inVS.PositionsWorld	[iTriangle];
+		const ::gpk::STriangle3<float>								& triNormals				= inVS.Normals			[iTriangle];
+		const ::gpk::STriangle2<float>								& triUVs					= inVS.UVs				[iTriangle];
 
 		trianglePixelCoords.clear();
 		triangleWeights.clear();
 		gerror_if(errored(::gpk::drawTriangle(backBufferDepth, nearFar, triPositions, trianglePixelCoords, triangleWeights)), "Not sure if these functions could ever fail");
 		for(uint32_t iCoord = 0; iCoord < trianglePixelCoords.size(); ++iCoord) {
 			const ::gpk::STriangle<float>								& vertexWeights				= triangleWeights[iCoord];
-			double														lightFactor					= (triNormals.A * vertexWeights.A + triNormals.B * vertexWeights.B + triNormals.C * vertexWeights.C).Dot(lightPos);
+			const ::gpk::SCoord3<float>									weightedPosition			= triPositionsWorld.A * vertexWeights.A + triPositionsWorld.B * vertexWeights.B + triPositionsWorld.C * vertexWeights.C;
+			const ::gpk::SCoord3<float>									weightedNormal				= (triNormals.A * vertexWeights.A + triNormals.B * vertexWeights.B + triNormals.C * vertexWeights.C).Normalize();
+			::gpk::SCoord2<float>										weightedUV					= ::gpk::SCoord2<float>{(triUVs.A * vertexWeights.A) + (triUVs.B * vertexWeights.B) + (triUVs.C * vertexWeights.C)};
+			const ::gpk::SColorFloat									surfacecolor				= surface
+				[(uint32_t)(weightedUV.y * surfaceUnit.y) % surfaceUnit.y]
+				[(uint32_t)(weightedUV.x * surfaceUnit.x) % surfaceUnit.x]
+				;
+			const ::gpk::SCoord3<float>									lightVecW					= (lightPosition - weightedPosition).Normalize();
 
-			::gpk::SCoord2<float>										uvcoord						= ::gpk::SCoord2<float>{(triUVs.A * vertexWeights.A) + (triUVs.B * vertexWeights.B) + (triUVs.C * vertexWeights.C)};
-			::gpk::SCoord2<float>										uvcoord2					= uvcoord;
-			uvcoord2.x												= float((uint32_t)(uvcoord2.x * surfaceUnit.x) % surfaceUnit.x);
-			uvcoord2.y												= float((uint32_t)(uvcoord2.y * surfaceUnit.y) % surfaceUnit.y);
-			const ::gpk::SColorFloat									surfacecolor				= surface[(uint16_t)uvcoord2.y][(uint16_t)uvcoord2.x];
-			const ::gpk::SColorBGRA										color						= ( surfacecolor * .1f + surfacecolor * lightFactor).Clamp();
+			const ::gpk::SColorFloat									specular					= lightCalcSpecular(cameraPosition, 10.f, gpk::WHITE, surfacecolor, weightedPosition, weightedNormal, lightVecW).Clamp();
+
+			double														lightFactor					= weightedNormal.Dot(lightVecW);
+			const ::gpk::SColorFloat									diffuse						= (surfacecolor * lightFactor).Clamp();
+
+			const ::gpk::SColorFloat									ambient						= surfacecolor * .1f;
+			const ::gpk::SColorBGRA										color						= ::gpk::SColorFloat(ambient + diffuse + specular).Clamp();
 			const ::gpk::SCoord2<uint16_t>								coord						= trianglePixelCoords[iCoord].Cast<uint16_t>();
 			backBufferColors[coord.y][coord.x]						= color;
 		}
@@ -112,8 +139,10 @@ static	::gpk::error_t								drawBuffers
 	, ::gpk::SEngineScene					& scene
 	, const ::gpk::SMatrix4<float>			& projection		
 	, const ::gpk::SNearFar					& nearFar 
+	, const ::gpk::SCoord3<float>			& cameraPosition
 	, const ::gpk::SCoord3<float>			& cameraFront
-	, const ::gpk::SCoord3<float>			& lightPos
+	, const ::gpk::SCoord3<float>			& lightPosition
+	, const ::gpk::SCoord3<float>			& lightDirection
 ) {	//
 
 	for(uint32_t iRenderNode = 0, countNodes = scene.ManagedRenderNodes.RenderNodes.size(); iRenderNode < countNodes; ++iRenderNode) {
@@ -140,7 +169,12 @@ static	::gpk::error_t								drawBuffers
 		const ::gpk::SRenderMaterial							& material				= skin.Material;
 		const uint32_t											tex						= skin.Textures[0];
 		const ::gpk::SSurface									& surface				= *scene.ManagedSurfaces.Surfaces[tex];
-		drawBuffers(backBufferColors, backBufferDepth, renderCache.OutputVertexShader, renderCache.CacheVertexShader, {&indices[slice.Slice.Offset], slice.Slice.Count}, positions, normals, uv, material, {(const ::gpk::SColorBGRA*)surface.Data.begin(), surface.Desc.Dimensions.Cast<uint32_t>()}, projection, nearFar, worldTransform, cameraFront, lightPos);
+		drawBuffers(backBufferColors, backBufferDepth, renderCache.OutputVertexShader, renderCache.CacheVertexShader
+			, {&indices[slice.Slice.Offset], slice.Slice.Count}, positions, normals, uv, material, {(const ::gpk::SColorBGRA*)surface.Data.begin(), surface.Desc.Dimensions.Cast<uint32_t>()}
+			, projection, nearFar, worldTransform
+			, cameraPosition, cameraFront
+			, lightPosition, lightDirection
+		);
 		
 	}
 

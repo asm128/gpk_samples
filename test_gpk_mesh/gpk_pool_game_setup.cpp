@@ -10,7 +10,7 @@ static	::gpk::error_t					poolGameResetTest2Balls	(::the1::SPoolGame & pool) {
 		pool.Engine.SetDampingAngular(pool.StartState.Balls[iBall].Entity, pool.StartState.DampingRollRotation);
 		pool.Engine.SetHidden(pool.StartState.Balls[iBall].Entity, false);
 	}
-	::gpk::SCoord3<float>						velocity				= {0, 0, -50.f};
+	::gpk::SCoord3<float>						velocity				= {0, 0, -25.f};
 	velocity.RotateY(::gpk::noiseNormal1D(pool.StartState.Seed + 2) / 20 * ((rand() % 2) ? -1 : 1));
 	pool.Engine.SetVelocity(pool.StartState.Balls[1].Entity, velocity);
 	return 0; 
@@ -55,7 +55,7 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 
 	for(uint32_t iBall = 0; iBall < pool.StartState.BallCount; ++iBall) {
 		const uint32_t							ballNumber			= pool.StartState.BallOrder[iBall];
-		const bool								stripped			= ballNumber > 7;
+		const bool								stripped			= ballNumber > 0 && ballNumber < 8;
 		pool.Engine.SetDampingLinear(pool.StartState.Balls[iBall].Entity, pool.StartState.DampingRollDisplacement);
 		pool.Engine.SetDampingAngular(pool.StartState.Balls[iBall].Entity, pool.StartState.DampingRollRotation);
 		pool.Engine.SetHidden(pool.StartState.Balls[iBall].Entity, false);
@@ -71,7 +71,7 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 		::gpk::view_grid<::gpk::SColorBGRA>		view				= {(::gpk::SColorBGRA*)surface.Data.begin(), surface.Desc.Dimensions.Cast<uint32_t>()};
 		if(stripped) {
 			memset(surface.Data.begin(), 0xFF, surface.Data.size());
-			for(uint32_t y = 6; y < 10; ++y)
+			for(uint32_t y = 5; y < 11; ++y)
 			for(uint32_t x = 0; x < 16; ++x)
 				view[y][x]	= color;
 		}
@@ -83,7 +83,7 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 	}
 
 	pool.Engine.SetPosition(pool.StartState.Balls[0].Entity, {-10, pool.StartState.BallRadius, 0});
-	::gpk::SCoord3<float>					velocity			= {50.f, 0, 0};
+	::gpk::SCoord3<float>					velocity			= {40.0f + (rand() % 90), 0, 0};
 	velocity.RotateY(::gpk::noiseNormal1D(pool.StartState.Seed + 2) / 10 * ((rand() % 2) ? -1 : 1));
 	pool.Engine.SetVelocity(pool.StartState.Balls[0].Entity, velocity);
 	//pool.Engine.SetRotation(pool.StartState.Balls[0].Entity, {0, 0, 10});

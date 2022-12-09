@@ -3,24 +3,28 @@
 #include "gpk_timer.h"
 #include "gpk_noise.h"
 
-::gpk::error_t								transformFragments						()	{ return 0; }
+::gpk::error_t								transformFragments				()	{ return 0; }
 
-::gpk::error_t								the1::poolGameDraw				(::the1::SPoolGame & pool, ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t> & backBuffer, double totalSeconds)	{
-	::gpk::SCoord3<float>							lightPos						= {10, 5, 0};
+::gpk::error_t								the1::poolGameDraw				
+	( ::the1::SPoolGame									& pool
+	, ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>	& backBuffer
+	, const ::gpk::SCoord3<float>						& cameraPosition
+	, const ::gpk::SCoord3<float>						& cameraTarget
+	, const ::gpk::SCoord3<float>						& cameraUp
+	, double											totalSeconds
+	) {
+	::gpk::SCoord3<float>							lightPos						= {10, 10, 0};
 	lightPos.RotateY(-totalSeconds);
-	lightPos.Normalize();
 
 	const ::gpk::SCoord2<uint16_t>					offscreenMetrics				= backBuffer.Color.View.metrics().Cast<uint16_t>();
 	::gpk::SNearFar									nearFar							= {0.01f , 500.0f};
 
-	static constexpr const ::gpk::SCoord3<float>	cameraUp						= {0, 1, 0};	
-	const ::the1::SCamera							& camera						= pool.Camera;
-	::gpk::SCoord3<float>							cameraFront						= (camera.Target - camera.Position).Normalize();
+	::gpk::SCoord3<float>							cameraFront						= (cameraTarget - cameraPosition).Normalize();
 
 	::gpk::SMatrix4<float>							mView							= {};
 	::gpk::SMatrix4<float>							mPerspective					= {};
 	::gpk::SMatrix4<float>							mViewport						= {};
-	mView.LookAt(camera.Position, camera.Target, cameraUp);
+	mView.LookAt(cameraPosition, cameraTarget, cameraUp);
 	mPerspective.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, nearFar.Near, nearFar.Far);
 	mViewport.ViewportLH(offscreenMetrics, nearFar);
 
@@ -83,7 +87,9 @@
 		backBuffer.Color.View[coord.y][coord.x]		= color;
 	}
 
-	::gpk::drawScene(backBuffer.Color.View, backBuffer.DepthStencil.View, engine.Scene->RenderCache, *engine.Scene, mViewPerspectiveScreen, nearFar, cameraFront, lightPos);
+	::gpk::drawScene(backBuffer.Color.View, backBuffer.DepthStencil.View, engine.Scene->RenderCache, *engine.Scene
+		, mViewPerspectiveScreen, nearFar
+		, cameraPosition, cameraFront, lightPos, {0, -1, 0});
 	timer.Frame();
 	info_printf("Render scene in %f seconds", timer.LastTimeSeconds);
 	return 0;

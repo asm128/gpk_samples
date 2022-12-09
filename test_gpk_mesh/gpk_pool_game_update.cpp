@@ -67,7 +67,7 @@ static	::gpk::error_t		resolveCollision
 		pool.GetBallPosition(iBall, pool.PositionDeltas[iBall][pool.PositionDeltas[iBall].size() - 1].A);
 	}
 
-	double							step							= .01f;
+	double							step							= .005f;
 	pool.LastFrameContactsBall		.clear();
 	pool.LastFrameContactsCushion	.clear();
 	::gpk::array_pod<::the1::SContactBall>	lastFrameContactsBatchBall;
@@ -100,26 +100,27 @@ static	::gpk::error_t		resolveCollision
 
 		for(uint32_t iContact = 0; iContact < lastFrameContactsBatchBall.size(); ++iContact) {
 			::the1::SContactBall			& contact			= lastFrameContactsBatchBall[iContact];
-			uint32_t						iBall				= contact.BallA;
-			uint32_t						iBall2				= contact.BallB;
+			const uint32_t					iBallA				= contact.BallA;
+			const uint32_t					iBallB				= contact.BallB;
+			const ::gpk::SVirtualEntity		& entityA			= engine.ManagedEntities.Entities[pool.StartState.Balls[iBallA].Entity]; 
+			const ::gpk::SVirtualEntity		& entityB			= engine.ManagedEntities.Entities[pool.StartState.Balls[iBallB].Entity]; 
 
 			contact.Result.DistanceDirection	= contact.Distance;
 			double							distanceLength		= contact.Distance.Length();
 			contact.Result.DistanceDirection.Normalize();
 
 			// Separate balls
-			::gpk::SCoord3<float>			& positionB			= engine.Integrator.Centers[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall2].Entity].RigidBody].Position;
-			::gpk::SCoord3<float>			& positionA			= engine.Integrator.Centers[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Position;
+			::gpk::SCoord3<float>			& positionA			= engine.Integrator.Centers[entityA.RigidBody].Position;
+			::gpk::SCoord3<float>			& positionB			= engine.Integrator.Centers[entityB.RigidBody].Position;
 			positionA					+= contact.Result.DistanceDirection * ::gpk::max(1.0f - distanceLength, 0.0) * -.5001f;
 			positionB					+= contact.Result.DistanceDirection * ::gpk::max(1.0f - distanceLength, 0.0) * .5001f;
 
 
 			// Calculate force transfer
-			::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Velocity;
-			::gpk::SCoord3<float>			& velocityB			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall2].Entity].RigidBody].Velocity;
-
-			::gpk::SCoord3<float>			& rotationA			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Rotation;
-			::gpk::SCoord3<float>			& rotationB			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall2].Entity].RigidBody].Rotation;
+			::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[entityA.RigidBody].Velocity;
+			::gpk::SCoord3<float>			& velocityB			= engine.Integrator.Forces[entityB.RigidBody].Velocity;
+			::gpk::SCoord3<float>			& rotationA			= engine.Integrator.Forces[entityA.RigidBody].Rotation;
+			::gpk::SCoord3<float>			& rotationB			= engine.Integrator.Forces[entityB.RigidBody].Rotation;
 
 			contact.Result.InitialVelocityA	= velocityA;
 			contact.Result.InitialVelocityB	= velocityB;
@@ -130,7 +131,7 @@ static	::gpk::error_t		resolveCollision
 			rotationB					= {};
 			rotationA					= {};
 			if(contact.Result.InitialVelocityA.LengthSquared()) {
-				engine.Integrator.BodyFlags[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall2].Entity].RigidBody].Active = true;
+				engine.Integrator.BodyFlags[entityB.RigidBody].Active = true;
 				::gpk::SCoord3<float>			lvelocityB					= {};
 				::gpk::SCoord3<float>			lvelocityA					= {};
 				::resolveCollision(contact.Result.InitialVelocityA.Cast<double>(), contact.Result.InitialRotationA.Cast<double>(), contact.Result.DistanceDirection.Cast<double>(), contact.Result.ForceTransferRatioB, rotationA, rotationB, lvelocityA, lvelocityB);
@@ -147,7 +148,7 @@ static	::gpk::error_t		resolveCollision
 			}
 
 			if(contact.Result.InitialVelocityB.LengthSquared()) {
-				engine.Integrator.BodyFlags[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Active = true;
+				engine.Integrator.BodyFlags[entityA.RigidBody].Active = true;
 				::gpk::SCoord3<float>			lvelocityB					= {};
 				::gpk::SCoord3<float>			lvelocityA					= {};
 				::resolveCollision(contact.Result.InitialVelocityB.Cast<double>(), contact.Result.InitialRotationB.Cast<double>(), contact.Result.DistanceDirection.Cast<double>() * -1, contact.Result.ForceTransferRatioA, rotationA, rotationB, lvelocityB, lvelocityA);
@@ -184,46 +185,49 @@ static	::gpk::error_t		resolveCollision
 
 		const gpk::SCoord3<float> halfDimensions = pool.StartState.TableDimensions * .5 - ::gpk::SCoord3<float>{pool.StartState.BallRadius, 0, pool.StartState.BallRadius};
 		for(uint32_t iBall = 0; iBall < pool.StartState.BallCount; ++iBall) {
-			::gpk::SCoord3<float>			& positionA			= engine.Integrator.Centers[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Position;
+			const ::gpk::SVirtualEntity		& entityA			= engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity]; 
+			::gpk::SCoord3<float>			& positionA			= engine.Integrator.Centers[entityA.RigidBody].Position;
 			if(positionA.x	< -halfDimensions.x) {
 				positionA.x = (-halfDimensions.x) - (positionA.x + halfDimensions.x);
-				::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Velocity;
+				::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[entityA.RigidBody].Velocity;
 				velocityA.x *= -1;
 				velocityA *= pool.StartState.DampingCushion;
 			}
 			if(positionA.x	> halfDimensions.x) {
 				positionA.x = halfDimensions.x - (positionA.x - halfDimensions.x);
-				::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Velocity;
+				::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[entityA.RigidBody].Velocity;
 				velocityA.x *= -1;
 				velocityA *= pool.StartState.DampingCushion;
 			}
 			if(positionA.z	< -halfDimensions.z) {
 				positionA.z = (-halfDimensions.z) - (positionA.z + halfDimensions.z);
-				::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Velocity;
+				::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[entityA.RigidBody].Velocity;
 				velocityA.z *= -1;
 				velocityA *= pool.StartState.DampingCushion;
 			}
 			if(positionA.z	> halfDimensions.z) {
 				positionA.z = halfDimensions.z - (positionA.z-halfDimensions.z);
-				::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Velocity;
+				::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[entityA.RigidBody].Velocity;
 				velocityA.z *= -1;
 				velocityA *= pool.StartState.DampingCushion;
 			}
 			if(positionA.y	< 0) {
 				positionA.y *= -1;
-				::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Velocity;
+				::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[entityA.RigidBody].Velocity;
 				velocityA.y *= -1;
 				velocityA *= pool.StartState.DampingGround;
 			}
 		}
 	}
 
+	const float radius = 0.5f;
+	const float diameter = radius * 2;
 	for(uint32_t iBall = 0; iBall < pool.StartState.BallCount; ++iBall) {
 		::gpk::SLine3<float> & delta = pool.PositionDeltas[iBall][pool.PositionDeltas[iBall].size() - 1];
 		pool.GetBallPosition(iBall, delta.B);
-		if((delta.B - delta.A).LengthSquared() > 0.00001) {
+		if((delta.B - delta.A).LengthSquared() > 0.000005) {
 			::gpk::SCoord3<float>			& rotationA			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Rotation;
-			::gpk::SCoord3<float>			rotationResult		= (delta.B - delta.A) * ::gpk::math_2pi;
+			::gpk::SCoord3<float>			rotationResult		= (delta.B - delta.A) * ::gpk::math_2pi * diameter;
 			rotationA	+= {rotationResult.z, 0, -rotationResult.x};
 		}
 		if(pool.PositionDeltas[iBall].size() > 10)

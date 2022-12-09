@@ -67,7 +67,8 @@ namespace gpk
 	};
 
 	struct SVSOutput {
-		::gpk::array_pod<::gpk::STriangle3<float>>		Positions				= {};
+		::gpk::array_pod<::gpk::STriangle3<float>>		PositionsWorld			= {};
+		::gpk::array_pod<::gpk::STriangle3<float>>		PositionsScreen			= {};
 		::gpk::array_pod<::gpk::STriangle3<float>>		Normals					= {};
 		::gpk::array_pod<::gpk::STriangle2<float>>		UVs						= {};
 	};
