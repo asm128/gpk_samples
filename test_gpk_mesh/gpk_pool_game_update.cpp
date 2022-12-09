@@ -192,24 +192,35 @@ static	::gpk::error_t		resolveCollision
 				::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[entityA.RigidBody].Velocity;
 				velocityA.x *= -1;
 				velocityA *= pool.StartState.DampingCushion;
+				::gpk::SCoord3<float>			& rotationA			= engine.Integrator.Forces[entityA.RigidBody].Rotation;
+				rotationA.z *= -1;
 			}
 			if(positionA.x	> halfDimensions.x) {
 				positionA.x = halfDimensions.x - (positionA.x - halfDimensions.x);
 				::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[entityA.RigidBody].Velocity;
 				velocityA.x *= -1;
 				velocityA *= pool.StartState.DampingCushion;
+
+				::gpk::SCoord3<float>			& rotationA			= engine.Integrator.Forces[entityA.RigidBody].Rotation;
+				rotationA.z *= -1;
 			}
 			if(positionA.z	< -halfDimensions.z) {
 				positionA.z = (-halfDimensions.z) - (positionA.z + halfDimensions.z);
 				::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[entityA.RigidBody].Velocity;
 				velocityA.z *= -1;
 				velocityA *= pool.StartState.DampingCushion;
+
+				::gpk::SCoord3<float>			& rotationA			= engine.Integrator.Forces[entityA.RigidBody].Rotation;
+				rotationA.x *= -1;
 			}
 			if(positionA.z	> halfDimensions.z) {
 				positionA.z = halfDimensions.z - (positionA.z-halfDimensions.z);
 				::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[entityA.RigidBody].Velocity;
 				velocityA.z *= -1;
 				velocityA *= pool.StartState.DampingCushion;
+
+				::gpk::SCoord3<float>			& rotationA			= engine.Integrator.Forces[entityA.RigidBody].Rotation;
+				rotationA.x *= -1;
 			}
 			if(positionA.y	< 0) {
 				positionA.y *= -1;

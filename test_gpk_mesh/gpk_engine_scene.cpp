@@ -101,7 +101,7 @@ static	::gpk::error_t								drawBuffers
 			const ::gpk::STriangle<float>								& vertexWeights				= triangleWeights[iCoord];
 			const ::gpk::SCoord3<float>									weightedPosition			= triPositionsWorld.A * vertexWeights.A + triPositionsWorld.B * vertexWeights.B + triPositionsWorld.C * vertexWeights.C;
 			const ::gpk::SCoord3<float>									weightedNormal				= (triNormals.A * vertexWeights.A + triNormals.B * vertexWeights.B + triNormals.C * vertexWeights.C).Normalize();
-			::gpk::SCoord2<float>										weightedUV					= ::gpk::SCoord2<float>{(triUVs.A * vertexWeights.A) + (triUVs.B * vertexWeights.B) + (triUVs.C * vertexWeights.C)};
+			::gpk::SCoord2<float>										weightedUV					= triUVs.A * vertexWeights.A + triUVs.B * vertexWeights.B + triUVs.C * vertexWeights.C;
 			const ::gpk::SColorFloat									surfacecolor				= surface
 				[(uint32_t)(weightedUV.y * surfaceUnit.y) % surfaceUnit.y]
 				[(uint32_t)(weightedUV.x * surfaceUnit.x) % surfaceUnit.x]
