@@ -1,11 +1,11 @@
 #include "gpk_pool_game.h"
 
-static	bool				revertCross				(const ::gpk::SCoord3<double> & distanceDirection)	{
-	if(distanceDirection.x >= 0)
-		return (distanceDirection.z >= 0);
-	else 
-		return (distanceDirection.z < 0);
-}
+//static	bool				revertCross				(const ::gpk::SCoord3<double> & distanceDirection)	{
+//	if(distanceDirection.x >= 0)
+//		return (distanceDirection.z >= 0);
+//	else 
+//		return (distanceDirection.z < 0);
+//}
 
 static	::gpk::error_t		resolveCollision							
 	( const ::gpk::SCoord3<double>	& initialVelocityA
@@ -31,16 +31,16 @@ static	::gpk::error_t		resolveCollision
 		return 0;
 	}
 
-	bool							revert				= ::revertCross(distanceDirection);
-	if(fabs(initialVelocityA.x) < fabs(initialVelocityA.z))
-		revert = !revert;
+	bool							revert				= distanceDirection.Dot(directionA.RotateY(::gpk::math_pi_2)) > 0; // ::revertCross(distanceDirection);
+	//if(fabs(initialVelocityA.x) < fabs(initialVelocityA.z))
+	//	revert = !revert;
 
 	info_printf("Total initial speed: %f", (float)(initialVelocityA.Length()));
 
 	double							speedA				= initialVelocityA.Length();
 	const ::gpk::SCoord3<double>	vUp					= {0, revert ? -1 : 1.0f, 0};
 	::gpk::SCoord3<double>			finalVelocityB		= distanceDirection * speedA * out_forceTransferRatioB;
-	::gpk::SCoord3<double>			finalVelocityA		= distanceDirection.Cross(vUp).Normalize() * speedA * (1.0f - out_forceTransferRatioB);
+	::gpk::SCoord3<double>			finalVelocityA		= ::gpk::SCoord3<double>{finalVelocityB}.Normalize().Cross(vUp).Normalize() * speedA * (1.0f - out_forceTransferRatioB);
 	double finalSpeedA = finalVelocityB.Length();
 	double finalSpeedB = finalVelocityA.Length();
 	info_printf("Total final speed: %f", (float)(finalSpeedA + finalSpeedB));
@@ -112,8 +112,8 @@ static	::gpk::error_t		resolveCollision
 			// Separate balls
 			::gpk::SCoord3<float>			& positionA			= engine.Integrator.Centers[entityA.RigidBody].Position;
 			::gpk::SCoord3<float>			& positionB			= engine.Integrator.Centers[entityB.RigidBody].Position;
-			positionA					+= contact.Result.DistanceDirection * ::gpk::max(1.0f - distanceLength, 0.0) * -.5001f;
-			positionB					+= contact.Result.DistanceDirection * ::gpk::max(1.0f - distanceLength, 0.0) * .5001f;
+			positionA					+= contact.Result.DistanceDirection * ::gpk::max(1.0f - distanceLength, 0.0) * -.51f;
+			positionB					+= contact.Result.DistanceDirection * ::gpk::max(1.0f - distanceLength, 0.0) * .51f;
 
 
 			// Calculate force transfer
