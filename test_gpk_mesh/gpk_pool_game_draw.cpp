@@ -48,20 +48,20 @@
 		}
 	}
 
-	const gpk::SCoord3<float>						halfDimensions			= pool.StartState.TableDimensions * .5;
+	const gpk::SCoord2<float>						halfDimensions			= pool.StartState.Table.Size * .5;
 
 	wireframePixelCoords.clear();
-	const	::gpk::SCoord3<float>	limitsBottom[4]	= 
-		{ { halfDimensions.x, .0f,  halfDimensions.z}
-		, {-halfDimensions.x, .0f,  halfDimensions.z}
-		, { halfDimensions.x, .0f, -halfDimensions.z}
-		, {-halfDimensions.x, .0f, -halfDimensions.z}
+	const	::gpk::SCoord3<float>					limitsBottom[4]			= 
+		{ { halfDimensions.x, .0f,  halfDimensions.y}
+		, {-halfDimensions.x, .0f,  halfDimensions.y}
+		, { halfDimensions.x, .0f, -halfDimensions.y}
+		, {-halfDimensions.x, .0f, -halfDimensions.y}
 		};
 	const	::gpk::SCoord3<float>	limitsTop	[4]	= 
-		{ limitsBottom[0] + ::gpk::SCoord3<float>{0, pool.StartState.TableDimensions.y, 0}
-		, limitsBottom[1] + ::gpk::SCoord3<float>{0, pool.StartState.TableDimensions.y, 0}
-		, limitsBottom[2] + ::gpk::SCoord3<float>{0, pool.StartState.TableDimensions.y, 0}
-		, limitsBottom[3] + ::gpk::SCoord3<float>{0, pool.StartState.TableDimensions.y, 0}
+		{ limitsBottom[0] + ::gpk::SCoord3<float>{0, pool.StartState.Table.Height, 0}
+		, limitsBottom[1] + ::gpk::SCoord3<float>{0, pool.StartState.Table.Height, 0}
+		, limitsBottom[2] + ::gpk::SCoord3<float>{0, pool.StartState.Table.Height, 0}
+		, limitsBottom[3] + ::gpk::SCoord3<float>{0, pool.StartState.Table.Height, 0}
 		};
 
 	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[3], limitsBottom[2]}, mViewPerspectiveScreen, wireframePixelCoords);
@@ -88,8 +88,7 @@
 	}
 
 	::gpk::drawScene(backBuffer.Color.View, backBuffer.DepthStencil.View, engine.Scene->RenderCache, *engine.Scene
-		, mViewPerspectiveScreen, nearFar
-		, cameraPosition, cameraFront, lightPos, {0, -1, 0});
+		, { mViewPerspectiveScreen, nearFar, cameraPosition, cameraFront, lightPos, {0, -1, 0} });
 	timer.Frame();
 	info_printf("Render scene in %f seconds", timer.LastTimeSeconds);
 	return 0;

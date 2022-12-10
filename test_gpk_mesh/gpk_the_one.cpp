@@ -15,7 +15,7 @@
 ::gpk::error_t		the1::theOneUpdate		(::the1::STheOne & app, double secondsElapsed) { 
 	::the1::poolGameUpdate(app.MainGame.Game, secondsElapsed);
 	for(uint32_t iBall = 0; iBall < app.MainGame.Game.StartState.BallCount; ++iBall) {
-		::the1::SCamera		& camera		= app.MainGame.CameraBalls[iBall];
+		::the1::SCamera			& camera				= app.MainGame.CameraBalls[iBall];
 		if(0 == iBall) {
 			app.MainGame.Game.GetBallPosition(iBall, camera.Target);
 			camera.Target /= 2;		
@@ -23,8 +23,8 @@
 		else {
 			app.MainGame.Game.GetBallPosition(0, camera.Target);
 			app.MainGame.Game.GetBallPosition(iBall, camera.Position);
-			auto					distance	=  camera.Target - camera.Position;
-			auto					direction	=  ::gpk::SCoord3<float>{distance}.Normalize();
+			auto					distance			=  camera.Target - camera.Position;
+			auto					direction			=  ::gpk::SCoord3<float>{distance}.Normalize();
 			camera.Position		+= direction * -40;
 			camera.Position.y	+= 10;
 		}

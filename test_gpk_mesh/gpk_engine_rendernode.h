@@ -19,10 +19,10 @@ namespace gpk
 	};
 
 	struct SRenderNode {
-		uint32_t									Mesh;
-		uint32_t									Slice;
-		uint32_t									Shader;
-		uint32_t									Skin;
+		uint32_t									Mesh			= (uint32_t)-1;
+		uint32_t									Slice			= (uint32_t)-1;
+		uint32_t									Shader			= (uint32_t)-1;
+		uint32_t									Skin			= (uint32_t)-1;
 	};
 	
 	GDEFINE_ENUM_TYPE(LIGHT_TYPE, uint8_t);

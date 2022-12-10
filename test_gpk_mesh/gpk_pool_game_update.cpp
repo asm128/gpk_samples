@@ -1,11 +1,5 @@
 #include "gpk_pool_game.h"
 
-//static	bool				revertCross				(const ::gpk::SCoord3<double> & distanceDirection)	{
-//	if(distanceDirection.x >= 0)
-//		return (distanceDirection.z >= 0);
-//	else 
-//		return (distanceDirection.z < 0);
-//}
 
 static	::gpk::error_t		resolveCollision							
 	( const ::gpk::SCoord3<double>	& initialVelocityA
@@ -31,9 +25,7 @@ static	::gpk::error_t		resolveCollision
 		return 0;
 	}
 
-	bool							revert				= distanceDirection.Dot(directionA.RotateY(::gpk::math_pi_2)) > 0; // ::revertCross(distanceDirection);
-	//if(fabs(initialVelocityA.x) < fabs(initialVelocityA.z))
-	//	revert = !revert;
+	bool							revert				= distanceDirection.Dot(directionA.RotateY(::gpk::math_pi_2)) >= 0; // ::revertCross(distanceDirection);
 
 	info_printf("Total initial speed: %f", (float)(initialVelocityA.Length()));
 
@@ -78,18 +70,28 @@ static	::gpk::error_t		resolveCollision
 
 		engine.Update(secondsThisStep);
 
+
 		lastFrameContactsBatchBall		.clear();
 		lastFrameContactsBatchCushion	.clear();
-		const float						collisionThreshold				= (pool.StartState.BallRadius * 2) * (pool.StartState.BallRadius * 2);
-		for(uint32_t iBall = 0; iBall < pool.StartState.BallCount; ++iBall) {
-			const ::gpk::SCoord3<float>		& positionA			= engine.Integrator.Centers[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Position;
+		for(uint32_t iBallA = 0; iBallA < pool.StartState.BallCount; ++iBallA) {
+			::gpk::SBodyForces				& forces			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StartState.Balls[iBallA].Entity].RigidBody];
+			::gpk::SRigidBodyFrame			& bodyAccum			= engine.Integrator.BodyFrames[engine.ManagedEntities.Entities[pool.StartState.Balls[iBallA].Entity].RigidBody];
+			if(::gpk::SCoord3<float>{forces.Velocity}.Normalize().Dot(::gpk::SCoord3<float>{forces.Rotation.z, 0, -forces.Rotation.x}.Normalize()) < 0) {
+				bodyAccum.AccumulatedForce += ::gpk::SCoord3<float>{forces.Rotation.z, 0, -forces.Rotation.x} * secondsThisStep;
+			}
+
+			if(forces.Rotation.y)
+				forces.Velocity.RotateY(forces.Rotation.y * secondsThisStep * .05);
+
+			const ::gpk::SCoord3<float>		& positionA			= engine.Integrator.Centers[engine.ManagedEntities.Entities[pool.StartState.Balls[iBallA].Entity].RigidBody].Position;
 			::the1::SContactBall			contactBall			= {};
 			::the1::SContactCushion			contactCushion		= {};
-			contactBall.BallA			= iBall;
-			contactCushion.BallA		= iBall;
-			for(uint32_t iBall2 = iBall + 1; iBall2 < pool.StartState.BallCount; ++iBall2) {
-				const ::gpk::SCoord3<float>		& positionB			= engine.Integrator.Centers[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall2].Entity].RigidBody].Position;
-				contactBall.BallB				= iBall2;
+			contactBall.BallA			= iBallA;
+			contactCushion.BallA		= iBallA;
+			for(uint32_t iBallB = iBallA + 1; iBallB < pool.StartState.BallCount; ++iBallB) {
+				const float						collisionThreshold				= (pool.StartState.Balls[iBallA].BallRadius * 2) * (pool.StartState.Balls[iBallB].BallRadius * 2);
+				const ::gpk::SCoord3<float>		& positionB			= engine.Integrator.Centers[engine.ManagedEntities.Entities[pool.StartState.Balls[iBallB].Entity].RigidBody].Position;
+				contactBall.BallB				= iBallB;
 				contactBall.Distance			= positionB - positionA;
 				if(contactBall.Distance.LengthSquared() >= collisionThreshold) 
 					continue;
@@ -130,7 +132,7 @@ static	::gpk::error_t		resolveCollision
 			velocityA					= {};
 			rotationB					= {};
 			rotationA					= {};
-			if(contact.Result.InitialVelocityA.LengthSquared()) {
+			/*if(contact.Result.InitialVelocityA.LengthSquared())*/ {
 				engine.Integrator.BodyFlags[entityB.RigidBody].Active = true;
 				::gpk::SCoord3<float>			lvelocityB					= {};
 				::gpk::SCoord3<float>			lvelocityA					= {};
@@ -147,7 +149,7 @@ static	::gpk::error_t		resolveCollision
 				velocityA					+= lvelocityA;
 			}
 
-			if(contact.Result.InitialVelocityB.LengthSquared()) {
+			/*if(contact.Result.InitialVelocityB.LengthSquared())*/ {
 				engine.Integrator.BodyFlags[entityA.RigidBody].Active = true;
 				::gpk::SCoord3<float>			lvelocityB					= {};
 				::gpk::SCoord3<float>			lvelocityA					= {};
@@ -183,50 +185,59 @@ static	::gpk::error_t		resolveCollision
 			pool.LastFrameContactsBall.append(lastFrameContactsBatchBall);
 		}
 
-		const gpk::SCoord3<float> halfDimensions = pool.StartState.TableDimensions * .5 - ::gpk::SCoord3<float>{pool.StartState.BallRadius, 0, pool.StartState.BallRadius};
+		const gpk::SCoord2<float>		tableHalfDimensions	= pool.StartState.Table.Size * .5f;
 		for(uint32_t iBall = 0; iBall < pool.StartState.BallCount; ++iBall) {
+			const gpk::SCoord2<float>		ballLimits			= tableHalfDimensions - ::gpk::SCoord2<float>{pool.StartState.Balls[iBall].BallRadius, pool.StartState.Balls[iBall].BallRadius};
 			const ::gpk::SVirtualEntity		& entityA			= engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity]; 
 			::gpk::SCoord3<float>			& positionA			= engine.Integrator.Centers[entityA.RigidBody].Position;
-			if(positionA.x	< -halfDimensions.x) {
-				positionA.x = (-halfDimensions.x) - (positionA.x + halfDimensions.x);
-				::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[entityA.RigidBody].Velocity;
-				velocityA.x *= -1;
-				velocityA *= pool.StartState.DampingCushion;
-				::gpk::SCoord3<float>			& rotationA			= engine.Integrator.Forces[entityA.RigidBody].Rotation;
-				rotationA.z *= -1;
+			if(positionA.x	< -ballLimits.x) {
+				positionA.x					= (-ballLimits.x) - (positionA.x + ballLimits.x);
+
+				::gpk::SBodyForces				& forces			= engine.Integrator.Forces[entityA.RigidBody];
+				forces.Velocity.x			*= -1;
+				forces.Velocity				*= pool.StartState.DampingCushion;
+				forces.Rotation.z			*= -1;
 			}
-			if(positionA.x	> halfDimensions.x) {
-				positionA.x = halfDimensions.x - (positionA.x - halfDimensions.x);
+			if(positionA.x	> ballLimits.x) {
+				positionA.x					= ballLimits.x - (positionA.x - ballLimits.x);
+
+				::gpk::SBodyForces				& forces			= engine.Integrator.Forces[entityA.RigidBody];
 				::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[entityA.RigidBody].Velocity;
-				velocityA.x *= -1;
-				velocityA *= pool.StartState.DampingCushion;
+				velocityA.x					*= -1;
+				forces.Velocity				*= pool.StartState.DampingCushion;
 
 				::gpk::SCoord3<float>			& rotationA			= engine.Integrator.Forces[entityA.RigidBody].Rotation;
-				rotationA.z *= -1;
+				rotationA.z					*= -1;
 			}
-			if(positionA.z	< -halfDimensions.z) {
-				positionA.z = (-halfDimensions.z) - (positionA.z + halfDimensions.z);
+			if(positionA.z	< -ballLimits.y) {
+				positionA.z					= (-ballLimits.y) - (positionA.z + ballLimits.y);
+
+				::gpk::SBodyForces				& forces			= engine.Integrator.Forces[entityA.RigidBody];
 				::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[entityA.RigidBody].Velocity;
-				velocityA.z *= -1;
-				velocityA *= pool.StartState.DampingCushion;
+				velocityA.z					*= -1;
+				forces.Velocity				*= pool.StartState.DampingCushion;
 
 				::gpk::SCoord3<float>			& rotationA			= engine.Integrator.Forces[entityA.RigidBody].Rotation;
-				rotationA.x *= -1;
+				rotationA.x					*= -1;
 			}
-			if(positionA.z	> halfDimensions.z) {
-				positionA.z = halfDimensions.z - (positionA.z-halfDimensions.z);
+			if(positionA.z	> ballLimits.y) {
+				positionA.z					= ballLimits.y - (positionA.z - ballLimits.y);
+
+				::gpk::SBodyForces				& forces			= engine.Integrator.Forces[entityA.RigidBody];
 				::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[entityA.RigidBody].Velocity;
-				velocityA.z *= -1;
-				velocityA *= pool.StartState.DampingCushion;
+				velocityA.z					*= -1;
+				forces.Velocity				*= pool.StartState.DampingCushion;
 
 				::gpk::SCoord3<float>			& rotationA			= engine.Integrator.Forces[entityA.RigidBody].Rotation;
-				rotationA.x *= -1;
+				rotationA.x					*= -1;
 			}
 			if(positionA.y	< 0) {
-				positionA.y *= -1;
+				positionA.y					*= -1;
+
+				::gpk::SBodyForces				& forces			= engine.Integrator.Forces[entityA.RigidBody];
 				::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[entityA.RigidBody].Velocity;
-				velocityA.y *= -1;
-				velocityA *= pool.StartState.DampingGround;
+				velocityA.y					*= -1;
+				forces.Velocity				*= pool.StartState.DampingGround;
 			}
 		}
 	}
@@ -237,9 +248,10 @@ static	::gpk::error_t		resolveCollision
 		::gpk::SLine3<float> & delta = pool.PositionDeltas[iBall][pool.PositionDeltas[iBall].size() - 1];
 		pool.GetBallPosition(iBall, delta.B);
 		if((delta.B - delta.A).LengthSquared() > 0.000005) {
-			::gpk::SCoord3<float>			& rotationA			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Rotation;
+			::gpk::SBodyForces				& forces			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody];
+
 			::gpk::SCoord3<float>			rotationResult		= (delta.B - delta.A) * ::gpk::math_2pi * diameter;
-			rotationA	+= {rotationResult.z, 0, -rotationResult.x};
+			forces.Rotation				+= {rotationResult.z, 0, -rotationResult.x};
 		}
 		if(pool.PositionDeltas[iBall].size() > 10)
 			for(uint32_t iDelta = 0; iDelta < pool.PositionDeltas[iBall].size(); ++iDelta) {

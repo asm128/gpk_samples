@@ -3,18 +3,43 @@
 
 static	::gpk::error_t					poolGameResetTest2Balls	(::the1::SPoolGame & pool) { 
 	pool.StartState.BallCount				= 2;
-	pool.Engine.SetPosition(pool.StartState.Balls[0].Entity, {0, pool.StartState.BallRadius,-5});
-	pool.Engine.SetPosition(pool.StartState.Balls[1].Entity, {0, pool.StartState.BallRadius, 5});
+	pool.Engine.SetPosition(pool.StartState.Balls[0].Entity, {0, pool.StartState.Balls[0].BallRadius,-5});
+	pool.Engine.SetPosition(pool.StartState.Balls[1].Entity, {0, pool.StartState.Balls[1].BallRadius, 5});
 	for(uint32_t iBall = 0; iBall < pool.StartState.BallCount; ++iBall) {
-		pool.Engine.SetDampingLinear(pool.StartState.Balls[iBall].Entity, pool.StartState.DampingRollDisplacement);
-		pool.Engine.SetDampingAngular(pool.StartState.Balls[iBall].Entity, pool.StartState.DampingRollRotation);
+		pool.Engine.SetDampingLinear(pool.StartState.Balls[iBall].Entity, pool.StartState.DampingClothDisplacement);
+		pool.Engine.SetDampingAngular(pool.StartState.Balls[iBall].Entity, pool.StartState.DampingClothRotation);
 		pool.Engine.SetHidden(pool.StartState.Balls[iBall].Entity, false);
 	}
-	::gpk::SCoord3<float>						velocity				= {0, 0, -25.f};
+	::gpk::SCoord3<float>						velocity				= {0, 0, -15.f};
 	velocity.RotateY(::gpk::noiseNormal1D(pool.StartState.Seed + 2) / 20 * ((rand() % 2) ? -1 : 1));
 	pool.Engine.SetVelocity(pool.StartState.Balls[1].Entity, velocity);
 	return 0; 
 }
+
+//static	::gpk::error_t					textureBallStripped		(::gpk::view_grid<::gpk::SColorBGRA> viewColors, ::gpk::view_grid<::gpk::SColorBGRA> viewNumber, uint32_t number, uint32_t color) { 
+//	memset(viewColors.begin(), 0xFF, viewColors.byte_count());
+//	for(uint32_t y = 5; y < 11; ++y)
+//	for(uint32_t x = 0; x < 16; ++x)
+//		viewColors[y][x]	= color;
+//	(void)number;
+//	memset(viewNumber.begin(), 0xFF, viewNumber.byte_count());
+//	return 0; 
+//}
+//static	::gpk::error_t					textureBallSolid		(::gpk::view_grid<::gpk::SColorBGRA> viewColors, ::gpk::view_grid<::gpk::SColorBGRA> viewNumber, uint32_t number, uint32_t color) { 
+//	for(uint32_t y = 0; y < viewColors.metrics().x; ++y)
+//	for(uint32_t x = 0; x < viewColors.metrics().y; ++x)
+//		viewColors[y][x]	= color;
+//	(void)number;
+//	memset(viewNumber.begin(), 0xFF, viewNumber.byte_count());
+//	return 0; 
+//}
+//static	::gpk::error_t					textureBallCue			(::gpk::view_grid<::gpk::SColorBGRA> viewColors, ::gpk::view_grid<::gpk::SColorBGRA> viewNumber, uint32_t color) { 
+//	for(uint32_t y = 0; y < viewColors.metrics().x; ++y)
+//	for(uint32_t x = 0; x < viewColors.metrics().y; ++x)
+//		viewColors[y][x]	= color;
+//	memset(viewNumber.begin(), 0xFF, viewNumber.byte_count());
+//	return 0; 
+//}
 
 static	::gpk::error_t					poolGameResetBall10		(::the1::SPoolGame & pool) { (void)pool; return 0; }
 static	::gpk::error_t					poolGameResetBall9		(::the1::SPoolGame & pool) { (void)pool; return 0; }
@@ -23,10 +48,10 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 
 	for(uint32_t iBall = 0; iBall < pool.StartState.BallCount; ++iBall) {
 		const bool								stripped			= iBall > 0 && iBall < 8;
-		pool.Engine.SetDampingLinear	(pool.StartState.Balls[iBall].Entity, pool.StartState.DampingRollDisplacement);
-		pool.Engine.SetDampingAngular	(pool.StartState.Balls[iBall].Entity, pool.StartState.DampingRollRotation);
+		pool.Engine.SetDampingLinear	(pool.StartState.Balls[iBall].Entity, pool.StartState.DampingClothDisplacement);
+		pool.Engine.SetDampingAngular	(pool.StartState.Balls[iBall].Entity, pool.StartState.DampingClothRotation);
 		pool.Engine.SetHidden			(pool.StartState.Balls[iBall].Entity, false);
-		pool.Engine.SetOrientation		(pool.StartState.Balls[iBall].Entity, {0, 0, 1, 1});
+		pool.Engine.SetOrientation		(pool.StartState.Balls[iBall].Entity, {0, 0, 1, -1});
 		const ::gpk::SVirtualEntity				& entity			= pool.Engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity];
 		const ::gpk::SRenderNode				& renderNode		= pool.Engine.Scene->ManagedRenderNodes.RenderNodes[entity.RenderNode];
 		::gpk::SSkin							& skin				= *pool.Engine.Scene->ManagedRenderNodes.Skins[renderNode.Skin];
@@ -68,33 +93,37 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 	pool.StartState.BallOrder[5]	= ball5;
 	pool.StartState.BallOrder[11]	= 8;
 
-	{ uint32_t index = ::gpk::noise1DBase32( 1, (uint32_t)pool.StartState.Seed) % ballPool.size(); pool.StartState.BallOrder[ 2] = ballPool[index]; ballPool.remove_unordered(index); }
-	{ uint32_t index = ::gpk::noise1DBase32( 2, (uint32_t)pool.StartState.Seed) % ballPool.size(); pool.StartState.BallOrder[ 3] = ballPool[index]; ballPool.remove_unordered(index); }
-	{ uint32_t index = ::gpk::noise1DBase32( 3, (uint32_t)pool.StartState.Seed) % ballPool.size(); pool.StartState.BallOrder[ 4] = ballPool[index]; ballPool.remove_unordered(index); }
-	{ uint32_t index = ::gpk::noise1DBase32( 4, (uint32_t)pool.StartState.Seed) % ballPool.size(); pool.StartState.BallOrder[ 6] = ballPool[index]; ballPool.remove_unordered(index); }
-	{ uint32_t index = ::gpk::noise1DBase32( 5, (uint32_t)pool.StartState.Seed) % ballPool.size(); pool.StartState.BallOrder[ 7] = ballPool[index]; ballPool.remove_unordered(index); }
-	{ uint32_t index = ::gpk::noise1DBase32( 6, (uint32_t)pool.StartState.Seed) % ballPool.size(); pool.StartState.BallOrder[ 8] = ballPool[index]; ballPool.remove_unordered(index); }
-	{ uint32_t index = ::gpk::noise1DBase32( 7, (uint32_t)pool.StartState.Seed) % ballPool.size(); pool.StartState.BallOrder[ 9] = ballPool[index]; ballPool.remove_unordered(index); }
-	{ uint32_t index = ::gpk::noise1DBase32( 8, (uint32_t)pool.StartState.Seed) % ballPool.size(); pool.StartState.BallOrder[10] = ballPool[index]; ballPool.remove_unordered(index); }
-	{ uint32_t index = ::gpk::noise1DBase32( 9, (uint32_t)pool.StartState.Seed) % ballPool.size(); pool.StartState.BallOrder[12] = ballPool[index]; ballPool.remove_unordered(index); }
-	{ uint32_t index = ::gpk::noise1DBase32(10, (uint32_t)pool.StartState.Seed) % ballPool.size(); pool.StartState.BallOrder[13] = ballPool[index]; ballPool.remove_unordered(index); }
-	{ uint32_t index = ::gpk::noise1DBase32(11, (uint32_t)pool.StartState.Seed) % ballPool.size(); pool.StartState.BallOrder[14] = ballPool[index]; ballPool.remove_unordered(index); }
-	{ uint32_t index = ::gpk::noise1DBase32(12, (uint32_t)pool.StartState.Seed) % ballPool.size(); pool.StartState.BallOrder[15] = ballPool[index]; ballPool.remove_unordered(index); }
+	{ uint32_t index = ::gpk::noise1DBase32((uint32_t)pool.StartState.Seed +  2) % ballPool.size(); pool.StartState.BallOrder[ 2] = ballPool[index]; ballPool.remove_unordered(index); }
+	{ uint32_t index = ::gpk::noise1DBase32((uint32_t)pool.StartState.Seed +  3) % ballPool.size(); pool.StartState.BallOrder[ 3] = ballPool[index]; ballPool.remove_unordered(index); }
+	{ uint32_t index = ::gpk::noise1DBase32((uint32_t)pool.StartState.Seed +  4) % ballPool.size(); pool.StartState.BallOrder[ 4] = ballPool[index]; ballPool.remove_unordered(index); }
+	{ uint32_t index = ::gpk::noise1DBase32((uint32_t)pool.StartState.Seed +  5) % ballPool.size(); pool.StartState.BallOrder[ 6] = ballPool[index]; ballPool.remove_unordered(index); }
+	{ uint32_t index = ::gpk::noise1DBase32((uint32_t)pool.StartState.Seed +  6) % ballPool.size(); pool.StartState.BallOrder[ 7] = ballPool[index]; ballPool.remove_unordered(index); }
+	{ uint32_t index = ::gpk::noise1DBase32((uint32_t)pool.StartState.Seed +  7) % ballPool.size(); pool.StartState.BallOrder[ 8] = ballPool[index]; ballPool.remove_unordered(index); }
+	{ uint32_t index = ::gpk::noise1DBase32((uint32_t)pool.StartState.Seed +  8) % ballPool.size(); pool.StartState.BallOrder[ 9] = ballPool[index]; ballPool.remove_unordered(index); }
+	{ uint32_t index = ::gpk::noise1DBase32((uint32_t)pool.StartState.Seed +  9) % ballPool.size(); pool.StartState.BallOrder[10] = ballPool[index]; ballPool.remove_unordered(index); }
+	{ uint32_t index = ::gpk::noise1DBase32((uint32_t)pool.StartState.Seed + 10) % ballPool.size(); pool.StartState.BallOrder[12] = ballPool[index]; ballPool.remove_unordered(index); }
+	{ uint32_t index = ::gpk::noise1DBase32((uint32_t)pool.StartState.Seed + 11) % ballPool.size(); pool.StartState.BallOrder[13] = ballPool[index]; ballPool.remove_unordered(index); }
+	{ uint32_t index = ::gpk::noise1DBase32((uint32_t)pool.StartState.Seed + 12) % ballPool.size(); pool.StartState.BallOrder[14] = ballPool[index]; ballPool.remove_unordered(index); }
+	{ uint32_t index = ::gpk::noise1DBase32((uint32_t)pool.StartState.Seed + 13) % ballPool.size(); pool.StartState.BallOrder[15] = ballPool[index]; ballPool.remove_unordered(index); }
 
-	pool.Engine.SetPosition(pool.StartState.Balls[0].Entity, {-10, pool.StartState.BallRadius, 0});
-	::gpk::SCoord3<float>					velocity			= {40.0f + (rand() % 90), 0, 0};
-	velocity.RotateY(::gpk::noiseNormal1D(pool.StartState.Seed + 2) / 10 * ((rand() % 2) ? -1 : 1));
+	const float								distanceFromCenter	= pool.StartState.Table.Size.x / 4;
+
+	pool.Engine.SetPosition(pool.StartState.Balls[0].Entity, {-distanceFromCenter / 4, pool.StartState.Balls[0].BallRadius, 0});
+	::gpk::SCoord3<float>					velocity			= {10.0f + (rand() % 150), 0, 0}; //{70.0f + (rand() % 90), 0, 0};
+	float									reverse				= (rand() % 2) ? -1.0f : 1.0f;
+	velocity.RotateY(::gpk::noiseNormal1D(pool.StartState.Seed + 2) / 50 + .1f * reverse);
 	pool.Engine.SetVelocity(pool.StartState.Balls[0].Entity, velocity);
-	//pool.Engine.SetRotation(pool.StartState.Balls[0].Entity, {0, 0, 10});
+	pool.Engine.SetRotation(pool.StartState.Balls[0].Entity, {0, (1.0f + (rand() % 50)) * -reverse, 0});
 	uint8_t									rowLen				= 5;
 	::gpk::SCoord3<float>					diagonal			= {1, 0, 1};
-	diagonal = diagonal.Normalize() * 1.22f; 
+	//diagonal							= diagonal.Normalize() * 1.22f; 
 	for(uint32_t iRow = 0, iBall = 1; iRow < 5; ++iRow, --rowLen) {
 		::gpk::SCoord3<float>					offsetZ				= {0, 0, -(rowLen / 2.0f) + .5f};
 		for(uint32_t iColumn = 0; iColumn < rowLen; ++iColumn) {
-			::gpk::SCoord3<float>					position			= offsetZ + ::gpk::SCoord3<float>{(10.f + diagonal.x * 5) - iRow * diagonal.x, pool.StartState.BallRadius, (float)iColumn};
+			::gpk::SCoord3<float>					position			= offsetZ + ::gpk::SCoord3<float>{(distanceFromCenter + diagonal.x * 5) - iRow * diagonal.x, pool.StartState.Balls[iBall].BallRadius, (float)iColumn};
 			uint32_t								iEntity				= pool.StartState.Balls[pool.StartState.BallOrder[iBall++]].Entity;
 			pool.Engine.SetPosition(iEntity, position);
+			pool.Engine.SetRotation(iEntity, {0, 0, 0});
 		}
 	}
 	return 0;
@@ -102,7 +131,7 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 
 ::gpk::error_t							the1::poolGameReset		(::the1::SPoolGame & pool, POOL_GAME_MODE mode) {
 	pool.StartState.Mode					= mode;
-	pool.StartState.Seed					= ::gpk::timeCurrentInUs();
+	pool.StartState.Seed					= ::gpk::timeCurrentInUs() ^ ::gpk::noise1DBase(::gpk::timeCurrentInUs());
 	pool.Engine.Integrator.ZeroForces();
 	for(uint32_t iBall = 0; iBall < ::the1::MAX_BALLS; ++iBall) {
 		pool.PositionDeltas[iBall].clear();
@@ -125,6 +154,7 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 	for(uint32_t iBall = 1; iBall < ::the1::MAX_BALLS; ++iBall) {
 		gpk_necs(pool.StartState.Balls[iBall].Entity = pool.Engine.Clone(pool.StartState.Balls[0].Entity, true, true));
 	}
+	gpk_necs(pool.StartState.Table.Entity = pool.Engine.CreateBox());
 	::the1::poolGameReset(pool, mode);
 	return 0;
 }

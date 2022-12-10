@@ -12,7 +12,7 @@ namespace the1
 	GDEFINE_ENUM_VALUE(POOL_GAME_MODE, 10Ball, 2);
 	GDEFINE_ENUM_VALUE(POOL_GAME_MODE, Test2Balls, 3);
 
-	static constexpr	uint8_t					MAX_BALLS					= 32;
+	static constexpr	uint8_t					MAX_BALLS						= 16;
 
 #pragma pack(push, 1)
 	struct SContactResultBall {
@@ -55,21 +55,27 @@ namespace the1
 	};
 
 	struct SPoolBall {
-		uint32_t									Entity;
+		uint32_t									Entity							= (uint32_t)-1;
+		float										BallRadius						= .5f;
+	};
+
+	struct SPoolTable {
+		uint32_t									Entity							= (uint32_t)-1;
+		::gpk::SCoord2<float>						Size							= {44, 22};
+		float										Height							= .65f;
 	};
 
 	struct SPoolStartState {
 		POOL_GAME_MODE								Mode							= POOL_GAME_MODE_8Ball;
 		uint64_t									Seed							= (uint64_t)::gpk::timeCurrentInUs();
 		uint32_t									BallCount						= 16;
-		float										DampingRollDisplacement			= .8f;
-		float										DampingRollRotation				= .005f;
+		float										DampingClothDisplacement		= .7f;
+		float										DampingClothRotation			= .01f;
 		float										DampingCollision				= .975f;
 		float										DampingCushion					= .95f;
 		float										DampingGround					= .5f;
 
-		float										BallRadius						= .5f;
-		::gpk::SCoord3<float>						TableDimensions					= {44, .65f, 22};
+		::the1::SPoolTable							Table							= {};
 		::the1::SPoolBall							Balls			[MAX_BALLS]		= {};
 		::gpk::SCoord3<float>						BallPositions	[MAX_BALLS]		= {};
 		uint32_t									BallOrder		[MAX_BALLS]		= {};

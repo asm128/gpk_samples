@@ -4,6 +4,8 @@
 #include "gpk_engine_rendernode.h"
 #include "gpk_bitmap_target.h"
 
+#include <functional>
+
 #ifndef GPK_ENGINE_SCENE_H
 #define GPK_ENGINE_SCENE_H
 
@@ -14,25 +16,38 @@ namespace gpk
 		::gpk::SVSCache						CacheVertexShader		= {};
 	};
 
+	struct SEngineScene;
+
+	struct SShaderManager {
+		::gpk::array_obj<::std::function<int32_t(const ::gpk::SEngineScene & sceneResources, int32_t iRenderNode)>>	Shaders;
+	};
+
+
 	struct SEngineScene {
 		::gpk::SRenderBufferManager			ManagedBuffers			= {};
-		::gpk::SRenderNodeManager			ManagedRenderNodes		= {};
 		::gpk::SSurfaceManager				ManagedSurfaces			= {};
 		::gpk::SMeshManager					ManagedMeshes			= {};
+		::gpk::SShaderManager				ManagedShaders			= {};
+		::gpk::SRenderNodeManager			ManagedRenderNodes		= {};
+
 		::gpk::SEngineRenderCache			RenderCache				= {};
+	};
+	
+	struct SEngineSceneConstants {
+		::gpk::SMatrix4<float>				Projection			= {}; 
+		::gpk::SNearFar						NearFar 			= {.1f, 500.0f}; 
+		::gpk::SCoord3<float>				CameraPosition		= {}; 
+		::gpk::SCoord3<float>				CameraFront			= {}; 
+		::gpk::SCoord3<float>				LightPosition		= {}; 
+		::gpk::SCoord3<float>				LightDirection		= {}; 
 	};
 
 	::gpk::error_t						drawScene									
 		( ::gpk::view_grid<::gpk::SColorBGRA>	& backBufferColors
 		, ::gpk::view_grid<uint32_t>			& backBufferDepth
 		, ::gpk::SEngineRenderCache				& renderCache
-		, ::gpk::SEngineScene					& scene
-		, const ::gpk::SMatrix4<float>			& projection		
-		, const ::gpk::SNearFar					& nearFar 
-		, const ::gpk::SCoord3<float>			& cameraPosition
-		, const ::gpk::SCoord3<float>			& cameraFront
-		, const ::gpk::SCoord3<float>			& lightPosition
-		, const ::gpk::SCoord3<float>			& lightDirection
+		, const ::gpk::SEngineScene				& scene
+		, const ::gpk::SEngineSceneConstants	& constants
 		);
 
 	template<typename _tCoord>

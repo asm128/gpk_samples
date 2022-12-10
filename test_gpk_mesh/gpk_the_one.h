@@ -35,8 +35,8 @@ namespace the1
 		::the1::TRenderTarget					GameRenderTarget				= {};
 		::gpk::array_pod<::the1::SContactBall>	ContactsToDraw					= {};
 
-		SCamera									CameraPlayer					= {{0, 40, -35}, {}};
-		SCamera									CameraBalls[::the1::MAX_BALLS]	= {{0, 40, -35}, {}};
+		SCamera									CameraPlayer					= {{0, 30, -35}, {}};
+		SCamera									CameraBalls[::the1::MAX_BALLS]	= {{0, 30, -35}, {}};
 		uint32_t								Camera							= 1;
 	};
 
