@@ -18,8 +18,8 @@ namespace the1
 	struct SContactResultBall {
 		::gpk::SCoord3<float>						ContactPosition					= {};
 		::gpk::SCoord3<float>						DistanceDirection				= {};
-		float										ForceTransferRatioA				= 0;
-		float										ForceTransferRatioB				= 0;
+		double										ForceTransferRatioA				= 0;
+		double										ForceTransferRatioB				= 0;
 
 		::gpk::SCoord3<float>						InitialVelocityA				= {};
 		::gpk::SCoord3<float>						InitialVelocityB				= {};

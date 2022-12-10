@@ -3,6 +3,7 @@
 #include "gpk_engine_rendersurface.h"
 #include "gpk_engine_rendernode.h"
 #include "gpk_bitmap_target.h"
+#include "gpk_font.h"
 
 #include <functional>
 
@@ -28,6 +29,7 @@ namespace gpk
 		::gpk::SSurfaceManager				ManagedSurfaces			= {};
 		::gpk::SMeshManager					ManagedMeshes			= {};
 		::gpk::SShaderManager				ManagedShaders			= {};
+		::gpk::SRasterFontManager			ManagerFonts			= {};
 		::gpk::SRenderNodeManager			ManagedRenderNodes		= {};
 
 		::gpk::SEngineRenderCache			RenderCache				= {};

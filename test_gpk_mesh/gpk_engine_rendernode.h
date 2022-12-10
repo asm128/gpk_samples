@@ -24,6 +24,12 @@ namespace gpk
 		uint32_t									Shader			= (uint32_t)-1;
 		uint32_t									Skin			= (uint32_t)-1;
 	};
+
+	struct SRenderNodeTransforms {
+		::gpk::SMatrix4<float>						World					= ::gpk::SMatrix4<float>::GetIdentity();
+		::gpk::SMatrix4<float>						WorldInverse			= ::gpk::SMatrix4<float>::GetIdentity();
+		::gpk::SMatrix4<float>						WorldInverseTranspose	= ::gpk::SMatrix4<float>::GetIdentity();
+	};
 	
 	GDEFINE_ENUM_TYPE(LIGHT_TYPE, uint8_t);
 	GDEFINE_ENUM_VALUE(LIGHT_TYPE, Directional	, 0);
@@ -86,10 +92,11 @@ namespace gpk
 		::gpk::array_pod<uint32_t>					Textures;
 	};
 
+
 	struct SRenderNodeManager {
 		::gpk::array_pod <::gpk::SRenderNode						>	RenderNodes				= {};
 		::gpk::array_pod <::gpk::SRenderNodeFlags					>	RenderNodeFlags			= {};
-		::gpk::array_pod <::gpk::SMatrix4<float>					>	RenderNodeTransforms	= {};
+		::gpk::array_pod <::gpk::SRenderNodeTransforms				>	RenderNodeTransforms	= {};
 		::gpk::array_pobj<::gpk::array_pod<::gpk::SLight	>		>	RenderNodeLights		= {};
 		::gpk::array_pobj<::gpk::array_pod<::gpk::SCamera	>		>	RenderNodeCameras		= {};
 
@@ -99,7 +106,7 @@ namespace gpk
 		::gpk::array_pobj<::gpk::array_pod<::gpk::SLightSpot		>>	LightsSpot				= {};
 
 		::gpk::error_t											Create		()	{
-			RenderNodeTransforms[RenderNodeTransforms.push_back({})].Identity();
+			RenderNodeTransforms	.push_back({});
 			RenderNodeLights		.push_back({});
 			RenderNodeCameras		.push_back({});
 			RenderNodeFlags			.push_back({});
@@ -107,7 +114,7 @@ namespace gpk
 		}
 
 		::gpk::error_t											Clone		(uint32_t iNode)	{
-			RenderNodeTransforms	.push_back(::gpk::SMatrix4<float>								{RenderNodeTransforms	[iNode]});
+			RenderNodeTransforms	.push_back(::gpk::SRenderNodeTransforms							{RenderNodeTransforms	[iNode]});
 			RenderNodeLights		.push_back(::gpk::ptr_obj<::gpk::array_pod<::gpk::SLight	>>	{RenderNodeLights		[iNode]});
 			RenderNodeCameras		.push_back(::gpk::ptr_obj<::gpk::array_pod<::gpk::SCamera	>>	{RenderNodeCameras		[iNode]});
 			RenderNodeFlags			.push_back(::gpk::SRenderNodeFlags								{RenderNodeFlags		[iNode]});

@@ -13,7 +13,8 @@ int												gpk::updateEntityTransforms
 {
 	const ::gpk::ptr_obj<::gpk::array_pod<uint32_t>>	& children						= managedEntities.EntityChildren[iEntity];
 	if(-1 != entity.RenderNode) {
-		::gpk::SMatrix4<float>								& worldTransform				= renderNodes.RenderNodeTransforms[entity.RenderNode];
+		::gpk::SRenderNodeTransforms						& transforms					= renderNodes.RenderNodeTransforms[entity.RenderNode];
+		::gpk::SMatrix4<float>								& worldTransform				= transforms.World;
 		if(-1 == entity.RigidBody)
 			worldTransform									= ::gpk::SMatrix4<float>::GetIdentity();
 		else
@@ -22,11 +23,13 @@ int												gpk::updateEntityTransforms
 		if(-1 != entity.Parent) {
 			const ::gpk::SVirtualEntity			& entityParent					= managedEntities.Entities[entity.Parent];
 			if(-1 != entityParent.RenderNode)
-				worldTransform					= renderNodes.RenderNodeTransforms[entityParent.RenderNode] * worldTransform;
+				worldTransform					= renderNodes.RenderNodeTransforms[entityParent.RenderNode].World * worldTransform;
 			else if(-1 != entityParent.RigidBody) {
 				worldTransform					= integrator.TransformsLocal[entityParent.RigidBody] * worldTransform;
 			}
 		}
+		transforms.WorldInverse				= worldTransform.GetInverse();
+		transforms.WorldInverseTranspose	= transforms.WorldInverse.GetTranspose();
 	}
 	if(children) {
 		for(uint32_t iChild = 0; iChild < children->size(); ++iChild) {
@@ -54,7 +57,7 @@ int												gpk::updateEntityTransforms
 		return -1;
 	}
 	Scene->ManagedRenderNodes.RenderNodeLights		[entity.RenderNode]->push_back({type, indexLight});
-	Scene->ManagedRenderNodes.RenderNodeTransforms	[entity.RenderNode].SetIdentity();
+	Scene->ManagedRenderNodes.RenderNodeTransforms	[entity.RenderNode] = {};
 	return iEntity;
 }
 
@@ -71,8 +74,8 @@ int												gpk::updateEntityTransforms
 	camera.Up							= {0, 1, 0};
 	camera.Right						= {0, 0, 1};
 
-	Scene->ManagedRenderNodes.RenderNodeTransforms	[entity.RenderNode].SetIdentity();
 	Scene->ManagedRenderNodes.RenderNodeCameras		[entity.RenderNode]->push_back(camera);
+	Scene->ManagedRenderNodes.RenderNodeTransforms	[entity.RenderNode] = {};
 	return iEntity;
 }
 
@@ -139,7 +142,7 @@ int												gpk::updateEntityTransforms
 		skin->Textures.push_back(iSurface);
 		skin->Material.Color.Ambient	= ::gpk::SColorBGRA(::gpk::ASCII_PALETTE[1 + iFace]);
 		skin->Material.Color.Diffuse	= ::gpk::SColorBGRA(::gpk::ASCII_PALETTE[1 + iFace]);
-		skin->Material.Color.Specular	= ::gpk::SColorBGRA(::gpk::ASCII_PALETTE[1 + iFace]);
+		skin->Material.Color.Specular	= ::gpk::WHITE;
 		skin->Material.SpecularPower	= 0.5f;
 
 		skin->Material.Color.Ambient	*= .1f;
@@ -179,7 +182,7 @@ int												gpk::updateEntityTransforms
 
 ::gpk::error_t						gpk::SEngine::CreateSphere			()	{ 
 	SGeometryIndexedTriangles				geometry;
-	::gpk::geometryBuildSphere(geometry, 32, 32, .5f, {});
+	::gpk::geometryBuildSphere(geometry, 32, 16, .5f, {});
 
 	int32_t									iEntity								= this->ManagedEntities.Create();
 	ManagedEntities.EntityNames[iEntity]	= ::gpk::vcs{"Sphere"};
@@ -236,7 +239,7 @@ int												gpk::updateEntityTransforms
 	::gpk::ptr_obj<::gpk::SSkin>				& skin					= Scene->ManagedRenderNodes.Skins[iSkin];
 	skin->Material.Color.Ambient			= ::gpk::SColorBGRA(::gpk::ASCII_PALETTE[3]);
 	skin->Material.Color.Diffuse			= ::gpk::SColorBGRA(::gpk::ASCII_PALETTE[3]);
-	skin->Material.Color.Specular			= ::gpk::SColorBGRA(::gpk::ASCII_PALETTE[3]);
+	skin->Material.Color.Specular			= ::gpk::WHITE;
 	skin->Material.SpecularPower			= 0.5f;
 
 	uint32_t									iSurface				= (uint32_t)Scene->ManagedSurfaces.Create();
@@ -249,7 +252,7 @@ int												gpk::updateEntityTransforms
 	surface->Desc.MethodCompression			= 0;
 	surface->Desc.MethodFilter				= 0;
 	surface->Desc.MethodInterlace			= 0;
-	surface->Desc.Dimensions				= {16, 16};
+	surface->Desc.Dimensions				= {256, 128};
 	surface->Data.resize(surface->Desc.Dimensions.Area() * sizeof(::gpk::SColorBGRA));
 	memset(surface->Data.begin(), 0xFF, surface->Data.size());
 	::gpk::view_grid<::gpk::SColorBGRA>			view	= {(::gpk::SColorBGRA*)surface->Data.begin(), surface->Desc.Dimensions.Cast<uint32_t>()};

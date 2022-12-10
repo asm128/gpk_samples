@@ -7,6 +7,8 @@
 	//}
 	for(uint32_t iBall = 0; iBall < app.MainGame.Game.StartState.BallCount; ++iBall) {
 		app.MainGame.CameraBalls[iBall].Position	= app.MainGame.CameraPlayer.Position;
+		app.MainGame.CameraBalls[iBall].BallLockAtPosition	= true;
+		app.MainGame.CameraBalls[iBall].BallLockAtTarget	= true;
 		app.MainGame.Game.GetBallPosition(iBall, app.MainGame.CameraBalls[iBall].Target);
 	}
 	return 0; 
@@ -18,7 +20,7 @@
 		::the1::SCamera			& camera				= app.MainGame.CameraBalls[iBall];
 		if(0 == iBall) {
 			app.MainGame.Game.GetBallPosition(iBall, camera.Target);
-			camera.Target /= 2;		
+			camera.Target		/= 2;		
 		}
 		else {
 			app.MainGame.Game.GetBallPosition(0, camera.Target);

@@ -1,5 +1,6 @@
 #include "gpk_pool_game.h"
 #include "gpk_noise.h"
+#include "gpk_gui_text.h"
 
 static	::gpk::error_t					poolGameResetTest2Balls	(::the1::SPoolGame & pool) { 
 	pool.StartState.BallCount				= 2;
@@ -68,15 +69,38 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 				view[y][x]	= color;
 		}
 		else {
-			for(uint32_t y = 0; y < surface.Desc.Dimensions.x; ++y)
-			for(uint32_t x = 0; x < surface.Desc.Dimensions.y; ++x)
+			for(uint32_t y = 0; y < surface.Desc.Dimensions.y; ++y)
+			for(uint32_t x = 0; x < surface.Desc.Dimensions.x; ++x)
 				view[y][x]	= color;
+		}
+
+		if(iBall) {
+			char number[4] = {};
+			sprintf_s(number, "%i", iBall);
+			::gpk::ptr_obj<::gpk::SRasterFont>		& font				= pool.Engine.Scene->ManagerFonts.Fonts[10];
+			::gpk::array_pod<::gpk::SCoord2<uint16_t>> coords;
+			::gpk::textLineRaster(view.metrics().Cast<uint16_t>(), font->CharSize
+				, { {int16_t(view.metrics().x / 2 - (font->CharSize.x * strlen(number)) / 2), int16_t(view.metrics().y / 2 - font->CharSize.y / 2)}
+				  , {font->CharSize.Cast<int16_t>()}
+				}, font->Texture
+				, number
+				, coords
+			);
+			for(uint32_t iCoord = 0; iCoord < coords.size(); ++iCoord) {
+				const ::gpk::SCoord2<uint16_t> coord = coords[iCoord];
+				view[coord.y][coord.x] = ::gpk::BLACK;
+			}
 		}
 	}
 
+	const uint32_t								ball1					= 1 + ::gpk::noise1DBase(pool.StartState.Seed + 1) % 7;
+	const uint32_t								ball5					= 9 + ::gpk::noise1DBase(pool.StartState.Seed + 5) % 7;
+	pool.StartState.BallOrder[0]	= 0;
+	pool.StartState.BallOrder[1]	= ball1;
+	pool.StartState.BallOrder[5]	= ball5;
+	pool.StartState.BallOrder[11]	= 8;
+
 	::gpk::array_pod<uint32_t>					ballPool				= {};
-	uint32_t									ball1					= 1 + ::gpk::noise1DBase(pool.StartState.Seed + 1) % 7;
-	uint32_t									ball5					= 9 + ::gpk::noise1DBase(pool.StartState.Seed + 11) % 7;
 	for(uint32_t iBall = 0; ballPool.size() < 12; ++iBall) {
 		if(iBall == 8)
 			continue;
@@ -88,11 +112,8 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 			continue;
 		ballPool.push_back(iBall);
 	}
-	pool.StartState.BallOrder[0]	= 0;
-	pool.StartState.BallOrder[1]	= ball1;
-	pool.StartState.BallOrder[5]	= ball5;
-	pool.StartState.BallOrder[11]	= 8;
-	const char ballsToSet[12] = {2, 3, 4, 6, 7, 8, 9, 10, 12, 13, 14, 15};
+
+	constexpr char								ballsToSet	[12]		= {2, 3, 4, 6, 7, 8, 9, 10, 12, 13, 14, 15};
 	for(uint32_t iBallToSet = 0; iBallToSet < 12; ++iBallToSet) { 
 		uint32_t index = ::gpk::noise1DBase32((uint32_t)pool.StartState.Seed + iBallToSet) % ballPool.size(); 
 		pool.StartState.BallOrder[ballsToSet[iBallToSet]] = ballPool[index]; 
@@ -143,6 +164,7 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 }
 
 ::gpk::error_t							the1::poolGameSetup			(::the1::SPoolGame & pool, POOL_GAME_MODE mode) {
+	gpk_necs(::gpk::rasterFontDefaults(pool.Engine.Scene->ManagerFonts));
 	gpk_necs(pool.StartState.Balls[0].Entity = pool.Engine.CreateSphere());
 	for(uint32_t iBall = 1; iBall < ::the1::MAX_BALLS; ++iBall) {
 		gpk_necs(pool.StartState.Balls[iBall].Entity = pool.Engine.Clone(pool.StartState.Balls[0].Entity, true, true));
