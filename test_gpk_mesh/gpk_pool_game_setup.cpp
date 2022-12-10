@@ -76,7 +76,7 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 
 	::gpk::array_pod<uint32_t>					ballPool				= {};
 	uint32_t									ball1					= 1 + ::gpk::noise1DBase(pool.StartState.Seed + 1) % 7;
-	uint32_t									ball5					= 9 + ::gpk::noise1DBase(pool.StartState.Seed + 2) % 7;
+	uint32_t									ball5					= 9 + ::gpk::noise1DBase(pool.StartState.Seed + 11) % 7;
 	for(uint32_t iBall = 0; ballPool.size() < 12; ++iBall) {
 		if(iBall == 8)
 			continue;
@@ -92,19 +92,12 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 	pool.StartState.BallOrder[1]	= ball1;
 	pool.StartState.BallOrder[5]	= ball5;
 	pool.StartState.BallOrder[11]	= 8;
-
-	{ uint32_t index = ::gpk::noise1DBase32((uint32_t)pool.StartState.Seed +  2) % ballPool.size(); pool.StartState.BallOrder[ 2] = ballPool[index]; ballPool.remove_unordered(index); }
-	{ uint32_t index = ::gpk::noise1DBase32((uint32_t)pool.StartState.Seed +  3) % ballPool.size(); pool.StartState.BallOrder[ 3] = ballPool[index]; ballPool.remove_unordered(index); }
-	{ uint32_t index = ::gpk::noise1DBase32((uint32_t)pool.StartState.Seed +  4) % ballPool.size(); pool.StartState.BallOrder[ 4] = ballPool[index]; ballPool.remove_unordered(index); }
-	{ uint32_t index = ::gpk::noise1DBase32((uint32_t)pool.StartState.Seed +  5) % ballPool.size(); pool.StartState.BallOrder[ 6] = ballPool[index]; ballPool.remove_unordered(index); }
-	{ uint32_t index = ::gpk::noise1DBase32((uint32_t)pool.StartState.Seed +  6) % ballPool.size(); pool.StartState.BallOrder[ 7] = ballPool[index]; ballPool.remove_unordered(index); }
-	{ uint32_t index = ::gpk::noise1DBase32((uint32_t)pool.StartState.Seed +  7) % ballPool.size(); pool.StartState.BallOrder[ 8] = ballPool[index]; ballPool.remove_unordered(index); }
-	{ uint32_t index = ::gpk::noise1DBase32((uint32_t)pool.StartState.Seed +  8) % ballPool.size(); pool.StartState.BallOrder[ 9] = ballPool[index]; ballPool.remove_unordered(index); }
-	{ uint32_t index = ::gpk::noise1DBase32((uint32_t)pool.StartState.Seed +  9) % ballPool.size(); pool.StartState.BallOrder[10] = ballPool[index]; ballPool.remove_unordered(index); }
-	{ uint32_t index = ::gpk::noise1DBase32((uint32_t)pool.StartState.Seed + 10) % ballPool.size(); pool.StartState.BallOrder[12] = ballPool[index]; ballPool.remove_unordered(index); }
-	{ uint32_t index = ::gpk::noise1DBase32((uint32_t)pool.StartState.Seed + 11) % ballPool.size(); pool.StartState.BallOrder[13] = ballPool[index]; ballPool.remove_unordered(index); }
-	{ uint32_t index = ::gpk::noise1DBase32((uint32_t)pool.StartState.Seed + 12) % ballPool.size(); pool.StartState.BallOrder[14] = ballPool[index]; ballPool.remove_unordered(index); }
-	{ uint32_t index = ::gpk::noise1DBase32((uint32_t)pool.StartState.Seed + 13) % ballPool.size(); pool.StartState.BallOrder[15] = ballPool[index]; ballPool.remove_unordered(index); }
+	const char ballsToSet[12] = {2, 3, 4, 6, 7, 8, 9, 10, 12, 13, 14, 15};
+	for(uint32_t iBallToSet = 0; iBallToSet < 12; ++iBallToSet) { 
+		uint32_t index = ::gpk::noise1DBase32((uint32_t)pool.StartState.Seed + iBallToSet) % ballPool.size(); 
+		pool.StartState.BallOrder[ballsToSet[iBallToSet]] = ballPool[index]; 
+		ballPool.remove_unordered(index); 
+	}
 
 	const float								distanceFromCenter	= pool.StartState.Table.Size.x / 4;
 

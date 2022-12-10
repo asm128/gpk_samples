@@ -33,9 +33,15 @@ static	::gpk::error_t		resolveCollision
 	const ::gpk::SCoord3<double>	vUp					= {0, revert ? -1 : 1.0f, 0};
 	::gpk::SCoord3<double>			finalVelocityB		= distanceDirection * speedA * out_forceTransferRatioB;
 	::gpk::SCoord3<double>			finalVelocityA		= ::gpk::SCoord3<double>{finalVelocityB}.Normalize().Cross(vUp).Normalize() * speedA * (1.0f - out_forceTransferRatioB);
-	double finalSpeedA = finalVelocityB.Length();
-	double finalSpeedB = finalVelocityA.Length();
-	info_printf("Total final speed: %f", (float)(finalSpeedA + finalSpeedB));
+	double							totalFinalSpeed		= finalVelocityA.Length() + finalVelocityB.Length();
+	double							totalInitialSpeed	= initialVelocityA.Length();
+	if ((totalFinalSpeed - totalInitialSpeed) > 0.0001f) {
+		warning_printf("Invalid resulting force: initial: %f, final: %f, gained: %f", totalInitialSpeed, totalFinalSpeed, (totalFinalSpeed - totalInitialSpeed));
+	}
+	if ((totalFinalSpeed - totalInitialSpeed) < -0.0001f) {
+		warning_printf("Invalid resulting force: initial: %f, final: %f, lost: %f", totalInitialSpeed, totalFinalSpeed, (totalFinalSpeed - totalInitialSpeed) * -1);
+	}			
+
 	out_finalVelocityA			+= finalVelocityA.Cast<float>();
 	out_finalVelocityB			+= finalVelocityB.Cast<float>();
 
@@ -132,38 +138,20 @@ static	::gpk::error_t		resolveCollision
 			velocityA					= {};
 			rotationB					= {};
 			rotationA					= {};
-			/*if(contact.Result.InitialVelocityA.LengthSquared())*/ {
+			if(contact.Result.InitialVelocityA.LengthSquared() || contact.Result.InitialRotationA.LengthSquared()) {
 				engine.Integrator.BodyFlags[entityB.RigidBody].Active = true;
 				::gpk::SCoord3<float>			lvelocityB					= {};
 				::gpk::SCoord3<float>			lvelocityA					= {};
 				::resolveCollision(contact.Result.InitialVelocityA.Cast<double>(), contact.Result.InitialRotationA.Cast<double>(), contact.Result.DistanceDirection.Cast<double>(), contact.Result.ForceTransferRatioB, rotationA, rotationB, lvelocityA, lvelocityB);
-				double totalFinalSpeed	= lvelocityA.Length() + lvelocityB.Length();
-				double totalInitialSpeed = contact.Result.InitialVelocityA.Length();
-				if ((totalFinalSpeed - totalInitialSpeed) > 0.0001f) {
-					warning_printf("Invalid resulting force: initial: %f, final: %f, gained: %f", totalInitialSpeed, totalFinalSpeed, (totalFinalSpeed - totalInitialSpeed));
-				}
-				if ((totalFinalSpeed - totalInitialSpeed) < -0.0001f) {
-					warning_printf("Invalid resulting force: initial: %f, final: %f, lost: %f", totalInitialSpeed, totalFinalSpeed, (totalFinalSpeed - totalInitialSpeed) * -1);
-				}			
 				velocityB					+= lvelocityB;
 				velocityA					+= lvelocityA;
 			}
 
-			/*if(contact.Result.InitialVelocityB.LengthSquared())*/ {
+			if(contact.Result.InitialVelocityB.LengthSquared() || contact.Result.InitialRotationB.LengthSquared()) {
 				engine.Integrator.BodyFlags[entityA.RigidBody].Active = true;
 				::gpk::SCoord3<float>			lvelocityB					= {};
 				::gpk::SCoord3<float>			lvelocityA					= {};
 				::resolveCollision(contact.Result.InitialVelocityB.Cast<double>(), contact.Result.InitialRotationB.Cast<double>(), contact.Result.DistanceDirection.Cast<double>() * -1, contact.Result.ForceTransferRatioA, rotationA, rotationB, lvelocityB, lvelocityA);
-				{
-					double							totalFinalSpeed				= lvelocityA.Length() + lvelocityB.Length();
-					double							totalInitialSpeed			= contact.Result.InitialVelocityB.Length();
-					if ((totalFinalSpeed - totalInitialSpeed) > 0.0001f) {
-						warning_printf("Invalid resulting force: initial: %f, final: %f, gained: %f", totalInitialSpeed, totalFinalSpeed, (totalFinalSpeed - totalInitialSpeed));
-					}
-					if ((totalFinalSpeed - totalInitialSpeed) < -0.0001f) {
-						warning_printf("Invalid resulting force: initial: %f, final: %f, lost: %f", totalInitialSpeed, totalFinalSpeed, (totalFinalSpeed - totalInitialSpeed) * -1);
-					}			
-				}
 				velocityB					+= lvelocityB;
 				velocityA					+= lvelocityA;
 				{
@@ -190,53 +178,31 @@ static	::gpk::error_t		resolveCollision
 			const gpk::SCoord2<float>		ballLimits			= tableHalfDimensions - ::gpk::SCoord2<float>{pool.StartState.Balls[iBall].BallRadius, pool.StartState.Balls[iBall].BallRadius};
 			const ::gpk::SVirtualEntity		& entityA			= engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity]; 
 			::gpk::SCoord3<float>			& positionA			= engine.Integrator.Centers[entityA.RigidBody].Position;
-			if(positionA.x	< -ballLimits.x) {
-				positionA.x					= (-ballLimits.x) - (positionA.x + ballLimits.x);
-
+			if((positionA.x	< -ballLimits.x) || (positionA.x > ballLimits.x)) {
+				positionA.x					= (positionA.x	< -ballLimits.x) 
+					? (-ballLimits.x) - (positionA.x + ballLimits.x)
+					:   ballLimits.x  - (positionA.x - ballLimits.x)
+					;
 				::gpk::SBodyForces				& forces			= engine.Integrator.Forces[entityA.RigidBody];
 				forces.Velocity.x			*= -1;
 				forces.Velocity				*= pool.StartState.DampingCushion;
 				forces.Rotation.z			*= -1;
 			}
-			if(positionA.x	> ballLimits.x) {
-				positionA.x					= ballLimits.x - (positionA.x - ballLimits.x);
-
+			if((positionA.z	< -ballLimits.y) || (positionA.z > ballLimits.y)) {
+				positionA.z					= (positionA.z	< -ballLimits.y) 
+					? (-ballLimits.y) - (positionA.z + ballLimits.y)
+					:   ballLimits.y  - (positionA.z - ballLimits.y)
+					;
 				::gpk::SBodyForces				& forces			= engine.Integrator.Forces[entityA.RigidBody];
-				::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[entityA.RigidBody].Velocity;
-				velocityA.x					*= -1;
+				forces.Velocity.z			*= -1;
 				forces.Velocity				*= pool.StartState.DampingCushion;
-
-				::gpk::SCoord3<float>			& rotationA			= engine.Integrator.Forces[entityA.RigidBody].Rotation;
-				rotationA.z					*= -1;
-			}
-			if(positionA.z	< -ballLimits.y) {
-				positionA.z					= (-ballLimits.y) - (positionA.z + ballLimits.y);
-
-				::gpk::SBodyForces				& forces			= engine.Integrator.Forces[entityA.RigidBody];
-				::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[entityA.RigidBody].Velocity;
-				velocityA.z					*= -1;
-				forces.Velocity				*= pool.StartState.DampingCushion;
-
-				::gpk::SCoord3<float>			& rotationA			= engine.Integrator.Forces[entityA.RigidBody].Rotation;
-				rotationA.x					*= -1;
-			}
-			if(positionA.z	> ballLimits.y) {
-				positionA.z					= ballLimits.y - (positionA.z - ballLimits.y);
-
-				::gpk::SBodyForces				& forces			= engine.Integrator.Forces[entityA.RigidBody];
-				::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[entityA.RigidBody].Velocity;
-				velocityA.z					*= -1;
-				forces.Velocity				*= pool.StartState.DampingCushion;
-
-				::gpk::SCoord3<float>			& rotationA			= engine.Integrator.Forces[entityA.RigidBody].Rotation;
-				rotationA.x					*= -1;
+				forces.Rotation.x			*= -1;
 			}
 			if(positionA.y	< 0) {
 				positionA.y					*= -1;
 
 				::gpk::SBodyForces				& forces			= engine.Integrator.Forces[entityA.RigidBody];
-				::gpk::SCoord3<float>			& velocityA			= engine.Integrator.Forces[entityA.RigidBody].Velocity;
-				velocityA.y					*= -1;
+				forces.Velocity.y			*= -1;
 				forces.Velocity				*= pool.StartState.DampingGround;
 			}
 		}

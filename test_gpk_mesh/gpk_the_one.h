@@ -7,6 +7,25 @@
 
 namespace the1 
 {
+	struct SCamera {
+		::gpk::SCoord3<float>							Position						= {};
+		::gpk::SCoord3<float>							Target							= {1, 0, 0};
+		uint8_t											BallLockAtPosition				= (uint8_t)-1;
+		uint8_t											BallLockAtTarget				= (uint8_t)-1;
+	};
+
+	typedef ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t> TRenderTarget;
+	struct STheOneGame {
+		::the1::SPoolGame								Game							= {};
+		::gpk::SDesktop									Desktop							= {};
+		::the1::TRenderTarget							GameRenderTarget				= {};
+		::gpk::array_pod<::the1::SContactBall>			ContactsToDraw					= {};
+
+		SCamera											CameraPlayer					= {{0, 20, -40}, {}};
+		SCamera											CameraBalls[::the1::MAX_BALLS]	= {{0, 20, -40}, {}};
+		uint32_t										Camera							= 1;
+	};
+
 	GDEFINE_ENUM_TYPE(APP_STATE, uint8_t);
 	GDEFINE_ENUM_VALUE(APP_STATE, Init		,  0);
 	GDEFINE_ENUM_VALUE(APP_STATE, Welcome	,  1);
@@ -24,32 +43,16 @@ namespace the1
 	GDEFINE_ENUM_VALUE(APP_STATE, Quit		, 13);
 	GDEFINE_ENUM_VALUE(APP_STATE, Load		, 14);
 	GDEFINE_ENUM_VALUE(APP_STATE, COUNT		, 15);
-	struct SCamera {
-		::gpk::SCoord3<float>						Position, Target;
-	};
-
-	typedef ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t> TRenderTarget;
-	struct STheOneGame {
-		::the1::SPoolGame						Game							= {};
-		::gpk::SDesktop							Desktop							= {};
-		::the1::TRenderTarget					GameRenderTarget				= {};
-		::gpk::array_pod<::the1::SContactBall>	ContactsToDraw					= {};
-
-		SCamera									CameraPlayer					= {{0, 30, -35}, {}};
-		SCamera									CameraBalls[::the1::MAX_BALLS]	= {{0, 30, -35}, {}};
-		uint32_t								Camera							= 1;
-	};
-
 	struct STheOne {
-		::the1::STheOneGame									MainGame			= {};
-		::gpk::array_static<::the1::STheOneGame, 64>		TestGames			= {};
+		::the1::STheOneGame								MainGame			= {};
+		::gpk::array_static<::the1::STheOneGame, 64>	TestGames			= {};
 
-		APP_STATE											ActiveState			= {};
+		APP_STATE										ActiveState			= {};
 	};
 
-	::gpk::error_t										theOneSetup			(::the1::STheOne & app, the1::POOL_GAME_MODE mode = the1::POOL_GAME_MODE_8Ball);
-	::gpk::error_t										theOneUpdate		(::the1::STheOne & app, double secondsElapsed);
-	::gpk::error_t										theOneDraw			(::the1::STheOne & app, ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t> & backBuffer, double totalSeconds);
+	::gpk::error_t									theOneSetup			(::the1::STheOne & app, the1::POOL_GAME_MODE mode = the1::POOL_GAME_MODE_8Ball);
+	::gpk::error_t									theOneUpdate		(::the1::STheOne & app, double secondsElapsed);
+	::gpk::error_t									theOneDraw			(::the1::STheOne & app, ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t> & backBuffer, double totalSeconds);
 
 } // namespace
 

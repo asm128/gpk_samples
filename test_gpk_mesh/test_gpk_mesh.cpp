@@ -116,11 +116,11 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 
 	::the1::SCamera				& camera				= app.TheOne.MainGame.Camera ? app.TheOne.MainGame.CameraBalls[app.TheOne.MainGame.Camera - 1] : app.TheOne.MainGame.CameraPlayer;
 	if(app.Framework.Input->KeyboardCurrent.KeyState[VK_CONTROL]) {
-		//if(app.TheOne.MainGame.Camera) {
+		if(0 == app.TheOne.MainGame.Camera) {
 				 if(app.Framework.Input->KeyboardCurrent.KeyState['Z']) camera.Target.z += float(frameInfo.Seconds.LastFrame * scale);
 			else if(app.Framework.Input->KeyboardCurrent.KeyState['X']) camera.Target.x += float(frameInfo.Seconds.LastFrame * scale);
 			else if(app.Framework.Input->KeyboardCurrent.KeyState['Y']) camera.Target.y += float(frameInfo.Seconds.LastFrame * scale);
-		//}
+		}
 	}
 	else{
 			 if(app.Framework.Input->KeyboardCurrent.KeyState['Z']) camera.Position.z += float(frameInfo.Seconds.LastFrame * scale);
