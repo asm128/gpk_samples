@@ -69,7 +69,7 @@ static	::gpk::error_t								drawBuffers
 	, ::gpk::view_array<const ::gpk::SCoord3<float>>		positions	
 	, ::gpk::view_array<const ::gpk::SCoord3<float>>		normals		
 	, ::gpk::view_array<const ::gpk::SCoord2<float>>		uv			
-	, const ::gpk::SRenderMaterial							& material	
+	, const ::gpk::SRenderMaterial							& /*material*/
 	, ::gpk::view_grid<const ::gpk::SColorBGRA>				surface
 	, const ::gpk::SMatrix4<float>							& worldTransform	 
 	, const ::gpk::SEngineSceneConstants					& constants
@@ -92,7 +92,7 @@ static	::gpk::error_t								drawBuffers
 		trianglePixelCoords.clear();
 		triangleWeights.clear();
 		gerror_if(errored(::gpk::drawTriangle(backBufferDepth, constants.NearFar, triPositions, trianglePixelCoords, triangleWeights)), "Not sure if these functions could ever fail");
-		const bool													stripped					= surface[0][0] == ::gpk::SColorBGRA{gpk::WHITE};
+		//const bool													stripped					= surface[0][0] == ::gpk::SColorBGRA{gpk::WHITE};
 		for(uint32_t iCoord = 0; iCoord < trianglePixelCoords.size(); ++iCoord) {
 			const ::gpk::STriangle<float>								& vertexWeights				= triangleWeights[iCoord];
 			const ::gpk::SCoord3<float>									weightedPosition			= triPositionsWorld.A * vertexWeights.A + triPositionsWorld.B * vertexWeights.B + triPositionsWorld.C * vertexWeights.C;
@@ -102,15 +102,7 @@ static	::gpk::error_t								drawBuffers
 				[(uint32_t)(weightedUV.y * surfaceUnit.y) % surfaceUnit.y]
 				[(uint32_t)(weightedUV.x * surfaceUnit.x) % surfaceUnit.x]
 				;
-			::gpk::SCoord2<float>										distanceFromCenter			= (::gpk::SCoord2<float>{(weightedUV.x - .5f) * 2, (weightedUV.y - .5f)});
-			double														distanceFromCenterN			= distanceFromCenter.Length();
-			::gpk::SColorFloat											materialcolor				
-				= (surfacecolor == 0xFF000000)				? ::gpk::BLACK 
-				: (distanceFromCenterN < .15)				? ::gpk::WHITE
-				: (weightedUV.y > .3 && weightedUV.y < .7)	? material.Color.Diffuse
-				: stripped									? ::gpk::WHITE 
-				: material.Color.Diffuse
-				;
+			::gpk::SColorFloat											materialcolor				= surfacecolor;		
 			materialcolor											+= materialcolor * ((::gpk::noiseNormal1D(iTriangle * ::gpk::primes16bit[rand() % ::gpk::size(::gpk::primes16bit)] + iCoord, trianglePixelCoords.size()) - .5f) * .05f);
 			const ::gpk::SCoord3<float>									lightVecW					= (constants.LightPosition - weightedPosition).Normalize();
 			const ::gpk::SColorFloat									specular					= lightCalcSpecular(constants.CameraPosition, 20.f, gpk::WHITE, ::gpk::WHITE, weightedPosition, weightedNormal, lightVecW).Clamp();

@@ -215,12 +215,12 @@ int												gpk::updateEntityTransforms
 	}
 	//memcpy(&pIndicesVertex	->Data[0], geometry.PositionIndices	.begin(), pIndicesVertex	->Data.size());
 
-	pVertices		->Data.resize(geometry.Positions		.byte_count());
-	pNormals		->Data.resize(geometry.Normals			.byte_count());
-	pUV				->Data.resize(geometry.TextureCoords	.byte_count());
-	memcpy(&pVertices		->Data[0], geometry.Positions		.begin(), pVertices			->Data.size());
-	memcpy(&pNormals		->Data[0], geometry.Normals			.begin(), pNormals			->Data.size());
-	memcpy(&pUV				->Data[0], geometry.TextureCoords	.begin(), pUV				->Data.size());
+	pVertices	->Data.resize(geometry.Positions		.byte_count());
+	pNormals	->Data.resize(geometry.Normals			.byte_count());
+	pUV			->Data.resize(geometry.TextureCoords	.byte_count());
+	memcpy(&pVertices	->Data[0], geometry.Positions		.begin(), pVertices	->Data.size());
+	memcpy(&pNormals	->Data[0], geometry.Normals			.begin(), pNormals	->Data.size());
+	memcpy(&pUV			->Data[0], geometry.TextureCoords	.begin(), pUV		->Data.size());
 
 	uint32_t									iVertices				= (uint32_t)Scene->ManagedBuffers.Buffers.push_back(pVertices);
 	uint32_t									iNormals				= (uint32_t)Scene->ManagedBuffers.Buffers.push_back(pNormals);
@@ -235,6 +235,7 @@ int												gpk::updateEntityTransforms
 	mesh->Desc.Mode							= ::gpk::MESH_MODE_List;
 	mesh->Desc.Type							= ::gpk::GEOMETRY_TYPE_Triangle;
 	mesh->Desc.NormalMode					= ::gpk::NORMAL_MODE_Point;
+
 	uint32_t									iSkin					= (uint32_t)Scene->ManagedRenderNodes.CreateSkin();
 	::gpk::ptr_obj<::gpk::SSkin>				& skin					= Scene->ManagedRenderNodes.Skins[iSkin];
 	skin->Material.Color.Ambient			= ::gpk::SColorBGRA(::gpk::ASCII_PALETTE[3]);
@@ -252,13 +253,13 @@ int												gpk::updateEntityTransforms
 	surface->Desc.MethodCompression			= 0;
 	surface->Desc.MethodFilter				= 0;
 	surface->Desc.MethodInterlace			= 0;
-	surface->Desc.Dimensions				= {256, 128};
+	surface->Desc.Dimensions				= {144, 72};
 	surface->Data.resize(surface->Desc.Dimensions.Area() * sizeof(::gpk::SColorBGRA));
 	memset(surface->Data.begin(), 0xFF, surface->Data.size());
 	::gpk::view_grid<::gpk::SColorBGRA>			view	= {(::gpk::SColorBGRA*)surface->Data.begin(), surface->Desc.Dimensions.Cast<uint32_t>()};
 	::gpk::SColorRGBA							color	= {::gpk::ASCII_PALETTE[rand() % 16]};
-	for(uint32_t y = 6; y < 10; ++y)
-	for(uint32_t x = 0; x < 16; ++x)
+	for(uint32_t y = surface->Desc.Dimensions.y / 3; y < surface->Desc.Dimensions.y / 3U * 2U; ++y)
+	for(uint32_t x = 0; x < surface->Desc.Dimensions.x; ++x)
 		view[y][x]	= color;
 
 	mesh->GeometrySlices.resize(1);	// one per face
