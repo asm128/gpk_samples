@@ -34,77 +34,13 @@ static	::gpk::error_t					textureBallNumber			(::gpk::view_grid<::gpk::SColorBGR
 	return 0; 
 }
 
-static	::gpk::error_t					textureBallStripped		(::gpk::view_grid<::gpk::SColorBGRA> view, const ::gpk::SRasterFont & font, ::gpk::SColorBGRA color, uint32_t number) { 
-	memset(view.begin(), 0xFF, view.byte_count());
-
-	::gpk::SCoord2<uint32_t>					viewCenter				= view.metrics() / 2;
-	::gpk::SSlice<uint16_t>						colorBand				= {uint16_t(view.metrics().y / 3), uint16_t(view.metrics().y / 3 * 2)};
-	for(uint32_t y = colorBand.Begin; y < colorBand.End; ++y)
-	for(uint32_t x = 0; x < view.metrics().x; ++x) {
-		if((viewCenter - ::gpk::SCoord2<uint32_t>{x, y}).Length() < view.metrics().y / 7)
-			view[y][x]								= ::gpk::WHITE;
-		else
-			view[y][x]								= color;
-	}
-
-	::textureBallNumber(view, number, font);
-	return 0; 
-}
-
-static	::gpk::error_t					textureBallSolid		(::gpk::view_grid<::gpk::SColorBGRA> view, const ::gpk::SRasterFont & font, ::gpk::SColorBGRA color, uint32_t number) { 
-	::gpk::SCoord2<uint32_t>					viewCenter				= view.metrics() / 2;
-
-	for(uint32_t y = 0; y < view.metrics().y; ++y)
-	for(uint32_t x = 0; x < view.metrics().x; ++x) {
-		if((viewCenter - ::gpk::SCoord2<uint32_t>{x, y}).Length() < view.metrics().y / 5)
-			view[y][x]								= ::gpk::WHITE;
-		else
-			view[y][x]								= color;
-	}
-
-	::textureBallNumber(view, number, font);
-	return 0; 
-}
-
-static	::gpk::error_t					textureBallCue			(::gpk::view_grid<::gpk::SColorBGRA> view, ::gpk::SColorBGRA color) {
-	::gpk::SCoord2<float>						viewCenter				= view.metrics().Cast<float>() / 2;
-	::gpk::SCoord2<float>						pointCenters[]			= 
-		{ {0, viewCenter.y}
-		, {view.metrics().x / 4.0f * 1, viewCenter.y}
-		, {view.metrics().x / 4.0f * 2, viewCenter.y}
-		, {view.metrics().x / 4.0f * 3, viewCenter.y}
-		, {view.metrics().x * 1.0f, viewCenter.y}
-		};
-	float										pointRadius				= view.metrics().y / 16.0f;
-	if(0 == pointRadius)
-		pointRadius = 3;
-
-	memset(view.begin(), 0xFF, view.byte_count());
-	for(uint32_t y = 0; y < view.metrics().y; ++y)
-	for(uint32_t x = 0; x < view.metrics().x; ++x) {
-		if(y <= pointRadius)
-			view[y][x]								= color;
-		else if(y >= (view.metrics().y - pointRadius - 1.0f))
-			view[y][x]								= color;
-		else {
-			for(uint32_t iPoint = 0; iPoint < ::gpk::size(pointCenters); ++iPoint) {
-				::gpk::SCoord2<float>					pointCenter			= pointCenters[iPoint];
-				if((pointCenter - ::gpk::SCoord2<float>{x + .0f, y + .0f}).Length() <= pointRadius + 1.0f)
-					view[y][x]								= color;
-			}
-		}
-	}
-
-	return 0; 
-}
-
 static	::gpk::error_t					poolGameResetBall10		(::the1::SPoolGame & pool) { (void)pool; return 0; }
 static	::gpk::error_t					poolGameResetBall9		(::the1::SPoolGame & pool) { (void)pool; return 0; }
 static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 	pool.StartState.BallCount				= 16;
 	const ::gpk::SRasterFont					& font					= *pool.Engine.Scene->ManagerFonts.Fonts[7];
 	for(uint32_t iBall = 0; iBall < pool.StartState.BallCount; ++iBall) {
-		const bool									stripped				= iBall && iBall > 8;
+		//const bool									stripped				= iBall && iBall > 8;
 		pool.Engine.SetDampingLinear	(pool.StartState.Balls[iBall].Entity, pool.StartState.DampingClothDisplacement);
 		pool.Engine.SetDampingAngular	(pool.StartState.Balls[iBall].Entity, pool.StartState.DampingClothRotation);
 		pool.Engine.SetHidden			(pool.StartState.Balls[iBall].Entity, false);
@@ -118,13 +54,16 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 		material.Color.Specular					= ::gpk::WHITE;
 		material.Color.Diffuse					= color;
   		material.Color.Ambient					= material.Color.Diffuse * .1f;
-		::gpk::view_grid<::gpk::SColorBGRA>			view					= {(::gpk::SColorBGRA*)surface.Data.begin(), surface.Desc.Dimensions.Cast<uint32_t>()};
-		if(0 == iBall)
-			textureBallCue(view, ::gpk::RED);
-		else if(stripped)
-			textureBallStripped(view, font, color, iBall);
-		else
-			textureBallSolid(view, font, color, iBall);
+		if(iBall) {
+			::gpk::view_grid<::gpk::SColorBGRA>			view					= {(::gpk::SColorBGRA*)surface.Data.begin(), surface.Desc.Dimensions.Cast<uint32_t>()};
+			textureBallNumber(view, iBall, font);
+			//if(0 == iBall)
+			//	textureBallCue(view, ::gpk::RED);
+			//else if(stripped)
+			//	textureBallStripped(view, font, color, iBall);
+			//else
+			//	textureBallSolid(view, font, color, iBall);
+		}
 	}
 
 	const uint32_t								ball1					= 1 + ::gpk::noise1DBase(pool.StartState.Seed + 1) % 7;
@@ -167,9 +106,9 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 	diagonal							= diagonal.Normalize() * 1.22f; 
 
 	for(uint32_t iRow = 0, iBall = 1; iRow < 5; ++iRow, --rowLen) {
-		::gpk::SCoord3<float>					offsetZ				= {0, 0, -(rowLen / 2.0f) + .5f};
+		float									offsetZ				= -(rowLen / 2.0f) + .5f;
 		for(uint32_t iColumn = 0; iColumn < rowLen; ++iColumn) {
-			::gpk::SCoord3<float>					position			= offsetZ + ::gpk::SCoord3<float>{(distanceFromCenter + diagonal.x * 5) - iRow * diagonal.x, pool.StartState.Balls[iBall].BallRadius, (float)iColumn};
+			::gpk::SCoord3<float>					position			= ::gpk::SCoord3<float>{(distanceFromCenter + diagonal.x * 5) - iRow * diagonal.x, pool.StartState.Balls[iBall].BallRadius, offsetZ + (float)iColumn};
 			uint32_t								iEntity				= pool.StartState.Balls[pool.StartState.BallOrder[iBall++]].Entity;
 			pool.Engine.SetPosition(iEntity, position);
 			pool.Engine.SetRotation(iEntity, {0, 0, 0});
@@ -209,3 +148,68 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 	::the1::poolGameReset(pool, mode);
 	return 0;
 }
+
+//
+//static	::gpk::error_t					textureBallStripped		(::gpk::view_grid<::gpk::SColorBGRA> view, const ::gpk::SRasterFont & font, ::gpk::SColorBGRA color, uint32_t number) { 
+//	memset(view.begin(), 0xFF, view.byte_count());
+//
+//	::gpk::SCoord2<uint32_t>					viewCenter				= view.metrics() / 2;
+//	::gpk::SSlice<uint16_t>						colorBand				= {uint16_t(view.metrics().y / 3), uint16_t(view.metrics().y / 3 * 2)};
+//	for(uint32_t y = colorBand.Begin; y < colorBand.End; ++y)
+//	for(uint32_t x = 0; x < view.metrics().x; ++x) {
+//		if((viewCenter - ::gpk::SCoord2<uint32_t>{x, y}).Length() < view.metrics().y / 7)
+//			view[y][x]								= ::gpk::WHITE;
+//		else
+//			view[y][x]								= color;
+//	}
+//
+//	::textureBallNumber(view, number, font);
+//	return 0; 
+//}
+//
+//static	::gpk::error_t					textureBallSolid		(::gpk::view_grid<::gpk::SColorBGRA> view, const ::gpk::SRasterFont & font, ::gpk::SColorBGRA color, uint32_t number) { 
+//	::gpk::SCoord2<uint32_t>					viewCenter				= view.metrics() / 2;
+//
+//	for(uint32_t y = 0; y < view.metrics().y; ++y)
+//	for(uint32_t x = 0; x < view.metrics().x; ++x) {
+//		if((viewCenter - ::gpk::SCoord2<uint32_t>{x, y}).Length() < view.metrics().y / 5)
+//			view[y][x]								= ::gpk::WHITE;
+//		else
+//			view[y][x]								= color;
+//	}
+//
+//	::textureBallNumber(view, number, font);
+//	return 0; 
+//}
+//
+//static	::gpk::error_t					textureBallCue			(::gpk::view_grid<::gpk::SColorBGRA> view, ::gpk::SColorBGRA color) {
+//	::gpk::SCoord2<float>						viewCenter				= view.metrics().Cast<float>() / 2;
+//	::gpk::SCoord2<float>						pointCenters[]			= 
+//		{ {0, viewCenter.y}
+//		, {view.metrics().x / 4.0f * 1, viewCenter.y}
+//		, {view.metrics().x / 4.0f * 2, viewCenter.y}
+//		, {view.metrics().x / 4.0f * 3, viewCenter.y}
+//		, {view.metrics().x * 1.0f, viewCenter.y}
+//		};
+//	float										pointRadius				= view.metrics().y / 16.0f;
+//	if(0 == pointRadius)
+//		pointRadius = 3;
+//
+//	memset(view.begin(), 0xFF, view.byte_count());
+//	for(uint32_t y = 0; y < view.metrics().y; ++y)
+//	for(uint32_t x = 0; x < view.metrics().x; ++x) {
+//		if(y <= pointRadius)
+//			view[y][x]								= color;
+//		else if(y >= (view.metrics().y - pointRadius - 1.0f))
+//			view[y][x]								= color;
+//		else {
+//			for(uint32_t iPoint = 0; iPoint < ::gpk::size(pointCenters); ++iPoint) {
+//				::gpk::SCoord2<float>					pointCenter			= pointCenters[iPoint];
+//				if((pointCenter - ::gpk::SCoord2<float>{x + .0f, y + .0f}).Length() <= pointRadius + 1.0f)
+//					view[y][x]								= color;
+//			}
+//		}
+//	}
+//
+//	return 0; 
+//}

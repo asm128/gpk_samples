@@ -10,7 +10,7 @@
 }
 
 ::gpk::SColorFloat								gpk::lightCalcDiffuse		(::gpk::SColorFloat diffuserMaterial, ::gpk::SCoord3<float> normalW, ::gpk::SCoord3<float> lightVecW) {
-	double												lightFactor				= normalW.Dot(lightVecW);
+	double												lightFactor				= ::gpk::max(0.0, normalW.Dot(lightVecW));
 	const ::gpk::SColorFloat							result					= (diffuserMaterial * lightFactor);
 	return result;
 }

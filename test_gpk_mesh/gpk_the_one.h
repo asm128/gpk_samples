@@ -21,9 +21,9 @@ namespace the1
 		::the1::TRenderTarget							GameRenderTarget				= {};
 		::gpk::array_pod<::the1::SContactBall>			ContactsToDraw					= {};
 
-		SCamera											CameraPlayer					= {{10, 20, -30}, {}};
+		SCamera											CameraPlayer					= {{5, 10, -30}, {15,}};
 		SCamera											CameraBalls[::the1::MAX_BALLS]	= {{10, 20, -30}, {}};
-		uint32_t										Camera							= 1;
+		uint32_t										Camera							= 9;
 	};
 
 	GDEFINE_ENUM_TYPE(APP_STATE, uint8_t);

@@ -67,6 +67,8 @@ namespace gpk
 		);
 }
 
+constexpr ::gpk::SColorBGRA							PIXEL_BLACK_NUMBER			= ::gpk::SColorBGRA{0, 0, 0, 255};
+
 static	::gpk::error_t								psBallCue				
 	( const ::gpk::SEngineSceneConstants					& constants
 	, const ::gpk::SPSIn									& inPS
@@ -104,25 +106,44 @@ static	::gpk::error_t								psBallSolid
 	relativeToCenter.x								*= 2;
 
 	::gpk::SColorFloat									materialColor;
-	if((::gpk::SCoord2<float>{0.0f, 0.0f} - relativeToCenter).LengthSquared() >= .0225f)
+	bool												shade						= false;
+	float												ambientFactor				= .1f;
+	if((::gpk::SCoord2<float>{0.0f, 0.0f} - relativeToCenter).LengthSquared() >= .0225f) {
 		materialColor									= inPS.Material.Color.Diffuse;
-	else {
-		const ::gpk::SColorBGRA									surfacecolor				= inPS.Surface
-			[(uint32_t)(inPS.WeightedUV.y * surfaceSize.y) % surfaceSize.y]
-			[(uint32_t)(inPS.WeightedUV.x * surfaceSize.x) % surfaceSize.x]
-			;
-		materialColor									= (::gpk::SColorFloat{surfacecolor} == gpk::BLACK) ? gpk::BLACK : ::gpk::WHITE;
+		shade											= true;
 	}
-	const ::gpk::SCoord3<float>							lightVecW					= (constants.LightPosition - inPS.WeightedPosition).Normalize();
-	const ::gpk::SColorFloat							specular					= ::gpk::lightCalcSpecular(constants.CameraPosition, 20.f, gpk::WHITE, ::gpk::WHITE, inPS.WeightedPosition, inPS.WeightedNormal, lightVecW);
-	const ::gpk::SColorFloat							diffuse						= ::gpk::lightCalcDiffuse(materialColor, inPS.WeightedNormal, lightVecW);
-	const ::gpk::SColorFloat							ambient						= materialColor * .1f;
+	else {
+		const ::gpk::SCoord2<uint32_t>							fetchCoord					= 
+			{ (uint32_t)(relativeToCenter.x * 2.f * surfaceSize.x + surfaceSize.x / 2)
+			, (uint32_t)(relativeToCenter.y * 4.f * surfaceSize.y + surfaceSize.y / 2)
+			};
+		const ::gpk::SColorBGRA									surfacecolor				= inPS.Surface
+			[fetchCoord.y % surfaceSize.y]
+			[fetchCoord.x % surfaceSize.x]
+			;
+		if(surfacecolor != PIXEL_BLACK_NUMBER) {
+			materialColor									= ::gpk::WHITE;
+			shade											= rand() % 2;
+			ambientFactor									*= 7.5f;
+		}
+		else {
+			materialColor									= gpk::BLACK;
+			shade											= true;
+		}
+	}
 
-	outputPixel										= ::gpk::SColorFloat(ambient + diffuse + specular).Clamp();
+	if(shade) {
+		const ::gpk::SCoord3<float>								lightVecW					= (constants.LightPosition - inPS.WeightedPosition).Normalize();
+		const ::gpk::SColorFloat								specular					= ::gpk::lightCalcSpecular(constants.CameraPosition, 20.f, gpk::WHITE, ::gpk::WHITE, inPS.WeightedPosition, inPS.WeightedNormal, lightVecW);
+		const ::gpk::SColorFloat								diffuse						= ::gpk::lightCalcDiffuse(materialColor, inPS.WeightedNormal, lightVecW);
+		const ::gpk::SColorFloat								ambient						= materialColor * ambientFactor;
+		materialColor									= ::gpk::SColorFloat(ambient + diffuse + specular).Clamp();
+	}
+	outputPixel										= materialColor;
 	return 0; 
 }
 
-	::gpk::error_t								psBallStripped			
+static	::gpk::error_t								psBallStripped			
 	( const ::gpk::SEngineSceneConstants	& constants
 	, const ::gpk::SPSIn					& inPS
 	, ::gpk::SColorBGRA						& outputPixel
@@ -132,25 +153,44 @@ static	::gpk::error_t								psBallSolid
 	relativeToCenter.x								*= 2;
 
 	::gpk::SColorFloat									materialColor;
-	if((::gpk::SCoord2<float>{0.0f, 0.0f} - relativeToCenter).LengthSquared() >= .0225f)
+	bool												shade						= false;
+	float												ambientFactor				= .1f;
+	if((::gpk::SCoord2<float>{0.0f, 0.0f} - relativeToCenter).LengthSquared() >= .0225f) {
 		materialColor									
 			= (relativeToCenter.y >  .20f) ? ::gpk::WHITE
 			: (relativeToCenter.y < -.20f) ? ::gpk::WHITE
 			: inPS.Material.Color.Diffuse
 			;
-	else {
-		const ::gpk::SColorBGRA									surfacecolor				= inPS.Surface
-			[(uint32_t)(inPS.WeightedUV.y * surfaceSize.y) % surfaceSize.y]
-			[(uint32_t)(inPS.WeightedUV.x * surfaceSize.x) % surfaceSize.x]
-			;
-		materialColor									= (::gpk::SColorFloat{surfacecolor} == gpk::BLACK) ? gpk::BLACK : ::gpk::WHITE;
+		shade											= true;
 	}
-	const ::gpk::SCoord3<float>								lightVecW					= (constants.LightPosition - inPS.WeightedPosition).Normalize();
-	const ::gpk::SColorFloat								specular					= ::gpk::lightCalcSpecular(constants.CameraPosition, 20.f, gpk::WHITE, ::gpk::WHITE, inPS.WeightedPosition, inPS.WeightedNormal, lightVecW);
-	const ::gpk::SColorFloat								diffuse						= ::gpk::lightCalcDiffuse(materialColor, inPS.WeightedNormal, lightVecW);
-	const ::gpk::SColorFloat								ambient						= materialColor * .1f;
+	else {
+		const ::gpk::SCoord2<uint32_t>							fetchCoord					= 
+			{ (uint32_t)(relativeToCenter.x * 2.f * surfaceSize.x + surfaceSize.x / 2)
+			, (uint32_t)(relativeToCenter.y * 4.f * surfaceSize.y + surfaceSize.y / 2)
+			};
+		const ::gpk::SColorBGRA									surfacecolor				= inPS.Surface
+			[fetchCoord.y % surfaceSize.y]
+			[fetchCoord.x % surfaceSize.x]
+			;
 
-	outputPixel											= ::gpk::SColorFloat(ambient + diffuse + specular).Clamp();
+		if(surfacecolor != PIXEL_BLACK_NUMBER) {
+			materialColor										= ::gpk::WHITE;
+			shade												= rand() % 2;
+			ambientFactor										*= 7.5f;
+		}
+		else {
+			materialColor										= ::gpk::BLACK;
+			shade												= true;
+		} 
+	}
+	if(shade) {
+		const ::gpk::SCoord3<float>								lightVecW					= (constants.LightPosition - inPS.WeightedPosition).Normalize();
+		const ::gpk::SColorFloat								specular					= ::gpk::lightCalcSpecular(constants.CameraPosition, 20.f, gpk::WHITE, ::gpk::WHITE, inPS.WeightedPosition, inPS.WeightedNormal, lightVecW);
+		const ::gpk::SColorFloat								diffuse						= ::gpk::lightCalcDiffuse(materialColor, inPS.WeightedNormal, lightVecW);
+		const ::gpk::SColorFloat								ambient						= materialColor * ambientFactor;
+		materialColor									= ::gpk::SColorFloat(ambient + diffuse + specular).Clamp();
+	}
+	outputPixel											= materialColor;
 	return 0; 
 }
 

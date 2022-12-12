@@ -254,7 +254,7 @@ int												gpk::updateEntityTransforms
 	surface->Desc.MethodCompression			= 0;
 	surface->Desc.MethodFilter				= 0;
 	surface->Desc.MethodInterlace			= 0;
-	surface->Desc.Dimensions				= {128, 64};
+	surface->Desc.Dimensions				= {32, 16};
 	surface->Data.resize(surface->Desc.Dimensions.Area() * sizeof(::gpk::SColorBGRA));
 	memset(surface->Data.begin(), 0xFF, surface->Data.size());
 	::gpk::view_grid<::gpk::SColorBGRA>			view	= {(::gpk::SColorBGRA*)surface->Data.begin(), surface->Desc.Dimensions.Cast<uint32_t>()};

@@ -27,8 +27,8 @@
 			app.MainGame.Game.GetBallPosition(iBall, camera.Position);
 			auto					distance			=  camera.Target - camera.Position;
 			auto					direction			=  ::gpk::SCoord3<float>{distance}.Normalize();
-			camera.Position		+= direction * -40;
-			camera.Position.y	+= 10;
+			camera.Position		+= direction * -30;
+			camera.Position.y	+= 20;
 		}
 	}
 	return 0; 
