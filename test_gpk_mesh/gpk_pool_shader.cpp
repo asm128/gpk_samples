@@ -59,6 +59,12 @@ namespace gpk
 		::gpk::SRenderMaterial							Material			;
 		::gpk::view_grid<const ::gpk::SColorBGRA>		Surface				; 
 	};
+
+	typedef ::gpk::error_t								(TFuncPixelShader)
+		( const ::gpk::SEngineSceneConstants					& constants
+		, const ::gpk::SPSIn									& inPS
+		, ::gpk::SColorBGRA										& outputPixel
+		);
 }
 
 static	::gpk::error_t								psBallCue				
@@ -79,7 +85,6 @@ static	::gpk::error_t								psBallCue
 		: ((-0.5f - relativeToCenter.y) > -.05f) ? ::gpk::RED 
 		: ::gpk::WHITE;
 	::gpk::SColorFloat									materialcolor				= surfacecolor;		
-	//materialcolor									+= materialcolor * ((::gpk::noiseNormal1D(iTriangle * ::gpk::primes16bit[rand() % ::gpk::size(::gpk::primes16bit)] + iCoord, trianglePixelCoords.size()) - .5f) * .05f);
 	const ::gpk::SCoord3<float>							lightVecW					= (constants.LightPosition - inPS.WeightedPosition).Normalize();
 	const ::gpk::SColorFloat							specular					= ::gpk::lightCalcSpecular(constants.CameraPosition, 20.f, gpk::WHITE, ::gpk::WHITE, inPS.WeightedPosition, inPS.WeightedNormal, lightVecW);
 	const ::gpk::SColorFloat							diffuse						= ::gpk::lightCalcDiffuse(materialcolor, inPS.WeightedNormal, lightVecW);
@@ -108,7 +113,6 @@ static	::gpk::error_t								psBallSolid
 			;
 		materialColor									= (::gpk::SColorFloat{surfacecolor} == gpk::BLACK) ? gpk::BLACK : ::gpk::WHITE;
 	}
-	//materialcolor									+= materialcolor * ((::gpk::noiseNormal1D(iTriangle * ::gpk::primes16bit[rand() % ::gpk::size(::gpk::primes16bit)] + iCoord, trianglePixelCoords.size()) - .5f) * .05f);
 	const ::gpk::SCoord3<float>							lightVecW					= (constants.LightPosition - inPS.WeightedPosition).Normalize();
 	const ::gpk::SColorFloat							specular					= ::gpk::lightCalcSpecular(constants.CameraPosition, 20.f, gpk::WHITE, ::gpk::WHITE, inPS.WeightedPosition, inPS.WeightedNormal, lightVecW);
 	const ::gpk::SColorFloat							diffuse						= ::gpk::lightCalcDiffuse(materialColor, inPS.WeightedNormal, lightVecW);
@@ -170,12 +174,17 @@ static	::gpk::error_t								drawBuffersBall
 	::transformTrianglesBall(outVS, indices, positions, normals, uv, constants.Projection, worldTransform, constants.CameraFront);
 	::gpk::array_pod<::gpk::STriangle<float>>					& triangleWeights			= cacheVS.TriangleWeights		;
 	::gpk::array_pod<::gpk::SCoord2<int16_t>>					& trianglePixelCoords		= cacheVS.SolidPixelCoords		;
-	//::gpk::array_pod<::gpk::SCoord2<int16_t>>					& wireframePixelCoords		= cacheVS.WireframePixelCoords	;
 	const ::gpk::SCoord2<uint16_t>								offscreenMetrics			= backBufferColors.metrics().Cast<uint16_t>();
 	const ::gpk::SCoord3<float>									lightDirectionNormalized	= ::gpk::SCoord3<float>{constants.LightDirection}.Normalize();
 	::gpk::SPSIn												inPS						= {};
 	inPS.Surface											= surface;
 	inPS.Material											= material;
+	::gpk::TFuncPixelShader										& ps
+		= (0 == iBall) ? psBallCue
+		: (8 >= iBall) ? psBallSolid
+		: psBallStripped
+		;
+
 	for(uint32_t iTriangle = 0; iTriangle < outVS.PositionsScreen.size(); ++iTriangle) {
 		const ::gpk::STriangle3<float>								& triPositions				= outVS.PositionsScreen	[iTriangle];
 		const ::gpk::STriangle3<float>								& triPositionsWorld			= outVS.PositionsWorld	[iTriangle];
@@ -192,12 +201,7 @@ static	::gpk::error_t								drawBuffersBall
 			inPS.WeightedNormal										= (triNormals.A * vertexWeights.A + triNormals.B * vertexWeights.B + triNormals.C * vertexWeights.C).Normalize();
 			inPS.WeightedUV											= triUVs.A * vertexWeights.A + triUVs.B * vertexWeights.B + triUVs.C * vertexWeights.C;
 			const ::gpk::SCoord2<uint16_t>								coord						= trianglePixelCoords[iCoord].Cast<uint16_t>();
-			if(0 == iBall)
-				::psBallCue(constants, inPS, backBufferColors[coord.y][coord.x]);
-			else if(9 > iBall)
-				::psBallSolid(constants, inPS, backBufferColors[coord.y][coord.x]);
-			else 
-				::psBallStripped(constants, inPS, backBufferColors[coord.y][coord.x]);
+			ps(constants, inPS, backBufferColors[coord.y][coord.x]);
 		}
 	}
 	return 0;
