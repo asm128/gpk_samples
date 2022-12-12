@@ -11,9 +11,6 @@
 #include "gpk_app_impl.h"
 #include "gpk_bitmap_target.h"
 
-static constexpr	const uint32_t										ASCII_SCREEN_WIDTH							= 132	;
-static constexpr	const uint32_t										ASCII_SCREEN_HEIGHT							= 50	;
-
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "The One");
 
 static				::gpk::error_t										updateSizeDependentResources				(::SApplication& app)											{
@@ -95,7 +92,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 			app.TheOne.MainGame.Camera = 9;
 		else {
 			if(app.Framework.Input->KeyboardCurrent.KeyState[VK_MENU]) {
-				for(uint32_t iBall = 1; iBall < app.TheOne.MainGame.Game.StartState.BallCount / 2; ++iBall) {
+				for(uint32_t iBall = 1; iBall < app.TheOne.MainGame.Game.StartState.BallCount / 2U; ++iBall) {
 					 if(app.Framework.Input->KeyboardCurrent.KeyState['0' + iBall]) {
 						 app.TheOne.MainGame.Camera = iBall + 1;
 						 break;

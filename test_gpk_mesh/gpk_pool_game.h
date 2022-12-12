@@ -67,8 +67,8 @@ namespace the1
 
 	struct SPoolStartState {
 		POOL_GAME_MODE								Mode							= POOL_GAME_MODE_8Ball;
+		uint8_t										BallCount						= 16;
 		uint64_t									Seed							= (uint64_t)::gpk::timeCurrentInUs();
-		uint32_t									BallCount						= 16;
 		float										DampingClothDisplacement		= .7f;
 		float										DampingClothRotation			= .01f;
 		float										DampingCollision				= .975f;

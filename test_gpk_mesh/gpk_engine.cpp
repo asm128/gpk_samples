@@ -2,6 +2,7 @@
 #include "gpk_voxel.h"
 #include "gpk_ascii_color.h"
 #include "gpk_geometry_lh.h"
+#include "gpk_engine_shader.h"
 
 int												gpk::updateEntityTransforms			
 	( uint32_t								iEntity
@@ -266,9 +267,11 @@ int												gpk::updateEntityTransforms
 	::gpk::SGeometrySlice						& slice					= mesh->GeometrySlices[0];
 	slice.Slice								= {0, geometry.PositionIndices.size()};
 
-	Scene->ManagedRenderNodes.RenderNodes[entity.RenderNode].Skin	= iSkin;
-	Scene->ManagedRenderNodes.RenderNodes[entity.RenderNode].Mesh	= iMesh;
-	Scene->ManagedRenderNodes.RenderNodes[entity.RenderNode].Slice	= 0;
+	::gpk::SRenderNode							& renderNode						= Scene->ManagedRenderNodes.RenderNodes[entity.RenderNode];
+	renderNode.Skin							= iSkin;
+	renderNode.Mesh							= iMesh;
+	renderNode.Shader						= Scene->ManagedShaders.Shaders.push_back(::gpk::shaderWireframe);
+	renderNode.Slice						= 0;
 
 	return iEntity;
 }

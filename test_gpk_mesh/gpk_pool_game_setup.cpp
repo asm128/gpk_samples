@@ -1,6 +1,7 @@
 #include "gpk_pool_game.h"
 #include "gpk_noise.h"
 #include "gpk_gui_text.h"
+#include "gpk_pool_shader.h"
 
 static	::gpk::error_t					poolGameResetTest2Balls		(::the1::SPoolGame & pool) { 
 	pool.StartState.BallCount				= 2;
@@ -200,6 +201,7 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 ::gpk::error_t							the1::poolGameSetup			(::the1::SPoolGame & pool, POOL_GAME_MODE mode) {
 	gpk_necs(::gpk::rasterFontDefaults(pool.Engine.Scene->ManagerFonts));
 	gpk_necs(pool.StartState.Balls[0].Entity = pool.Engine.CreateSphere());
+	pool.Engine.Scene->ManagedShaders.Shaders[pool.Engine.Scene->ManagedRenderNodes.RenderNodes[pool.Engine.ManagedEntities.Entities[pool.StartState.Balls[0].Entity].RenderNode].Shader] = ::the1::shaderBall;
 	for(uint32_t iBall = 1; iBall < ::the1::MAX_BALLS; ++iBall) {
 		gpk_necs(pool.StartState.Balls[iBall].Entity = pool.Engine.Clone(pool.StartState.Balls[0].Entity, true, true));
 	}
