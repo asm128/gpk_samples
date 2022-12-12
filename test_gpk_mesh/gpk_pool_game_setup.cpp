@@ -145,6 +145,7 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 		gpk_necs(pool.StartState.Balls[iBall].Entity = pool.Engine.Clone(pool.StartState.Balls[0].Entity, true, true));
 	}
 	gpk_necs(pool.StartState.Table.Entity = pool.Engine.CreateBox());
+	gpk_necs(pool.StartState.Sticks[0].Entity = pool.Engine.CreateCylinder());
 	::the1::poolGameReset(pool, mode);
 	return 0;
 }
@@ -172,7 +173,7 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 //
 //	for(uint32_t y = 0; y < view.metrics().y; ++y)
 //	for(uint32_t x = 0; x < view.metrics().x; ++x) {
-//		if((viewCenter - ::gpk::SCoord2<uint32_t>{x, y}).Length() < view.metrics().y / 5)
+//		if((viewCenter - ::gpk::SCoord2<uint32_t>{x, y}).Length() < view.metrics().y / 7)
 //			view[y][x]								= ::gpk::WHITE;
 //		else
 //			view[y][x]								= color;

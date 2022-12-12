@@ -59,6 +59,11 @@ namespace the1
 		float										BallRadius						= .5f;
 	};
 
+	struct SPoolStick {
+		uint32_t									Entity							= (uint32_t)-1;
+		float										Radius							= .5f;
+	};
+
 	struct SPoolTable {
 		uint32_t									Entity							= (uint32_t)-1;
 		::gpk::SCoord2<float>						Size							= {44, 22};
@@ -75,6 +80,7 @@ namespace the1
 		float										DampingCushion					= .95f;
 		float										DampingGround					= .5f;
 
+		::the1::SPoolStick							Sticks			[2]				= {};
 		::the1::SPoolTable							Table							= {};
 		::the1::SPoolBall							Balls			[MAX_BALLS]		= {};
 		::gpk::SCoord3<float>						BallPositions	[MAX_BALLS]		= {};

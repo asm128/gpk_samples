@@ -107,7 +107,7 @@ static	::gpk::error_t								psBallSolid
 
 	::gpk::SColorFloat									materialColor;
 	bool												shade						= false;
-	float												ambientFactor				= .1f;
+	float												ambientFactor				= .025f;
 	if((::gpk::SCoord2<float>{0.0f, 0.0f} - relativeToCenter).LengthSquared() >= .0225f) {
 		materialColor									= inPS.Material.Color.Diffuse;
 		shade											= true;
@@ -124,7 +124,7 @@ static	::gpk::error_t								psBallSolid
 		if(surfacecolor != PIXEL_BLACK_NUMBER) {
 			materialColor									= ::gpk::WHITE;
 			shade											= rand() % 2;
-			ambientFactor									*= 7.5f;
+			ambientFactor									*= 30;
 		}
 		else {
 			materialColor									= gpk::BLACK;
@@ -154,7 +154,7 @@ static	::gpk::error_t								psBallStripped
 
 	::gpk::SColorFloat									materialColor;
 	bool												shade						= false;
-	float												ambientFactor				= .1f;
+	float												ambientFactor				= .025f;
 	if((::gpk::SCoord2<float>{0.0f, 0.0f} - relativeToCenter).LengthSquared() >= .0225f) {
 		materialColor									
 			= (relativeToCenter.y >  .20f) ? ::gpk::WHITE
@@ -176,7 +176,7 @@ static	::gpk::error_t								psBallStripped
 		if(surfacecolor != PIXEL_BLACK_NUMBER) {
 			materialColor										= ::gpk::WHITE;
 			shade												= rand() % 2;
-			ambientFactor										*= 7.5f;
+			ambientFactor										*= 30;
 		}
 		else {
 			materialColor										= ::gpk::BLACK;

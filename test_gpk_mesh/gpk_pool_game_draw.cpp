@@ -50,10 +50,10 @@
 		}
 	}
 
-	const gpk::SCoord2<float>						halfDimensions			= pool.StartState.Table.Size * .5;
+	const gpk::SCoord2<float>						halfDimensions					= pool.StartState.Table.Size * .5;
 
 	wireframePixelCoords.clear();
-	const	::gpk::SCoord3<float>					limitsBottom[4]			= 
+	const	::gpk::SCoord3<float>					limitsBottom[4]					= 
 		{ { halfDimensions.x, .0f,  halfDimensions.y}
 		, {-halfDimensions.x, .0f,  halfDimensions.y}
 		, { halfDimensions.x, .0f, -halfDimensions.y}
