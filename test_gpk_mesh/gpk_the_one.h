@@ -21,8 +21,8 @@ namespace the1
 		::the1::TRenderTarget							GameRenderTarget				= {};
 		::gpk::array_pod<::the1::SContactBall>			ContactsToDraw					= {};
 
-		SCamera											CameraPlayer					= {{0, 20, -40}, {}};
-		SCamera											CameraBalls[::the1::MAX_BALLS]	= {{0, 20, -40}, {}};
+		SCamera											CameraPlayer					= {{10, 20, -30}, {}};
+		SCamera											CameraBalls[::the1::MAX_BALLS]	= {{10, 20, -30}, {}};
 		uint32_t										Camera							= 1;
 	};
 
@@ -43,6 +43,7 @@ namespace the1
 	GDEFINE_ENUM_VALUE(APP_STATE, Quit		, 13);
 	GDEFINE_ENUM_VALUE(APP_STATE, Load		, 14);
 	GDEFINE_ENUM_VALUE(APP_STATE, COUNT		, 15);
+
 	struct STheOne {
 		::the1::STheOneGame								MainGame			= {};
 		::gpk::array_static<::the1::STheOneGame, 64>	TestGames			= {};

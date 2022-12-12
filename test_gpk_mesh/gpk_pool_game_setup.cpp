@@ -2,7 +2,7 @@
 #include "gpk_noise.h"
 #include "gpk_gui_text.h"
 
-static	::gpk::error_t					poolGameResetTest2Balls	(::the1::SPoolGame & pool) { 
+static	::gpk::error_t					poolGameResetTest2Balls		(::the1::SPoolGame & pool) { 
 	pool.StartState.BallCount				= 2;
 	pool.Engine.SetPosition(pool.StartState.Balls[0].Entity, {0, pool.StartState.Balls[0].BallRadius,-5});
 	pool.Engine.SetPosition(pool.StartState.Balls[1].Entity, {0, pool.StartState.Balls[1].BallRadius, 5});
@@ -11,7 +11,7 @@ static	::gpk::error_t					poolGameResetTest2Balls	(::the1::SPoolGame & pool) {
 		pool.Engine.SetDampingAngular(pool.StartState.Balls[iBall].Entity, pool.StartState.DampingClothRotation);
 		pool.Engine.SetHidden(pool.StartState.Balls[iBall].Entity, false);
 	}
-	::gpk::SCoord3<float>						velocity				= {0, 0, -15.f};
+	::gpk::SCoord3<float>						velocity					= {0, 0, -15.f};
 	velocity.RotateY(::gpk::noiseNormal1D(pool.StartState.Seed + 2) / 20 * ((rand() % 2) ? -1 : 1));
 	pool.Engine.SetVelocity(pool.StartState.Balls[1].Entity, velocity);
 	return 0; 
@@ -21,7 +21,7 @@ static	::gpk::error_t					textureBallNumber			(::gpk::view_grid<::gpk::SColorBGR
 	char										strNumber[4]				= {};
 	sprintf_s(strNumber, "%i", number);
 	const ::gpk::SRectangle2<int16_t>			targetRect					= 
-		{ {int16_t(view.metrics().x / 2 - (font.CharSize.x * strlen(strNumber)) / 2), int16_t(view.metrics().y / 2 - font.CharSize.y / 2)}
+		{ {int16_t(view.metrics().x / 2 - (font.CharSize.x * strlen(strNumber)) / 2), int16_t(view.metrics().y / 2 - font.CharSize.y / 2) + 1}
 		, font.CharSize.Cast<int16_t>()
 		};
 	::gpk::array_pod<::gpk::SCoord2<uint16_t>>	coords;
@@ -46,7 +46,7 @@ static	::gpk::error_t					textureBallStripped		(::gpk::view_grid<::gpk::SColorBG
 			view[y][x]								= color;
 	}
 
-	textureBallNumber(view, number, font);
+	::textureBallNumber(view, number, font);
 	return 0; 
 }
 
@@ -61,7 +61,7 @@ static	::gpk::error_t					textureBallSolid		(::gpk::view_grid<::gpk::SColorBGRA>
 			view[y][x]								= color;
 	}
 
-	textureBallNumber(view, number, font);
+	::textureBallNumber(view, number, font);
 	return 0; 
 }
 
@@ -101,7 +101,7 @@ static	::gpk::error_t					poolGameResetBall10		(::the1::SPoolGame & pool) { (voi
 static	::gpk::error_t					poolGameResetBall9		(::the1::SPoolGame & pool) { (void)pool; return 0; }
 static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 	pool.StartState.BallCount				= 16;
-	const ::gpk::SRasterFont					& font					= *pool.Engine.Scene->ManagerFonts.Fonts[8];
+	const ::gpk::SRasterFont					& font					= *pool.Engine.Scene->ManagerFonts.Fonts[7];
 	for(uint32_t iBall = 0; iBall < pool.StartState.BallCount; ++iBall) {
 		const bool									stripped				= iBall && iBall > 8;
 		pool.Engine.SetDampingLinear	(pool.StartState.Balls[iBall].Entity, pool.StartState.DampingClothDisplacement);

@@ -13,22 +13,24 @@
 	, const ::gpk::SCoord3<float>						& cameraUp
 	, double											totalSeconds
 	) {
-	::gpk::SCoord3<float>							lightPos						= {10, 10, 0};
+	::gpk::SCoord3<float>							lightPos						= {15, 10, 0};
 	lightPos.RotateY(-totalSeconds);
 
 	const ::gpk::SCoord2<uint16_t>					offscreenMetrics				= backBuffer.Color.View.metrics().Cast<uint16_t>();
-	::gpk::SNearFar									nearFar							= {0.1f , 200.0f};
 
 	::gpk::SCoord3<float>							cameraFront						= (cameraTarget - cameraPosition).Normalize();
 
-	::gpk::SMatrix4<float>							mView							= {};
-	::gpk::SMatrix4<float>							mPerspective					= {};
-	::gpk::SMatrix4<float>							mViewport						= {};
-	mView.LookAt(cameraPosition, cameraTarget, cameraUp);
-	mPerspective.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, nearFar.Near, nearFar.Far);
-	mViewport.ViewportLH(offscreenMetrics, nearFar);
+	::gpk::SEngineSceneConstants					constants						= {};
+	constants.NearFar							= {0.1f , 200.0f};
+	constants.CameraPosition					= cameraPosition;
+	constants.CameraFront						= cameraFront;
+	constants.LightPosition						= lightPos;
+	constants.LightDirection					= {0, -1, 0};
 
-	::gpk::SMatrix4<float>							mViewPerspectiveScreen			= mView * mPerspective * mViewport;
+	constants.View.LookAt(cameraPosition, cameraTarget, cameraUp);
+	constants.Perspective.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, constants.NearFar.Near, constants.NearFar.Far);
+	constants.Screen.ViewportLH(offscreenMetrics, constants.NearFar);
+	constants.Projection						= constants.View * constants.Perspective * constants.Screen;
 
 	::gpk::STimer									timer;
 	::gpk::SEngine									& engine						= pool.Engine;
@@ -37,8 +39,8 @@
 	for(uint32_t iBall = 0; iBall < pool.StartState.BallCount; ++iBall) {
 		for(uint32_t iDelta = ::gpk::max(0, (int32_t)pool.PositionDeltas[iBall].size() - 20); iDelta < pool.PositionDeltas[iBall].size(); ++iDelta) {
 			::gpk::SLine3<float>							screenDelta				= pool.PositionDeltas[iBall][iDelta];
-			screenDelta.A								= mViewPerspectiveScreen.Transform(screenDelta.A);
-			screenDelta.B								= mViewPerspectiveScreen.Transform(screenDelta.B);
+			screenDelta.A								= constants.Projection.Transform(screenDelta.A);
+			screenDelta.B								= constants.Projection.Transform(screenDelta.B);
 			wireframePixelCoords.clear();
 			::gpk::drawLine(offscreenMetrics, screenDelta, wireframePixelCoords);
 			for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord) {
@@ -64,18 +66,18 @@
 		, limitsBottom[3] + ::gpk::SCoord3<float>{0, pool.StartState.Table.Height, 0}
 		};
 
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[3], limitsBottom[2]}, mViewPerspectiveScreen, wireframePixelCoords);
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[3], limitsBottom[1]}, mViewPerspectiveScreen, wireframePixelCoords);
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[0], limitsBottom[1]}, mViewPerspectiveScreen, wireframePixelCoords);
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[0], limitsBottom[2]}, mViewPerspectiveScreen, wireframePixelCoords);
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsTop[3], limitsTop[2]}, mViewPerspectiveScreen, wireframePixelCoords);
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsTop[3], limitsTop[1]}, mViewPerspectiveScreen, wireframePixelCoords);
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsTop[0], limitsTop[1]}, mViewPerspectiveScreen, wireframePixelCoords);
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsTop[0], limitsTop[2]}, mViewPerspectiveScreen, wireframePixelCoords);
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[0], limitsTop[0]}, mViewPerspectiveScreen, wireframePixelCoords);
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[1], limitsTop[1]}, mViewPerspectiveScreen, wireframePixelCoords);
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[2], limitsTop[2]}, mViewPerspectiveScreen, wireframePixelCoords);
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[3], limitsTop[3]}, mViewPerspectiveScreen, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[3], limitsBottom[2]}, constants.Projection, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[3], limitsBottom[1]}, constants.Projection, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[0], limitsBottom[1]}, constants.Projection, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[0], limitsBottom[2]}, constants.Projection, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsTop[3], limitsTop[2]}, constants.Projection, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsTop[3], limitsTop[1]}, constants.Projection, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsTop[0], limitsTop[1]}, constants.Projection, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsTop[0], limitsTop[2]}, constants.Projection, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[0], limitsTop[0]}, constants.Projection, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[1], limitsTop[1]}, constants.Projection, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[2], limitsTop[2]}, constants.Projection, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[3], limitsTop[3]}, constants.Projection, wireframePixelCoords);
 
 	for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord) {
 		::gpk::SCoord2<int16_t>								coord		= wireframePixelCoords[iCoord];
@@ -87,8 +89,7 @@
 		backBuffer.Color.View[coord.y][coord.x]		= color;
 	}
 
-	::gpk::drawScene(backBuffer.Color.View, backBuffer.DepthStencil.View, engine.Scene->RenderCache, *engine.Scene
-		, { mViewPerspectiveScreen, nearFar, cameraPosition, cameraFront, lightPos, {0, -1, 0} });
+	::gpk::drawScene(backBuffer.Color.View, backBuffer.DepthStencil.View, engine.Scene->RenderCache, *engine.Scene, constants);
 	timer.Frame();
 	info_printf("Render scene in %f seconds", timer.LastTimeSeconds);
 	return 0;

@@ -16,11 +16,32 @@ namespace gpk
 		::gpk::SVSOutput					OutputVertexShader		= {};
 		::gpk::SVSCache						CacheVertexShader		= {};
 	};
+	
+	struct SEngineSceneConstants {
+		::gpk::SMatrix4<float>				View				= {}; 
+		::gpk::SMatrix4<float>				Perspective			= {}; 
+		::gpk::SMatrix4<float>				Screen				= {}; 
+		::gpk::SMatrix4<float>				Projection			= {}; 
+		::gpk::SNearFar						NearFar 			= {.1f, 500.0f}; 
+		::gpk::SCoord3<float>				CameraPosition		= {}; 
+		::gpk::SCoord3<float>				CameraFront			= {}; 
+		::gpk::SCoord3<float>				LightPosition		= {}; 
+		::gpk::SCoord3<float>				LightDirection		= {}; 
+	};
 
 	struct SEngineScene;
 
+	typedef int32_t							(TFuncEffect)
+		( ::gpk::view_grid<::gpk::SColorBGRA>	backBufferColors
+		, ::gpk::view_grid<uint32_t>			backBufferDepth
+		, ::gpk::SEngineRenderCache				& renderCache
+		, const ::gpk::SEngineScene				& scene
+		, const ::gpk::SEngineSceneConstants	& constants
+		, int32_t								iRenderNode
+		);
+
 	struct SShaderManager {
-		::gpk::array_obj<::std::function<int32_t(const ::gpk::SEngineScene & sceneResources, int32_t iRenderNode)>>	Shaders;
+		::gpk::array_obj<std::function<TFuncEffect>>	Shaders;
 	};
 
 
@@ -34,15 +55,7 @@ namespace gpk
 
 		::gpk::SEngineRenderCache			RenderCache				= {};
 	};
-	
-	struct SEngineSceneConstants {
-		::gpk::SMatrix4<float>				Projection			= {}; 
-		::gpk::SNearFar						NearFar 			= {.1f, 500.0f}; 
-		::gpk::SCoord3<float>				CameraPosition		= {}; 
-		::gpk::SCoord3<float>				CameraFront			= {}; 
-		::gpk::SCoord3<float>				LightPosition		= {}; 
-		::gpk::SCoord3<float>				LightDirection		= {}; 
-	};
+
 
 	::gpk::error_t						drawScene									
 		( ::gpk::view_grid<::gpk::SColorBGRA>	& backBufferColors

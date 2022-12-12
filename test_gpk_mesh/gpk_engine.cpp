@@ -182,7 +182,7 @@ int												gpk::updateEntityTransforms
 
 ::gpk::error_t						gpk::SEngine::CreateSphere			()	{ 
 	SGeometryIndexedTriangles				geometry;
-	::gpk::geometryBuildSphere(geometry, 32, 16, .5f, {});
+	::gpk::geometryBuildSphere(geometry, 24, 32, .5f, {});
 
 	int32_t									iEntity								= this->ManagedEntities.Create();
 	ManagedEntities.EntityNames[iEntity]	= ::gpk::vcs{"Sphere"};
@@ -209,7 +209,7 @@ int												gpk::updateEntityTransforms
 	pUV				->Desc.Usage		= ::gpk::BUFFER_USAGE_UV;
 
 	pIndicesVertex	->Data.resize(geometry.PositionIndices	.byte_count() / 2);
-	::gpk::view_array<uint16_t> viewIndices = {(uint16_t*)pIndicesVertex->Data.begin(), geometry.PositionIndices.size()};
+	::gpk::view_array<uint16_t>				viewIndices							= {(uint16_t*)pIndicesVertex->Data.begin(), geometry.PositionIndices.size()};
 	for(uint32_t index = 0; index < geometry.PositionIndices.size(); ++index) {
 		viewIndices[index] = (uint16_t)geometry.PositionIndices[index];
 	}
@@ -253,7 +253,7 @@ int												gpk::updateEntityTransforms
 	surface->Desc.MethodCompression			= 0;
 	surface->Desc.MethodFilter				= 0;
 	surface->Desc.MethodInterlace			= 0;
-	surface->Desc.Dimensions				= {144, 72};
+	surface->Desc.Dimensions				= {128, 64};
 	surface->Data.resize(surface->Desc.Dimensions.Area() * sizeof(::gpk::SColorBGRA));
 	memset(surface->Data.begin(), 0xFF, surface->Data.size());
 	::gpk::view_grid<::gpk::SColorBGRA>			view	= {(::gpk::SColorBGRA*)surface->Data.begin(), surface->Desc.Dimensions.Cast<uint32_t>()};

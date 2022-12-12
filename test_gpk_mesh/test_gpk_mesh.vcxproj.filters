@@ -48,6 +48,12 @@
     <ClInclude Include="gpk_engine_scene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="gpk_pool_draw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gpk_engine_shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test_gpk_mesh.cpp">
@@ -69,6 +75,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="gpk_the_one.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpk_pool_draw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpk_engine_shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
