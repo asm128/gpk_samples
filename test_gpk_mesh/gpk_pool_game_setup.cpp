@@ -56,7 +56,7 @@ static	::gpk::error_t					textureBallSolid		(::gpk::view_grid<::gpk::SColorBGRA>
 
 	for(uint32_t y = 0; y < view.metrics().y; ++y)
 	for(uint32_t x = 0; x < view.metrics().x; ++x) {
-		if((viewCenter - ::gpk::SCoord2<uint32_t>{x, y}).Length() < view.metrics().y / 7)
+		if((viewCenter - ::gpk::SCoord2<uint32_t>{x, y}).Length() < view.metrics().y / 5)
 			view[y][x]								= ::gpk::WHITE;
 		else
 			view[y][x]								= color;
