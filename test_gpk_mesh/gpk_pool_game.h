@@ -59,28 +59,47 @@ namespace the1
 		float										BallRadius						= .5f;
 	};
 
-	struct SPoolStick {
+	struct SPoolPocket {
 		uint32_t									Entity							= (uint32_t)-1;
-		float										Radius							= .5f;
 	};
 
 	struct SPoolTable {
 		uint32_t									Entity							= (uint32_t)-1;
 		::gpk::SCoord2<float>						Size							= {44, 22};
 		float										Height							= .65f;
+		SPoolPocket									Pockets	[6]						= {};
+		float										PocketRadius					= 1.f;
+	};
+
+	struct SPoolStick {
+		uint32_t									Entity							= (uint32_t)-1;
+		float										Radius							= .25f;
+		::gpk::SCoord2<float>						Shift							= {};
+		::gpk::SCoord2<float>						Tilt							= {};
+		float										Angle							= 0;
+	};
+
+	struct SPoolPlayer {
+		uint32_t									Team							= 0;
+		::the1::SPoolStick							Stick							= {};
 	};
 
 	struct SPoolStartState {
 		POOL_GAME_MODE								Mode							= POOL_GAME_MODE_8Ball;
-		uint8_t										BallCount						= 16;
+		uint8_t										BallCount						= MAX_BALLS;
+		uint8_t										PlayerCount						= MAX_BALLS;
 		uint64_t									Seed							= (uint64_t)::gpk::timeCurrentInUs();
 		float										DampingClothDisplacement		= .7f;
 		float										DampingClothRotation			= .01f;
 		float										DampingCollision				= .975f;
 		float										DampingCushion					= .95f;
+		float										DampingPocket					= .95f;
 		float										DampingGround					= .5f;
+		float										Gravity							= 9.8f;	// m/s
+		float										BallRadius						= .5f;	// meters
+		float										BallWeight						= 165;	// grams
 
-		::the1::SPoolStick							Sticks			[2]				= {};
+		::the1::SPoolPlayer							Players			[MAX_BALLS]		= {};
 		::the1::SPoolTable							Table							= {};
 		::the1::SPoolBall							Balls			[MAX_BALLS]		= {};
 		::gpk::SCoord3<float>						BallPositions	[MAX_BALLS]		= {};

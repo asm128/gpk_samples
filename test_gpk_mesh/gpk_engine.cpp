@@ -20,6 +20,8 @@ int												gpk::updateEntityTransforms
 			worldTransform									= ::gpk::SMatrix4<float>::GetIdentity();
 		else
 			integrator.GetTransform(entity.RigidBody, worldTransform);
+
+		worldTransform = renderNodes.RenderNodeBaseTransforms[entity.RenderNode].World * worldTransform;
 	
 		if(-1 != entity.Parent) {
 			const ::gpk::SVirtualEntity			& entityParent					= managedEntities.Entities[entity.Parent];
@@ -45,7 +47,6 @@ int												gpk::updateEntityTransforms
 ::gpk::error_t						gpk::SEngine::CreateLight			(::gpk::LIGHT_TYPE type) {
 	int32_t									iEntity								= this->ManagedEntities.Create();
 	::gpk::SVirtualEntity					& entity							= ManagedEntities.Entities[iEntity];
-	entity.Parent						= -1;
 	entity.RenderNode					= Scene->ManagedRenderNodes.Create();
 
 	uint16_t								indexLight							= (uint16_t)-1;
@@ -65,7 +66,6 @@ int												gpk::updateEntityTransforms
 ::gpk::error_t						gpk::SEngine::CreateCamera			() {
 	int32_t									iEntity								= this->ManagedEntities.Create();
 	::gpk::SVirtualEntity					& entity							= ManagedEntities.Entities[iEntity];
-	entity.Parent						= -1;
 	entity.RenderNode					= Scene->ManagedRenderNodes.Create();
 	entity.RigidBody					= this->Integrator.Create();
 
@@ -84,7 +84,6 @@ int												gpk::updateEntityTransforms
 	int32_t									iEntity								= this->ManagedEntities.Create();
 	ManagedEntities.EntityNames[iEntity]	= ::gpk::vcs{"Box"};
 	::gpk::SVirtualEntity					& entity							= ManagedEntities.Entities[iEntity];
-	entity.Parent						= -1;
 	entity.RenderNode					= Scene->ManagedRenderNodes.Create();
 	entity.RigidBody					= this->Integrator.Create();
 
@@ -170,7 +169,7 @@ int												gpk::updateEntityTransforms
 		faceRenderNode.Slice			= iFace;
 		faceRenderNode.Skin				= iSkin;
 
-		faceEntity.RigidBody			= -1;
+		//faceEntity.RigidBody			= Integrator.Create();
 		faceEntity.Parent				= iEntity;
 		faceEntity.RenderNode			= iFaceRenderNode;
 		this->ManagedEntities.EntityNames	[iFaceEntity]	= ::gpk::get_value_label((VOXEL_FACE)iFace);
@@ -188,7 +187,6 @@ int												gpk::updateEntityTransforms
 	int32_t									iEntity								= this->ManagedEntities.Create();
 	ManagedEntities.EntityNames[iEntity]	= ::gpk::vcs{"Sphere"};
 	::gpk::SVirtualEntity					& entity							= ManagedEntities.Entities[iEntity];
-	entity.Parent						= -1;
 	entity.RenderNode					= Scene->ManagedRenderNodes.Create();;
 	entity.RigidBody					= this->Integrator.Create();
 
@@ -254,7 +252,7 @@ int												gpk::updateEntityTransforms
 	surface->Desc.MethodCompression			= 0;
 	surface->Desc.MethodFilter				= 0;
 	surface->Desc.MethodInterlace			= 0;
-	surface->Desc.Dimensions				= {32, 16};
+	surface->Desc.Dimensions				= {44, 22};
 	surface->Data.resize(surface->Desc.Dimensions.Area() * sizeof(::gpk::SColorBGRA));
 	memset(surface->Data.begin(), 0xFF, surface->Data.size());
 	::gpk::view_grid<::gpk::SColorBGRA>			view	= {(::gpk::SColorBGRA*)surface->Data.begin(), surface->Desc.Dimensions.Cast<uint32_t>()};
@@ -283,7 +281,6 @@ int												gpk::updateEntityTransforms
 	int32_t									iEntity								= this->ManagedEntities.Create();
 	ManagedEntities.EntityNames[iEntity]	= ::gpk::vcs{"Cylinder"};
 	::gpk::SVirtualEntity					& entity							= ManagedEntities.Entities[iEntity];
-	entity.Parent						= -1;
 	entity.RenderNode					= Scene->ManagedRenderNodes.Create();
 	entity.RigidBody					= this->Integrator.Create();
 

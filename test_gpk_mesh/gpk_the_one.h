@@ -8,22 +8,34 @@
 namespace the1 
 {
 	struct SCamera {
-		::gpk::SCoord3<float>							Position						= {};
-		::gpk::SCoord3<float>							Target							= {1, 0, 0};
-		uint8_t											BallLockAtPosition				= (uint8_t)-1;
-		uint8_t											BallLockAtTarget				= (uint8_t)-1;
+		::gpk::SCoord3<float>							Position					= {};
+		::gpk::SCoord3<float>							Target						= {1, 0, 0};
+		uint8_t											BallLockAtPosition			= (uint8_t)-1;
+		uint8_t											BallLockAtTarget			= (uint8_t)-1;
+	};
+
+	struct SPlayerCameras {
+		::the1::SCamera									Free						= {{5, 10, -30}, {15,}};
+		::the1::SCamera									Balls[::the1::MAX_BALLS]	= {{10, 20, -30}, {}};
+		::the1::SCamera									Pockets[::the1::MAX_BALLS]	= {{10, 20, -30}, {}};
+		::the1::SCamera									Stick						= {{10, 20, -30}, {}};
+		uint32_t										Selected					= 9;
+	};
+
+	struct SPlayerUI {
+		::gpk::SDesktop									Desktop						= {};
+		::the1::SPlayerCameras							Cameras						= {};
 	};
 
 	typedef ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t> TRenderTarget;
 	struct STheOneGame {
-		::the1::SPoolGame								Game							= {};
-		::gpk::SDesktop									Desktop							= {};
-		::the1::TRenderTarget							GameRenderTarget				= {};
-		::gpk::array_pod<::the1::SContactBall>			ContactsToDraw					= {};
+		::the1::SPoolGame								Game						= {};
+		::gpk::SDesktop									Desktop						= {};
+		::the1::TRenderTarget							GameRenderTarget			= {};
+		::gpk::array_pod<::the1::SContactBall>			ContactsToDraw				= {};
+		::the1::SPlayerUI								PlayerUI[::the1::MAX_BALLS]	= {};
 
-		SCamera											CameraPlayer					= {{5, 10, -30}, {15,}};
-		SCamera											CameraBalls[::the1::MAX_BALLS]	= {{10, 20, -30}, {}};
-		uint32_t										Camera							= 9;
+		uint32_t										CurrentPlayer				= 0;
 	};
 
 	GDEFINE_ENUM_TYPE(APP_STATE, uint8_t);
@@ -45,14 +57,15 @@ namespace the1
 	GDEFINE_ENUM_VALUE(APP_STATE, COUNT		, 15);
 
 	struct STheOne {
-		::the1::STheOneGame								MainGame			= {};
-		::gpk::array_static<::the1::STheOneGame, 64>	TestGames			= {};
+		::the1::STheOneGame								MainGame					= {};
+		::gpk::array_static<::the1::STheOneGame, 16>	TestGames					= {};
+		::gpk::SDesktop									Desktop						= {};
 
-		APP_STATE										ActiveState			= {};
+		APP_STATE										ActiveState					= {};
 	};
 
 	::gpk::error_t									theOneSetup			(::the1::STheOne & app, the1::POOL_GAME_MODE mode = the1::POOL_GAME_MODE_8Ball);
-	::gpk::error_t									theOneUpdate		(::the1::STheOne & app, double secondsElapsed);
+	::gpk::error_t									theOneUpdate		(::the1::STheOne & app, double secondsElapsed, ::gpk::view_array<const uint8_t> keyStates);
 	::gpk::error_t									theOneDraw			(::the1::STheOne & app, ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t> & backBuffer, double totalSeconds);
 
 } // namespace

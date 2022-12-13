@@ -7,9 +7,9 @@ namespace gpk
 {
 #pragma pack(push, 1)
 	struct SVirtualEntity {
-		int32_t											RenderNode	;
-		int32_t											RigidBody	;
-		int32_t											Parent		;
+		uint32_t										RenderNode		= (uint32_t)-1;
+		uint32_t										RigidBody		= (uint32_t)-1;
+		uint32_t										Parent			= (uint32_t)-1;
 	};
 #pragma pack(pop)
 

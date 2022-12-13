@@ -67,16 +67,17 @@ namespace gpk
 #pragma pack(pop)
 
 	struct SVSCache {
-		::gpk::array_pod<::gpk::STriangle<float>>		TriangleWeights			= {};
-		::gpk::array_pod<::gpk::SCoord2<int16_t>>		SolidPixelCoords		= {};
-		::gpk::array_pod<::gpk::SCoord2<int16_t>>		WireframePixelCoords	= {};
+		::gpk::array_pod<::gpk::STriangle<float>>	TriangleWeights			= {};
+		::gpk::array_pod<::gpk::SCoord2<int16_t>>	SolidPixelCoords		= {};
+		::gpk::array_pod<::gpk::SCoord2<int16_t>>	WireframePixelCoords	= {};
 	};
 
 	struct SVSOutput {
-		::gpk::array_pod<::gpk::STriangle3<float>>		PositionsWorld			= {};
-		::gpk::array_pod<::gpk::STriangle3<float>>		PositionsScreen			= {};
-		::gpk::array_pod<::gpk::STriangle3<float>>		Normals					= {};
-		::gpk::array_pod<::gpk::STriangle2<float>>		UVs						= {};
+		::gpk::array_pod<::gpk::STriangle3<float>>	PositionsWorld			= {};
+		::gpk::array_pod<::gpk::STriangle3<float>>	PositionsScreen			= {};
+		::gpk::array_pod<::gpk::STriangle3<float>>	Normals					= {};
+		::gpk::array_pod<::gpk::STriangle3<float>>	NormalsScreen			= {};
+		::gpk::array_pod<::gpk::STriangle2<float>>	UVs						= {};
 	};
 
 
@@ -94,39 +95,43 @@ namespace gpk
 
 
 	struct SRenderNodeManager {
-		::gpk::array_pod <::gpk::SRenderNode						>	RenderNodes				= {};
-		::gpk::array_pod <::gpk::SRenderNodeFlags					>	RenderNodeFlags			= {};
-		::gpk::array_pod <::gpk::SRenderNodeTransforms				>	RenderNodeTransforms	= {};
-		::gpk::array_pobj<::gpk::array_pod<::gpk::SLight	>		>	RenderNodeLights		= {};
-		::gpk::array_pobj<::gpk::array_pod<::gpk::SCamera	>		>	RenderNodeCameras		= {};
+		::gpk::array_pod <::gpk::SRenderNode						>	RenderNodes					= {};
+		::gpk::array_pod <::gpk::SRenderNodeFlags					>	RenderNodeFlags				= {};
+		::gpk::array_pod <::gpk::SRenderNodeTransforms				>	RenderNodeTransforms		= {};
+		::gpk::array_pod <::gpk::SRenderNodeTransforms				>	RenderNodeBaseTransforms	= {};
+		::gpk::array_pobj<::gpk::array_pod<::gpk::SLight	>		>	RenderNodeLights			= {};
+		::gpk::array_pobj<::gpk::array_pod<::gpk::SCamera	>		>	RenderNodeCameras			= {};
 
 		// 
-		::gpk::array_pobj<::gpk::array_pod<::gpk::SLightDirectional	>>	LightsDirectional		= {};
-		::gpk::array_pobj<::gpk::array_pod<::gpk::SLightPoint		>>	LightsPoint				= {};
-		::gpk::array_pobj<::gpk::array_pod<::gpk::SLightSpot		>>	LightsSpot				= {};
+		::gpk::array_pobj<::gpk::array_pod<::gpk::SLightDirectional	>>	LightsDirectional			= {};
+		::gpk::array_pobj<::gpk::array_pod<::gpk::SLightPoint		>>	LightsPoint					= {};
+		::gpk::array_pobj<::gpk::array_pod<::gpk::SLightSpot		>>	LightsSpot					= {};
 
 		::gpk::error_t											Create		()	{
-			RenderNodeTransforms	.push_back({});
-			RenderNodeLights		.push_back({});
-			RenderNodeCameras		.push_back({});
-			RenderNodeFlags			.push_back({});
-			return RenderNodes		.push_back({(uint32_t)-1});
+			RenderNodeTransforms		.push_back({});
+			RenderNodeBaseTransforms	.push_back({});
+			RenderNodeLights			.push_back({});
+			RenderNodeCameras			.push_back({});
+			RenderNodeFlags				.push_back({});
+			return RenderNodes			.push_back({(uint32_t)-1});
 		}
 
 		::gpk::error_t											Clone		(uint32_t iNode)	{
-			RenderNodeTransforms	.push_back(::gpk::SRenderNodeTransforms							{RenderNodeTransforms	[iNode]});
-			RenderNodeLights		.push_back(::gpk::ptr_obj<::gpk::array_pod<::gpk::SLight	>>	{RenderNodeLights		[iNode]});
-			RenderNodeCameras		.push_back(::gpk::ptr_obj<::gpk::array_pod<::gpk::SCamera	>>	{RenderNodeCameras		[iNode]});
-			RenderNodeFlags			.push_back(::gpk::SRenderNodeFlags								{RenderNodeFlags		[iNode]});
-			return RenderNodes		.push_back(::gpk::SRenderNode									{RenderNodes			[iNode]});
+			RenderNodeTransforms		.push_back(::gpk::SRenderNodeTransforms							{RenderNodeTransforms		[iNode]});
+			RenderNodeBaseTransforms	.push_back(::gpk::SRenderNodeTransforms							{RenderNodeBaseTransforms	[iNode]});
+			RenderNodeLights			.push_back(::gpk::ptr_obj<::gpk::array_pod<::gpk::SLight	>>	{RenderNodeLights			[iNode]});
+			RenderNodeCameras			.push_back(::gpk::ptr_obj<::gpk::array_pod<::gpk::SCamera	>>	{RenderNodeCameras			[iNode]});
+			RenderNodeFlags				.push_back(::gpk::SRenderNodeFlags								{RenderNodeFlags			[iNode]});
+			return RenderNodes			.push_back(::gpk::SRenderNode									{RenderNodes				[iNode]});
 		}
 
 		::gpk::error_t											Delete		(uint32_t indexNode)	{
-			RenderNodeTransforms	.remove_unordered(indexNode);
-			RenderNodeLights		.remove_unordered(indexNode);
-			RenderNodeCameras		.remove_unordered(indexNode);
-			RenderNodeFlags			.remove_unordered(indexNode);
-			return RenderNodes		.remove_unordered(indexNode);
+			RenderNodeTransforms		.remove_unordered(indexNode);
+			RenderNodeBaseTransforms	.remove_unordered(indexNode);
+			RenderNodeLights			.remove_unordered(indexNode);
+			RenderNodeCameras			.remove_unordered(indexNode);
+			RenderNodeFlags				.remove_unordered(indexNode);
+			return RenderNodes			.remove_unordered(indexNode);
 		}
 
 

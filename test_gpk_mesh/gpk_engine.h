@@ -26,11 +26,12 @@ namespace gpk
 			int32_t									iEntityNew			= ManagedEntities.Create();
 			::gpk::SVirtualEntity					& entityNew			= ManagedEntities.Entities[iEntityNew];
 			entityNew.RenderNode				= Scene->ManagedRenderNodes	.Clone(entitySource.RenderNode);
-			entityNew.RigidBody					= Integrator				.Clone(entitySource.RigidBody);
+			entityNew.RigidBody					= ((uint32_t)entitySource.RigidBody < Integrator.BodyFlags.size()) ? Integrator.Clone(entitySource.RigidBody) : (uint32_t)-1;
 			entityNew.Parent					= entitySource.Parent;
 
-			if(cloneSkin) {
-				uint32_t								idSkin						= Scene->ManagedRenderNodes.CloneSkin(Scene->ManagedRenderNodes.RenderNodes[entityNew.RenderNode].Skin);
+			uint32_t								idSkinSource		= Scene->ManagedRenderNodes.RenderNodes[entityNew.RenderNode].Skin;
+			if(cloneSkin && idSkinSource < Scene->ManagedRenderNodes.Skins.size()) {
+				uint32_t								idSkin						= Scene->ManagedRenderNodes.CloneSkin(idSkinSource);
 				Scene->ManagedRenderNodes.RenderNodes[entityNew.RenderNode].Skin	= idSkin;
 				if(cloneSurfaces) {
 					if(Scene->ManagedRenderNodes.Skins[idSkin]) {
@@ -50,6 +51,7 @@ namespace gpk
 					ManagedEntities.Entities[entityChild].Parent	= iEntityNew;
 					childrenNew->push_back(entityChild);
 				}
+				ManagedEntities.EntityChildren[iEntityNew]		= childrenNew;
 			}
 			return iEntityNew;
 		}
