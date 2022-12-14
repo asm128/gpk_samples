@@ -98,6 +98,11 @@ namespace gpk
 			return 0;
 		}
 
+		::gpk::error_t						SetAcceleration		(uint32_t iEntity, const ::gpk::SCoord3<float> & acceleration) {
+			Integrator.SetAcceleration(ManagedEntities.Entities[iEntity].RigidBody, acceleration);
+			return 0;
+		}
+
 		::gpk::error_t						SetRotation			(uint32_t iEntity, const ::gpk::SCoord3<float> & velocity) {
 			Integrator.SetRotation(ManagedEntities.Entities[iEntity].RigidBody, velocity);
 			return 0;

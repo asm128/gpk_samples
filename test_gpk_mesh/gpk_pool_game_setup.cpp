@@ -11,9 +11,10 @@ static	::gpk::error_t					poolGameResetTest2Balls		(::the1::SPoolGame & pool) {
 		pool.Engine.SetDampingLinear(pool.StartState.Balls[iBall].Entity, pool.StartState.DampingClothDisplacement);
 		pool.Engine.SetDampingAngular(pool.StartState.Balls[iBall].Entity, pool.StartState.DampingClothRotation);
 		pool.Engine.SetHidden(pool.StartState.Balls[iBall].Entity, false);
+		pool.Engine.Integrator.BodyFlags[pool.Engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Collides	= true;
 	}
-	::gpk::SCoord3<float>						velocity					= {0, 0, -15.f};
-	velocity.RotateY(::gpk::noiseNormal1D(pool.StartState.Seed + 2) / 20 * ((rand() % 2) ? -1 : 1));
+	::gpk::SCoord3<float>						velocity					= {0, 0, -10.f - rand() % 30};
+	//velocity.RotateY(::gpk::noiseNormal1D(pool.StartState.Seed + 2) / 20 * ((rand() % 2) ? -1 : 1));
 	pool.Engine.SetVelocity(pool.StartState.Balls[1].Entity, velocity);
 	return 0; 
 }
@@ -45,6 +46,8 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 		pool.Engine.SetDampingAngular	(pool.StartState.Balls[iBall].Entity, pool.StartState.DampingClothRotation);
 		pool.Engine.SetHidden			(pool.StartState.Balls[iBall].Entity, false);
 		pool.Engine.SetOrientation		(pool.StartState.Balls[iBall].Entity, {0, 0, 1, -1});
+		pool.Engine.Integrator.BodyFlags[pool.Engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Collides	= true;
+
 		const ::gpk::SVirtualEntity					& entity				= pool.Engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity];
 		const ::gpk::SRenderNode					& renderNode			= pool.Engine.Scene->ManagedRenderNodes.RenderNodes[entity.RenderNode];
 		::gpk::SSkin								& skin					= *pool.Engine.Scene->ManagedRenderNodes.Skins[renderNode.Skin];
@@ -98,9 +101,9 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 	pool.Engine.SetPosition(pool.StartState.Balls[0].Entity, {-distanceFromCenter / 4, pool.StartState.Balls[0].BallRadius, 0});
 	::gpk::SCoord3<float>						velocity				= {10.0f + (rand() % 150), 0, 0}; //{70.0f + (rand() % 90), 0, 0};
 	float										reverse					= (rand() % 2) ? -1.0f : 1.0f;
-	velocity.RotateY(::gpk::noiseNormal1D(pool.StartState.Seed + 2) / 50 + .1f * reverse);
+	velocity.RotateY(::gpk::noiseNormal1D(pool.StartState.Seed + 2) / 100 + .01f * reverse);
 	pool.Engine.SetVelocity(pool.StartState.Balls[0].Entity, velocity);
-	pool.Engine.SetRotation(pool.StartState.Balls[0].Entity, {0, (30.0f + (rand() % 50) * 2) * -reverse, 0});
+	//pool.Engine.SetRotation(pool.StartState.Balls[0].Entity, {0, (1.0f + (rand() % 10) * .5f) * -reverse, 0});
 	uint8_t										rowLen					= 5;
 	::gpk::SCoord3<float>						diagonal				= {1, 0, 1};
 	diagonal								= diagonal.Normalize() * 1.22f; 
@@ -125,6 +128,7 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 		pool.PositionDeltas[iBall].clear();
 		pool.Engine.SetHidden	(pool.StartState.Balls[iBall].Entity, true);
 		pool.Engine.SetPosition	(pool.StartState.Balls[iBall].Entity, {});
+		pool.Engine.Integrator.BodyFlags[pool.Engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Collides	= false;
 	}
 
 	pool.Engine.SetPosition	(pool.StartState.Table.Entity, {0, -3});
@@ -160,7 +164,6 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 
 	// balls
 	gpk_necs(pool.StartState.Balls[0].Entity = pool.Engine.CreateSphere());
-	pool.Engine.Integrator.BodyFlags[pool.Engine.ManagedEntities.Entities[pool.StartState.Balls[0].Entity].RigidBody].Collides	= true;;
 	pool.Engine.Scene->ManagedShaders.Shaders[pool.Engine.Scene->ManagedRenderNodes.RenderNodes[pool.Engine.ManagedEntities.Entities[pool.StartState.Balls[0].Entity].RenderNode].Shader] = ::the1::shaderBall;
 	for(uint32_t iBall = 1; iBall < ::the1::MAX_BALLS; ++iBall) {
 		gpk_necs(pool.StartState.Balls[iBall].Entity = pool.Engine.Clone(pool.StartState.Balls[0].Entity, true, true));

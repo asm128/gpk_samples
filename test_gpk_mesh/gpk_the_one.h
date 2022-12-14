@@ -16,11 +16,11 @@ namespace the1
 	};
 
 	struct SPlayerCameras {
-		::the1::SCamera									Free						= {{5, 10, -30}, {15,}};
-		::the1::SCamera									Balls	[::the1::MAX_BALLS]	= {{10, 20, -30}, {}};
-		::the1::SCamera									Pockets	[::the1::MAX_BALLS]	= {{10, 20, -30}, {}};
-		::the1::SCamera									Stick						= {{10, 20, -30}, {}};
-		uint32_t										Selected					= 9;
+		::the1::SCamera									Free						= {{-5, 20, -60}, {0,}};
+		::the1::SCamera									Balls	[::the1::MAX_BALLS]	= {{-5, 20, -60}, {}};
+		::the1::SCamera									Pockets	[::the1::MAX_BALLS]	= {{-5, 20, -60}, {}};
+		::the1::SCamera									Stick						= {{-5, 20, -60}, {}};
+		uint32_t										Selected					= 0;
 	};
 
 	struct SPlayerUI {

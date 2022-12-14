@@ -65,8 +65,12 @@ static	::gpk::error_t		resolveCollision
 		if(false == flagsA.Collides)
 			continue;
 
-		const ::gpk::SCoord3<float>		& positionA						= engine.Integrator.Centers[entityA.RigidBody].Position;
 		const ::gpk::SCoord3<float>		& radiusA						= engine.Integrator.BoundingVolumes[entityA.RigidBody].HalfSizes;
+		const ::gpk::SCoord3<float>		positionA
+			= entityA.RenderNode >= engine.Scene->ManagedRenderNodes.RenderNodeTransforms.size() 
+				? engine.Integrator.Centers[entityA.RigidBody].Position
+				: engine.Scene->ManagedRenderNodes.RenderNodeTransforms[entityA.RenderNode].World.GetTranslation()
+				;
 
 		::gpk::SContact					contactBall						= {};
 		contactBall.EntityA			= iEntityA;
@@ -79,8 +83,12 @@ static	::gpk::error_t		resolveCollision
 			if(false == flagsB.Collides)
 				continue;
 
-			const ::gpk::SCoord3<float>		& positionB						= engine.Integrator.Centers[entityB.RigidBody].Position;
 			const ::gpk::SCoord3<float>		& radiusB						= engine.Integrator.BoundingVolumes[entityB.RigidBody].HalfSizes;
+			const ::gpk::SCoord3<float>		positionB						
+				= entityB.RenderNode >= engine.Scene->ManagedRenderNodes.RenderNodeTransforms.size() 
+					? engine.Integrator.Centers[entityB.RigidBody].Position
+					: engine.Scene->ManagedRenderNodes.RenderNodeTransforms[entityB.RenderNode].World.GetTranslation()
+					;
 
 			const float						maxDistance						= radiusA.x + radiusB.x;
 			const float						collisionThreshold				= maxDistance * maxDistance;
@@ -204,9 +212,29 @@ static	::gpk::error_t		resolveCollision
 
 		const gpk::SCoord2<float>		tableHalfDimensions	= pool.StartState.Table.Size * .5f;
 		for(uint32_t iBall = 0; iBall < pool.StartState.BallCount; ++iBall) {
-			const gpk::SCoord2<float>		ballLimits			= tableHalfDimensions - ::gpk::SCoord2<float>{pool.StartState.Balls[iBall].BallRadius, pool.StartState.Balls[iBall].BallRadius};
+			const float						ballRadius			= pool.StartState.Balls[iBall].BallRadius;
+			const gpk::SCoord2<float>		ballLimits			= tableHalfDimensions - ::gpk::SCoord2<float>{ballRadius, ballRadius};
 			const ::gpk::SVirtualEntity		& entityA			= engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity]; 
 			::gpk::SCoord3<float>			& positionA			= engine.Integrator.Centers[entityA.RigidBody].Position;
+			bool							falling				= engine.Integrator.BodyFlags[entityA.RigidBody].Falling;
+			bool							inPocket			= false;
+			for(uint32_t iPocket = 0; iPocket < 6; ++iPocket) {
+				const ::gpk::SVirtualEntity		& entityPocket		= engine.ManagedEntities.Entities[(*engine.ManagedEntities.EntityChildren[pool.StartState.Table.Pockets[iPocket].Entity])[6]];
+				::gpk::SCoord3<float>			pocketPosition		= engine.Scene->ManagedRenderNodes.RenderNodeTransforms[entityPocket.RenderNode].World.GetTranslation();
+				pocketPosition.y			= 0;
+				const float						pocketRadius		= pool.StartState.Table.PocketRadius;
+				const float						maxLength			= pocketRadius + ballRadius;
+				if((positionA - pocketPosition).LengthSquared() > maxLength * maxLength)
+					continue;
+				inPocket = true;
+				engine.SetAcceleration(pool.StartState.Balls[iBall].Entity, engine.Integrator.Forces[entityA.RigidBody].Acceleration + ::gpk::SCoord3<float>{0, -pool.StartState.Gravity, 0});
+				break;
+			}
+			if(inPocket)
+				continue;
+
+			engine.SetAcceleration(pool.StartState.Balls[iBall].Entity, {});
+
 			if((positionA.x	< -ballLimits.x) || (positionA.x > ballLimits.x)) {
 				positionA.x					= (positionA.x	< -ballLimits.x) 
 					? (-ballLimits.x) - (positionA.x + ballLimits.x)
@@ -227,7 +255,7 @@ static	::gpk::error_t		resolveCollision
 				forces.Velocity				*= pool.StartState.DampingCushion;
 				forces.Rotation.x			*= -1;
 			}
-			if(positionA.y	< 0) {
+			if(falling && positionA.y < 0) {
 				positionA.y					*= -1;
 
 				::gpk::SBodyForces				& forces			= engine.Integrator.Forces[entityA.RigidBody];
