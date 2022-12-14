@@ -17,7 +17,8 @@
 	return 0; 
 }
 
-::gpk::error_t				the1::theOneUpdate		(::the1::STheOne & app, double secondsElapsed, ::gpk::view_array<const uint8_t> keyStates) { 
+
+static	::gpk::error_t		updateInput				(::the1::STheOne & app, double secondsElapsed, ::gpk::view_array<const uint8_t> keyStates) { 
 	static float					timeScale				= 1;
 	if(keyStates[VK_ADD]) 
 		timeScale					+= .1f;
@@ -61,7 +62,7 @@
 	}
 
 
-	::the1::SCamera				& cameraSelected				= playerUI.Cameras.Selected ? playerUI.Cameras.Balls[playerUI.Cameras.Selected - 1] : playerUI.Cameras.Free;
+	::the1::SCamera					& cameraSelected		= playerUI.Cameras.Selected ? playerUI.Cameras.Balls[playerUI.Cameras.Selected - 1] : playerUI.Cameras.Free;
 	if(keyStates[VK_CONTROL]) {
 		if(0 == playerUI.Cameras.Selected) {
 				 if(keyStates['Z']) cameraSelected.Target.z += float(secondsElapsed * scale);
@@ -81,30 +82,36 @@
 		else if(keyStates['2']) ::the1::poolGameReset(app.MainGame.Game, ::the1::POOL_GAME_MODE_Test2Balls);
 	}
 
+	return 0;
+}
+
+::gpk::error_t				the1::theOneUpdate		(::the1::STheOne & app, double secondsElapsed, ::gpk::view_array<const uint8_t> keyStates) { 
+	::updateInput(app, secondsElapsed, keyStates);
 	::the1::poolGameUpdate(app.MainGame.Game, secondsElapsed);
 
+	::the1::SPlayerUI				& playerUI				= app.MainGame.PlayerUI[app.MainGame.CurrentPlayer];
 	for(uint32_t iBall = 0; iBall < app.MainGame.Game.StartState.BallCount; ++iBall) {
-		::the1::SCamera				& cameraBall				= playerUI.Cameras.Balls[iBall];
+		::the1::SCamera					& cameraBall			= playerUI.Cameras.Balls[iBall];
 		if(0 == iBall) {
 			app.MainGame.Game.GetBallPosition(iBall, cameraBall.Target);
-			cameraBall.Target		/= 2;		
+			cameraBall.Target			/= 2;		
 		}
 		else {
 			app.MainGame.Game.GetBallPosition(0, cameraBall.Target);
 			app.MainGame.Game.GetBallPosition(iBall, cameraBall.Position);
-			auto						distance			=  cameraBall.Target - cameraBall.Position;
-			auto						direction			=  ::gpk::SCoord3<float>{distance}.Normalize();
-			cameraBall.Position		+= direction * -30;
-			cameraBall.Position.y	+= 20;
+			auto							distance				=  cameraBall.Target - cameraBall.Position;
+			auto							direction				=  ::gpk::SCoord3<float>{distance}.Normalize();
+			cameraBall.Position			+= direction * -30;
+			cameraBall.Position.y		+= 20;
 		}
 	}
 
 	return 0; 
 }
 
-::gpk::error_t		the1::theOneDraw		(::the1::STheOne & app, ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t> & backBuffer, double totalSeconds) { 
-	const ::the1::SPlayerUI	& playerUI				= app.MainGame.PlayerUI[app.MainGame.CurrentPlayer];
-	const ::the1::SCamera	& camera				= playerUI.Cameras.Selected ? playerUI.Cameras.Balls[playerUI.Cameras.Selected - 1] : playerUI.Cameras.Free;
+::gpk::error_t				the1::theOneDraw		(::the1::STheOne & app, ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t> & backBuffer, double totalSeconds) { 
+	const ::the1::SPlayerUI			& playerUI				= app.MainGame.PlayerUI[app.MainGame.CurrentPlayer];
+	const ::the1::SCamera			& camera				= playerUI.Cameras.Selected ? playerUI.Cameras.Balls[playerUI.Cameras.Selected - 1] : playerUI.Cameras.Free;
 	::the1::poolGameDraw(app.MainGame.Game, backBuffer, camera.Position, camera.Target, {0, 1, 0}, totalSeconds);
 	return 0; 
 }

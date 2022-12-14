@@ -65,8 +65,8 @@ namespace the1
 
 	struct SPoolTable {
 		uint32_t									Entity							= (uint32_t)-1;
-		::gpk::SCoord2<float>						Size							= {44, 22};
-		float										Height							= .65f;
+		::gpk::SCoord2<float>						Size							= {44, 22}; //{2.7f, 2.7f * .5f};
+		float										Height							= .065f;
 		SPoolPocket									Pockets	[6]						= {};
 		float										PocketRadius					= 1.f;
 	};
@@ -77,6 +77,7 @@ namespace the1
 		::gpk::SCoord2<float>						Shift							= {};
 		::gpk::SCoord2<float>						Tilt							= {};
 		float										Angle							= 0;
+		float										Velocity						= 10;
 	};
 
 	struct SPoolPlayer {
@@ -96,8 +97,9 @@ namespace the1
 		float										DampingPocket					= .95f;
 		float										DampingGround					= .5f;
 		float										Gravity							= 9.8f;	// m/s
-		float										BallRadius						= .5f;	// meters
+		float										BallRadius						= .057f * .5f;	// meters
 		float										BallWeight						= 165;	// grams
+		float										PocketRadius					= BallRadius * 2;
 
 		::the1::SPoolPlayer							Players			[MAX_BALLS]		= {};
 		::the1::SPoolTable							Table							= {};

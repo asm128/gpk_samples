@@ -56,6 +56,11 @@ namespace gpk
 			return iEntityNew;
 		}
 
+		::gpk::error_t						SetScale			(uint32_t iEntity, const ::gpk::SCoord3<float> & scale) {
+			Scene->ManagedRenderNodes.RenderNodeBaseTransforms[ManagedEntities.Entities[iEntity].RenderNode].World.Scale(scale, true);
+			return 0;
+		}
+
 		::gpk::error_t						SetPosition			(uint32_t iEntity, const ::gpk::SCoord3<float> & position) {
 			Integrator.SetPosition(ManagedEntities.Entities[iEntity].RigidBody, position);
 			return 0;

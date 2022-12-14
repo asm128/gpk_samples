@@ -18,17 +18,18 @@ int												gpk::updateEntityTransforms
 		::gpk::SMatrix4<float>								& worldTransform				= transforms.World;
 		if(-1 == entity.RigidBody)
 			worldTransform									= ::gpk::SMatrix4<float>::GetIdentity();
-		else
+		else {
 			integrator.GetTransform(entity.RigidBody, worldTransform);
+		}
 
 		worldTransform = renderNodes.RenderNodeBaseTransforms[entity.RenderNode].World * worldTransform;
-	
+
 		if(-1 != entity.Parent) {
 			const ::gpk::SVirtualEntity			& entityParent					= managedEntities.Entities[entity.Parent];
 			if(-1 != entityParent.RenderNode)
-				worldTransform					= renderNodes.RenderNodeTransforms[entityParent.RenderNode].World * worldTransform;
+				worldTransform					= worldTransform * renderNodes.RenderNodeTransforms[entityParent.RenderNode].World;
 			else if(-1 != entityParent.RigidBody) {
-				worldTransform					= integrator.TransformsLocal[entityParent.RigidBody] * worldTransform;
+				worldTransform					= worldTransform * integrator.TransformsLocal[entityParent.RigidBody];
 			}
 		}
 		transforms.WorldInverse				= worldTransform.GetInverse();
@@ -276,7 +277,7 @@ int												gpk::updateEntityTransforms
 
 ::gpk::error_t			gpk::SEngine::CreateCylinder		()	{ 
 	SGeometryIndexedTriangles				geometry;
-	::gpk::geometryBuildCylinder(geometry, 5, 24, .5f, .5f, {}, {1, 1, 1});
+	::gpk::geometryBuildCylinder(geometry, 1, 24, .5f, .5f, {}, {1, 1, 1});
 
 	int32_t									iEntity								= this->ManagedEntities.Create();
 	ManagedEntities.EntityNames[iEntity]	= ::gpk::vcs{"Cylinder"};

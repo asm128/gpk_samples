@@ -1,6 +1,7 @@
 #include "gpk_pool_game.h"
 
-#include "gpk_gui_desktop.h"
+#include "gpk_dialog.h"
+#include "gpk_gui_control.h"
 
 #ifndef GPK_THE_ONE_H_098273498237423
 #define GPK_THE_ONE_H_098273498237423
@@ -16,26 +17,28 @@ namespace the1
 
 	struct SPlayerCameras {
 		::the1::SCamera									Free						= {{5, 10, -30}, {15,}};
-		::the1::SCamera									Balls[::the1::MAX_BALLS]	= {{10, 20, -30}, {}};
-		::the1::SCamera									Pockets[::the1::MAX_BALLS]	= {{10, 20, -30}, {}};
+		::the1::SCamera									Balls	[::the1::MAX_BALLS]	= {{10, 20, -30}, {}};
+		::the1::SCamera									Pockets	[::the1::MAX_BALLS]	= {{10, 20, -30}, {}};
 		::the1::SCamera									Stick						= {{10, 20, -30}, {}};
 		uint32_t										Selected					= 9;
 	};
 
 	struct SPlayerUI {
-		::gpk::SDesktop									Desktop						= {};
+		::gpk::SDialog									DialogPlay					= {};
+		::gpk::SDialog									DialogHome					= {};
 		::the1::SPlayerCameras							Cameras						= {};
 	};
 
 	typedef ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t> TRenderTarget;
 	struct STheOneGame {
 		::the1::SPoolGame								Game						= {};
-		::gpk::SDesktop									Desktop						= {};
 		::the1::TRenderTarget							GameRenderTarget			= {};
 		::gpk::array_pod<::the1::SContactBall>			ContactsToDraw				= {};
+		uint32_t										CurrentPlayer				= 0;
+
+		::gpk::SDialog									Dialog						= {};
 		::the1::SPlayerUI								PlayerUI[::the1::MAX_BALLS]	= {};
 
-		uint32_t										CurrentPlayer				= 0;
 	};
 
 	GDEFINE_ENUM_TYPE(APP_STATE, uint8_t);
@@ -59,7 +62,11 @@ namespace the1
 	struct STheOne {
 		::the1::STheOneGame								MainGame					= {};
 		::gpk::array_static<::the1::STheOneGame, 16>	TestGames					= {};
-		::gpk::SDesktop									Desktop						= {};
+		::gpk::SDialog									Dialog						= {};
+		::gpk::array_static<::gpk::SDialog
+			, ::the1::APP_STATE_COUNT>					DialogPerState				= {};
+
+		::gpk::SVirtualKeyboard							VirtualKeyboard				= {};
 
 		APP_STATE										ActiveState					= {};
 	};
@@ -68,6 +75,8 @@ namespace the1
 	::gpk::error_t									theOneUpdate		(::the1::STheOne & app, double secondsElapsed, ::gpk::view_array<const uint8_t> keyStates);
 	::gpk::error_t									theOneDraw			(::the1::STheOne & app, ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t> & backBuffer, double totalSeconds);
 
+	::gpk::error_t									guiSetup			(::the1::STheOne & app, const ::gpk::ptr_obj<::gpk::SInput> & input);
+	::gpk::error_t									guiUpdate			(::the1::STheOne & app, const ::gpk::view_array<::gpk::SSysEvent> & sysEvents);
 } // namespace
 
 #endif
