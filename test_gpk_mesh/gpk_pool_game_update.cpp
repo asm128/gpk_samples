@@ -30,28 +30,70 @@ static	::gpk::error_t		resolveCollision
 	const ::gpk::SCoord3<double>	vUp					= {0, revert ? -1 : 1.0f, 0};
 	::gpk::SCoord3<double>			finalVelocityB		= distanceDirection * speedA * out_forceTransferRatioB;
 	::gpk::SCoord3<double>			finalVelocityA		= ::gpk::SCoord3<double>{finalVelocityB}.Normalize().Cross(vUp).Normalize() * speedA * (1.0f - out_forceTransferRatioB);
-	const double					totalFinalSpeed		= finalVelocityA.Length() + finalVelocityB.Length();
-	const double					totalInitialSpeed	= initialVelocityA.Length();
-	if ((totalFinalSpeed - totalInitialSpeed) > 0.0001f) {
-		warning_printf("Invalid resulting force: initial: %f, final: %f, gained: %f", totalInitialSpeed, totalFinalSpeed, (totalFinalSpeed - totalInitialSpeed));
-	}
-	if ((totalFinalSpeed - totalInitialSpeed) < -0.0001f) {
-		warning_printf("Invalid resulting force: initial: %f, final: %f, lost: %f", totalInitialSpeed, totalFinalSpeed, (totalFinalSpeed - totalInitialSpeed) * -1);
-	}			
+	//const double					totalFinalSpeed		= finalVelocityA.Length() + finalVelocityB.Length();
+	//const double					totalInitialSpeed	= initialVelocityA.Length();
+	//if ((totalFinalSpeed - totalInitialSpeed) > 0.0001f) {
+	//	warning_printf("Invalid resulting force: initial: %f, final: %f, gained: %f", totalInitialSpeed, totalFinalSpeed, (totalFinalSpeed - totalInitialSpeed));
+	//}
+	//if ((totalFinalSpeed - totalInitialSpeed) < -0.0001f) {
+	//	warning_printf("Invalid resulting force: initial: %f, final: %f, lost: %f", totalInitialSpeed, totalFinalSpeed, (totalFinalSpeed - totalInitialSpeed) * -1);
+	//}			
 
 	out_finalVelocityA			+= finalVelocityA.Cast<float>();
 	out_finalVelocityB			+= finalVelocityB.Cast<float>();
 
-	info_printf("Total initial rotation: %f", (float)(initialRotationA.Length()));
+	//info_printf("Total initial rotation: %f", (float)(initialRotationA.Length()));
 
 	const double					rotA				= initialRotationA.Length();
 	const ::gpk::SCoord3<double>	finalRotationB		= initialRotationA.Cast<double>().Normalize() * rotA * out_forceTransferRatioB;
 	const ::gpk::SCoord3<double>	finalRotationA		= initialRotationA.Cast<double>().Normalize() * rotA * (1.0 - out_forceTransferRatioB);
-	const double					finalRotA			= finalRotationB.Length();
-	const double					finalRotB			= finalRotationA.Length();
-	info_printf("Total final rotation: %f", (float)(finalRotA + finalRotB));
+	//const double					finalRotA			= finalRotationB.Length();
+	//const double					finalRotB			= finalRotationA.Length();
+	//info_printf("Total final rotation: %f", (float)(finalRotA + finalRotB));
 	out_finalRotationA			+= finalRotationA.Cast<float>();
 	out_finalRotationB			+= finalRotationB.Cast<float>();
+	return 0;
+}
+
+::gpk::error_t				gpk::collisionDetect			(const ::gpk::SEngine & engine, ::gpk::array_pod<::gpk::SContact> & contactsDetected) {
+	for(uint32_t iEntityA = 0, countEntities = engine.ManagedEntities.Entities.size(); iEntityA < countEntities; ++iEntityA) {
+		const ::gpk::SVirtualEntity		& entityA						= engine.ManagedEntities.Entities[iEntityA];
+		if(entityA.RigidBody >= engine.Integrator.BodyFlags.size())
+			continue;
+
+		const ::gpk::SRigidBodyFlags	& flagsA						= engine.Integrator.BodyFlags[entityA.RigidBody];
+		if(false == flagsA.Collides)
+			continue;
+
+		const ::gpk::SCoord3<float>		& positionA						= engine.Integrator.Centers[entityA.RigidBody].Position;
+		const ::gpk::SCoord3<float>		& radiusA						= engine.Integrator.BoundingVolumes[entityA.RigidBody].HalfSizes;
+
+		::gpk::SContact					contactBall						= {};
+		contactBall.EntityA			= iEntityA;
+		for(uint32_t iEntityB = iEntityA + 1; iEntityB < countEntities; ++iEntityB) {
+			const ::gpk::SVirtualEntity		& entityB						= engine.ManagedEntities.Entities[iEntityB];
+			if(entityB.RigidBody >= engine.Integrator.BodyFlags.size())
+				continue;
+
+			const ::gpk::SRigidBodyFlags	& flagsB						= engine.Integrator.BodyFlags[entityB.RigidBody];
+			if(false == flagsB.Collides)
+				continue;
+
+			const ::gpk::SCoord3<float>		& positionB						= engine.Integrator.Centers[entityB.RigidBody].Position;
+			const ::gpk::SCoord3<float>		& radiusB						= engine.Integrator.BoundingVolumes[entityB.RigidBody].HalfSizes;
+
+			const float						maxDistance						= radiusA.x + radiusB.x;
+			const float						collisionThreshold				= maxDistance * maxDistance;
+			contactBall.Distance		= positionB - positionA;			
+			const double					distanceSquared					= contactBall.Distance.LengthSquared();
+			if(distanceSquared >= collisionThreshold) 
+				continue;
+
+			contactBall.EntityB			= iEntityB;
+			contactBall.DistanceLength	= distanceSquared ? sqrt(distanceSquared) : 0.0f;
+			contactsDetected.push_back(contactBall);
+		}
+	}
 	return 0;
 }
 
@@ -67,49 +109,36 @@ static	::gpk::error_t		resolveCollision
 	pool.LastFrameContactsCushion	.clear();
 	::gpk::array_pod<::the1::SContactBall>	lastFrameContactsBatchBall;
 	::gpk::array_pod<::the1::SContactBall>	lastFrameContactsBatchCushion;
+
+
 	while(secondsElapsed > 0) { 
 		double							secondsThisStep					= ::gpk::min(step, secondsElapsed);
 		secondsElapsed				-= secondsThisStep;
 
+		for(uint32_t iBallA = 0; iBallA < pool.StartState.BallCount; ++iBallA) {
+			::gpk::SBodyForces				& forces						= engine.Integrator.Forces		[engine.ManagedEntities.Entities[pool.StartState.Balls[iBallA].Entity].RigidBody];
+			::gpk::SRigidBodyFrame			& bodyAccum						= engine.Integrator.BodyFrames	[engine.ManagedEntities.Entities[pool.StartState.Balls[iBallA].Entity].RigidBody];
+			if(::gpk::SCoord3<float>{forces.Velocity}.Normalize().Dot(::gpk::SCoord3<float>{forces.Rotation.z, 0, -forces.Rotation.x}.Normalize()) < 0) {
+				bodyAccum.AccumulatedForce += ::gpk::SCoord3<float>{forces.Rotation.z, 0, -forces.Rotation.x} * secondsElapsed;
+			}
+			if(forces.Rotation.y)
+				forces.Velocity.RotateY(forces.Rotation.y * secondsElapsed * .05);
+		}
 		engine.Update(secondsThisStep);
 
 
 		lastFrameContactsBatchBall		.clear();
+		::gpk::collisionDetect(pool.Engine, lastFrameContactsBatchBall);
+
 		lastFrameContactsBatchCushion	.clear();
-		for(uint32_t iBallA = 0; iBallA < pool.StartState.BallCount; ++iBallA) {
-			::gpk::SBodyForces				& forces			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StartState.Balls[iBallA].Entity].RigidBody];
-			::gpk::SRigidBodyFrame			& bodyAccum			= engine.Integrator.BodyFrames[engine.ManagedEntities.Entities[pool.StartState.Balls[iBallA].Entity].RigidBody];
-			if(::gpk::SCoord3<float>{forces.Velocity}.Normalize().Dot(::gpk::SCoord3<float>{forces.Rotation.z, 0, -forces.Rotation.x}.Normalize()) < 0) {
-				bodyAccum.AccumulatedForce += ::gpk::SCoord3<float>{forces.Rotation.z, 0, -forces.Rotation.x} * secondsThisStep;
-			}
-
-			if(forces.Rotation.y)
-				forces.Velocity.RotateY(forces.Rotation.y * secondsThisStep * .05);
-
-			const ::gpk::SCoord3<float>		& positionA			= engine.Integrator.Centers[engine.ManagedEntities.Entities[pool.StartState.Balls[iBallA].Entity].RigidBody].Position;
-			::the1::SContactBall			contactBall			= {};
-			::the1::SContactCushion			contactCushion		= {};
-			contactBall.BallA			= iBallA;
-			contactCushion.BallA		= iBallA;
-			for(uint32_t iBallB = iBallA + 1; iBallB < pool.StartState.BallCount; ++iBallB) {
-				const float						collisionThreshold	= (pool.StartState.Balls[iBallA].BallRadius * 2) * (pool.StartState.Balls[iBallB].BallRadius * 2);
-				const ::gpk::SCoord3<float>		& positionB			= engine.Integrator.Centers[engine.ManagedEntities.Entities[pool.StartState.Balls[iBallB].Entity].RigidBody].Position;
-				contactBall.BallB				= iBallB;
-				contactBall.Distance			= positionB - positionA;
-				if(contactBall.Distance.LengthSquared() >= collisionThreshold) 
-					continue;
-
-				lastFrameContactsBatchBall.push_back(contactBall);
-			}
-		}
 
 		for(uint32_t iContact = 0; iContact < lastFrameContactsBatchBall.size(); ++iContact) {
 			::the1::SContactBall			& contact			= lastFrameContactsBatchBall[iContact];
-			const ::gpk::SVirtualEntity		& entityA			= engine.ManagedEntities.Entities[pool.StartState.Balls[contact.BallA].Entity]; 
-			const ::gpk::SVirtualEntity		& entityB			= engine.ManagedEntities.Entities[pool.StartState.Balls[contact.BallB].Entity]; 
+			const ::gpk::SVirtualEntity		& entityA			= engine.ManagedEntities.Entities[contact.EntityA]; 
+			const ::gpk::SVirtualEntity		& entityB			= engine.ManagedEntities.Entities[contact.EntityB]; 
 
 			contact.Result.DistanceDirection	= contact.Distance;
-			double							distanceLength		= contact.Distance.Length();
+			double							distanceLength		= contact.DistanceLength;
 			contact.Result.DistanceDirection.Normalize();
 
 			// Separate balls

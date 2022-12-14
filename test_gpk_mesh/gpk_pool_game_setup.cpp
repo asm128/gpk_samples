@@ -160,6 +160,7 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 
 	// balls
 	gpk_necs(pool.StartState.Balls[0].Entity = pool.Engine.CreateSphere());
+	pool.Engine.Integrator.BodyFlags[pool.Engine.ManagedEntities.Entities[pool.StartState.Balls[0].Entity].RigidBody].Collides	= true;;
 	pool.Engine.Scene->ManagedShaders.Shaders[pool.Engine.Scene->ManagedRenderNodes.RenderNodes[pool.Engine.ManagedEntities.Entities[pool.StartState.Balls[0].Entity].RenderNode].Shader] = ::the1::shaderBall;
 	for(uint32_t iBall = 1; iBall < ::the1::MAX_BALLS; ++iBall) {
 		gpk_necs(pool.StartState.Balls[iBall].Entity = pool.Engine.Clone(pool.StartState.Balls[0].Entity, true, true));

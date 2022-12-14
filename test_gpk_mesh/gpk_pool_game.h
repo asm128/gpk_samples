@@ -15,31 +15,8 @@ namespace the1
 	static constexpr	uint8_t					MAX_BALLS						= 16;
 
 #pragma pack(push, 1)
-	struct SContactResultBall {
-		::gpk::SCoord3<float>						ContactPosition					= {};
-		::gpk::SCoord3<float>						DistanceDirection				= {};
-		double										ForceTransferRatioA				= 0;
-		double										ForceTransferRatioB				= 0;
-
-		::gpk::SCoord3<float>						InitialVelocityA				= {};
-		::gpk::SCoord3<float>						InitialVelocityB				= {};
-		::gpk::SCoord3<float>						FinalVelocityA					= {};
-		::gpk::SCoord3<float>						FinalVelocityB					= {};
-
-		::gpk::SCoord3<float>						InitialRotationA				= {};
-		::gpk::SCoord3<float>						InitialRotationB				= {};
-		::gpk::SCoord3<float>						FinalRotationA					= {};
-		::gpk::SCoord3<float>						FinalRotationB					= {};
-
-
-	};
-
-	struct SContactBall {
-		uint32_t									BallA							= 0;
-		uint32_t									BallB							= 0;
-		::gpk::SCoord3<float>						Distance						= {};
-		::the1::SContactResultBall					Result							= {};
-	};
+	typedef ::gpk::SContactResult	SContactResultBall;
+	typedef ::gpk::SContact			SContactBall;
 
 	struct SContactResultCushion {
 		::gpk::SCoord3<float>						ContactPosition					= {};

@@ -16,6 +16,33 @@ namespace gpk
 		, ::gpk::SRenderNodeManager				& renderNodes
 		);
 
+#pragma pack(push, 1)
+	struct SContactResult {
+		::gpk::SCoord3<float>				ContactPosition					= {};
+		::gpk::SCoord3<float>				DistanceDirection				= {};
+		double								ForceTransferRatioA				= 0;
+		double								ForceTransferRatioB				= 0;
+
+		::gpk::SCoord3<float>				InitialVelocityA				= {};
+		::gpk::SCoord3<float>				InitialVelocityB				= {};
+		::gpk::SCoord3<float>				FinalVelocityA					= {};
+		::gpk::SCoord3<float>				FinalVelocityB					= {};
+
+		::gpk::SCoord3<float>				InitialRotationA				= {};
+		::gpk::SCoord3<float>				InitialRotationB				= {};
+		::gpk::SCoord3<float>				FinalRotationA					= {};
+		::gpk::SCoord3<float>				FinalRotationB					= {};
+	};
+
+	struct SContact {
+		uint32_t							EntityA							= (uint32_t)-1;
+		uint32_t							EntityB							= (uint32_t)-1;
+		::gpk::SCoord3<float>				Distance						= {};
+		double								DistanceLength					= {};
+		::gpk::SContactResult				Result							= {};
+	};
+#pragma pack(pop)
+
 	struct SEngine {
 		::gpk::ptr_obj<::gpk::SEngineScene>	Scene				;
 		::gpk::SVirtualEntityManager		ManagedEntities		;
@@ -125,6 +152,7 @@ namespace gpk
 		}
 	};
 
+	::gpk::error_t						collisionDetect		(const ::gpk::SEngine & engine, ::gpk::array_pod<::gpk::SContact> & contactsDetected);
 } // namespace
 
 #endif
