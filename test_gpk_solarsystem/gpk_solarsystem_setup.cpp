@@ -167,6 +167,8 @@ int													ssg::solarSystemSetup				(::ssg::SSolarSystemGame & solarSystem,
 			int32_t													iEntityPlanet				= solarSystem.Entities.push_back({iEntityOrbit, 0, (int32_t)iPlanet + 1, (int32_t)iPlanet + 1, (int32_t)iBodyPlanet});
 			solarSystem.Entities[iEntityOrbit].Children.push_back(iEntityPlanet);
 		}
+		for(uint32_t iRigidBody = 0; iRigidBody < solarSystem.Bodies.BodyFlags.size(); ++iRigidBody)
+			solarSystem.Bodies.BodyFlags[iRigidBody].Active	= true;
 
 		::gpk::SColorBGRA										colors []						=
 			{ ::gpk::YELLOW

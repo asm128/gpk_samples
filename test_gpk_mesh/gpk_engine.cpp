@@ -276,12 +276,12 @@ int												gpk::updateEntityTransforms
 	return iEntity;
 }
 
-::gpk::error_t			gpk::SEngine::CreateCylinder		(bool reverse)	{ 
+::gpk::error_t			gpk::SEngine::CreateCylinder		(uint16_t slices, bool reverse, float diameterRatio)	{ 
 	SGeometryIndexedTriangles				geometry;
 	if(reverse)
-		::gpk::geometryBuildCylinder(geometry, 1, 16, .5f, .5f, {}, {1, 1, -1}, true);
+		::gpk::geometryBuildCylinder(geometry, 1, slices, .5f, .5f, {}, {1, 1, -1}, true, diameterRatio);
 	else
-		::gpk::geometryBuildCylinder(geometry, 1, 16, .5f, .5f, {}, {1, 1, 1}, false);
+		::gpk::geometryBuildCylinder(geometry, 1, slices, .5f, .5f, {}, {1, 1, 1}, false, diameterRatio);
 
 	int32_t									iEntity								= this->ManagedEntities.Create();
 	ManagedEntities.EntityNames[iEntity]	= ::gpk::vcs{"Cylinder"};

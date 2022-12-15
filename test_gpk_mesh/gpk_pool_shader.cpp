@@ -75,9 +75,19 @@ static	::gpk::error_t								psTableCloth
 	, const ::gpk::SPSIn									& inPS
 	, ::gpk::SColorBGRA										& outputPixel
 	) { 
-	::gpk::SColorFloat									materialcolor				= ::gpk::DARKGREEN;		
 	const ::gpk::SCoord3<float>							lightVecW					= (constants.LightPosition - inPS.WeightedPosition).Normalize();
-	const ::gpk::SColorFloat							diffuse						= ::gpk::lightCalcDiffuse(materialcolor, inPS.WeightedNormal, lightVecW);
+	const ::gpk::SColorFloat							diffuse						= ::gpk::lightCalcDiffuse(::gpk::DARKGREEN, inPS.WeightedNormal, lightVecW);
+	outputPixel										= ::gpk::SColorFloat(diffuse).Clamp();
+	return 0; 
+}
+
+static	::gpk::error_t								psPocket
+	( const ::gpk::SEngineSceneConstants					& constants
+	, const ::gpk::SPSIn									& inPS
+	, ::gpk::SColorBGRA										& outputPixel
+	) { 
+	const ::gpk::SCoord3<float>							lightVecW					= (constants.LightPosition - inPS.WeightedPosition).Normalize();
+	const ::gpk::SColorFloat							diffuse						= ::gpk::lightCalcDiffuse(::gpk::DARKGRAY, inPS.WeightedNormal, lightVecW);
 	outputPixel										= ::gpk::SColorFloat(diffuse).Clamp();
 	return 0; 
 }
@@ -360,7 +370,7 @@ int32_t												the1::shaderHole
 
 	drawBuffersBall(backBufferColors, backBufferDepth, renderCache.OutputVertexShader, renderCache.CacheVertexShader
 		, {&indices[slice.Slice.Offset], slice.Slice.Count}, positions, normals, uv, material, {(const ::gpk::SColorBGRA*)surface.Data.begin(), surface.Desc.Dimensions.Cast<uint32_t>()}
-		, worldTransform, constants, ::psBallCue
+		, worldTransform, constants, ::psPocket
 	);
 
 	return 0;

@@ -83,8 +83,13 @@ namespace gpk
 			return iEntityNew;
 		}
 
-		::gpk::error_t						SetScale			(uint32_t iEntity, const ::gpk::SCoord3<float> & scale) {
-			Scene->ManagedRenderNodes.RenderNodeBaseTransforms[ManagedEntities.Entities[iEntity].RenderNode].World.Scale(scale, true);
+		::gpk::error_t						SetMeshScale		(uint32_t iEntity, const ::gpk::SCoord3<float> & scale) {
+			Scene->ManagedRenderNodes.RenderNodeBaseTransforms[ManagedEntities.Entities[iEntity].RenderNode].World.Scale(scale, false);
+			return 0;
+		}
+
+		::gpk::error_t						SetMeshPosition		(uint32_t iEntity, const ::gpk::SCoord3<float> & position) {
+			Scene->ManagedRenderNodes.RenderNodeBaseTransforms[ManagedEntities.Entities[iEntity].RenderNode].World.SetTranslation(position, false);
 			return 0;
 		}
 
@@ -138,7 +143,7 @@ namespace gpk
 		::gpk::error_t						CreateCamera		();
 
 		::gpk::error_t						CreateSphere		();
-		::gpk::error_t						CreateCylinder		(bool reverse);
+		::gpk::error_t						CreateCylinder		(uint16_t slices, bool reverse, float diameterRatio);
 		::gpk::error_t						CreateBox			();
 		::gpk::error_t						CreateCircle		();
 		::gpk::error_t						CreateRing			();
