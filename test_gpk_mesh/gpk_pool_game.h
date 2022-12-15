@@ -121,8 +121,7 @@ namespace the1
 	::gpk::error_t								poolGameReset					(::the1::SPoolGame & pool, POOL_GAME_MODE mode);
 	::gpk::error_t								poolGameSetup					(::the1::SPoolGame & pool, POOL_GAME_MODE mode = POOL_GAME_MODE_8Ball);
 	::gpk::error_t								poolGameUpdate					(::the1::SPoolGame & pool, double secondsElapsed);
-	::gpk::error_t								poolGameDraw
-		( ::the1::SPoolGame									& pool
+	::gpk::error_t								poolGameDraw					(::the1::SPoolGame & pool
 		, ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>	& backBuffer
 		, const ::gpk::SCoord3<float>						& cameraPosition
 		, const ::gpk::SCoord3<float>						& cameraTarget

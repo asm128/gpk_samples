@@ -63,7 +63,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	::gpk::SFrameInfo									& frameInfo									= framework.FrameInfo;
 	{
 		::gpk::STimer										timer;
-		::the1::theOneUpdate(app.TheOne, frameInfo.Seconds.LastFrame, framework.Input->KeyboardCurrent.KeyState, framework.Input->MouseCurrent.Deltas.Cast<int16_t>());
+		::the1::theOneUpdate(app.TheOne, frameInfo.Seconds.LastFrame, framework.Input->KeyboardCurrent.KeyState, framework.Input->MouseCurrent.Deltas.Cast<int16_t>(), framework.Input->MouseCurrent.ButtonState);
 
 		timer.Frame();
 		info_printf("Update engine in %f seconds", timer.LastTimeSeconds);

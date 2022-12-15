@@ -18,7 +18,7 @@
 }
 
 
-static	::gpk::error_t		updateInput				(::the1::STheOne & app, double secondsElapsed, ::gpk::view_array<const uint8_t> keyStates, const ::gpk::SCoord3<int16_t> mouseDeltas) { 
+static	::gpk::error_t		updateInput				(::the1::STheOne & app, double secondsElapsed, ::gpk::view_array<const uint8_t> keyStates, const ::gpk::SCoord3<int16_t> mouseDeltas, ::gpk::view_array<const uint8_t> buttonStates) { 
 	if(keyStates[VK_ADD]) 
 		app.MainGame.TimeScale					+= (float)secondsElapsed;
 	else if(keyStates[VK_SUBTRACT]) 
@@ -62,8 +62,13 @@ static	::gpk::error_t		updateInput				(::the1::STheOne & app, double secondsElap
 
 	app.MainGame.Game.StartState.Players[0].Stick.Angle	+= mouseDeltas.x * (1.0f / (float)::gpk::math_2pi) * .05f;
 
-	if(keyStates[VK_RETURN]) {
-		app.MainGame.Game.StartState.Players[0].Stick.Velocity	+= (float)secondsElapsed * 5;
+	if(keyStates[VK_RETURN] || buttonStates[0]) {
+		if(app.MainGame.Game.StartState.Players[0].Stick.Velocity < 5) {
+			app.MainGame.Game.StartState.Players[0].Stick.Velocity	+= (float)secondsElapsed * 2.5f;
+			app.MainGame.Game.Engine.SetHidden(app.MainGame.Game.StartState.Players[0].Stick.Entity, false);
+		}
+		else if(app.MainGame.Game.StartState.Players[0].Stick.Velocity > 5)
+			app.MainGame.Game.StartState.Players[0].Stick.Velocity	= 5;
 	}
 	else if(app.MainGame.Game.StartState.Players[0].Stick.Velocity > 0) {
 		::gpk::SCoord3<float>						velocity				= {app.MainGame.Game.StartState.Players[0].Stick.Velocity, 0, 0}; //{70.0f + (rand() % 90), 0, 0};
@@ -103,8 +108,8 @@ static	::gpk::error_t		updateInput				(::the1::STheOne & app, double secondsElap
 	return 0;
 }
 
-::gpk::error_t				the1::theOneUpdate		(::the1::STheOne & app, double secondsElapsed, ::gpk::view_array<const uint8_t> keyStates, const ::gpk::SCoord3<int16_t> mouseDeltas) { 
-	::updateInput(app, secondsElapsed, keyStates, mouseDeltas);
+::gpk::error_t				the1::theOneUpdate		(::the1::STheOne & app, double secondsElapsed, ::gpk::view_array<const uint8_t> keyStates, const ::gpk::SCoord3<int16_t> mouseDeltas, ::gpk::view_array<const uint8_t> buttonStates) { 
+	::updateInput(app, secondsElapsed, keyStates, mouseDeltas, buttonStates);
 
 	::the1::SPoolGame				& activeGame			= app.MainGame.Game;
 	::the1::poolGameUpdate(activeGame, secondsElapsed * app.MainGame.TimeScale);

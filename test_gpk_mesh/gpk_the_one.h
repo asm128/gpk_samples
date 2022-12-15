@@ -73,7 +73,7 @@ namespace the1
 	};
 
 	::gpk::error_t									theOneSetup			(::the1::STheOne & app, the1::POOL_GAME_MODE mode = the1::POOL_GAME_MODE_8Ball);
-	::gpk::error_t									theOneUpdate		(::the1::STheOne & app, double secondsElapsed, ::gpk::view_array<const uint8_t> keyStates, const ::gpk::SCoord3<int16_t> mouseDeltas);
+	::gpk::error_t									theOneUpdate		(::the1::STheOne & app, double secondsElapsed, ::gpk::view_array<const uint8_t> keyStates, const ::gpk::SCoord3<int16_t> mouseDeltas, ::gpk::view_array<const uint8_t> buttonStates);
 	::gpk::error_t									theOneDraw			(::the1::STheOne & app, ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t> & backBuffer, double totalSeconds);
 
 	::gpk::error_t									guiSetup			(::the1::STheOne & app, const ::gpk::ptr_obj<::gpk::SInput> & input);
