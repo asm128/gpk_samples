@@ -19,15 +19,14 @@
 
 
 static	::gpk::error_t		updateInput				(::the1::STheOne & app, double secondsElapsed, ::gpk::view_array<const uint8_t> keyStates) { 
-	static float					timeScale				= 1;
 	if(keyStates[VK_ADD]) 
-		timeScale					+= .1f;
+		app.MainGame.TimeScale					+= (float)secondsElapsed;
 	else if(keyStates[VK_SUBTRACT]) 
-		timeScale					= ::gpk::max(0.f, timeScale - .1f);
+		app.MainGame.TimeScale					= ::gpk::max(0.f, app.MainGame.TimeScale - (float)secondsElapsed);
 	else if(keyStates['T']) 
-		timeScale					= 1;
+		app.MainGame.TimeScale					= 1;
 
-	secondsElapsed				*= timeScale;
+	secondsElapsed				*= app.MainGame.TimeScale;
 
 	bool							reverse					= keyStates[VK_SHIFT];
 	float							scale					= 10.0f * (reverse ? -1 : 1);
@@ -87,7 +86,7 @@ static	::gpk::error_t		updateInput				(::the1::STheOne & app, double secondsElap
 
 ::gpk::error_t				the1::theOneUpdate		(::the1::STheOne & app, double secondsElapsed, ::gpk::view_array<const uint8_t> keyStates) { 
 	::updateInput(app, secondsElapsed, keyStates);
-	::the1::poolGameUpdate(app.MainGame.Game, secondsElapsed);
+	::the1::poolGameUpdate(app.MainGame.Game, secondsElapsed * app.MainGame.TimeScale);
 
 	::the1::SPlayerUI				& playerUI				= app.MainGame.PlayerUI[app.MainGame.CurrentPlayer];
 	for(uint32_t iBall = 0; iBall < app.MainGame.Game.StartState.BallCount; ++iBall) {

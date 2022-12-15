@@ -138,7 +138,7 @@ namespace gpk
 		::gpk::error_t						CreateCamera		();
 
 		::gpk::error_t						CreateSphere		();
-		::gpk::error_t						CreateCylinder		();
+		::gpk::error_t						CreateCylinder		(bool reverse);
 		::gpk::error_t						CreateBox			();
 		::gpk::error_t						CreateCircle		();
 		::gpk::error_t						CreateRing			();

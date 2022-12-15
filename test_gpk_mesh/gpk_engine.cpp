@@ -169,6 +169,7 @@ int												gpk::updateEntityTransforms
 		faceRenderNode.Mesh				= iMesh;
 		faceRenderNode.Slice			= iFace;
 		faceRenderNode.Skin				= iSkin;
+		faceRenderNode.Shader			= Scene->ManagedShaders.Shaders.push_back(::gpk::shaderWireframe);
 
 		//faceEntity.RigidBody			= Integrator.Create();
 		faceEntity.Parent				= iEntity;
@@ -275,10 +276,12 @@ int												gpk::updateEntityTransforms
 	return iEntity;
 }
 
-::gpk::error_t			gpk::SEngine::CreateCylinder		()	{ 
+::gpk::error_t			gpk::SEngine::CreateCylinder		(bool reverse)	{ 
 	SGeometryIndexedTriangles				geometry;
-	::gpk::geometryBuildCylinder(geometry, 1, 16, .5f, .5f, {}, {1, 1, 1});
-	::gpk::geometryBuildCylinder(geometry, 1, 16, .5f, .5f, {}, {1, 1, -1});
+	if(reverse)
+		::gpk::geometryBuildCylinder(geometry, 1, 16, .5f, .5f, {}, {1, 1, -1}, true);
+	else
+		::gpk::geometryBuildCylinder(geometry, 1, 16, .5f, .5f, {}, {1, 1, 1}, false);
 
 	int32_t									iEntity								= this->ManagedEntities.Create();
 	ManagedEntities.EntityNames[iEntity]	= ::gpk::vcs{"Cylinder"};

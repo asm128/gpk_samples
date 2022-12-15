@@ -69,6 +69,36 @@ namespace gpk
 
 constexpr ::gpk::SColorBGRA							PIXEL_BLACK_NUMBER			= ::gpk::SColorBGRA{0, 0, 0, 255};
 
+
+static	::gpk::error_t								psTableCloth
+	( const ::gpk::SEngineSceneConstants					& constants
+	, const ::gpk::SPSIn									& inPS
+	, ::gpk::SColorBGRA										& outputPixel
+	) { 
+	::gpk::SColorFloat									materialcolor				= ::gpk::DARKGREEN;		
+	const ::gpk::SCoord3<float>							lightVecW					= (constants.LightPosition - inPS.WeightedPosition).Normalize();
+	const ::gpk::SColorFloat							diffuse						= ::gpk::lightCalcDiffuse(materialcolor, inPS.WeightedNormal, lightVecW);
+	const ::gpk::SColorFloat							ambient						= materialcolor * .1f;
+
+	outputPixel										= ::gpk::SColorFloat(ambient + diffuse).Clamp();
+	return 0; 
+}
+
+static	::gpk::error_t								psStick
+	( const ::gpk::SEngineSceneConstants					& constants
+	, const ::gpk::SPSIn									& inPS
+	, ::gpk::SColorBGRA										& outputPixel
+	) { 
+	::gpk::SColorFloat									materialcolor				= ::gpk::BROWN + (::gpk::ORANGE * .5f);
+	const ::gpk::SCoord3<float>							lightVecW					= (constants.LightPosition - inPS.WeightedPosition).Normalize();
+	const ::gpk::SColorFloat							diffuse						= ::gpk::lightCalcDiffuse(materialcolor, inPS.WeightedNormal, lightVecW);
+	const ::gpk::SColorFloat							ambient						= materialcolor * .1f;
+
+	outputPixel										= ::gpk::SColorFloat(ambient + diffuse).Clamp();
+	return 0; 
+}
+
+
 static	::gpk::error_t								psBallCue				
 	( const ::gpk::SEngineSceneConstants					& constants
 	, const ::gpk::SPSIn									& inPS
@@ -371,7 +401,47 @@ int32_t												the1::shaderStick
 
 	drawBuffersBall(backBufferColors, backBufferDepth, renderCache.OutputVertexShader, renderCache.CacheVertexShader
 		, {&indices[slice.Slice.Offset], slice.Slice.Count}, positions, normals, uv, material, {(const ::gpk::SColorBGRA*)surface.Data.begin(), surface.Desc.Dimensions.Cast<uint32_t>()}
-		, worldTransform, constants, ::psBallStripped
+		, worldTransform, constants, ::psStick
+	);
+
+	return 0;
+}
+
+
+
+int32_t												the1::shaderCloth
+	( ::gpk::view_grid<::gpk::SColorBGRA>	backBufferColors
+	, ::gpk::view_grid<uint32_t>			backBufferDepth
+	, ::gpk::SEngineRenderCache				& renderCache
+	, const ::gpk::SEngineScene				& scene
+	, const ::gpk::SEngineSceneConstants	& constants
+	, int32_t								iRenderNode
+	) {
+	const ::gpk::SRenderNode								& renderNode			= scene.ManagedRenderNodes.RenderNodes[iRenderNode];
+	if(renderNode.Mesh >= scene.ManagedMeshes.Meshes.size())
+		return 0;
+
+	const ::gpk::SRenderMesh								& mesh					= *scene.ManagedMeshes.Meshes[renderNode.Mesh];
+	::gpk::vcc												meshName				= scene.ManagedMeshes.MeshNames[renderNode.Mesh];
+
+	info_printf("Drawing node %i, mesh %i, slice %i, mesh name: %s", iRenderNode, renderNode.Mesh, renderNode.Slice, meshName.begin());
+
+	const ::gpk::SRenderNodeTransforms						& transforms				= scene.ManagedRenderNodes.RenderNodeTransforms[iRenderNode];
+	const ::gpk::SMatrix4<float>							& worldTransform			= transforms.World;
+	const ::gpk::view_array<const uint16_t>					indices						= (mesh.GeometryBuffers.size() > 0) ? ::gpk::view_array<const uint16_t>					{(const uint16_t				*)scene.ManagedBuffers.Buffers[mesh.GeometryBuffers[0]]->Data.begin(), scene.ManagedBuffers.Buffers[mesh.GeometryBuffers[0]]->Data.size() / sizeof(const uint16_t)}					: ::gpk::view_array<const uint16_t>					{};
+	const ::gpk::view_array<const ::gpk::SCoord3<float>>	positions					= (mesh.GeometryBuffers.size() > 1) ? ::gpk::view_array<const ::gpk::SCoord3<float>>	{(const ::gpk::SCoord3<float>	*)scene.ManagedBuffers.Buffers[mesh.GeometryBuffers[1]]->Data.begin(), scene.ManagedBuffers.Buffers[mesh.GeometryBuffers[1]]->Data.size() / sizeof(const ::gpk::SCoord3<float>)}	: ::gpk::view_array<const ::gpk::SCoord3<float>>	{};
+	const ::gpk::view_array<const ::gpk::SCoord3<float>>	normals						= (mesh.GeometryBuffers.size() > 2) ? ::gpk::view_array<const ::gpk::SCoord3<float>>	{(const ::gpk::SCoord3<float>	*)scene.ManagedBuffers.Buffers[mesh.GeometryBuffers[2]]->Data.begin(), scene.ManagedBuffers.Buffers[mesh.GeometryBuffers[2]]->Data.size() / sizeof(const ::gpk::SCoord3<float>)}	: ::gpk::view_array<const ::gpk::SCoord3<float>>	{};
+	const ::gpk::view_array<const ::gpk::SCoord2<float>>	uv							= (mesh.GeometryBuffers.size() > 3) ? ::gpk::view_array<const ::gpk::SCoord2<float>>	{(const ::gpk::SCoord2<float>	*)scene.ManagedBuffers.Buffers[mesh.GeometryBuffers[3]]->Data.begin(), scene.ManagedBuffers.Buffers[mesh.GeometryBuffers[3]]->Data.size() / sizeof(const ::gpk::SCoord2<float>)}	: ::gpk::view_array<const ::gpk::SCoord2<float>>	{};
+	const ::gpk::SSkin										& skin						= *scene.ManagedRenderNodes.Skins[renderNode.Skin];
+	const ::gpk::SRenderMaterial							& material					= skin.Material;
+	const uint32_t											tex							= skin.Textures[0];
+	const ::gpk::SSurface									& surface					= *scene.ManagedSurfaces.Surfaces[tex];
+
+	const ::gpk::SGeometrySlice								slice						= (renderNode.Slice < mesh.GeometrySlices.size()) ? mesh.GeometrySlices[renderNode.Slice] : ::gpk::SGeometrySlice{{0, indices.size() / 3}};
+
+	drawBuffersBall(backBufferColors, backBufferDepth, renderCache.OutputVertexShader, renderCache.CacheVertexShader
+		, {&indices[slice.Slice.Offset], slice.Slice.Count}, positions, normals, uv, material, {(const ::gpk::SColorBGRA*)surface.Data.begin(), surface.Desc.Dimensions.Cast<uint32_t>()}
+		, worldTransform, constants, ::psTableCloth
 	);
 
 	return 0;

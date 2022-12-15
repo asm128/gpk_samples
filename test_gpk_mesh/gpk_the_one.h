@@ -35,6 +35,7 @@ namespace the1
 		::the1::TRenderTarget							GameRenderTarget			= {};
 		::gpk::array_pod<::the1::SContactBall>			ContactsToDraw				= {};
 		uint32_t										CurrentPlayer				= 0;
+		float											TimeScale					= 1;
 
 		::gpk::SDialog									Dialog						= {};
 		::the1::SPlayerUI								PlayerUI[::the1::MAX_BALLS]	= {};

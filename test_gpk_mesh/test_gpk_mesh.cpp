@@ -85,7 +85,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 					::gpk::error_t										draw										(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	::gpk::SFramework															& framework									= app.Framework;
 	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>			backBuffer;
-	backBuffer->resize(framework.MainDisplayOffscreen->Color.metrics(), 0xFF004000, (uint32_t)-1);
+	backBuffer->resize(framework.MainDisplayOffscreen->Color.metrics(), 0xFF000030, (uint32_t)-1);
 
 	::the1::theOneDraw(app.TheOne, *backBuffer, framework.FrameInfo.Seconds.Total);
 

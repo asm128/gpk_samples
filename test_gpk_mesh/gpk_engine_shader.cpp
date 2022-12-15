@@ -112,3 +112,16 @@ int32_t												gpk::shaderWireframe
 
 	return drawBuffersWireframe(backBufferColors, backBufferDepth, renderCache.OutputVertexShader, renderCache.CacheVertexShader, {&indices[slice.Slice.Offset], slice.Slice.Count}, positions, normals, material, worldTransform, constants);
 }
+
+
+int32_t												gpk::shaderHidden
+	( ::gpk::view_grid<::gpk::SColorBGRA>	/*backBufferColors*/
+	, ::gpk::view_grid<uint32_t>			/*backBufferDepth*/
+	, ::gpk::SEngineRenderCache				& /*renderCache*/
+	, const ::gpk::SEngineScene				& /*scene*/
+	, const ::gpk::SEngineSceneConstants	& /*constants*/
+	, int32_t								/*iRenderNode*/
+	) {
+	//info_printf("Drawing node %i, mesh %i, slice %i, mesh name: %s", iRenderNode, renderNode.Mesh, renderNode.Slice, meshName.begin());
+	return 0;
+}

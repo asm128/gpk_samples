@@ -17,6 +17,14 @@ namespace gpk
 		, const ::gpk::SEngineSceneConstants	& constants
 		, int32_t								iRenderNode
 		);
+	::gpk::error_t				shaderHidden
+		( ::gpk::view_grid<::gpk::SColorBGRA>	backBufferColors
+		, ::gpk::view_grid<uint32_t>			backBufferDepth
+		, ::gpk::SEngineRenderCache				& renderCache
+		, const ::gpk::SEngineScene				& scene
+		, const ::gpk::SEngineSceneConstants	& constants
+		, int32_t								iRenderNode
+		);
 }  // namespace
 
 
