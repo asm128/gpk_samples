@@ -277,7 +277,8 @@ int												gpk::updateEntityTransforms
 
 ::gpk::error_t			gpk::SEngine::CreateCylinder		()	{ 
 	SGeometryIndexedTriangles				geometry;
-	::gpk::geometryBuildCylinder(geometry, 1, 24, .5f, .5f, {}, {1, 1, 1});
+	::gpk::geometryBuildCylinder(geometry, 1, 16, .5f, .5f, {}, {1, 1, 1});
+	::gpk::geometryBuildCylinder(geometry, 1, 16, .5f, .5f, {}, {1, 1, -1});
 
 	int32_t									iEntity								= this->ManagedEntities.Create();
 	ManagedEntities.EntityNames[iEntity]	= ::gpk::vcs{"Cylinder"};
