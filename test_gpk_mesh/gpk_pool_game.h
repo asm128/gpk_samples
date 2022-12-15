@@ -33,19 +33,21 @@ namespace the1
 
 	struct SPoolBall {
 		uint32_t									Entity							= (uint32_t)-1;
-		float										BallRadius						= .5f;
+		//float										BallRadius						= .5f;
 	};
 
 	struct SPoolPocket {
 		uint32_t									Entity							= (uint32_t)-1;
 	};
 
+
+	const float									FOOT_SCALE						= 1.0f / 3.281f;
 	struct SPoolTable {
 		uint32_t									Entity							= (uint32_t)-1;
-		::gpk::SCoord2<float>						Size							= {44, 22}; //{2.7f, 2.7f * .5f};
-		float										Height							= .065f;
+		::gpk::SCoord2<float>						Size							= {8 * FOOT_SCALE, 4 * FOOT_SCALE};;
+		float										Height							= .0265f;
 		SPoolPocket									Pockets	[6]						= {};
-		float										PocketRadius					= 1.f;
+		float										PocketRadius					= .057f;
 	};
 
 	struct SPoolStick {
@@ -54,7 +56,7 @@ namespace the1
 		::gpk::SCoord2<float>						Shift							= {};
 		::gpk::SCoord2<float>						Tilt							= {};
 		float										Angle							= 0;
-		float										Velocity						= 10;
+		float										Velocity						= 0;
 	};
 
 	struct SPoolPlayer {
@@ -76,7 +78,6 @@ namespace the1
 		float										Gravity							= 9.8f;	// m/s
 		float										BallRadius						= .057f * .5f;	// meters
 		float										BallWeight						= 165;	// grams
-		float										PocketRadius					= BallRadius * 2;
 
 		::the1::SPoolPlayer							Players			[MAX_BALLS]		= {};
 		::the1::SPoolTable							Table							= {};

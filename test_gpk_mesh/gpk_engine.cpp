@@ -190,7 +190,7 @@ int												gpk::updateEntityTransforms
 	ManagedEntities.EntityNames[iEntity]	= ::gpk::vcs{"Sphere"};
 	::gpk::SVirtualEntity					& entity							= ManagedEntities.Entities[iEntity];
 	entity.RenderNode					= Scene->ManagedRenderNodes.Create();;
-	entity.RigidBody					= this->Integrator.Create();
+	Integrator.BoundingVolumes[entity.RigidBody = this->Integrator.Create()].HalfSizes = {0.5f, 0.5f, 0.5f};
 
 	::gpk::ptr_obj<::gpk::SRenderBuffer>	pIndicesVertex;
 	::gpk::ptr_obj<::gpk::SRenderBuffer>	pVertices;

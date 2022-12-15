@@ -18,7 +18,7 @@
 }
 
 
-static	::gpk::error_t		updateInput				(::the1::STheOne & app, double secondsElapsed, ::gpk::view_array<const uint8_t> keyStates) { 
+static	::gpk::error_t		updateInput				(::the1::STheOne & app, double secondsElapsed, ::gpk::view_array<const uint8_t> keyStates, const ::gpk::SCoord3<int16_t> mouseDeltas) { 
 	if(keyStates[VK_ADD]) 
 		app.MainGame.TimeScale					+= (float)secondsElapsed;
 	else if(keyStates[VK_SUBTRACT]) 
@@ -29,7 +29,7 @@ static	::gpk::error_t		updateInput				(::the1::STheOne & app, double secondsElap
 	secondsElapsed				*= app.MainGame.TimeScale;
 
 	bool							reverse					= keyStates[VK_SHIFT];
-	float							scale					= 10.0f * (reverse ? -1 : 1);
+	float							scale					= 1.0f * (reverse ? -1 : 1);
 
 	::the1::SPlayerUI				& playerUI				= app.MainGame.PlayerUI[app.MainGame.CurrentPlayer];
 
@@ -60,6 +60,21 @@ static	::gpk::error_t		updateInput				(::the1::STheOne & app, double secondsElap
 		}
 	}
 
+	app.MainGame.Game.StartState.Players[0].Stick.Angle	+= mouseDeltas.x * (1.0f / (float)::gpk::math_2pi) * .05f;
+
+	if(keyStates[VK_RETURN]) {
+		app.MainGame.Game.StartState.Players[0].Stick.Velocity	+= (float)secondsElapsed * 5;
+	}
+	else if(app.MainGame.Game.StartState.Players[0].Stick.Velocity > 0) {
+		::gpk::SCoord3<float>						velocity				= {app.MainGame.Game.StartState.Players[0].Stick.Velocity, 0, 0}; //{70.0f + (rand() % 90), 0, 0};
+		velocity.RotateY(app.MainGame.Game.StartState.Players[0].Stick.Angle);
+		app.MainGame.Game.Engine.SetVelocity(app.MainGame.Game.StartState.Balls[0].Entity, velocity);
+		//app.MainGame.Game.Engine.SetRotation(app.MainGame.Game.StartState.Balls[0].Entity, {0, (1.0f + (rand() % 10) * .5f) * -scale, 0});
+		app.MainGame.Game.Engine.SetHidden(app.MainGame.Game.StartState.Players[0].Stick.Entity, true);
+		app.MainGame.Game.StartState.Players[0].Stick.Velocity = 0;
+	}
+
+
 
 	::the1::SCamera					& cameraSelected		
 		= (playerUI.Cameras.Selected == 0					) ? playerUI.Cameras.Free 
@@ -88,26 +103,33 @@ static	::gpk::error_t		updateInput				(::the1::STheOne & app, double secondsElap
 	return 0;
 }
 
-::gpk::error_t				the1::theOneUpdate		(::the1::STheOne & app, double secondsElapsed, ::gpk::view_array<const uint8_t> keyStates) { 
-	::updateInput(app, secondsElapsed, keyStates);
-	::the1::poolGameUpdate(app.MainGame.Game, secondsElapsed * app.MainGame.TimeScale);
+::gpk::error_t				the1::theOneUpdate		(::the1::STheOne & app, double secondsElapsed, ::gpk::view_array<const uint8_t> keyStates, const ::gpk::SCoord3<int16_t> mouseDeltas) { 
+	::updateInput(app, secondsElapsed, keyStates, mouseDeltas);
+
+	::the1::SPoolGame				& activeGame			= app.MainGame.Game;
+	::the1::poolGameUpdate(activeGame, secondsElapsed * app.MainGame.TimeScale);
 
 	::the1::SPlayerUI				& playerUI				= app.MainGame.PlayerUI[app.MainGame.CurrentPlayer];
-	for(uint32_t iBall = 0; iBall < app.MainGame.Game.StartState.BallCount; ++iBall) {
+	bool							playActive				= false;
+	for(uint32_t iBall = 0; iBall < activeGame.StartState.BallCount; ++iBall) {
 		::the1::SCamera					& cameraBall			= playerUI.Cameras.Balls[iBall];
 		if(0 == iBall) {
-			app.MainGame.Game.GetBallPosition(iBall, cameraBall.Target);
+			activeGame.GetBallPosition(iBall, cameraBall.Target);
 			cameraBall.Target			/= 2;		
 		}
 		else {
-			app.MainGame.Game.GetBallPosition(0, cameraBall.Target);
-			app.MainGame.Game.GetBallPosition(iBall, cameraBall.Position);
+			activeGame.GetBallPosition(0, cameraBall.Target);
+			activeGame.GetBallPosition(iBall, cameraBall.Position);
 			auto							distance				=  cameraBall.Target - cameraBall.Position;
 			auto							direction				=  ::gpk::SCoord3<float>{distance}.Normalize();
-			cameraBall.Position			+= direction * -30;
-			cameraBall.Position.y		+= 20;
+			cameraBall.Position			+= direction * -1.0f;
+			cameraBall.Position.y		+= 1.75f;
 		}
+		playActive = playActive || activeGame.Engine.Integrator.BodyFlags[activeGame.Engine.ManagedEntities.Entities[activeGame.StartState.Balls[iBall].Entity].RigidBody].Active;
 	}
+	if(false == playActive)
+		app.MainGame.Game.Engine.SetHidden(app.MainGame.Game.StartState.Players[0].Stick.Entity, false);
+
 
 	return 0; 
 }
