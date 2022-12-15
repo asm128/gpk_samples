@@ -236,17 +236,26 @@ static	::gpk::error_t		resolveCollision
 
 				const float						pocketRadius		= pool.StartState.Table.PocketRadius;
 				const float						maxLength			= pocketRadius;// + ballRadius;
-				if((positionA - pocketPosition).LengthSquared() > maxLength * maxLength)
+				::gpk::SCoord3<float>			distanceFromPocket	= positionA - pocketPosition;
+				if(distanceFromPocket.LengthSquared() > maxLength * maxLength)
 					continue;
+				float							w					= (float)(distanceFromPocket.Length() - ballRadius) / (pocketRadius - ballRadius);
 				inPocket					= true;
-				forces.Acceleration.y		= -pool.StartState.Gravity;
+				forces.Acceleration.y		= -pool.StartState.Gravity * ::gpk::max(0.0f, (1.0f - w));
 				flags.Falling				= true;
 				break;
 			}
 			if(inPocket)
 				continue;
 
-			if((positionA.x	< -ballLimits.x) || (positionA.x > ballLimits.x)) {
+			::gpk::SCoord2<bool>				outOfBounds			= 
+				{ (positionA.x	< -ballLimits.x) || (positionA.x > ballLimits.x)
+				, (positionA.z	< -ballLimits.y) || (positionA.z > ballLimits.y)
+				};
+			if(outOfBounds.x 
+				&& (positionA.z > -(tableHalfDimensions.y - pool.StartState.Table.PocketRadius))
+				&& (positionA.z <  (tableHalfDimensions.y - pool.StartState.Table.PocketRadius))
+			) {
 				positionA.x					= (positionA.x	< -ballLimits.x) 
 					? (-ballLimits.x) - (positionA.x + ballLimits.x)
 					:   ballLimits.x  - (positionA.x - ballLimits.x)
@@ -255,7 +264,11 @@ static	::gpk::error_t		resolveCollision
 				forces.Velocity				*= pool.StartState.DampingCushion;
 				forces.Rotation.z			*= -1;
 			}
-			if((positionA.z	< -ballLimits.y) || (positionA.z > ballLimits.y)) {
+			if(outOfBounds.y 
+			 &&  (positionA.x > -(tableHalfDimensions.x - pool.StartState.Table.PocketRadius)
+				&& positionA.x <  (tableHalfDimensions.x - pool.StartState.Table.PocketRadius)
+				&& (positionA.x < -pool.StartState.Table.PocketRadius || positionA.x > pool.StartState.Table.PocketRadius)
+			)) {
 				positionA.z					= (positionA.z	< -ballLimits.y) 
 					? (-ballLimits.y) - (positionA.z + ballLimits.y)
 					:   ballLimits.y  - (positionA.z - ballLimits.y)

@@ -6,17 +6,17 @@
 
 static	::gpk::error_t					poolGameResetTest2Balls		(::the1::SPoolGame & pool) { 
 	pool.StartState.BallCount				= 2;
-	pool.Engine.SetPosition(pool.StartState.Balls[0].Entity, {0, pool.StartState.BallRadius,-5});
-	pool.Engine.SetPosition(pool.StartState.Balls[1].Entity, {0, pool.StartState.BallRadius, 5});
+	pool.Engine.SetPosition(pool.StartState.Balls[0].Entity, {0, pool.StartState.BallRadius,-.5});
+	pool.Engine.SetPosition(pool.StartState.Balls[1].Entity, {0, pool.StartState.BallRadius, .5});
 	for(uint32_t iBall = 0; iBall < pool.StartState.BallCount; ++iBall) {
 		pool.Engine.SetDampingLinear(pool.StartState.Balls[iBall].Entity, pool.StartState.DampingClothDisplacement);
 		pool.Engine.SetDampingAngular(pool.StartState.Balls[iBall].Entity, pool.StartState.DampingClothRotation);
 		pool.Engine.SetHidden(pool.StartState.Balls[iBall].Entity, false);
 		pool.Engine.Integrator.BodyFlags[pool.Engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody].Collides	= true;
 	}
-	::gpk::SCoord3<float>						velocity					= {0, 0, -1.f - rand() % 30};
+	//::gpk::SCoord3<float>						velocity					= {0, 0, -1.f - rand() % 30};
 	//velocity.RotateY(::gpk::noiseNormal1D(pool.StartState.Seed + 2) / 20 * ((rand() % 2) ? -1 : 1));
-	pool.Engine.SetVelocity(pool.StartState.Balls[1].Entity, velocity);
+	//pool.Engine.SetVelocity(pool.StartState.Balls[1].Entity, velocity);
 	return 0; 
 }
 

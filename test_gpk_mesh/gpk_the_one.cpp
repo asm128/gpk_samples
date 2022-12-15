@@ -123,12 +123,12 @@ static	::gpk::error_t		updateInput				(::the1::STheOne & app, double secondsElap
 			cameraBall.Target			/= 2;		
 		}
 		else {
-			activeGame.GetBallPosition(0, cameraBall.Target);
-			activeGame.GetBallPosition(iBall, cameraBall.Position);
+			activeGame.GetBallPosition(0, cameraBall.Position);
+			activeGame.GetBallPosition(iBall, cameraBall.Target);
 			auto							distance				=  cameraBall.Target - cameraBall.Position;
 			auto							direction				=  ::gpk::SCoord3<float>{distance}.Normalize();
-			cameraBall.Position			+= direction * -1.0f;
-			cameraBall.Position.y		+= 1.75f;
+			cameraBall.Position			+= direction * -2.0f;
+			cameraBall.Position.y		= 1.75f * .35f;
 		}
 		playActive = playActive || activeGame.Engine.Integrator.BodyFlags[activeGame.Engine.ManagedEntities.Entities[activeGame.StartState.Balls[iBall].Entity].RigidBody].Active;
 	}
