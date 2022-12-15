@@ -78,9 +78,7 @@ static	::gpk::error_t								psTableCloth
 	::gpk::SColorFloat									materialcolor				= ::gpk::DARKGREEN;		
 	const ::gpk::SCoord3<float>							lightVecW					= (constants.LightPosition - inPS.WeightedPosition).Normalize();
 	const ::gpk::SColorFloat							diffuse						= ::gpk::lightCalcDiffuse(materialcolor, inPS.WeightedNormal, lightVecW);
-	const ::gpk::SColorFloat							ambient						= materialcolor * .1f;
-
-	outputPixel										= ::gpk::SColorFloat(ambient + diffuse).Clamp();
+	outputPixel										= ::gpk::SColorFloat(diffuse).Clamp();
 	return 0; 
 }
 
@@ -266,6 +264,12 @@ static	::gpk::error_t								drawBuffersBall
 
 	for(uint32_t iTriangle = 0; iTriangle < outVS.PositionsScreen.size(); ++iTriangle) {
 		const ::gpk::STriangle3<float>								& triPositions				= outVS.PositionsScreen	[iTriangle];
+		if( (triPositions.CulledZ({0, 0xFFFFFF}))
+		 || (triPositions.CulledX({0, (float)offscreenMetrics.x}))
+		 || (triPositions.CulledY({0, (float)offscreenMetrics.y}))
+		)
+			continue;
+
 		const ::gpk::STriangle3<float>								& triPositionsWorld			= outVS.PositionsWorld	[iTriangle];
 		const ::gpk::STriangle3<float>								& triNormals				= outVS.Normals			[iTriangle];
 		const ::gpk::STriangle2<float>								& triUVs					= outVS.UVs				[iTriangle];
@@ -295,9 +299,6 @@ int32_t												the1::shaderBall
 	, int32_t								iRenderNode
 	) {
 	const ::gpk::SRenderNode								& renderNode			= scene.ManagedRenderNodes.RenderNodes[iRenderNode];
-	if(renderNode.Mesh >= scene.ManagedMeshes.Meshes.size())
-		return 0;
-
 	const ::gpk::SRenderMesh								& mesh					= *scene.ManagedMeshes.Meshes[renderNode.Mesh];
 	::gpk::vcc												meshName				= scene.ManagedMeshes.MeshNames[renderNode.Mesh];
 
@@ -339,9 +340,6 @@ int32_t												the1::shaderHole
 	, int32_t								iRenderNode
 	) {
 	const ::gpk::SRenderNode								& renderNode			= scene.ManagedRenderNodes.RenderNodes[iRenderNode];
-	if(renderNode.Mesh >= scene.ManagedMeshes.Meshes.size())
-		return 0;
-
 	const ::gpk::SRenderMesh								& mesh					= *scene.ManagedMeshes.Meshes[renderNode.Mesh];
 	::gpk::vcc												meshName				= scene.ManagedMeshes.MeshNames[renderNode.Mesh];
 
@@ -378,9 +376,6 @@ int32_t												the1::shaderStick
 	, int32_t								iRenderNode
 	) {
 	const ::gpk::SRenderNode								& renderNode			= scene.ManagedRenderNodes.RenderNodes[iRenderNode];
-	if(renderNode.Mesh >= scene.ManagedMeshes.Meshes.size())
-		return 0;
-
 	const ::gpk::SRenderMesh								& mesh					= *scene.ManagedMeshes.Meshes[renderNode.Mesh];
 	::gpk::vcc												meshName				= scene.ManagedMeshes.MeshNames[renderNode.Mesh];
 
@@ -407,8 +402,6 @@ int32_t												the1::shaderStick
 	return 0;
 }
 
-
-
 int32_t												the1::shaderCloth
 	( ::gpk::view_grid<::gpk::SColorBGRA>	backBufferColors
 	, ::gpk::view_grid<uint32_t>			backBufferDepth
@@ -418,9 +411,6 @@ int32_t												the1::shaderCloth
 	, int32_t								iRenderNode
 	) {
 	const ::gpk::SRenderNode								& renderNode			= scene.ManagedRenderNodes.RenderNodes[iRenderNode];
-	if(renderNode.Mesh >= scene.ManagedMeshes.Meshes.size())
-		return 0;
-
 	const ::gpk::SRenderMesh								& mesh					= *scene.ManagedMeshes.Meshes[renderNode.Mesh];
 	::gpk::vcc												meshName				= scene.ManagedMeshes.MeshNames[renderNode.Mesh];
 

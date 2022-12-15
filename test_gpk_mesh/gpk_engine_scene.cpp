@@ -14,9 +14,17 @@
 	for(uint32_t iRenderNode = 0, countNodes = scene.ManagedRenderNodes.RenderNodes.size(); iRenderNode < countNodes; ++iRenderNode) {
 		const ::gpk::SRenderNodeFlags					& renderNodeFlags		= scene.ManagedRenderNodes.RenderNodeFlags[iRenderNode];
 		if(renderNodeFlags.NoDraw)
-			continue; 
+			continue;
 
 		const ::gpk::SRenderNode						& renderNode			= scene.ManagedRenderNodes.RenderNodes[iRenderNode];
+		if(renderNode.Mesh >= scene.ManagedMeshes.Meshes.size())
+			continue;
+		
+		const ::gpk::SRenderNodeTransforms				& transforms			= scene.ManagedRenderNodes.RenderNodeTransforms[iRenderNode];
+		const ::gpk::SMatrix4<float>					& worldTransform		= transforms.World;
+		if((worldTransform.GetTranslation() - constants.CameraPosition).Normalize().Dot(constants.CameraFront) <= 0)
+			return 0;
+
 		if(renderNode.Shader >= scene.ManagedShaders.Shaders.size()) 
 			::gpk::shaderWireframe(backBufferColors, backBufferDepth, renderCache, scene, constants, iRenderNode); 
 			//::the1::shaderBall(backBufferColors, backBufferDepth, renderCache, scene, constants, iRenderNode); 

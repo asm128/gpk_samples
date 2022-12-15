@@ -178,8 +178,8 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 
 	framework.Settings.GUIZoom											= false;
 	app.Scene.Camera.Points.Position									= {30, 40, 0};
-	app.Scene.Camera.NearFar.Far										= 1000;
-	app.Scene.Camera.NearFar.Near										= 0.001;
+	app.Scene.Camera.NearFar.Far										= 1000.0f;
+	app.Scene.Camera.NearFar.Near										= 0.001f;
 	return 0;
 }
 

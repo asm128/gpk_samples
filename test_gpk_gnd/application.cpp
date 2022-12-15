@@ -155,8 +155,8 @@
 		}
 	}
 	app.Scene.Camera.Points.Position										= {0, 30, -20};
-	app.Scene.Camera.NearFar.Far											= 1000;
-	app.Scene.Camera.NearFar.Near											= 0.001;
+	app.Scene.Camera.NearFar.Far											= 1000.0f;
+	app.Scene.Camera.NearFar.Near											= 0.001f;
 
 	::gpk::SGNDFileContents														& gndData									= app.GNDData;
 		// -- Generate minimap

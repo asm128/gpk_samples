@@ -3,16 +3,20 @@
 ::gpk::SColorFloat								gpk::lightCalcSpecular		(::gpk::SCoord3<float> gEyePosW, float specularPower, ::gpk::SColorFloat specularLight, ::gpk::SColorFloat specularMaterial, ::gpk::SCoord3<float> posW, ::gpk::SCoord3<float> normalW, ::gpk::SCoord3<float> lightVecW) {
 	const ::gpk::SCoord3<float>							pointToEye				= (gEyePosW - posW).Normalize();
 	const ::gpk::SCoord3<float>							reflected				= normalW.Reflect(-lightVecW);
-	const float											factor					= powf((float)::gpk::max(reflected.Dot(pointToEye), 0.0), specularPower);
+	const double										reflectedFactor			= ::gpk::max(reflected.Dot(pointToEye), 0.0);
+	if(0 == reflectedFactor) 
+		return ::gpk::BLACK;
+
+	const float											factor					= powf((float)reflectedFactor, specularPower);
 	::gpk::SColorFloat									result					= specularMaterial * specularLight * factor;
 	result.a										= specularMaterial.a;
 	return result;
+	
 }
 
 ::gpk::SColorFloat								gpk::lightCalcDiffuse		(::gpk::SColorFloat diffuserMaterial, ::gpk::SCoord3<float> normalW, ::gpk::SCoord3<float> lightVecW) {
 	double												lightFactor				= ::gpk::max(0.0, normalW.Dot(lightVecW));
-	const ::gpk::SColorFloat							result					= (diffuserMaterial * lightFactor);
-	return result;
+	return lightFactor ? diffuserMaterial * (float)lightFactor : ::gpk::BLACK;
 }
 
 static	::gpk::error_t							transformTrianglesWireframe
@@ -70,6 +74,12 @@ static	::gpk::error_t								drawBuffersWireframe
 	const ::gpk::SCoord2<uint16_t>								offscreenMetrics			= backBufferColors.metrics().Cast<uint16_t>();
 	for(uint32_t iTriangle = 0; iTriangle < inVS.PositionsScreen.size(); ++iTriangle) {
 		const ::gpk::STriangle3<float>								& triPositions				= inVS.PositionsScreen	[iTriangle];
+		if(triPositions.CulledZ({0, 0xFFFFFF}))
+			continue;
+		if(triPositions.CulledX({0, (float)offscreenMetrics.x}))
+			continue;
+		if(triPositions.CulledY({0, (float)offscreenMetrics.y}))
+			continue;
 		//const ::gpk::STriangle3<float>								& triNormals				= inVS.Normals			[iTriangle];
 		cacheVS.WireframePixelCoords.clear();
 		::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<int32_t>{triPositions.A.Cast<int32_t>(), triPositions.B.Cast<int32_t>()}, cacheVS.WireframePixelCoords);
@@ -93,9 +103,6 @@ int32_t												gpk::shaderWireframe
 	, int32_t								iRenderNode
 	) {
 	const ::gpk::SRenderNode								& renderNode			= scene.ManagedRenderNodes.RenderNodes[iRenderNode];
-	if(renderNode.Mesh >= scene.ManagedMeshes.Meshes.size())
-		return 0;
-
 	const ::gpk::SRenderMesh								& mesh					= *scene.ManagedMeshes.Meshes[renderNode.Mesh];
 	::gpk::vcc												meshName				= scene.ManagedMeshes.MeshNames[renderNode.Mesh];
 

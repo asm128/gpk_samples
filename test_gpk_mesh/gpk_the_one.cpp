@@ -35,7 +35,7 @@ static	::gpk::error_t		updateInput				(::the1::STheOne & app, double secondsElap
 
 	if(keyStates[VK_CONTROL]) {
 		if(keyStates['0']) 
-			playerUI.Cameras.Selected	= 0;
+			playerUI.Cameras.Selected	= reverse ? 0 : the1::MAX_BALLS + 1;
 		else if(keyStates['9']) 
 			playerUI.Cameras.Selected	= 1;
 		if(keyStates['8']) 
@@ -61,7 +61,11 @@ static	::gpk::error_t		updateInput				(::the1::STheOne & app, double secondsElap
 	}
 
 
-	::the1::SCamera					& cameraSelected		= playerUI.Cameras.Selected ? playerUI.Cameras.Balls[playerUI.Cameras.Selected - 1] : playerUI.Cameras.Free;
+	::the1::SCamera					& cameraSelected		
+		= (playerUI.Cameras.Selected == 0					) ? playerUI.Cameras.Free 
+		: (playerUI.Cameras.Selected > the1::MAX_BALLS		) ? playerUI.Cameras.Stick
+		: playerUI.Cameras.Balls[playerUI.Cameras.Selected - 1] 
+		;
 	if(keyStates[VK_CONTROL]) {
 		if(0 == playerUI.Cameras.Selected) {
 				 if(keyStates['Z']) cameraSelected.Target.z += float(secondsElapsed * scale);

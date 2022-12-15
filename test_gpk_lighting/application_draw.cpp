@@ -61,8 +61,8 @@
 	::gpk::SMatrix4<float>														xViewProjection								= viewMatrix * projection;
 	::gpk::SMatrix4<float>														xWorld										= {};
 	::gpk::SMatrix4<float>														xRotation									= {};
-	const double																& fFar										= app.Scene.Camera.NearFar.Far	;
-	const double																& fNear										= app.Scene.Camera.NearFar.Near	;
+	const float																	& fFar										= app.Scene.Camera.NearFar.Far	;
+	const float																	& fNear										= app.Scene.Camera.NearFar.Near	;
 	int32_t																		& pixelsDrawn								= app.RenderCache.PixelsDrawn	= 0;
 	int32_t																		& pixelsSkipped								= app.RenderCache.PixelsSkipped	= 0;
 	renderCache.WireframePixelCoords.clear();
