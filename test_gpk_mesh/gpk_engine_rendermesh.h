@@ -43,7 +43,6 @@ namespace gpk
 		::gpk::array_pod<uint32_t>					ConstantBuffers;
 		::gpk::array_pod<::gpk::SGeometrySlice>		GeometrySlices;
 	};	
-
 } // namespace
 
 #endif

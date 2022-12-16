@@ -57,11 +57,7 @@ static	::gpk::error_t		resolveCollision
 
 static	::gpk::error_t		collisionDetectSphere			(const ::gpk::SEngine & engine, uint32_t iEntityA, const ::gpk::SVirtualEntity & entityA, ::gpk::array_pod<::gpk::SContact> & contactsDetected) {
 	const ::gpk::SCoord3<float>		& radiusA						= engine.Integrator.BoundingVolumes[entityA.RigidBody].HalfSizes;
-	const ::gpk::SCoord3<float>		positionA
-		= entityA.RenderNode >= engine.Scene->ManagedRenderNodes.RenderNodeTransforms.size() 
-			? engine.Integrator.Centers[entityA.RigidBody].Position
-			: engine.Scene->ManagedRenderNodes.RenderNodeTransforms[entityA.RenderNode].World.GetTranslation()
-			;
+	const ::gpk::SCoord3<float>		& positionA						= engine.Integrator.Centers[entityA.RigidBody].Position;
 
 	::gpk::SContact					contactBall						= {};
 	contactBall.EntityA			= iEntityA;
@@ -77,11 +73,7 @@ static	::gpk::error_t		collisionDetectSphere			(const ::gpk::SEngine & engine, u
 		switch(flagsB.BVType) {
 		case ::gpk::BOUNDING_TYPE_Sphere: {
 			const ::gpk::SCoord3<float>		& radiusB						= engine.Integrator.BoundingVolumes[entityB.RigidBody].HalfSizes;
-			const ::gpk::SCoord3<float>		positionB						
-				= entityB.RenderNode >= engine.Scene->ManagedRenderNodes.RenderNodeTransforms.size() 
-					? engine.Integrator.Centers[entityB.RigidBody].Position
-					: engine.Scene->ManagedRenderNodes.RenderNodeTransforms[entityB.RenderNode].World.GetTranslation()
-					;
+			const ::gpk::SCoord3<float>		& positionB						= engine.Integrator.Centers[entityB.RigidBody].Position;
 
 			const float						maxDistance						= radiusA.x + radiusB.x;
 			const float						collisionThreshold				= maxDistance * maxDistance;
@@ -233,7 +225,7 @@ static	::gpk::error_t		collisionDetectSphere			(const ::gpk::SEngine & engine, u
 			::gpk::SBodyForces				& forces			= engine.Integrator.Forces[entityA.RigidBody];
 			for(uint32_t iPocket = 0; iPocket < 6; ++iPocket) {
 				const ::gpk::SVirtualEntity		& entityPocket		= engine.ManagedEntities.Entities[pool.StateCurrent.Table.Pockets[iPocket].Entity];
-				::gpk::SCoord3<float>			pocketPosition		= engine.Scene->ManagedRenderNodes.RenderNodeTransforms[entityPocket.RenderNode].World.GetTranslation();
+				::gpk::SCoord3<float>			pocketPosition		= engine.Scene->ManagedRenderNodes.Transforms[entityPocket.RenderNode].World.GetTranslation();
 				::gpk::SCoord3<float>			positionBall		= positionA;
 				if(positionBall.y < 0) {
 					inPocket					= true;

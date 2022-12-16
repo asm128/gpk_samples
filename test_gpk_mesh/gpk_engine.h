@@ -70,26 +70,30 @@ namespace gpk
 				}
 			}
 
-			const ::gpk::ptr_obj<::gpk::array_pod<uint32_t>>	childrenSource	= ManagedEntities.EntityChildren[iEntitySource];
+			const ::gpk::ptr_obj<::gpk::array_pod<uint32_t>>	childrenSource	= ManagedEntities.Children[iEntitySource];
 			if(childrenSource && childrenSource->size()) {
-				::gpk::ptr_obj<::gpk::array_pod<uint32_t>>			childrenNew		= ManagedEntities.EntityChildren[iEntityNew];
+				::gpk::ptr_obj<::gpk::array_pod<uint32_t>>			childrenNew		= ManagedEntities.Children[iEntityNew];
 				for(uint32_t iChild = 0; iChild < childrenSource->size(); ++iChild) {
 					uint32_t entityChild = Clone((*childrenSource)[iChild], cloneSkin, cloneSurfaces);
 					ManagedEntities.Entities[entityChild].Parent	= iEntityNew;
 					childrenNew->push_back(entityChild);
 				}
-				ManagedEntities.EntityChildren[iEntityNew]		= childrenNew;
+				ManagedEntities.Children[iEntityNew]		= childrenNew;
 			}
 			return iEntityNew;
 		}
 
+		::gpk::error_t						SetShader			(uint32_t iEntity, const ::std::function<::gpk::TFuncEffect> & shader) {
+			Scene->Graphics->Shaders[Scene->ManagedRenderNodes.RenderNodes[ManagedEntities.Entities[iEntity].RenderNode].Shader].create(shader);
+			return 0;
+		}
 		::gpk::error_t						SetMeshScale		(uint32_t iEntity, const ::gpk::SCoord3<float> & scale) {
-			Scene->ManagedRenderNodes.RenderNodeBaseTransforms[ManagedEntities.Entities[iEntity].RenderNode].World.Scale(scale, false);
+			Scene->ManagedRenderNodes.BaseTransforms[ManagedEntities.Entities[iEntity].RenderNode].World.Scale(scale, false);
 			return 0;
 		}
 
 		::gpk::error_t						SetMeshPosition		(uint32_t iEntity, const ::gpk::SCoord3<float> & position) {
-			Scene->ManagedRenderNodes.RenderNodeBaseTransforms[ManagedEntities.Entities[iEntity].RenderNode].World.SetTranslation(position, false);
+			Scene->ManagedRenderNodes.BaseTransforms[ManagedEntities.Entities[iEntity].RenderNode].World.SetTranslation(position, false);
 			return 0;
 		}
 
@@ -129,12 +133,12 @@ namespace gpk
 		}
 
 		::gpk::error_t						SetHidden				(uint32_t iEntity, bool hidden) {
-			Scene->ManagedRenderNodes.RenderNodeFlags[ManagedEntities.Entities[iEntity].RenderNode].NoDraw = hidden;
+			Scene->ManagedRenderNodes.Flags[ManagedEntities.Entities[iEntity].RenderNode].NoDraw = hidden;
 			return 0;
 		}
 
 		::gpk::error_t						ToggleHidden			(uint32_t iEntity) {
-			::gpk::SRenderNodeFlags					& flags					= Scene->ManagedRenderNodes.RenderNodeFlags[ManagedEntities.Entities[iEntity].RenderNode];
+			::gpk::SRenderNodeFlags					& flags					= Scene->ManagedRenderNodes.Flags[ManagedEntities.Entities[iEntity].RenderNode];
 			flags.NoDraw						= !flags.NoDraw;
 			return 0;
 		}
