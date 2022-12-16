@@ -29,7 +29,7 @@
 
 	constants.View.LookAt(cameraPosition, cameraTarget, cameraUp);
 	constants.Perspective.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, constants.NearFar.Near, constants.NearFar.Far);
-	constants.Screen.ViewportLH(offscreenMetrics, constants.NearFar);
+	constants.Screen.ViewportLH(offscreenMetrics);
 	constants.Projection						= constants.View * constants.Perspective * constants.Screen;
 
 	::gpk::STimer									timer;

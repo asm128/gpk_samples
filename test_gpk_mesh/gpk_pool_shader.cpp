@@ -1,5 +1,6 @@
 ﻿#include "gpk_pool_shader.h"
 #include "gpk_engine_shader.h"
+#include "gpk_raster_lh.h"
 
 static constexpr float							LIGHT_FACTOR_AMBIENT			= .025f;
 static constexpr float							LIGHT_FACTOR_SPECULAR_POWER		= 30.0f;
@@ -288,7 +289,7 @@ static	::gpk::error_t								drawBuffersBall
 
 		trianglePixelCoords.clear();
 		triangleWeights.clear();
-		gerror_if(errored(::gpk::drawTriangle(backBufferDepth, constants.NearFar, triPositions, trianglePixelCoords, triangleWeights)), "Not sure if these functions could ever fail");
+		gerror_if(errored(::gpk::drawTriangle(offscreenMetrics.Cast<uint32_t>(), triPositions, trianglePixelCoords, triangleWeights, backBufferDepth)), "Not sure if these functions could ever fail");
 		//const bool													stripped					= surface[0][0] == ::gpk::SColorBGRA{gpk::WHITE};
 		for(uint32_t iCoord = 0; iCoord < trianglePixelCoords.size(); ++iCoord) {
 			const ::gpk::STriangle<float>								& vertexWeights				= triangleWeights[iCoord];

@@ -2,7 +2,6 @@
 //		Also useful for copy & paste operations in which you need to copy a bunch of variable or function names and you can't afford the time of copying them one by one.
 #include "test_gpk_vox.h"
 
-#include "gpk_bitmap_target.h"
 #include "gpk_grid_copy.h"
 #include "gpk_grid_scale.h"
 #include "gpk_view_bit.h"
@@ -10,6 +9,7 @@
 #include "gpk_png.h"
 
 #include "gpk_app_impl.h"
+#include "gpk_raster_lh.h"
 #include "gpk_bitmap_target.h"
 
 #include <GL\Gl.h>
@@ -215,7 +215,7 @@ static	::gpk::error_t						drawVoxelFace
 					};
 				trianglePositions.push_back(triangle);
 				::gpk::SRange<uint32_t>								triangleSlice			= {facePixelCoords.size()};
-				::gpk::drawTriangle<float>(pixelCache.TargetDepth, nearFar, triangle, facePixelCoords, faceTriangleWeights); 
+				::gpk::drawTriangle(pixelCache.TargetDepth.metrics(), triangle, facePixelCoords, faceTriangleWeights, pixelCache.TargetDepth); 
 				triangleSlice.Count								= facePixelCoords.size() - triangleSlice.Offset;
 				if(triangleSlice.Count)
 					triangleSlices.push_back(triangleSlice);
@@ -387,14 +387,8 @@ struct SCamera {
 
 	const ::gpk::SCoord2<uint16_t>							screenCenter				= {(uint16_t)(offscreenMetrics.x / 2), (uint16_t)(offscreenMetrics.y / 2)};
 	::gpk::SMatrix4<float>									viewport									= {};
-	viewport._11										= 2.0f / offscreenMetrics.x;
-	viewport._22										= 2.0f / offscreenMetrics.y;
-	viewport._33										= 1.0f / (float)(nearFar.Far - nearFar.Near);
-	viewport._41										= -1.0f;
-	viewport._42										= -1.0f;
-	viewport._43										= (float)(-nearFar.Near * ( 1.0f / (nearFar.Far - nearFar.Near) ));
-	viewport._44										= 1.0f;
-	projection											= projection * viewport.GetInverse();
+	viewport.ViewportLH(offscreenMetrics.Cast<uint16_t>());
+	projection											= projection * viewport;
 
 	::gpk::SCoord3<float>									cameraFront					= (camera.Target - camera.Position).Normalize();
 

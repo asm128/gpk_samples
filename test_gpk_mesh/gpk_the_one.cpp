@@ -44,16 +44,17 @@ static	::gpk::error_t		updateInput				(::the1::STheOne & app, double secondsElap
 			playerUI.Cameras.Selected	= 9;
 		else {
 			if(keyStates[VK_MENU]) {
-				for(uint32_t iBall = 1; iBall < app.MainGame.Game.StateCurrent.BallCount / 2U; ++iBall) {
-					 if(keyStates['0' + iBall]) {
+				for(uint32_t iBall = 0; iBall < app.MainGame.Game.StateCurrent.BallCount / 2U - 1; ++iBall) {
+					 if(keyStates['1' + iBall]) {
 						 playerUI.Cameras.Selected	= iBall + 1;
 						 break;
 					 }
 				}
 			}
 			else {
-				for(uint32_t iBall = app.MainGame.Game.StateCurrent.BallCount / 2 + 1; iBall < app.MainGame.Game.StateCurrent.BallCount; ++iBall) {
-					 if(keyStates['0' + iBall - app.MainGame.Game.StateCurrent.BallCount / 2]) {
+				const uint32_t offset = app.MainGame.Game.StateCurrent.BallCount / 2U;
+				for(uint32_t iBall = offset; iBall < app.MainGame.Game.StateCurrent.BallCount; ++iBall) {
+					 if(keyStates['1' + iBall - offset]) {
 						 playerUI.Cameras.Selected	= iBall + 1;
 						 break;
 					 }
@@ -157,8 +158,12 @@ static	::gpk::error_t		updateInput				(::the1::STheOne & app, double secondsElap
 
 ::gpk::error_t				the1::theOneDraw		(::the1::STheOne & app, ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t> & backBuffer, double totalSeconds) { 
 	const ::the1::SPlayerUI			& playerUI				= app.MainGame.PlayerUI[app.MainGame.CurrentPlayer];
-	const ::the1::SCamera			& camera				= playerUI.Cameras.Selected ? playerUI.Cameras.Balls[playerUI.Cameras.Selected - 1] : playerUI.Cameras.Free;
-	::the1::poolGameDraw(app.MainGame.Game, backBuffer, camera.Position, camera.Target, {0, 1, 0}, totalSeconds);
+	const ::the1::SCamera			& cameraSelected		
+		= (playerUI.Cameras.Selected == 0					) ? playerUI.Cameras.Free 
+		: (playerUI.Cameras.Selected > the1::MAX_BALLS		) ? playerUI.Cameras.Stick
+		: playerUI.Cameras.Balls[playerUI.Cameras.Selected - 1] 
+		;
+	::the1::poolGameDraw(app.MainGame.Game, backBuffer, cameraSelected.Position, cameraSelected.Target, {0, 1, 0}, totalSeconds);
 	return 0; 
 }
 
