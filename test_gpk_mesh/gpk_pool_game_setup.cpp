@@ -97,7 +97,7 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 		ballPool.remove_unordered(index); 
 	}
 
-	const float									distanceFromCenter		= pool.StateStart.Table.Size.x / 4;
+	const float									distanceFromCenter		= pool.StateStart.Table.Dimensions.Slate.x / 4;
 
 	pool.Engine.SetPosition(pool.StateStart.Ball[0].Entity, {-distanceFromCenter, pool.StateStart.BallRadius, 0});
 	uint8_t										rowLen					= 5;
@@ -129,12 +129,12 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 		pool.Engine.Integrator.BoundingVolumes	[pool.Engine.ManagedEntities.Entities[pool.StateStart.Ball[iBall].Entity].RigidBody].HalfSizes		= {pool.StateStart.BallRadius, pool.StateStart.BallRadius, pool.StateStart.BallRadius};
 	}
 
-	pool.Engine.SetPosition	(pool.StateStart.Table.Entity, {0, -pool.StateStart.Table.Size.y * .125f});
-	const ::gpk::SCoord2<float>					tableCenter				= {pool.StateStart.Table.Size.x * .5f, pool.StateStart.Table.Size.y * .5f};
+	pool.Engine.SetPosition	(pool.StateStart.Table.Entity, {0, -pool.StateStart.Table.Dimensions.Slate.y * .125f});
+	const ::gpk::SCoord2<float>					tableCenter				= {pool.StateStart.Table.Dimensions.Slate.x * .5f, pool.StateStart.Table.Dimensions.Slate.y * .5f};
 	for(uint32_t iPocket = 0; iPocket < 6; ++iPocket) {
 		const uint32_t								row						= iPocket / 3;
 		const uint32_t								column					= iPocket % 3;
-		const ::gpk::SCoord3<float>					pocketPosition			= {tableCenter.x * column - tableCenter.x, -pool.StateStart.Table.PocketRadius, pool.StateStart.Table.Size.y * row - tableCenter.y};
+		const ::gpk::SCoord3<float>					pocketPosition			= {tableCenter.x * column - tableCenter.x, -pool.StateStart.Table.PocketRadius, pool.StateStart.Table.Dimensions.Slate.y * row - tableCenter.y};
 		pool.Engine.SetHidden		(pool.StateStart.Table.Pockets[iPocket].Entity, false);
 		pool.Engine.SetPosition		(pool.StateStart.Table.Pockets[iPocket].Entity, pocketPosition);
 	}
@@ -162,7 +162,7 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 
 	// table
 	gpk_necs(pool.StateStart.Table.Entity = pool.Engine.CreateBox());
-	pool.Engine.SetMeshScale(pool.StateStart.Table.Entity, {pool.StateStart.Table.Size.x, pool.StateStart.Table.Size.y * .25f, pool.StateStart.Table.Size.y});
+	pool.Engine.SetMeshScale(pool.StateStart.Table.Entity, {pool.StateStart.Table.Dimensions.Slate.x, pool.StateStart.Table.Dimensions.Slate.y * .25f, pool.StateStart.Table.Dimensions.Slate.y});
 	pool.Engine.Scene->ManagedShaders.Shaders[pool.Engine.Scene->ManagedRenderNodes.RenderNodes[(*pool.Engine.ManagedEntities.EntityChildren[pool.StateStart.Table.Entity])[0]].Shader] = ::the1::shaderCloth;
 	for(uint32_t iFace = 1; iFace < 6; ++iFace)
 		pool.Engine.Scene->ManagedShaders.Shaders[pool.Engine.Scene->ManagedRenderNodes.RenderNodes[(*pool.Engine.ManagedEntities.EntityChildren[pool.StateStart.Table.Entity])[iFace]].Shader] = ::gpk::shaderHidden;
@@ -188,7 +188,7 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 	// sticks
 	gpk_necs(pool.StateStart.Player[0].Stick.Entity = pool.Engine.CreateCylinder(8, false, 1.0f));
 	pool.Engine.Scene->ManagedShaders.Shaders[pool.Engine.Scene->ManagedRenderNodes.RenderNodes[pool.Engine.ManagedEntities.Entities[pool.StateStart.Player[0].Stick.Entity].RenderNode].Shader] = ::the1::shaderStick;
-	pool.Engine.SetMeshScale(pool.StateStart.Player[0].Stick.Entity, {.01f, pool.StateStart.Table.Size.y, .01f});
+	pool.Engine.SetMeshScale(pool.StateStart.Player[0].Stick.Entity, {.01f, pool.StateStart.Table.Dimensions.Slate.y, .01f});
 	::gpk::SMatrix4<float>				mRotation;
 	mRotation.SetOrientation(::gpk::SQuaternion<float>{0, 0, 1, 1}.Normalize());
 	pool.Engine.Scene->ManagedRenderNodes.RenderNodeBaseTransforms[pool.Engine.ManagedEntities.Entities[pool.StateStart.Player[0].Stick.Entity].RenderNode].World *= mRotation;

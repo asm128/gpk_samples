@@ -42,11 +42,30 @@ namespace the1
 	};
 
 
-	const float									FOOT_SCALE						= 1.0f / 3.281f;
+	static constexpr float						FOOT_SCALE						= 1.0f / 3.281f;
+	static constexpr float						INCH_SCALE						= 2.54f;
+
+	struct SPoolTableDimensions {
+		::gpk::SCoord2<float>						Slate							= {8 * ::the1::FOOT_SCALE, 4 * ::the1::FOOT_SCALE};
+		::gpk::SCoord2<float>						PlayingSurface					= {92 * ::the1::INCH_SCALE, 46 * ::the1::INCH_SCALE};
+		float										Height							= .0265f;
+	};
+
+	static constexpr ::the1::SPoolTableDimensions	COMMON_TABLE_SIZES	[]	 =
+	{	{ {::the1::FOOT_SCALE * 8.0f, ::the1::FOOT_SCALE * 4.0f}	// 8-foot
+		, {::the1::INCH_SCALE * 92.f, ::the1::INCH_SCALE * 46.f}
+		, .0265f
+		},	
+		{ {::the1::FOOT_SCALE *  9.0f, ::the1::FOOT_SCALE * 4.5f}	// 9-foot
+		, {::the1::INCH_SCALE * 100.f, ::the1::INCH_SCALE * 50.f}
+		, .0265f
+		},	
+	};
+
 	struct SPoolTable {
 		uint32_t									Entity							= (uint32_t)-1;
-		::gpk::SCoord2<float>						Size							= {8 * ::the1::FOOT_SCALE, 4 * ::the1::FOOT_SCALE};
-		float										Height							= .0265f;
+		SPoolTableDimensions						Dimensions						= COMMON_TABLE_SIZES[0];
+		float										CushionDepth					= .234f;
 		SPoolPocket									Pockets	[6]						= {};
 		float										PocketRadius					= .057f;
 	};
@@ -112,15 +131,34 @@ namespace the1
 			, ::gpk::DARKRED * .5f
 			};
 	};
+
+	struct SPoolControllerStick {
+		::gpk::SCoord2<float>						Shift							= {};
+		::gpk::SCoord2<float>						Tilt							= {};
+		float										Angle							= 0;
+		float										Velocity						= 0;
+		bool										Cancel							= false;
+	};
+
+	struct SPoolControllerCamera {
+		::gpk::SCoord3<float>						Position						= {};
+		::gpk::SCoord3<float>						Target							= {};
+		bool										ToggleLockPosition				= false;
+		bool										ToggleLockTarget				= false;
+	};
 #pragma pack(pop)
 
 	struct SPoolGame {
 		::the1::SPoolStartState						StateStart						= {};
 		::the1::SPoolStartState						StateCurrent					= {};
 
+		::the1::SPoolControllerStick				ControlStick					= {};
+		::the1::SPoolControllerCamera				ControlCamera					= {};
+
 		::gpk::array_pod<::gpk::SLine3<float>>		PositionDeltas	[MAX_BALLS]		= {};
 		::gpk::array_pod<::the1::SContactBall>		LastFrameContactsBall			= {};
 		::gpk::array_pod<::the1::SContactCushion>	LastFrameContactsCushion		= {};
+
 		::gpk::SEngine								Engine							= {};
 
 		::gpk::error_t								GetBallPosition					(uint32_t iBall, ::gpk::SCoord3<float> & ballPosition) {

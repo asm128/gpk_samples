@@ -50,7 +50,7 @@
 		}
 	}
 
-	const gpk::SCoord2<float>						halfDimensions					= pool.StateCurrent.Table.Size * .5;
+	const gpk::SCoord2<float>						halfDimensions					= pool.StateCurrent.Table.Dimensions.Slate * .5;
 
 	wireframePixelCoords.clear();
 	const	::gpk::SCoord3<float>					limitsBottom[4]					= 
@@ -60,10 +60,10 @@
 		, {-halfDimensions.x, .0f, -halfDimensions.y}
 		};
 	const	::gpk::SCoord3<float>	limitsTop	[4]	= 
-		{ limitsBottom[0] + ::gpk::SCoord3<float>{0, pool.StateCurrent.Table.Height, 0}
-		, limitsBottom[1] + ::gpk::SCoord3<float>{0, pool.StateCurrent.Table.Height, 0}
-		, limitsBottom[2] + ::gpk::SCoord3<float>{0, pool.StateCurrent.Table.Height, 0}
-		, limitsBottom[3] + ::gpk::SCoord3<float>{0, pool.StateCurrent.Table.Height, 0}
+		{ limitsBottom[0] + ::gpk::SCoord3<float>{0, pool.StateCurrent.Table.Dimensions.Height, 0}
+		, limitsBottom[1] + ::gpk::SCoord3<float>{0, pool.StateCurrent.Table.Dimensions.Height, 0}
+		, limitsBottom[2] + ::gpk::SCoord3<float>{0, pool.StateCurrent.Table.Dimensions.Height, 0}
+		, limitsBottom[3] + ::gpk::SCoord3<float>{0, pool.StateCurrent.Table.Dimensions.Height, 0}
 		};
 
 	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[3], limitsBottom[2]}, constants.Projection, wireframePixelCoords);

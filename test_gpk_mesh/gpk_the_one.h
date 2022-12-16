@@ -15,10 +15,11 @@ namespace the1
 		uint8_t											BallLockAtTarget			= (uint8_t)-1;
 	};
 
+	typedef ::gpk::array_static<::the1::SCamera, ::the1::MAX_BALLS> TCameraStaticArray;
 	struct SPlayerCameras {
 		::the1::SCamera									Free						= {{-1, 1.75, -1}, {0,}};
-		::the1::SCamera									Balls	[::the1::MAX_BALLS]	= {{-1, 1.75, -1}, {}};
-		::the1::SCamera									Pockets	[::the1::MAX_BALLS]	= {{-1, 1.75, -1}, {}};
+		::the1::TCameraStaticArray						Balls						= {{{-1, 1.75, -1}, {}}};
+		::the1::TCameraStaticArray						Pockets						= {{{-1, 1.75, -1}, {}}};
 		::the1::SCamera									Stick						= {{-1, 1.75, -1}, {}};
 		uint32_t										Selected					= 0;
 	};
@@ -27,6 +28,7 @@ namespace the1
 		::gpk::SDialog									DialogPlay					= {};
 		::gpk::SDialog									DialogHome					= {};
 		::the1::SPlayerCameras							Cameras						= {};
+		::gpk::SUIInputBox								Name;
 	};
 
 	typedef ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t> TRenderTarget;
@@ -41,6 +43,17 @@ namespace the1
 		::the1::SPlayerUI								PlayerUI[::the1::MAX_BALLS]	= {};
 
 	};
+
+	GDEFINE_ENUM_TYPE (UI_HOME, uint8_t);
+	GDEFINE_ENUM_VALUE(UI_HOME, Continue		, 0);
+	GDEFINE_ENUM_VALUE(UI_HOME, Shop			, 1);
+	GDEFINE_ENUM_VALUE(UI_HOME, Save			, 2);
+	GDEFINE_ENUM_VALUE(UI_HOME, Load			, 3);
+	GDEFINE_ENUM_VALUE(UI_HOME, Start			, 4);
+	GDEFINE_ENUM_VALUE(UI_HOME, Leaderboards	, 5);
+	GDEFINE_ENUM_VALUE(UI_HOME, Credits			, 6);
+	GDEFINE_ENUM_VALUE(UI_HOME, Settings		, 7);
+	GDEFINE_ENUM_VALUE(UI_HOME, Exit			, 8);
 
 	GDEFINE_ENUM_TYPE(APP_STATE, uint8_t);
 	GDEFINE_ENUM_VALUE(APP_STATE, Init		,  0);
@@ -72,8 +85,7 @@ namespace the1
 		APP_STATE										ActiveState					= {};
 	};
 
-	::gpk::error_t									theOneSetup			(::the1::STheOne & app, the1::POOL_GAME_MODE mode = the1::POOL_GAME_MODE_8Ball);
-	::gpk::error_t									theOneUpdate		(::the1::STheOne & app, double secondsElapsed, ::gpk::view_array<const uint8_t> keyStates, const ::gpk::SCoord3<int16_t> mouseDeltas, ::gpk::view_array<const uint8_t> buttonStates);
+	::gpk::error_t									theOneUpdate		(::the1::STheOne & app, double secondsElapsed, const ::gpk::ptr_obj<::gpk::SInput> & inputState, const ::gpk::view_array<::gpk::SSysEvent> & systemEvents);
 	::gpk::error_t									theOneDraw			(::the1::STheOne & app, ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t> & backBuffer, double totalSeconds);
 
 	::gpk::error_t									guiSetup			(::the1::STheOne & app, const ::gpk::ptr_obj<::gpk::SInput> & input);

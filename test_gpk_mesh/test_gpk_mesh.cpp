@@ -33,7 +33,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	mainWindow.Size															= {1280, 720};
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?!");
 
-	::the1::theOneSetup(app.TheOne);
+	//::the1::theOneSetup(app.TheOne);
 
 	//app.EntityCamera					= app.Engine.CreateCamera	();
 	//app.EntityLightDirectional		= app.Engine.CreateLight	(::gpk::LIGHT_TYPE_Directional	);
@@ -54,21 +54,23 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 }
 
 ::gpk::error_t										update										(::SApplication& app, bool systemRequestedExit)					{
-	retval_ginfo_if(1, systemRequestedExit, "Exiting because the runtime asked for close. We could also ignore this value and just continue execution if we don't want to exit.");
-	::gpk::error_t											frameworkResult								= ::gpk::updateFramework(app.Framework);
-	ree_if(errored(frameworkResult), "Unknown error.");
-	rvi_if(1, frameworkResult == 1, "Framework requested close. Terminating execution.");
-	ree_if(errored(::updateSizeDependentResources(app)), "Cannot update offscreen and this could cause an invalid memory access later on.");
 	::gpk::SFramework									& framework									= app.Framework;
 	::gpk::SFrameInfo									& frameInfo									= framework.FrameInfo;
 	{
 		::gpk::STimer										timer;
-		::the1::theOneUpdate(app.TheOne, frameInfo.Seconds.LastFrame, framework.Input->KeyboardCurrent.KeyState, framework.Input->MouseCurrent.Deltas.Cast<int16_t>(), framework.Input->MouseCurrent.ButtonState);
+		::the1::theOneUpdate(app.TheOne, frameInfo.Seconds.LastFrame, framework.Input, framework.MainDisplay.EventQueue);
 
 		timer.Frame();
 		info_printf("Update engine in %f seconds", timer.LastTimeSeconds);
 	}
 
+
+	retval_ginfo_if(1, systemRequestedExit, "Exiting because the runtime asked for close. We could also ignore this value and just continue execution if we don't want to exit.");
+
+	::gpk::error_t											frameworkResult								= ::gpk::updateFramework(app.Framework);
+	ree_if(errored(frameworkResult), "Unknown error.");
+	rvi_if(1, frameworkResult == 1, "Framework requested close. Terminating execution.");
+	ree_if(errored(::updateSizeDependentResources(app)), "Cannot update offscreen and this could cause an invalid memory access later on.");
 	//-----------------------------
 	::gpk::STimer																& timer										= app.Framework.Timer;
 	::gpk::SWindow																& mainWindow								= app.Framework.MainDisplay;

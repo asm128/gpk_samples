@@ -1,6 +1,6 @@
 #include "gpk_the_one.h"
 
-::gpk::error_t				the1::theOneSetup		(::the1::STheOne & app, the1::POOL_GAME_MODE mode) { 
+static	::gpk::error_t				theOneSetup		(::the1::STheOne & app, const ::gpk::ptr_obj<::gpk::SInput> & inputState, the1::POOL_GAME_MODE mode = the1::POOL_GAME_MODE_8Ball) { 
 	gpk_necs(::the1::poolGameSetup(app.MainGame.Game, mode));
 	//for(uint32_t iGame = 0; iGame < app.TestGames.size(); ++iGame) {
 	//	gpk_necs(::the1::poolGameSetup(app.TestGames[iGame].Game, the1::POOL_GAME_MODE_Test2Balls));
@@ -14,6 +14,8 @@
 		playerUI.Cameras.Balls[iBall].BallLockAtTarget		= true;
 		app.MainGame.Game.GetBallPosition(iBall, playerUI.Cameras.Balls[iBall].Target);
 	}
+
+	::the1::guiSetup(app, inputState);
 	return 0; 
 }
 
@@ -112,8 +114,18 @@ static	::gpk::error_t		updateInput				(::the1::STheOne & app, double secondsElap
 	return 0;
 }
 
-::gpk::error_t				the1::theOneUpdate		(::the1::STheOne & app, double secondsElapsed, ::gpk::view_array<const uint8_t> keyStates, const ::gpk::SCoord3<int16_t> mouseDeltas, ::gpk::view_array<const uint8_t> buttonStates) { 
-	::updateInput(app, secondsElapsed, keyStates, mouseDeltas, buttonStates);
+::gpk::error_t				the1::theOneUpdate		(::the1::STheOne & app, double secondsElapsed, const ::gpk::ptr_obj<::gpk::SInput> & inputState, const ::gpk::view_array<::gpk::SSysEvent> & /*systemEvents*/) { 
+	switch(app.ActiveState) {
+	case ::the1::APP_STATE_Init		: {
+		::theOneSetup(app, inputState);
+		app.ActiveState				= ::the1::APP_STATE_Home;
+	}
+		break;
+	//case ::the1::APP_STATE_Play		: {
+	//	app.ActiveState				= ::the1::APP_STATE_Home;
+	//	break;
+	}
+	::updateInput(app, secondsElapsed, inputState->KeyboardCurrent.KeyState, inputState->MouseCurrent.Deltas.Cast<int16_t>(), inputState->MouseCurrent.ButtonState);
 
 	::the1::SPoolGame				& activeGame			= app.MainGame.Game;
 	::the1::poolGameUpdate(activeGame, secondsElapsed * app.MainGame.TimeScale);

@@ -210,7 +210,7 @@ static	::gpk::error_t		resolveCollision
 
 		pool.LastFrameContactsBall.append(lastFrameContactsBatchBall);
 
-		const gpk::SCoord2<float>		tableHalfDimensions	= pool.StateCurrent.Table.Size * .5f;
+		const gpk::SCoord2<float>		tableHalfDimensions	= pool.StateCurrent.Table.Dimensions.Slate * .5f;
 		for(uint32_t iBall = 0; iBall < pool.StateCurrent.BallCount; ++iBall) {
 			const float						ballRadius			= pool.StateCurrent.BallRadius;
 			const gpk::SCoord2<float>		ballLimits			= tableHalfDimensions - ::gpk::SCoord2<float>{ballRadius, ballRadius};

@@ -24,7 +24,18 @@ static	::gpk::error_t			dialogCreateCommon			(::gpk::SDialog & dialog, const ::g
 }
 
 static	::gpk::error_t			guiSetupWelcome				(::the1::STheOne & app) { ::gpk::SDialog	& dialog = app.DialogPerState[::the1::APP_STATE_Welcome		]; (void)dialog; return 0; }
-static	::gpk::error_t			guiSetupHome				(::the1::STheOne & app) { ::gpk::SDialog	& dialog = app.DialogPerState[::the1::APP_STATE_Home		]; (void)dialog; return 0; }
+static	::gpk::error_t			guiSetupHome				(::the1::STheOne & app) { ::gpk::SDialog	& dialog = app.DialogPerState[::the1::APP_STATE_Home		]; 
+	constexpr int						BUTTON_HEIGHT				= 24;
+	gpk_necs(::gpk::guiSetupButtonList<::the1::UI_HOME>(*dialog.GUI, dialog.Root, {160, BUTTON_HEIGHT}, {0, int16_t(-BUTTON_HEIGHT * ::gpk::get_value_count<::the1::UI_HOME>() / 2)}, ::gpk::ALIGN_CENTER)); 
+	for(uint32_t iButton = 0; iButton < ::gpk::get_value_count<::the1::UI_HOME>(); ++iButton)
+		dialog.GUI->Controls.Controls[iButton + 1].Area.Offset.y += 0;
+
+	for(uint32_t iButton = ::the1::UI_HOME_Start; iButton < ::gpk::get_value_count<::the1::UI_HOME>(); ++iButton)
+		dialog.GUI->Controls.Controls[iButton + 1].Area.Offset.y += 36;
+
+	(void)dialog; 
+	return 0; 
+}
 static	::gpk::error_t			guiSetupPlay				(::the1::STheOne & app) { ::gpk::SDialog	& dialog = app.DialogPerState[::the1::APP_STATE_Play		]; (void)dialog; return 0; }
 static	::gpk::error_t			guiSetupShop				(::the1::STheOne & app) { ::gpk::SDialog	& dialog = app.DialogPerState[::the1::APP_STATE_Shop		]; (void)dialog; return 0; }
 static	::gpk::error_t			guiSetupProfile				(::the1::STheOne & app) { ::gpk::SDialog	& dialog = app.DialogPerState[::the1::APP_STATE_Profile		]; (void)dialog; return 0; }
