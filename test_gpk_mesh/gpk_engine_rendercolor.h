@@ -12,7 +12,6 @@ namespace gpk
 		::gpk::SColorFloat							Specular;
 	};
 #pragma pack(pop)
-
 } // namespace
 
 #endif

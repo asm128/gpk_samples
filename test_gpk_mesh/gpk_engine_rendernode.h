@@ -81,19 +81,6 @@ namespace gpk
 	};
 
 
-#pragma pack(push, 1)
-	struct SRenderMaterial {
-		::gpk::SRenderColor							Color;
-		float										SpecularPower;
-	};
-#pragma pack(pop)
-
-	struct SSkin {
-		::gpk::SRenderMaterial						Material;
-		::gpk::array_pod<uint32_t>					Textures;
-	};
-
-
 	struct SRenderNodeManager {
 		::gpk::array_pod <::gpk::SRenderNode						>	RenderNodes					= {};
 		::gpk::array_pod <::gpk::SRenderNodeFlags					>	RenderNodeFlags				= {};
@@ -133,22 +120,6 @@ namespace gpk
 			RenderNodeFlags				.remove_unordered(indexNode);
 			return RenderNodes			.remove_unordered(indexNode);
 		}
-
-
-		::gpk::array_pobj<::gpk::SSkin>				Skins			= {};
-		::gpk::array_obj<::gpk::vcc>				SkinNames		= {};
-
-		::gpk::error_t								CreateSkin		()					{ SkinNames.push_back({});				return Skins.push_back({}); }
-		::gpk::error_t								DeleteSkin		(uint32_t index)	{ SkinNames.remove_unordered(index);	return Skins.remove_unordered(index); }
-		::gpk::error_t								CloneSkin		(uint32_t index)	{ 
-			::gpk::ptr_obj<::gpk::SSkin>					& newSkin		= Skins[Skins.push_back({})]; 
-			const ::gpk::ptr_obj<::gpk::SSkin>				& srcSkin		= Skins[index];
-			if(srcSkin) {
-				*newSkin.create() = *srcSkin;
-			}
-			return SkinNames.push_back(::gpk::vcc{SkinNames[index]}); 
-		}
-
 	};
 } // namespace
 

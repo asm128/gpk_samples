@@ -1,6 +1,4 @@
-#include "gpk_engine_rendercolor.h"
 #include "gpk_matrix.h"
-#include "gpk_ptr.h"
 
 #ifndef GPK_ENGINE_RENDERMESH_H
 #define GPK_ENGINE_RENDERMESH_H
@@ -46,16 +44,6 @@ namespace gpk
 		::gpk::array_pod<::gpk::SGeometrySlice>		GeometrySlices;
 	};	
 
-	struct SMeshManager {
-		::gpk::array_pobj<::gpk::SRenderMesh>		Meshes			= {};
-
-		::gpk::array_obj<::gpk::vcc>				MeshNames		= {};
-
-		::gpk::error_t								CloneMesh		(uint32_t index)	{ Meshes	.push_back(::gpk::ptr_obj<::gpk::SRenderMesh	>{Meshes[index]}); return MeshNames.push_back(::gpk::vcc{MeshNames[index]}); }
-
-		::gpk::error_t								CreateMesh		()					{ MeshNames.push_back({});				return Meshes .push_back({}); }
-		::gpk::error_t								DeleteMesh		(uint32_t index)	{ MeshNames.remove_unordered(index);	return Meshes .remove_unordered(index); }
-	};
 } // namespace
 
 #endif

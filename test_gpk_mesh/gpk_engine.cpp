@@ -105,14 +105,14 @@ int												gpk::updateEntityTransforms
 	pUV				->Desc.Usage	= ::gpk::BUFFER_USAGE_UV;
 
 
-	uint32_t							iVertices				= (uint32_t)Scene->ManagedBuffers.Buffers.push_back(pVertices);
-	uint32_t							iNormals				= (uint32_t)Scene->ManagedBuffers.Buffers.push_back(pNormals);
-	uint32_t							iUV						= (uint32_t)Scene->ManagedBuffers.Buffers.push_back(pUV);
-	uint32_t							iIndicesVertex			= (uint32_t)Scene->ManagedBuffers.Buffers.push_back(pIndicesVertex);
+	uint32_t							iVertices				= (uint32_t)Scene->Graphics->Buffers.push_back(pVertices);
+	uint32_t							iNormals				= (uint32_t)Scene->Graphics->Buffers.push_back(pNormals);
+	uint32_t							iUV						= (uint32_t)Scene->Graphics->Buffers.push_back(pUV);
+	uint32_t							iIndicesVertex			= (uint32_t)Scene->Graphics->Buffers.push_back(pIndicesVertex);
 
-	uint32_t							iMesh					= (uint32_t)Scene->ManagedMeshes.CreateMesh();
-	Scene->ManagedMeshes.MeshNames[iMesh]	= ::gpk::vcs{"Box"};
-	::gpk::ptr_obj<::gpk::SRenderMesh>	& mesh					= Scene->ManagedMeshes.Meshes[iMesh];
+	uint32_t							iMesh					= (uint32_t)Scene->Graphics->Meshes.Create();
+	Scene->Graphics->Meshes.Names[iMesh]	= ::gpk::vcs{"Box"};
+	::gpk::ptr_obj<::gpk::SRenderMesh>	& mesh					= Scene->Graphics->Meshes[iMesh];
 
 	mesh->GeometryBuffers.append({iIndicesVertex, iVertices, iNormals, iUV});
 
@@ -137,9 +137,9 @@ int												gpk::updateEntityTransforms
 
 	uint32_t							offsetIndex				= 0;
 	for(uint32_t iFace = 0; iFace < 6; ++iFace) {
-		uint32_t							iSkin					= (uint32_t)Scene->ManagedRenderNodes.CreateSkin();
-		uint32_t							iSurface				= (uint32_t)Scene->ManagedSurfaces.Create();
-		::gpk::ptr_obj<::gpk::SSkin>		& skin					= Scene->ManagedRenderNodes.Skins[iSkin];
+		uint32_t							iSkin					= (uint32_t)Scene->Graphics->Skins.Create();
+		uint32_t							iSurface				= (uint32_t)Scene->Graphics->Surfaces.Create();
+		::gpk::ptr_obj<::gpk::SSkin>		& skin					= Scene->Graphics->Skins.Elements[iSkin];
 		skin->Textures.push_back(iSurface);
 		skin->Material.Color.Ambient	= ::gpk::SColorBGRA(::gpk::ASCII_PALETTE[1 + iFace]);
 		skin->Material.Color.Diffuse	= ::gpk::SColorBGRA(::gpk::ASCII_PALETTE[1 + iFace]);
@@ -148,7 +148,7 @@ int												gpk::updateEntityTransforms
 
 		skin->Material.Color.Ambient	*= .1f;
 
-		::gpk::ptr_obj<::gpk::SSurface>		& surface				= Scene->ManagedSurfaces.Surfaces[iSurface];
+		::gpk::ptr_obj<::gpk::SSurface>		& surface				= Scene->Graphics->Surfaces[iSurface];
 		surface->Desc.ColorType			= ::gpk::COLOR_TYPE_BGRA;
 		surface->Desc.MethodCompression	= 0;
 		surface->Desc.MethodFilter		= 0;
@@ -169,7 +169,7 @@ int												gpk::updateEntityTransforms
 		faceRenderNode.Mesh				= iMesh;
 		faceRenderNode.Slice			= iFace;
 		faceRenderNode.Skin				= iSkin;
-		faceRenderNode.Shader			= Scene->ManagedShaders.Shaders.push_back(::gpk::shaderWireframe);
+		Scene->Graphics->Shaders[faceRenderNode.Shader = Scene->Graphics->Shaders.push_back({})].create(::gpk::shaderWireframe);
 
 		//faceEntity.RigidBody			= Integrator.Create();
 		faceEntity.Parent				= iEntity;
@@ -223,33 +223,33 @@ int												gpk::updateEntityTransforms
 	memcpy(&pNormals	->Data[0], geometry.Normals			.begin(), pNormals	->Data.size());
 	memcpy(&pUV			->Data[0], geometry.TextureCoords	.begin(), pUV		->Data.size());
 
-	uint32_t									iVertices				= (uint32_t)Scene->ManagedBuffers.Buffers.push_back(pVertices);
-	uint32_t									iNormals				= (uint32_t)Scene->ManagedBuffers.Buffers.push_back(pNormals);
-	uint32_t									iUV						= (uint32_t)Scene->ManagedBuffers.Buffers.push_back(pUV);
-	uint32_t									iIndicesVertex			= (uint32_t)Scene->ManagedBuffers.Buffers.push_back(pIndicesVertex);
+	uint32_t									iVertices				= (uint32_t)Scene->Graphics->Buffers.push_back(pVertices);
+	uint32_t									iNormals				= (uint32_t)Scene->Graphics->Buffers.push_back(pNormals);
+	uint32_t									iUV						= (uint32_t)Scene->Graphics->Buffers.push_back(pUV);
+	uint32_t									iIndicesVertex			= (uint32_t)Scene->Graphics->Buffers.push_back(pIndicesVertex);
 
-	uint32_t									iMesh					= (uint32_t)Scene->ManagedMeshes.CreateMesh();
-	::gpk::ptr_obj<::gpk::SRenderMesh>			& mesh					= Scene->ManagedMeshes.Meshes[iMesh];
-	Scene->ManagedMeshes.MeshNames[iMesh]	= ::gpk::vcs{"Sphere"};
+	uint32_t									iMesh					= (uint32_t)Scene->Graphics->Meshes.Create();
+	::gpk::ptr_obj<::gpk::SRenderMesh>			& mesh					= Scene->Graphics->Meshes[iMesh];
+	Scene->Graphics->Meshes.Names[iMesh]	= ::gpk::vcs{"Sphere"};
 	mesh->GeometryBuffers.append({iIndicesVertex, iVertices, iNormals, iUV});
 
 	mesh->Desc.Mode							= ::gpk::MESH_MODE_List;
 	mesh->Desc.Type							= ::gpk::GEOMETRY_TYPE_Triangle;
 	mesh->Desc.NormalMode					= ::gpk::NORMAL_MODE_Point;
 
-	uint32_t									iSkin					= (uint32_t)Scene->ManagedRenderNodes.CreateSkin();
-	::gpk::ptr_obj<::gpk::SSkin>				& skin					= Scene->ManagedRenderNodes.Skins[iSkin];
+	uint32_t									iSkin					= (uint32_t)Scene->Graphics->Skins.Create();
+	::gpk::ptr_obj<::gpk::SSkin>				& skin					= Scene->Graphics->Skins.Elements[iSkin];
 	skin->Material.Color.Ambient			= ::gpk::SColorBGRA(::gpk::ASCII_PALETTE[3]);
 	skin->Material.Color.Diffuse			= ::gpk::SColorBGRA(::gpk::ASCII_PALETTE[3]);
 	skin->Material.Color.Specular			= ::gpk::WHITE;
 	skin->Material.SpecularPower			= 0.5f;
 
-	uint32_t									iSurface				= (uint32_t)Scene->ManagedSurfaces.Create();
+	uint32_t									iSurface				= (uint32_t)Scene->Graphics->Surfaces.Create();
 	skin->Textures.push_back(iSurface);
 
 	skin->Material.Color.Ambient			*= .1f;
 
-	::gpk::ptr_obj<::gpk::SSurface>				& surface				= Scene->ManagedSurfaces.Surfaces[iSurface];
+	::gpk::ptr_obj<::gpk::SSurface>				& surface				= Scene->Graphics->Surfaces[iSurface];
 	surface->Desc.ColorType					= ::gpk::COLOR_TYPE_BGRA;
 	surface->Desc.MethodCompression			= 0;
 	surface->Desc.MethodFilter				= 0;
@@ -270,9 +270,8 @@ int												gpk::updateEntityTransforms
 	::gpk::SRenderNode							& renderNode						= Scene->ManagedRenderNodes.RenderNodes[entity.RenderNode];
 	renderNode.Skin							= iSkin;
 	renderNode.Mesh							= iMesh;
-	renderNode.Shader						= Scene->ManagedShaders.Shaders.push_back(::gpk::shaderWireframe);
 	renderNode.Slice						= 0;
-
+	Scene->Graphics->Shaders[renderNode.Shader = Scene->Graphics->Shaders.push_back({})].create(::gpk::shaderWireframe);
 	return iEntity;
 }
 
@@ -320,33 +319,33 @@ int												gpk::updateEntityTransforms
 	memcpy(&pNormals	->Data[0], geometry.Normals			.begin(), pNormals	->Data.size());
 	memcpy(&pUV			->Data[0], geometry.TextureCoords	.begin(), pUV		->Data.size());
 
-	uint32_t									iVertices				= (uint32_t)Scene->ManagedBuffers.Buffers.push_back(pVertices);
-	uint32_t									iNormals				= (uint32_t)Scene->ManagedBuffers.Buffers.push_back(pNormals);
-	uint32_t									iUV						= (uint32_t)Scene->ManagedBuffers.Buffers.push_back(pUV);
-	uint32_t									iIndicesVertex			= (uint32_t)Scene->ManagedBuffers.Buffers.push_back(pIndicesVertex);
+	uint32_t									iVertices				= (uint32_t)Scene->Graphics->Buffers.push_back(pVertices);
+	uint32_t									iNormals				= (uint32_t)Scene->Graphics->Buffers.push_back(pNormals);
+	uint32_t									iUV						= (uint32_t)Scene->Graphics->Buffers.push_back(pUV);
+	uint32_t									iIndicesVertex			= (uint32_t)Scene->Graphics->Buffers.push_back(pIndicesVertex);
 
-	uint32_t									iMesh					= (uint32_t)Scene->ManagedMeshes.CreateMesh();
-	::gpk::ptr_obj<::gpk::SRenderMesh>			& mesh					= Scene->ManagedMeshes.Meshes[iMesh];
-	Scene->ManagedMeshes.MeshNames[iMesh]	= ::gpk::vcs{"Sphere"};
+	uint32_t									iMesh					= (uint32_t)Scene->Graphics->Meshes.Create();
+	::gpk::ptr_obj<::gpk::SRenderMesh>			& mesh					= Scene->Graphics->Meshes[iMesh];
+	Scene->Graphics->Meshes.Names[iMesh]	= ::gpk::vcs{"Sphere"};
 	mesh->GeometryBuffers.append({iIndicesVertex, iVertices, iNormals, iUV});
 
 	mesh->Desc.Mode							= ::gpk::MESH_MODE_List;
 	mesh->Desc.Type							= ::gpk::GEOMETRY_TYPE_Triangle;
 	mesh->Desc.NormalMode					= ::gpk::NORMAL_MODE_Point;
 
-	uint32_t									iSkin					= (uint32_t)Scene->ManagedRenderNodes.CreateSkin();
-	::gpk::ptr_obj<::gpk::SSkin>				& skin					= Scene->ManagedRenderNodes.Skins[iSkin];
+	uint32_t									iSkin					= (uint32_t)Scene->Graphics->Skins.Create();
+	::gpk::ptr_obj<::gpk::SSkin>				& skin					= Scene->Graphics->Skins.Elements[iSkin];
 	skin->Material.Color.Ambient			= ::gpk::SColorBGRA(::gpk::ASCII_PALETTE[3]);
 	skin->Material.Color.Diffuse			= ::gpk::SColorBGRA(::gpk::ASCII_PALETTE[3]);
 	skin->Material.Color.Specular			= ::gpk::WHITE;
 	skin->Material.SpecularPower			= 0.5f;
 
-	uint32_t									iSurface				= (uint32_t)Scene->ManagedSurfaces.Create();
+	uint32_t									iSurface				= (uint32_t)Scene->Graphics->Surfaces.Create();
 	skin->Textures.push_back(iSurface);
 
 	skin->Material.Color.Ambient			*= .1f;
 
-	::gpk::ptr_obj<::gpk::SSurface>				& surface				= Scene->ManagedSurfaces.Surfaces[iSurface];
+	::gpk::ptr_obj<::gpk::SSurface>				& surface				= Scene->Graphics->Surfaces[iSurface];
 	surface->Desc.ColorType					= ::gpk::COLOR_TYPE_BGRA;
 	surface->Desc.MethodCompression			= 0;
 	surface->Desc.MethodFilter				= 0;
@@ -367,8 +366,8 @@ int												gpk::updateEntityTransforms
 	::gpk::SRenderNode							& renderNode						= Scene->ManagedRenderNodes.RenderNodes[entity.RenderNode];
 	renderNode.Skin							= iSkin;
 	renderNode.Mesh							= iMesh;
-	renderNode.Shader						= Scene->ManagedShaders.Shaders.push_back(::gpk::shaderWireframe);
 	renderNode.Slice						= 0;
+	Scene->Graphics->Shaders[renderNode.Shader = Scene->Graphics->Shaders.push_back({})].create(::gpk::shaderWireframe);
 
 	return iEntity;
 }

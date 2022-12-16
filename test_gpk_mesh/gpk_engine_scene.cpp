@@ -17,7 +17,7 @@
 			continue;
 
 		const ::gpk::SRenderNode						& renderNode			= scene.ManagedRenderNodes.RenderNodes[iRenderNode];
-		if(renderNode.Mesh >= scene.ManagedMeshes.Meshes.size())
+		if(renderNode.Mesh >= scene.Graphics->Meshes.size())
 			continue;
 		
 		const ::gpk::SRenderNodeTransforms				& transforms			= scene.ManagedRenderNodes.RenderNodeTransforms[iRenderNode];
@@ -25,11 +25,11 @@
 		if((worldTransform.GetTranslation() - constants.CameraPosition).Normalize().Dot(constants.CameraFront) <= 0)
 			return 0;
 
-		if(renderNode.Shader >= scene.ManagedShaders.Shaders.size()) 
+		if(renderNode.Shader >= scene.Graphics->Shaders.size()) 
 			::gpk::shaderWireframe(backBufferColors, backBufferDepth, renderCache, scene, constants, iRenderNode); 
 			//::the1::shaderBall(backBufferColors, backBufferDepth, renderCache, scene, constants, iRenderNode); 
 		else {
-			const std::function<TFuncEffect>				& fx					= scene.ManagedShaders.Shaders[renderNode.Shader];
+			const ::std::function<TFuncEffect>				& fx					= *scene.Graphics->Shaders[renderNode.Shader];
 			fx(backBufferColors, backBufferDepth, renderCache, scene, constants, iRenderNode);
 		}
 	}

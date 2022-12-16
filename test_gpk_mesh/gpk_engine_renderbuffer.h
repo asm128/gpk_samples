@@ -1,6 +1,5 @@
 #include "gpk_datatype.h"
 #include "gpk_enum.h"
-#include "gpk_array.h"
 
 #ifndef GPK_ENGINE_RENDERBUFFER_H
 #define GPK_ENGINE_RENDERBUFFER_H
@@ -47,11 +46,6 @@ namespace gpk
 			return 0;
 		}
 	};
-
-	struct SRenderBufferManager {
-		::gpk::array_pobj<::gpk::SRenderBuffer>		Buffers;
-	};
-
 } // namespace
 
 #endif

@@ -1,7 +1,9 @@
-#include "gpk_engine_rendermesh.h"
 #include "gpk_engine_renderbuffer.h"
-#include "gpk_engine_rendersurface.h"
+#include "gpk_engine_rendermesh.h"
 #include "gpk_engine_rendernode.h"
+#include "gpk_engine_rendersurface.h"
+#include "gpk_engine_container.h"
+
 #include "gpk_bitmap_target.h"
 #include "gpk_font.h"
 
@@ -40,22 +42,38 @@ namespace gpk
 		, int32_t								iRenderNode
 		);
 
-	struct SShaderManager {
-		::gpk::array_obj<std::function<TFuncEffect>>	Shaders;
+	struct SRenderMaterial {
+		::gpk::SRenderColor							Color;
+		float										SpecularPower;
 	};
 
+	struct SSkin {
+		::gpk::SRenderMaterial						Material;
+		::gpk::array_pod<uint32_t>					Textures;
+	};
+
+	typedef		::gpk::SLinearMap<::gpk::SSkin>					SSkinManager;
+	typedef		::gpk::SLinearMap<::gpk::SRenderBuffer>			SRenderBufferManager;
+	typedef		::gpk::SLinearMap<::gpk::SSurface>				SSurfaceManager;
+	typedef		::gpk::SLinearMap<::gpk::SRenderMesh>			SMeshManager;
+	typedef		::gpk::SLinearMap<::std::function<TFuncEffect>>	SShaderManager;
+
+	struct SEngineSceneGraphics {
+		::gpk::SRenderBufferManager			Buffers			= {};
+		::gpk::SSurfaceManager				Surfaces		= {};
+		::gpk::SMeshManager					Meshes			= {};
+		::gpk::SSkinManager					Skins			= {};
+		::gpk::SShaderManager				Shaders			= {};
+
+		::gpk::SRasterFontManager			Fonts			= {};
+	};
 
 	struct SEngineScene {
-		::gpk::SRenderBufferManager			ManagedBuffers			= {};
-		::gpk::SSurfaceManager				ManagedSurfaces			= {};
-		::gpk::SMeshManager					ManagedMeshes			= {};
-		::gpk::SShaderManager				ManagedShaders			= {};
-		::gpk::SRasterFontManager			ManagerFonts			= {};
-		::gpk::SRenderNodeManager			ManagedRenderNodes		= {};
+		::gpk::ptr_obj<SEngineSceneGraphics>	Graphics				= {};
+		::gpk::SRenderNodeManager				ManagedRenderNodes		= {};
 
-		::gpk::SEngineRenderCache			RenderCache				= {};
+		::gpk::SEngineRenderCache				RenderCache				= {};
 	};
-
 
 	::gpk::error_t						drawScene									
 		( ::gpk::view_grid<::gpk::SColorBGRA>	& backBufferColors

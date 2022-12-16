@@ -55,34 +55,27 @@ static	::gpk::error_t		resolveCollision
 	return 0;
 }
 
-::gpk::error_t				gpk::collisionDetect			(const ::gpk::SEngine & engine, ::gpk::array_pod<::gpk::SContact> & contactsDetected) {
-	for(uint32_t iEntityA = 0, countEntities = engine.ManagedEntities.Entities.size(); iEntityA < countEntities; ++iEntityA) {
-		const ::gpk::SVirtualEntity		& entityA						= engine.ManagedEntities.Entities[iEntityA];
-		if(entityA.RigidBody >= engine.Integrator.BodyFlags.size())
+static	::gpk::error_t		collisionDetectSphere			(const ::gpk::SEngine & engine, uint32_t iEntityA, const ::gpk::SVirtualEntity & entityA, ::gpk::array_pod<::gpk::SContact> & contactsDetected) {
+	const ::gpk::SCoord3<float>		& radiusA						= engine.Integrator.BoundingVolumes[entityA.RigidBody].HalfSizes;
+	const ::gpk::SCoord3<float>		positionA
+		= entityA.RenderNode >= engine.Scene->ManagedRenderNodes.RenderNodeTransforms.size() 
+			? engine.Integrator.Centers[entityA.RigidBody].Position
+			: engine.Scene->ManagedRenderNodes.RenderNodeTransforms[entityA.RenderNode].World.GetTranslation()
+			;
+
+	::gpk::SContact					contactBall						= {};
+	contactBall.EntityA			= iEntityA;
+	for(uint32_t iEntityB = iEntityA + 1; iEntityB < engine.ManagedEntities.Entities.size(); ++iEntityB) {
+		const ::gpk::SVirtualEntity		& entityB						= engine.ManagedEntities.Entities[iEntityB];
+		if(entityB.RigidBody >= engine.Integrator.BodyFlags.size())
 			continue;
 
-		const ::gpk::SRigidBodyFlags	& flagsA						= engine.Integrator.BodyFlags[entityA.RigidBody];
-		if(false == flagsA.Collides)
+		const ::gpk::SRigidBodyFlags	& flagsB						= engine.Integrator.BodyFlags[entityB.RigidBody];
+		if(false == flagsB.Collides)
 			continue;
 
-		const ::gpk::SCoord3<float>		& radiusA						= engine.Integrator.BoundingVolumes[entityA.RigidBody].HalfSizes;
-		const ::gpk::SCoord3<float>		positionA
-			= entityA.RenderNode >= engine.Scene->ManagedRenderNodes.RenderNodeTransforms.size() 
-				? engine.Integrator.Centers[entityA.RigidBody].Position
-				: engine.Scene->ManagedRenderNodes.RenderNodeTransforms[entityA.RenderNode].World.GetTranslation()
-				;
-
-		::gpk::SContact					contactBall						= {};
-		contactBall.EntityA			= iEntityA;
-		for(uint32_t iEntityB = iEntityA + 1; iEntityB < countEntities; ++iEntityB) {
-			const ::gpk::SVirtualEntity		& entityB						= engine.ManagedEntities.Entities[iEntityB];
-			if(entityB.RigidBody >= engine.Integrator.BodyFlags.size())
-				continue;
-
-			const ::gpk::SRigidBodyFlags	& flagsB						= engine.Integrator.BodyFlags[entityB.RigidBody];
-			if(false == flagsB.Collides)
-				continue;
-
+		switch(flagsB.BVType) {
+		case ::gpk::BOUNDING_TYPE_Sphere: {
 			const ::gpk::SCoord3<float>		& radiusB						= engine.Integrator.BoundingVolumes[entityB.RigidBody].HalfSizes;
 			const ::gpk::SCoord3<float>		positionB						
 				= entityB.RenderNode >= engine.Scene->ManagedRenderNodes.RenderNodeTransforms.size() 
@@ -100,7 +93,26 @@ static	::gpk::error_t		resolveCollision
 			contactBall.EntityB			= iEntityB;
 			contactBall.DistanceLength	= distanceSquared ? sqrt(distanceSquared) : 0.0f;
 			contactsDetected.push_back(contactBall);
-		}
+			} // case
+			break;
+		} // switch
+	}
+	return 0;
+}
+
+::gpk::error_t				gpk::collisionDetect			(const ::gpk::SEngine & engine, ::gpk::array_pod<::gpk::SContact> & contactsDetected) {
+	for(uint32_t iEntityA = 0, countEntities = engine.ManagedEntities.Entities.size(); iEntityA < countEntities; ++iEntityA) {
+		const ::gpk::SVirtualEntity		& entityA						= engine.ManagedEntities.Entities[iEntityA];
+		if(entityA.RigidBody >= engine.Integrator.BodyFlags.size())
+			continue;
+
+		const ::gpk::SRigidBodyFlags	& flagsA						= engine.Integrator.BodyFlags[entityA.RigidBody];
+		if(false == flagsA.Collides)
+			continue;
+
+		switch(flagsA.BVType) {
+		case ::gpk::BOUNDING_TYPE_Sphere: ::collisionDetectSphere(engine, iEntityA, entityA, contactsDetected); break;
+		} // switch
 	}
 	return 0;
 }

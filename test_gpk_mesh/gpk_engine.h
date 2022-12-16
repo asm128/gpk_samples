@@ -57,14 +57,14 @@ namespace gpk
 			entityNew.Parent					= entitySource.Parent;
 
 			uint32_t								idSkinSource		= Scene->ManagedRenderNodes.RenderNodes[entityNew.RenderNode].Skin;
-			if(cloneSkin && idSkinSource < Scene->ManagedRenderNodes.Skins.size()) {
-				uint32_t								idSkin						= Scene->ManagedRenderNodes.CloneSkin(idSkinSource);
+			if(cloneSkin && idSkinSource < Scene->Graphics->Skins.size()) {
+				uint32_t								idSkin						= Scene->Graphics->Skins.Clone(idSkinSource);
 				Scene->ManagedRenderNodes.RenderNodes[entityNew.RenderNode].Skin	= idSkin;
 				if(cloneSurfaces) {
-					if(Scene->ManagedRenderNodes.Skins[idSkin]) {
-						::gpk::SSkin							& newSkin					= *Scene->ManagedRenderNodes.Skins[idSkin];
+					if(Scene->Graphics->Skins[idSkin]) {
+						::gpk::SSkin							& newSkin					= *Scene->Graphics->Skins[idSkin];
 						for(uint32_t iTexture = 0; iTexture < newSkin.Textures.size(); ++iTexture) {
-							newSkin.Textures[iTexture]			= Scene->ManagedSurfaces.Clone(newSkin.Textures[iTexture]);
+							newSkin.Textures[iTexture]			= Scene->Graphics->Surfaces.Clone(newSkin.Textures[iTexture]);
 						}
 					}
 				}
