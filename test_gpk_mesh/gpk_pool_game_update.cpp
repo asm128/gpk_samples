@@ -107,7 +107,7 @@ static	::gpk::error_t		resolveCollision
 
 ::gpk::error_t				the1::poolGameUpdate			(::the1::SPoolGame & pool, double secondsElapsed) {
 	::gpk::SEngine					& engine						= pool.Engine;
-	for(uint32_t iBall = 0; iBall < pool.StartState.BallCount; ++iBall) {
+	for(uint32_t iBall = 0; iBall < pool.StateCurrent.BallCount; ++iBall) {
 		pool.PositionDeltas[iBall].push_back({});
 		pool.GetBallPosition(iBall, pool.PositionDeltas[iBall][pool.PositionDeltas[iBall].size() - 1].A);
 	}
@@ -152,8 +152,8 @@ static	::gpk::error_t		resolveCollision
 			// Separate balls
 			::gpk::SCoord3<float>			& positionA			= engine.Integrator.Centers[entityA.RigidBody].Position;
 			::gpk::SCoord3<float>			& positionB			= engine.Integrator.Centers[entityB.RigidBody].Position;
-			positionA					+= contact.Result.DistanceDirection * ::gpk::max(pool.StartState.BallRadius * 2 - distanceLength, 0.0) * -.51f;
-			positionB					+= contact.Result.DistanceDirection * ::gpk::max(pool.StartState.BallRadius * 2 - distanceLength, 0.0) * .51f;
+			positionA					+= contact.Result.DistanceDirection * ::gpk::max(pool.StateCurrent.BallRadius * 2 - distanceLength, 0.0) * -.51f;
+			positionB					+= contact.Result.DistanceDirection * ::gpk::max(pool.StateCurrent.BallRadius * 2 - distanceLength, 0.0) * .51f;
 
 
 			// Calculate force transfer
@@ -202,25 +202,25 @@ static	::gpk::error_t		resolveCollision
 				}
 			}
 
-			contact.Result.FinalVelocityA	= (velocityA *= pool.StartState.DampingCollision);
-			contact.Result.FinalVelocityB	= (velocityB *= pool.StartState.DampingCollision);
-			contact.Result.FinalRotationA	= (rotationA *= pool.StartState.DampingCollision);
-			contact.Result.FinalRotationB	= (rotationB *= pool.StartState.DampingCollision);
+			contact.Result.FinalVelocityA	= (velocityA *= pool.StateCurrent.Physics.DampingCollision);
+			contact.Result.FinalVelocityB	= (velocityB *= pool.StateCurrent.Physics.DampingCollision);
+			contact.Result.FinalRotationA	= (rotationA *= pool.StateCurrent.Physics.DampingCollision);
+			contact.Result.FinalRotationB	= (rotationB *= pool.StateCurrent.Physics.DampingCollision);
 		}
 
 		pool.LastFrameContactsBall.append(lastFrameContactsBatchBall);
 
-		const gpk::SCoord2<float>		tableHalfDimensions	= pool.StartState.Table.Size * .5f;
-		for(uint32_t iBall = 0; iBall < pool.StartState.BallCount; ++iBall) {
-			const float						ballRadius			= pool.StartState.BallRadius;
+		const gpk::SCoord2<float>		tableHalfDimensions	= pool.StateCurrent.Table.Size * .5f;
+		for(uint32_t iBall = 0; iBall < pool.StateCurrent.BallCount; ++iBall) {
+			const float						ballRadius			= pool.StateCurrent.BallRadius;
 			const gpk::SCoord2<float>		ballLimits			= tableHalfDimensions - ::gpk::SCoord2<float>{ballRadius, ballRadius};
-			const ::gpk::SVirtualEntity		& entityA			= engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity]; 
+			const ::gpk::SVirtualEntity		& entityA			= engine.ManagedEntities.Entities[pool.StateCurrent.Ball[iBall].Entity]; 
 			::gpk::SCoord3<float>			& positionA			= engine.Integrator.Centers[entityA.RigidBody].Position;
 			::gpk::SRigidBodyFlags			& flags				= engine.Integrator.BodyFlags[entityA.RigidBody];
 			bool							inPocket			= false;
 			::gpk::SBodyForces				& forces			= engine.Integrator.Forces[entityA.RigidBody];
 			for(uint32_t iPocket = 0; iPocket < 6; ++iPocket) {
-				const ::gpk::SVirtualEntity		& entityPocket		= engine.ManagedEntities.Entities[pool.StartState.Table.Pockets[iPocket].Entity];
+				const ::gpk::SVirtualEntity		& entityPocket		= engine.ManagedEntities.Entities[pool.StateCurrent.Table.Pockets[iPocket].Entity];
 				::gpk::SCoord3<float>			pocketPosition		= engine.Scene->ManagedRenderNodes.RenderNodeTransforms[entityPocket.RenderNode].World.GetTranslation();
 				::gpk::SCoord3<float>			positionBall		= positionA;
 				if(positionBall.y < 0) {
@@ -234,14 +234,14 @@ static	::gpk::error_t		resolveCollision
 				pocketPosition.y			= 0;
 				positionBall.y				= 0;
 
-				const float						pocketRadius		= pool.StartState.Table.PocketRadius;
+				const float						pocketRadius		= pool.StateCurrent.Table.PocketRadius;
 				const float						maxLength			= pocketRadius;// + ballRadius;
 				::gpk::SCoord3<float>			distanceFromPocket	= positionA - pocketPosition;
 				if(distanceFromPocket.LengthSquared() > maxLength * maxLength)
 					continue;
 				float							w					= (float)(distanceFromPocket.Length() - ballRadius) / (pocketRadius - ballRadius);
 				inPocket					= true;
-				forces.Acceleration.y		= -pool.StartState.Gravity * ::gpk::max(0.0f, (1.0f - w));
+				forces.Acceleration.y		= -pool.StateCurrent.Physics.Gravity * ::gpk::max(0.0f, (1.0f - w));
 				flags.Falling				= true;
 				break;
 			}
@@ -253,47 +253,47 @@ static	::gpk::error_t		resolveCollision
 				, (positionA.z	< -ballLimits.y) || (positionA.z > ballLimits.y)
 				};
 			if(outOfBounds.x 
-				&& (positionA.z > -(tableHalfDimensions.y - pool.StartState.Table.PocketRadius))
-				&& (positionA.z <  (tableHalfDimensions.y - pool.StartState.Table.PocketRadius))
+				&& (positionA.z > -(tableHalfDimensions.y - pool.StateCurrent.Table.PocketRadius))
+				&& (positionA.z <  (tableHalfDimensions.y - pool.StateCurrent.Table.PocketRadius))
 			) {
 				positionA.x					= (positionA.x	< -ballLimits.x) 
 					? (-ballLimits.x) - (positionA.x + ballLimits.x)
 					:   ballLimits.x  - (positionA.x - ballLimits.x)
 					;
 				forces.Velocity.x			*= -1;
-				forces.Velocity				*= pool.StartState.DampingCushion;
+				forces.Velocity				*= pool.StateCurrent.Physics.DampingCushion;
 				forces.Rotation.z			*= -1;
 			}
 			if(outOfBounds.y 
-			 &&  (positionA.x > -(tableHalfDimensions.x - pool.StartState.Table.PocketRadius)
-				&& positionA.x <  (tableHalfDimensions.x - pool.StartState.Table.PocketRadius)
-				&& (positionA.x < -pool.StartState.Table.PocketRadius || positionA.x > pool.StartState.Table.PocketRadius)
+			 &&  (positionA.x > -(tableHalfDimensions.x - pool.StateCurrent.Table.PocketRadius)
+				&& positionA.x <  (tableHalfDimensions.x - pool.StateCurrent.Table.PocketRadius)
+				&& (positionA.x < -pool.StateCurrent.Table.PocketRadius || positionA.x > pool.StateCurrent.Table.PocketRadius)
 			)) {
 				positionA.z					= (positionA.z	< -ballLimits.y) 
 					? (-ballLimits.y) - (positionA.z + ballLimits.y)
 					:   ballLimits.y  - (positionA.z - ballLimits.y)
 					;
 				forces.Velocity.z			*= -1;
-				forces.Velocity				*= pool.StartState.DampingCushion;
+				forces.Velocity				*= pool.StateCurrent.Physics.DampingCushion;
 				forces.Rotation.x			*= -1;
 			}
 			if(false == flags.Falling) 
 				forces.Velocity.y			=  0;
 			else {
-				if(positionA.y < pool.StartState.BallRadius) {
-					positionA.y					= (positionA.y - pool.StartState.BallRadius) * -.95f + pool.StartState.BallRadius;
+				if(positionA.y < pool.StateCurrent.BallRadius) {
+					positionA.y					= (positionA.y - pool.StateCurrent.BallRadius) * -.95f + pool.StateCurrent.BallRadius;
 
 					forces.Velocity.y			*= -1.0f;
-					forces.Velocity.y			*= pool.StartState.DampingGround;
-					forces.Acceleration.y		= -pool.StartState.Gravity;
+					forces.Velocity.y			*= pool.StateCurrent.Physics.DampingGround;
+					forces.Acceleration.y		= -pool.StateCurrent.Physics.Gravity;
 				}
-				else if(fabs(forces.Velocity.y) > 0.00075 || positionA.y > (pool.StartState.BallRadius + pool.StartState.BallRadius * .125f) || positionA.y < (pool.StartState.BallRadius - pool.StartState.BallRadius * .125f)) {
-					forces.Acceleration.y		= -pool.StartState.Gravity;
+				else if(fabs(forces.Velocity.y) > 0.00075 || positionA.y > (pool.StateCurrent.BallRadius + pool.StateCurrent.BallRadius * .125f) || positionA.y < (pool.StateCurrent.BallRadius - pool.StateCurrent.BallRadius * .125f)) {
+					forces.Acceleration.y		= -pool.StateCurrent.Physics.Gravity;
 				}
 				else {
 					forces.Acceleration.y		=  0;
 					forces.Velocity.y			=  0;
-					positionA.y					= pool.StartState.BallRadius;
+					positionA.y					= pool.StateCurrent.BallRadius;
 					flags.Falling				= false;
 				}
 			}
@@ -301,13 +301,13 @@ static	::gpk::error_t		resolveCollision
 		}
 	}
 
-	const float radius = pool.StartState.BallRadius;
+	const float radius = pool.StateCurrent.BallRadius;
 	const float diameter = radius * 2;
-	for(uint32_t iBall = 0; iBall < pool.StartState.BallCount; ++iBall) {
+	for(uint32_t iBall = 0; iBall < pool.StateCurrent.BallCount; ++iBall) {
 		::gpk::SLine3<float> & delta = pool.PositionDeltas[iBall][pool.PositionDeltas[iBall].size() - 1];
 		pool.GetBallPosition(iBall, delta.B);
 		if((delta.B - delta.A).LengthSquared() > 0.0000005) {
-			::gpk::SBodyForces				& forces			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StartState.Balls[iBall].Entity].RigidBody];
+			::gpk::SBodyForces				& forces			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StateCurrent.Ball[iBall].Entity].RigidBody];
 
 			::gpk::SCoord3<float>			rotationResult		= (delta.B - delta.A) / diameter * ::gpk::math_2pi;
 			forces.Rotation				+= {rotationResult.z, 0, -rotationResult.x};
@@ -322,7 +322,7 @@ static	::gpk::error_t		resolveCollision
 
 	::gpk::SCoord3<float> ballPosition = {};
 	pool.GetBallPosition(0, ballPosition);
-	engine.SetPosition(pool.StartState.Players[0].Stick.Entity, ballPosition);
-	engine.SetOrientation(pool.StartState.Players[0].Stick.Entity, ::gpk::SQuaternion<float>{}.CreateFromAxisAngle({0, 1}, -pool.StartState.Players[0].Stick.Angle));
+	engine.SetPosition(pool.StateCurrent.Player[0].Stick.Entity, ballPosition);
+	engine.SetOrientation(pool.StateCurrent.Player[0].Stick.Entity, ::gpk::SQuaternion<float>{}.CreateFromAxisAngle({0, 1}, -pool.StateCurrent.Player[0].Stick.Angle));
 	return 0;
 }

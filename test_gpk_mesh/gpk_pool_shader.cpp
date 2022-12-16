@@ -1,6 +1,11 @@
 ﻿#include "gpk_pool_shader.h"
 #include "gpk_engine_shader.h"
 
+static constexpr float							LIGHT_FACTOR_AMBIENT			= .025f;
+static constexpr float							LIGHT_FACTOR_SPECULAR_POWER		= 30.0f;
+static constexpr ::gpk::SColorBGRA				PIXEL_BLACK_NUMBER				= ::gpk::SColorBGRA{0, 0, 0, 255};
+
+
 static	::gpk::error_t							transformTrianglesBall					
 	( ::gpk::SVSOutput									& output
 	, ::gpk::view_array<const uint16_t>					indices			
@@ -67,9 +72,6 @@ namespace gpk
 		);
 }
 
-constexpr ::gpk::SColorBGRA							PIXEL_BLACK_NUMBER			= ::gpk::SColorBGRA{0, 0, 0, 255};
-
-
 static	::gpk::error_t								psTableCloth
 	( const ::gpk::SEngineSceneConstants					& constants
 	, const ::gpk::SPSIn									& inPS
@@ -100,7 +102,7 @@ static	::gpk::error_t								psStick
 	::gpk::SColorFloat									materialcolor				= ::gpk::BROWN + (::gpk::ORANGE * .5f);
 	const ::gpk::SCoord3<float>							lightVecW					= (constants.LightPosition - inPS.WeightedPosition).Normalize();
 	const ::gpk::SColorFloat							diffuse						= ::gpk::lightCalcDiffuse(materialcolor, inPS.WeightedNormal, lightVecW);
-	const ::gpk::SColorFloat							ambient						= materialcolor * .1f;
+	const ::gpk::SColorFloat							ambient						= materialcolor * ::LIGHT_FACTOR_AMBIENT;
 
 	outputPixel										= ::gpk::SColorFloat(ambient + diffuse).Clamp();
 	return 0; 
@@ -126,9 +128,9 @@ static	::gpk::error_t								psBallCue
 		: ::gpk::WHITE;
 	::gpk::SColorFloat									materialcolor				= surfacecolor;		
 	const ::gpk::SCoord3<float>							lightVecW					= (constants.LightPosition - inPS.WeightedPosition).Normalize();
-	const ::gpk::SColorFloat							specular					= ::gpk::lightCalcSpecular(constants.CameraPosition, 20.f, gpk::WHITE, ::gpk::WHITE, inPS.WeightedPosition, inPS.WeightedNormal, lightVecW);
+	const ::gpk::SColorFloat							specular					= ::gpk::lightCalcSpecular(constants.CameraPosition, ::LIGHT_FACTOR_SPECULAR_POWER, gpk::WHITE, ::gpk::WHITE, inPS.WeightedPosition, inPS.WeightedNormal, lightVecW);
 	const ::gpk::SColorFloat							diffuse						= ::gpk::lightCalcDiffuse(materialcolor, inPS.WeightedNormal, lightVecW);
-	const ::gpk::SColorFloat							ambient						= materialcolor * .1f;
+	const ::gpk::SColorFloat							ambient						= materialcolor * ::LIGHT_FACTOR_AMBIENT;
 
 	outputPixel										= (0 == surfacecolor.g) ? ::gpk::RED : ::gpk::SColorFloat(ambient + diffuse + specular).Clamp();
 	return 0; 
@@ -145,7 +147,7 @@ static	::gpk::error_t								psBallSolid
 
 	::gpk::SColorFloat									materialColor;
 	bool												shade						= false;
-	float												ambientFactor				= .025f;
+	float												ambientFactor				= ::LIGHT_FACTOR_AMBIENT;
 	if((::gpk::SCoord2<float>{0.0f, 0.0f} - relativeToCenter).LengthSquared() >= .0225f) {
 		materialColor									= inPS.Material.Color.Diffuse;
 		shade											= true;
@@ -178,7 +180,7 @@ static	::gpk::error_t								psBallSolid
 			materialColor									= (materialColor * ambientFactor).Clamp();
 		}
 		else {
-			const ::gpk::SColorFloat								specular					= ::gpk::lightCalcSpecular(constants.CameraPosition, 20.f, gpk::WHITE, ::gpk::WHITE, inPS.WeightedPosition, inPS.WeightedNormal, lightVecW);
+			const ::gpk::SColorFloat								specular					= ::gpk::lightCalcSpecular(constants.CameraPosition, ::LIGHT_FACTOR_SPECULAR_POWER, gpk::WHITE, ::gpk::WHITE, inPS.WeightedPosition, inPS.WeightedNormal, lightVecW);
 			const ::gpk::SColorFloat								diffuse						= materialColor * ::gpk::max(0.0, diffuseFactor);
 			const ::gpk::SColorFloat								ambient						= materialColor * ambientFactor;
 			materialColor									= ::gpk::SColorFloat(ambient + diffuse + specular).Clamp();
@@ -199,7 +201,7 @@ static	::gpk::error_t								psBallStripped
 
 	::gpk::SColorFloat									materialColor;
 	bool												shade						= false;
-	float												ambientFactor				= .025f;
+	float												ambientFactor				= ::LIGHT_FACTOR_AMBIENT;
 	if((::gpk::SCoord2<float>{0.0f, 0.0f} - relativeToCenter).LengthSquared() >= .0225f) {
 		materialColor									
 			= (relativeToCenter.y >  .20f) ? ::gpk::WHITE
@@ -236,7 +238,7 @@ static	::gpk::error_t								psBallStripped
 			materialColor									= (materialColor * ambientFactor).Clamp();
 		}
 		else {
-			const ::gpk::SColorFloat								specular					= ::gpk::lightCalcSpecular(constants.CameraPosition, 20.f, gpk::WHITE, ::gpk::WHITE, inPS.WeightedPosition, inPS.WeightedNormal, lightVecW);
+			const ::gpk::SColorFloat								specular					= ::gpk::lightCalcSpecular(constants.CameraPosition, ::LIGHT_FACTOR_SPECULAR_POWER, gpk::WHITE, ::gpk::WHITE, inPS.WeightedPosition, inPS.WeightedNormal, lightVecW);
 			const ::gpk::SColorFloat								diffuse						= materialColor * ::gpk::max(0.0, diffuseFactor);
 			const ::gpk::SColorFloat								ambient						= materialColor * ambientFactor;
 			materialColor									= ::gpk::SColorFloat(ambient + diffuse + specular).Clamp();

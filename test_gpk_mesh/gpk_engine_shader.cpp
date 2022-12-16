@@ -7,7 +7,7 @@
 	if(0 == reflectedFactor) 
 		return ::gpk::BLACK;
 
-	const float											factor					= powf((float)reflectedFactor, specularPower);
+	const double										factor					= pow(reflectedFactor, specularPower);
 	::gpk::SColorFloat									result					= specularMaterial * specularLight * factor;
 	result.a										= specularMaterial.a;
 	return result;

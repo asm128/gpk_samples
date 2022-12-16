@@ -1,5 +1,6 @@
 #include "gpk_engine.h"
 #include "gpk_image.h"
+#include "gpk_array_static.h"
 
 #ifndef GPK_POOL_GAME_H_098273498237423
 #define GPK_POOL_GAME_H_098273498237423
@@ -44,7 +45,7 @@ namespace the1
 	const float									FOOT_SCALE						= 1.0f / 3.281f;
 	struct SPoolTable {
 		uint32_t									Entity							= (uint32_t)-1;
-		::gpk::SCoord2<float>						Size							= {8 * FOOT_SCALE, 4 * FOOT_SCALE};;
+		::gpk::SCoord2<float>						Size							= {8 * ::the1::FOOT_SCALE, 4 * ::the1::FOOT_SCALE};
 		float										Height							= .0265f;
 		SPoolPocket									Pockets	[6]						= {};
 		float										PocketRadius					= .057f;
@@ -64,11 +65,7 @@ namespace the1
 		::the1::SPoolStick							Stick							= {};
 	};
 
-	struct SPoolStartState {
-		POOL_GAME_MODE								Mode							= POOL_GAME_MODE_8Ball;
-		uint8_t										BallCount						= MAX_BALLS;
-		uint8_t										PlayerCount						= MAX_BALLS;
-		uint64_t									Seed							= (uint64_t)::gpk::timeCurrentInUs();
+	struct SPoolPhysicsState {
 		float										DampingClothDisplacement		= .7f;
 		float										DampingClothRotation			= .01f;
 		float										DampingCollision				= .975f;
@@ -76,15 +73,27 @@ namespace the1
 		float										DampingPocket					= .95f;
 		float										DampingGround					= .5f;
 		float										Gravity							= 9.8f;	// m/s
-		float										BallRadius						= .057f * .5f;	// meters
 		float										BallWeight						= 165;	// grams
+	};
 
-		::the1::SPoolPlayer							Players			[MAX_BALLS]		= {};
+	struct SPoolStartState {
+		POOL_GAME_MODE								Mode							= ::the1::POOL_GAME_MODE_8Ball;
+		uint8_t										BallCount						= ::the1::MAX_BALLS;
+		uint8_t										PlayerCount						= ::the1::MAX_BALLS;
+		uint64_t									Seed							= (uint64_t)::gpk::timeCurrentInUs();
+		float										BallRadius						= .057f * .5f;	// meters
+		uint8_t										TeamActive						= 0;
+		uint8_t										TeamStripped					= 0;
+		uint64_t									TimeInSeconds					= 0;
+		::the1::SPoolPhysicsState					Physics							= {};
+
 		::the1::SPoolTable							Table							= {};
-		::the1::SPoolBall							Balls			[MAX_BALLS]		= {};
-		::gpk::SCoord3<float>						BallPositions	[MAX_BALLS]		= {};
-		uint32_t									BallOrder		[MAX_BALLS]		= {};
-		::gpk::SColorFloat							BallColors		[MAX_BALLS]		= 
+
+		::gpk::array_static<::the1::SPoolPlayer		, ::the1::MAX_BALLS> Player			= {};
+		::gpk::array_static<::the1::SPoolBall		, ::the1::MAX_BALLS> Ball			= {};
+		::gpk::array_static<uint32_t				, ::the1::MAX_BALLS> BallOrder		= {};
+		::gpk::array_static<::gpk::SCoord3<float>	, ::the1::MAX_BALLS> BallPositions	= {};
+		::gpk::array_static<::gpk::SColorFloat		, ::the1::MAX_BALLS> BallColors		= 
 			{ ::gpk::WHITE
 			, ::gpk::YELLOW
 			, ::gpk::BLUE
@@ -106,14 +115,16 @@ namespace the1
 #pragma pack(pop)
 
 	struct SPoolGame {
-		::the1::SPoolStartState						StartState						= {};
+		::the1::SPoolStartState						StateStart						= {};
+		::the1::SPoolStartState						StateCurrent					= {};
+
 		::gpk::array_pod<::gpk::SLine3<float>>		PositionDeltas	[MAX_BALLS]		= {};
 		::gpk::array_pod<::the1::SContactBall>		LastFrameContactsBall			= {};
 		::gpk::array_pod<::the1::SContactCushion>	LastFrameContactsCushion		= {};
 		::gpk::SEngine								Engine							= {};
 
 		::gpk::error_t								GetBallPosition					(uint32_t iBall, ::gpk::SCoord3<float> & ballPosition) {
-			ballPosition = Engine.Integrator.Centers[Engine.ManagedEntities.Entities[StartState.Balls[iBall].Entity].RigidBody].Position;
+			ballPosition = Engine.Integrator.Centers[Engine.ManagedEntities.Entities[StateCurrent.Ball[iBall].Entity].RigidBody].Position;
 			return 0;
 		}
 	};
