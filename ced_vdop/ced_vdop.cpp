@@ -236,7 +236,7 @@ int													draw					(SApplication & app) {
 			if(0 == asciiCode)
 				continue;
 			const uint16_t											asciiColor			= mapColors[y][x];
-			::gpk::SColorFloat										color					= (*app.Framework.GUI->Palette)[(asciiColor & 0xF)];//::gpk::COLOR_TABLE[((int)timeAnimation) % ::gpk::size(::gpk::COLOR_TABLE)];
+			::gpk::SColorFloat										color					= (*app.Framework.GUI->Colors->Palette)[(asciiColor & 0xF)];//::gpk::COLOR_TABLE[((int)timeAnimation) % ::gpk::size(::gpk::COLOR_TABLE)];
 			::gpk::SCoord3<float>									position			= offset;
 			position.x											+= x;
 			position.z											-= y;
@@ -274,7 +274,7 @@ int													draw					(SApplication & app) {
 			if(0 == asciiCode)
 				continue;
 			const uint16_t											asciiColor			= mapColors[y][x];
-			::gpk::SColorFloat										color					= (*app.Framework.GUI->Palette)[(asciiColor & 0xF)];//::gpk::COLOR_TABLE[((int)timeAnimation) % ::gpk::size(::gpk::COLOR_TABLE)];
+			::gpk::SColorFloat										color					= (*app.Framework.GUI->Colors->Palette)[(asciiColor & 0xF)];//::gpk::COLOR_TABLE[((int)timeAnimation) % ::gpk::size(::gpk::COLOR_TABLE)];
 			::gpk::SCoord3<float>									position			= offset;
 			position.x											+= x;
 			position.z											-= y;

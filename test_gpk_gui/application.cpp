@@ -21,15 +21,15 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	gui.ThemeDefault												= app.PaletteColumn * iShades + app.PaletteRow;
 	gui.ColorModeDefault											= ::gpk::GUI_COLOR_MODE_3D;
 	int32_t																controlTestRoot			= ::gpk::controlCreate(gui);
-	const ::gpk::SColorBGRA												colorBase				= (*gui.Palette)[gui.ThemeDefault];
-	::gpk::memcpy_s(app.Palettes, gui.DefaultColors.Storage);
-	app.Palettes[::gpk::GUI_CONTROL_PALETTE_NORMAL				]	= gui.Palettes.push_back({colorBase, {}, {}, {}, {}, {}, ::gpk::RED, {}, {}, {}, });// gui.DefaultColors.CONTROL_NORMAL				;
-	app.Palettes[::gpk::GUI_CONTROL_PALETTE_HOVER				]	= gui.Palettes.push_back({colorBase, {}, {}, {}, {}, {}, ::gpk::RED, {}, {}, {}, });// gui.DefaultColors.CONTROL_HOVER				;
-	app.Palettes[::gpk::GUI_CONTROL_PALETTE_PRESSED				]	= gui.Palettes.push_back({colorBase, {}, {}, {}, {}, {}, ::gpk::RED, {}, {}, {}, });// gui.DefaultColors.CONTROL_PRESSED			;
-	app.Palettes[::gpk::GUI_CONTROL_PALETTE_SELECTED			]	= gui.Palettes.push_back({colorBase, {}, {}, {}, {}, {}, ::gpk::RED, {}, {}, {}, });// gui.DefaultColors.CONTROL_SELECTED			;
-	app.Palettes[::gpk::GUI_CONTROL_PALETTE_SELECTED_HOVER		]	= gui.Palettes.push_back({colorBase, {}, {}, {}, {}, {}, ::gpk::RED, {}, {}, {}, });// gui.DefaultColors.CONTROL_SELECTED_HOVER		;
-	app.Palettes[::gpk::GUI_CONTROL_PALETTE_SELECTED_PRESSED	]	= gui.Palettes.push_back({colorBase, {}, {}, {}, {}, {}, ::gpk::RED, {}, {}, {}, });// gui.DefaultColors.CONTROL_SELECTED_PRESSED	;
-	app.Palettes[::gpk::GUI_CONTROL_PALETTE_OUTDATED			]	= gui.Palettes.push_back({colorBase, {}, {}, {}, {}, {}, ::gpk::RED, {}, {}, {}, });// gui.DefaultColors.CONTROL_OUTDATED			;
+	const ::gpk::SColorBGRA												colorBase				= (*gui.Colors->Palette)[gui.ThemeDefault];
+	::gpk::memcpy_s(app.Palettes, gui.Colors->DefaultColors.Storage);
+	app.Palettes[::gpk::GUI_CONTROL_PALETTE_NORMAL				]	= gui.Colors->Palettes.push_back({colorBase, {}, {}, {}, {}, {}, ::gpk::RED, {}, {}, {}, });// gui.DefaultColors.CONTROL_NORMAL				;
+	app.Palettes[::gpk::GUI_CONTROL_PALETTE_HOVER				]	= gui.Colors->Palettes.push_back({colorBase, {}, {}, {}, {}, {}, ::gpk::RED, {}, {}, {}, });// gui.DefaultColors.CONTROL_HOVER				;
+	app.Palettes[::gpk::GUI_CONTROL_PALETTE_PRESSED				]	= gui.Colors->Palettes.push_back({colorBase, {}, {}, {}, {}, {}, ::gpk::RED, {}, {}, {}, });// gui.DefaultColors.CONTROL_PRESSED			;
+	app.Palettes[::gpk::GUI_CONTROL_PALETTE_SELECTED			]	= gui.Colors->Palettes.push_back({colorBase, {}, {}, {}, {}, {}, ::gpk::RED, {}, {}, {}, });// gui.DefaultColors.CONTROL_SELECTED			;
+	app.Palettes[::gpk::GUI_CONTROL_PALETTE_SELECTED_HOVER		]	= gui.Colors->Palettes.push_back({colorBase, {}, {}, {}, {}, {}, ::gpk::RED, {}, {}, {}, });// gui.DefaultColors.CONTROL_SELECTED_HOVER		;
+	app.Palettes[::gpk::GUI_CONTROL_PALETTE_SELECTED_PRESSED	]	= gui.Colors->Palettes.push_back({colorBase, {}, {}, {}, {}, {}, ::gpk::RED, {}, {}, {}, });// gui.DefaultColors.CONTROL_SELECTED_PRESSED	;
+	app.Palettes[::gpk::GUI_CONTROL_PALETTE_OUTDATED			]	= gui.Colors->Palettes.push_back({colorBase, {}, {}, {}, {}, {}, ::gpk::RED, {}, {}, {}, });// gui.DefaultColors.CONTROL_OUTDATED			;
 
 	::gpk::SControl														& controlRoot			= gui.Controls.Controls[controlTestRoot];
 	controlRoot.Area												= {{0, 0}, {320, 240}};
@@ -127,7 +127,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	gui.Controls.Constraints[app.IdNewPalette	].AttachSizeToText.x	= true;
 
 	//const int32_t													iShadesHalf				= iShades / 2;
-	for(uint32_t iTone = 0, countTones = gui.Palette->size() / iShades; iTone < countTones; ++iTone) {
+	for(uint32_t iTone = 0, countTones = gui.Colors->Palette->size() / iShades; iTone < countTones; ++iTone) {
 		for(uint32_t iShade = 0; iShade < iShades; ++iShade) {
 			const int32_t													idPaletteItem			= ::gpk::controlCreate(gui);
 			::gpk::SControl													& control				= gui.Controls.Controls	[idPaletteItem];
@@ -156,7 +156,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 		//gui.Controls.Constraints[idPaletteRow].AttachSizeToText.x	= true;
 		::gpk::controlSetParent(gui, idPaletteRow, 0);
 	}
-	for(uint32_t iTone = 0, countTones = gui.Palette->size() / iShades; iTone < countTones; ++iTone) {
+	for(uint32_t iTone = 0, countTones = gui.Colors->Palette->size() / iShades; iTone < countTones; ++iTone) {
 		const int32_t													idPaletteRow		= ::gpk::controlCreate(gui);
 		::gpk::SControl													& controlRow		= gui.Controls.Controls	[idPaletteRow];
 		::gpk::SControlText												& controlRowText	= gui.Controls.Text[idPaletteRow];
@@ -255,7 +255,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 				}
 				else if(iControl == (uint32_t)app.IdTheme) {
 					++gui.ThemeDefault;
-					if(gui.ThemeDefault >= gui.ControlThemes->size())
+					if(gui.ThemeDefault >= gui.Colors->ControlThemes->size())
 						gui.ThemeDefault												= 0;
 				}
 				else if(iControl == (uint32_t)app.IdNewPalette) {
@@ -264,7 +264,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 				}
 				else if(iControl > (uint32_t)app.IdMode) {
 					gui.Controls.Controls[5].ColorTheme								= int16_t(iControl - app.IdNewPalette);
-					if(gui.Controls.Controls[5].ColorTheme >= (int32_t)gui.Palette->size())
+					if(gui.Controls.Controls[5].ColorTheme >= (int32_t)gui.Colors->Palette->size())
 						gui.Controls.Controls[5].ColorTheme								= 10;
 					for(uint32_t iChild = 0; iChild < gui.Controls.Children[5].size(); ++iChild)
 						gui.Controls.Controls[gui.Controls.Children[5][iChild]].ColorTheme = gui.Controls.Controls[5].ColorTheme;
