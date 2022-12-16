@@ -40,22 +40,22 @@ static	::gpk::error_t		updateInput				(::the1::STheOne & app, double secondsElap
 			playerUI.Cameras.Selected	= reverse ? 0 : the1::MAX_BALLS + 1;
 		else if(keyStates['9']) 
 			playerUI.Cameras.Selected	= 1;
-		if(keyStates['8']) 
+		else if(keyStates['8']) 
 			playerUI.Cameras.Selected	= 9;
 		else {
 			if(keyStates[VK_MENU]) {
-				for(uint32_t iBall = 0; iBall < app.MainGame.Game.StateCurrent.BallCount / 2U - 1; ++iBall) {
-					 if(keyStates['1' + iBall]) {
-						 playerUI.Cameras.Selected	= iBall + 1;
+				const uint32_t offset = app.MainGame.Game.StateCurrent.BallCount / 2U;
+				for(uint32_t iBall = offset; iBall < app.MainGame.Game.StateCurrent.BallCount; ++iBall) {
+					 if(keyStates['1' + iBall - offset]) {
+						 playerUI.Cameras.Selected	= iBall + 2;
 						 break;
 					 }
 				}
 			}
 			else {
-				const uint32_t offset = app.MainGame.Game.StateCurrent.BallCount / 2U;
-				for(uint32_t iBall = offset; iBall < app.MainGame.Game.StateCurrent.BallCount; ++iBall) {
-					 if(keyStates['1' + iBall - offset]) {
-						 playerUI.Cameras.Selected	= iBall + 1;
+				for(uint32_t iBall = 0; iBall < app.MainGame.Game.StateCurrent.BallCount / 2U - 1; ++iBall) {
+					 if(keyStates['1' + iBall]) {
+						 playerUI.Cameras.Selected	= iBall + 2;
 						 break;
 					 }
 				}

@@ -1,4 +1,5 @@
 #include "gpk_pool_game.h"
+#include "gpk_engine_shader.h"
 
 #include "gpk_timer.h"
 #include "gpk_noise.h"
@@ -21,7 +22,7 @@
 	::gpk::SCoord3<float>							cameraFront						= (cameraTarget - cameraPosition).Normalize();
 
 	::gpk::SEngineSceneConstants					constants						= {};
-	constants.NearFar							= {0.1f , 200.0f};
+	constants.NearFar							= {0.01f, 10.0f};
 	constants.CameraPosition					= cameraPosition;
 	constants.CameraFront						= cameraFront;
 	constants.LightPosition						= lightPos;
@@ -35,16 +36,15 @@
 	::gpk::STimer									timer;
 	::gpk::SEngine									& engine						= pool.Engine;
 
-	::gpk::array_pod<::gpk::SCoord2<int16_t>>		& wireframePixelCoords			= engine.Scene->RenderCache.CacheVertexShader.WireframePixelCoords;
+	::gpk::array_pod<::gpk::SCoord3<float>>		& wireframePixelCoords			= engine.Scene->RenderCache.CacheVertexShader.WireframePixelCoords;
 	for(uint32_t iBall = 0; iBall < pool.StateCurrent.BallCount; ++iBall) {
 		for(uint32_t iDelta = ::gpk::max(0, (int32_t)pool.PositionDeltas[iBall].size() - 20); iDelta < pool.PositionDeltas[iBall].size(); ++iDelta) {
 			::gpk::SLine3<float>							screenDelta				= pool.PositionDeltas[iBall][iDelta];
-			screenDelta.A								= constants.Projection.Transform(screenDelta.A);
-			screenDelta.B								= constants.Projection.Transform(screenDelta.B);
 			wireframePixelCoords.clear();
-			::gpk::drawLine(offscreenMetrics, screenDelta, wireframePixelCoords);
+			screenDelta.A.y = screenDelta.B.y = 0;
+			::gpk::drawLine(offscreenMetrics, screenDelta, constants.Projection, wireframePixelCoords, backBuffer.DepthStencil);
 			for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord) {
-				::gpk::SCoord2<int16_t>							coord					= wireframePixelCoords[iCoord];
+				::gpk::SCoord3<int16_t>							coord					= wireframePixelCoords[iCoord].Cast<int16_t>();
 				backBuffer.Color.View[coord.y][coord.x]		= pool.StateCurrent.BallColors[iBall];
 			}
 		}
@@ -66,21 +66,21 @@
 		, limitsBottom[3] + ::gpk::SCoord3<float>{0, pool.StateCurrent.Table.Dimensions.Height, 0}
 		};
 
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[3], limitsBottom[2]}, constants.Projection, wireframePixelCoords);
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[3], limitsBottom[1]}, constants.Projection, wireframePixelCoords);
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[0], limitsBottom[1]}, constants.Projection, wireframePixelCoords);
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[0], limitsBottom[2]}, constants.Projection, wireframePixelCoords);
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsTop[3], limitsTop[2]}, constants.Projection, wireframePixelCoords);
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsTop[3], limitsTop[1]}, constants.Projection, wireframePixelCoords);
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsTop[0], limitsTop[1]}, constants.Projection, wireframePixelCoords);
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsTop[0], limitsTop[2]}, constants.Projection, wireframePixelCoords);
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[0], limitsTop[0]}, constants.Projection, wireframePixelCoords);
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[1], limitsTop[1]}, constants.Projection, wireframePixelCoords);
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[2], limitsTop[2]}, constants.Projection, wireframePixelCoords);
-	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[3], limitsTop[3]}, constants.Projection, wireframePixelCoords);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[3], limitsBottom[2]}, constants.Projection, wireframePixelCoords, backBuffer.DepthStencil);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[3], limitsBottom[1]}, constants.Projection, wireframePixelCoords, backBuffer.DepthStencil);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[0], limitsBottom[1]}, constants.Projection, wireframePixelCoords, backBuffer.DepthStencil);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[0], limitsBottom[2]}, constants.Projection, wireframePixelCoords, backBuffer.DepthStencil);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsTop[3], limitsTop[2]}, constants.Projection, wireframePixelCoords, backBuffer.DepthStencil);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsTop[3], limitsTop[1]}, constants.Projection, wireframePixelCoords, backBuffer.DepthStencil);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsTop[0], limitsTop[1]}, constants.Projection, wireframePixelCoords, backBuffer.DepthStencil);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsTop[0], limitsTop[2]}, constants.Projection, wireframePixelCoords, backBuffer.DepthStencil);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[0], limitsTop[0]}, constants.Projection, wireframePixelCoords, backBuffer.DepthStencil);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[1], limitsTop[1]}, constants.Projection, wireframePixelCoords, backBuffer.DepthStencil);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[2], limitsTop[2]}, constants.Projection, wireframePixelCoords, backBuffer.DepthStencil);
+	::gpk::drawLine(offscreenMetrics, ::gpk::SLine3<float>{limitsBottom[3], limitsTop[3]}, constants.Projection, wireframePixelCoords, backBuffer.DepthStencil);
 
 	for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord) {
-		::gpk::SCoord2<int16_t>								coord		= wireframePixelCoords[iCoord];
+		::gpk::SCoord3<int16_t>								coord		= wireframePixelCoords[iCoord].Cast<int16_t>();
 		::gpk::SColorFloat									color		= 
 			{ (float)(totalSeconds - iCoord / 1.0f / totalSeconds)
 			, (float)(totalSeconds - iCoord / 2.0f / totalSeconds)
