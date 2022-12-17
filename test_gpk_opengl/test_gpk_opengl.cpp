@@ -278,6 +278,10 @@ static constexpr const ::gpk::STriangle3<float>						geometryCube	[12]						=
  
 	// make it the calling thread's current rendering context 
 	wglMakeCurrent (app.DrawingContext, app.GLRenderContext);
+
+	//GLuint VertexArrayID;
+	//glGenVertexArrays(1, &VertexArrayID);
+	//glBindVertexArray(VertexArrayID);
 	return 0;
 }
 
@@ -294,11 +298,6 @@ static constexpr const ::gpk::STriangle3<float>						geometryCube	[12]						=
 	sprintf_s(buffer, "[%u x %u]. FPS: %g. Last frame seconds: %g.", mainWindow.Size.x, mainWindow.Size.y, 1 / timer.LastTimeSeconds, timer.LastTimeSeconds);
 	::HWND																		windowHandle								= mainWindow.PlatformDetail.WindowHandle;
 	SetWindowTextA(windowHandle, buffer);
-	
-	//glVertexAttribPointer();
-	HDC hDC = GetDC(mainWindow.PlatformDetail.WindowHandle);
-	display(hDC);
-	ReleaseDC(mainWindow.PlatformDetail.WindowHandle, hDC);
 
 	return 0;
 }
@@ -328,6 +327,12 @@ struct SCamera {
 };
 
 					::gpk::error_t										draw										(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
+	
+	//glVertexAttribPointer();
+	::gpk::SWindow																& mainWindow								= app.Framework.MainDisplay;
+	HDC hDC = GetDC(mainWindow.PlatformDetail.WindowHandle);
+	display(hDC);
+	ReleaseDC(mainWindow.PlatformDetail.WindowHandle, hDC);
 	(void)app;
 	//::gpk::SFramework															& framework									= app.Framework;
 	//
