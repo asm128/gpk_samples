@@ -10,7 +10,7 @@
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 
 			::gpk::error_t											cleanup					(::gme::SApplication & app)							{
-	::gpk::mainWindowDestroy(app.Framework.MainDisplay);
+	::gpk::mainWindowDestroy(app.Framework.RootWindow);
 	::gpk::clientDisconnect(app.LobbyClient.Client);
 	::gpk::tcpipShutdown();
 	::gpk::sleep(100);
@@ -18,7 +18,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 }
 			::gpk::error_t											setup						(::gme::SApplication & app)						{
 	::gpk::SFramework														& framework					= app.Framework;
-	::gpk::SWindow															& mainWindow				= framework.MainDisplay;
+	::gpk::SWindow															& mainWindow				= framework.RootWindow;
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?!");
 	::gpk::SGUI																& gui						= *framework.GUI;
 	app.IdExit															= ::gpk::controlCreate(gui);
@@ -70,7 +70,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 		app.Framework.BackBuffer									= app.Offscreen;
 	}
 	::gpk::SFramework														& framework					= app.Framework;
-	app.LobbyClient.Update(framework.Input, framework.MainDisplay.EventQueue);
+	app.LobbyClient.Update(framework.Input, framework.RootWindow.EventQueue);
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework), "Exit requested by framework update.");
 
 	::gpk::SGUI																& gui						= *framework.GUI;
@@ -132,7 +132,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	::gpk::STimer																timer;
 	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>			target;
 	target.create();
-	target->resize(app.Framework.MainDisplay.Size, {0xFF, 0x20, 0x6F, 0xCF}, (uint32_t)-1);
+	target->resize(app.Framework.RootWindow.Size, {0xFF, 0x20, 0x6F, 0xCF}, (uint32_t)-1);
 	app.LobbyClient.Draw(target->Color);
 	//::gpk::clearTarget(*target);
 	{

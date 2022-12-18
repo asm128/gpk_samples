@@ -10,10 +10,10 @@
 
  GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 
-			::gpk::error_t											cleanup						(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.MainDisplay); }
+			::gpk::error_t											cleanup						(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.RootWindow); }
 			::gpk::error_t											setup						(::gme::SApplication & app)						{
 	::gpk::SFramework														& framework					= app.Framework;
-	::gpk::SWindow															& mainWindow				= framework.MainDisplay;
+	::gpk::SWindow															& mainWindow				= framework.RootWindow;
 	framework.Settings.GUIZoom											= false;
 	app.Framework.GUI													= app.DialogMain.GUI;
 	app.DialogMain.Input												= framework.Input;
@@ -337,7 +337,7 @@
 	gerror_if(errored(pixelsDrawn0), "??");
 	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>		target;
 	target.create();
-	target->resize(app.Framework.MainDisplay.Size, ::gpk::LIGHTGRAY, 0xFFFFFFFFU);
+	target->resize(app.Framework.RootWindow.Size, ::gpk::LIGHTGRAY, 0xFFFFFFFFU);
 	{
 		::gpk::mutex_guard														lock					(app.Framework.LockGUI);
 		::gpk::controlDrawHierarchy(*app.Framework.GUI, 0, target->Color.View);

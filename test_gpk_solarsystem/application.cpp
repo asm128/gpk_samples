@@ -11,11 +11,11 @@
 
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Solar System Test");
 
-			::gpk::error_t											cleanup								(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.MainDisplay); }
+			::gpk::error_t											cleanup								(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.RootWindow); }
 
 			::gpk::error_t											setup								(::gme::SApplication & app)						{
 	::gpk::SFramework														& framework							= app.Framework;
-	::gpk::SWindow															& mainWindow						= framework.MainDisplay;
+	::gpk::SWindow															& mainWindow						= framework.RootWindow;
 	mainWindow.Size														= {1280, 720};
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window. %s.", "why?!");
 	{ // Build the exit button
@@ -70,9 +70,9 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Solar System Test");
 			::gpk::error_t											draw					(::gme::SApplication & app)							{
 	//::gpk::STimer															timer;
 	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>		target;
-	target->resize(app.Framework.MainDisplay.Size, {}, (uint32_t)-1);
+	target->resize(app.Framework.RootWindow.Size, {}, (uint32_t)-1);
 	//::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>		targetGame;
-	//targetGame->resize(app.Framework.MainDisplay.Size / 2, {}, (uint32_t)-1);
+	//targetGame->resize(app.Framework.RootWindow.Size / 2, {}, (uint32_t)-1);
 
 	::ssg::solarSystemUpdate(app.SolarSystemGame, app.Framework.Timer.LastTimeSeconds, target);
 
@@ -86,7 +86,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Solar System Test");
 		::gpk::mutex_guard														lock					(app.LockRender);
 		app.Offscreen														= target;
 	}
-	app.Framework.MainDisplay.Repaint									= true;
+	app.Framework.RootWindow.Repaint									= true;
 	//timer.Frame();
 	//warning_printf("Draw time: %f.", (float)timer.LastTimeSeconds);
 	return 0;

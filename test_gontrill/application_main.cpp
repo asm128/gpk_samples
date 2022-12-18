@@ -105,8 +105,8 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	//_CrtSetBreakAlloc(120);
 	g_ApplicationInstance													= &app;
 	::gpk::SFramework															& framework									= app.Framework;
-	framework.MainDisplay.Size												= {1280, 720};
-	gerror_if(errored(::gpk::mainWindowCreate(framework.MainDisplay, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?!");
+	framework.RootWindow.Size												= {1280, 720};
+	gerror_if(errored(::gpk::mainWindowCreate(framework.RootWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?!");
 	::setupParticles();
 	ree_if	(errored(::updateSizeDependentResources	(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
 	ree_if	(errored(::setupSprites					(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
@@ -173,7 +173,7 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	::gpk::textLineDrawAlignedFixedSizeLit(offscreenView, app.TextureFontMonochrome.View, fontAtlasView.metrics(), --lineOffset, offscreenMetrics, sizeCharCell, weaponProperties[app.Game.Ships.Weapon[0].IndexProperties].Name, ::gpk::SColorBGRA{app.Framework.FrameInfo.FrameNumber % 0xFFU, 0xFFU, 0, 0xFFU});
 	if(app.Debugging) {
 		::gpk::STimer																& timer										= framework.Timer;
-		::gpk::SWindow																& mainWindow								= framework.MainDisplay;
+		::gpk::SWindow																& mainWindow								= framework.RootWindow;
 		char																		buffer		[512]							= {};
 		int32_t																		lineLen										= sprintf_s(buffer, "[%u x %u]. Projecitle fx count: %u. Thrust fx count: %u."
 			, mainWindow.Size.x, mainWindow.Size.y

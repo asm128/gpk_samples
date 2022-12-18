@@ -12,10 +12,10 @@
 
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 
-			::gpk::error_t											cleanup								(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.MainDisplay); }
+			::gpk::error_t											cleanup								(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.RootWindow); }
 			::gpk::error_t											setup								(::gme::SApplication & app)						{
 	::gpk::SFramework														& framework							= app.Framework;
-	::gpk::SWindow															& mainWindow						= framework.MainDisplay;
+	::gpk::SWindow															& mainWindow						= framework.RootWindow;
 	mainWindow.Size														= {1280, 720};
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window. %s.", "why?!");
 	{ // Build the exit button
@@ -97,7 +97,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 			::gpk::error_t											draw					(::gme::SApplication & app)							{
 	//::gpk::STimer															timer;
 	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>		target;
-	target->resize(app.Framework.MainDisplay.Size, 0x00102030U, 0xFFFFFFFFU);
+	target->resize(app.Framework.RootWindow.Size, 0x00102030U, 0xFFFFFFFFU);
 	for(uint32_t y = 0; y < target->Color.View.metrics().y / 3; ++y)
 	for(uint32_t x = 0; x < target->Color.View.metrics().x / 3; ++x) {
 		//target->Color.View[y * 3][x * 3]									= uint32_t(::gpk::noise1DBase(y * target->Color.View.metrics().x + x + app.Framework.FrameInfo.Microseconds.Total) + app.Framework.FrameInfo.Seconds.Total) | 0xFF000000;
@@ -125,6 +125,6 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 	}
 	//timer.Frame();
 	//warning_printf("Draw time: %f.", (float)timer.LastTimeSeconds);
-	app.Framework.MainDisplay.Repaint									= true;
+	app.Framework.RootWindow.Repaint									= true;
 	return 0;
 }

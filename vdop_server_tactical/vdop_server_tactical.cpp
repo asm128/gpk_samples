@@ -12,12 +12,12 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 
 ::gpk::error_t										cleanup							(::SApplication & app)						{
 	::klib::shutdownASCIIScreen();
-	return ::gpk::mainWindowDestroy(app.Framework.MainDisplay);
+	return ::gpk::mainWindowDestroy(app.Framework.RootWindow);
 }
 
 ::gpk::error_t										setup							(::SApplication & app)						{
 	::gpk::SFramework										& framework						= app.Framework;
-	::gpk::SWindow											& mainWindow					= framework.MainDisplay;
+	::gpk::SWindow											& mainWindow					= framework.RootWindow;
 	mainWindow.Size														= {1280, 720};
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window. %s.", "why?!");
 	{ // Build the exit button
@@ -97,11 +97,11 @@ int													update				(SApplication & app, bool exitSignal)	{
 				return 1;
 		}
 	}
-	if(framework.MainDisplay.Resized) {
+	if(framework.RootWindow.Resized) {
 		::gpk::SMatrix4<float>									& matrixProjection	= app.TextOverlay.MatrixProjection;
-		matrixProjection.FieldOfView(::gpk::math_pi * .25, framework.MainDisplay.Size.x / (double)framework.MainDisplay.Size.y, 0.01, 500);
+		matrixProjection.FieldOfView(::gpk::math_pi * .25, framework.RootWindow.Size.x / (double)framework.RootWindow.Size.y, 0.01, 500);
 		::gpk::SMatrix4<float>									matrixViewport		= {};
-		matrixViewport.ViewportLH(framework.MainDisplay.Size.Cast<uint16_t>());
+		matrixViewport.ViewportLH(framework.RootWindow.Size.Cast<uint16_t>());
 		matrixProjection									*= matrixViewport;
 	}
 	::klib::SASCIITarget							target;
@@ -170,7 +170,7 @@ int													update				(SApplication & app, bool exitSignal)	{
 int													draw					(SApplication & app) {
 	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>		target;
 	target.create();
-	target->resize(app.Framework.MainDisplay.Size, ::gpk::DARKGREEN, 0xFFFFFFFFU);
+	target->resize(app.Framework.RootWindow.Size, ::gpk::DARKGREEN, 0xFFFFFFFFU);
 
 	{
 		::gpk::mutex_guard														lock					(app.LockGUI);

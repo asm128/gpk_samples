@@ -215,7 +215,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "Title");
 					::SApplication										* g_app						= 0;
 
 static				::gpk::error_t										updateSizeDependentResources				(::SApplication& app)											{
-	const ::gpk::SCoord2<uint32_t>												newSize										= app.Framework.MainDisplay.Size;
+	const ::gpk::SCoord2<uint32_t>												newSize										= app.Framework.RootWindow.Size;
 	//::gpk::updateSizeDependentTarget(app.Framework.MainDisplayOffscreen->Color, newSize);
 	//::gpk::updateSizeDependentTarget(app.Framework.MainDisplayOffscreen->DepthStencil, newSize);
 
@@ -224,8 +224,8 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 
 // --- Cleanup application resources.
 					::gpk::error_t										cleanup										(::SApplication& app)											{
-	::gpk::SWindowPlatformDetail												& displayDetail								= app.Framework.MainDisplay.PlatformDetail;
-	::gpk::mainWindowDestroy(app.Framework.MainDisplay);
+	::gpk::SWindowPlatformDetail												& displayDetail								= app.Framework.RootWindow.PlatformDetail;
+	::gpk::mainWindowDestroy(app.Framework.RootWindow);
 	::UnregisterClass(displayDetail.WindowClassName, displayDetail.WindowClass.hInstance);
 	g_app													= 0;
 	return 0;
@@ -255,7 +255,7 @@ static constexpr const ::gpk::STriangle3<float>						geometryCube	[12]						=
 					::gpk::error_t										setup										(::SApplication& app)											{
 	g_app													= &app;
 	::gpk::SFramework															& framework									= app.Framework;
-	::gpk::SWindow																& mainWindow								= framework.MainDisplay;
+	::gpk::SWindow																& mainWindow								= framework.RootWindow;
 	mainWindow.Size														= {640, 480};
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?!");
 
@@ -273,7 +273,7 @@ static constexpr const ::gpk::STriangle3<float>						geometryCube	[12]						=
 	framework.BackBuffer = {};
 
 	// create a rendering context  
-	app.DrawingContext				= GetDC(framework.MainDisplay.PlatformDetail.WindowHandle);
+	app.DrawingContext				= GetDC(framework.RootWindow.PlatformDetail.WindowHandle);
 	app.GLRenderContext				= wglCreateContext(app.DrawingContext); 
  
 	// make it the calling thread's current rendering context 
@@ -293,7 +293,7 @@ static constexpr const ::gpk::STriangle3<float>						geometryCube	[12]						=
 	ree_if(errored(::updateSizeDependentResources(app)), "Cannot update offscreen and this could cause an invalid memory access later on.");
 	//-----------------------------
 	::gpk::STimer																& timer										= app.Framework.Timer;
-	::gpk::SWindow																& mainWindow								= app.Framework.MainDisplay;
+	::gpk::SWindow																& mainWindow								= app.Framework.RootWindow;
 	char																		buffer		[256]							= {};
 	sprintf_s(buffer, "[%u x %u]. FPS: %g. Last frame seconds: %g.", mainWindow.Size.x, mainWindow.Size.y, 1 / timer.LastTimeSeconds, timer.LastTimeSeconds);
 	::HWND																		windowHandle								= mainWindow.PlatformDetail.WindowHandle;
@@ -329,7 +329,7 @@ struct SCamera {
 					::gpk::error_t										draw										(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	
 	//glVertexAttribPointer();
-	::gpk::SWindow																& mainWindow								= app.Framework.MainDisplay;
+	::gpk::SWindow																& mainWindow								= app.Framework.RootWindow;
 	HDC hDC = GetDC(mainWindow.PlatformDetail.WindowHandle);
 	display(hDC);
 	ReleaseDC(mainWindow.PlatformDetail.WindowHandle, hDC);

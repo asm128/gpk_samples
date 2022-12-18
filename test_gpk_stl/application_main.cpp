@@ -19,15 +19,15 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "Title");
 					::SApplication										* g_ApplicationInstance						= 0;
 
 static				::gpk::error_t										updateSizeDependentResources				(::SApplication& app)											{
-	const ::gpk::SCoord2<uint32_t>												newSize										= app.Framework.MainDisplay.Size;
+	const ::gpk::SCoord2<uint32_t>												newSize										= app.Framework.RootWindow.Size;
 	::gpk::updateSizeDependentTarget(app.Framework.BackBuffer->Color, newSize);
 	return 0;
 }
 
 // --- Cleanup application resources.
 					::gpk::error_t										cleanup										(::SApplication& app)											{
-	::gpk::SWindowPlatformDetail												& displayDetail								= app.Framework.MainDisplay.PlatformDetail;
-	::gpk::mainWindowDestroy(app.Framework.MainDisplay);
+	::gpk::SWindowPlatformDetail												& displayDetail								= app.Framework.RootWindow.PlatformDetail;
+	::gpk::mainWindowDestroy(app.Framework.RootWindow);
 	::UnregisterClass(displayDetail.WindowClassName, displayDetail.WindowClass.hInstance);
 	g_ApplicationInstance													= 0;
 	return 0;
@@ -37,7 +37,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 					::gpk::error_t										setup										(::SApplication& app)											{
 	g_ApplicationInstance													= &app;
 	::gpk::SFramework															& framework									= app.Framework;
-	::gpk::SWindow																& mainWindow								= framework.MainDisplay;
+	::gpk::SWindow																& mainWindow								= framework.RootWindow;
 	mainWindow.Size														= {640, 480};
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?!");
 
@@ -84,7 +84,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	ree_if(errored(::updateSizeDependentResources(app)), "Cannot update offscreen and this could cause an invalid memory access later on.");
 	//-----------------------------
 	::gpk::STimer																& timer										= app.Framework.Timer;
-	::gpk::SWindow																& mainWindow								= app.Framework.MainDisplay;
+	::gpk::SWindow																& mainWindow								= app.Framework.RootWindow;
 	char																		buffer		[256]							= {};
 	sprintf_s(buffer, "[%u x %u]. FPS: %g. Last frame seconds: %g.", mainWindow.Size.x, mainWindow.Size.y, 1 / timer.LastTimeSeconds, timer.LastTimeSeconds);
 	::HWND																		windowHandle								= mainWindow.PlatformDetail.WindowHandle;

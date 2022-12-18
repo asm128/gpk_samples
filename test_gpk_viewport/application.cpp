@@ -77,14 +77,14 @@ template<typename _tIndex, typename _tValue>
 	return 0;
 }
 
-					::gpk::error_t									cleanup										(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.MainDisplay); }
+					::gpk::error_t									cleanup										(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.RootWindow); }
 					::gpk::error_t									setup										(::gme::SApplication & app)						{
 	app.Buffer3D.create();
 	::gpk::SFramework														& framework									= app.Framework;
-	::gpk::SWindow															& mainWindow								= framework.MainDisplay;
+	::gpk::SWindow															& mainWindow								= framework.RootWindow;
 	app.Framework.GUI													= app.DialogMain.GUI;
 	app.DialogMain.Input												= framework.Input;
-	framework.MainDisplay.Size												= {1280, 720};
+	framework.RootWindow.Size												= {1280, 720};
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window. %s.", "why?!");
 	::gpk::SGUI																& gui										= *framework.GUI;
 	gui.ColorModeDefault												= ::gpk::GUI_COLOR_MODE_3D;
@@ -313,7 +313,7 @@ template<typename _tIndex, typename _tValue>
 	// ---
 	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>		target;
 	target.create();
-	target->resize(app.Framework.MainDisplay.Size, ::gpk::LIGHTGRAY, 0xFFFFFFFFU);
+	target->resize(app.Framework.RootWindow.Size, ::gpk::LIGHTGRAY, 0xFFFFFFFFU);
 	{
 		::gpk::mutex_guard														lock										(app.Framework.LockGUI);
 		::gpk::guiDraw(*app.DialogMain.GUI, target->Color.View);
@@ -326,6 +326,6 @@ template<typename _tIndex, typename _tValue>
 	snprintf(app.StringFrameRateRender, ::gpk::size(app.StringFrameRateRender), "Last frame time (render): %fs.", (float)timer.LastTimeSeconds);
 	gui.Controls.Text[app.IdFrameRateRender].Text							= app.StringFrameRateRender;
 	::gpk::controlMetricsInvalidate(gui, app.IdFrameRateRender);
-	framework.MainDisplay.Repaint										= true;
+	framework.RootWindow.Repaint										= true;
 	return 0;
 }
