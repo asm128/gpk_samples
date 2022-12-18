@@ -40,7 +40,7 @@ static				void												setupParticles								()																				{
 
 static				::gpk::error_t										updateSizeDependentResources				(::SApplication& app)											{
 	//static constexpr	const ::gpk::SCoord2<uint32_t>							GAME_SCREEN_SIZE							= {640, 360};
-	::gpk::updateSizeDependentTarget(app.Framework.BackBuffer->Color.Texels, app.Framework.BackBuffer->Color.View, GAME_SCREEN_SIZE);
+	::gpk::updateSizeDependentTarget(app.Framework.RootWindow.BackBuffer->Color.Texels, app.Framework.RootWindow.BackBuffer->Color.View, GAME_SCREEN_SIZE);
 	return 0;
 }
 
@@ -119,7 +119,7 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 			curTexel																= {0xFF, 0x00, 0xFF, 0xFF};
 	}
 
-	::gpk::SCoord2<uint32_t>													metricsScreen								= framework.BackBuffer->Color.View.metrics();
+	::gpk::SCoord2<uint32_t>													metricsScreen								= framework.RootWindow.BackBuffer->Color.View.metrics();
 	::SGame																		& gameInstance								= app.Game;
 	for(uint32_t iShip = 0, shipCount = app.Game.ShipsPlaying; iShip < shipCount; ++iShip) {
 		gameInstance.Ships.Alive		[iShip]									= 1;
@@ -164,7 +164,7 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	static	const ::gpk::view_const_string										textLine1									= "T: Shoot. Y: Thrust. U: Handbrake.";
 	static	const ::gpk::view_const_string										textLine2									= "Press ESC to exit or P to (un)pause.";
 	::gpk::SFramework															& framework									= app.Framework;
-	::gpk::view_grid<::gpk::SColorBGRA>											& offscreenView								= framework.BackBuffer->Color.View;
+	::gpk::view_grid<::gpk::SColorBGRA>											& offscreenView								= framework.RootWindow.BackBuffer->Color.View;
 	::gpk::view_grid<::gpk::SColorBGRA>											& fontAtlasView								= app.Textures[GAME_TEXTURE_FONT_ATLAS].Processed.View;
 	const ::gpk::SCoord2<uint32_t>												& offscreenMetrics							= offscreenView.metrics();
 	::gpk::textLineDrawAlignedFixedSizeLit(offscreenView, app.TextureFontMonochrome.View, fontAtlasView.metrics(), lineOffset++, offscreenMetrics, sizeCharCell, textLine0, ::gpk::SColorBGRA{0, app.Framework.FrameInfo.FrameNumber % 0xFF, 0xFFU, 0xFFU});

@@ -81,7 +81,7 @@ int													update				(SApplication & app, bool exitSignal)	{
 	//retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, exitSignal, "%s", "Exit requested by runtime.");
 	{
 		::gpk::mutex_guard									lock						(app.LockRender);
-		app.Framework.BackBuffer				= app.Offscreen;
+		app.Framework.RootWindow.BackBuffer				= app.Offscreen;
 	}
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework), "%s", "Exit requested by framework update.");
 

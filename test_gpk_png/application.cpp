@@ -100,7 +100,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, exitSignal, "%s", "Exit requested by runtime.");
 	{
 		::gpk::mutex_guard														lock						(app.LockRender);
-		app.Framework.BackBuffer									= app.Offscreen;
+		app.Framework.RootWindow.BackBuffer									= app.Offscreen;
 	}
 	::gpk::SFramework														& framework					= app.Framework;
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework), "%s", "Exit requested by framework update.");

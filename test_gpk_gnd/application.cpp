@@ -225,7 +225,7 @@
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, exitSignal, "%s", "Exit requested by runtime.");
 	{
 		::gpk::mutex_guard														lock						(app.LockRender);
-		app.Framework.BackBuffer									= app.Offscreen;
+		app.Framework.RootWindow.BackBuffer									= app.Offscreen;
 	}
 	::gpk::SFramework														& framework					= app.Framework;
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework), "%s", "Exit requested by framework update.");
@@ -310,7 +310,7 @@
 	( ::gpk::SRenderCache												& renderCache
 	, ::gpk::SSceneTransforms											& transforms
 	, ::gpk::SSceneCamera												& camera
-	, ::gpk::SRenderTarget<::gpk::SFramework::TTexel, uint32_t>			& target
+	, ::gpk::SWindow::TOffscreen										& target
 	, const ::gpk::SModelPivot<float>									& modelPivot
 	, const ::gpk::SCoord3<float>										& lightDir
 	, const ::gpk::SModelGND											& modelGND

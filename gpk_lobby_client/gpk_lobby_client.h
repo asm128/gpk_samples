@@ -11,17 +11,17 @@ namespace gme // I'm gonna use a different namespace in order to test a few thin
 
 
 	struct SApplication {
-		::gpk::SFramework								Framework;
-		::gpk::ptr_obj<::gpk::SFramework::TOffscreen>	Offscreen			= {};
+		::gpk::SFramework							Framework;
+		::gpk::ptr_obj<::gpk::SWindow::TOffscreen>	Offscreen			= {};
 
-		int32_t											IdExit				= -1;
+		int32_t										IdExit				= -1;
 
-		::std::mutex									LockGUI;
-		::std::mutex									LockRender;
+		::std::mutex								LockGUI;
+		::std::mutex								LockRender;
 
-		::gpk::SLobbyClient								LobbyClient;
+		::gpk::SLobbyClient							LobbyClient;
 
-														SApplication		(::gpk::SRuntimeValues& runtimeValues)	: Framework(runtimeValues)		{}
+													SApplication		(::gpk::SRuntimeValues& runtimeValues)	: Framework(runtimeValues)		{}
 	};
 } // namespace
 

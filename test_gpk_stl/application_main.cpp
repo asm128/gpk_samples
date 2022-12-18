@@ -20,15 +20,13 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "Title");
 
 static				::gpk::error_t										updateSizeDependentResources				(::SApplication& app)											{
 	const ::gpk::SCoord2<uint32_t>												newSize										= app.Framework.RootWindow.Size;
-	::gpk::updateSizeDependentTarget(app.Framework.BackBuffer->Color, newSize);
+	::gpk::updateSizeDependentTarget(app.Framework.RootWindow.BackBuffer->Color, newSize);
 	return 0;
 }
 
 // --- Cleanup application resources.
 					::gpk::error_t										cleanup										(::SApplication& app)											{
-	::gpk::SWindowPlatformDetail												& displayDetail								= app.Framework.RootWindow.PlatformDetail;
 	::gpk::mainWindowDestroy(app.Framework.RootWindow);
-	::UnregisterClass(displayDetail.WindowClassName, displayDetail.WindowClass.hInstance);
 	g_ApplicationInstance													= 0;
 	return 0;
 }
@@ -101,7 +99,7 @@ struct SCamera {
 	::gpk::SFramework															& framework									= app.Framework;
 
 	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>			backBuffer;
-	backBuffer->resize(framework.BackBuffer->Color.metrics(), 0xFF000080, (uint32_t)-1);
+	backBuffer->resize(framework.RootWindow.BackBuffer->Color.metrics(), 0xFF000080, (uint32_t)-1);
 
 	::gpk::SSTLFile																& stlFile									= app.STLFile;
 
@@ -192,7 +190,7 @@ struct SCamera {
 	//for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord)
 	//	::gpk::drawPixelLight(backBuffer->Color.View, wireframePixelCoords[iCoord], (::gpk::SColorBGRA)::gpk::GREEN, 0.05f, 1.5);
 
-	::gpk::grid_mirror_y(framework.BackBuffer->Color.View, backBuffer->Color.View);
+	::gpk::grid_mirror_y(framework.RootWindow.BackBuffer->Color.View, backBuffer->Color.View);
 	//framework.MainDisplayOffscreen = backBuffer;
 	//------------------------------------------------
 	return 0;

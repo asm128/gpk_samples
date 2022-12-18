@@ -20,11 +20,9 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT_MT(::SApplication, "Title");
 
 // --- Cleanup application resources.
 					::gpk::error_t										cleanup										(::SApplication& app)											{
-	::gpk::SWindowPlatformDetail												& displayDetail								= app.Framework.RootWindow.PlatformDetail;
 	// --- when the rendering context is no longer needed ...   
  	// make the rendering context not current  
 	::gpk::mainWindowDestroy(app.Framework.RootWindow);
-	::UnregisterClass(displayDetail.WindowClassName, displayDetail.WindowClass.hInstance);
 	return 0;
 }
 
@@ -34,7 +32,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT_MT(::SApplication, "Title");
 	mainWindow.Size														= {1280, 720};
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?!");
 
-	framework.BackBuffer->resize(mainWindow.Size);
+	framework.RootWindow.BackBuffer->resize(mainWindow.Size);
 
 	::gpk::array_pod<byte_t>			fileBytes;
 	::gpk::array_static<char, 256>		pathNameData		= {"../gpk_data"};
@@ -489,7 +487,7 @@ struct SCamera {
 	}
 
 	//::gpk::grid_mirror_y(framework.MainDisplayOffscreen->Color.View, backBuffer->Color.View);
-	::std::swap(framework.BackBuffer, app.BackBuffer);
+	::std::swap(framework.RootWindow.BackBuffer, app.BackBuffer);
 	//------------------------------------------------
 	return 0;
 }

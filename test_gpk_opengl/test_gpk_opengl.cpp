@@ -224,9 +224,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 
 // --- Cleanup application resources.
 					::gpk::error_t										cleanup										(::SApplication& app)											{
-	::gpk::SWindowPlatformDetail												& displayDetail								= app.Framework.RootWindow.PlatformDetail;
 	::gpk::mainWindowDestroy(app.Framework.RootWindow);
-	::UnregisterClass(displayDetail.WindowClassName, displayDetail.WindowClass.hInstance);
 	g_app													= 0;
 	return 0;
 }
@@ -270,7 +268,7 @@ static constexpr const ::gpk::STriangle3<float>						geometryCube	[12]						=
 	ree_if(errored(::updateSizeDependentResources	(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
 
 	::IntiOpenGLForWindow(mainWindow.PlatformDetail.WindowHandle, PFD_TYPE_RGBA, PFD_DOUBLEBUFFER);
-	framework.BackBuffer = {};
+	framework.RootWindow.BackBuffer = {};
 
 	// create a rendering context  
 	app.DrawingContext				= GetDC(framework.RootWindow.PlatformDetail.WindowHandle);
