@@ -21,6 +21,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "Title");
 static				::gpk::error_t										updateSizeDependentResources				(::SApplication& app)											{
 	const ::gpk::SCoord2<uint32_t>												newSize										= app.Framework.RootWindow.Size;
 	::gpk::updateSizeDependentTarget(app.Framework.RootWindow.BackBuffer->Color, newSize);
+	::gpk::updateSizeDependentTarget(app.Framework.RootWindow.BackBuffer->DepthStencil, newSize);
 	return 0;
 }
 

@@ -41,6 +41,7 @@ static				void												setupParticles								()																				{
 static				::gpk::error_t										updateSizeDependentResources				(::SApplication& app)											{
 	//static constexpr	const ::gpk::SCoord2<uint32_t>							GAME_SCREEN_SIZE							= {640, 360};
 	::gpk::updateSizeDependentTarget(app.Framework.RootWindow.BackBuffer->Color.Texels, app.Framework.RootWindow.BackBuffer->Color.View, GAME_SCREEN_SIZE);
+	::gpk::updateSizeDependentTarget(app.Framework.RootWindow.BackBuffer->DepthStencil, GAME_SCREEN_SIZE);
 	return 0;
 }
 
