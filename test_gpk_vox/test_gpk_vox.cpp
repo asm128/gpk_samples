@@ -84,9 +84,9 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT_MT(::SApplication, "Title");
 	::gpk::SWindow																& mainWindow								= app.Framework.RootWindow;
 	for(uint32_t iEvent = 0; iEvent < mainWindow.EventQueue.size(); ++iEvent) {
 		switch(mainWindow.EventQueue[iEvent].Type) {
-		case ::gpk::SYSEVENT_ACTIVATE:
+		case ::gpk::SYSEVENT_WINDOW_ACTIVATE:
 			break;
-		case ::gpk::SYSEVENT_DEACTIVATE:
+		case ::gpk::SYSEVENT_WINDOW_DEACTIVATE:
 			break;
 		case ::gpk::SYSEVENT_SYSKEY_DOWN:
 		case ::gpk::SYSEVENT_KEY_DOWN:
