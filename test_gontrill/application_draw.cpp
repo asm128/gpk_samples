@@ -9,7 +9,7 @@
 
 static				::gpk::error_t										drawShipHealthBar							(::SApplication& app, const ::gpk::SCoord2<float> & centerEnemy, const ::gpk::SCoord2<int32_t> & halfMetrics, uint32_t health, int32_t yOffset, const ::gpk::SColorBGRA & finalColor)											{
 	::gpk::SFramework															& framework									= app.Framework;
-	::gpk::view_grid<::gpk::SColorBGRA>											& viewOffscreen								= framework.MainDisplayOffscreen->Color.View;
+	::gpk::view_grid<::gpk::SColorBGRA>											& viewOffscreen								= framework.BackBuffer->Color.View;
 	::gpk::SLine2<int32_t>														healthBar									= {};
 	healthBar.A 															= {(int32_t)(centerEnemy.x  + .5f - halfMetrics.x), (int32_t)(centerEnemy.y Y_PLUS yOffset)};
 	healthBar.B																= healthBar.A; //{(int32_t)(centerEnemy.x  + .5f + halfMetrics.x), (int32_t)(centerEnemy.y + yOffset)};
@@ -28,7 +28,7 @@ static				::gpk::error_t										drawShipHealthBar							(::SApplication& app, 
 					::gpk::error_t										drawShips									(::SApplication& app)											{
 	::SGame																		& gameInstance								= app.Game;
 	::gpk::SFramework															& framework									= app.Framework;
-	::gpk::view_grid<::gpk::SColorBGRA>											& viewOffscreen								= framework.MainDisplayOffscreen->Color.View;
+	::gpk::view_grid<::gpk::SColorBGRA>											& viewOffscreen								= framework.BackBuffer->Color.View;
 	// ---- Draw enemy ships
 	const ::gpk::view_grid<::gpk::SColorBGRA>									& enemyView									= app.Textures[GAME_TEXTURE_ENEMY].Processed.View;
 	char																		indexPositionsX[]							= {0, 1, 2, 3, 2, 1, 0, -1, -2, -3, -2, -1};
@@ -97,7 +97,7 @@ static				::gpk::error_t										drawShipHealthBar							(::SApplication& app, 
 
 					::gpk::error_t										drawCollisions								(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	::gpk::SFramework															& framework									= app.Framework;
-	::gpk::view_grid<::gpk::SColorBGRA>											& viewOffscreen								= framework.MainDisplayOffscreen->Color.View;
+	::gpk::view_grid<::gpk::SColorBGRA>											& viewOffscreen								= framework.BackBuffer->Color.View;
 	for(uint32_t iRay = 0, rayCount = app.StuffToDraw.CollisionPoints.size(); iRay < rayCount; ++iRay) {
 		const ::gpk::SCoord2<float>													& pointToDraw									= app.StuffToDraw.CollisionPoints[iRay];
 		::gpk::drawPixelLight(viewOffscreen, pointToDraw, ::gpk::SColorBGRA(::gpk::ORANGE), .15f, 3.0f);
@@ -132,7 +132,7 @@ static				const ::gpk::array_static<::gpk::SColorBGRA, WEAPON_TYPE_COUNT>	weapon
 	};
 
 					::gpk::error_t										drawShots									(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
-	::gpk::view_grid<::gpk::SColorBGRA>											& viewOffscreen								= app.Framework.MainDisplayOffscreen->Color.View;
+	::gpk::view_grid<::gpk::SColorBGRA>											& viewOffscreen								= app.Framework.BackBuffer->Color.View;
 	for(uint32_t iRay = 0, rayCount = app.StuffToDraw.ProjectilePaths.size(); iRay < rayCount; ++iRay) {
 		const ::SLaserToDraw														& laserToDraw								= app.StuffToDraw.ProjectilePaths[iRay];
 		app.CacheLinePoints.clear();
@@ -156,7 +156,7 @@ static				const ::gpk::array_static<::gpk::SColorBGRA, WEAPON_TYPE_COUNT>	weapon
 }
 					::gpk::error_t										drawBackground								(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	::gpk::SFramework															& framework									= app.Framework;
-	::gpk::SImage<::gpk::SColorBGRA>											& offscreen									= framework.MainDisplayOffscreen->Color;
+	::gpk::SImage<::gpk::SColorBGRA>											& offscreen									= framework.BackBuffer->Color;
 	::gpk::view_grid<::gpk::SColorBGRA>											& viewOffscreen								= offscreen.View;
 	::gpk::drawRectangle(offscreen.View, app.ColorBackground, ::gpk::SRectangle2<uint32_t>{{}, offscreen.View.metrics()});
 	for(uint32_t iRay = 0, rayCount = app.StuffToDraw.Stars.size(); iRay < rayCount; ++iRay) {
@@ -183,7 +183,7 @@ static				const ::gpk::array_static<::gpk::SColorBGRA, WEAPON_TYPE_COUNT>	weapon
 }
 					::gpk::error_t										drawThrust								(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	::gpk::SFramework															& framework									= app.Framework;
-	::gpk::SImage<::gpk::SColorBGRA>											& offscreen									= framework.MainDisplayOffscreen->Color;
+	::gpk::SImage<::gpk::SColorBGRA>											& offscreen									= framework.BackBuffer->Color;
 	::gpk::view_grid<::gpk::SColorBGRA>											& viewOffscreen								= offscreen.View;
 	::SGame																		& gameInstance								= app.Game;
 	for(uint32_t iThrust = 0, particleCount = (uint32_t)app.StuffToDraw.Thrust.size(); iThrust < particleCount; ++iThrust) {
@@ -224,7 +224,7 @@ static				const ::gpk::SColorBGRA								powerupFamilyColorPalette []				=
 
 static				::gpk::error_t										drawPowerup						(::SApplication& app, POWERUP_FAMILY powFamily, const ::gpk::view_array<::gpk::view_grid<::gpk::SColorBGRA>>& texturePowerup, const ::gpk::SCoord2<int32_t>& textureCenterPowerup, const ::gpk::SCoord2<float>& powPosition, const ::gpk::view_array<const ::gpk::SCoord2<int32_t>>& lightPos, double time)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	::gpk::SFramework															& framework									= app.Framework;
-	::gpk::view_grid<::gpk::SColorBGRA>											& viewOffscreen								= framework.MainDisplayOffscreen->Color.View;
+	::gpk::view_grid<::gpk::SColorBGRA>											& viewOffscreen								= framework.BackBuffer->Color.View;
 	::gpk::SCoord2<int32_t>														position									= powPosition.Cast<int32_t>();
 	for(uint32_t iTex = 0, textureCount = texturePowerup.size(); iTex < textureCount; ++iTex)
 		gerror_if(errored(::gpk::grid_copy_alpha(viewOffscreen, texturePowerup[iTex], position - textureCenterPowerup, {0xFF, 0, 0xFF, 0xFF})), "I believe this never fails.");
@@ -296,7 +296,7 @@ static constexpr	const ::gpk::SCoord2<int32_t>						diagonalPowerupLightPosition
 
 static				::gpk::error_t										drawCrosshairDiagonal						(::SApplication& app, double beaconTimer, const ::gpk::SCoord2<int32_t>	& centerCrosshair)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	::gpk::SFramework															& framework									= app.Framework;
-	::gpk::view_grid<::gpk::SColorBGRA>											& viewOffscreen								= framework.MainDisplayOffscreen->Color.View;
+	::gpk::view_grid<::gpk::SColorBGRA>											& viewOffscreen								= framework.BackBuffer->Color.View;
 	int32_t																		halfWidth									= 10 - ((int32_t)beaconTimer % 11);
 	::gpk::SCoord2<int32_t>														lightCrosshair []							=
 		{ centerCrosshair + ::gpk::SCoord2<int32_t>{ halfWidth,  halfWidth }
@@ -313,7 +313,7 @@ static				::gpk::error_t										drawCrosshairDiagonal						(::SApplication& ap
 
 static				::gpk::error_t										drawCrosshairAligned						(::SApplication& app, double beaconTimer, const ::gpk::SCoord2<int32_t>	& centerCrosshair)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	::gpk::SFramework															& framework									= app.Framework;
-	::gpk::view_grid<::gpk::SColorBGRA>											& viewOffscreen								= framework.MainDisplayOffscreen->Color.View;
+	::gpk::view_grid<::gpk::SColorBGRA>											& viewOffscreen								= framework.BackBuffer->Color.View;
 	const int32_t																halfWidth									= 10 - ((int32_t)beaconTimer % 11);
 	const ::gpk::SCoord2<int32_t>												lightCrosshair []							=
 		{ centerCrosshair + ::gpk::SCoord2<int32_t>{-1, -halfWidth - 1}
@@ -349,7 +349,7 @@ static				::gpk::error_t										drawCrosshairAligned						(::SApplication& app
 		::gpk::SCoord2<int32_t>														posXHair									= gameInstance.PositionCrosshair[iShip].Cast<int32_t>();
 		if(false == gameInstance.Ships.LineOfFire[iShip])
 			::drawCrosshairDiagonal(app, beaconTimer, posXHair);
-		gerror_if(errored(::gpk::grid_copy_alpha(framework.MainDisplayOffscreen->Color.View, app.Textures[GAME_TEXTURE_CROSSHAIR].Processed.View, posXHair - app.TextureCenters[GAME_TEXTURE_CROSSHAIR], {0xFF, 0, 0xFF, 0xFF})), "I believe this never fails.");
+		gerror_if(errored(::gpk::grid_copy_alpha(framework.BackBuffer->Color.View, app.Textures[GAME_TEXTURE_CROSSHAIR].Processed.View, posXHair - app.TextureCenters[GAME_TEXTURE_CROSSHAIR], {0xFF, 0, 0xFF, 0xFF})), "I believe this never fails.");
 		if(gameInstance.Ships.LineOfFire[iShip])
 			::drawCrosshairAligned(app, beaconTimer, posXHair);
 	}

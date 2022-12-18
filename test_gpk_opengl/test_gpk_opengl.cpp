@@ -270,7 +270,7 @@ static constexpr const ::gpk::STriangle3<float>						geometryCube	[12]						=
 	ree_if(errored(::updateSizeDependentResources	(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
 
 	::IntiOpenGLForWindow(mainWindow.PlatformDetail.WindowHandle, PFD_TYPE_RGBA, PFD_DOUBLEBUFFER);
-	framework.MainDisplayOffscreen = {};
+	framework.BackBuffer = {};
 
 	// create a rendering context  
 	app.DrawingContext				= GetDC(framework.MainDisplay.PlatformDetail.WindowHandle);

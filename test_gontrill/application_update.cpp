@@ -106,7 +106,7 @@ template <size_t _sizeAlive>
 					::gpk::error_t										updateShips									(::SApplication & app)			{
 	::gpk::SFramework															& framework									= app.Framework;
 	::SGame																		& gameInstance			 					= app.Game;
-	const ::gpk::SCoord2<uint32_t>												& offscreenMetrics							= framework.MainDisplayOffscreen->Color.View.metrics();
+	const ::gpk::SCoord2<uint32_t>												& offscreenMetrics							= framework.BackBuffer->Color.View.metrics();
 	for(uint32_t iShip = 0, shipCount = gameInstance.ShipsPlaying; iShip < shipCount; ++iShip) { // Update ship positions
 		if(0 == gameInstance.Ships.Alive[iShip])
 			continue;
@@ -245,7 +245,7 @@ static				::gpk::error_t										integrateParticleVelocity					(::SApplication&
 		, app.StuffToDraw.Thrust
 		, app.StuffToDraw.Stars
 		);
-	const ::gpk::SCoord2<uint32_t>												& offscreenViewMetrics						= framework.MainDisplayOffscreen->Color.View.metrics();
+	const ::gpk::SCoord2<uint32_t>												& offscreenViewMetrics						= framework.BackBuffer->Color.View.metrics();
 	gpk_necall(::removeDeadParticles(app.ParticleSystemThrust		.Integrator, app.ParticleSystemThrust		.Instances, offscreenViewMetrics), "???");
 	gpk_necall(::removeDeadParticles(app.ParticleSystemDebris		.Integrator, app.ParticleSystemDebris		.Instances, offscreenViewMetrics), "???");
 	gpk_necall(::removeDeadParticles(app.ParticleSystemProjectiles	.Integrator, app.ParticleSystemProjectiles	.Instances, offscreenViewMetrics), "???");
@@ -375,7 +375,7 @@ static				::gpk::error_t										updateSpawnShots
 	)
 {
 	::gpk::SFramework															& framework									= app.Framework;
-	auto																		& offscreen									= framework.MainDisplayOffscreen->Color;
+	auto																		& offscreen									= framework.BackBuffer->Color;
 	// Add some effect particles
 	app.EffectsDelay.Thrust									+= framework.FrameInfo.Seconds.LastFrame;
 	::SGame																		& gameInstance								= app.Game;
@@ -637,7 +637,7 @@ static				::gpk::error_t												spawnEnemy										(::SGame & gameInstance,
 
 					::gpk::error_t												updateEnemies									(::SApplication & app)			{
 	::gpk::SFramework																	& framework										= app.Framework;
-	const ::gpk::SCoord2<uint32_t>														& offscreenMetrics								= framework.MainDisplayOffscreen->Color.View.metrics();
+	const ::gpk::SCoord2<uint32_t>														& offscreenMetrics								= framework.BackBuffer->Color.View.metrics();
 	::SGame																				& gameInstance									= app.Game;
 	gameInstance.GhostTimer															+= framework.FrameInfo.Seconds.LastFrame;
 	static float																		timerSpawn										= 0;
