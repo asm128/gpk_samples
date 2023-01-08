@@ -356,9 +356,9 @@ static				::gpk::error_t										updateSpawnShots
 				gameParticle.TypePlayer													= playerType;
 				gameParticle.IndexWeapon												= (int8_t)weapons[iShip].IndexProperties;
 				gameParticle.TypeWeapon													= ::weaponProperties[gameParticle.IndexWeapon].TypeWeapon;
-				const ::gpk::n2d<float>														textureShipMetrics							= app.Processed[textureIndex].View.metrics().Cast<float>();
-				const ::gpk::n2d<float>														weaponParticleOffset						= {textureShipMetrics.x - (textureShipMetrics.x - app.TextureCenters[textureIndex].x), -1};
-				const ::gpk::n2d<float>														shotDirection								= (playerType == PLAYER_TYPE_PLAYER) ? ::gpk::n2<float>{1.0f, 0.0f} :
+				const ::gpk::n2<float>														textureShipMetrics							= app.Processed[textureIndex].View.metrics().Cast<float>();
+				const ::gpk::n2<float>														weaponParticleOffset						= {textureShipMetrics.x - (textureShipMetrics.x - app.TextureCenters[textureIndex].x), -1};
+				const ::gpk::n2<float>														shotDirection								= (playerType == PLAYER_TYPE_PLAYER) ? ::gpk::n2<float>{1.0f, 0.0f} :
 					(gameInstance.Ships.Position[rand() % gameInstance.ShipsPlaying] - gameInstance.Enemies.Position[iShip]).InPlaceNormalize();
 				int32_t																		projectileIndex								= ::addProjectile(gameInstance, iShip, gameParticle.TypePlayer, gameParticle.TypeWeapon, weaponProp.Speed);
 				ce_if(errored(projectileIndex), "Projectile storage is full. Cannot add projectile.");
