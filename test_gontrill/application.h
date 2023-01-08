@@ -76,7 +76,7 @@ struct SEffectsDelay {
 						double																						Star;
 };
 
-static constexpr	const ::gpk::SCoord2<uint32_t>																GAME_SCREEN_SIZE							= {640 / 2 * 3, 360 / 2 * 3};
+static constexpr	const ::gpk::n2<uint16_t>																	GAME_SCREEN_SIZE							= {640 / 2 * 3, 360 / 2 * 3};
 
 struct SLevelState {
 	int32_t							Number;
@@ -104,7 +104,8 @@ struct SApplication {
 
 						::gpk::SColorBGRA																			ColorBackground								= ::gpk::SColorFloat(.15f, .15f, .15f, 1.0f);
 
-						::gpk::array_static<::gpk::SImageProcessable<::gpk::SColorBGRA>	, GAME_TEXTURE_COUNT>		Textures									= {};
+						::gpk::array_static<::gpk::img<::gpk::SColorBGRA>				, GAME_TEXTURE_COUNT>		Original									= {};
+						::gpk::array_static<::gpk::img<::gpk::SColorBGRA>				, GAME_TEXTURE_COUNT>		Processed									= {};
 						::gpk::array_static<::gpk::SCoord2<int32_t>						, GAME_TEXTURE_COUNT>		TextureCenters								= {};
 						::gpk::SCoord2<int32_t>																		PSOffsetFromShipCenter						= {};
 						::gpk::SImageMonochrome<uint32_t>															TextureFontMonochrome						= {};

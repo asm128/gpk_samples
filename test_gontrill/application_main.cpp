@@ -54,10 +54,10 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	return 0;
 }
 
-static				::gpk::error_t										setupSprite									(::gpk::SImageProcessable<::gpk::SColorBGRA>& textureToProcess, ::gpk::SCoord2<int32_t>& textureCenter, const ::gpk::view_const_string& filename)	{
-	gpk_necall(::gpk::pngFileLoad(filename, textureToProcess.Original), "%s", "Failed to load sprite image.");
-	textureCenter															= (textureToProcess.Original.View.metrics() / 2).Cast<int32_t>();
-	textureToProcess.Processed.View											= textureToProcess.Original.View;
+static				::gpk::error_t										setupSprite									(::gpk::img<::gpk::SColorBGRA> & textureToProcess, ::gpk::img<::gpk::SColorBGRA>& processed, ::gpk::SCoord2<int32_t>& textureCenter, const ::gpk::view_const_string& filename)	{
+	gpk_necall(::gpk::pngFileLoad(filename, textureToProcess), "%s", "Failed to load sprite image.");
+	textureCenter															= (textureToProcess.View.metrics() / 2).Cast<int32_t>();
+	processed.View															= textureToProcess.View;
 	return 0;
 }
 
@@ -78,11 +78,11 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 			::gpk::jsonExpressionResolve({subscriptExpression, lenExpression}, jsonReader, indexJSONNodeArrayPNGFileNames, fileNamePNG);
 			fullPathPNG.clear();
 			::gpk::pathNameCompose(pathPNGSuite, fileNamePNG, fullPathPNG);
-			::setupSprite(app.Textures[iFile], app.TextureCenters[iFile], {fullPathPNG.begin(), fullPathPNG.size()});
+			::setupSprite(app.Original[iFile], app.Processed[iFile], app.TextureCenters[iFile], {fullPathPNG.begin(), fullPathPNG.size()});
 		}
 	}
 
-	const ::gpk::view_grid<::gpk::SColorBGRA>									& fontAtlas									= app.Textures[GAME_TEXTURE_FONT_ATLAS].Processed.View;
+	const ::gpk::view_grid<::gpk::SColorBGRA>									& fontAtlas									= app.Processed[GAME_TEXTURE_FONT_ATLAS].View;
 	const ::gpk::SCoord2<uint32_t>												& textureFontMetrics						= fontAtlas.metrics();
 	app.TextureFontMonochrome.resize(textureFontMetrics);
 	for(uint32_t y = 0, yMax = textureFontMetrics.y; y < yMax; ++y)
@@ -94,10 +94,10 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 		||	0 != pixelToTest.b
 		;
 	}
-	app.StuffToDraw.TexturesPowerup0.push_back(app.Textures[GAME_TEXTURE_POWCORESQUARE		].Processed.View);
-	app.StuffToDraw.TexturesPowerup0.push_back(app.Textures[GAME_TEXTURE_POWICON			].Processed.View);
-	app.StuffToDraw.TexturesPowerup1.push_back(app.Textures[GAME_TEXTURE_POWCOREDIAGONAL	].Processed.View);
-	app.StuffToDraw.TexturesPowerup1.push_back(app.Textures[GAME_TEXTURE_POWICON			].Processed.View);
+	app.StuffToDraw.TexturesPowerup0.push_back(app.Processed[GAME_TEXTURE_POWCORESQUARE		].View);
+	app.StuffToDraw.TexturesPowerup0.push_back(app.Processed[GAME_TEXTURE_POWICON			].View);
+	app.StuffToDraw.TexturesPowerup1.push_back(app.Processed[GAME_TEXTURE_POWCOREDIAGONAL	].View);
+	app.StuffToDraw.TexturesPowerup1.push_back(app.Processed[GAME_TEXTURE_POWICON			].View);
 	return 0;
 }
 
@@ -111,7 +111,7 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	::setupParticles();
 	ree_if	(errored(::updateSizeDependentResources	(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
 	ree_if	(errored(::setupSprites					(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
-	::gpk::view_grid<::gpk::SColorBGRA>											& fontAtlasView								= app.Textures[GAME_TEXTURE_FONT_ATLAS].Processed.View;
+	::gpk::view_grid<::gpk::SColorBGRA>											& fontAtlasView								= app.Processed[GAME_TEXTURE_FONT_ATLAS].View;
 	const ::gpk::SCoord2<uint32_t>												& fontAtlasMetrics							= fontAtlasView.metrics();
 	for(uint32_t y = 0, yMax = fontAtlasMetrics.y; y < yMax; ++y)
 	for(uint32_t x = 0, xMax = fontAtlasMetrics.x; x < xMax; ++x) {
@@ -166,7 +166,7 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	static	const ::gpk::view_const_string										textLine2									= "Press ESC to exit or P to (un)pause.";
 	::gpk::SFramework															& framework									= app.Framework;
 	::gpk::view_grid<::gpk::SColorBGRA>											& offscreenView								= framework.RootWindow.BackBuffer->Color.View;
-	::gpk::view_grid<::gpk::SColorBGRA>											& fontAtlasView								= app.Textures[GAME_TEXTURE_FONT_ATLAS].Processed.View;
+	::gpk::view_grid<::gpk::SColorBGRA>											& fontAtlasView								= app.Processed[GAME_TEXTURE_FONT_ATLAS].View;
 	const ::gpk::SCoord2<uint32_t>												& offscreenMetrics							= offscreenView.metrics();
 	::gpk::textLineDrawAlignedFixedSizeLit(offscreenView, app.TextureFontMonochrome.View, fontAtlasView.metrics(), lineOffset++, offscreenMetrics, sizeCharCell, textLine0, ::gpk::SColorBGRA{0, app.Framework.FrameInfo.FrameNumber % 0xFF, 0xFFU, 0xFFU});
 	::gpk::textLineDrawAlignedFixedSizeLit(offscreenView, app.TextureFontMonochrome.View, fontAtlasView.metrics(), lineOffset++, offscreenMetrics, sizeCharCell, textLine1, ::gpk::SColorBGRA{app.Framework.FrameInfo.FrameNumber % 0xFFU, 0xFFU, 0, 0xFFU});

@@ -1,4 +1,3 @@
-#include "gpk_view_array.h"
 #include "gontrill_base.h"
 
 #ifndef SHIP_H_2098379238

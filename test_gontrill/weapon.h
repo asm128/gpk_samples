@@ -1,4 +1,4 @@
-#include "gpk_view_array.h"
+#include "gpk_view.h"
 
 #ifndef WEAPON_H_298364239
 #define WEAPON_H_298364239

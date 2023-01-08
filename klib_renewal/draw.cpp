@@ -327,8 +327,8 @@ void										klib::drawAndPresentGame		(SGame& instanceGame, ::klib::SASCIITarg
 	// Print log
 	::showMenu(instanceGame);
 
-	::gpk::SRenderTarget<char_t, uint16_t>			& displayGlobal					= instanceGame.GlobalDisplay	.Screen;
-	::gpk::SRenderTarget<char_t, uint16_t>			& displayTactical				= instanceGame.TacticalDisplay	.Screen;
+	::gpk::rt<char_t, uint16_t>			& displayGlobal					= instanceGame.GlobalDisplay	.Screen;
+	::gpk::rt<char_t, uint16_t>			& displayTactical				= instanceGame.TacticalDisplay	.Screen;
 	const ::gpk::SCoord2<uint32_t>					& displayMetricsGlobal			= displayGlobal		.metrics();
 	const ::gpk::SCoord2<uint32_t>					& displayMetricsTactical		= displayTactical	.metrics();
 
@@ -732,7 +732,7 @@ void									klib::displayAgentSlot					(const ::klib::SEntityTables & tables, :
 }
 
 void									klib::drawSquadSlots					(SGame& instanceGame)																																						{
-	::gpk::SRenderTarget<char, uint16_t>		& display								= instanceGame.GlobalDisplay.Screen;
+	::gpk::rt<char, uint16_t>		& display								= instanceGame.GlobalDisplay.Screen;
 	static const int32_t						slotWidth								= display.metrics().x / ::klib::MAX_AGENT_COLUMNS;
 	static const int32_t						slotRowSpace							= 30;// display.Depth / (MAX_AGENT_ROWS);
 
@@ -833,7 +833,7 @@ static SDrawMenuGlobals	drawMenu_globals = {{}, {0, 0.30}};
 
 int32_t													drawMenu
 	( ::klib::SDrawMenuState									& localPersistentState
-	, ::gpk::view2d_char										targetASCII
+	, ::gpk::v2c												targetASCII
 	, uint16_t													* targetAttributes
 	, int32_t													& lineOffset
 	, const ::gpk::SCoord2<int32_t>								mousePos
@@ -915,7 +915,7 @@ int32_t													drawMenu
 	return 0;
 }
 
-int32_t												klib::drawMenu											(::klib::SDrawMenuState	& localPersistentState, ::gpk::view2d_char display, uint16_t* targetAttributes, const ::gpk::view_const_char& title, const ::gpk::view_array<const ::gpk::view_const_char> & menuItems, const ::klib::SInput& frameInput, const int32_t noActionValue, uint32_t rowWidth, bool disableEscKeyClose, const ::gpk::view_const_char& exitText) {
+int32_t												klib::drawMenu											(::klib::SDrawMenuState	& localPersistentState, ::gpk::v2c display, uint16_t* targetAttributes, const ::gpk::view_const_char& title, const ::gpk::view_array<const ::gpk::view_const_char> & menuItems, const ::klib::SInput& frameInput, const int32_t noActionValue, uint32_t rowWidth, bool disableEscKeyClose, const ::gpk::view_const_char& exitText) {
 	drawMenu_globals.Timer.Frame();
 	const uint32_t												targetWidth											= display.metrics().x;
 	const uint32_t												targetHeight										= display.metrics().y;

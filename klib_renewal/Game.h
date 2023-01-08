@@ -35,7 +35,7 @@ namespace klib
 	static inline		double						getFinalRange			(const CCharacter& playerAgent, const SEntityPoints& playerAgentPoints)						{	return getFinalSight(playerAgentPoints.Attack	.Range + RANGE_OFFSET, playerAgent);	}
 
 	struct SWeightedDisplay {
-							::gpk::SRenderTarget<char, uint16_t>	Screen					= {};
+							::gpk::rt<char, uint16_t>	Screen					= {};
 							::gpk::SImage<float	>					DisplayWeights			= {};
 							::gpk::SImage<float	>					Speed					= {};
 							::gpk::SImage<float	>					SpeedTarget				= {};

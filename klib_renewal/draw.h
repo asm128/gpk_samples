@@ -2,8 +2,6 @@
 
 #include "gpk_noise.h"
 
-#include "gpk_view_array.h"
-
 #include <algorithm>
 
 #ifndef __DRAW_H_2394623987462983746823749623__

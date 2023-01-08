@@ -3,6 +3,7 @@
 //		Also useful for copy & paste operations in which you need to copy a bunch of variable or function names and you can't afford the time of copying them one by one.
 #include "application.h"
 #include "gpk_collision.h"
+#include "gpk_coord.h"
 
 					::gpk::error_t										updateInput									(::SApplication& app)											{
 	::gpk::SInput																& inputSystem								= *app.Framework.Input;
@@ -322,15 +323,15 @@ static				::gpk::error_t										addProjectile								(::SGame & gameInstance, 
 
 template <size_t _sizeAlive>
 static				::gpk::error_t										updateSpawnShots
-	( ::SApplication												& app
-	, const ::gpk::view_array<::SApplication::TParticle>			& particleDefinitions
-	, uint32_t														maxShips
-	, const ::gpk::array_static<::gpk::SCoord2<float>, _sizeAlive>	& positions
-	, ::gpk::array_static<double, _sizeAlive>						& weaponDelay
-	, const ::gpk::array_static<::SWeapon, _sizeAlive>				& weapons
-	, const ::gpk::array_static<::SShipState, _sizeAlive>			& shipState
-	, const ::SArrayElementState<_sizeAlive>						& alive
-	, PLAYER_TYPE													playerType
+	( ::SApplication											& app
+	, const ::gpk::view_array<::SApplication::TParticle>		& particleDefinitions
+	, uint32_t													maxShips
+	, const ::gpk::array_static<::gpk::n2<float>, _sizeAlive>	& positions
+	, ::gpk::array_static<double, _sizeAlive>					& weaponDelay
+	, const ::gpk::array_static<::SWeapon, _sizeAlive>			& weapons
+	, const ::gpk::array_static<::SShipState, _sizeAlive>		& shipState
+	, const ::SArrayElementState<_sizeAlive>					& alive
+	, PLAYER_TYPE												playerType
 	)
 {
 	::gpk::SFramework															& framework									= app.Framework;
@@ -355,9 +356,9 @@ static				::gpk::error_t										updateSpawnShots
 				gameParticle.TypePlayer													= playerType;
 				gameParticle.IndexWeapon												= (int8_t)weapons[iShip].IndexProperties;
 				gameParticle.TypeWeapon													= ::weaponProperties[gameParticle.IndexWeapon].TypeWeapon;
-				const ::gpk::SCoord2<float>													textureShipMetrics							= app.Textures[textureIndex].Processed.View.metrics().Cast<float>();
-				const ::gpk::SCoord2<float>													weaponParticleOffset						= {textureShipMetrics.x - (textureShipMetrics.x - app.TextureCenters[textureIndex].x), -1};
-				const ::gpk::SCoord2<float>													shotDirection								= (playerType == PLAYER_TYPE_PLAYER) ? ::gpk::SCoord2<float>{1.0f, 0.0f} :
+				const ::gpk::n2d<float>														textureShipMetrics							= app.Processed[textureIndex].View.metrics().Cast<float>();
+				const ::gpk::n2d<float>														weaponParticleOffset						= {textureShipMetrics.x - (textureShipMetrics.x - app.TextureCenters[textureIndex].x), -1};
+				const ::gpk::n2d<float>														shotDirection								= (playerType == PLAYER_TYPE_PLAYER) ? ::gpk::n2<float>{1.0f, 0.0f} :
 					(gameInstance.Ships.Position[rand() % gameInstance.ShipsPlaying] - gameInstance.Enemies.Position[iShip]).InPlaceNormalize();
 				int32_t																		projectileIndex								= ::addProjectile(gameInstance, iShip, gameParticle.TypePlayer, gameParticle.TypeWeapon, weaponProp.Speed);
 				ce_if(errored(projectileIndex), "Projectile storage is full. Cannot add projectile.");

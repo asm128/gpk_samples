@@ -1,4 +1,4 @@
-#include "gpk_view_array.h"
+#include "gpk_view.h"
 
 #ifndef __CREDITS_H__230984729380740298374092837423__
 #define __CREDITS_H__230984729380740298374092837423__
@@ -6,7 +6,7 @@
 namespace klib
 {
 	//static const ::std::string namesSpecialThanks[] =
-	static const ::gpk::view_const_string	namesSpecialThanks[] =
+	static const ::gpk::vcs		namesSpecialThanks[] =
 	{	"-- Loosely based on homework code and idea by --"
 	,	"Nethrim"
 	,	""
