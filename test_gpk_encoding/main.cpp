@@ -273,8 +273,8 @@ int													main						()			{
 					encoded.clear_pointer();
 					continue;
 				}
-				encoded.clear_pointer();
 				gerror_if(::memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
+				encoded.clear_pointer();
 				timer.Frame();
 				timeTotal											+= timer.LastTimeSeconds;
 			}
