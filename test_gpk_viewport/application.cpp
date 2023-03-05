@@ -126,7 +126,7 @@ template<typename _tIndex, typename _tValue>
 		::gpk::controlSetParent(gui, app.IdFrameRateRender, -1);
 	}
 
-	::gpk::ptr_obj<::gpk::SDialogTuner>										tuner										= {};
+	::gpk::pobj<::gpk::SDialogTuner<uint8_t>>								tuner						= {};
 	app.NumericTuner													= ::gpk::tunerCreate(app.DialogMain, tuner);
 	tuner->ValueLimits.Min												= 100;
 	tuner->ValueLimits.Max												= 200;
@@ -134,7 +134,7 @@ template<typename _tIndex, typename _tValue>
 	controlTable.Controls[tuner->IdGUIControl].Area.Offset				= {128, 192};
 	controlTable.Controls[tuner->IdGUIControl].Area.Size.x				= 128;
 	controlTable.Controls[tuner->IdGUIControl].Area.Size.y				=  20;
-	::gpk::tunerSetValue(*tuner, 0);
+	tuner->SetValue(0);
 
 	::gpk::ptr_obj<::gpk::SDialogSlider>									slider										= {};
 	app.Slider															= ::gpk::sliderCreate(app.DialogMain, slider);
