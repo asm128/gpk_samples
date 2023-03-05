@@ -1,4 +1,4 @@
-#include "application.h"
+#include "test_udp_client.h"
 #include "gpk_bitmap_file.h"
 #include "gpk_parse.h"
 
@@ -10,9 +10,9 @@
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 
 			::gpk::error_t											cleanup					(::gme::SApplication & app)							{
-	::gpk::mainWindowDestroy(app.Framework.RootWindow);
 	::gpk::clientDisconnect(app.Client);
 	::gpk::tcpipShutdown();
+	::gpk::mainWindowDestroy(app.Framework.RootWindow);
 	return 0;
 }
 			::gpk::error_t											setup						(::gme::SApplication & app)						{
@@ -85,7 +85,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	}
 
 	//static bool bSend = true;
-	reterr_gerror_if(app.Client.State != ::gpk::UDP_CONNECTION_STATE_IDLE, "Failed to connect to server.")
+	ree_if(app.Client.State != ::gpk::UDP_CONNECTION_STATE_IDLE, "Failed to connect to server.")
 	else {
 		{
 			::gpk::mutex_guard														lockRecv					(app.Client.Queue.MutexReceive);

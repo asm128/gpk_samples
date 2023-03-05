@@ -1,4 +1,4 @@
-#include "application.h"
+#include "test_udp_server.h"
 #include "gpk_bitmap_file.h"
 #include "gpk_tcpip.h"
 #include "gpk_parse.h"
@@ -36,7 +36,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	::gpk::tcpipInitialize();
 	uint64_t																port						= 9998;
 	uint64_t																adapter						= 0;
-	::gpk::view_const_string												jsonPort					= {};
+	::gpk::vcc																jsonPort					= {};
 	const ::gpk::SJSONReader												& jsonReader				= framework.JSONConfig.Reader;
 	{ // load port from config file
 		gwarn_if(errored(::gpk::jsonExpressionResolve(::gpk::vcs{"application.test_udp_server.listen_port"}, jsonReader, 0, jsonPort)), "Failed to load config from json! Last contents found: %s.", jsonPort.begin())
@@ -91,7 +91,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 				for(int32_t iMessage = 0; iMessage < (int32_t)client->Queue.Received.size(); ++iMessage) {
 					if(client->Queue.Received[iMessage]->Command.Type == ::gpk::ENDPOINT_COMMAND_TYPE_RESPONSE)
 						continue;
-					::gpk::ptr_obj<::gpk::SUDPConnectionMessage>							messageReceived				= client->Queue.Received[iMessage];
+					::gpk::pobj<::gpk::SUDPConnectionMessage>							messageReceived				= client->Queue.Received[iMessage];
 					gpk_necall(app.MessagesToProcess[iClient].push_back(messageReceived), "%s", "Out of memory?");
 					client->Queue.Received.remove_unordered(iMessage--);
 				}
@@ -101,25 +101,26 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 		::gpk::sleep(10);
 	}
 	for(uint32_t iClient = 0; iClient < app.MessagesToProcess.size(); ++iClient) {
-		const ::gpk::array_obj<::gpk::ptr_obj<::gpk::SUDPConnectionMessage>>	& clientQueue				= app.MessagesToProcess[iClient];
+		const ::gpk::apobj<::gpk::SUDPConnectionMessage>	& clientQueue				= app.MessagesToProcess[iClient];
 		for(uint32_t iMessage = 0; iMessage < clientQueue.size(); ++iMessage) {
-			::gpk::ptr_obj<::gpk::SUDPConnectionMessage>							messageReceived				= clientQueue[iMessage];
-			::gpk::view_const_byte													viewPayload					= messageReceived->Payload;
+			::gpk::pobj<::gpk::SUDPConnectionMessage>			messageReceived				= clientQueue[iMessage];
+			::gpk::view_const_byte								viewPayload					= messageReceived->Payload;
 			info_printf("Client %i received: %s.", iClient, viewPayload.begin());
+			sprintf_s(messageToSend, "Message arrived(true, true    ): %u", currentMessage++); 
 			{
-				::gpk::mutex_guard														lock						(app.Server.Mutex);
-				::gpk::ptr_nco<::gpk::SUDPConnection>									client						= app.Server.Clients[iClient];
+				::gpk::mutex_guard									lock						(app.Server.Mutex);
+				::gpk::pnco<::gpk::SUDPConnection>					client						= app.Server.Clients[iClient];
 				if(client->State != ::gpk::UDP_CONNECTION_STATE_IDLE)
 					continue;
-				sprintf_s(messageToSend, "Message arrived(true, true    ): %u", currentMessage++); ::gpk::connectionPushData(*client, client->Queue, ::gpk::view_const_string{messageToSend}, true, true	, 10);
-				//sprintf_s(messageToSend, "Message arrived(false, true   ): %u", currentMessage++); ::gpk::connectionPushData(*client, client->Queue, ::gpk::view_const_string{messageToSend}, false, true	, 10);
-				//sprintf_s(messageToSend, "Message arrived(true, false   ): %u", currentMessage++); ::gpk::connectionPushData(*client, client->Queue, ::gpk::view_const_string{messageToSend}, true, false	, 10);
-				//sprintf_s(messageToSend, "Message arrived(false, false  ): %u", currentMessage++); ::gpk::connectionPushData(*client, client->Queue, ::gpk::view_const_string{messageToSend}, false, false	, 10);
+				::gpk::connectionPushData(*client, client->Queue, ::gpk::vcs{messageToSend}, true, true	, 10);
+				//sprintf_s(messageToSend, "Message arrived(false, true   ): %u", currentMessage++); ::gpk::connectionPushData(*client, client->Queue, ::gpk::vcs{messageToSend}, false, true	, 10);
+				//sprintf_s(messageToSend, "Message arrived(true, false   ): %u", currentMessage++); ::gpk::connectionPushData(*client, client->Queue, ::gpk::vcs{messageToSend}, true, false	, 10);
+				//sprintf_s(messageToSend, "Message arrived(false, false  ): %u", currentMessage++); ::gpk::connectionPushData(*client, client->Queue, ::gpk::vcs{messageToSend}, false, false	, 10);
 				//
-				//sprintf_s(messageToSend, "Message arrived(true, true	) x: %u", currentMessage++); ::gpk::connectionPushData(*client, client->Queue, ::gpk::view_const_string{messageToSend}, true, true	, 10);
-				//sprintf_s(messageToSend, "Message arrived(false, true	) x: %u", currentMessage++); ::gpk::connectionPushData(*client, client->Queue, ::gpk::view_const_string{messageToSend}, false, true	, 10);
-				//sprintf_s(messageToSend, "Message arrived(true, false	) x: %u", currentMessage++); ::gpk::connectionPushData(*client, client->Queue, ::gpk::view_const_string{messageToSend}, true, false	, 10);
-				//sprintf_s(messageToSend, "Message arrived(false, false	) x: %u", currentMessage++); ::gpk::connectionPushData(*client, client->Queue, ::gpk::view_const_string{messageToSend}, false, false, 10);
+				//sprintf_s(messageToSend, "Message arrived(true, true	) x: %u", currentMessage++); ::gpk::connectionPushData(*client, client->Queue, ::gpk::vcs{messageToSend}, true, true	, 10);
+				//sprintf_s(messageToSend, "Message arrived(false, true	) x: %u", currentMessage++); ::gpk::connectionPushData(*client, client->Queue, ::gpk::vcs{messageToSend}, false, true	, 10);
+				//sprintf_s(messageToSend, "Message arrived(true, false	) x: %u", currentMessage++); ::gpk::connectionPushData(*client, client->Queue, ::gpk::vcs{messageToSend}, true, false	, 10);
+				//sprintf_s(messageToSend, "Message arrived(false, false	) x: %u", currentMessage++); ::gpk::connectionPushData(*client, client->Queue, ::gpk::vcs{messageToSend}, false, false, 10);
 			}
 		}
 	}
