@@ -21,7 +21,7 @@ namespace gme // I'm gonna use a different namespace in order to test a few thin
 		::std::mutex																		LockRender;
 
 
-		::gpk::array_obj<::gpk::array_obj<::gpk::ptr_obj<::gpk::SUDPConnectionMessage>>>	MessagesToProcess;
+		::gpk::array_obj<::gpk::array_obj<::gpk::ptr_obj<::gpk::SUDPMessage>>>	MessagesToProcess;
 
 
 																							SApplication						(::gpk::SRuntimeValues& runtimeValues)	: Framework(runtimeValues)		{}

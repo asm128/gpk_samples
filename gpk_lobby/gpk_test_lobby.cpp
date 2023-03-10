@@ -92,7 +92,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 				for(int32_t iMessage = 0; iMessage < (int32_t)client->Queue.Received.size(); ++iMessage) {
 					if(client->Queue.Received[iMessage]->Command.Type == ::gpk::ENDPOINT_COMMAND_TYPE_RESPONSE)
 						continue;
-					::gpk::ptr_obj<::gpk::SUDPConnectionMessage>							messageReceived				= client->Queue.Received[iMessage];
+					::gpk::ptr_obj<::gpk::SUDPMessage>							messageReceived				= client->Queue.Received[iMessage];
 					gpk_necall(app.LobbyServer.MessagesToProcess[iClient].push_back(messageReceived), "%s", "Out of memory?");
 					client->Queue.Received.remove_unordered(iMessage--);
 				}
@@ -101,9 +101,9 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 		::gpk::sleep(10);
 	}
 	for(uint32_t iClient = 0; iClient < app.LobbyServer.MessagesToProcess.size(); ++iClient) {
-		const ::gpk::array_obj<::gpk::ptr_obj<::gpk::SUDPConnectionMessage>>	& clientQueue				= app.LobbyServer.MessagesToProcess[iClient];
+		const ::gpk::array_obj<::gpk::ptr_obj<::gpk::SUDPMessage>>	& clientQueue				= app.LobbyServer.MessagesToProcess[iClient];
 		for(uint32_t iMessage = 0; iMessage < clientQueue.size(); ++iMessage) {
-			::gpk::ptr_obj<::gpk::SUDPConnectionMessage>							messageReceived				= clientQueue[iMessage];
+			::gpk::ptr_obj<::gpk::SUDPMessage>							messageReceived				= clientQueue[iMessage];
 			::gpk::view_const_byte													viewPayload					= messageReceived->Payload;
 			info_printf("Client %i received: %s.", iClient, viewPayload.begin());
 			{

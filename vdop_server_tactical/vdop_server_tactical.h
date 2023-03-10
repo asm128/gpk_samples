@@ -99,7 +99,7 @@ struct SApplication {
 			::gpk::array_obj<::gpk::ptr_obj<::klib::SGame>>							Game						= {};
 
 			::gpk::SUDPServer														TacticalServer;
-			typedef ::gpk::array_obj<::gpk::ptr_obj<::gpk::SUDPConnectionMessage>> TClientQueue;
+			typedef ::gpk::array_obj<::gpk::ptr_obj<::gpk::SUDPMessage>> TClientQueue;
 			::gpk::array_obj<TClientQueue>											MessagesToProcess;
 
 																					SApplication				(::gpk::SRuntimeValues& runtimeValues)	: Framework(runtimeValues)		{}

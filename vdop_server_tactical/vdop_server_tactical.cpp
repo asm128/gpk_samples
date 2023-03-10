@@ -125,7 +125,7 @@ int													update				(SApplication & app, bool exitSignal)	{
 				for(int32_t iMessage = 0; iMessage < (int32_t)client->Queue.Received.size(); ++iMessage) {
 					if(client->Queue.Received[iMessage]->Command.Type == ::gpk::ENDPOINT_COMMAND_TYPE_RESPONSE)
 						continue;
-					::gpk::ptr_obj<::gpk::SUDPConnectionMessage>							messageReceived				= client->Queue.Received[iMessage];
+					::gpk::ptr_obj<::gpk::SUDPMessage>							messageReceived				= client->Queue.Received[iMessage];
 					gpk_necall(app.MessagesToProcess[iClient].push_back(messageReceived), "%s", "Out of memory?");
 					client->Queue.Received.remove_unordered(iMessage--);
 				}
@@ -138,9 +138,9 @@ int													update				(SApplication & app, bool exitSignal)	{
 	static	uint32_t														currentMessage;
 	char																	messageToSend	[256]		= {};
 	for(uint32_t iClient = 0; iClient < app.MessagesToProcess.size(); ++iClient) {
-		const ::gpk::array_obj<::gpk::ptr_obj<::gpk::SUDPConnectionMessage>>	& clientQueue				= app.MessagesToProcess[iClient];
+		const ::gpk::array_obj<::gpk::ptr_obj<::gpk::SUDPMessage>>	& clientQueue				= app.MessagesToProcess[iClient];
 		for(uint32_t iMessage = 0; iMessage < clientQueue.size(); ++iMessage) {
-			::gpk::ptr_obj<::gpk::SUDPConnectionMessage>							messageReceived				= clientQueue[iMessage];
+			::gpk::ptr_obj<::gpk::SUDPMessage>							messageReceived				= clientQueue[iMessage];
 			::gpk::view_const_byte													viewPayload					= messageReceived->Payload;
 			info_printf("Server connection %i received: %s.", iClient, viewPayload.begin());
 			{
