@@ -30,7 +30,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT_MT(::SApplication, "Title");
 	::gpk::SFramework															& framework									= app.Framework;
 	::gpk::SWindow																& mainWindow								= framework.RootWindow;
 	mainWindow.Size														= {1280, 720};
-	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?!");
+	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)), "Failed to create main window why?!");
 
 	framework.RootWindow.BackBuffer->resize(mainWindow.Size);
 
@@ -440,7 +440,7 @@ struct SCamera {
 	//camera.Position *= 2.0f;
 	::gpk::SCoord3<float>									lightPos									= {150, 50, 0};
 	static float											cameraRotation								= 0;
-	cameraRotation										+= (float)framework.Input->MouseCurrent.Deltas.x / 5.0f;
+	cameraRotation										+= (float)framework.RootWindow.Input->MouseCurrent.Deltas.x / 5.0f;
 	//camera.Position	.RotateY(cameraRotation);
 	camera.Position	.RotateY(frameInfo.Seconds.Total * 0.1f);
 	camera.Position.y *= (float)fabs(sin(frameInfo.Seconds.Total * .1f));

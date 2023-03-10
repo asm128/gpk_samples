@@ -105,7 +105,7 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	g_ApplicationInstance													= &app;
 	::gpk::SFramework															& framework									= app.Framework;
 	framework.RootWindow.Size												= {1280, 720};
-	gerror_if(errored(::gpk::mainWindowCreate(framework.RootWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?!");
+	gerror_if(errored(::gpk::mainWindowCreate(framework.RootWindow, framework.RuntimeValues.PlatformDetail, framework.RootWindow.Input)), "Failed to create main window why?!");
 	::setupParticles();
 	ree_if	(errored(::updateSizeDependentResources	(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
 	ree_if	(errored(::setupSprites					(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");

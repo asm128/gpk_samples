@@ -83,9 +83,9 @@ template<typename _tIndex, typename _tValue>
 	::gpk::SFramework														& framework									= app.Framework;
 	::gpk::SWindow															& mainWindow								= framework.RootWindow;
 	app.Framework.GUI													= app.DialogMain.GUI;
-	app.DialogMain.Input												= framework.Input;
+	app.DialogMain.Input												= mainWindow.Input;
 	framework.RootWindow.Size												= {1280, 720};
-	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window. %s.", "why?!");
+	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)), "Failed to create main window. %s.", "why?!");
 	::gpk::SGUI																& gui										= *framework.GUI;
 	gui.ColorModeDefault												= ::gpk::GUI_COLOR_MODE_3D;
 	gui.ThemeDefault													= ::gpk::ASCII_COLOR_DARKGREEN * 16 + 7;
@@ -200,7 +200,7 @@ template<typename _tIndex, typename _tValue>
 		static	float															cameraRotation								= 0;
 		scene.Camera																= {{10, 5, 0}, {}};
 		scene.LightPos															= scene.Camera.Position;
-		cameraRotation														+= (float)framework.Input->MouseCurrent.Deltas.x / 5.0f;
+		cameraRotation														+= (float)framework.RootWindow.Input->MouseCurrent.Deltas.x / 5.0f;
 		//camera.Position	.RotateY(cameraRotation);
 		scene.Camera.Position	.RotateY(frameInfo.Microseconds.Total / 1000000.0f);
 		scene.LightPos		.RotateY(frameInfo.Microseconds.Total /  500000.0f);

@@ -6,7 +6,7 @@
 #include "gpk_coord.h"
 
 					::gpk::error_t										updateInput									(::SApplication& app)											{
-	::gpk::SInput																& inputSystem								= *app.Framework.Input;
+	::gpk::SInput																& inputSystem								= *app.Framework.RootWindow.Input;
 	::SGame																		& gameInstance								= app.Game;
 	::SShipState																& ship0State								= gameInstance.Ships.States[0];
 	ship0State.Firing														= inputSystem.KeyboardCurrent.KeyState['T'] != 0;

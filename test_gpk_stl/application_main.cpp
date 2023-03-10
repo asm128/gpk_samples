@@ -38,7 +38,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	::gpk::SFramework															& framework									= app.Framework;
 	::gpk::SWindow																& mainWindow								= framework.RootWindow;
 	mainWindow.Size														= {640, 480};
-	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?!");
+	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)), "Failed to create main window why?!");
 
 	::gpk::SSTLFile																& stlFile									= app.STLFile;
 	::gpk::stlFileLoad("Base Flat v5.stl", stlFile);
@@ -122,7 +122,7 @@ struct SCamera {
 	::SCamera																	camera										= {{150, 75, 0}, {}};
 	::gpk::SCoord3<float>														lightPos									= {150, 75, 0};
 	static float																cameraRotation								= 0;
-	cameraRotation															+= (float)framework.Input->MouseCurrent.Deltas.x / 5.0f;
+	cameraRotation															+= (float)framework.RootWindow.Input->MouseCurrent.Deltas.x / 5.0f;
 	//camera.Position	.RotateY(cameraRotation);
 	camera.Position	.RotateY(frameInfo.Microseconds.Total / 1000000.0f);
 	lightPos		.RotateY(frameInfo.Microseconds.Total /  500000.0f * -2);
