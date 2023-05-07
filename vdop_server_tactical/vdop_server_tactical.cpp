@@ -135,17 +135,17 @@ int													update				(SApplication & app, bool exitSignal)	{
 		::gpk::sleep(10);
 	}
 
-	static	uint32_t														currentMessage;
-	char																	messageToSend	[256]		= {};
+	static	uint32_t							currentMessage;
+	char										messageToSend	[256]		= {};
 	for(uint32_t iClient = 0; iClient < app.MessagesToProcess.size(); ++iClient) {
-		const ::gpk::array_obj<::gpk::ptr_obj<::gpk::SUDPMessage>>	& clientQueue				= app.MessagesToProcess[iClient];
+		const ::gpk::apobj<::gpk::SUDPMessage>		& clientQueue				= app.MessagesToProcess[iClient];
 		for(uint32_t iMessage = 0; iMessage < clientQueue.size(); ++iMessage) {
-			::gpk::ptr_obj<::gpk::SUDPMessage>							messageReceived				= clientQueue[iMessage];
-			::gpk::vcu8													viewPayload					= messageReceived->Payload;
+			::gpk::pobj<::gpk::SUDPMessage>				messageReceived				= clientQueue[iMessage];
+			::gpk::vcu8									viewPayload					= messageReceived->Payload;
 			info_printf("Server connection %i received: %s.", iClient, viewPayload.begin());
 			{
-				::gpk::mutex_guard											lock						(app.TacticalServer.Mutex);
-				::gpk::pnco<::gpk::SUDPConnection>							client						= app.TacticalServer.Clients[iClient];
+				::gpk::mutex_guard							lock						(app.TacticalServer.Mutex);
+				::gpk::pnco<::gpk::SUDPConnection>			client						= app.TacticalServer.Clients[iClient];
 				if(client->State != ::gpk::UDP_CONNECTION_STATE_IDLE)
 					continue;
 				sprintf_s(messageToSend, "Message arrived(true, true    ): %u", currentMessage++); ::gpk::connectionPushData(*client, client->Queue, ::gpk::view_const_string{messageToSend}, true, true	, 10);

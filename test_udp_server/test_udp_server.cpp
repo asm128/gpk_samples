@@ -83,7 +83,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 		::gpk::mutex_guard														lock						(app.Server.Mutex);
 		app.MessagesToProcess.resize(app.Server.Clients.size());
 		for(uint32_t iClient = 0, countClients = app.Server.Clients.size(); iClient < countClients; ++iClient) {
-			::gpk::ptr_nco<::gpk::SUDPConnection>									client						= app.Server.Clients[iClient];
+			::gpk::pnco<::gpk::SUDPConnection>									client						= app.Server.Clients[iClient];
 			if(client->State != ::gpk::UDP_CONNECTION_STATE_IDLE || 0 == client->KeyPing)
 				continue;
 			{

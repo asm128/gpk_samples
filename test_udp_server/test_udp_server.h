@@ -23,7 +23,6 @@ namespace gme // I'm gonna use a different namespace in order to test a few thin
 
 		::gpk::aobj<::gpk::apobj<::gpk::SUDPMessage>>	MessagesToProcess;
 
-
 														SApplication		(::gpk::SRuntimeValues& runtimeValues)	: Framework(runtimeValues)		{}
 	};
 } // namespace
