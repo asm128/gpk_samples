@@ -12,97 +12,97 @@
 #define CED_DEMO_08_H_298837492837
 
 struct SDrawCache {
-	::gpk::array_pod<::gpk::SCoord2<int32_t>>			PixelCoords				= {};
-	::gpk::array_pod<::gpk::STriangle<float>>	PixelVertexWeights		= {};
-	::gpk::array_pod<::gpk::SCoord3<float>>				LightPointsModel		= {};
-	::gpk::array_pod<::gpk::SColorBGRA>					LightColorsModel		= {};
+	::gpk::apod<::gpk::n2<int32_t>>			PixelCoords				= {};
+	::gpk::apod<::gpk::STriangle<float>>	PixelVertexWeights		= {};
+	::gpk::apod<::gpk::n3<float>>			LightPointsModel		= {};
+	::gpk::apod<::gpk::bgra>				LightColorsModel		= {};
 };
 
 struct STextOverlay {
-	::gpk::SCoord3<float>								LightVector0			= {-15, 50, -15};
+	::gpk::n3<float>						LightVector0			= {-15, 50, -15};
+	::gpk::n3<float>						CameraTarget			= {0, 0, 0};
+	::gpk::n3<float>						CameraPosition			= {.0001f, 1000.1f, -0.00001f};
+	::gpk::n3<float>						CameraUp				= {0, 0, 1};
+	::gpk::SGeometryQuads					GeometryLetters	[256]	= {};
+	::gpk::m4<float>						MatrixProjection		= {};
+	::SDrawCache							DrawCache				= {};
 
-	::gpk::SCoord3<float>								CameraTarget			= {0, 0, 0};
-	::gpk::SCoord3<float>								CameraPosition			= {.0001f, 1000.1f, -0.00001f};
-	::gpk::SCoord3<float>								CameraUp				= {0, 0, 1};
-	::gpk::SGeometryQuads								GeometryLetters	[256]	= {};
-	::gpk::SMatrix4<float>								MatrixProjection		= {};
-	::SDrawCache										DrawCache				= {};
-
-	static constexpr	const ::gpk::SCoord3<float>		ControlTranslation		= {0, 0, 20.0f};
-	static constexpr	const ::gpk::SCoord2<uint32_t>	MetricsLetter			= {12, 12};
-	static constexpr	const ::gpk::SCoord2<uint32_t>	MetricsMap				= {16, 16};
+	stacxpr	::gpk::n3<float>				ControlTranslation		= {0, 0, 20.0f};
+	stacxpr	::gpk::n2<uint32_t>				MetricsLetter			= {12, 12};
+	stacxpr	::gpk::n2<uint32_t>				MetricsMap				= {16, 16};
 };
 
 namespace klib
 {
 	//----------------------------------------------------------------------------------------------------------------------------------------------
 	struct STacticalGame {
-				// Game Flags tell us about the				current state of the application.
-				::klib::GAME_FLAGS							Flags							= (::klib::GAME_FLAGS)(::klib::GAME_FLAGS_NETWORK_ENABLED | ::klib::GAME_FLAGS_TURN_BUSY);
-				::klib::GAME_MODE							Mode							= ::klib::GAME_MODE_CAMPAIGN;	// This is the default because it's the only available mode at the moment
-				::klib::SGameState							State							= {::klib::GAME_STATE_MENU_MAIN,};
-				::klib::SGameState							PreviousState					= {::klib::GAME_STATE_MENU_MAIN,};
+		// Game Flags tell us about the				current state of the application.
+		::klib::GAME_FLAGS							Flags							= (::klib::GAME_FLAGS)(::klib::GAME_FLAGS_NETWORK_ENABLED | ::klib::GAME_FLAGS_TURN_BUSY);
+		::klib::GAME_MODE							Mode							= ::klib::GAME_MODE_CAMPAIGN;	// This is the default because it's the only available mode at the moment
+		::klib::SGameState							State							= {::klib::GAME_STATE_MENU_MAIN,};
+		::klib::SGameState							PreviousState					= {::klib::GAME_STATE_MENU_MAIN,};
 
-				::klib::SGamePlayer							Players[MAX_PLAYER_TYPES]		= {};
+		::klib::SGamePlayer							Players[MAX_PLAYER_TYPES]		= {};
 
-				::klib::STimer								FrameTimer						= {};
+		::klib::STimer								FrameTimer						= {};
 
-				// Tactical board.
-				::klib::STacticalInfo						TacticalInfo					= {};
+		// Tactical board.
+		::klib::STacticalInfo						TacticalInfo					= {};
 
-				// Displays.
-				::klib::SWeightedDisplay					TacticalDisplay					= {};
-				::klib::SWeightedDisplay					GlobalDisplay					= {};
+		// Displays.
+		::klib::SWeightedDisplay					TacticalDisplay					= {};
+		::klib::SWeightedDisplay					GlobalDisplay					= {};
 
-				// Feedback messages.
-				::klib::SGameMessages						Messages;
-				::gpk::array_pod<::klib::SGameEvent>		Events;
+		// Feedback messages.
+		::klib::SGameMessages						Messages;
+		::gpk::array_pod<::klib::SGameEvent>		Events;
 
-				// For the special effect
-				::klib::SEntityTables						EntityTables					= {};
+		// For the special effect
+		::klib::SEntityTables						EntityTables					= {};
 
-				::std::mutex								PlayerMutex						= {};
-				::std::mutex								ServerTimeMutex					= {};
-				uint64_t									ServerTime						= 0;
-				int64_t										Seed							= 0;
+		::std::mutex								PlayerMutex						= {};
+		::std::mutex								ServerTimeMutex					= {};
+		uint64_t									ServerTime						= 0;
+		int64_t										Seed							= 0;
 
-				void										ClearDisplays					()																						{
+		void										ClearDisplays					()																						{
 			TacticalDisplay	.Clear();
 			GlobalDisplay	.Clear();
 		}
 
-		inline	void										LogAuxStateMessage				()	{ Messages.LogAuxStateMessage	(); }
-		inline	void										LogAuxMessage					()	{ Messages.LogAuxMessage		(); }
-		inline	void										LogAuxSuccess					()	{ Messages.LogAuxSuccess		(); }
-		inline	void										LogAuxError						()	{ Messages.LogAuxError			(); }
-		inline	void										LogAuxMiss						()	{ Messages.LogAuxMiss			(); }
+		inline	void								LogAuxStateMessage				()	{ Messages.LogAuxStateMessage	(); }
+		inline	void								LogAuxMessage					()	{ Messages.LogAuxMessage		(); }
+		inline	void								LogAuxSuccess					()	{ Messages.LogAuxSuccess		(); }
+		inline	void								LogAuxError						()	{ Messages.LogAuxError			(); }
+		inline	void								LogAuxMiss						()	{ Messages.LogAuxMiss			(); }
 
-		inline	void										LogStateMessage					()	{ Messages.LogStateMessage	(); }
-		inline	void										LogMessage						()	{ Messages.LogMessage		(); }
-		inline	void										LogSuccess						()	{ Messages.LogSuccess		(); }
-		inline	void										LogError						()	{ Messages.LogError			(); }
-		inline	void										LogMiss							()	{ Messages.LogMiss			(); }
-		inline	void										ClearMessages					()	{ Messages.ClearMessages	(); }
+		inline	void								LogStateMessage					()	{ Messages.LogStateMessage	(); }
+		inline	void								LogMessage						()	{ Messages.LogMessage		(); }
+		inline	void								LogSuccess						()	{ Messages.LogSuccess		(); }
+		inline	void								LogError						()	{ Messages.LogError			(); }
+		inline	void								LogMiss							()	{ Messages.LogMiss			(); }
+		inline	void								ClearMessages					()	{ Messages.ClearMessages	(); }
 	};	// struct
 } // namespace
 
 struct SApplication {
-			::gpk::SFramework														Framework;
-			::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>		Offscreen					= {};
+	::gpk::SFramework								Framework;
+	::gpk::pobj<::gpk::rt<::gpk::bgra, uint32_t>>	Offscreen			= {};
 
-			int32_t																	IdExit						= -1;
+	int32_t											IdExit				= -1;
 
-			::std::mutex															LockGUI;
-			::std::mutex															LockRender;
+	::std::mutex									LockGUI;
+	::std::mutex									LockRender;
 
-			::STextOverlay															TextOverlay					= {};
-			::gpk::array_obj<::gpk::ptr_obj<::klib::SGame>>							Game						= {};
+	::STextOverlay									TextOverlay			= {};
+	::gpk::apobj<::klib::SGame>						Game				= {};
 
-			::gpk::SUDPServer														TacticalServer;
-			typedef ::gpk::array_obj<::gpk::ptr_obj<::gpk::SUDPMessage>> TClientQueue;
-			::gpk::array_obj<TClientQueue>											MessagesToProcess;
+	::gpk::SUDPServer								TacticalServer;
 
-																					SApplication				(::gpk::SRuntimeValues& runtimeValues)	: Framework(runtimeValues)		{}
+	typedef ::gpk::apobj<::gpk::SUDPMessage>		TClientQueue;
+	::gpk::aobj<TClientQueue>						MessagesToProcess;
+
+													SApplication		(::gpk::SRuntimeValues & runtimeValues)	: Framework(runtimeValues)		{}
 };
 
 #endif // CED_DEMO_08_H_298837492837

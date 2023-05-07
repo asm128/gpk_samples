@@ -101,7 +101,7 @@ int													update				(SApplication & app, bool exitSignal)	{
 	}
 	if(framework.RootWindow.Resized) {
 		::gpk::SMatrix4<float>									& matrixProjection			= app.TextOverlay.MatrixProjection;
-		matrixProjection.FieldOfView(::gpk::math_pi * .25, framework.RootWindow.Size.x / (double)framework.RootWindow.Size.y, 0.01f, 500.0f);
+		matrixProjection.FieldOfView(::gpk::math_pi * .25, framework.RootWindow.Size.x / (double)framework.RootWindow.Size.y, 0.01, 500.0);
 		::gpk::SMatrix4<float>									matrixViewport				= {};
 		matrixViewport.ViewportLH(framework.RootWindow.Size.Cast<uint16_t>());
 		matrixProjection									*= matrixViewport;
@@ -216,7 +216,7 @@ int													draw					(SApplication & app) {
 	matrixProjection.Identity();
 	matrixViewport	.Identity();
 
-	matrixProjection.FieldOfView(::gpk::math_pi * .25, targetPixels.metrics().x / (double)targetPixels.metrics().y, 0.01f, 5000.0f);
+	matrixProjection.FieldOfView(::gpk::math_pi * .25, targetPixels.metrics().x / (double)targetPixels.metrics().y, 0.01, 5000.0);
 	matrixViewport.ViewportLH(targetPixels.metrics().Cast<uint16_t>());
 	matrixView											*= matrixProjection;
 	matrixView											*= matrixViewport;

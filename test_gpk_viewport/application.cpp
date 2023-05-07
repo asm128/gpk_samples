@@ -13,7 +13,7 @@
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 
 // Vertex coordinates for cube faces
-static constexpr	const ::gpk::STriangle3<float>					modelPositionsVertices	[12]						=
+stacxpr	const ::gpk::STriangle3<float>					modelPositionsVertices	[12]						=
 	{ {{1.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}}	// Right	- first			?? I have no idea if this is correct lol
 	, {{1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 0.0f}}	// Right	- second		?? I have no idea if this is correct lol
 
@@ -33,7 +33,7 @@ static constexpr	const ::gpk::STriangle3<float>					modelPositionsVertices	[12]	
 	, {{1.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 1.0f}}	// Top		- second
 	};
 
-static constexpr	const ::gpk::STriangle3<float>						modelNormalVectors		[12]						=
+stacxpr	const ::gpk::STriangle3<float>						modelNormalVectors		[12]						=
 	{ {{0.0f, 0.0f, -1.0f}	, {0.0f, 0.0f, -1.0f}	, {0.0f, 0.0f, -1.0f}}	// Right	- first			?? I have no idea if this is correct lol
 	, {{0.0f, 0.0f, -1.0f}	, {0.0f, 0.0f, -1.0f}	, {0.0f, 0.0f, -1.0f}}	// Right	- second		?? I have no idea if this is correct lol
 //		{					, , 										}
@@ -193,7 +193,7 @@ template<typename _tIndex, typename _tValue>
 	//------------------------------------------------
 	::gpk::SFrameInfo														& frameInfo									= framework.FrameInfo;
 	::gme::SViewportScene													& scene										= app.Scene;
-	::gpk::SNearFar													& nearFar									= scene.Camera.NearFar;
+	::gpk::SNearFar															& nearFar									= scene.Camera.NearFar;
 	{
 		::gpk::mutex_guard														lockViewport								(app.LockViewport);
 		scene.Projection.Identity();

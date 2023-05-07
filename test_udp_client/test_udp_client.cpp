@@ -88,10 +88,10 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	ree_if(app.Client.State != ::gpk::UDP_CONNECTION_STATE_IDLE, "Failed to connect to server.")
 	else {
 		{
-			::gpk::mutex_guard														lockRecv					(app.Client.Queue.MutexReceive);
+			::gpk::mutex_guard				lockRecv					(app.Client.Queue.MutexReceive);
 			for(uint32_t iMessage = 0; iMessage < app.Client.Queue.Received.size(); ++iMessage) {
 				//gpk_necall(app.MessagesToProcess.push_back(client->Queue.Received[iMessage]), "%s", "Out of memory?");
-				::gpk::view_const_byte													viewPayload					= app.Client.Queue.Received[iMessage]->Payload;
+				::gpk::vcu8						viewPayload					= app.Client.Queue.Received[iMessage]->Payload;
 				info_printf("Client received: %s.", viewPayload.begin());
 			}
 			app.Client.Queue.Received.clear();

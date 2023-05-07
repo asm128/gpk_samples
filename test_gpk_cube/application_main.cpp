@@ -176,7 +176,7 @@ struct SCamera {
 	}
 	::gpk::array_pod<::gpk::SCoord2<int16_t>>									trianglePixelCoords;
 	::gpk::array_pod<::gpk::SCoord2<int16_t>>									wireframePixelCoords;
-	::gpk::SCoord3<float> cameraFront = (camera.Target - camera.Position).Normalize();
+	::gpk::SCoord3<float>														cameraFront					= (camera.Target - camera.Position).Normalize();
 	for(uint32_t iTriangle = 0; iTriangle < 12; ++iTriangle) {
 		double																		lightFactor									= geometryCubeNormals[iTriangle].Dot(cameraFront);
 		if(lightFactor > 0)

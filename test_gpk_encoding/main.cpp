@@ -35,24 +35,24 @@ static	int											primalityTest						(uint64_t number)						{
 }
 
 int													main						()			{
-	::gpk::view_const_byte signatureToEncode []	=
+	::gpk::vcs												 signatureToEncode []	=
 		{ "Last Chance! - CGI Interceptor - asm128 (c) 2009-2019",
 		};
 	{
-		::gpk::array_pod<char_t>								testBytes;
-		::gpk::array_pod<char_t>								loadedBytes;
-		::gpk::view_const_string								fileName					= "test_secure.bin";
-		::gpk::view_const_string								key							= {signatureToEncode->begin(), 32};
+		::gpk::au8												testBytes;
+		::gpk::au8												loadedBytes;
+		::gpk::vcs												fileName					= "test_secure.bin";
+		::gpk::vcu8												key							= {(const uint8_t*)signatureToEncode->begin(), 32};
 		gpk_necall(::gpk::fileToMemory("klib_renewal.lib", testBytes), "%s", "Failed to open test file.");
 		gerror_if(errored(::gpk::fileFromMemorySecure	(testBytes, fileName, key, true)	), "Failed to save secure file: %s.", ::gpk::toString(fileName).begin());
 		gerror_if(errored(::gpk::fileToMemorySecure		(loadedBytes, fileName, key, true)			), "Failed to read secure file: %s.", ::gpk::toString(fileName).begin());
 		gerror_if(loadedBytes != testBytes, "Test failed: %s - %s.", "", "");//::gpk::toString(loadedBytes).begin(), signatureToEncode[0].begin());
 	}
 	//const char  a[ ] = "TGFzdCBDaGFuY2UhIC0gQ0dJIEludGVyY2VwdG9yIC0gYXNtMTI4IChjKSAyMDA5LTIwMTkA";
-	::gpk::array_pod<char_t> signaturesEncoded [::gpk::size(signatureToEncode)]	= {};
+	::gpk::au8 signaturesEncoded [::gpk::size(signatureToEncode)]	= {};
 
 	for(uint32_t iSign = 0; iSign < ::gpk::size(signatureToEncode); ++iSign) {
-		::gpk::base64Encode(signatureToEncode[iSign], signaturesEncoded[iSign]);
+		gpk_necs(::gpk::base64Encode(signatureToEncode[iSign], signaturesEncoded[iSign]));
 	}
 	char message[4096] = {};
 	for(uint32_t iSign = 0; iSign < ::gpk::size(signatureToEncode); ++iSign) {
@@ -84,8 +84,8 @@ int													main						()			{
 			"e"
 			;
 
-		::gpk::array_pod<byte_t> encoded;
-		::gpk::rleEncode(::gpk::view_const_string(textTest), encoded);
+		::gpk::au8 encoded;
+		::gpk::rleEncode(::gpk::vcs(textTest), encoded);
 		encoded.push_back(0);
 		encoded.resize(encoded.size() - 1);
 		always_printf("RLE Encoded: %s", encoded.begin());
@@ -98,7 +98,7 @@ int													main						()			{
 		gerror_if(0 != memcmp(decoded.begin(), textTest, decoded.size()), "RLE test failed.");
 	}
 
-	const ::gpk::view_const_string							testStrings	[]				=
+	const ::gpk::vcs							testStrings	[]				=
 		{ "0Some string to test 0"
 		//,
 		, "1Some string to test 01"
@@ -146,14 +146,14 @@ int													main						()			{
 	{
 		::gpk::STimer											timer;
 		double													timeTotal					= 0;
-		::gpk::array_pod<byte_t>								encoded						;
-		::gpk::array_pod<byte_t>								decoded						;
+		::gpk::au8												encoded						;
+		::gpk::au8												decoded						;
 		for(uint32_t iRound=0; iRound < rounds; ++iRound)
 			for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {
 				encoded.clear();
 				decoded.clear();
 				ce_if(errored(::gpk::ardellEncode(encodingCache, testStrings[iTest]	, (int)::gpk::noise1DBase(iTest), false, encoded)), "%s", "Out of memory?");
-				ce_if(errored(::gpk::ardellDecode(encodingCache, encoded			, (int)::gpk::noise1DBase(iTest), false, decoded)), "%s", "Out of memory?");
+				ce_if(errored(::gpk::ardellDecode(encodingCache, encoded						, (int)::gpk::noise1DBase(iTest), false, decoded)), "%s", "Out of memory?");
 				gerror_if(0 == decoded.size() || ::memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
 				timer.Frame();
 				timeTotal											+= timer.LastTimeSeconds;
@@ -163,8 +163,8 @@ int													main						()			{
 	{
 		::gpk::STimer											timer;
 		double													timeTotal					= 0;
-		::gpk::array_pod<byte_t>								encoded						;
-		::gpk::array_pod<byte_t>								decoded						;
+		::gpk::au8												encoded						;
+		::gpk::au8												decoded						;
 		for(uint32_t iRound=0; iRound < rounds; ++iRound)
 			for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {
 				encoded.clear();
@@ -180,8 +180,8 @@ int													main						()			{
 	{
 		::gpk::STimer											timer;
 		double													timeTotal					= 0;
-		::gpk::array_pod<byte_t>								encoded;
-		::gpk::array_pod<byte_t>								decoded;
+		::gpk::au8												encoded;
+		::gpk::au8												decoded;
 		for(uint32_t iRound=0; iRound < rounds; ++iRound)
 			for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {
 				encoded.clear();
@@ -196,8 +196,8 @@ int													main						()			{
 	}
 	{
 		double													timeTotal					= 0;
-		::gpk::array_pod<byte_t>								encoded;
-		::gpk::array_pod<byte_t>								decoded;
+		::gpk::au8												encoded;
+		::gpk::au8												decoded;
 		::gpk::STimer											timer;
 		for(uint32_t iRound=0; iRound < rounds; ++iRound)
 			for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {
@@ -213,15 +213,15 @@ int													main						()			{
 	}
 	{
 		double													timeTotal					= 0;
-		::gpk::array_obj<::gpk::array_pod<byte_t>>				encodedList;
-		::gpk::array_obj<::gpk::array_pod<byte_t>>				decodedList;
+		::gpk::aobj<::gpk::au8>				encodedList;
+		::gpk::aobj<::gpk::au8>				decodedList;
 		encodedList.resize(rounds * ::gpk::size(testStrings));
 		decodedList.resize(rounds * ::gpk::size(testStrings));
 		::gpk::STimer											timer;
 		for(uint32_t iRound=0; iRound < rounds; ++iRound)
 			for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {
 				int32_t													indexBuffer					= iRound * ::gpk::size(testStrings) + iTest;
-				::gpk::array_pod<byte_t>								& encoded					= encodedList[indexBuffer];
+				::gpk::au8								& encoded					= encodedList[indexBuffer];
 				ce_if(errored(::gpk::base64Encode(testStrings[iTest], encoded)), "%s", "Out of memory?");
 				timer.Frame();
 				timeTotal											+= timer.LastTimeSeconds;
@@ -231,8 +231,8 @@ int													main						()			{
 		for(uint32_t iRound=0; iRound < rounds; ++iRound)
 			for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {
 				int32_t													indexBuffer					= iRound * ::gpk::size(testStrings) + iTest;
-				::gpk::array_pod<byte_t>								& encoded					= encodedList[indexBuffer];
-				::gpk::array_pod<byte_t>								& decoded					= decodedList[indexBuffer];
+				::gpk::au8								& encoded					= encodedList[indexBuffer];
+				::gpk::au8								& decoded					= decodedList[indexBuffer];
 				if errored(::gpk::base64Decode(encoded, decoded)) {
 					error_printf( "%s", "Out of memory?");
 					encoded.clear_pointer();
@@ -248,8 +248,8 @@ int													main						()			{
 
 	{
 		double													timeTotal					= 0;
-		::gpk::array_obj<::gpk::array_pod<byte_t>	>			encodedList;
-		::gpk::array_obj<::gpk::array_pod<ubyte_t>	>			decodedList;
+		::gpk::array_obj<::gpk::ac>				encodedList;
+		::gpk::array_obj<::gpk::au8>			decodedList;
 		encodedList.resize(rounds * ::gpk::size(testStrings));
 		decodedList.resize(rounds * ::gpk::size(testStrings));
 		::gpk::STimer											timer;
@@ -266,8 +266,8 @@ int													main						()			{
 		for(uint32_t iRound=0; iRound < rounds; ++iRound)
 			for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {
 				int32_t													indexBuffer					= iRound * ::gpk::size(testStrings) + iTest;
-				::gpk::array_pod<byte_t>								& encoded					= encodedList[indexBuffer];
-				::gpk::array_pod<ubyte_t>								& decoded					= decodedList[indexBuffer];
+				::gpk::ac												& encoded					= encodedList[indexBuffer];
+				::gpk::au8												& decoded					= decodedList[indexBuffer];
 				if errored(::gpk::hexDecode(encoded, decoded)) {
 					error_printf( "%s", "Out of memory?");
 					encoded.clear_pointer();
@@ -322,8 +322,8 @@ int													main						()			{
 	}
 
 	for(uint32_t iAESLevel = 0; iAESLevel < 3; ++iAESLevel) {
-		::gpk::array_obj<::gpk::array_pod<byte_t>	>			encodedList;
-		::gpk::array_obj<::gpk::array_pod<byte_t>	>			decodedList;
+		::gpk::aobj<::gpk::au8>			encodedList;
+		::gpk::aobj<::gpk::au8>			decodedList;
 		gpk_necall(encodedList.resize(rounds * ::gpk::size(testStrings)), "%s", "Out of memory?");
 		gpk_necall(decodedList.resize(rounds * ::gpk::size(testStrings)), "%s", "Out of memory?");
 		{
@@ -332,8 +332,8 @@ int													main						()			{
 			for(uint32_t iRound=0; iRound < rounds; ++iRound)
 				for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {
 					int32_t													indexBuffer					= iRound * ::gpk::size(testStrings) + iTest;
-					::gpk::array_pod<byte_t>								& encoded					= encodedList[indexBuffer];
-					ce_if(errored(::gpk::aesEncode(testStrings[iTest], ::gpk::view_const_byte{"RandomnessAtLargeQuantities1234", 32}, (::gpk::AES_LEVEL)iAESLevel, encoded)), "%s", "Out of memory?");
+					::gpk::au8												& encoded					= encodedList[indexBuffer];
+					ce_if(errored(::gpk::aesEncode(testStrings[iTest], ::gpk::vcc{"RandomnessAtLargeQuantities1234", 32}, (::gpk::AES_LEVEL)iAESLevel, encoded)), "%s", "Out of memory?");
 					timer.Frame();
 					timeTotal											+= timer.LastTimeSeconds;
 				}
@@ -345,9 +345,9 @@ int													main						()			{
 			for(uint32_t iRound=0; iRound < rounds; ++iRound)
 				for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {
 					int32_t													indexBuffer					= iRound * ::gpk::size(testStrings) + iTest;
-					::gpk::array_pod<byte_t>								& encoded					= encodedList[indexBuffer];
-					::gpk::array_pod<byte_t>								& decoded					= decodedList[indexBuffer];
-					if errored(::gpk::aesDecode(encoded.begin(), encoded.size(), ::gpk::view_const_byte{"RandomnessAtLargeQuantities1234", 32}, (::gpk::AES_LEVEL)iAESLevel, decoded)) {
+					::gpk::au8												& encoded					= encodedList[indexBuffer];
+					::gpk::au8												& decoded					= decodedList[indexBuffer];
+					if errored(::gpk::aesDecode(encoded, ::gpk::vcs{"RandomnessAtLargeQuantities1234", 32}, (::gpk::AES_LEVEL)iAESLevel, decoded)) {
 						error_printf("%s", "Out of memory?");
 						encoded.clear_pointer();
 						continue;
@@ -385,8 +385,8 @@ int													main						()			{
 	const uint32_t											rsaRounds					= (rsaKeys[rsaKeys.size() - 1].Public == rsaKeys[rsaKeys.size() - 1].Private) ? rsaKeys.size() - 1 : rsaKeys.size();
 	{
 		double													timeTotal					= 0;
-		::gpk::array_pod<uint64_t>								encoded;
-		::gpk::array_pod<byte_t>								decoded;
+		::gpk::au64												encoded;
+		::gpk::au8												decoded;
 		::gpk::STimer											timer;
 		for(uint32_t iRound=0; iRound < rsaRounds; ++iRound) {
 			double													timeRoundStart				= timeTotal;
@@ -397,10 +397,10 @@ int													main						()			{
 				decoded.clear();
 				::gpk::STimer											timerEncode;
 				timerEncode.Frame();
-				ce_if(errored(::gpk::rsaEncode(testStrings[iTest]	, rsa_n, rsaKeys[pair].Public	, 0, encoded)), "%s", "Out of memory?");
+				ce_if(errored(::gpk::rsaEncode(testStrings[iTest], rsa_n, rsaKeys[pair].Public	, 0, encoded)), "%s", "Out of memory?");
 				timerEncode.Frame();
 				always_printf("------ RSA (cacheless)\nEncoding time for this step of %u size: %llu microseconds.", testStrings[iTest].size(), timerEncode.LastTimeMicroseconds);
-				ce_if(errored(::gpk::rsaDecode(encoded				, rsa_n, rsaKeys[pair].Private	, decoded)), "%s", "Out of memory?");
+				ce_if(errored(::gpk::rsaDecode(encoded			, rsa_n, rsaKeys[pair].Private	, decoded)), "%s", "Out of memory?");
 				timerEncode.Frame();
 				always_printf("------ RSA (cacheless)\nDecoding time for this step of %u size: %g milliseconds.", testStrings[iTest].size(), timerEncode.LastTimeMicroseconds / 1000.0);
 				//always_printf("RSA:"
@@ -420,8 +420,8 @@ int													main						()			{
 	}
 	{
 		double													timeTotal					= 0;
-		::gpk::array_pod<uint64_t>								encoded;
-		::gpk::array_pod<byte_t>								decoded;
+		::gpk::au64												encoded;
+		::gpk::au8												decoded;
 		::gpk::STimer											timer;
 		for(uint32_t iRound=0; iRound < rsaRounds; ++iRound)
 			for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {
@@ -480,8 +480,8 @@ int													main						()			{
 	}
 	{
 		double													timeTotal					= 0;
-		::gpk::array_pod<uint64_t>								encoded;
-		::gpk::array_pod<byte_t>								decoded;
+		::gpk::au64												encoded;
+		::gpk::au8												decoded;
 		::gpk::STimer											timer;
 		for(uint32_t iRound=0; iRound < rsaRounds; ++iRound)
 			for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {

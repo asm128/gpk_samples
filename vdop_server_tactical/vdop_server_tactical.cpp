@@ -64,7 +64,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 	::klib::initASCIIScreen(DEFAULT_ASCII_DISPLAY_WIDTH, DEFAULT_ASCII_DISPLAY_HEIGHT);
 
 	app.Game.push_back({});
-	::gpk::ptr_obj<::klib::SGame>							& instanceGame		= app.Game[0];
+	::gpk::pobj<::klib::SGame>							& instanceGame		= app.Game[0];
 	instanceGame->GlobalDisplay		.Resize({DEFAULT_ASCII_DISPLAY_WIDTH, DEFAULT_ASCII_DISPLAY_HEIGHT});
 	instanceGame->TacticalDisplay	.Resize({::klib::GAME_MAP_WIDTH, ::klib::GAME_MAP_DEPTH});
 
@@ -99,7 +99,7 @@ int													update				(SApplication & app, bool exitSignal)	{
 	}
 	if(framework.RootWindow.Resized) {
 		::gpk::SMatrix4<float>									& matrixProjection	= app.TextOverlay.MatrixProjection;
-		matrixProjection.FieldOfView(::gpk::math_pi * .25, framework.RootWindow.Size.x / (double)framework.RootWindow.Size.y, 0.01f, 500.0f);
+		matrixProjection.FieldOfView(::gpk::math_pi * .25, framework.RootWindow.Size.x / (double)framework.RootWindow.Size.y, 0.01, 500.0);
 		::gpk::SMatrix4<float>									matrixViewport		= {};
 		matrixViewport.ViewportLH(framework.RootWindow.Size.Cast<uint16_t>());
 		matrixProjection									*= matrixViewport;
@@ -135,17 +135,17 @@ int													update				(SApplication & app, bool exitSignal)	{
 		::gpk::sleep(10);
 	}
 
-	static	uint32_t														currentMessage;
-	char																	messageToSend	[256]		= {};
+	static	uint32_t							currentMessage;
+	char										messageToSend	[256]		= {};
 	for(uint32_t iClient = 0; iClient < app.MessagesToProcess.size(); ++iClient) {
-		const ::gpk::array_obj<::gpk::ptr_obj<::gpk::SUDPMessage>>	& clientQueue				= app.MessagesToProcess[iClient];
+		const ::gpk::apobj<::gpk::SUDPMessage>		& clientQueue				= app.MessagesToProcess[iClient];
 		for(uint32_t iMessage = 0; iMessage < clientQueue.size(); ++iMessage) {
-			::gpk::ptr_obj<::gpk::SUDPMessage>							messageReceived				= clientQueue[iMessage];
-			::gpk::view_const_byte													viewPayload					= messageReceived->Payload;
+			::gpk::pobj<::gpk::SUDPMessage>				messageReceived				= clientQueue[iMessage];
+			::gpk::vcu8									viewPayload					= messageReceived->Payload;
 			info_printf("Server connection %i received: %s.", iClient, viewPayload.begin());
 			{
-				::gpk::mutex_guard														lock						(app.TacticalServer.Mutex);
-				::gpk::ptr_nco<::gpk::SUDPConnection>									client						= app.TacticalServer.Clients[iClient];
+				::gpk::mutex_guard							lock						(app.TacticalServer.Mutex);
+				::gpk::pnco<::gpk::SUDPConnection>			client						= app.TacticalServer.Clients[iClient];
 				if(client->State != ::gpk::UDP_CONNECTION_STATE_IDLE)
 					continue;
 				sprintf_s(messageToSend, "Message arrived(true, true    ): %u", currentMessage++); ::gpk::connectionPushData(*client, client->Queue, ::gpk::view_const_string{messageToSend}, true, true	, 10);

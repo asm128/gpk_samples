@@ -83,7 +83,7 @@
 
 	//---------------------------
 
-	static constexpr const char													ragnaPath	[]								= "\\data_2005\\data\\";
+	stacxpr char													ragnaPath	[]								= "\\data_2005\\data\\";
 
 	char																		temp		[512]							= {};
 	::gpk::SRSWFileContents														& rswData									= app.RSWData;
@@ -246,17 +246,17 @@
 	app.DialogMain.Update();
 
 	//----------------------------------------------
-	::gpk::SFrameInfo															& frameInfo									= framework.FrameInfo;
-	bool																		updateProjection							= false;
-	if(framework.RootWindow.Input->KeyboardCurrent.KeyState[VK_ADD		])	{ updateProjection = true; app.Scene.Camera.Angle += frameInfo.Seconds.LastFrame; }
-	if(framework.RootWindow.Input->KeyboardCurrent.KeyState[VK_SUBTRACT])	{ updateProjection = true; app.Scene.Camera.Angle -= frameInfo.Seconds.LastFrame; }
-	if(framework.RootWindow.Input->KeyboardCurrent.KeyState['Q'])			{ updateProjection = true; app.Scene.Camera.Points.Position.x += (float)frameInfo.Seconds.LastFrame * 10; }
-	if(framework.RootWindow.Input->KeyboardCurrent.KeyState['E'])			{ updateProjection = true; app.Scene.Camera.Points.Position.x -= (float)frameInfo.Seconds.LastFrame * 10; }
-	if(framework.RootWindow.Input->KeyboardCurrent.KeyState['W'])			{ updateProjection = true; app.Scene.Camera.Points.Position.y += (float)frameInfo.Seconds.LastFrame * 10; }
-	if(framework.RootWindow.Input->KeyboardCurrent.KeyState['S'])			{ updateProjection = true; app.Scene.Camera.Points.Position.y -= (float)frameInfo.Seconds.LastFrame * 10; }
-	if(framework.RootWindow.Input->KeyboardCurrent.KeyState['A'])			{ updateProjection = true; app.Scene.Camera.Points.Position.z += (float)frameInfo.Seconds.LastFrame * 10; }
-	if(framework.RootWindow.Input->KeyboardCurrent.KeyState['D'])			{ updateProjection = true; app.Scene.Camera.Points.Position.z -= (float)frameInfo.Seconds.LastFrame * 10; }
-
+	::gpk::SFrameInfo								& frameInfo									= framework.FrameInfo;
+	bool											updateProjection							= false;
+	::gpk::SWindow									& mainWindow						= framework.RootWindow;
+	if(mainWindow.Input->KeyboardCurrent.KeyState[VK_ADD		])	{ updateProjection = true; app.Scene.Camera.Angle += frameInfo.Seconds.LastFrame; }
+	if(mainWindow.Input->KeyboardCurrent.KeyState[VK_SUBTRACT	])	{ updateProjection = true; app.Scene.Camera.Angle -= frameInfo.Seconds.LastFrame; }
+	if(mainWindow.Input->KeyboardCurrent.KeyState['Q'])				{ updateProjection = true; app.Scene.Camera.Points.Position.x += (float)frameInfo.Seconds.LastFrame * 10; }
+	if(mainWindow.Input->KeyboardCurrent.KeyState['E'])				{ updateProjection = true; app.Scene.Camera.Points.Position.x -= (float)frameInfo.Seconds.LastFrame * 10; }
+	if(mainWindow.Input->KeyboardCurrent.KeyState['W'])				{ updateProjection = true; app.Scene.Camera.Points.Position.y += (float)frameInfo.Seconds.LastFrame * 10; }
+	if(mainWindow.Input->KeyboardCurrent.KeyState['S'])				{ updateProjection = true; app.Scene.Camera.Points.Position.y -= (float)frameInfo.Seconds.LastFrame * 10; }
+	if(mainWindow.Input->KeyboardCurrent.KeyState['A'])				{ updateProjection = true; app.Scene.Camera.Points.Position.z += (float)frameInfo.Seconds.LastFrame * 10; }
+	if(mainWindow.Input->KeyboardCurrent.KeyState['D'])				{ updateProjection = true; app.Scene.Camera.Points.Position.z -= (float)frameInfo.Seconds.LastFrame * 10; }
 
 	//------------------------------------------------ Camera
 	::gpk::SCameraPoints														& camera									= app.Scene.Camera.Points;
