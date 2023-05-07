@@ -161,7 +161,7 @@ namespace gpk
 				+ triangle.B.z * proportions.B
 				+ triangle.C.z * proportions.C
 				;
-			double																		depth										= ((finalZ - fNearFar.Near) / (fNearFar.Far - fNearFar.Near));
+			double																		depth										= ((finalZ - fNearFar.Min) / (fNearFar.Max - fNearFar.Min));
 			if(depth >= 1 || depth <= 0) // discard from depth planes
 				continue;
 			uint32_t																	finalDepth									= (uint32_t)(depth * 0x00FFFFFFU);
@@ -449,7 +449,7 @@ struct SCamera {
 
 	viewMatrix.LookAt(camera.Position, camera.Target, cameraUp);
 	const ::gpk::SCoord2<uint32_t>							& offscreenMetrics							= backBuffer->metrics();
-	projection.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, nearFar.Near, nearFar.Far );
+	projection.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, nearFar);
 	projection											= viewMatrix * projection;
 	lightPos.x += 100;
 	lightPos.y *= (float)fabs(sin(frameInfo.Seconds.Total * .1f));

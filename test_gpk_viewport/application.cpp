@@ -208,15 +208,15 @@ template<typename _tIndex, typename _tValue>
 		::gpk::ptr_obj<::gpk::SDialogViewport>									viewport									= {};
 		app.DialogMain.Controls[app.Viewport].as(viewport);
 		const ::gpk::SCoord2<uint32_t>											& offscreenMetrics							= gui.Controls.Controls[viewport->IdClient].Area.Size.Cast<uint32_t>();
-		scene.Projection.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, nearFar.Near, nearFar.Far );
+		scene.Projection.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, nearFar);
 		scene.Projection															= scene.ViewMatrix * scene.Projection;
 		scene.LightPos.Normalize();
 
 		::gpk::SMatrix4<float>													mViewport									= {};
 		mViewport._11														= 2.0f / offscreenMetrics.x;
 		mViewport._22														= 2.0f / offscreenMetrics.y;
-		mViewport._33														= 1.0f / (float)(nearFar.Far - nearFar.Near);
-		mViewport._43														= (float)(-nearFar.Near * ( 1.0f / (nearFar.Far - nearFar.Near) ));
+		mViewport._33														= 1.0f / (float)(nearFar.Max - nearFar.Min);
+		mViewport._43														= (float)(-nearFar.Min * ( 1.0f / (nearFar.Max - nearFar.Min) ));
 		mViewport._44														= 1.0f;
 		scene.Projection													= scene.Projection * mViewport.GetInverse();
 	}

@@ -142,15 +142,15 @@ struct SCamera {
 	lightPos		.RotateY(frameInfo.Microseconds.Total /  500000.0f * -2);
 	viewMatrix.LookAt(camera.Position, camera.Target, cameraUp);
 	const ::gpk::SCoord2<uint16_t>												& offscreenMetrics							= backBuffer->Color.View.metrics().Cast<uint16_t>();
-	projection.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, nearFar.Near, nearFar.Far );
+	projection.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, nearFar);
 	projection																= viewMatrix * projection;
 	lightPos.Normalize();
 
 	::gpk::SMatrix4<float>														viewport									= {};
 	viewport._11															= 2.0f / offscreenMetrics.x;
 	viewport._22															= 2.0f / offscreenMetrics.y;
-	viewport._33															= 1.0f / (float)(nearFar.Far - nearFar.Near);
-	viewport._43															= (float)(-nearFar.Near * ( 1.0f / (nearFar.Far - nearFar.Near) ));
+	viewport._33															= 1.0f / (float)(nearFar.Max - nearFar.Min);
+	viewport._43															= (float)(-nearFar.Min * ( 1.0f / (nearFar.Max - nearFar.Min) ));
 	viewport._44															= 1.0f;
 	projection																= projection * viewport.GetInverse();
 	for(uint32_t iTriangle = 0; iTriangle < 12; ++iTriangle) {
