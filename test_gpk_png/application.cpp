@@ -16,7 +16,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 	::gpk::SFramework														& framework							= app.Framework;
 	::gpk::SWindow															& mainWindow						= framework.RootWindow;
 	mainWindow.Size														= {1280, 720};
-	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window. %s.", "why?!");
+	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)), "Failed to create main window. %s.", "why?!");
 	{ // Build the exit button
 		::gpk::SGUI																& gui								= *framework.GUI;
 		gui.ColorModeDefault												= ::gpk::GUI_COLOR_MODE_3D;
@@ -59,17 +59,17 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 		}
 		{
 			// ---- Test our recently developed RLE algorithm.
-			::gpk::array_pod<uint32_t>												sizesUncompressed;
-			::gpk::array_pod<byte_t>												rleBuffer;
-			::gpk::array_pod<uint32_t>												sizesRLE;
-			uint32_t																sizeTotalUncompressed				= 0;
-			uint32_t																sizeTotalRLE						= 0;
+			::gpk::au32												sizesUncompressed;
+			::gpk::au8												rleBuffer;
+			::gpk::au32												sizesRLE;
+			uint32_t												sizeTotalUncompressed				= 0;
+			uint32_t												sizeTotalRLE						= 0;
 			for(uint32_t iFile = 0, countFilesToLoad = app.PNGImages.size(); iFile < countFilesToLoad; ++iFile) {
-				::gpk::view_array<::gpk::SColorBGRA>	viewToRLE{app.PNGImages[iFile].View.begin(), app.PNGImages[iFile].View.metrics().x * app.PNGImages[iFile].View.metrics().y};
+				::gpk::view<::gpk::bgra>	viewToRLE{app.PNGImages[iFile].View.begin(), app.PNGImages[iFile].View.metrics().x * app.PNGImages[iFile].View.metrics().y};
 				sizesUncompressed.push_back(viewToRLE.size());
 				::gpk::rleEncode(viewToRLE, rleBuffer);
 				sizesRLE.push_back(rleBuffer.size());
-				const uint32_t															sizePNGInBytes			= viewToRLE.size() * sizeof(::gpk::SColorBGRA);
+				const uint32_t											sizePNGInBytes			= viewToRLE.size() * sizeof(::gpk::SColorBGRA);
 				//info_printf("--- RLE compression stats:"
 				//	"\nsizePNGRLE          : %u"
 				//	"\nsizePNGUncompressed : %u"

@@ -11,36 +11,36 @@
 
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Solar System Test");
 
-			::gpk::error_t											cleanup								(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.RootWindow); }
+::gpk::error_t								cleanup								(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.RootWindow); }
 
-			::gpk::error_t											setup								(::gme::SApplication & app)						{
-	::gpk::SFramework														& framework							= app.Framework;
-	::gpk::SWindow															& mainWindow						= framework.RootWindow;
-	mainWindow.Size														= {1280, 720};
-	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window. %s.", "why?!");
+::gpk::error_t								setup								(::gme::SApplication & app)						{
+	::gpk::SFramework								& framework							= app.Framework;
+	::gpk::SWindow									& mainWindow						= framework.RootWindow;
+	mainWindow.Size								= {1280, 720};
+	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)), "Failed to create main window. %s.", "why?!");
 	{ // Build the exit button
-		::gpk::SGUI																& gui								= *framework.GUI;
-		gui.ColorModeDefault												= ::gpk::GUI_COLOR_MODE_3D;
-		gui.ThemeDefault													= ::gpk::ASCII_COLOR_DARKGREEN * 16 + 7;
-		app.IdExit															= ::gpk::controlCreate(gui);
-		::gpk::SControl															& controlExit						= gui.Controls.Controls[app.IdExit];
-		controlExit.Area													= {{}, {64, 20}};
-		controlExit.Border													= {10, 10, 10, 10};
-		controlExit.Margin													= {1, 1, 1, 1};
-		controlExit.Align													= ::gpk::ALIGN_BOTTOM_RIGHT;
-		::gpk::SControlText														& controlText						= gui.Controls.Text[app.IdExit];
-		controlText.Text													= "Exit";
-		controlText.Align													= ::gpk::ALIGN_CENTER;
-		::gpk::SControlConstraints												& controlConstraints				= gui.Controls.Constraints[app.IdExit];
-		controlConstraints.AttachSizeToControl								= {app.IdExit, -1};
+		::gpk::SGUI										& gui								= *framework.GUI;
+		gui.ColorModeDefault						= ::gpk::GUI_COLOR_MODE_3D;
+		gui.ThemeDefault							= ::gpk::ASCII_COLOR_DARKGREEN * 16 + 7;
+		app.IdExit									= ::gpk::controlCreate(gui);
+		::gpk::SControl									& controlExit						= gui.Controls.Controls[app.IdExit];
+		controlExit.Area							= {{}, {64, 20}};
+		controlExit.Border							= {10, 10, 10, 10};
+		controlExit.Margin							= {1, 1, 1, 1};
+		controlExit.Align							= ::gpk::ALIGN_BOTTOM_RIGHT;
+		::gpk::SControlText								& controlText						= gui.Controls.Text[app.IdExit];
+		controlText.Text							= "Exit";
+		controlText.Align							= ::gpk::ALIGN_CENTER;
+		::gpk::SControlConstraints						& controlConstraints				= gui.Controls.Constraints[app.IdExit];
+		controlConstraints.AttachSizeToControl		= {app.IdExit, -1};
 		::gpk::controlSetParent(gui, app.IdExit, -1);
 	}
 	gpk_necs(::ssg::solarSystemSetup(app.SolarSystemGame, "solarsystem.json"));
 	return 0;
 }
 
-			::gpk::error_t											update						(::gme::SApplication & app, bool exitSignal)	{
-	//::gpk::STimer															timer;
+::gpk::error_t								update						(::gme::SApplication & app, bool exitSignal)	{
+	//::gpk::STimer									timer;
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, exitSignal, "%s", "Exit requested by runtime.");
 	{
 		::gpk::mutex_guard														lock						(app.LockRender);

@@ -34,21 +34,21 @@ struct STextOverlay {
 };
 
 struct SApplication {
-				::gpk::SFramework													Framework;
-				::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>	Offscreen					= {};
+				::gpk::SFramework								Framework;
+				::gpk::pobj<::gpk::rt<::gpk::bgra, uint32_t>>	Offscreen					= {};
 
-				int32_t																IdExit						= -1;
+				int32_t											IdExit						= -1;
 
-				::std::mutex														LockGUI;
-				::std::mutex														LockRender;
+				::std::mutex									LockGUI;
+				::std::mutex									LockRender;
 
-				::STextOverlay														TextOverlay					= {};
-				::klib::SGame														Game						= {};
+				::STextOverlay									TextOverlay					= {};
+				::klib::SGame									Game						= {};
 
-				::gpk::SUDPClient													TacticalClient				= {};
-				::gpk::array_obj<::gpk::ptr_obj<::gpk::SUDPConnectionMessage>>		TacticalMessages;
+				::gpk::SUDPClient								TacticalClient				= {};
+				::gpk::apobj<::gpk::SUDPMessage>				TacticalMessages;
 
-				uint8_t																MapToDraw[5][32]			=
+				uint8_t											MapToDraw[5][32]			=
 					{ {0xDA, 0xC4,  0xC4,  0xC4	,  0xC4	,  0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xBF}
 					, {0xB3, '\0', '\0'	, '\0'	, '\0'	, '\0'	, '\0'	, '\0'	, '\0'	, '\0'	, '\0'	, '\0'	, '\0'	, '\0'	, '\0'	,  '\0',  '\0',  '\0'	, '\0'	, '\0'	, '\0'	,  '\0'	,  '\0'	,  '\0'	, '\0'	, '\0'	, '\0'	, '\0'	, '\0'	, '\0'	, '\0'	, 0xB3}
 					, {0xC3, 0xC4,  0xC4,  0xC4	,  0xC4	,  0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xC4	, 0xB4}

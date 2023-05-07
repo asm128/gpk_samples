@@ -30,7 +30,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT_MT(::SApplication, "Title");
 	::gpk::SFramework															& framework									= app.Framework;
 	::gpk::SWindow																& mainWindow								= framework.RootWindow;
 	mainWindow.Size														= {1280, 720};
-	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?!");
+	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)), "Failed to create main window why?!");
 
 	framework.RootWindow.BackBuffer->resize(mainWindow.Size);
 
@@ -161,7 +161,7 @@ namespace gpk
 				+ triangle.B.z * proportions.B
 				+ triangle.C.z * proportions.C
 				;
-			double																		depth										= ((finalZ - fNearFar.Near) / (fNearFar.Far - fNearFar.Near));
+			double																		depth										= ((finalZ - fNearFar.Min) / (fNearFar.Max - fNearFar.Min));
 			if(depth >= 1 || depth <= 0) // discard from depth planes
 				continue;
 			uint32_t																	finalDepth									= (uint32_t)(depth * 0x00FFFFFFU);
@@ -440,7 +440,7 @@ struct SCamera {
 	//camera.Position *= 2.0f;
 	::gpk::SCoord3<float>									lightPos									= {150, 50, 0};
 	static float											cameraRotation								= 0;
-	cameraRotation										+= (float)framework.Input->MouseCurrent.Deltas.x / 5.0f;
+	cameraRotation										+= (float)framework.RootWindow.Input->MouseCurrent.Deltas.x / 5.0f;
 	//camera.Position	.RotateY(cameraRotation);
 	camera.Position	.RotateY(frameInfo.Seconds.Total * 0.1f);
 	camera.Position.y *= (float)fabs(sin(frameInfo.Seconds.Total * .1f));
@@ -449,7 +449,7 @@ struct SCamera {
 
 	viewMatrix.LookAt(camera.Position, camera.Target, cameraUp);
 	const ::gpk::SCoord2<uint32_t>							& offscreenMetrics							= backBuffer->metrics();
-	projection.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, nearFar.Near, nearFar.Far );
+	projection.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, nearFar.Min, nearFar.Max );
 	projection											= viewMatrix * projection;
 	lightPos.x += 100;
 	lightPos.y *= (float)fabs(sin(frameInfo.Seconds.Total * .1f));

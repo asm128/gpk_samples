@@ -38,7 +38,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	::gpk::SFramework															& framework									= app.Framework;
 	::gpk::SWindow																& mainWindow								= framework.RootWindow;
 	mainWindow.Size														= {640, 480};
-	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?!");
+	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)), "Failed to create main window why?!");
 
 	::gpk::SSTLFile																& stlFile									= app.STLFile;
 	::gpk::stlFileLoad("Base Flat v5.stl", stlFile);
@@ -96,47 +96,48 @@ struct SCamera {
 						::gpk::SCoord3<float>								Position, Target;
 };
 
-					::gpk::error_t										draw										(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
-	::gpk::SFramework															& framework									= app.Framework;
+::gpk::error_t										draw										(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
+	::gpk::SFramework										& framework									= app.Framework;
+	::gpk::SWindow											& mainWindow								= framework.RootWindow;
 
-	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>			backBuffer;
-	backBuffer->resize(framework.RootWindow.BackBuffer->Color.metrics(), 0xFF000080, (uint32_t)-1);
+	::gpk::pobj<::gpk::rt<::gpk::bgra, uint32_t>>			backBuffer;
+	backBuffer->resize(mainWindow.BackBuffer->Color.metrics(), 0xFF000080, (uint32_t)-1);
 
-	::gpk::SSTLFile																& stlFile									= app.STLFile;
+	::gpk::SSTLFile											& stlFile									= app.STLFile;
 
 	//------------------------------------------------
-	::gpk::array_pod<::gpk::STriangle3<float>>									triangle3dList								= {};
-	::gpk::array_pod<::gpk::SColorBGRA>											triangle3dColorList							= {};
+	::gpk::array_pod<::gpk::STriangle3<float>>				triangle3dList								= {};
+	::gpk::array_pod<::gpk::SColorBGRA>						triangle3dColorList							= {};
 	triangle3dList.resize(app.CubePositions.size());
 	triangle3dColorList.resize(app.CubePositions.size());
-	::gpk::SMatrix4<float>														projection									= {};
-	::gpk::SMatrix4<float>														viewMatrix									= {};
+	::gpk::SMatrix4<float>									projection									= {};
+	::gpk::SMatrix4<float>									viewMatrix									= {};
 	projection.Identity();
-	::gpk::SFrameInfo															& frameInfo									= framework.FrameInfo;
-	const ::gpk::SCoord3<float>													tilt										= {10, };	// ? cam't remember what is this. Radians? Eulers?
-	const ::gpk::SCoord3<float>													rotation									= {0, (float)frameInfo.FrameNumber / 100, 0};
+	::gpk::SFrameInfo										& frameInfo									= framework.FrameInfo;
+	const ::gpk::SCoord3<float>								tilt										= {10, };	// ? cam't remember what is this. Radians? Eulers?
+	const ::gpk::SCoord3<float>								rotation									= {0, (float)frameInfo.FrameNumber / 100, 0};
 
-	::gpk::SNearFar																nearFar										= {0.01f , 1000.0f};
+	::gpk::SNearFar											nearFar										= {0.01f , 1000.0f};
 
-	static constexpr const ::gpk::SCoord3<float>								cameraUp									= {0, 1, 0};	// ? cam't remember what is this. Radians? Eulers?
-	::SCamera																	camera										= {{150, 75, 0}, {}};
-	::gpk::SCoord3<float>														lightPos									= {150, 75, 0};
-	static float																cameraRotation								= 0;
-	cameraRotation															+= (float)framework.Input->MouseCurrent.Deltas.x / 5.0f;
+	static constexpr const ::gpk::SCoord3<float>			cameraUp									= {0, 1, 0};	// ? cam't remember what is this. Radians? Eulers?
+	::SCamera												camera										= {{150, 75, 0}, {}};
+	::gpk::SCoord3<float>									lightPos									= {150, 75, 0};
+	static float											cameraRotation								= 0;
+	cameraRotation										+= (float)mainWindow.Input->MouseCurrent.Deltas.x / 5.0f;
 	//camera.Position	.RotateY(cameraRotation);
 	camera.Position	.RotateY(frameInfo.Microseconds.Total / 1000000.0f);
 	lightPos		.RotateY(frameInfo.Microseconds.Total /  500000.0f * -2);
 	viewMatrix.LookAt(camera.Position, camera.Target, cameraUp);
 	const ::gpk::SCoord2<uint32_t>												& offscreenMetrics							= backBuffer->Color.View.metrics();
-	projection.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, nearFar.Near, nearFar.Far );
+	projection.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, nearFar);
 	projection																= viewMatrix * projection;
 	lightPos.Normalize();
 
 	::gpk::SMatrix4<float>														viewport									= {};
 	viewport._11															= 2.0f / offscreenMetrics.x;
 	viewport._22															= 2.0f / offscreenMetrics.y;
-	viewport._33															= 1.0f / (float)(nearFar.Far - nearFar.Near);
-	viewport._43															= (float)(-nearFar.Near * ( 1.0f / (nearFar.Far - nearFar.Near) ));
+	viewport._33															= 1.0f / (float)(nearFar.Max - nearFar.Min);
+	viewport._43															= (float)(-nearFar.Min * ( 1.0f / (nearFar.Max - nearFar.Min) ));
 	viewport._44															= 1.0f;
 	projection																= projection * viewport.GetInverse();
 	for(uint32_t iTriangle = 0; iTriangle < app.CubePositions.size(); ++iTriangle) {
@@ -160,14 +161,14 @@ struct SCamera {
 		double																		lightFactor									= stlFile.Triangles[iTriangle].Normal.Dot(lightPos);
 		triangle3dColorList[iTriangle]											= (::gpk::RED * lightFactor).Clamp();
 	}
-	::gpk::array_pod<::gpk::SCoord2<int32_t>>									trianglePixelCoords;
-	::gpk::array_pod<::gpk::SCoord2<int32_t>>									wireframePixelCoords;
+	::gpk::array_pod<::gpk::n3i32>									trianglePixelCoords;
+	::gpk::array_pod<::gpk::n3i32>									wireframePixelCoords;
 	::gpk::SCoord3<float> cameraFront = (camera.Target - camera.Position).Normalize();
 	for(uint32_t iTriangle = 0; iTriangle < app.CubePositions.size(); ++iTriangle) {
 		//double																		lightFactor									= stlFile.Triangles[iTriangle].Normal.Dot(cameraFront);
 		//if(lightFactor > 0)
 		//	continue;
-		gerror_if(errored(::gpk::drawTriangle(backBuffer->Color.View, triangle3dColorList[iTriangle], triangle2dList[iTriangle])), "Not sure if these functions could ever fail");
+		gerror_if(errored(::gpk::drawTriangle(backBuffer->Color.View, triangle3dColorList[iTriangle], triangle2dList[iTriangle])), "%s", "Not sure if these functions could ever fail");
 		//::gpk::drawLine(backBuffer->Color.View, (::gpk::SColorBGRA)::gpk::GREEN	, ::gpk::SLine2<int32_t>{triangle2dList[iTriangle].A, triangle2dList[iTriangle].B});
 		//::gpk::drawLine(backBuffer->Color.View, (::gpk::SColorBGRA)::gpk::BLUE	, ::gpk::SLine2<int32_t>{triangle2dList[iTriangle].B, triangle2dList[iTriangle].C});
 		//::gpk::drawLine(backBuffer->Color.View, (::gpk::SColorBGRA)::gpk::RED	, ::gpk::SLine2<int32_t>{triangle2dList[iTriangle].C, triangle2dList[iTriangle].A});
@@ -191,7 +192,7 @@ struct SCamera {
 	//for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord)
 	//	::gpk::drawPixelLight(backBuffer->Color.View, wireframePixelCoords[iCoord], (::gpk::SColorBGRA)::gpk::GREEN, 0.05f, 1.5);
 
-	::gpk::grid_mirror_y(framework.RootWindow.BackBuffer->Color.View, backBuffer->Color.View);
+	::gpk::grid_mirror_y(mainWindow.BackBuffer->Color.View, backBuffer->Color.View);
 	//framework.MainDisplayOffscreen = backBuffer;
 	//------------------------------------------------
 	return 0;

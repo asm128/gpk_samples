@@ -19,7 +19,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 	::gpk::SFramework										& framework						= app.Framework;
 	::gpk::SWindow											& mainWindow					= framework.RootWindow;
 	mainWindow.Size										= {1280, 720};
-	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window. %s.", "why?!");
+	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)), "Failed to create main window. %s.", "why?!");
 	{ // Build the exit button
 		::gpk::SGUI											& gui								= *framework.GUI;
 		gui.ColorModeDefault							= ::gpk::GUI_COLOR_MODE_3D;
@@ -101,7 +101,7 @@ int													update				(SApplication & app, bool exitSignal)	{
 	}
 	if(framework.RootWindow.Resized) {
 		::gpk::SMatrix4<float>									& matrixProjection			= app.TextOverlay.MatrixProjection;
-		matrixProjection.FieldOfView(::gpk::math_pi * .25, framework.RootWindow.Size.x / (double)framework.RootWindow.Size.y, 0.01, 500);
+		matrixProjection.FieldOfView(::gpk::math_pi * .25, framework.RootWindow.Size.x / (double)framework.RootWindow.Size.y, 0.01, 500.0);
 		::gpk::SMatrix4<float>									matrixViewport				= {};
 		matrixViewport.ViewportLH(framework.RootWindow.Size.Cast<uint16_t>());
 		matrixProjection									*= matrixViewport;
@@ -216,7 +216,7 @@ int													draw					(SApplication & app) {
 	matrixProjection.Identity();
 	matrixViewport	.Identity();
 
-	matrixProjection.FieldOfView(::gpk::math_pi * .25, targetPixels.metrics().x / (double)targetPixels.metrics().y, 0.01, 5000);
+	matrixProjection.FieldOfView(::gpk::math_pi * .25, targetPixels.metrics().x / (double)targetPixels.metrics().y, 0.01, 5000.0);
 	matrixViewport.ViewportLH(targetPixels.metrics().Cast<uint16_t>());
 	matrixView											*= matrixProjection;
 	matrixView											*= matrixViewport;

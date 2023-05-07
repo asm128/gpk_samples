@@ -250,14 +250,14 @@ static constexpr const ::gpk::STriangle3<float>						geometryCube	[12]						=
 	, {{1.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 1.0f}}	// Top		- second
 	};
 
-					::gpk::error_t										setup										(::SApplication& app)											{
-	g_app													= &app;
-	::gpk::SFramework															& framework									= app.Framework;
-	::gpk::SWindow																& mainWindow								= framework.RootWindow;
-	mainWindow.Size														= {640, 480};
-	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?!");
+::gpk::error_t										setup										(::SApplication& app)											{
+	g_app												= &app;
+	::gpk::SFramework										& framework									= app.Framework;
+	::gpk::SWindow											& mainWindow								= framework.RootWindow;
+	mainWindow.Size										= {640, 480};
+	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)), "Failed to create main window why?!");
 
-	static constexpr const ::gpk::SCoord3<float>								cubeCenter									= {0.5f, 0.5f, 0.5f};
+	stacxpr ::gpk::n3f										cubeCenter									= {0.5f, 0.5f, 0.5f};
 	for(uint32_t iTriangle = 0; iTriangle < 12; ++iTriangle) {
 		::gpk::STriangle3<float>													& transformedTriangle						= app.CubePositions[iTriangle];
 		transformedTriangle														= geometryCube[iTriangle];

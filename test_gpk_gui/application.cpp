@@ -14,7 +14,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	::gpk::SFramework													& framework				= app.Framework;
 	::gpk::SWindow														& mainWindow			= framework.RootWindow;
 	mainWindow.Size														= {1280, 720};
-	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window. %s", " why?!");
+	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)), "Failed to create main window. %s", " why?!");
 	::gpk::SGUI															& gui					= *framework.GUI;
 
 	const int32_t														iShades					= 16;

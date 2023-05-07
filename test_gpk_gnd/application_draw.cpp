@@ -50,7 +50,7 @@ namespace gpk
 				+ triangle.B.z * proportions.B
 				+ triangle.C.z * proportions.C
 				;
-			float																depth										= float((finalZ - fNearFar.Near) / (fNearFar.Far - fNearFar.Near));
+			float																depth										= float((finalZ - fNearFar.Min) / (fNearFar.Max - fNearFar.Min));
 			if(depth >= 1 || depth <= 0) // discard from depth planes
 				continue;
 			uint32_t															finalDepth									= (uint32_t)(depth * 0x00FFFFFFU);
@@ -154,7 +154,7 @@ static				::gpk::error_t										transformTriangles
 		::gpk::STriangle3<float>													transformedTriangle3D						= triangle3DWorld;
 		::gpk::transform(transformedTriangle3D, xWV);
 		// Check against far and near planes
-		if(transformedTriangle3D.CulledZSpecial({(float)nearFar.Near, (float)nearFar.Far}))
+		if(transformedTriangle3D.CulledZSpecial({(float)nearFar.Min, (float)nearFar.Max}))
 			continue;
 		float																		oldzA										= transformedTriangle3D.A.z;
 		float																		oldzB										= transformedTriangle3D.B.z;
@@ -259,7 +259,7 @@ static				::gpk::error_t										drawTriangles
 	::gpk::SMatrix4<float>														& finalProjection							= transforms.FinalProjection	;
 	::gpk::SMatrix4<float>														& fieldOfView								= transforms.FieldOfView		;
 	::gpk::SMatrix4<float>														& mviewport									= transforms.Viewport			;
-	fieldOfView.FieldOfView(camera.Angle * ::gpk::math_pi, targetMetrics.x / (double)targetMetrics.y, camera.NearFar.Near, camera.NearFar.Far);
+	fieldOfView.FieldOfView(camera.Angle * ::gpk::math_pi, targetMetrics.x / (double)targetMetrics.y, camera.NearFar.Min, camera.NearFar.Max);
 	mviewport.ViewportRH(targetMetrics.Cast<uint16_t>());
 	const ::gpk::SCoord2<int32_t>												screenCenter								= {(int32_t)targetMetrics.x / 2, (int32_t)targetMetrics.y / 2};
 	finalProjection															= fieldOfView * mviewport;

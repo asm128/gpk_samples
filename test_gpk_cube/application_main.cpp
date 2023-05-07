@@ -58,7 +58,7 @@ static constexpr const ::gpk::STriangle3<float>						geometryCube	[12]						=
 	::gpk::SFramework															& framework									= app.Framework;
 	::gpk::SWindow																& mainWindow								= framework.RootWindow;
 	mainWindow.Size														= {640, 480};
-	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?!");
+	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)), "Failed to create main window why?!");
 
 	static constexpr const ::gpk::SCoord3<float>								cubeCenter									= {0.5f, 0.5f, 0.5f};
 	for(uint32_t iTriangle = 0; iTriangle < 12; ++iTriangle) {
@@ -136,21 +136,21 @@ struct SCamera {
 	::SCamera																	camera										= {{10, 5, 0}, {}};
 	::gpk::SCoord3<float>														lightPos									= {10, 5, 0};
 	static float																cameraRotation								= 0;
-	cameraRotation															+= (float)framework.Input->MouseCurrent.Deltas.x / 5.0f;
+	cameraRotation															+= (float)framework.RootWindow.Input->MouseCurrent.Deltas.x / 5.0f;
 	//camera.Position	.RotateY(cameraRotation);
 	camera.Position	.RotateY(frameInfo.Microseconds.Total / 1000000.0f);
 	lightPos		.RotateY(frameInfo.Microseconds.Total /  500000.0f * -2);
 	viewMatrix.LookAt(camera.Position, camera.Target, cameraUp);
 	const ::gpk::SCoord2<uint16_t>												& offscreenMetrics							= backBuffer->Color.View.metrics().Cast<uint16_t>();
-	projection.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, nearFar.Near, nearFar.Far );
+	projection.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, nearFar);
 	projection																= viewMatrix * projection;
 	lightPos.Normalize();
 
 	::gpk::SMatrix4<float>														viewport									= {};
 	viewport._11															= 2.0f / offscreenMetrics.x;
 	viewport._22															= 2.0f / offscreenMetrics.y;
-	viewport._33															= 1.0f / (float)(nearFar.Far - nearFar.Near);
-	viewport._43															= (float)(-nearFar.Near * ( 1.0f / (nearFar.Far - nearFar.Near) ));
+	viewport._33															= 1.0f / (float)(nearFar.Max - nearFar.Min);
+	viewport._43															= (float)(-nearFar.Min * ( 1.0f / (nearFar.Max - nearFar.Min) ));
 	viewport._44															= 1.0f;
 	projection																= projection * viewport.GetInverse();
 	for(uint32_t iTriangle = 0; iTriangle < 12; ++iTriangle) {
@@ -176,7 +176,7 @@ struct SCamera {
 	}
 	::gpk::array_pod<::gpk::SCoord2<int16_t>>									trianglePixelCoords;
 	::gpk::array_pod<::gpk::SCoord2<int16_t>>									wireframePixelCoords;
-	::gpk::SCoord3<float> cameraFront = (camera.Target - camera.Position).Normalize();
+	::gpk::SCoord3<float>														cameraFront					= (camera.Target - camera.Position).Normalize();
 	for(uint32_t iTriangle = 0; iTriangle < 12; ++iTriangle) {
 		double																		lightFactor									= geometryCubeNormals[iTriangle].Dot(cameraFront);
 		if(lightFactor > 0)

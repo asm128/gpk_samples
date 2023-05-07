@@ -18,7 +18,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 			::gpk::error_t											setup						(::gme::SApplication & app)						{
 	::gpk::SFramework														& framework					= app.Framework;
 	::gpk::SWindow															& mainWindow				= framework.RootWindow;
-	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?!");
+	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)), "Failed to create main window why?!");
 	::gpk::SGUI																& gui						= *framework.GUI;
 	app.IdExit															= ::gpk::controlCreate(gui);
 	::gpk::SControl															& controlExit				= gui.Controls.Controls[app.IdExit];
@@ -91,7 +91,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 				for(int32_t iMessage = 0; iMessage < (int32_t)client->Queue.Received.size(); ++iMessage) {
 					if(client->Queue.Received[iMessage]->Command.Type == ::gpk::ENDPOINT_COMMAND_TYPE_RESPONSE)
 						continue;
-					::gpk::pobj<::gpk::SUDPConnectionMessage>							messageReceived				= client->Queue.Received[iMessage];
+					::gpk::pobj<::gpk::SUDPMessage>							messageReceived				= client->Queue.Received[iMessage];
 					gpk_necall(app.MessagesToProcess[iClient].push_back(messageReceived), "%s", "Out of memory?");
 					client->Queue.Received.remove_unordered(iMessage--);
 				}
@@ -101,10 +101,10 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 		::gpk::sleep(10);
 	}
 	for(uint32_t iClient = 0; iClient < app.MessagesToProcess.size(); ++iClient) {
-		const ::gpk::apobj<::gpk::SUDPConnectionMessage>	& clientQueue				= app.MessagesToProcess[iClient];
+		const ::gpk::apobj<::gpk::SUDPMessage>	& clientQueue				= app.MessagesToProcess[iClient];
 		for(uint32_t iMessage = 0; iMessage < clientQueue.size(); ++iMessage) {
-			::gpk::pobj<::gpk::SUDPConnectionMessage>			messageReceived				= clientQueue[iMessage];
-			::gpk::view_const_byte								viewPayload					= messageReceived->Payload;
+			::gpk::pobj<::gpk::SUDPMessage>			messageReceived				= clientQueue[iMessage];
+			::gpk::vcu8								viewPayload					= messageReceived->Payload;
 			info_printf("Client %i received: %s.", iClient, viewPayload.begin());
 			sprintf_s(messageToSend, "Message arrived(true, true    ): %u", currentMessage++); 
 			{

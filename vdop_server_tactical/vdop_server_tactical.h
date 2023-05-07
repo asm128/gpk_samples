@@ -87,22 +87,23 @@ namespace klib
 } // namespace
 
 struct SApplication {
-			::gpk::SFramework														Framework;
-			::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>		Offscreen					= {};
+			::gpk::SFramework								Framework;
+			::gpk::pobj<::gpk::rt<::gpk::bgra, uint32_t>>	Offscreen			= {};
 
-			int32_t																	IdExit						= -1;
+			int32_t											IdExit				= -1;
 
-			::std::mutex															LockGUI;
-			::std::mutex															LockRender;
+			::std::mutex									LockGUI;
+			::std::mutex									LockRender;
 
-			::STextOverlay															TextOverlay					= {};
-			::gpk::array_obj<::gpk::ptr_obj<::klib::SGame>>							Game						= {};
+			::STextOverlay									TextOverlay			= {};
+			::gpk::apobj<::klib::SGame>						Game				= {};
 
-			::gpk::SUDPServer														TacticalServer;
-			typedef ::gpk::array_obj<::gpk::ptr_obj<::gpk::SUDPConnectionMessage>> TClientQueue;
-			::gpk::array_obj<TClientQueue>											MessagesToProcess;
+			::gpk::SUDPServer								TacticalServer;
 
-																					SApplication				(::gpk::SRuntimeValues& runtimeValues)	: Framework(runtimeValues)		{}
+			typedef ::gpk::apobj<::gpk::SUDPMessage>		TClientQueue;
+			::gpk::array_obj<TClientQueue>					MessagesToProcess;
+
+															SApplication		(::gpk::SRuntimeValues& runtimeValues)	: Framework(runtimeValues)		{}
 };
 
 #endif // CED_DEMO_08_H_298837492837
