@@ -5,7 +5,7 @@
 	::klib::drawSquadSlots(instanceGame);
 	::klib::SGamePlayer													& player											= instanceGame.Players[::klib::PLAYER_INDEX_USER];
 
-	::gpk::array_obj<::gpk::array_pod<char_t>>							menuItems											= {};
+	::gpk::array_obj<::gpk::array_pod<char>>							menuItems											= {};
 	::gpk::array_obj<::gpk::view_const_char>							menuItemsView										= {};
 	menuItems		.resize(player.Tactical.Squad.Size);
 	menuItemsView	.resize(menuItems.size());

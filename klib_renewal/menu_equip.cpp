@@ -41,7 +41,7 @@ static	::klib::SGameState					drawEquipMenu						(::klib::SGame& instanceGame, c
 	::klib::SCharacterInventory						& playerInventory					= instanceGame.Players[::klib::PLAYER_INDEX_USER].Inventory;
 	::gpk::SRenderTarget<char, uint16_t>			& display							= instanceGame.GlobalDisplay.Screen;
 	int16_t											selectedChoice						= 0;
-	::gpk::array_pod<char_t>						menuTitle							= ::gpk::view_const_string{"Equip "};
+	::gpk::apod<char>						menuTitle							= ::gpk::view_const_string{"Equip "};
 
 	char 											playerUnitPlusOne [32]	;
 	if( player.Tactical.Selection.PlayerUnit != -1 && player.Tactical.Squad.Agents[player.Tactical.Selection.PlayerUnit] != -1 && ::klib::GAME_SUBSTATE_CHARACTER != instanceGame.State.Substate) {
@@ -95,7 +95,7 @@ static	::klib::SGameState					drawEquipMenu						(::klib::SGame& instanceGame, c
 	::klib::SGameState							retVal								= returnState;
 	::klib::SEntity								selectedItem						= {0,0,0};
 	instanceGame.Messages.ClearMessages();
-	::gpk::array_pod<char_t>					itemName							= "Invalid item?";
+	::gpk::apod<char>					itemName							= "Invalid item?";
 	const int32_t								iAgent								= (-1 == player.Tactical.Selection.PlayerUnit) ? -1 : player.Tactical.Squad.Agents[player.Tactical.Selection.PlayerUnit];
 	switch(instanceGame.State.Substate) {
 	case ::klib::GAME_SUBSTATE_PROFESSION	:	if(0 == ::klib::restrictedProfession	(instanceGame.Messages, player, instanceGame.EntityTables, iAgent, selectedChoice)) { instanceGame.Events.push_back({::klib::GAME_EVENT_CONFIRM, instanceGame.State, (uint64_t)iAgent | (((uint64_t)selectedChoice) << 32)}); retVal = { ::klib::GAME_STATE_MENU_EQUIPMENT }; } else { } break;
@@ -168,7 +168,7 @@ static void								drawScore						(::gpk::view_grid<char> display, int32_t offse
 	::gpk::view_grid<uint16_t>				textAttributes			= instanceGame.GlobalDisplay.Screen.DepthStencil;
 
 	::klib::SGameState						actualReturnState		= returnState;
-	::gpk::array_pod<char_t>				menuTitle				= ::gpk::view_const_string{"Agent Setup"};
+	::gpk::apod<char>				menuTitle				= ::gpk::view_const_string{"Agent Setup"};
 	char 									playerUnitPlusOne[32];
 	sprintf_s(playerUnitPlusOne, "%i", player.Tactical.Selection.PlayerUnit+1);
 	if( player.Tactical.Selection.PlayerUnit != -1 && player.Tactical.Squad.Agents[player.Tactical.Selection.PlayerUnit] != -1) {

@@ -493,7 +493,7 @@ static const ::gpk::vcs								fileNames []								=
 	};
 
 int main() {
-	::gpk::array_pod<byte_t>			fileBytes;
+	::gpk::au8						fileBytes;
 	::gpk::array_static<char, 256>		pathNameData		= {"../gpk_data"};
 	::gpk::array_static<char, 256>		folderNameVox		= {"vox"};
 	char								pathToLoad[4096]	= {};
@@ -504,8 +504,8 @@ int main() {
 		sprintf_s(pathToLoad, "%s/%s/%s", pathNameData.Storage, folderNameVox.Storage, fileName.begin());
 		gpk_necs(::gpk::fileToMemory(pathToLoad, fileBytes));
 		gpk_vox_info_printf("Loaded %s.", pathToLoad);
-		::gpk::vcc						viewBytes			= fileBytes;
-		::gpk::ptr_obj<::gpk::SVOXData>	& voxFile			= voxModels[voxModels.push_back({})];
+		::gpk::vcu8						viewBytes			= fileBytes;
+		::gpk::pobj<::gpk::SVOXData>	& voxFile			= voxModels[voxModels.push_back({})];
 		gpk_necs(voxFile->Load(viewBytes));
 		gpk_vox_info_printf("-------- %s Parsed successfully.", pathToLoad);
 		auto							coord				= voxFile->GetDimensions();

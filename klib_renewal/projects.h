@@ -6,7 +6,7 @@
 namespace klib
 {
 	struct SEntityResearch  {
-		::gpk::array_pod<char_t>					Name;
+		::gpk::apod<char>					Name;
 		int32_t										ResearchIndex;
 		int64_t										PriceUnit;
 		int64_t										PricePaid;
@@ -51,7 +51,7 @@ namespace klib
 		,	const ::gpk::view_array<const ::klib::SEntityResearch>	& queuedResearch
 		,	const ::gpk::view_array<const ::klib::CCharacter*>		& playerArmy
 		,	::gpk::array_obj<::klib::SEntityResearch>				& menuItemsValue
-		,	::gpk::array_obj<::gpk::array_pod<char_t>>				& menuItemsText
+		,	::gpk::array_obj<::gpk::apod<char>>				& menuItemsText
 		);
 
 	::gpk::error_t								getResearchedItems
@@ -60,7 +60,7 @@ namespace klib
 		,	const ::klib::SCharacterResearch						& researchCompleted
 		,	const ::gpk::view_array<const ::klib::CCharacter*>		& playerArmy
 		,	::gpk::array_obj<::klib::SEntityResearch>				& menuItemsValue
-		,	::gpk::array_obj<::gpk::array_pod<char_t>>				& menuItemsText
+		,	::gpk::array_obj<::gpk::apod<char>>				& menuItemsText
 		);
 
 	void										handleProductionStep

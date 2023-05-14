@@ -15,7 +15,7 @@ static int32_t										reinitBuyMenuItem			(::klib::SMenuItem<::klib::SBuyable>
 }
 
 template <typename _tEntity>
-static int32_t										initBuyMenuItem				(const int32_t itemIndex, const ::klib::SEntityRecord<_tEntity> & definition, ::klib::SMenuItem<::klib::SBuyable> & menuItem, ::gpk::array_pod<char_t> & nameItem) {
+static int32_t										initBuyMenuItem				(const int32_t itemIndex, const ::klib::SEntityRecord<_tEntity> & definition, ::klib::SMenuItem<::klib::SBuyable> & menuItem, ::gpk::apod<char> & nameItem) {
 	char													preformatted	[256]		= {};
 	char													strPrice		[64];
 	::sprintf_s(strPrice, "%lli", definition.Points.PriceBuy);

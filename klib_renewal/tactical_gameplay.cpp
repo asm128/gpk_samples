@@ -656,7 +656,7 @@ void																					klib::handleAgentDeath													(::klib::STacticalIn
 	tacticalInfo.Board.Tiles.Entities.Coins[deadTarget.Position.z][deadTarget.Position.x] += deadTarget.Points.Coins;
 	deadTarget.Points.Coins																	= 0;
 
-	::gpk::array_pod<char_t>																	ripText																	= deadTarget.Name;
+	::gpk::apod<char>																	ripText																	= deadTarget.Name;
 	ripText.append_string(" has died.");
 	if(teamId == tacticalInfo.Setup.TeamPerPlayer[::klib::PLAYER_INDEX_USER]) {
 		messages.UserMiss																		= ripText;

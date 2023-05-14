@@ -112,7 +112,7 @@ namespace klib
 	class CCharacter : public SCharacter {
 	public:
 						::gpk::SCoord3<int32_t>			Position				= {};
-						::gpk::array_pod<char_t>		Name					= ::gpk::view_const_string{"Unnamed"};
+						::gpk::apod<char>		Name					= ::gpk::view_const_string{"Unnamed"};
 
 														CCharacter				()						= default;
 														CCharacter				(int maxHP, int hitChance, int attack, int coins, SFitnessPoints speed, SEntityEffect characterEffect, SEntityStatus characterStatus, const ::gpk::view_const_char& name)
@@ -124,7 +124,7 @@ namespace klib
 	class CDeadCharacter {
 	public:
 						::klib::SCharacterScore			Score					= {};
-						::gpk::array_pod<char_t>		Name					= "Unnamed";
+						::gpk::apod<char>		Name					= "Unnamed";
 
 		inline											CDeadCharacter			()									= default;
 		inline											CDeadCharacter			(const CCharacter& deadCharacter)

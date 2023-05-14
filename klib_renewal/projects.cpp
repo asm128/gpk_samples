@@ -2,7 +2,7 @@
 #include "projects.h"
 #include "helper_projects.h"
 
-static	void							completeProduction			(const ::klib::SEntityTables & entityTables, ::klib::SCharacterInventory & playerInventory, const ::klib::SEntityResearch & product, ::gpk::array_pod<char_t>& messageSuccess) {
+static	void							completeProduction			(const ::klib::SEntityTables & entityTables, ::klib::SCharacterInventory & playerInventory, const ::klib::SEntityResearch & product, ::gpk::apod<char>& messageSuccess) {
 	switch(product.Type) {
 	case ::klib::ENTITY_TYPE_ACCESSORY	: ::klib::completeProduction(playerInventory.Accessory	, product.Entity, messageSuccess, entityTables.Accessory	);  break;
 	case ::klib::ENTITY_TYPE_ARMOR		: ::klib::completeProduction(playerInventory.Armor		, product.Entity, messageSuccess, entityTables.Armor		);  break;
@@ -50,7 +50,7 @@ void									klib::handleProductionStep	(const ::klib::SEntityTables & entityTab
 	playerScore.MoneySpent					+= actualCostProduction;
 }
 
-static	void							completeResearch				(const ::klib::SEntityResearch& product, ::klib::SCharacterResearch& playerResearch, ::gpk::array_pod<char_t> & successMessage)		{
+static	void							completeResearch				(const ::klib::SEntityResearch& product, ::klib::SCharacterResearch& playerResearch, ::gpk::apod<char> & successMessage)		{
 	switch(product.Type) {
 	case ::klib::ENTITY_TYPE_ACCESSORY	: ::klib::completeResearch(product, playerResearch.Accessory	.MaxResearch, playerResearch.Accessory	, successMessage); break;
 	case ::klib::ENTITY_TYPE_ARMOR		: ::klib::completeResearch(product, playerResearch.Armor		.MaxResearch, playerResearch.Armor		, successMessage); break;
@@ -126,7 +126,7 @@ int32_t									klib::getResearchableItems
 	,	const ::gpk::view_array<const ::klib::SEntityResearch>	& queuedResearch
 	,	const ::gpk::view_array<const ::klib::CCharacter*>		& playerArmy
 	,	::gpk::array_obj<::klib::SEntityResearch>				& menuItemsValue
-	,	::gpk::array_obj<::gpk::array_pod<char_t>>				& menuItemsText
+	,	::gpk::array_obj<::gpk::apod<char>>				& menuItemsText
 	) {
 	::klib::SCharacterResearch					researchableItems				= {};
 
@@ -229,7 +229,7 @@ int32_t									klib::getResearchableItems
 	,	const ::klib::SCharacterResearch						& researchCompleted
 	,	const ::gpk::view_array<const ::klib::CCharacter*>		& playerArmy
 	,	::gpk::array_obj<::klib::SEntityResearch>				& menuItemsValue
-	,	::gpk::array_obj<::gpk::array_pod<char_t>>				& menuItemsText
+	,	::gpk::array_obj<::gpk::apod<char>>				& menuItemsText
 	) {
 	::klib::SCharacterResearch					researchedItems										= {};
 

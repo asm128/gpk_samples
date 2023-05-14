@@ -22,7 +22,7 @@ namespace klib
 
 		for(uint32_t i=0, count = (uint32_t)::gpk::size(namesCredits); i < count && curLine < bbHeight; ++i)
 			if((curLine+=2) >= 0)
-				printfToRect((char_t*)display, width, depth, curLine, 0, ::klib::SCREEN_CENTER, "%s", namesCredits[i].begin());
+				printfToRect((char*)display, width, depth, curLine, 0, ::klib::SCREEN_CENTER, "%s", namesCredits[i].begin());
 
 		maxDifference			= ::gpk::max(curLine - curDifference, maxDifference);
 

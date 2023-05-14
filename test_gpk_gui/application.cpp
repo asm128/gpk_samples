@@ -216,7 +216,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	//		;
 	//}
 
-	//::gpk::array_pod<char_t>	encoded;
+	//::gpk::apod<char>	encoded;
 	//::gpk::base64Encode({(const ubyte_t*)gui.FontTexture.Texels.begin(), gui.FontTexture.Texels.size() * 4}, encoded);
 	//FILE						* fp = 0;
 	//const int nul = 0;

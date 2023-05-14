@@ -10,7 +10,7 @@ template <typename _TReturn>
 struct SListItem {
 	_TReturn					ReturnValue;
 	uint32_t					Color;
-	::gpk::array_pod<char_t>	Text;
+	::gpk::apod<char>	Text;
 };
 
 static	int32_t mouseOverList(const ::klib::SInput& frameInput, uint32_t rowCount, int32_t offsetX, int32_t offsetY, int32_t width) {
@@ -82,7 +82,7 @@ int32_t							drawAgentResume				(const ::klib::SEntityTables & tables, ::gpk::v
 
 	int32_t								columnOffset;
 	int32_t								finalColor, genderColor = agent.Flags.Tech.Gender == ::klib::GENDER_FEMALE ? ::klib::ASCII_COLOR_INDEX_DARKMAGENTA : agent.Flags.Tech.Gender == ::klib::GENDER_MALE ? ::klib::ASCII_COLOR_INDEX_BLUE : ::klib::ASCII_COLOR_INDEX_GREEN;
-	::gpk::array_pod<char_t>			equipName;
+	::gpk::apod<char>			equipName;
 
 	finalColor						= (selectedAgentField == ::klib::ENTITY_TYPE_CHARACTER) ? (genderColor<<4)|::klib::ASCII_COLOR_INDEX_DARKGREY : (::klib::ASCII_COLOR_INDEX_DARKGREY<<4)|genderColor;
 	columnOffset					= printfToGridColored(display, textAttributes, (uint16_t)finalColor, offsetY++, offsetX, ::klib::SCREEN_LEFT, " %c - %-38.38s", ::klib::ascii_gender[agent.Flags.Tech.Gender], agent.Name.begin());
@@ -175,7 +175,7 @@ int32_t												drawEquipDetail
 	, const _TEntity						& entity
 	, const ::klib::SEntityTable<_TEntity>	& table
 	) {
-	//const ::gpk::array_pod<char_t>						entityName = ::getEntityName(entity, tableDefinitions, tableModifiers);
+	//const ::gpk::apod<char>						entityName = ::getEntityName(entity, tableDefinitions, tableModifiers);
 	::klib::drawEntityDetail(display, textAttributes, offsetY, offsetX, entity, table, entityTypeName);
 
 	char													formattedTitle[32]					= {};
@@ -204,7 +204,7 @@ int32_t										drawEquipList
 		formattedTitle[i]							= (char)::tolower(formattedTitle[i]);
 
 	selectedRow									&= ~0x80000000;
-	::gpk::array_pod<char_t>						entityName;
+	::gpk::apod<char>						entityName;
 	for(uint32_t iEntity = 0, entityCount = entityContainer.Slots.size(); iEntity < entityCount; ++iEntity) {
 		entityName									= ::klib::getEntityName(table, entityContainer[iEntity].Entity);
 		uint16_t										colorRow						= (iEntity == (uint32_t)selectedRow) ? ::klib::ASCII_COLOR_INDEX_YELLOW : ::klib::ASCII_COLOR_INDEX_YELLOW << 4;
@@ -229,7 +229,7 @@ int32_t drawAgentList
 			continue;
 
 		const ::klib::CCharacter						& agent							= *army[iEntity];
-		const ::gpk::array_pod<char>					& entityName					= agent.Name;
+		const ::gpk::apod<char>					& entityName					= agent.Name;
 		uint16_t										colorRow						= ((int32_t)iEntity == selectedRow) ? ::klib::ASCII_COLOR_INDEX_YELLOW : ::klib::ASCII_COLOR_INDEX_YELLOW << 4;
 
 		printfToGridColored(display, textAttributes, colorRow, offsetY+1+actualRowsDisplayed, offsetX, ::klib::SCREEN_LEFT, " %c - %-38.38s", ::klib::ascii_gender[agent.Flags.Tech.Gender], entityName.begin());
@@ -424,7 +424,7 @@ int32_t drawWelcomeGUI(::klib::SGame& instanceGame) {
 ::klib::SGameState								drawWelcome			(::klib::SGame& instanceGame, const ::klib::SGameState& returnValue) {
 	instanceGame.GlobalDisplay.Clear();
 
-	::gpk::array_pod<char_t>					textToPrint			= ::gpk::view_const_string{"Welcome back commander "};
+	::gpk::apod<char>					textToPrint			= ::gpk::view_const_string{"Welcome back commander "};
 	textToPrint.append(instanceGame.Players[::klib::PLAYER_INDEX_USER].Tactical.Name);
 	textToPrint.append_string(".");
 	::gpk::SRenderTarget<char, uint16_t>		& display			= instanceGame.GlobalDisplay.Screen;

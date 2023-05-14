@@ -33,7 +33,7 @@ void																	assignDrops					(const ::klib::SEntityTables & tables, ::kl
 	for(uint32_t i=0; i<loser.Goods.Inventory.Items.Slots.size(); i++)
 		if( 0 == (rand()%2) ) {
 			const ::klib::SEntitySlot<klib::SItem>										& itemDrop					= loser.Goods.Inventory.Items[i];
-			::gpk::array_pod<char_t>													itemDropName				= klib::getItemName(itemDrop.Entity);
+			::gpk::array_pod<char>													itemDropName				= klib::getItemName(itemDrop.Entity);
 			if(winner.Goods.Inventory.Items.AddElement(itemDrop.Entity)) {
 				printf("\n%s dropped %s!!\n", loser.Name.begin(), itemDropName.begin());
 				loser.Goods.Inventory.Items.DecreaseEntity(i);
@@ -43,7 +43,7 @@ void																	assignDrops					(const ::klib::SEntityTables & tables, ::kl
 			}
 		}
 
-	::gpk::array_pod<char_t>													loserWeaponName				= klib::getEntityName(tables.Weapon, loser.CurrentEquip.Weapon);
+	::gpk::array_pod<char>													loserWeaponName				= klib::getEntityName(tables.Weapon, loser.CurrentEquip.Weapon);
 	if( 0 == (rand()%2) ) {
 		printf("%s recovers %s level %u from %s.\n", winner.Name.begin(), loserWeaponName.begin(), loser.CurrentEquip.Armor.Level, loser.Name.begin());
 		::klib::SWeapon																oldWinnerWeapon				= winner.CurrentEquip.Weapon;
@@ -63,7 +63,7 @@ void																	assignDrops					(const ::klib::SEntityTables & tables, ::kl
 	else
 		printf("%s doesn't get to recover %s from %s.\n", winner.Name.begin(), loserWeaponName.begin(), loser.Name.begin());
 
-	::gpk::array_pod<char_t>													loserAccessoryName			= ::klib::getEntityName(tables.Accessory, loser.CurrentEquip.Accessory);
+	::gpk::array_pod<char>													loserAccessoryName			= ::klib::getEntityName(tables.Accessory, loser.CurrentEquip.Accessory);
 	if( 0 == (rand()%2) ) {
 		printf("%s recovers %s level %u from %s.\n", winner.Name.begin(), loserAccessoryName.begin(), loser.CurrentEquip.Accessory.Level, loser.Name.begin());
 		::klib::SAccessory															oldWinnerAccessory			= winner.CurrentEquip.Accessory;
@@ -83,7 +83,7 @@ void																	assignDrops					(const ::klib::SEntityTables & tables, ::kl
 	else
 		printf("%s doesn't get to recover %s from %s.\n", winner.Name.begin(), loserAccessoryName.begin(), loser.Name.begin());
 
-	::gpk::array_pod<char_t>													loserArmorName				= ::klib::getEntityName(tables.Armor, loser.CurrentEquip.Armor);
+	::gpk::array_pod<char>													loserArmorName				= ::klib::getEntityName(tables.Armor, loser.CurrentEquip.Armor);
 	if( 0 == (rand()%2) ) {
 		printf("%s recovers %s level %u from %s.\n", winner.Name.begin(), loserArmorName.begin(), loser.CurrentEquip.Armor.Level, loser.Name.begin());
 		::klib::SArmor																oldWinnerArmor				= winner.CurrentEquip.Armor;
@@ -103,7 +103,7 @@ void																	assignDrops					(const ::klib::SEntityTables & tables, ::kl
 	else
 		printf("%s doesn't get to recover %s from %s.\n", winner.Name.begin(), loserArmorName.begin(), loser.Name.begin());
 
-	::gpk::array_pod<char_t>													loserVehicleName			= ::klib::getEntityName(tables.Vehicle, loser.CurrentEquip.Vehicle);
+	::gpk::array_pod<char>													loserVehicleName			= ::klib::getEntityName(tables.Vehicle, loser.CurrentEquip.Vehicle);
 	if( 0 == (rand()%2) ) {
 		printf("%s recovers %s level %u from %s.\n", winner.Name.begin(), loserVehicleName.begin(), loser.CurrentEquip.Vehicle.Level, loser.Name.begin());
 		::klib::SVehicle															oldWinnerVehicle			= winner.CurrentEquip.Vehicle;
@@ -123,7 +123,7 @@ void																	assignDrops					(const ::klib::SEntityTables & tables, ::kl
 	else
 		printf("%s doesn't get to recover %s from %s.\n", winner.Name.begin(), loserVehicleName.begin(), loser.Name.begin());
 
-	::gpk::array_pod<char_t>													loserFacilityName			= ::klib::getEntityName(tables.Facility, loser.CurrentEquip.Facility);
+	::gpk::array_pod<char>													loserFacilityName			= ::klib::getEntityName(tables.Facility, loser.CurrentEquip.Facility);
 	if( 0 == (rand()%2) ) {
 		printf("%s recovers %s level %u from %s.\n", winner.Name.begin(), loserFacilityName.begin(), loser.CurrentEquip.Facility.Level, loser.Name.begin());
 		klib::SFacility																oldWinnerFacility			= winner.CurrentEquip.Facility;
@@ -143,7 +143,7 @@ void																	assignDrops					(const ::klib::SEntityTables & tables, ::kl
 	else
 		printf("%s doesn't get to recover %s from %s.\n", winner.Name.begin(), loserFacilityName.begin(), loser.Name.begin());
 
-	::gpk::array_pod<char_t>													loserProfessionName			= ::klib::getEntityName(tables.Profession, loser.CurrentEquip.Profession);
+	::gpk::array_pod<char>													loserProfessionName			= ::klib::getEntityName(tables.Profession, loser.CurrentEquip.Profession);
 	if(rand()%2) {
 		printf("%s recovers a %s level %u from %s.\n", winner.Name.begin(), loserProfessionName.begin(), loser.CurrentEquip.Profession.Level, loser.Name.begin());
 		winner.Goods.Inventory.Profession.AddElement(loser.CurrentEquip.Profession);
@@ -439,7 +439,7 @@ int32_t																	selectItemsPlayer						(::klib::CCharacter& user)							
 	::klib::SMenuItem<int32_t>													itemOptions[4096]						= {};
 	char																		itemOption[128]							= {};
 	for(uint32_t i = 0; i < user.Goods.Inventory.Items.size(); ++i) {
-		const ::gpk::array_pod<char_t>												itemName								= ::klib::getItemName(user.Goods.Inventory.Items[i].Entity);
+		const ::gpk::array_pod<char>												itemName								= ::klib::getItemName(user.Goods.Inventory.Items[i].Entity);
 		sprintf_s(itemOption, "- x%.2u %s", user.Goods.Inventory.Items[i].Count, itemName.begin());
 		itemOptions[i].ReturnValue												= i;
  		itemOptions[i].Text														= itemOption;
@@ -468,7 +468,7 @@ int32_t																	selectItemsPlayer						(::klib::CCharacter& user)							
 		{
 			// if we reached here it means that the input was valid so we select the description and exit the loop
 			const ::gpk::view_const_string												userMessage			= "You don't need to use %s!\n";
-			const ::gpk::array_pod<char_t>												itemName			= ::klib::getItemName(user.Goods.Inventory.Items[indexInventory].Entity);
+			const ::gpk::array_pod<char>												itemName			= ::klib::getItemName(user.Goods.Inventory.Items[indexInventory].Entity);
 			printf(userMessage.begin(), itemName.begin());
 			indexInventory															= user.Goods.Inventory.Items.size();
 		}
@@ -492,7 +492,7 @@ int32_t																	selectItemsAI				(::klib::CCharacter& user)													
 	)
 	{
 		const ::gpk::view_const_string												userMessage											= "The enemy changes his mind about consuming %s because it doens't seem to be necessary!\n\n";
-		const ::gpk::array_pod<char_t>												itemName											= klib::getItemName(user.Goods.Inventory.Items[indexInventory].Entity);
+		const ::gpk::array_pod<char>												itemName											= klib::getItemName(user.Goods.Inventory.Items[indexInventory].Entity);
 		printf(userMessage.begin(), itemName.begin());
 		indexInventory															= user.Goods.Inventory.Items.size();
 	}

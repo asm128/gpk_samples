@@ -260,11 +260,11 @@ static	SGameState							drawMemorial			(char* display, uint32_t width, uint32_t 
 		int32_t					messageColor			= ::klib::ASCII_COLOR_INDEX_GREEN;
 		int32_t					offsetX					= 4;
 		if((curLine+=2) >= 0 && (curLine < bbHeight))
-			::klib::printfToRectColored((char_t*)display, width, depth, textAttributes, (uint16_t)messageColor, curLine, 0, ::klib::SCREEN_CENTER, "-- %s --", deadCharacter.Name.begin());
+			::klib::printfToRectColored((char*)display, width, depth, textAttributes, (uint16_t)messageColor, curLine, 0, ::klib::SCREEN_CENTER, "-- %s --", deadCharacter.Name.begin());
 
 		messageColor = ::klib::ASCII_COLOR_INDEX_DARKGREY;
 		if((curLine+=2) >= 0 && curLine < bbHeight)
-			offsetX = printfToRectColored((char_t*)display, width, depth, textAttributes, (uint16_t)messageColor, curLine, 3, ::klib::SCREEN_LEFT, format0
+			offsetX = printfToRectColored((char*)display, width, depth, textAttributes, (uint16_t)messageColor, curLine, 3, ::klib::SCREEN_LEFT, format0
 				, bufferTurnsPlayed
 				, bufferBattlesWon
 				, bufferBattlesLost
@@ -272,25 +272,25 @@ static	SGameState							drawMemorial			(char* display, uint32_t width, uint32_t 
 				//, bufferEscapesFailed
 				);
 		if((curLine+=1) >= 0 && curLine < bbHeight)
-			::klib::printfToRectColored((char_t*)display, width, depth, textAttributes, (uint16_t)messageColor, curLine, offsetX, ::klib::SCREEN_LEFT, format1
+			::klib::printfToRectColored((char*)display, width, depth, textAttributes, (uint16_t)messageColor, curLine, offsetX, ::klib::SCREEN_LEFT, format1
 				, bufferDamageDealt
 				, bufferDamageTaken
 				, bufferEnemiesKilled
 				);
 		if((curLine+=1) >= 0 && curLine < bbHeight)
-			::klib::printfToRectColored((char_t*)display, width, depth, textAttributes, (uint16_t)messageColor, curLine, offsetX, ::klib::SCREEN_LEFT, format2
+			::klib::printfToRectColored((char*)display, width, depth, textAttributes, (uint16_t)messageColor, curLine, offsetX, ::klib::SCREEN_LEFT, format2
 				, bufferAttacksHit
 				, bufferAttacksMissed
 				, bufferAttacksReceived
 				, bufferAttacksAvoided
 				);
 		if((curLine+=1) >= 0 && curLine < bbHeight)
-			::klib::printfToRectColored((char_t*)display, width, depth, textAttributes, (uint16_t)messageColor, curLine, offsetX, ::klib::SCREEN_LEFT, format3
+			::klib::printfToRectColored((char*)display, width, depth, textAttributes, (uint16_t)messageColor, curLine, offsetX, ::klib::SCREEN_LEFT, format3
 				, bufferPotionsUsed
 				, bufferGrenadesUsed
 				);
 		if((curLine+=1) >= 0 && curLine < bbHeight)
-			::klib::printfToRectColored((char_t*)display, width, depth, textAttributes, (uint16_t)messageColor, curLine, offsetX, ::klib::SCREEN_LEFT, format4
+			::klib::printfToRectColored((char*)display, width, depth, textAttributes, (uint16_t)messageColor, curLine, offsetX, ::klib::SCREEN_LEFT, format4
 				, bufferMoneyEarned
 				, bufferMoneySpent
 				);
@@ -327,8 +327,8 @@ void										klib::drawAndPresentGame		(SGame& instanceGame, ::klib::SASCIITarg
 	// Print log
 	::showMenu(instanceGame);
 
-	::gpk::rt<char_t, uint16_t>			& displayGlobal					= instanceGame.GlobalDisplay	.Screen;
-	::gpk::rt<char_t, uint16_t>			& displayTactical				= instanceGame.TacticalDisplay	.Screen;
+	::gpk::rt<char, uint16_t>			& displayGlobal					= instanceGame.GlobalDisplay	.Screen;
+	::gpk::rt<char, uint16_t>			& displayTactical				= instanceGame.TacticalDisplay	.Screen;
 	const ::gpk::SCoord2<uint32_t>					& displayMetricsGlobal			= displayGlobal		.metrics();
 	const ::gpk::SCoord2<uint32_t>					& displayMetricsTactical		= displayTactical	.metrics();
 
@@ -346,8 +346,8 @@ void										klib::drawAndPresentGame		(SGame& instanceGame, ::klib::SASCIITarg
 	case GAME_STATE_MENU_LAN_MISSION	:
 	case GAME_STATE_TACTICAL_CONTROL	:
 	case GAME_STATE_START_MISSION		: drawDisplay(displayTactical.Color.View, TACTICAL_DISPLAY_POSY, (displayMetricsGlobal.x >> 1) - (displayMetricsTactical.x >> 1), target);	break;
-	case GAME_STATE_CREDITS				: drawCredits((char_t*)bbChar, bbWidth, bbHeight, instanceGame.FrameTimer.LastTimeSeconds, namesSpecialThanks, instanceGame.State);																		break;
-	case GAME_STATE_MEMORIAL			: drawMemorial((char_t*)bbChar, bbWidth, bbHeight, displayGlobal.DepthStencil.begin(), instanceGame.FrameTimer.LastTimeSeconds, instanceGame.Players[0].Memorial, instanceGame.State);	break;
+	case GAME_STATE_CREDITS				: drawCredits((char*)bbChar, bbWidth, bbHeight, instanceGame.FrameTimer.LastTimeSeconds, namesSpecialThanks, instanceGame.State);																		break;
+	case GAME_STATE_MEMORIAL			: drawMemorial((char*)bbChar, bbWidth, bbHeight, displayGlobal.DepthStencil.begin(), instanceGame.FrameTimer.LastTimeSeconds, instanceGame.Players[0].Memorial, instanceGame.State);	break;
 	case GAME_STATE_WELCOME_COMMANDER	:
 	case GAME_STATE_MENU_SQUAD_SETUP	:
 	case GAME_STATE_MENU_EQUIPMENT		: break;
@@ -423,7 +423,7 @@ void										klib::drawAndPresentGame		(SGame& instanceGame, ::klib::SASCIITarg
 	char											send_buffer[64]					= {};
 	ctime_s(send_buffer, sizeof(send_buffer), &curTimeWithUnreliableSize);
 
-	::gpk::array_pod<char_t>						serverTime						= ::gpk::view_const_string{"Server time: "};
+	::gpk::apod<char>						serverTime						= ::gpk::view_const_string{"Server time: "};
 	serverTime.append_string({send_buffer, (uint32_t)strlen(send_buffer) - 1});
 	serverTime									= ::gpk::view_const_char{serverTime.begin(), serverTime.size() - 2};
 	::klib::printfToRectColored(target, ::klib::ASCII_COLOR_INDEX_CYAN		, bbHeight-2, 0, ::klib::SCREEN_CENTER, "%s.", serverTime.begin());
@@ -634,7 +634,7 @@ static void								displayResumedAgentSlot			(const ::klib::SEntityTables & tabl
 	::klib::valueToGrid(textAttributes, offsetY, offsetX+13, ::klib::SCREEN_LEFT, &color, 1, LINE_SIZE-14);
 	offsetY									+= 2;
 
-	::gpk::array_pod<char_t>					equipName;
+	::gpk::apod<char>					equipName;
 	equipName	 = getEntityName	(tables.Profession	, character.CurrentEquip.Profession	); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, "Class"		, equipName.begin(), character.CurrentEquip.Profession	.Level);
 	equipName	 = getEntityName	(tables.Weapon		, character.CurrentEquip.Weapon		); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, "Weapon"	, equipName.begin(), character.CurrentEquip.Weapon		.Level);
 	equipName	 = getEntityName	(tables.Armor		, character.CurrentEquip.Armor		); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, "Armor"		, equipName.begin(), character.CurrentEquip.Armor		.Level);
@@ -682,7 +682,7 @@ void									klib::displayDetailedAgentSlot		(const ::klib::SEntityTables & tabl
 	printfToGridColored(display, textAttributes, color, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentTitle, character.Name.begin());
 	offsetY									+=1;
 
-	::gpk::array_pod<char_t>					equipName;
+	::gpk::apod<char>					equipName;
 	equipName	= ::klib::getEntityName(tables.Profession	, character.CurrentEquip.Profession	); ::klib::printfToGrid(display, offsetY++	, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, equipName.begin(), character.CurrentEquip.Profession	.Level);
 	equipName	= ::klib::getEntityName(tables.Weapon		, character.CurrentEquip.Weapon		); ::klib::printfToGrid(display, offsetY++	, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, equipName.begin(), character.CurrentEquip.Weapon		.Level);
 	equipName	= ::klib::getEntityName(tables.Armor		, character.CurrentEquip.Armor		); ::klib::printfToGrid(display, offsetY++	, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, equipName.begin(), character.CurrentEquip.Armor		.Level);
@@ -851,7 +851,7 @@ int32_t													drawMenu
 	const uint32_t												targetHeight										= targetASCII.metrics().y;
 	const int32_t												clearOffset											= (int32_t)(targetHeight - MENU_ROFFSET - 2 - 9);
 
-	::gpk::array_pod<char_t>									clearString											;
+	::gpk::apod<char>									clearString											;
 	clearString.resize(::gpk::max(rowWidth, 64U), ' ');
 	for(int32_t i = -2, count = (int32_t)targetHeight-clearOffset; i<count; ++i)
 		::klib::printfToRectColored(targetASCII.begin(), targetWidth, targetHeight, targetAttributes, (::klib::ASCII_COLOR_INDEX_BLACK << 4) | ::klib::ASCII_COLOR_INDEX_YELLOW, clearOffset+i, 0, ::klib::SCREEN_CENTER, "%s", clearString.begin()); // clear all lines where we're going to draw

@@ -90,7 +90,7 @@ int													main						()			{
 		encoded.resize(encoded.size() - 1);
 		always_printf("RLE Encoded: %s", encoded.begin());
 
-		::gpk::array_pod<char_t> decoded;
+		::gpk::apod<char> decoded;
 		::gpk::rleDecode(encoded, decoded);
 		decoded.push_back(0);
 		encoded.resize(encoded.size() - 1);
@@ -248,16 +248,16 @@ int													main						()			{
 
 	{
 		double													timeTotal					= 0;
-		::gpk::array_obj<::gpk::ac>				encodedList;
-		::gpk::array_obj<::gpk::au8>			decodedList;
+		::gpk::aobj<::gpk::ac>				encodedList;
+		::gpk::aobj<::gpk::au8>			decodedList;
 		encodedList.resize(rounds * ::gpk::size(testStrings));
 		decodedList.resize(rounds * ::gpk::size(testStrings));
 		::gpk::STimer											timer;
 		for(uint32_t iRound=0; iRound < rounds; ++iRound)
 			for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {
 				int32_t													indexBuffer					= iRound * ::gpk::size(testStrings) + iTest;
-				::gpk::array_pod<byte_t>								& encoded					= encodedList[indexBuffer];
-				ce_if(errored(::gpk::hexEncode({(const ubyte_t*)testStrings[iTest].begin(), testStrings[iTest].size()}, encoded)), "%s", "Out of memory?");
+				::gpk::ac												& encoded					= encodedList[indexBuffer];
+				ce_if(errored(::gpk::hexEncode({(const uint8_t*)testStrings[iTest].begin(), testStrings[iTest].size()}, encoded)), "%s", "Out of memory?");
 				timer.Frame();
 				timeTotal											+= timer.LastTimeSeconds;
 			}
@@ -439,7 +439,7 @@ int													main						()			{
 	{
 		double													timeTotal					= 0;
 		::gpk::array_pod<uint64_t>								encoded;
-		::gpk::array_pod<byte_t>								decoded;
+		::gpk::array_pod<uint8_t>								decoded;
 		::gpk::STimer											timer;
 		for(uint32_t iRound=0; iRound < rsaRounds; ++iRound)
 			for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {
@@ -463,7 +463,7 @@ int													main						()			{
 	{
 		double													timeTotal					= 0;
 		::gpk::array_pod<uint64_t>								encoded;
-		::gpk::array_pod<byte_t>								decoded;
+		::gpk::array_pod<uint8_t>								decoded;
 		::gpk::STimer											timer;
 		for(uint32_t iRound=0; iRound < rsaRounds; ++iRound)
 			for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {

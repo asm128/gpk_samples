@@ -11,11 +11,11 @@ namespace klib
 {
 	::gpk::error_t			initASCIIScreen					(uint32_t width = DEFAULT_ASCII_SCREEN_WIDTH, uint32_t height = DEFAULT_ASCII_SCREEN_HEIGHT);
 	::gpk::error_t			shutdownASCIIScreen				();
-	::gpk::error_t			setASCIIScreenTitle				(const char_t* title);
+	::gpk::error_t			setASCIIScreenTitle				(const char* title);
 	::gpk::error_t			getASCIIBackBuffer				(::klib::SASCIITarget& target);
 	::gpk::error_t			getASCIIFrontBuffer				(::klib::SASCIITarget& target);
 	::gpk::error_t			swapASCIIBuffers				();
-	::gpk::error_t			clearASCIIBackBuffer			(char_t value, uint16_t colorValue=15);
+	::gpk::error_t			clearASCIIBackBuffer			(char value, uint16_t colorValue=15);
 	::gpk::error_t			presentASCIIFrontBuffer			();
 	::gpk::error_t			presentASCIIBackBuffer			();
 };

@@ -19,19 +19,19 @@
 #include <algorithm>
 #include <string>
 
-::gpk::array_pod<char_t>			klib::getItemName					(const ::klib::SItem& item)									{
+::gpk::apod<char>			klib::getItemName					(const ::klib::SItem& item)									{
 	char									formattedName[128]					= {};
 	sprintf_s(formattedName, ::klib::itemGrades[item.Level].Name.begin(), ::klib::itemDescriptions[item.Definition].Name.begin());
 	return ::gpk::view_const_string(formattedName);
 }
 
 // Set up a nice prompt
-static	::gpk::error_t					prompt					(::gpk::array_pod<char_t>& userInput, const ::gpk::view_const_char& displayText, ::klib::SASCIITarget& asciiTarget) {
+static	::gpk::error_t					prompt					(::gpk::apod<char>& userInput, const ::gpk::view_const_char& displayText, ::klib::SASCIITarget& asciiTarget) {
 	::klib::asciiTargetClear(asciiTarget, ' ', ::klib::ASCII_COLOR_INDEX_GREEN);
 	uint32_t									screenWidth				=	asciiTarget.Width()
 		,										screenHeight			=	asciiTarget.Height()
 		;
-	::klib::lineToRect((char_t*)asciiTarget.Characters.begin(), screenWidth, screenHeight, (screenHeight>>1)-1, 0, ::klib::SCREEN_CENTER, displayText.begin());
+	::klib::lineToRect((char*)asciiTarget.Characters.begin(), screenWidth, screenHeight, (screenHeight>>1)-1, 0, ::klib::SCREEN_CENTER, displayText.begin());
 	::klib::presentASCIIBackBuffer();
 
 	static const HANDLE							hConsoleOut				= ::GetStdHandle( STD_OUTPUT_HANDLE );
@@ -89,7 +89,7 @@ int64_t								klib::missionCost				(const SGamePlayer& player, const SSquad& sq
 	//::klib::clearASCIIBackBuffer(' ', COLOR_WHITE);
 
 	// Set up a nice prompt
-	::gpk::array_pod<char_t>				playerName;
+	::gpk::apod<char>				playerName;
 	::klib::SASCIITarget					asciiTarget;
 	::klib::getASCIIBackBuffer(asciiTarget);
 
@@ -341,7 +341,7 @@ struct SWearables {
 			player.Tactical.Squad.Agents[1 + i]		= (int16_t)(CAMPAIGN_AGENT_COUNT + i);
 
 		player.Tactical.Selection				= {0, 0, -1, -1, -1};
-		::gpk::array_pod<char_t>					& playerName			= player.Tactical.Name;
+		::gpk::apod<char>					& playerName			= player.Tactical.Name;
 		char										striPlayer [64]	;
 		sprintf_s(striPlayer, " #%i", iPlayer);
 		playerName.append_string(striPlayer);

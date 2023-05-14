@@ -6,7 +6,7 @@
 
 static	::klib::SGameState				drawResearchMenu				(::klib::SGame& instanceGame, const ::klib::SGameState& returnState) {
 	::klib::SGamePlayer							& player						= instanceGame.Players[::klib::PLAYER_INDEX_USER];
-	::gpk::array_obj<::gpk::array_pod<char_t>>	& menuItemsText					= player.ResearchablesText;
+	::gpk::array_obj<::gpk::apod<char>>	& menuItemsText					= player.ResearchablesText;
 	::gpk::array_obj<::gpk::view_const_char>	menuItemsView					= {};
 	menuItemsView.resize(menuItemsText.size());
 	for(uint32_t i = 0, count = menuItemsText.size(); i < count; ++i)

@@ -100,7 +100,7 @@ namespace klib
 
 	static inline constexpr	int32_t						getFinalItemCount					()													{ return (int32_t)((::gpk::size(itemDescriptions) - 1) * itemGrades.size()); }
 	static inline			int32_t						getItemPrice						(const SItem& item, bool bSellPrice=false)			{ return (int32_t)( bSellPrice ? (itemDescriptions[item.Definition].Price*item.Level)*.5 : itemDescriptions[item.Definition].Price*item.Level ); }
-							::gpk::array_pod<char_t>	getItemName							(const SItem& item);
+							::gpk::array_pod<char>	getItemName							(const SItem& item);
 	struct CItemV2 {
 		ITEM_TYPE											Type;
 		int64_t												Price;

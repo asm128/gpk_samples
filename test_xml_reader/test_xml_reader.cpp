@@ -31,7 +31,7 @@ int xmlTestDoc(::gpk::vcc xmlDoc) {
 }
 
 int xmlTestFile(::gpk::vcs xmlFilename) {
-	::gpk::array_pod<char_t> testXmlFile = {};
+	::gpk::apod<char> testXmlFile = {};
 	printf("\ntesting file '%s'", ::gpk::toString(xmlFilename).begin());
 	::gpk::fileToMemory(xmlFilename, testXmlFile);
 	return xmlTestDoc(testXmlFile);

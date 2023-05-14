@@ -274,15 +274,15 @@ namespace klib
 
 	struct SLogLine {
 							uint16_t							Color;
-							const ::gpk::array_pod<char_t>		Message;
+							const ::gpk::apod<char>		Message;
 	};
 	struct SGameMessages {
 							char								Aux		[4096]					= {};
-							::gpk::array_pod<char_t>			UserMessage						= "";
-							::gpk::array_pod<char_t>			UserSuccess						= "";
-							::gpk::array_pod<char_t>			UserMiss						= "";
-							::gpk::array_pod<char_t>			UserError						= "";
-							::gpk::array_pod<char_t>			StateMessage					= "";
+							::gpk::apod<char>			UserMessage						= "";
+							::gpk::apod<char>			UserSuccess						= "";
+							::gpk::apod<char>			UserMiss						= "";
+							::gpk::apod<char>			UserError						= "";
+							::gpk::apod<char>			StateMessage					= "";
 							::gpk::array_obj<SLogLine>			UserLog							= {};
 							void								ClearMessages					()	{
 			UserError	.clear();

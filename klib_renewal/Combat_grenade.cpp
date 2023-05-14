@@ -52,14 +52,14 @@ bool										klib::useGrenade						(const ::klib::SEntityTables & tables, ::kli
 	int32_t											itemEffectValueSelf						= int32_t(finalPointsThrower.LifeMax.Health*(0.2f*itemGrade)) >> 1;
 
 	ATTACK_TARGET									hitTarget								= ATTACK_TARGET_MISS;
-	::gpk::array_pod<char_t>						itemName								= ::klib::getItemName(itemGrenade);
+	::gpk::apod<char>						itemName								= ::klib::getItemName(itemGrenade);
 	::sprintf_s(messages.Aux, "%s throws %s to %s.", thrower.Name.begin(), itemName.begin(), target.Name.begin());
 	messages.LogAuxMessage();
 	bool											bAddStatus								= false;
 
 	PROPERTY_TYPE									grenadeProperty							= itemDescription.Property;
 	COMBAT_STATUS									grenadeStatus							= ::getGrenadeStatusFromProperty(grenadeProperty);
-	const ::gpk::array_pod<char_t>					targetArmorName							= ::klib::getEntityName(tables.Armor, target.CurrentEquip.Armor);
+	const ::gpk::apod<char>					targetArmorName							= ::klib::getEntityName(tables.Armor, target.CurrentEquip.Armor);
 	switch(grenadeProperty) {
 	case PROPERTY_TYPE_SMOKE		:
 	case PROPERTY_TYPE_STUN			:

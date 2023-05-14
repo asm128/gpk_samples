@@ -126,7 +126,7 @@ namespace klib
 		int16_t							Grade;
 		int64_t							Price;
 		int64_t							MaintenanceCost;
-		::gpk::array_pod<char_t>		Name;
+		::gpk::array_pod<char>		Name;
 	};
 
 	struct SShopMenus {
@@ -150,15 +150,15 @@ namespace klib
 		::klib::SMenuHeader<::klib::SBuyable>	MenuItem					= {{::klib::SHOP_EXIT_VALUE},	::gpk::view_const_string{"Item"			" a la carte"}, 48};
 		::klib::SMenuHeader<::klib::SBuyable>	MenuAgent					= {{::klib::SHOP_EXIT_VALUE},	::gpk::view_const_string{"Agent"		" a la carte"}, 48};
 
-		::gpk::array_pod<char_t>				NamesAccessory		[256]	= {};
-		::gpk::array_pod<char_t>				NamesStageProp		[256]	= {};
-		::gpk::array_pod<char_t>				NamesFacility		[256]	= {};
-		::gpk::array_pod<char_t>				NamesVehicle		[256]	= {};
-		::gpk::array_pod<char_t>				NamesProfession		[256]	= {};
-		::gpk::array_pod<char_t>				NamesWeapon			[256]	= {};
-		::gpk::array_pod<char_t>				NamesArmor			[256]	= {};
-		::gpk::array_pod<char_t>				NamesItem			[256]	= {};
-		::gpk::array_pod<char_t>				NamesAgent			[256]	= {};
+		::gpk::array_pod<char>				NamesAccessory		[256]	= {};
+		::gpk::array_pod<char>				NamesStageProp		[256]	= {};
+		::gpk::array_pod<char>				NamesFacility		[256]	= {};
+		::gpk::array_pod<char>				NamesVehicle		[256]	= {};
+		::gpk::array_pod<char>				NamesProfession		[256]	= {};
+		::gpk::array_pod<char>				NamesWeapon			[256]	= {};
+		::gpk::array_pod<char>				NamesArmor			[256]	= {};
+		::gpk::array_pod<char>				NamesItem			[256]	= {};
+		::gpk::array_pod<char>				NamesAgent			[256]	= {};
 	};
 
 	::gpk::error_t												initBuyMenus		(const ::klib::SEntityTables & entityTables, ::klib::SShopMenus& menus);

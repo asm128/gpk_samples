@@ -10,11 +10,11 @@ void											klib::playerUpdateResearchLists		(const ::klib::SEntityTables & e
 		playerArmy.push_back(player.Tactical.Army[iAgent]);
 
 	::gpk::array_obj<::klib::SEntityResearch>			& researchablesValue				= player.ResearchablesValue	= {};
-	::gpk::array_obj<::gpk::array_pod<char_t>>			& researchablesText					= player.ResearchablesText	= {};
+	::gpk::array_obj<::gpk::apod<char>>			& researchablesText					= player.ResearchablesText	= {};
 
 	::klib::getResearchableItems	(entityTables, playerInventory, researchCompleted, queuedResearch, playerArmy, researchablesValue, researchablesText);
 
 	::gpk::array_obj<::klib::SEntityResearch>			& researchedValue					= player.ResearchedValue	= {};
-	::gpk::array_obj<::gpk::array_pod<char_t>>			& researchedText					= player.ResearchedText		= {};
+	::gpk::array_obj<::gpk::apod<char>>			& researchedText					= player.ResearchedText		= {};
 	::klib::getResearchedItems		(entityTables, playerInventory, researchCompleted, playerArmy, researchedValue, researchedText);
 }

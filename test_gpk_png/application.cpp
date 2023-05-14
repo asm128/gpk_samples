@@ -46,8 +46,8 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 			const int32_t															indexJSONNodeArrayPNGFileNames		= ::gpk::jsonExpressionResolve(::gpk::vcs{"application.gpk_test_png.images"}, jsonReader, 0, fileNamePNG);
 			const uint32_t															countFilesToLoad					= (uint32_t)::gpk::jsonArraySize(*jsonReader.Tree[indexJSONNodeArrayPNGFileNames]);
 			gpk_necall(app.PNGImages.resize(countFilesToLoad), "Failed to resize array for %u PNG files.", countFilesToLoad);
-			::gpk::array_pod<char_t>												expression							= {};
-			::gpk::array_pod<char_t>												fullPathPNG							= {};
+			::gpk::apod<char>												expression							= {};
+			::gpk::apod<char>												fullPathPNG							= {};
 			char																	subscriptExpression	[64]			= {};
 			for(uint32_t iFile = 0; iFile < countFilesToLoad; ++iFile) {
 				const uint32_t															lenExpression						= snprintf(subscriptExpression, 62, "['%u']", iFile);

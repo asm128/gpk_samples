@@ -34,20 +34,20 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT_MT(::SApplication, "Title");
 
 	framework.RootWindow.BackBuffer->resize(mainWindow.Size);
 
-	::gpk::array_pod<byte_t>			fileBytes;
-	::gpk::array_static<char, 256>		pathNameData		= {"../gpk_data"};
+	::gpk::apod<uint8_t>			fileBytes;
+	::gpk::astatic<char, 256>		pathNameData		= {"../gpk_data"};
 
-	::gpk::array_static<char, 256>		folderNameVox		= {"vox"};
+	::gpk::astatic<char, 256>		folderNameVox		= {"vox"};
 
 	uint64_t							timeStart			= ::gpk::timeCurrentInMs();
-	::gpk::array_pobj<::gpk::SVOXData>	voxModels									= {};
+	::gpk::apobj<::gpk::SVOXData>	voxModels									= {};
 	for(uint32_t iModel = 0; iModel < ::gpk::size(fileNames); ++iModel) {
 		gpk::vcc							fileName			= fileNames[iModel];
 		char								pathToLoad[4096]	= {};
 		sprintf_s(pathToLoad, "%s/%s/%s", pathNameData.Storage, folderNameVox.Storage, fileName.begin());
 		gpk_necs(::gpk::fileToMemory(pathToLoad, fileBytes));
 
-		::gpk::vcc							viewBytes			= fileBytes;
+		::gpk::vcu8							viewBytes			= fileBytes;
 		gpk_necs(voxModels[voxModels.push_back({})]->Load(viewBytes));
 		app.VOXModelNames.push_back(fileName);
 		gpk_vox_info_printf("Loaded %s.", pathToLoad);
@@ -62,7 +62,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT_MT(::SApplication, "Title");
 		auto										coord				= voxFile->GetDimensions();
 		chunkMap.Palette						= voxFile->GetBGRA();
 		chunkMap.Dimensions						= voxFile->GetDimensions();
-		::gpk::view_array<const ::gpk::SVOXVoxel>	voxels				= voxFile->GetXYZI();
+		::gpk::view<const ::gpk::SVOXVoxel>	voxels				= voxFile->GetXYZI();
 		for(uint32_t iVoxel = 0; iVoxel < voxels.size(); ++iVoxel) {
 			const ::gpk::SVOXVoxel						voxel				= voxels[iVoxel];
 			chunkMap.SetValue({voxel.x, voxel.y, voxel.z}, voxel.i);
@@ -122,7 +122,7 @@ namespace gpk
 		( ::gpk::view_grid<uint32_t>						& targetDepth
 		, const ::gpk::SNearFar								& fNearFar
 		, const ::gpk::STriangle3<_tCoord>					& triangle
-		, ::gpk::array_pod<::gpk::SCoord2<int16_t>>			& out_Points
+		, ::gpk::apod<::gpk::SCoord2<int16_t>>			& out_Points
 		) {
 		int32_t																		pixelsDrawn									= 0;
 		const ::gpk::SCoord2<uint32_t>												& _targetMetrics							= targetDepth.metrics();
@@ -181,9 +181,9 @@ namespace gpk
 		//, double												fNear
 		, uint32_t												baseIndex
 		, uint32_t												baseVertexIndex
-		, ::gpk::view_array<const ::gpk::SCoord3<_tCoord>>		coordList
-		, ::gpk::view_array<const _tIndex>						indices
-		, ::gpk::array_pod<::gpk::SCoord2<int16_t>>				& out_Points
+		, ::gpk::view<const ::gpk::SCoord3<_tCoord>>		coordList
+		, ::gpk::view<const _tIndex>						indices
+		, ::gpk::apod<::gpk::SCoord2<int16_t>>				& out_Points
 		) {
 		return drawTriangle(targetDepth, fNearFar, ::gpk::STriangle3<_tCoord>{coordList[baseVertexIndex + indices[baseIndex + 0]], coordList[baseVertexIndex + indices[baseIndex + 1]], coordList[baseVertexIndex + indices[baseIndex + 2]]}, out_Points);
 	}
@@ -191,12 +191,12 @@ namespace gpk
 
 ::gpk::error_t										drawVoxelFaceGeometry
 	( ::gpk::view_grid<uint32_t>								targetDepth
-	, ::gpk::array_pod<::gpk::SCoord2<int16_t>>					& Points
+	, ::gpk::apod<::gpk::SCoord2<int16_t>>					& Points
 	, const ::gpk::SCoord3<float>								& voxelPos
 	, const ::gpk::SMatrix4<float>								& mWVP
 	, const ::gpk::SNearFar										& nearFar
-	, const ::gpk::view_array<const ::gpk::SCoord3<float>>		verticesRaw
-	, const ::gpk::view_array<const uint8_t>					& indices
+	, const ::gpk::view<const ::gpk::SCoord3<float>>		verticesRaw
+	, const ::gpk::view<const uint8_t>					& indices
 	) {
 	::gpk::SCoord3<float>									vertices [4]				= {}; 
 	for(uint32_t iVertex = 0; iVertex < 4; ++iVertex) {
@@ -208,8 +208,8 @@ namespace gpk
 }
 
 struct SFragmentCache {
-	::gpk::array_pod<::gpk::SCoord2<int16_t>>			Points				[6]	= {};
-	::gpk::array_pod<::gpk::STriangle<float>>			TriangleWeights		[6]	= {};	
+	::gpk::apod<::gpk::SCoord2<int16_t>>			Points				[6]	= {};
+	::gpk::apod<::gpk::STriangle<float>>			TriangleWeights		[6]	= {};	
 	::gpk::view_grid<::gpk::SColorBGRA>					TargetPixels;
 	::gpk::view_grid<uint32_t>							TargetDepth	;
 };
@@ -229,8 +229,8 @@ static	::gpk::error_t						drawVoxelFace
 	pixelCache.Points			[iFace].clear();
 	pixelCache.TriangleWeights	[iFace].clear();
 
-	::gpk::view_array<const ::gpk::SCoord3<float>>	rawVertices				= {&::gpk::VOXEL_FACE_VERTICES[iFace].A, 4};
-	::gpk::view_array<const uint8_t>				rawIndices				= ::gpk::VOXEL_FACE_INDICES[iFace];
+	::gpk::view<const ::gpk::SCoord3<float>>	rawVertices				= {&::gpk::VOXEL_FACE_VERTICES[iFace].A, 4};
+	::gpk::view<const uint8_t>				rawIndices				= ::gpk::VOXEL_FACE_INDICES[iFace];
 
 	::drawVoxelFaceGeometry(pixelCache.TargetDepth, pixelCache.Points[iFace], voxelPos, mVP, nearFar, rawVertices, rawIndices); 
 
@@ -261,14 +261,14 @@ static	::gpk::error_t						drawVoxelFace
 	, ::SFragmentCache									& pixelCache
 	) {	
 	for(uint32_t iFace = 0; iFace < 6; ++iFace) {
-		::gpk::view_array<const ::gpk::SGeometryGroup>		faceSlices				= {(const ::gpk::SGeometryGroup*)voxelGeometry.GeometrySlices[iFace].begin(), voxelGeometry.GeometrySlices[iFace].size()};
+		::gpk::view<const ::gpk::SGeometryGroup>		faceSlices				= {(const ::gpk::SGeometryGroup*)voxelGeometry.GeometrySlices[iFace].begin(), voxelGeometry.GeometrySlices[iFace].size()};
 		for(uint32_t iSlice = 0, countSlices = faceSlices.size(); iSlice < countSlices; ++iSlice) {
 			// Clear out output
-			::gpk::array_pod<::gpk::SCoord2<int16_t>>			& facePixelCoords		= pixelCache.Points[iFace];
-			::gpk::array_pod<::gpk::STriangle<float>>			& faceTriangleWeights	= pixelCache.TriangleWeights[iFace];
-			::gpk::array_pod<::gpk::STriangle3<float>>			trianglePositions		= {};
-			::gpk::array_pod<::gpk::SRange<uint32_t>>			triangleSlices			= {};
-			::gpk::array_pod<uint32_t>							triangleIndices			= {};
+			::gpk::apod<::gpk::SCoord2<int16_t>>			& facePixelCoords		= pixelCache.Points[iFace];
+			::gpk::apod<::gpk::STriangle<float>>			& faceTriangleWeights	= pixelCache.TriangleWeights[iFace];
+			::gpk::apod<::gpk::STriangle3<float>>			trianglePositions		= {};
+			::gpk::apod<::gpk::SRange<uint32_t>>			triangleSlices			= {};
+			::gpk::apod<uint32_t>							triangleIndices			= {};
 			facePixelCoords		.clear();
 			faceTriangleWeights	.clear();
 
@@ -344,8 +344,8 @@ static	::gpk::error_t						drawVoxelFace
 	, const ::gpk::SCoord3<float>						& lightPosition
 	, ::SFragmentCache									& pixelCache
 	) {	
-	const ::gpk::view_array<const ::gpk::SVoxel<uint8_t>>	voxels						= voxelMap.Voxels;
-	::gpk::view_array<const ::gpk::SColorBGRA>				rgba						= voxelMap.Palette;
+	const ::gpk::view<const ::gpk::SVoxel<uint8_t>>	voxels						= voxelMap.Voxels;
+	::gpk::view<const ::gpk::SColorBGRA>				rgba						= voxelMap.Palette;
 	const ::gpk::SCoord3<uint8_t>							dimensions					= voxelMap.Dimensions;
 	if(0 == rgba.size())
 		rgba												= ::gpk::VOX_PALETTE_DEFAULT;

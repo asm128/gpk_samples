@@ -45,13 +45,13 @@ namespace klib
 	}
 
 	static inline				int32_t	lineToRectColored		(::klib::SASCIITarget& target, uint16_t messageColor, int32_t offsetLine, int32_t offsetColumn, ::klib::ALIGN_SCREEN align, const char* text, uint32_t charCount = 0xFFFFFFFF)		{
-		return lineToRectColored	((char_t*)target.Characters.begin(), target.Width(), target.Height(), target.Colors.begin(), messageColor, offsetLine, offsetColumn, align, text, charCount);
+		return lineToRectColored	((char*)target.Characters.begin(), target.Width(), target.Height(), target.Colors.begin(), messageColor, offsetLine, offsetColumn, align, text, charCount);
 	}
 	static inline				int32_t	lineToRectColored		(::gpk::v2c chars, ::gpk::v2u16 colors, uint16_t messageColor, int32_t offsetLine, int32_t offsetColumn, ::klib::ALIGN_SCREEN align, const char* text, uint32_t charCount = 0xFFFFFFFF)		{
-		return lineToRectColored	((char_t*)chars.begin(), chars.metrics().x, chars.metrics().y, colors.begin(), messageColor, offsetLine, offsetColumn, align, text, charCount);
+		return lineToRectColored	((char*)chars.begin(), chars.metrics().x, chars.metrics().y, colors.begin(), messageColor, offsetLine, offsetColumn, align, text, charCount);
 	}
 	template<typename... _Args>	int32_t	printfToRectColored		(::klib::SASCIITarget& target, uint16_t messageColor, int32_t offsetLine, int32_t offsetColumn, ::klib::ALIGN_SCREEN align, const char* format, _Args&&... args)						{
-		return printfToRectColored	((char_t*)target.Characters.begin(), target.Width(), target.Height(), target.Colors.begin(), messageColor, offsetLine, offsetColumn, align, format, args...);
+		return printfToRectColored	((char*)target.Characters.begin(), target.Width(), target.Height(), target.Colors.begin(), messageColor, offsetLine, offsetColumn, align, format, args...);
 	}
 
 	template<typename... _Args>	int32_t	printfToRectColored		(::gpk::v2c chars, ::gpk::v2u16 colors, uint16_t messageColor, int32_t offsetLine, int32_t offsetColumn, ::klib::ALIGN_SCREEN align, const char* format, _Args&&... args)						{

@@ -136,7 +136,7 @@ namespace klib
 	void										completeProduction
 		(	SEntityContainer<_tEntity>				& playerInventory
 		,	const ::klib::SEntity					& entity
-		,	::gpk::array_pod<char_t>				& messageSuccess
+		,	::gpk::array_pod<char>				& messageSuccess
 		,	const ::klib::SEntityTable<_tEntity>	& entityTable
 		) {
 		playerInventory.AddElement(entity);
@@ -149,7 +149,7 @@ namespace klib
 		(	const SEntityResearch			& selectedChoice
 		,	::klib::SEntity					& maxResearch
 		,	SResearchGroup<_EntityType>		& researchCompleted
-		,	::gpk::array_pod<char_t>		& successMessage
+		,	::gpk::array_pod<char>		& successMessage
 		) {
 		if(selectedChoice.IsModifier) {
 			researchCompleted.Modifiers.AddElement(selectedChoice.Entity.Modifier);
@@ -165,7 +165,7 @@ namespace klib
 	}
 
 	//-------------------------------------------------------------------------------------------
-	static inline	void						acknowledgeResearch				(const ::klib::SEntityResearch& selectedChoice, ::klib::SPlayerProjects& playerProjects, ::gpk::array_pod<char_t> & successMessage)	{
+	static inline	void						acknowledgeResearch				(const ::klib::SEntityResearch& selectedChoice, ::klib::SPlayerProjects& playerProjects, ::gpk::array_pod<char> & successMessage)	{
 		playerProjects.EnqueueResearch(selectedChoice);
 		successMessage								= selectedChoice.Name;
 		successMessage.append_string(" research has begun. Research cost: ");
@@ -173,7 +173,7 @@ namespace klib
 		sprintf_s(cost, "%lli", selectedChoice.PriceUnit - selectedChoice.PricePaid);
 		successMessage.append_string(cost);
 	}
-	static inline	void						acknowledgeProduction			(const ::klib::SEntityResearch& selectedChoice, ::klib::SPlayerProjects& playerProjects, ::gpk::array_pod<char_t> & successMessage)	{
+	static inline	void						acknowledgeProduction			(const ::klib::SEntityResearch& selectedChoice, ::klib::SPlayerProjects& playerProjects, ::gpk::array_pod<char> & successMessage)	{
 		playerProjects.EnqueueProduction(selectedChoice);
 		successMessage								= selectedChoice.Name;
 		successMessage.append_string(" production has begun. Cost: ");

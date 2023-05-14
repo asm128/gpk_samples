@@ -7,7 +7,7 @@
 #include "gpk_json_expression.h"
 
 ::gpk::error_t								printNode						(::gpk::SJSONNode* node, const ::gpk::view_const_char& testJson)			{
-	const ::gpk::array_pod<char_t>						viewPrintable					= ::gpk::toString({&testJson[node->Token->Span.Begin], node->Token->Span.End - node->Token->Span.Begin});
+	const ::gpk::array_pod<char>						viewPrintable					= ::gpk::toString({&testJson[node->Token->Span.Begin], node->Token->Span.End - node->Token->Span.Begin});
 	const ::gpk::view_const_char						viewTokenType					= ::gpk::get_value_label(node->Token->Type);
 	//info_printf("Entering JSON node type: %u (%s). Node Span: {%u, %u}. Parent index: %u. Object index: %u. Text: %s", node->Token->Type, viewTokenType.begin(), node->Token->Span.Begin, node->Token->Span.End, node->Token->ParentIndex, node->ObjectIndex, viewPrintable.begin());
 	for(uint32_t iChildren = 0; iChildren < node->Children.size(); ++iChildren)
@@ -40,7 +40,7 @@
 	gpk_necall(::gpk::jsonParse(jsonReader, testJson), "Failed to parse json: '%s'.", testJson.begin());
 
 	info_printf("---------------------------- Linear iteration: %u objects.", jsonReader.Token.size());
-	::gpk::array_pod<char_t>						outputJson;
+	::gpk::array_pod<char>						outputJson;
 	::gpk::ptr_obj<::gpk::SJSONNode>				root							= jsonReader.Tree[0];
 	::printNode(root, testJson);
 
@@ -78,7 +78,7 @@
 	::printNode(root, inputJson);
 	const ::gpk::error_t						indexOfFirstObject			= 0;
 	info_printf("Test format:\n%s", format.begin());
-	::gpk::array_pod<char_t>						formatted;
+	::gpk::array_pod<char>						formatted;
 	gpk_necall(::gpk::jsonStringFormat(format, jsonReader, indexOfFirstObject, formatted), "%s", "Error formatting string from JSON object.");
 	info_printf("Formatted string after jsonStringFormat():\n%s", formatted.begin());
 	return 0;
@@ -91,7 +91,7 @@
 	) {
 	info_printf("Testing expression: %s", ::gpk::toString(expression).begin());
 	::gpk::view_const_string						result;
-	::gpk::array_pod<char_t>						output;
+	::gpk::array_pod<char>						output;
 	if(-1 == ::gpk::jsonExpressionResolve(expression, jsonReader, 0U, result) || result != expected) {
 		error_printf("Failed to resolve expression. \nExpression: %s \nExpected: %s \nResult: ", expression.begin(), expected.begin());
 		output										= result;

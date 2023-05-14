@@ -400,7 +400,7 @@ static int																initializeItemMenu							(::klib::SMenuItem<klib::SIte
 		for(int32_t grade = 0; grade < gradeCount; ++grade) {
 			const int32_t																finalMenuItemIndex							= indexItem * gradeCount + grade;
 			menuItems[finalMenuItemIndex].ReturnValue								= { (int16_t)indexDefinition, 0, (int16_t)grade };
-			const ::gpk::array_pod<char_t>												itemName									= ::klib::getItemName( menuItems[finalMenuItemIndex].ReturnValue );
+			const ::gpk::array_pod<char>												itemName									= ::klib::getItemName( menuItems[finalMenuItemIndex].ReturnValue );
 			sprintf_s(itemOption, "- $%.2u Coins - %s", (int32_t)klib::getItemPrice(menuItems[finalMenuItemIndex].ReturnValue), itemName.begin());
 			menuItems[finalMenuItemIndex].Text										= itemOption;
 		}
@@ -427,7 +427,7 @@ void																	bar											(::klib::CCharacter& adventurer)						{
 		}
 		else {
 			int																		itemPrice									= klib::getItemPrice(selectedItem);	// Get a copy of this value because we use it very often.
-			const ::gpk::array_pod<char_t>											itemName									= klib::getItemName(selectedItem);
+			const ::gpk::array_pod<char>											itemName									= klib::getItemName(selectedItem);
 
 			// Check first for conditions that prevent from acquiring the item
 			if(adventurer.Points.Coins < itemPrice)

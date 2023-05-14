@@ -15,8 +15,8 @@ static struct SASCIIDisplayBuffered {
 
 ::gpk::error_t									klib::getASCIIBackBuffer			(::klib::SASCIITarget& target)											{ target = __g_ASCIIScreen.BackBuffer	; return 0; }
 ::gpk::error_t									klib::getASCIIFrontBuffer			(::klib::SASCIITarget& target)											{ target = __g_ASCIIScreen.FrontBuffer	; return 0; }
-::gpk::error_t									klib::setASCIIScreenTitle			(const char_t* title)													{ return ::klib::asciiDisplayTitleSet({title, (uint32_t)strlen(title)}); }
-::gpk::error_t									klib::clearASCIIBackBuffer			(char_t value, uint16_t colorValue)										{ return ::klib::asciiTargetClear(__g_ASCIIScreen.BackBuffer, value, colorValue); }
+::gpk::error_t									klib::setASCIIScreenTitle			(const char* title)													{ return ::klib::asciiDisplayTitleSet({title, (uint32_t)strlen(title)}); }
+::gpk::error_t									klib::clearASCIIBackBuffer			(char value, uint16_t colorValue)										{ return ::klib::asciiTargetClear(__g_ASCIIScreen.BackBuffer, value, colorValue); }
 ::gpk::error_t									klib::presentASCIIFrontBuffer		()																		{ return ::klib::asciiDisplayPresent(__g_ASCIIScreen.FrontBuffer); }
 ::gpk::error_t									klib::presentASCIIBackBuffer		()																		{
 	gerror_if(errored(::klib::swapASCIIBuffers()), "Why would this ever happen? Is the memory corrupt?");

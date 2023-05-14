@@ -2,8 +2,8 @@
 #include "gpk_string_helper.h"
 #include "gpk_process.h"
 
-static	::gpk::error_t								generate_output_qs				(::gpk::SCGIRuntimeValues & runtimeValues, ::gpk::array_pod<char_t> & output)				{
-	::gpk::array_pod<char>									buffer							= {};
+static	::gpk::error_t								generate_output_qs				(::gpk::SCGIRuntimeValues & runtimeValues, ::gpk::apod<char> & output)				{
+	::gpk::apod<char>									buffer							= {};
 	::gpk::view_const_string								querystring;
 	::gpk::array_obj<::gpk::TKeyValConstString>				environBlockViews;
 	::gpk::environmentBlockViews(runtimeValues.EntryPointArgs.EnvironmentBlock, environBlockViews);
@@ -17,8 +17,8 @@ static	::gpk::error_t								generate_output_qs				(::gpk::SCGIRuntimeValues & r
 		const ::gpk::TKeyValConstString							& keyval						= runtimeValues.QueryStringKeyVals[iEnviron];
 		if(iEnviron > 0)
 			output.push_back(',');
-		::gpk::array_pod<char_t>								key				= keyval.Key;
-		::gpk::array_pod<char_t>								val				= keyval.Val;
+		::gpk::apod<char>								key				= keyval.Key;
+		::gpk::apod<char>								val				= keyval.Val;
 		key.push_back('\0');
 		val.push_back('\0');
 		output.append(buffer.begin(), sprintf_s(buffer.begin(), buffer.size(), "\n\"%s\" : \"%s\"", key.begin(), val.begin()));
@@ -29,8 +29,8 @@ static	::gpk::error_t								generate_output_qs				(::gpk::SCGIRuntimeValues & r
 	return 0;
 }
 
-static	::gpk::error_t								generate_output_cgi_env			(::gpk::array_pod<char_t> & output, ::gpk::view_array<const ::gpk::TKeyValConstString> environViews)					{
-	::gpk::array_pod<char>									buffer							= {};
+static	::gpk::error_t								generate_output_cgi_env			(::gpk::apod<char> & output, ::gpk::view_array<const ::gpk::TKeyValConstString> environViews)					{
+	::gpk::apod<char>									buffer							= {};
 	output.push_back('{');
 	uint32_t												iComma							= 0;
 	for(uint32_t iCGIEnviron	= 0; iCGIEnviron	< ::gpk::size(::gpk::cgi_environ)	; ++iCGIEnviron	)
@@ -39,7 +39,7 @@ static	::gpk::error_t								generate_output_cgi_env			(::gpk::array_pod<char_t>
 		if(::gpk::cgi_environ[iCGIEnviron] == keyval.Key) {
 			if(iComma > 0)
 				output.push_back(',');
-			::gpk::array_pod<char_t>								key								= keyval.Key;
+			::gpk::apod<char>								key								= keyval.Key;
 			key.push_back('\0');
 			buffer.resize(key.size() + keyval.Val.size() + 1024);
 			output.append(buffer.begin(), sprintf_s(buffer.begin(), buffer.size(), "\n\"%s\" : \"%s\"", key.begin(), keyval.Val.begin()));
@@ -51,14 +51,14 @@ static	::gpk::error_t								generate_output_cgi_env			(::gpk::array_pod<char_t>
 	return 0;
 }
 
-static	::gpk::error_t								generate_output_process_env		(::gpk::array_pod<char_t> & output, ::gpk::view_array<const ::gpk::TKeyValConstString> environViews)					{
-	::gpk::array_pod<char>									buffer							= {};
+static	::gpk::error_t								generate_output_process_env		(::gpk::apod<char> & output, ::gpk::view_array<const ::gpk::TKeyValConstString> environViews)					{
+	::gpk::apod<char>									buffer							= {};
 	output.push_back('{');
 	for(uint32_t iEnviron = 0; iEnviron < environViews.size(); ++iEnviron) {
 		const ::gpk::TKeyValConstString							& keyval						= environViews[iEnviron];
 		if(iEnviron > 0)
 			output.push_back(',');
-		::gpk::array_pod<char_t>								key								= keyval.Key;
+		::gpk::apod<char>								key								= keyval.Key;
 		key.push_back('\0');
 		buffer.resize(key.size() + keyval.Val.size() + 1024);
 		output.append(buffer.begin(), sprintf_s(buffer.begin(), buffer.size(), "\n\"%s\" : \"%s\"", key.begin(), keyval.Val.begin()));
@@ -67,7 +67,7 @@ static	::gpk::error_t								generate_output_process_env		(::gpk::array_pod<char
 	return 0;
 }
 
-		::gpk::error_t								generate_output					(::gpk::SCGIRuntimeValues & runtimeValues, ::gpk::array_pod<char_t> & output)					{
+		::gpk::error_t								generate_output					(::gpk::SCGIRuntimeValues & runtimeValues, ::gpk::apod<char> & output)					{
 	output.append(::gpk::view_const_string{"\r\n"});
 	output.push_back('[');
 	output.push_back('{');
@@ -97,10 +97,10 @@ static	::gpk::error_t								generate_output_process_env		(::gpk::array_pod<char
 		}
 	}
 
-	::gpk::array_pod<char>									buffer							= {};
+	::gpk::apod<char>									buffer							= {};
 	buffer.resize(runtimeValues.Content.Length + 4096);
 	{
-		::gpk::array_pod<char>									content_body				= {};
+		::gpk::apod<char>									content_body				= {};
 		content_body.resize(runtimeValues.Content.Length);
 		uint32_t												iChar						= 0;
 		char													iArg						= 0;
@@ -139,7 +139,7 @@ static ::gpk::error_t								cgiMain							(int argc, char** argv, char**envv)		
 	(void)(envv);
 	::gpk::SCGIRuntimeValues								runtimeValues;
 	::gpk::cgiRuntimeValuesLoad(runtimeValues, {(const char**)argv, (uint32_t)argc});
-	::gpk::array_pod<char_t>								output							= ::gpk::vcs{"Content-type: application/json\r\n"};
+	::gpk::apod<char>								output							= ::gpk::vcs{"Content-type: application/json\r\n"};
 	::generate_output(runtimeValues, output);
 	printf("%s", output.begin());
 	return 0;

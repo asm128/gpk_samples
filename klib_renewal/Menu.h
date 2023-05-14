@@ -9,7 +9,7 @@ namespace klib
 	class SMenuItem {
 	public:
 		_ReturnType								ReturnValue;
-		::gpk::array_pod<char_t>				Text;
+		::gpk::array_pod<char>				Text;
 	};
 };
 

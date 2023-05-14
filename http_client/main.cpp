@@ -24,7 +24,7 @@
 #	include <arpa/inet.h>
 #endif
 
-static	::gpk::error_t			httpRequestChunkedJoin			(const ::gpk::view_const_byte & body, ::gpk::array_pod<byte_t> & joined)		{
+static	::gpk::error_t			httpRequestChunkedJoin			(const ::gpk::vcc & body, ::gpk::apod<char> & joined)		{
 	uint32_t							iBegin							= 0;
 	uint32_t							iStop							= 0;
 	while(iBegin < (int32_t)body.size()) {
@@ -40,7 +40,7 @@ static	::gpk::error_t			httpRequestChunkedJoin			(const ::gpk::view_const_byte &
 		::gpk::parseArbitraryBaseInteger(16, "0123456789abcdef", strSize, &sizeChunk);
 		if(0 == sizeChunk)
 			break;
-		joined.append(::gpk::view_const_byte{&body[iStop], (uint32_t)sizeChunk});
+		joined.append(::gpk::vcc{&body[iStop], (uint32_t)sizeChunk});
 		iStop							+= (uint32_t)sizeChunk;
 		iStop							+= 2;	// skip \n
 	}
@@ -97,7 +97,7 @@ int								main							()						{
     int									numbytes						= 0;
     ree_if(-1 == (numbytes = send(sockfd, http_request, ::gpk::size(http_request), 0)), "%s", "send");
 
-	::gpk::array_pod<char>				buf								= {};
+	::gpk::apod<char>				buf								= {};
 	buf.resize(1024*1024*64);
 	uint32_t							totalBytes						= 0;
     while(-1 != (numbytes = recv(sockfd, &buf[totalBytes], buf.size() - totalBytes - 1, 0)) && 0 != numbytes) {
@@ -110,20 +110,20 @@ int								main							()						{
 	}
 
 	uint32_t							stopOfHeader					= (uint32_t)::gpk::find_sequence_pod(::gpk::vcs{"\r\n\r\n"}, {buf.begin(), buf.size()});
-	::gpk::view_const_byte				httpheaderReceived				= buf;
-	::gpk::view_const_byte				contentReceived					= {};
+	::gpk::vcc				httpheaderReceived				= buf;
+	::gpk::vcc				contentReceived					= {};
 	if(stopOfHeader >= buf.size() - 4)
 		stopOfHeader					= buf.size();
 	info_printf("Header stop at position %u.", (uint32_t)stopOfHeader);
 
 	::gpk::tolower({buf.begin(), stopOfHeader});
 
-	::gpk::array_obj<::gpk::view_const_byte> headerLines;
+	::gpk::array_obj<::gpk::vcc> headerLines;
 	httpheaderReceived				= {buf.begin(), (uint32_t)stopOfHeader};
 	::gpk::split(httpheaderReceived, '\n', headerLines);
 	bool								bChunked						= false;
 	for(uint32_t iLine = 0; iLine < headerLines.size(); ++iLine) {
-		::gpk::array_pod<char_t>			strLine = headerLines[iLine];
+		::gpk::apod<char>			strLine = headerLines[iLine];
 		strLine.push_back(0);
 		printf("\n%s", strLine.begin());
 		if(0 <= ::gpk::find_sequence_pod(::gpk::vcs{"chunked"}, ::gpk::view_const_char{strLine}))
@@ -133,7 +133,7 @@ int								main							()						{
 	if(stopOfHeader + 4 < buf.size())
 		contentReceived					= {&buf[stopOfHeader + 4], buf.size() - stopOfHeader + 4};
 
-	::gpk::array_pod<byte_t>			joined;
+	::gpk::apod<char>			joined;
 	if(bChunked) {
 		::httpRequestChunkedJoin(contentReceived, joined);
 		contentReceived					= joined;

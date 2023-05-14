@@ -1,7 +1,7 @@
 #include "klib_text.h"
 
 bool								klib::getMessageSlow	(::klib::SMessageSlow & message, const char* textToPrint, uint32_t sizeToPrint, double lastFrameSeconds, double limit)	{
-	::gpk::view_array<char_t>				_mes					= message.Message;
+	::gpk::view_array<char>				_mes					= message.Message;
 	int32_t									outputLen				= (int32_t)strlen(message.Message);
 	if(0 == outputLen) {
 		_mes[outputLen++]		= '_';

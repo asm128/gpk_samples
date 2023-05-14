@@ -12,7 +12,7 @@
 	if(0 >= target.Points.LifeCurrent.Health)	// This character is already dead
 		return {};
 
-	const ::gpk::array_pod<char_t>		targetArmorName				= ::klib::getEntityName	(tables.Armor, target.CurrentEquip.Armor);
+	const ::gpk::apod<char>		targetArmorName				= ::klib::getEntityName	(tables.Armor, target.CurrentEquip.Armor);
 	const ::klib::SEntityPoints			& targetFinalPoints			= target.FinalPoints	;
 	const ::klib::SEntityFlags			& targetFinalFlags			= target.FinalFlags		;
 	const int32_t						targetArmorShield			= targetFinalPoints.LifeMax.Shield;
@@ -108,7 +108,7 @@
 	if(::klib::COMBAT_STATUS_NONE == weaponStatus || 0 >= target.Points.LifeCurrent.Health)
 		return ::klib::COMBAT_STATUS_NONE;
 
-	const ::gpk::array_pod<char_t>		targetArmorName					= ::klib::getEntityName(tables.Armor, target.CurrentEquip.Armor);
+	const ::gpk::apod<char>		targetArmorName					= ::klib::getEntityName(tables.Armor, target.CurrentEquip.Armor);
 	COMBAT_STATUS						appliedStatus					= ::klib::COMBAT_STATUS_NONE;
 
 	//target.Recalculate();
@@ -154,7 +154,7 @@
 		return ::klib::COMBAT_STATUS_NONE;
 
 	const int32_t					targetArmorAbsorption			= getArmorAbsorption(tables.Armor, target.CurrentEquip.Armor);
-	const ::gpk::array_pod<char_t>	targetArmorName					= getEntityName(tables.Armor, target.CurrentEquip.Armor);
+	const ::gpk::apod<char>	targetArmorName					= getEntityName(tables.Armor, target.CurrentEquip.Armor);
 	//target.Recalculate();
 	const SEntityPoints				& targetFinalPoints				= target.FinalPoints;
 	const int32_t					targetArmorShield				= targetFinalPoints.LifeMax.Shield;
@@ -179,7 +179,7 @@ int32_t						klib::applyArmorReflect			(const ::klib::SEntityTables & tables, ::
 	 )
 		return 0;
 
-	const ::gpk::array_pod<char_t>			targetArmorName			= getEntityName(tables.Armor, targetReflecting.CurrentEquip.Armor);
+	const ::gpk::apod<char>			targetArmorName			= getEntityName(tables.Armor, targetReflecting.CurrentEquip.Armor);
 
 	if(damageDealt > 0)
 		sprintf_s(messages.Aux, "%s reflects %i damage from %s with %s.", targetReflecting.Name.begin(), damageDealt, ::gpk::toString(sourceName).begin(), targetArmorName.begin());
@@ -194,7 +194,7 @@ int32_t						klib::applyArmorReflect			(const ::klib::SEntityTables & tables, ::
 		const SEntityFlags&						attackerFinalFlags		= attacker.FinalFlags;
 		DEFEND_EFFECT							attackerArmorEffect		= attackerFinalFlags.Effect.Defend;
 		if((attackerArmorEffect & ::klib::DEFEND_EFFECT_REFLECT) && attacker.Points.LifeCurrent.Shield) {
-			const ::gpk::array_pod<char_t>			attackerArmorName		= getEntityName(tables.Armor, attacker.CurrentEquip.Armor);
+			const ::gpk::apod<char>			attackerArmorName		= getEntityName(tables.Armor, attacker.CurrentEquip.Armor);
 			sprintf_s(messages.Aux, "%s causes a recursive reflection with %s dealing %u damage.", attackerArmorName.begin(), targetArmorName.begin(), damageDealt);
 			messages.LogAuxMessage();
 			::klib::applyArmorReflect(tables, messages, targetReflecting, attacker, finalDamage.Shield, targetArmorName);
@@ -286,7 +286,7 @@ void								klib::applyWeaponLeechEffects	(const ::klib::SEntityTables & tables,
 
 void								klib::applySuccessfulWeaponHit	(const ::klib::SEntityTables & tables, ::klib::SGameMessages & messages, ::klib::CCharacter& attacker, ::klib::CCharacter& targetReflecting, int32_t damageDealt, const ::gpk::view_const_char& sourceName) {
 	if(targetReflecting.FinalFlags.Effect.Defend & ::klib::DEFEND_EFFECT_BLIND)	{
-		const ::gpk::array_pod<char_t>			armorName						= getEntityName(tables.Armor, targetReflecting.CurrentEquip.Armor);
+		const ::gpk::apod<char>			armorName						= getEntityName(tables.Armor, targetReflecting.CurrentEquip.Armor);
 		applyAttackStatus(tables, messages, attacker, ::klib::COMBAT_STATUS_BLIND, 1, {armorName.begin(), (uint32_t)armorName.size()});
 	}
 
@@ -309,7 +309,7 @@ bool								klib::attack					(const ::klib::SEntityTables & tables, ::klib::SGam
 	// Calculate success from the hit chance and apply damage to target or just print the miss message.
 	int32_t									damageDealt						= 0;
 
-	const ::gpk::array_pod<char_t>			attackerWeaponName				= ::klib::getEntityName(tables.Weapon, attacker.CurrentEquip.Weapon);
+	const ::gpk::apod<char>			attackerWeaponName				= ::klib::getEntityName(tables.Weapon, attacker.CurrentEquip.Weapon);
 	::klib::SEntityPoints					& attackerPoints				= attacker.FinalPoints;
 
 	bool									bIsBlind						= true_if(attacker.ActiveBonus.Status.Status & COMBAT_STATUS_BLIND);
@@ -458,11 +458,11 @@ void						klib::applyTurnStatusAndBonusesAndSkipTurn(const ::klib::SEntityTables
 	//printf("");
 	applyTurnStatus		(tables, messages, character);																																		if(0 >= character.Points.LifeCurrent.Health) return;
 	applyCombatBonus	(tables, messages, character, character.ActiveBonus.Points.Points, "Turn Combat Bonus");																				if(0 >= character.Points.LifeCurrent.Health) return;
-	::gpk::array_pod<char_t>		nameProfession			= ::klib::getEntityName		(tables.Profession, character.CurrentEquip.Profession)	; ::klib::applyCombatBonus(tables, messages, character, ::klib::getEntityPoints(tables.Profession	, character.CurrentEquip.Profession	), {nameProfession	.begin(), (uint32_t)nameProfession.size()});	if(0 >= character.Points.LifeCurrent.Health) return;
-	::gpk::array_pod<char_t>		nameArmor				= ::klib::getEntityName		(tables.Armor, character.CurrentEquip.Armor)			; ::klib::applyCombatBonus(tables, messages, character, ::klib::getEntityPoints(tables.Armor		, character.CurrentEquip.Armor		), {nameArmor		.begin(), (uint32_t)nameArmor		.size()});	if(0 >= character.Points.LifeCurrent.Health) return;
-	::gpk::array_pod<char_t>		nameAccessory			= ::klib::getEntityName		(tables.Accessory, character.CurrentEquip.Accessory)	; ::klib::applyCombatBonus(tables, messages, character, ::klib::getEntityPoints(tables.Accessory	, character.CurrentEquip.Accessory	), {nameAccessory	.begin(), (uint32_t)nameAccessory	.size()});	if(0 >= character.Points.LifeCurrent.Health) return;
+	::gpk::apod<char>		nameProfession			= ::klib::getEntityName		(tables.Profession, character.CurrentEquip.Profession)	; ::klib::applyCombatBonus(tables, messages, character, ::klib::getEntityPoints(tables.Profession	, character.CurrentEquip.Profession	), {nameProfession	.begin(), (uint32_t)nameProfession.size()});	if(0 >= character.Points.LifeCurrent.Health) return;
+	::gpk::apod<char>		nameArmor				= ::klib::getEntityName		(tables.Armor, character.CurrentEquip.Armor)			; ::klib::applyCombatBonus(tables, messages, character, ::klib::getEntityPoints(tables.Armor		, character.CurrentEquip.Armor		), {nameArmor		.begin(), (uint32_t)nameArmor		.size()});	if(0 >= character.Points.LifeCurrent.Health) return;
+	::gpk::apod<char>		nameAccessory			= ::klib::getEntityName		(tables.Accessory, character.CurrentEquip.Accessory)	; ::klib::applyCombatBonus(tables, messages, character, ::klib::getEntityPoints(tables.Accessory	, character.CurrentEquip.Accessory	), {nameAccessory	.begin(), (uint32_t)nameAccessory	.size()});	if(0 >= character.Points.LifeCurrent.Health) return;
 	//::applyCombatBonus	(tables, character, getEntityPoints(tables.Vehicle	, character.CurrentEquip.Vehicle), getVehicleName	(character.CurrentEquip.Vehicle));							if(0 >= character.Points.LifeCurrent.Health) return;
-	::gpk::array_pod<char_t>
+	::gpk::apod<char>
 	nameWeapon					= ::klib::getEntityName(tables.Weapon		, character.CurrentEquip.Weapon		); ::applyPassive(tables, messages, character, ::klib::getEntityFlags(tables.Weapon		, character.CurrentEquip.Weapon		).Effect.Passive, nameWeapon		); if(0 >= character.Points.LifeCurrent.Health) return;
 	nameProfession				= ::klib::getEntityName(tables.Profession	, character.CurrentEquip.Profession	); ::applyPassive(tables, messages, character, ::klib::getEntityFlags(tables.Profession	, character.CurrentEquip.Profession	).Effect.Passive, nameProfession	); if(0 >= character.Points.LifeCurrent.Health) return;
 	nameArmor					= ::klib::getEntityName(tables.Armor		, character.CurrentEquip.Armor		); ::applyPassive(tables, messages, character, ::klib::getEntityFlags(tables.Armor		, character.CurrentEquip.Armor		).Effect.Passive, nameArmor			); if(0 >= character.Points.LifeCurrent.Health) return;
@@ -523,7 +523,7 @@ void							klib::applyRoundStatusAndBonusesAndSkipRound	(const ::klib::SEntityTa
 bool							klib::executeItem			(const ::klib::SEntityTables & tables, ::klib::SGameMessages & messages, int32_t indexInventory, CCharacter& user, CCharacter& target) {
 
 	const SItem							& item						= user.Goods.Inventory.Items[indexInventory].Entity;
-	::gpk::array_pod<char_t>			itemName					= ::klib::getItemName(item);
+	::gpk::apod<char>			itemName					= ::klib::getItemName(item);
 	bool								bUsedItem					= false;
 
 	sprintf_s(messages.Aux, "%s uses: %s.", user.Name.begin(), itemName.begin());

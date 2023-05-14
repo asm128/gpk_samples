@@ -15,7 +15,7 @@ namespace klib {
 		, const SEntityTable<_TEntity>								& table
 		, const ::gpk::view_const_char								& entityTypeName
 		) {
-		::gpk::array_pod<char_t>					nameAndLevelText					= ::gpk::view_const_string{"-- "};
+		::gpk::apod<char>					nameAndLevelText					= ::gpk::view_const_string{"-- "};
 		nameAndLevelText.append(entityTypeName);
 		nameAndLevelText.append_string(": ");
 		lineToGridColored(display, textAttributes, ::klib::ASCII_COLOR_INDEX_GREEN , offsetY++, offsetX, ::klib::SCREEN_LEFT, nameAndLevelText.begin(), (uint32_t)nameAndLevelText.size());
