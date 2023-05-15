@@ -83,7 +83,7 @@ static constexpr	const ::gpk::SColorRGBA				g_DefaultPalette	[]							=
 	return ::initWindowsConsoleProperties(g_ConsoleInfo.InfoScreenBufferCurrent.dwSize.X, g_ConsoleInfo.InfoScreenBufferCurrent.dwSize.Y, palette.begin());
 }
 
-					::gpk::error_t						klib::asciiDisplaySize							(::gpk::SCoord2<uint32_t>& size)																		{
+					::gpk::error_t						klib::asciiDisplaySize							(::gpk::n2<uint32_t>& size)																		{
 	const ::CONSOLE_SCREEN_BUFFER_INFOEX						& csbiInfo										= g_ConsoleInfo.InfoScreenBufferCurrent;
 	size													= {(uint32_t)csbiInfo.dwSize.X, (uint32_t)csbiInfo.dwSize.Y};
 	return 0;

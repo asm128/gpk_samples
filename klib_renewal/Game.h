@@ -40,7 +40,7 @@ namespace klib
 							::gpk::SImage<float	>					Speed					= {};
 							::gpk::SImage<float	>					SpeedTarget				= {};
 
-		inline				::gpk::error_t							Resize					(::gpk::SCoord2<uint32_t> newSize)															{
+		inline				::gpk::error_t							Resize					(::gpk::n2<uint32_t> newSize)															{
 			Screen			.resize(newSize, ' ', (uint16_t)::klib::ASCII_COLOR_INDEX_WHITE);
 			DisplayWeights	.resize(newSize, 0.0f);
 			Speed			.resize(newSize, 0.0f);

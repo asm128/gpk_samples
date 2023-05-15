@@ -13,7 +13,7 @@ static int32_t												getAgentsInTeamSight								(::klib::SAgentsReference&
 	return agentsAdded;
 }
 
-static int32_t												getAgentsInRange									(::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players, const ::gpk::SCoord3<int32_t>& origin, double range, ::klib::SAgentsReference& agentsInRange)	{
+static int32_t												getAgentsInRange									(::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players, const ::gpk::n3<int32_t>& origin, double range, ::klib::SAgentsReference& agentsInRange)	{
 	agentsInRange												= {};
 	for(uint32_t iPlayer = 0, playerCount = tacticalInfo.Setup.TotalPlayers; iPlayer < playerCount; ++iPlayer) {
 		if(tacticalInfo.Setup.Players[iPlayer] == (::klib::PLAYER_INDEX)-1)
@@ -31,8 +31,8 @@ static int32_t												getAgentsInRange									(::klib::STacticalInfo & tact
 			//const SEntityPoints	& playerAgentPoints = agent.FinalPoints;
 			const ::klib::SEntityFlags										& playerAgentFlags									= agent.FinalFlags;
 
-			const ::gpk::SCoord3<int32_t>									& coordAgent										= agent.Position;
-			const ::gpk::SCoord3<float>										distance											= (coordAgent-origin).Cast<float>();
+			const ::gpk::n3<int32_t>									& coordAgent										= agent.Position;
+			const ::gpk::n3<float>										distance											= (coordAgent-origin).Cast<float>();
 			if(distance.Length() > range && ::gpk::bit_false(playerAgentFlags.Tech.AttackType, ::klib::ATTACK_TYPE_RANGED))
 				continue;
 
@@ -72,14 +72,14 @@ void														recalculateAgentsInRangeAndSight					(::klib::STacticalInfo & 
 }
 
 // Returns
-bool														klib::moveStep										(const ::klib::SEntityTables & entityTables, ::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players, ::klib::STacticalPlayer& player, int8_t playerIndex, int32_t agentIndex, TEAM_TYPE teamId, STacticalBoard& board, ::gpk::SCoord3<int32_t>& agentPosition_, ::klib::SGameMessages & messages) {
+bool														klib::moveStep										(const ::klib::SEntityTables & entityTables, ::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players, ::klib::STacticalPlayer& player, int8_t playerIndex, int32_t agentIndex, TEAM_TYPE teamId, STacticalBoard& board, ::gpk::n3<int32_t>& agentPosition_, ::klib::SGameMessages & messages) {
 	if(agentPosition_ == player.Squad.TargetPositions[agentIndex])
 		return player.Squad.ActionsLeft[agentIndex].Moves <= 0;	// I added this just in case but currently there is no situation in which this function is called when the agent is in the target position already.
 	else if(::gpk::bit_false(player.Squad.AgentStates[agentIndex], ::klib::AGENT_STATE_MOVE))
 		return player.Squad.ActionsLeft[agentIndex].Moves <= 0;	// I added this just in case but currently there is no situation in which this function is called when the agent is in the target position already.
 
-	const ::gpk::SCoord3<int32_t>									initialPosition										= agentPosition_;
-	::gpk::SCoord3<int32_t>											finalPosition										= agentPosition_;
+	const ::gpk::n3<int32_t>									initialPosition										= agentPosition_;
+	::gpk::n3<int32_t>											finalPosition										= agentPosition_;
 	int8_t															movesLeft											= player.Squad.ActionsLeft[agentIndex].Moves;
 
 	// This dice makes random the selection between moving left or moving forward first when both options are available.
@@ -134,12 +134,12 @@ bool														klib::moveStep										(const ::klib::SEntityTables & entityT
 		board.Tiles.Entities.Coins[finalPosition.z][finalPosition.x]= 0;
 		for(uint32_t iAOE = 0, countAOE = board.AreaOfEffect.AOE.size(); iAOE < countAOE; ++iAOE) {
 			const ::klib::SAOE												& aoeInstance										= board.AreaOfEffect.AOE[iAOE];
-			const ::gpk::SCoord3<int32_t>									aoeCell												= aoeInstance.Position.Cell;
-			::gpk::SCoord3<float>											aoePos												= aoeCell.Cast<float>();
+			const ::gpk::n3<int32_t>									aoeCell												= aoeInstance.Position.Cell;
+			::gpk::n3<float>											aoePos												= aoeCell.Cast<float>();
 			aoePos.x													+= aoeInstance.Position.Offset.x;
 			aoePos.y													+= aoeInstance.Position.Offset.y;
 			aoePos.z													+= aoeInstance.Position.Offset.z;
-			::gpk::SCoord3<float>											currentTilePos										= playerAgent.Position.Cast<float>();
+			::gpk::n3<float>											currentTilePos										= playerAgent.Position.Cast<float>();
 			if((aoePos - currentTilePos).Length() <= aoeInstance.RadiusOrHalfSize && aoeInstance.StatusInflict)
 				::klib::applyAttackStatus(entityTables, messages, playerAgent, aoeInstance.StatusInflict, aoeInstance.Level, ::gpk::view_const_string{"Area of effect"});
 		}
@@ -349,7 +349,7 @@ bool																					klib::updateCurrentPlayer												(const ::klib::SEn
 	if( currentPlayer.Army[currentPlayer.Squad.Agents[currentPlayer.Selection.PlayerUnit]]->Points.LifeCurrent.Health <= 0 )
 		return false;
 
-	::gpk::SCoord3<int32_t>																		& currentAgentPosition													= currentPlayer.Army[currentPlayer.Squad.Agents[currentPlayer.Selection.PlayerUnit]]->Position;
+	::gpk::n3<int32_t>																		& currentAgentPosition													= currentPlayer.Army[currentPlayer.Squad.Agents[currentPlayer.Selection.PlayerUnit]]->Position;
 
 	bool																						bHasArrived																= true;
 	if( currentPlayer.Squad.TargetPositions[currentPlayer.Selection.PlayerUnit] != currentAgentPosition && (0 < currentPlayer.Squad.ActionsLeft[currentPlayer.Selection.PlayerUnit].Moves) ) {
@@ -618,8 +618,8 @@ template<typename _TEntity>
 	void																				dropEntities
 	(	::gpk::array_pod<_TEntity>					& mapEntities
 	,	::klib::SEntityContainer<_TEntity>			& deadTargetEntities
-	,	::gpk::array_pod<::gpk::SCoord3<int32_t>>	& entityCoords
-	,	const ::gpk::SCoord3<int32_t>				& deadTargetCoords
+	,	::gpk::array_pod<::gpk::n3<int32_t>>	& entityCoords
+	,	const ::gpk::n3<int32_t>				& deadTargetCoords
 	) {
 	while(deadTargetEntities.Slots.size()) {
 		if(deadTargetEntities[0].Entity.Definition != -1) {

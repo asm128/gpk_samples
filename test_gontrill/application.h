@@ -37,7 +37,7 @@ struct SParticleToDraw {
 						int32_t																						IndexParticlePhysics;
 						int32_t																						IndexParticleInstance;
 						float																						TimeLived;
-						::gpk::SCoord2<int32_t>																		Position;
+						::gpk::n2<int32_t>																		Position;
 };
 
 struct SLaserToDraw {
@@ -52,7 +52,7 @@ struct SStuffToDraw {
 						::gpk::array_pod<::SParticleToDraw>															Stars										= {};
 						::gpk::array_pod<::SParticleToDraw>															Thrust										= {};
 						::gpk::array_pod<::SParticleToDraw>															Debris										= {};
-						::gpk::array_pod<::gpk::SCoord2<float>>														CollisionPoints								= {};
+						::gpk::array_pod<::gpk::n2<float>>														CollisionPoints								= {};
 
 						::gpk::array_obj<::gpk::view_grid<::gpk::SColorBGRA>>										TexturesPowerup0							= {};
 						::gpk::array_obj<::gpk::view_grid<::gpk::SColorBGRA>>										TexturesPowerup1							= {};
@@ -106,12 +106,12 @@ struct SApplication {
 
 						::gpk::array_static<::gpk::img<::gpk::SColorBGRA>				, GAME_TEXTURE_COUNT>		Original									= {};
 						::gpk::array_static<::gpk::img<::gpk::SColorBGRA>				, GAME_TEXTURE_COUNT>		Processed									= {};
-						::gpk::array_static<::gpk::SCoord2<int32_t>						, GAME_TEXTURE_COUNT>		TextureCenters								= {};
-						::gpk::SCoord2<int32_t>																		PSOffsetFromShipCenter						= {};
+						::gpk::array_static<::gpk::n2<int32_t>						, GAME_TEXTURE_COUNT>		TextureCenters								= {};
+						::gpk::n2<int32_t>																		PSOffsetFromShipCenter						= {};
 						::gpk::SImageMonochrome<uint32_t>															TextureFontMonochrome						= {};
 
 						::SStuffToDraw																				StuffToDraw									= {};
-						::gpk::array_pod<::gpk::SCoord2<int16_t>>													CacheLinePoints								= {};
+						::gpk::array_pod<::gpk::n2<int16_t>>													CacheLinePoints								= {};
 						::SEffectsDelay																				EffectsDelay								= {};
 
 																													SApplication								(::gpk::SRuntimeValues& runtimeValues)			noexcept	: Framework(runtimeValues) {}

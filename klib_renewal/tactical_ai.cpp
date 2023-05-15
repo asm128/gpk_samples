@@ -57,7 +57,7 @@ static	void							selectAITarget											(::klib::STacticalInfo & tacticalInfo
 	}
 }
 
-static	void											selectAvailableTile										(const ::klib::STacticalBoard& tacticalBoard, ::gpk::SCoord3<int32_t>& targetPosition)		{
+static	void											selectAvailableTile										(const ::klib::STacticalBoard& tacticalBoard, ::gpk::n3<int32_t>& targetPosition)		{
 	do {
 		targetPosition.x										= (rand() % tacticalBoard.Tiles.Terrain.Geometry.metrics().x);
 		targetPosition.z										= (rand() % tacticalBoard.Tiles.Terrain.Geometry.metrics().y);
@@ -69,7 +69,7 @@ static	void											selectAvailableTile										(const ::klib::STacticalBoard
 	);
 }
 
-static	void											getValidCoordForAgentDestination						(::gpk::SCoord3<int32_t>& targetPositionAgent, const ::klib::STacticalBoard& tacticalBoard)	{
+static	void											getValidCoordForAgentDestination						(::gpk::n3<int32_t>& targetPositionAgent, const ::klib::STacticalBoard& tacticalBoard)	{
 	do {
 			 if( rand()%2 )	targetPositionAgent.x = (rand()%tacticalBoard.Tiles.Terrain.Geometry.metrics().x);
 		else if( rand()%2 )	targetPositionAgent.z = (rand()%tacticalBoard.Tiles.Terrain.Geometry.metrics().y);
@@ -85,7 +85,7 @@ static	void											getValidCoordForAgentDestination						(::gpk::SCoord3<int3
 void													selectAIDestination										(::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players)	{
 	::klib::SGamePlayer											& currentPlayer											= players[tacticalInfo.Setup.Players[tacticalInfo.CurrentPlayer]];
 
-	::gpk::SCoord3<int32_t>										& targetPositionAgent									= currentPlayer.Tactical.Squad.TargetPositions[currentPlayer.Tactical.Selection.PlayerUnit];
+	::gpk::n3<int32_t>										& targetPositionAgent									= currentPlayer.Tactical.Squad.TargetPositions[currentPlayer.Tactical.Selection.PlayerUnit];
 
 	if(currentPlayer.Tactical.Control.AIMode == ::klib::PLAYER_AI_ASSISTS) {
 		::selectAvailableTile(tacticalInfo.Board, targetPositionAgent);
@@ -115,8 +115,8 @@ void													selectAIDestination										(::klib::STacticalInfo & tacticalI
 
 	const ::klib::SEntityFlags									& playerAgentFlags										= currentPlayer.Tactical.Army[currentPlayer.Tactical.Squad.Agents[currentPlayer.Tactical.Selection.PlayerUnit]]->FinalFlags;
 	targetPositionAgent										= playerTarget.Tactical.Army[playerTarget.Tactical.Squad.Agents[currentPlayer.Tactical.Selection.TargetUnit]]->Position;
-	::gpk::SCoord3<int32_t>										vectorToAgent											= targetPositionAgent-currentPlayer.Tactical.Army[currentPlayer.Tactical.Squad.Agents[currentPlayer.Tactical.Selection.PlayerUnit]]->Position;
-	::gpk::SCoord3<float>										vec														= vectorToAgent.Cast<float>();
+	::gpk::n3<int32_t>										vectorToAgent											= targetPositionAgent-currentPlayer.Tactical.Army[currentPlayer.Tactical.Squad.Agents[currentPlayer.Tactical.Selection.PlayerUnit]]->Position;
+	::gpk::n3<float>										vec														= vectorToAgent.Cast<float>();
 	if(::gpk::bit_false(playerAgentFlags.Tech.AttackType, ::klib::ATTACK_TYPE_MELEE) && vec.Length() <= 18) {
 		::getValidCoordForAgentDestination(targetPositionAgent, tacticalInfo.Board);
 		return;
@@ -163,9 +163,9 @@ void													selectAIDestination										(::klib::STacticalInfo & tacticalI
 					if(targetCharacter.IsAlive())  {
 						::klib::CCharacter											& playerAgent											= *currentPlayer.Tactical.Army[currentPlayer.Tactical.Squad.Agents[currentPlayer.Tactical.Selection.PlayerUnit]];
 
-						const ::gpk::SCoord3<int32_t>								& coordPlayer											= playerAgent.Position;
-						const ::gpk::SCoord3<int32_t>								& coordTarget											= targetCharacter.Position;
-						const ::gpk::SCoord3<float>									distance												= (coordTarget-coordPlayer).Cast<float>();
+						const ::gpk::n3<int32_t>								& coordPlayer											= playerAgent.Position;
+						const ::gpk::n3<int32_t>								& coordTarget											= targetCharacter.Position;
+						const ::gpk::n3<float>									distance												= (coordTarget-coordPlayer).Cast<float>();
 
 						const ::klib::SEntityPoints									& playerAgentPoints										= playerAgent.FinalPoints;
 						const ::klib::SEntityFlags									& playerAgentFlags										= playerAgent.FinalFlags;

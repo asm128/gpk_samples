@@ -12,25 +12,25 @@
 #define CED_DEMO_08_H_298837492837
 
 struct SDrawCache {
-	::gpk::array_pod<::gpk::SCoord2<int16_t>>			PixelCoords				= {};
+	::gpk::array_pod<::gpk::n2<int16_t>>			PixelCoords				= {};
 	::gpk::array_pod<::gpk::STriangle<float>>			PixelVertexWeights		= {};
-	::gpk::array_pod<::gpk::SCoord3<float>>				LightPointsModel		= {};
+	::gpk::array_pod<::gpk::n3<float>>				LightPointsModel		= {};
 	::gpk::array_pod<::gpk::SColorBGRA>					LightColorsModel		= {};
 };
 
 struct STextOverlay {
-	::gpk::SCoord3<float>								LightVector0			= {-15, 50, -15};
+	::gpk::n3<float>								LightVector0			= {-15, 50, -15};
 
-	::gpk::SCoord3<float>								CameraTarget			= {0, 0, 0};
-	::gpk::SCoord3<float>								CameraPosition			= {.0001f, 1000.1f, -0.00001f};
-	::gpk::SCoord3<float>								CameraUp				= {0, 0, 1};
+	::gpk::n3<float>								CameraTarget			= {0, 0, 0};
+	::gpk::n3<float>								CameraPosition			= {.0001f, 1000.1f, -0.00001f};
+	::gpk::n3<float>								CameraUp				= {0, 0, 1};
 	::gpk::SGeometryQuads								GeometryLetters	[256]	= {};
 	::gpk::SMatrix4<float>								MatrixProjection		= {};
 	::SDrawCache										DrawCache				= {};
 
-	static constexpr	const ::gpk::SCoord3<float>		ControlTranslation		= {0, 0, 20.0f};
-	static constexpr	const ::gpk::SCoord2<uint32_t>	MetricsLetter			= {12, 12};
-	static constexpr	const ::gpk::SCoord2<uint32_t>	MetricsMap				= {16, 16};
+	static constexpr	const ::gpk::n3<float>		ControlTranslation		= {0, 0, 20.0f};
+	static constexpr	const ::gpk::n2<uint32_t>	MetricsLetter			= {12, 12};
+	static constexpr	const ::gpk::n2<uint32_t>	MetricsMap				= {16, 16};
 };
 
 struct SApplication {

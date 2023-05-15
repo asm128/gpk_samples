@@ -53,7 +53,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	return 0;
 }
 
-static				::gpk::error_t										setupSprite									(::gpk::img<::gpk::SColorBGRA> & textureToProcess, ::gpk::img<::gpk::SColorBGRA>& processed, ::gpk::SCoord2<int32_t>& textureCenter, const ::gpk::view_const_string& filename)	{
+static				::gpk::error_t										setupSprite									(::gpk::img<::gpk::SColorBGRA> & textureToProcess, ::gpk::img<::gpk::SColorBGRA>& processed, ::gpk::n2<int32_t>& textureCenter, const ::gpk::view_const_string& filename)	{
 	gpk_necall(::gpk::pngFileLoad(filename, textureToProcess), "%s", "Failed to load sprite image.");
 	textureCenter															= (textureToProcess.View.metrics() / 2).Cast<int32_t>();
 	processed.View															= textureToProcess.View;
@@ -82,7 +82,7 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	}
 
 	const ::gpk::view_grid<::gpk::SColorBGRA>									& fontAtlas									= app.Processed[GAME_TEXTURE_FONT_ATLAS].View;
-	const ::gpk::SCoord2<uint32_t>												& textureFontMetrics						= fontAtlas.metrics();
+	const ::gpk::n2<uint32_t>												& textureFontMetrics						= fontAtlas.metrics();
 	app.TextureFontMonochrome.resize(textureFontMetrics);
 	for(uint32_t y = 0, yMax = textureFontMetrics.y; y < yMax; ++y)
 	for(uint32_t x = 0, xMax = textureFontMetrics.x; x < xMax; ++x) {
@@ -122,13 +122,13 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	::SGame																		& gameInstance								= app.Game;
 	for(uint32_t iShip = 0, shipCount = app.Game.ShipsPlaying; iShip < shipCount; ++iShip) {
 		gameInstance.Ships.Alive		[iShip]									= 1;
-		gameInstance.Ships.Position		[iShip]									= metricsScreen.Cast<float>() / 4 + ::gpk::SCoord2<float>{0, (float)iShip * 64};
+		gameInstance.Ships.Position		[iShip]									= metricsScreen.Cast<float>() / 4 + ::gpk::n2<float>{0, (float)iShip * 64};
 		gameInstance.Ships.Weapon		[iShip]									= {(int32_t)iShip};
 		gameInstance.Ships.Health		[iShip].Health							= 5000;
 		gameInstance.Ships.Health		[iShip].Shield							= 5000;
-		gameInstance.PositionCrosshair	[iShip]									= gameInstance.Ships.Position[iShip] + ::gpk::SCoord2<float>{96, };
+		gameInstance.PositionCrosshair	[iShip]									= gameInstance.Ships.Position[iShip] + ::gpk::n2<float>{96, };
 		gameInstance.Powerups.Alive		[iShip]									= 1;
-		gameInstance.Powerups.Position	[iShip]									= metricsScreen.Cast<float>() / 4 * 3 + ::gpk::SCoord2<float>{0, (float)iShip * 64};
+		gameInstance.Powerups.Position	[iShip]									= metricsScreen.Cast<float>() / 4 * 3 + ::gpk::n2<float>{0, (float)iShip * 64};
 		gameInstance.Powerups.Family	[iShip]									= (POWERUP_FAMILY)iShip;
 		if(gameInstance.Powerups.Family	[iShip] == POWERUP_FAMILY_WEAPON)
 			gameInstance.Powerups.Type		[iShip].TypeWeapon						= (WEAPON_TYPE)(rand() % WEAPON_TYPE_COUNT);

@@ -111,7 +111,7 @@ namespace klib
 	}
 	class CCharacter : public SCharacter {
 	public:
-						::gpk::SCoord3<int32_t>			Position				= {};
+						::gpk::n3<int32_t>			Position				= {};
 						::gpk::apod<char>		Name					= ::gpk::view_const_string{"Unnamed"};
 
 														CCharacter				()						= default;

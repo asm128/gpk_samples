@@ -111,7 +111,7 @@ int32_t												klib::reinitBuyMenus		(const ::klib::SEntityTables & entityTa
 
 	static ::klib::SMessageSlow						slowMessage;
 	bool											bDonePrinting						= ::klib::getMessageSlow(slowMessage, textToPrint.begin(), textToPrint.size(), instanceGame.FrameTimer.LastTimeSeconds*3);
-	::gpk::SCoord2<uint32_t>						position							= instanceGame.TacticalDisplay.Screen.metrics() / 2;
+	::gpk::n2<uint32_t>						position							= instanceGame.TacticalDisplay.Screen.metrics() / 2;
 	const uint32_t									messageLen							= (uint32_t)strlen(slowMessage.Message);
 	memcpy(&instanceGame.TacticalDisplay.Screen[position.y][position.x - (messageLen + 1) / 2], slowMessage.Message, messageLen);
 	if ( !bDonePrinting )

@@ -136,7 +136,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 
 	for(uint32_t iFile = 0; iFile < app.PNGImages.size(); ++iFile) {
 		const uint32_t															offsetX					= (iFile * 64);
-		::gpk::SCoord2<uint32_t>												position				= {offsetX % (target->Color.View.metrics().x - 64), offsetX / (target->Color.View.metrics().x - 64) * 64};
+		::gpk::n2<uint32_t>												position				= {offsetX % (target->Color.View.metrics().x - 64), offsetX / (target->Color.View.metrics().x - 64) * 64};
 		::gpk::grid_copy_blend(target->Color.View, app.PNGImages[iFile].View, position);
 		//::gpk::grid_scale_alpha(target->Color.View, app.PNGImages[iFile].View, position.Cast<int32_t>(), app.PNGImages[iFile].View.metrics().Cast<int32_t>() * (1 + (.01 * iFile)));
 	}

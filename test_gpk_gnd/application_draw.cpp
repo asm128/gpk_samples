@@ -10,17 +10,17 @@ namespace gpk
 		( ::gpk::view_grid<uint32_t>						& targetDepth
 		, const ::gpk::SNearFar								& fNearFar
 		, const ::gpk::STriangle3<_tCoord>					& triangle
-		, ::gpk::array_pod<::gpk::SCoord2<int16_t>>			& out_Points
+		, ::gpk::array_pod<::gpk::n2<int16_t>>			& out_Points
 		, ::gpk::array_pod<::gpk::STriangle<float>>			& triangleWeights
 		) {
 		int32_t																		pixelsDrawn									= 0;
-		const ::gpk::SCoord2<uint32_t>												& _targetMetrics							= targetDepth.metrics();
-		::gpk::SCoord2	<float>														areaMin										= {(float)::gpk::min(::gpk::min(triangle.A.x, triangle.B.x), triangle.C.x), (float)::gpk::min(::gpk::min(triangle.A.y, triangle.B.y), triangle.C.y)};
-		::gpk::SCoord2	<float>														areaMax										= {(float)::gpk::max(::gpk::max(triangle.A.x, triangle.B.x), triangle.C.x), (float)::gpk::max(::gpk::max(triangle.A.y, triangle.B.y), triangle.C.y)};
+		const ::gpk::n2<uint32_t>												& _targetMetrics							= targetDepth.metrics();
+		::gpk::n2	<float>														areaMin										= {(float)::gpk::min(::gpk::min(triangle.A.x, triangle.B.x), triangle.C.x), (float)::gpk::min(::gpk::min(triangle.A.y, triangle.B.y), triangle.C.y)};
+		::gpk::n2	<float>														areaMax										= {(float)::gpk::max(::gpk::max(triangle.A.x, triangle.B.x), triangle.C.x), (float)::gpk::max(::gpk::max(triangle.A.y, triangle.B.y), triangle.C.y)};
 		const float																	xStop										= ::gpk::min(areaMax.x, (float)_targetMetrics.x);
 		for(float y = ::gpk::max(areaMin.y, 0.f), yStop = ::gpk::min(areaMax.y, (float)_targetMetrics.y); y < yStop; ++y)
 		for(float x = ::gpk::max(areaMin.x, 0.f); x < xStop; ++x) {
-			const ::gpk::SCoord2<int32_t>												cellCurrent									= {(int32_t)x, (int32_t)y};
+			const ::gpk::n2<int32_t>												cellCurrent									= {(int32_t)x, (int32_t)y};
 			const ::gpk::STriangle2<int32_t>											triangle2D									=
 				{ {(int32_t)triangle.A.x, (int32_t)triangle.A.y}
 				, {(int32_t)triangle.B.x, (int32_t)triangle.B.y}
@@ -33,7 +33,7 @@ namespace gpk
 				if(w0 <= -1 || w1 <= -1 || w2 <= -1) // ---- If p is on or inside all edges, render pixel.
 					continue;
 			}
-			const ::gpk::SCoord2<float>											cellCurrentF								= {x, y};
+			const ::gpk::n2<float>											cellCurrentF								= {x, y};
 			::gpk::STriangle<float>												proportions									=
 				{ ::gpk::orient2d3d({triangle.C, triangle.B}, cellCurrentF)	// notice how having to type "template" every time before "Cast" totally defeats the purpose of the template. I really find this rule very stupid and there is no situation in which the compiler is unable to resolve it from the code it already has.
 				, ::gpk::orient2d3d({triangle.A, triangle.C}, cellCurrentF)
@@ -72,7 +72,7 @@ namespace gpk
 	, const ::gpk::STriangle2<float>						& uvs
 	, const ::gpk::view_grid<::gpk::SColorBGRA>				& textureColors
 	, int32_t												iTriangle
-	, const ::gpk::SCoord3<double>							& lightDir
+	, const ::gpk::n3<double>							& lightDir
 	, const ::gpk::SColorFloat								& diffuseColor
 	, const ::gpk::SColorFloat								& ambientColor
 	, const ::gpk::view_array<const ::gpk::SLightInfoRSW>	& lights
@@ -83,10 +83,10 @@ namespace gpk
 		, normals.B.Cast<double>() * pixelWeights.B
 		, normals.C.Cast<double>() * pixelWeights.C
 		};
-	const ::gpk::SCoord3<double>												interpolatedNormal							= (weightedNormals.A + weightedNormals.B + weightedNormals.C).Normalize();
+	const ::gpk::n3<double>												interpolatedNormal							= (weightedNormals.A + weightedNormals.B + weightedNormals.C).Normalize();
 	::gpk::SColorFloat															directionalColor							= diffuseColor * interpolatedNormal.Dot(lightDir);
-	const ::gpk::SCoord2<uint32_t>												textureMetrics								= textureColors.metrics();
-	const ::gpk::SCoord2<double>												uv											=
+	const ::gpk::n2<uint32_t>												textureMetrics								= textureColors.metrics();
+	const ::gpk::n2<double>												uv											=
 		{ uvs.A.x * pixelWeights.A + uvs.B.x * pixelWeights.B + uvs.C.x * pixelWeights.C
 		, uvs.A.y * pixelWeights.A + uvs.B.y * pixelWeights.B + uvs.C.y * pixelWeights.C
 		};
@@ -96,7 +96,7 @@ namespace gpk
 		, positions.C.Cast<double>() * pixelWeights.C
 		};
 
-	const ::gpk::SCoord3<double>												interpolatedPosition						= weightedPositions.A + weightedPositions.B + weightedPositions.C;
+	const ::gpk::n3<double>												interpolatedPosition						= weightedPositions.A + weightedPositions.B + weightedPositions.C;
 	::gpk::SColorBGRA															interpolatedBGRA;
 	::gpk::SColorFloat															lightColor									= {0, 0, 0, 1}; //((::gpk::RED * pixelWeights.A) + (::gpk::GREEN * pixelWeights.B) + (::gpk::BLUE * pixelWeights.C));
 	if( 0 == textureMetrics.x
@@ -104,13 +104,13 @@ namespace gpk
 	 ) {
 		for(uint32_t iLight = 0; iLight < lights.size(); ++iLight) {
 			const ::gpk::SLightInfoRSW													& rswLight									= lights[iLight];
-			::gpk::SCoord3<float>														rswColor									= rswLight.Color * (1.0 - (rswLight.Position.Cast<double>() - interpolatedPosition).Length() / 10.0);
+			::gpk::n3<float>														rswColor									= rswLight.Color * (1.0 - (rswLight.Position.Cast<double>() - interpolatedPosition).Length() / 10.0);
 			lightColor																+= ::gpk::SColorFloat(rswColor.x, rswColor.y, rswColor.z, 1.0f) / 2.0;
 		}
 		interpolatedBGRA														= (directionalColor + lightColor + (ambientColor / 2.0)).Clamp();
 	}
 	else {
-		const ::gpk::SCoord2<int32_t>												uvcoords									=
+		const ::gpk::n2<int32_t>												uvcoords									=
 			{ (int32_t)((uint32_t)(uv.x * textureMetrics.x) % textureMetrics.x)
 			, (int32_t)((uint32_t)(uv.y * textureMetrics.y) % textureMetrics.y)
 			};
@@ -121,7 +121,7 @@ namespace gpk
 			const ::gpk::SLightInfoRSW													& rswLight									= lights[rand() % lights.size()];
 			double																		distFactor									= 1.0 - (rswLight.Position.Cast<double>() - interpolatedPosition).Length() / 10.0;
 			if(distFactor > 0) {
-				::gpk::SCoord3<float>														rswColor									= rswLight.Color * distFactor;
+				::gpk::n3<float>														rswColor									= rswLight.Color * distFactor;
 				lightColor																+= srcTexel * ::gpk::SColorFloat(rswColor.x, rswColor.y, rswColor.z, 1.0f) / 2.0;
 			}
 		}
@@ -136,12 +136,12 @@ namespace gpk
 
 static				::gpk::error_t										transformTriangles
 	( const ::gpk::view_array<::gpk::STriangle<uint32_t>>	& vertexIndexList
-	, const ::gpk::view_array<::gpk::SCoord3<float>>				& vertices
+	, const ::gpk::view_array<::gpk::n3<float>>				& vertices
 	, const ::gpk::SNearFar									& nearFar
 	, const ::gpk::SMatrix4<float>									& xWorld
 	, const ::gpk::SMatrix4<float>									& xWV
 	, const ::gpk::SMatrix4<float>									& xProjection
-	, const ::gpk::SCoord2<int32_t>									& targetMetrics
+	, const ::gpk::n2<int32_t>									& targetMetrics
 	, ::gpk::SRenderCache											& out_transformed
 	) {	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	for(uint32_t iTriangle = 0, triCount = vertexIndexList.size(); iTriangle < triCount; ++iTriangle) {
@@ -177,7 +177,7 @@ static				::gpk::error_t										transformTriangles
 
 static				::gpk::error_t										transformNormals
 	( const ::gpk::view_array<::gpk::STriangle<uint32_t>>	& vertexIndexList
-	, const ::gpk::view_array<::gpk::SCoord3<float>>				& normals
+	, const ::gpk::view_array<::gpk::n3<float>>				& normals
 	, const ::gpk::SMatrix4<float>									& xWorld
 	, ::gpk::SRenderCache											& renderCache
 	) {	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
@@ -202,11 +202,11 @@ static				::gpk::error_t										transformNormals
 
 static				::gpk::error_t										drawTriangles
 	( const ::gpk::view_array<::gpk::STriangle<uint32_t>>			& vertexIndexList
-	, const ::gpk::view_array<::gpk::SCoord3<float>>				& vertices
-	, const ::gpk::view_array<::gpk::SCoord2<float>>				& uvs
+	, const ::gpk::view_array<::gpk::n3<float>>				& vertices
+	, const ::gpk::view_array<::gpk::n2<float>>				& uvs
 	, const ::gpk::view_grid	<::gpk::SColorBGRA>					& textureView
 	, const ::gpk::SNearFar											& nearFar
-	, const ::gpk::SCoord3<float>									& lightDir
+	, const ::gpk::n3<float>									& lightDir
 	, ::gpk::SRenderCache											& renderCache
 	, ::gpk::view_grid<uint32_t>									& targetDepthView
 	, ::gpk::view_grid<::gpk::SColorBGRA>							& targetView
@@ -217,7 +217,7 @@ static				::gpk::error_t										drawTriangles
 	, uint32_t														* pixelsSkipped
 	, bool															wireframe
 	) {	// ---
-		//const ::gpk::SCoord3<float>													& lightDir									= app.LightDirection;
+		//const ::gpk::n3<float>													& lightDir									= app.LightDirection;
 		for(uint32_t iTriangle = 0, triCount = renderCache.Triangle3dIndices.size(); iTriangle < triCount; ++iTriangle) { //
 			renderCache.TrianglePixelCoords.clear();
 			renderCache.TrianglePixelWeights.clear();
@@ -237,7 +237,7 @@ static				::gpk::error_t										drawTriangles
 				};
 
 			for(uint32_t iPixel = 0, pixCount = renderCache.TrianglePixelCoords.size(); iPixel < pixCount; ++iPixel) {
-				const ::gpk::SCoord2<int16_t>												& pixelCoord								= renderCache.TrianglePixelCoords	[iPixel];
+				const ::gpk::n2<int16_t>												& pixelCoord								= renderCache.TrianglePixelCoords	[iPixel];
 				const ::gpk::STriangle<float>												& pixelWeights								= renderCache.TrianglePixelWeights	[iPixel];
 				if(false == wireframe) {
 					if(0 == ::drawPixelGND(renderCache, targetView[pixelCoord.y][pixelCoord.x], pixelWeights, triangle3DPositions, triangle3DUVs, textureView, iTriangle, lightDir.Cast<double>(), diffuseColor, ambientColor, ::gpk::view_array<const ::gpk::SLightInfoRSW>{lights.begin(), ::gpk::min(lights.size(), 8U)}))
@@ -255,13 +255,13 @@ static				::gpk::error_t										drawTriangles
 	return 0;
 }
 
-					::gpk::error_t										updateTransforms							(::gpk::SSceneTransforms & transforms, ::gpk::SSceneCamera& camera, ::gpk::SCoord2<uint32_t> targetMetrics)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
+					::gpk::error_t										updateTransforms							(::gpk::SSceneTransforms & transforms, ::gpk::SSceneCamera& camera, ::gpk::n2<uint32_t> targetMetrics)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	::gpk::SMatrix4<float>														& finalProjection							= transforms.FinalProjection	;
 	::gpk::SMatrix4<float>														& fieldOfView								= transforms.FieldOfView		;
 	::gpk::SMatrix4<float>														& mviewport									= transforms.Viewport			;
 	fieldOfView.FieldOfView(camera.Angle * ::gpk::math_pi, targetMetrics.x / (double)targetMetrics.y, camera.NearFar);
 	mviewport.ViewportRH(targetMetrics.Cast<uint16_t>());
-	const ::gpk::SCoord2<int32_t>												screenCenter								= {(int32_t)targetMetrics.x / 2, (int32_t)targetMetrics.y / 2};
+	const ::gpk::n2<int32_t>												screenCenter								= {(int32_t)targetMetrics.x / 2, (int32_t)targetMetrics.y / 2};
 	finalProjection															= fieldOfView * mviewport;
 	transforms.FinalProjectionInverse										= finalProjection.GetInverse();
 
@@ -282,7 +282,7 @@ static				::gpk::error_t										drawTriangles
 	, ::gpk::SSceneCamera												& camera
 	, ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>					& target
 	, const ::gpk::SModelPivot<float>									& modelPivot
-	, const ::gpk::SCoord3<float>										& lightDir
+	, const ::gpk::n3<float>										& lightDir
 	, const ::gpk::SModelGND											& modelGND
 	, const ::gpk::SRSWWorldLight										& directionalLight
 	, const ::gpk::view_array<const ::gpk::SImage<::gpk::SColorBGRA>>	& textures
@@ -290,7 +290,7 @@ static				::gpk::error_t										drawTriangles
 	, bool																wireframe
 	) {	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	::gpk::view_grid<::gpk::SColorBGRA>											& offscreen									= target.Color.View;
-	const ::gpk::SCoord2<uint32_t>												& offscreenMetrics							= offscreen.metrics();
+	const ::gpk::n2<uint32_t>												& offscreenMetrics							= offscreen.metrics();
 	::updateTransforms(transforms, camera, offscreenMetrics);
 
 	const ::gpk::SMatrix4<float>												& projection								= transforms.FinalProjection	;
@@ -331,7 +331,7 @@ static				::gpk::error_t										drawTriangles
 
 	static	const ::gpk::SColorBGRA												color										= ::gpk::YELLOW;
 	for(uint32_t iPixel = 0, pixCount = renderCache.WireframePixelCoords.size(); iPixel < pixCount; ++iPixel) {
-		const ::gpk::SCoord2<int16_t>												& pixelCoord								= renderCache.WireframePixelCoords[iPixel];
+		const ::gpk::n2<int16_t>												& pixelCoord								= renderCache.WireframePixelCoords[iPixel];
 		if( offscreen[pixelCoord.y][pixelCoord.x] != color ) {
 			offscreen[pixelCoord.y][pixelCoord.x]								= color;
 			++pixelsDrawn;

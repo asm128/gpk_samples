@@ -91,7 +91,7 @@ void												deployCampaignAgents
 		if(!playerAgent.IsAlive())
 			continue;
 
-		::gpk::SCoord3<int32_t>									agentPosition										= {0,0,0};
+		::gpk::n3<int32_t>									agentPosition										= {0,0,0};
 		if(::klib::isRelevantTeam(teamId))  {
 			agentPosition.x										= 1 + (int32_t)(rangeX * ::gpk::noiseNormal1D(iAgent, seed			) );
 			agentPosition.z										= 1 + (int32_t)(rangeZ * ::gpk::noiseNormal1D(iAgent, seed << 8	) );

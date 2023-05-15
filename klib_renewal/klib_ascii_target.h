@@ -22,7 +22,7 @@ namespace klib
 							::gpk::error_t									asciiTargetDestroy							(::klib::SASCIITarget& console);
 							::gpk::error_t									asciiTargetClear							(::klib::SASCIITarget& console, uint8_t character = ' ', uint16_t color = ::klib::ASCII_COLOR_INDEX_WHITE);
 	template<typename _tUnit>
-	static inline			::gpk::error_t									asciiTargetCreate							(::klib::SASCIITarget& console, const ::gpk::SCoord2<_tUnit>& size)					{ return ::klib::asciiTargetCreate(console, (uint32_t)size.x, (uint32_t)size.y); }
+	static inline			::gpk::error_t									asciiTargetCreate							(::klib::SASCIITarget& console, const ::gpk::n2<_tUnit>& size)					{ return ::klib::asciiTargetCreate(console, (uint32_t)size.x, (uint32_t)size.y); }
 } // namespace
 
 #endif // KLIB_ASCII_TARGET_H_9823740982374

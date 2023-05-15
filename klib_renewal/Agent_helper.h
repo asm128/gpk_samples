@@ -9,7 +9,7 @@
 namespace klib
 {
 	template <typename _BitfieldType>
-	int32_t									displayFlag						(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, ::gpk::SCoord2<int32_t> offset, _BitfieldType characterBits, uint32_t statusCount, uint16_t colorTitle, uint16_t colorField, const ::gpk::view_const_char& textFormat)	{
+	int32_t									displayFlag						(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, ::gpk::n2<int32_t> offset, _BitfieldType characterBits, uint32_t statusCount, uint16_t colorTitle, uint16_t colorField, const ::gpk::view_const_char& textFormat)	{
 		uint16_t									color							= ::klib::ASCII_COLOR_INDEX_GREEN;
 		int32_t										iLine							= 0;
 		for(uint32_t iStatus=0; iStatus<statusCount; ++iStatus) {

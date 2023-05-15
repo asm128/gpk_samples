@@ -300,7 +300,7 @@ static constexpr const ::gpk::STriangle3<float>						geometryCube	[12]						=
 	return 0;
 }
 
-static constexpr const ::gpk::SCoord3<float>						geometryCubeNormals	[12]						=
+static constexpr const ::gpk::n3<float>						geometryCubeNormals	[12]						=
 	{ {0.0f, 0.0f, -1.0f}	// Right	- first			?? I have no idea if this is correct lol
 	, {0.0f, 0.0f, -1.0f}	// Right	- second		?? I have no idea if this is correct lol
 
@@ -321,7 +321,7 @@ static constexpr const ::gpk::SCoord3<float>						geometryCubeNormals	[12]						
 	};
 
 struct SCamera {
-						::gpk::SCoord3<float>								Position, Target;
+						::gpk::n3<float>								Position, Target;
 };
 
 					::gpk::error_t										draw										(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
@@ -346,21 +346,21 @@ struct SCamera {
 	//::gpk::SMatrix4<float>														viewMatrix									= {};
 	//projection.Identity();
 	//::gpk::SFrameInfo															& frameInfo									= framework.FrameInfo;
-	//const ::gpk::SCoord3<float>													tilt										= {10, };	// ? cam't remember what is this. Radians? Eulers?
-	//const ::gpk::SCoord3<float>													rotation									= {0, (float)frameInfo.FrameNumber / 100, 0};
+	//const ::gpk::n3<float>													tilt										= {10, };	// ? cam't remember what is this. Radians? Eulers?
+	//const ::gpk::n3<float>													rotation									= {0, (float)frameInfo.FrameNumber / 100, 0};
 	//
 	//::gpk::SNearFar																nearFar										= {0.01f , 1000.0f};
 	//
-	//static constexpr const ::gpk::SCoord3<float>								cameraUp									= {0, 1, 0};	// ? cam't remember what is this. Radians? Eulers?
+	//static constexpr const ::gpk::n3<float>								cameraUp									= {0, 1, 0};	// ? cam't remember what is this. Radians? Eulers?
 	//::SCamera																	camera										= {{10, 5, 0}, {}};
-	//::gpk::SCoord3<float>														lightPos									= {10, 5, 0};
+	//::gpk::n3<float>														lightPos									= {10, 5, 0};
 	//static float																cameraRotation								= 0;
 	//cameraRotation															+= (float)framework.Input->MouseCurrent.Deltas.x / 5.0f;
 	////camera.Position	.RotateY(cameraRotation);
 	//camera.Position	.RotateY(frameInfo.Microseconds.Total / 1000000.0f);
 	//lightPos		.RotateY(frameInfo.Microseconds.Total /  500000.0f * -2);
 	//viewMatrix.LookAt(camera.Position, camera.Target, cameraUp);
-	//const ::gpk::SCoord2<uint32_t>												& offscreenMetrics							= backBuffer->Color.View.metrics();
+	//const ::gpk::n2<uint32_t>												& offscreenMetrics							= backBuffer->Color.View.metrics();
 	//projection.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, nearFar.Near, nearFar.Far );
 	//projection																= viewMatrix * projection;
 	//lightPos.Normalize();
@@ -379,7 +379,7 @@ struct SCamera {
 	//}
 	//::gpk::array_pod<::gpk::STriangle2<int32_t>>								triangle2dList								= {};
 	//triangle2dList.resize(12);
-	//const ::gpk::SCoord2<int32_t>												screenCenter								= {(int32_t)offscreenMetrics.x / 2, (int32_t)offscreenMetrics.y / 2};
+	//const ::gpk::n2<int32_t>												screenCenter								= {(int32_t)offscreenMetrics.x / 2, (int32_t)offscreenMetrics.y / 2};
 	//for(uint32_t iTriangle = 0; iTriangle < 12; ++iTriangle) { // Maybe the scale
 	//	::gpk::STriangle3<float>													& transformedTriangle3D						= triangle3dList[iTriangle];
 	//	::gpk::STriangle2<int32_t>													& transformedTriangle2D						= triangle2dList[iTriangle];
@@ -393,9 +393,9 @@ struct SCamera {
 	//	double																		lightFactor									= geometryCubeNormals[iTriangle].Dot(lightPos);
 	//	triangle3dColorList[iTriangle]											= (::gpk::RED * lightFactor).Clamp();
 	//}
-	//::gpk::array_pod<::gpk::SCoord2<int32_t>>									trianglePixelCoords;
-	//::gpk::array_pod<::gpk::SCoord2<int32_t>>									wireframePixelCoords;
-	//::gpk::SCoord3<float> cameraFront = (camera.Target - camera.Position).Normalize();
+	//::gpk::array_pod<::gpk::n2<int32_t>>									trianglePixelCoords;
+	//::gpk::array_pod<::gpk::n2<int32_t>>									wireframePixelCoords;
+	//::gpk::n3<float> cameraFront = (camera.Target - camera.Position).Normalize();
 	//for(uint32_t iTriangle = 0; iTriangle < 12; ++iTriangle) {
 	//	double																		lightFactor									= geometryCubeNormals[iTriangle].Dot(cameraFront);
 	//	if(lightFactor > 0)

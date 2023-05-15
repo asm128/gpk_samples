@@ -39,7 +39,7 @@ namespace gme // I'm gonna use a different namespace in order to test a few thin
 					::gpk::array_obj<::gpk::SImage<::gpk::SColorBGRA>>					TexturesGND						= {};
 					::gpk::SModelPivot	<float>											GridPivot						= {};
 					::gpk::SScene														Scene;
-					::gpk::SCoord3<float>												LightDirection					= {10, 5, 0};
+					::gpk::n3<float>												LightDirection					= {10, 5, 0};
 					::gpk::SGNDFileContents												GNDData							= {};
 					::gpk::SRSWFileContents												RSWData							= {};
 					::gpk::array_obj<::gpk::SRSMFileContents>							RSMData							= {};

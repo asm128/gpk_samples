@@ -18,16 +18,16 @@ namespace gme // I'm gonna use a different namespace in order to test a few thin
 	};
 
 	struct SCamera {
-							::gpk::SCoord3<float>												Position;
-							::gpk::SCoord3<float>												Target;
+							::gpk::n3<float>												Position;
+							::gpk::n3<float>												Target;
 							::gpk::SNearFar														NearFar							= {0.01f , 1000.0f};
 	};
 
 	struct SViewportScene {
-		static constexpr	const ::gpk::SCoord3<float>											CameraUp						= {0, 1, 0};	// ? cam't remember what is this. Radians? Eulers?
+		static constexpr	const ::gpk::n3<float>											CameraUp						= {0, 1, 0};	// ? cam't remember what is this. Radians? Eulers?
 							::gme::SCamera														Camera							= {{10, 5, 0}, {}};
 
-							::gpk::SCoord3<float>												LightPos						= {10, 5, 0};
+							::gpk::n3<float>												LightPos						= {10, 5, 0};
 
 							::gpk::SMatrix4<float>												Projection						= {};
 							::gpk::SMatrix4<float>												ViewMatrix						= {};

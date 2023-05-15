@@ -103,7 +103,7 @@ static constexpr	const uint32_t															MAGIC_NUMBER														= 139770
 template<uint32_t _sizeArray>
 struct SPropertiesPowerup		{
 						::SArrayElementState						< _sizeArray>				Alive																= {};
-						::gpk::array_static<::gpk::SCoord2<float>	, _sizeArray>				Position															= {};
+						::gpk::array_static<::gpk::n2<float>	, _sizeArray>				Position															= {};
 						::gpk::array_static<POWERUP_FAMILY			, _sizeArray>				Family																= {};
 						::gpk::array_static<::SPowerup				, _sizeArray>				Type																= {};
 };
@@ -119,8 +119,8 @@ template<uint32_t _sizeArray>
 struct SPropertiesEnemy			{
 						::SArrayElementState						< _sizeArray>				Alive																= {};
 						::gpk::array_static<::SShipState			, _sizeArray>				States																= {};
-						::gpk::array_static<::gpk::SCoord2<float>	, _sizeArray>				Position															= {};
-						::gpk::array_static<::gpk::SCoord2<float>	, _sizeArray>				Direction															= {};
+						::gpk::array_static<::gpk::n2<float>	, _sizeArray>				Position															= {};
+						::gpk::array_static<::gpk::n2<float>	, _sizeArray>				Direction															= {};
 						::gpk::array_static<::SHealthPoints			, _sizeArray>				Health																= {};
 						::gpk::array_static<double					, _sizeArray>				TimeLived															= {};
 						::gpk::array_static<double					, _sizeArray>				SkillTimer															= {};
@@ -137,8 +137,8 @@ struct SPropertiesShip			{
 						::gpk::array_static<::SShipState			, _sizeArray>				States																= {};
 						::gpk::array_static<::SHealthPoints			, _sizeArray>				Health																= {};
 						::gpk::array_static<::SWeapon				, _sizeArray>				Weapon																= {};
-						::gpk::array_static<::gpk::SCoord2<float>	, _sizeArray>				Position															= {};
-						::gpk::array_static<::gpk::SCoord2<float>	, _sizeArray>				Direction															= {};
+						::gpk::array_static<::gpk::n2<float>	, _sizeArray>				Position															= {};
+						::gpk::array_static<::gpk::n2<float>	, _sizeArray>				Direction															= {};
 						::gpk::array_static<bool					, _sizeArray>				LineOfFire															= {};
 						::gpk::array_static<double					, _sizeArray>				WeaponDelay															= {};
 };
@@ -149,7 +149,7 @@ struct SGame {
 						::SPropertiesEnemy		<MAX_ENEMIES>									Enemies																= {};
 						::SPropertiesProjectile	<MAX_PROJECTILES>								Projectiles															= {};
 						::SPropertiesPowerup	<MAX_POWERUP>									Powerups															= {};
-						::gpk::array_static<::gpk::SCoord2<float>, MAX_PLAYERS>					PositionCrosshair													= {};
+						::gpk::array_static<::gpk::n2<float>, MAX_PLAYERS>					PositionCrosshair													= {};
 						uint32_t																CountEnemies														= 0;
 						uint32_t																CountProjectiles													= 0;
 						uint32_t																CountPowerups														= 0;
@@ -161,7 +161,7 @@ struct SGame {
 
 						double																	GhostTimer															= 0;
 						uint32_t																PathStep															= 0;
-						::gpk::SCoord2<float>													PathEnemy					[10]									=
+						::gpk::n2<float>													PathEnemy					[10]									=
 							{ { 10.f,  10.f}
 							, {320.f, 180.f}
 							, { 50.f, 200.f}

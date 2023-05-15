@@ -16,8 +16,8 @@ namespace klib
 	// This is done this way for simplifying a bunch of operations for which we only need the integer part
 	// while improving the precision of the floating point values by only requiring them to represent a value between 0 and 1 for a very small distance.
 	struct STacticalCoord {
-		::gpk::SCoord3<int32_t>									Cell											;	// Position in tile map.
-		::gpk::SCoord3<float>									Offset											;	// Position between 0 and 1 relative to the tile.
+		::gpk::n3<int32_t>									Cell											;	// Position in tile map.
+		::gpk::n3<float>									Offset											;	// Position between 0 and 1 relative to the tile.
 
 		bool													operator==										(const STacticalCoord& other)			const	noexcept	{
 			return	(Cell.x		== other.Cell.x	)
@@ -50,7 +50,7 @@ namespace klib
 
 	struct SBullet {
 		STacticalCoord											Position										;
-		::gpk::SCoord3<float>									Direction										;
+		::gpk::n3<float>									Direction										;
 		STileCharacter											Shooter											;
 		SBulletPoints											Points											;
 
@@ -94,7 +94,7 @@ namespace klib
 #pragma pack(pop)
 	struct SMapShots {
 		::gpk::array_pod<::klib::SBullet>					Bullet											= {};
-		::gpk::array_pod<::gpk::SCoord3<int32_t>>			Coords											= {};
+		::gpk::array_pod<::gpk::n3<int32_t>>			Coords											= {};
 	};
 
 	struct SMapInventory {
@@ -107,14 +107,14 @@ namespace klib
 		::gpk::array_pod<::klib::SStageProp	>				StageProp										= {};
 		::gpk::array_pod<::klib::SItem		>				Items											= {};
 
-		::gpk::array_pod<::gpk::SCoord3<int32_t>>			CoordsProfession								= {};
-		::gpk::array_pod<::gpk::SCoord3<int32_t>>			CoordsAccessory									= {};
-		::gpk::array_pod<::gpk::SCoord3<int32_t>>			CoordsArmor										= {};
-		::gpk::array_pod<::gpk::SCoord3<int32_t>>			CoordsWeapon									= {};
-		::gpk::array_pod<::gpk::SCoord3<int32_t>>			CoordsVehicle									= {};
-		::gpk::array_pod<::gpk::SCoord3<int32_t>>			CoordsFacility									= {};
-		::gpk::array_pod<::gpk::SCoord3<int32_t>>			CoordsStageProp									= {};
-		::gpk::array_pod<::gpk::SCoord3<int32_t>>			CoordsItems										= {};
+		::gpk::array_pod<::gpk::n3<int32_t>>			CoordsProfession								= {};
+		::gpk::array_pod<::gpk::n3<int32_t>>			CoordsAccessory									= {};
+		::gpk::array_pod<::gpk::n3<int32_t>>			CoordsArmor										= {};
+		::gpk::array_pod<::gpk::n3<int32_t>>			CoordsWeapon									= {};
+		::gpk::array_pod<::gpk::n3<int32_t>>			CoordsVehicle									= {};
+		::gpk::array_pod<::gpk::n3<int32_t>>			CoordsFacility									= {};
+		::gpk::array_pod<::gpk::n3<int32_t>>			CoordsStageProp									= {};
+		::gpk::array_pod<::gpk::n3<int32_t>>			CoordsItems										= {};
 	};
 
 	// We need a way to identify the local player type in the player array. Other types don't really matter because they are used depending on the user's choice.
@@ -149,7 +149,7 @@ namespace klib
 
 	struct SMapAOE {
 		::gpk::array_pod<SAOE>										AOE												= {};
-		::gpk::array_pod<::gpk::SCoord3<int32_t>>					Coords											= {};
+		::gpk::array_pod<::gpk::n3<int32_t>>					Coords											= {};
 	};
 
 	struct STacticalBoard {
@@ -157,7 +157,7 @@ namespace klib
 		::klib::SMapAOE												AreaOfEffect									= {};
 		::klib::SGameTiles											Tiles											= {};
 
-		inline	int32_t												Resize											(::gpk::SCoord2<uint32_t> newSize)	{ return Tiles.Resize(newSize); }
+		inline	int32_t												Resize											(::gpk::n2<uint32_t> newSize)	{ return Tiles.Resize(newSize); }
 		void														Clear											()									{
 			Tiles.Clear();
 			Shots														= {};
@@ -178,7 +178,7 @@ namespace klib
 		STacticalBoard											Board											= {};
 		SMapInventory											Drops											= {};
 
-		inline	int32_t											ResizeBoard										(::gpk::SCoord2<uint32_t> newSize)							{ Board.Resize(newSize); }
+		inline	int32_t											ResizeBoard										(::gpk::n2<uint32_t> newSize)							{ Board.Resize(newSize); }
 		bool													AddBullet										(const SBullet& newBullet)									{
 			Board.Shots.Bullet.push_back(newBullet);
 			Board.Shots.Coords.push_back(newBullet.Position.Cell);
@@ -201,7 +201,7 @@ namespace klib
 			Board.Clear();
 		}
 
-		bool													HasDrops										(const ::gpk::SCoord3<int32_t>& coord)	const	noexcept	{
+		bool													HasDrops										(const ::gpk::n3<int32_t>& coord)	const	noexcept	{
 			return ( (Board.Tiles.Entities.Coins[coord.z][coord.x] != 0)
 				|| (-1) != Drops.CoordsProfession	.find(coord)
 				|| (-1) != Drops.CoordsWeapon		.find(coord)

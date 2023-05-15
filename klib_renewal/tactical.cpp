@@ -22,7 +22,7 @@ bool																	handleUserInput									(::klib::SGame& instanceGame, const
 	if(instanceGame.FrameInput.Keys[VK_TAB] && bDoneWaiting) {
 		//if(playerSelection.PlayerUnit != -1 && currentPlayer.Squad.Agents[playerSelection.PlayerUnit] != -1) {
 		//	CCharacter																	& currentAgent									= *currentPlayer.Army[currentPlayer.Squad.Agents[playerSelection.PlayerUnit]];
-		//	::gpk::SCoord3<int32_t>													& currentAgentPosition							= currentAgent.Position;
+		//	::gpk::n3<int32_t>													& currentAgentPosition							= currentAgent.Position;
 		//}
 		if(instanceGame.FrameInput.Keys[VK_SHIFT]) {
 			if(!currentPlayer.SelectPreviousAgent()) {
@@ -47,8 +47,8 @@ bool																	handleUserInput									(::klib::SGame& instanceGame, const
 		int32_t																		mouseX											= instanceGame.FrameInput.Mouse.Deltas.x;
 		int32_t																		mouseY											= instanceGame.FrameInput.Mouse.Deltas.y;
 
-		const ::gpk::SCoord2<uint32_t>												& metricsDisplayGlobal							= instanceGame.GlobalDisplay	.Screen.metrics();
-		const ::gpk::SCoord2<uint32_t>												& metricsDisplayTactical						= instanceGame.TacticalDisplay	.Screen.metrics();
+		const ::gpk::n2<uint32_t>												& metricsDisplayGlobal							= instanceGame.GlobalDisplay	.Screen.metrics();
+		const ::gpk::n2<uint32_t>												& metricsDisplayTactical						= instanceGame.TacticalDisplay	.Screen.metrics();
 		int32_t																		tacticalDisplayX								= (metricsDisplayGlobal.x >> 1)	- (metricsDisplayTactical.x >> 1);
 		//int32_t																		tacticalDisplayStop								= TACTICAL_DISPLAY_POSY		+ (tacticalDisplay.Depth);
 		int32_t																		tacticalMouseX									= mouseX-tacticalDisplayX;
@@ -68,7 +68,7 @@ bool																	handleUserInput									(::klib::SGame& instanceGame, const
 
 		if(playerSelection.PlayerUnit != -1 && currentPlayer.Squad.Agents[playerSelection.PlayerUnit] != -1) {
 			::klib::CCharacter															& currentAgent									= *currentPlayer.Army[currentPlayer.Squad.Agents[playerSelection.PlayerUnit]];
-			const ::gpk::SCoord3<int32_t>												& currentAgentPosition							= currentAgent.Position;
+			const ::gpk::n3<int32_t>												& currentAgentPosition							= currentAgent.Position;
 			int32_t																		targetPlayerIndex								= tacticalBoard.Tiles.Entities.Agents[tacticalMouseY][tacticalMouseX].PlayerIndex;
 			int32_t																		agentIndex										= tacticalBoard.Tiles.Entities.Agents[tacticalMouseY][tacticalMouseX].AgentIndex;
 			if(0 != instanceGame.FrameInput.Mouse.Buttons[0]) {// || 0 != instanceGame.FrameInput.MouseButtons[4])
@@ -233,8 +233,8 @@ void																drawPlayerInfo									(::klib::SGame& instanceGame)								
 	::gpk::SRenderTarget<char, uint16_t>										& displayGlobal									= instanceGame.GlobalDisplay	.Screen;
 	::gpk::SRenderTarget<char, uint16_t>										& displayTactical								= instanceGame.TacticalDisplay	.Screen;
 
-	const ::gpk::SCoord2<uint32_t>												& metricsDisplayGlobal							= displayGlobal  .metrics();
-	const ::gpk::SCoord2<uint32_t>												& metricsDisplayTactical						= displayTactical.metrics();
+	const ::gpk::n2<uint32_t>												& metricsDisplayGlobal							= displayGlobal  .metrics();
+	const ::gpk::n2<uint32_t>												& metricsDisplayTactical						= displayTactical.metrics();
 	//const int32_t																tacticalDisplayStop								= TACTICAL_DISPLAY_POSY			+ (metricsDisplayTactical.y);
 	const int32_t																tacticalDisplayX								= (metricsDisplayGlobal.x >> 1)	- (metricsDisplayTactical.x >> 1);
 	const ::klib::STacticalInfo													& tacticalInfo									= instanceGame.TacticalInfo;
@@ -359,7 +359,7 @@ bool																	shoot											(::klib::STacticalInfo & tacticalInfo, ::gp
 	::klib::SGamePlayer																& playerShooter									= players[tacticalInfo.Setup.Players[tacticalPlayer]];
 	::klib::CCharacter															& agentShooter									= *playerShooter.Tactical.Army[playerShooter.Tactical.Squad.Agents[squadAgent]];
 
-	const ::gpk::SCoord3<int32_t>												& targetTile									= playerShooter.Tactical.Squad.TargetPositions[squadAgent];
+	const ::gpk::n3<int32_t>												& targetTile									= playerShooter.Tactical.Squad.TargetPositions[squadAgent];
 	if(targetTile == agentShooter.Position)
 		return false;
 
@@ -461,9 +461,9 @@ static CHARACTER_TURN_ACTION											characterTurn									(const ::klib::SEnt
 				::klib::CCharacter															& targetAgent									= *targetPlayer	.Tactical.Army[targetPlayer.Tactical.Squad.Agents[currentPlayer.Tactical.Selection.TargetUnit]];
 				//CCharacter																	& playerAgent									= *currentPlayer.Army[currentPlayer.Squad.Agents[currentPlayer.Selection.PlayerUnit]];
 
-				::gpk::SCoord3<int32_t>														coordPlayer										= playerAgent.Position;
-				::gpk::SCoord3<int32_t>														coordTarget										= targetAgent.Position;
-				::gpk::SCoord3<float>														distance										= (coordTarget-coordPlayer).Cast<float>();
+				::gpk::n3<int32_t>														coordPlayer										= playerAgent.Position;
+				::gpk::n3<int32_t>														coordTarget										= targetAgent.Position;
+				::gpk::n3<float>														distance										= (coordTarget-coordPlayer).Cast<float>();
 
 				const ::klib::SEntityPoints													& playerAgentPoints								= playerAgent.FinalPoints;
 				const ::klib::SEntityFlags													& playerAgentFlags								= playerAgent.FinalFlags;
@@ -703,7 +703,7 @@ static	void															updateBullets									(::klib::SGame & instanceGame, d
 		if(fActualSpeed >= 0.25)
 			fActualSpeed															= 0.25;
 		::klib::STacticalCoord														& bulletPos										= bullets[iBullet].Position;
-		::gpk::SCoord3<float>														& bulletDir										= bullets[iBullet].Direction;
+		::gpk::n3<float>														& bulletDir										= bullets[iBullet].Direction;
 		bulletPos.Offset.AddScaled(bulletDir, fActualSpeed);
 		::klib::SBullet																newBullet										= bullets[iBullet];
 		::klib::STacticalCoord														& newBulletPos									= newBullet.Position;
@@ -812,8 +812,8 @@ static	void															updateBullets									(::klib::SGame & instanceGame, d
 							if(x < 0 || x >= (int32_t)tacticalInfo.Board.Tiles.Terrain.Geometry.metrics().x)
 								continue;
 
-							const ::gpk::SCoord3<int32_t>	currentCoord	= {x, y, z};
-							const ::gpk::SCoord3<float>		distance		= (currentCoord-newAOE.Position.Cell).Cast<float>();
+							const ::gpk::n3<int32_t>	currentCoord	= {x, y, z};
+							const ::gpk::n3<float>		distance		= (currentCoord-newAOE.Position.Cell).Cast<float>();
 							double							length			= distance.Length();
 							if((length + 1.0000000000001) > newAOE.RadiusOrHalfSize)
 								continue;
@@ -830,17 +830,17 @@ static	void															updateBullets									(::klib::SGame & instanceGame, d
 									continue;
 								tileGeometry.fHeight[0]		-= (float)(newAOE.RadiusOrHalfSize/2*(1.0-proportion));
 
-								length						= ::gpk::SCoord3<float>{distance.x+1, distance.y, distance.z}.Length();
+								length						= ::gpk::n3<float>{distance.x+1, distance.y, distance.z}.Length();
 								proportion					= length/newAOE.RadiusOrHalfSize;
 								if(proportion <= 1.0)
 									tileGeometry.fHeight[1]		-= (float)(newAOE.RadiusOrHalfSize/2*(1.0-proportion));
 
-								length						= ::gpk::SCoord3<float>{distance.x, distance.y, distance.z+1}.Length();
+								length						= ::gpk::n3<float>{distance.x, distance.y, distance.z+1}.Length();
 								proportion					= length/newAOE.RadiusOrHalfSize;
 								if(proportion <= 1.0)
 									tileGeometry.fHeight[2]		-= (float)(newAOE.RadiusOrHalfSize/2*(1.0-proportion));
 
-								length						= ::gpk::SCoord3<float>{distance.x+1, distance.y, distance.z+1}.Length();
+								length						= ::gpk::n3<float>{distance.x+1, distance.y, distance.z+1}.Length();
 								proportion					= length/newAOE.RadiusOrHalfSize;
 								if(proportion <= 1.0)
 									tileGeometry.fHeight[3]		-= (float)(newAOE.RadiusOrHalfSize/2*(1.0-proportion));
@@ -864,9 +864,9 @@ static	void															updateBullets									(::klib::SGame & instanceGame, d
 						::klib::SGamePlayer							& playerVictim			= instanceGame.Players[tacticalInfo.Setup.Players[agentsInRange.Agents[iAgentInRange].Agent.PlayerIndex]];
 						::klib::TEAM_TYPE						teamVictim				= tacticalInfo.Setup.TeamPerPlayer[agentsInRange.Agents[iAgentInRange].Agent.PlayerIndex];
 						::klib::CCharacter						& agentVictim			= *playerVictim.Tactical.Army[playerVictim.Tactical.Squad.Agents[agentsInRange.Agents[iAgentInRange].Agent.AgentIndex]];
-						//::gpk::SCoord3<int32_t> distance = agentVictim.Position-newAOE.Position.Cell;
-						const ::gpk::SCoord3<int32_t>			& coordAgent			= agentVictim.Position;
-						const ::gpk::SCoord3<float>				distance				= (coordAgent - newAOE.Position.Cell).Cast<float>();
+						//::gpk::n3<int32_t> distance = agentVictim.Position-newAOE.Position.Cell;
+						const ::gpk::n3<int32_t>			& coordAgent			= agentVictim.Position;
+						const ::gpk::n3<float>				distance				= (coordAgent - newAOE.Position.Cell).Cast<float>();
 						double									length					= distance.Length();
 						if(length > newAOE.RadiusOrHalfSize)
 							continue;
@@ -977,7 +977,7 @@ bool																	initTacticalGame								(::klib::SGame& instanceGame);
 			selectedAction = ::selectRemoteAction(tacticalInfo, instanceGame.Players);
 	}
 	else {
-		::gpk::SCoord3<float>				bulletPos				= {0.0f,0.0f,0.0f};
+		::gpk::n3<float>				bulletPos				= {0.0f,0.0f,0.0f};
 		const ::klib::SBullet				& bulletToPrint			= tacticalInfo.Board.Shots.Bullet[0];
 		bulletPos.x						= bulletToPrint.Position.Cell.x + bulletToPrint.Position.Offset.x;
 		bulletPos.y						= bulletToPrint.Position.Cell.y + bulletToPrint.Position.Offset.y;

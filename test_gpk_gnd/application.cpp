@@ -98,7 +98,7 @@
 	}
 	for(uint32_t iLight = 0; iLight < rswData.RSWLights.size(); ++iLight) {
 		rswData.RSWLights[iLight].Position										*= 1.0 / app.GNDData.Metrics.TileScale;
-		rswData.RSWLights[iLight].Position										+= ::gpk::SCoord3<float>{app.GNDData.Metrics.Size.x / 2.0f, 0.0f, (app.GNDData.Metrics.Size.y / 2.0f)};
+		rswData.RSWLights[iLight].Position										+= ::gpk::n3<float>{app.GNDData.Metrics.Size.x / 2.0f, 0.0f, (app.GNDData.Metrics.Size.y / 2.0f)};
 		rswData.RSWLights[iLight].Position.y									*= -1;
 	}
 
@@ -140,7 +140,7 @@
 		const int32_t																texIndex1									= processTile1 ? app.GNDData.lstTileTextureData[tileGeometry1.SkinMapping.SkinIndexTop].TextureIndex : -1;
 		const int32_t																texIndex2									= processTile2 ? app.GNDData.lstTileTextureData[tileGeometry2.SkinMapping.SkinIndexTop].TextureIndex : -1;
 		const int32_t																texIndex3									= processTile3 ? app.GNDData.lstTileTextureData[tileGeometry3.SkinMapping.SkinIndexTop].TextureIndex : -1;
-		::gpk::SCoord3<float>														normal										= {};
+		::gpk::n3<float>														normal										= {};
 		uint32_t																	divisor										= 0;
 		if(processTile0) { ++divisor; ::gpk::SModelNodeGND & gndNode0 = app.GNDModel.Nodes[texIndex0]; normal += gndNode0.Normals[tileMapping0.VerticesTop[3]]; }
 		if(processTile1) { ++divisor; ::gpk::SModelNodeGND & gndNode1 = app.GNDModel.Nodes[texIndex1]; normal += gndNode1.Normals[tileMapping1.VerticesTop[2]]; }
@@ -262,19 +262,19 @@
 	::gpk::SCameraPoints														& camera									= app.Scene.Camera.Points;
 	//camera.Position.RotateY(framework.Input->MouseCurrent.Deltas.x / 20.0f / (framework.Input->KeyboardCurrent.KeyState[VK_CONTROL] ? 2.0 : 1));
 	//if(framework.Input->MouseCurrent.Deltas.z) {
-	//	::gpk::SCoord3<float>														zoomVector									= camera.Position;
+	//	::gpk::n3<float>														zoomVector									= camera.Position;
 	//	zoomVector.Normalize();
 	//	const double																zoomWeight									= framework.Input->MouseCurrent.Deltas.z * (framework.Input->KeyboardCurrent.KeyState[VK_SHIFT] ? 10 : 1) / 240.;
 	//	camera.Position															+= zoomVector * zoomWeight * .5;
 	//}
 	camera.Target																= {app.TextureMinimap.metrics().x / 2.0f, 0, -(int32_t)app.TextureMinimap.metrics().y / 2.0f};
 	//------------------------------------------------ Lights
-	::gpk::SCoord3<float>														& lightDir									= app.LightDirection;
+	::gpk::n3<float>														& lightDir									= app.LightDirection;
 	lightDir.RotateY(frameInfo.Microseconds.LastFrame / 1000000.0f);
 	lightDir.Normalize();
 
 	::gpk::SRSWFileContents														& rswData									= app.RSWData;
-	const ::gpk::SCoord3<float>													halfMapDir									= ::gpk::SCoord3<float>{app.GNDData.Metrics.Size.x / 2.0f, 0.0f, (app.GNDData.Metrics.Size.y / 2.0f)};
+	const ::gpk::n3<float>													halfMapDir									= ::gpk::n3<float>{app.GNDData.Metrics.Size.x / 2.0f, 0.0f, (app.GNDData.Metrics.Size.y / 2.0f)};
 	for(uint32_t iLight = 0; iLight < rswData.RSWLights.size(); ++iLight) {
 		rswData.RSWLights[iLight].Position										-= halfMapDir;
 		rswData.RSWLights[iLight].Position.RotateY(frameInfo.Seconds.LastFrame);
@@ -312,7 +312,7 @@
 	, ::gpk::SSceneCamera												& camera
 	, ::gpk::SWindow::TOffscreen										& target
 	, const ::gpk::SModelPivot<float>									& modelPivot
-	, const ::gpk::SCoord3<float>										& lightDir
+	, const ::gpk::n3<float>										& lightDir
 	, const ::gpk::SModelGND											& modelGND
 	, const ::gpk::SRSWWorldLight										& directionalLight
 	, const ::gpk::view_array<const ::gpk::SImage<::gpk::SColorBGRA>>	& textures
@@ -326,7 +326,7 @@
 	static ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>				buffer3D;
 	::gpk::ptr_obj<::gpk::SDialogViewport>									viewport									= {};
 	app.DialogMain.Controls[app.Viewport].as(viewport);
-	const ::gpk::SCoord2<uint32_t>											& offscreenMetrics							= gui.Controls.Controls[viewport->IdClient].Area.Size.Cast<uint32_t>();
+	const ::gpk::n2<uint32_t>											& offscreenMetrics							= gui.Controls.Controls[viewport->IdClient].Area.Size.Cast<uint32_t>();
 
 	buffer3D.resize(offscreenMetrics, {0, 0, 0, 0}, 0xFFFFFFFF);
 	gui.Controls.Controls[viewport->IdClient].Image						= buffer3D.Color.View;

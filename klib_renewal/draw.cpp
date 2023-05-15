@@ -329,8 +329,8 @@ void										klib::drawAndPresentGame		(SGame& instanceGame, ::klib::SASCIITarg
 
 	::gpk::rt<char, uint16_t>			& displayGlobal					= instanceGame.GlobalDisplay	.Screen;
 	::gpk::rt<char, uint16_t>			& displayTactical				= instanceGame.TacticalDisplay	.Screen;
-	const ::gpk::SCoord2<uint32_t>					& displayMetricsGlobal			= displayGlobal		.metrics();
-	const ::gpk::SCoord2<uint32_t>					& displayMetricsTactical		= displayTactical	.metrics();
+	const ::gpk::n2<uint32_t>					& displayMetricsGlobal			= displayGlobal		.metrics();
+	const ::gpk::n2<uint32_t>					& displayMetricsTactical		= displayTactical	.metrics();
 
 	const int32_t									MAX_LOG_LINES					= (instanceGame.State.State == GAME_STATE_WELCOME_COMMANDER || ::gpk::bit_true(instanceGame.Flags, GAME_FLAGS_TACTICAL)) ? 30 : 4;
 	int32_t											logSize							= (int32_t)instanceGame.Messages.UserLog.size();
@@ -836,7 +836,7 @@ int32_t													drawMenu
 	, ::gpk::v2c												targetASCII
 	, uint16_t													* targetAttributes
 	, int32_t													& lineOffset
-	, const ::gpk::SCoord2<int32_t>								mousePos
+	, const ::gpk::n2<int32_t>								mousePos
 	, const ::gpk::view_const_char								& title
 	, const ::gpk::view_array<const ::gpk::view_const_char>		& menuItems
 	, const uint32_t											actualOptionCount

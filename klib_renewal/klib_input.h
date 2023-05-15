@@ -6,7 +6,7 @@
 namespace klib
 {
 	struct SMouseInput {
-								::gpk::SCoord3<int32_t>						Deltas									;
+								::gpk::n3<int32_t>						Deltas									;
 								uint8_t										Buttons					[16]			;
 	};
 

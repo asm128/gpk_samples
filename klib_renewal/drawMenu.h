@@ -14,7 +14,7 @@
 
 namespace klib
 {
-	static inline constexpr		bool						mouseOver						(::gpk::SCoord2<int32_t> mousePos, ::gpk::SCoord2<int32_t> targetPos, int32_t width)																							{ return (mousePos.y == targetPos.y) && (mousePos.x >= targetPos.x) && (mousePos.x < targetPos.x + width); }
+	static inline constexpr		bool						mouseOver						(::gpk::n2<int32_t> mousePos, ::gpk::n2<int32_t> targetPos, int32_t width)																							{ return (mousePos.y == targetPos.y) && (mousePos.x >= targetPos.x) && (mousePos.x < targetPos.x + width); }
 
 #pragma pack(push, 1)
 	struct SDrawMenuState {

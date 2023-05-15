@@ -14,11 +14,11 @@ void									klib::boardToDisplay			(::klib::SGame& instanceGame, const STactica
 		int32_t										topologyHeight			= board.Tiles.Terrain.Topology[z][x].Smooth + board.Tiles.Terrain.Topology[z][x].Sharp;
 		float										cornerHeight[4]			= {};
 		::memcpy(cornerHeight, board.Tiles.Terrain.Geometry[z][x].fHeight, sizeof(float)*4);
-		::gpk::SCoord3<int32_t>						currentCoord			= {(int32_t)x, (int32_t)y, (int32_t)z};
+		::gpk::n3<int32_t>						currentCoord			= {(int32_t)x, (int32_t)y, (int32_t)z};
 		bool										bInRange				= false;
 		double										initialSight			= 0.0;
 		double										finalSight				= 0.0;
-		::gpk::SCoord3<float>						currentTilePos			= currentCoord.Cast<float>();
+		::gpk::n3<float>						currentTilePos			= currentCoord.Cast<float>();
 
 		if(false == bFogOfWar)
 			bInRange								= true;
@@ -40,8 +40,8 @@ void									klib::boardToDisplay			(::klib::SGame& instanceGame, const STactica
 					if(false == playerAgent.IsAlive())
 						continue;
 
-					::gpk::SCoord3<int32_t>						coordPlayer				= playerAgent.Position;
-					::gpk::SCoord3<float>						distance				= currentTilePos - coordPlayer.Cast<float>();;
+					::gpk::n3<int32_t>						coordPlayer				= playerAgent.Position;
+					::gpk::n3<float>						distance				= currentTilePos - coordPlayer.Cast<float>();;
 
 					SEntityPoints								playerAgentPoints		= playerAgent.FinalPoints	;
 					SEntityFlags								playerAgentFlags		= playerAgent.FinalFlags	;
@@ -115,7 +115,7 @@ void									klib::boardToDisplay			(::klib::SGame& instanceGame, const STactica
 				if(::gpk::bit_true(bullet.Points.Tech.ProjectileClass, PROJECTILE_CLASS_ROCKET))
 					bulletAscii = 0x0F; // bigger asterisk
 				else if(::gpk::bit_false(bullet.Points.Tech.ProjectileClass, PROJECTILE_CLASS_SHELL)) {
-					const ::gpk::SCoord2<float> dirVector = {bullet.Direction.x, bullet.Direction.z};
+					const ::gpk::n2<float> dirVector = {bullet.Direction.x, bullet.Direction.z};
 					if( ( dirVector.x < (-GAME_EPSILON) && dirVector.y < (-GAME_EPSILON) )
 						|| ( dirVector.x > GAME_EPSILON && dirVector.y > GAME_EPSILON )
 						)
@@ -242,8 +242,8 @@ void									klib::boardToDisplay			(::klib::SGame& instanceGame, const STactica
 
 		for(uint32_t iAOE = 0, countAOE = board.AreaOfEffect.AOE.size(); iAOE <countAOE; ++iAOE) {
 			const ::klib::SAOE						& aoeInstance			= board.AreaOfEffect.AOE[iAOE];
-			const ::gpk::SCoord3<int32_t>& aoeCell = aoeInstance.Position.Cell;
-			::gpk::SCoord3<float> aoePos = {(float)aoeCell.x, (float)aoeCell.y, (float)aoeCell.z};
+			const ::gpk::n3<int32_t>& aoeCell = aoeInstance.Position.Cell;
+			::gpk::n3<float> aoePos = {(float)aoeCell.x, (float)aoeCell.y, (float)aoeCell.z};
 			aoePos += aoeInstance.Position.Offset;
 
 			bool failBVTest =

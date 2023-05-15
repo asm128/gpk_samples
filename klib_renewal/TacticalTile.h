@@ -37,7 +37,7 @@ namespace klib
 				::gpk::SImage<::klib::STileGeometry		>			Geometry;
 				::gpk::SImage<::klib::STopologyDetail	>			Topology;
 
-		inline	int32_t												Resize			(::gpk::SCoord2<uint32_t> newSize)											{
+		inline	int32_t												Resize			(::gpk::n2<uint32_t> newSize)											{
 			Geometry.resize(newSize, {});
 			return Topology.resize(newSize, {});
 		}
@@ -52,7 +52,7 @@ namespace klib
 				::gpk::SImage<STileProp		>						Props	;
 				::gpk::SImage<int64_t		>						Coins	;
 
-		inline	int32_t												Resize			(::gpk::SCoord2<uint32_t> newSize)											{
+		inline	int32_t												Resize			(::gpk::n2<uint32_t> newSize)											{
 			Agents	.resize(newSize, {(::klib::TEAM_TYPE)-1, -1, -1, -1} );
 			Props	.resize(newSize, {-1, -1, -1, -1});
 			return Coins	.resize(newSize, 0);
@@ -68,7 +68,7 @@ namespace klib
 				::klib::STerrainTiles								Terrain ;
 				::klib::SEntityTiles								Entities;
 
-		inline	int32_t												Resize			(::gpk::SCoord2<uint32_t> newSize)											{
+		inline	int32_t												Resize			(::gpk::n2<uint32_t> newSize)											{
 			Terrain.Resize(newSize);
 			return Entities.Resize(newSize);
 		}

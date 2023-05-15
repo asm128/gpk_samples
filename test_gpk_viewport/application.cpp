@@ -154,11 +154,11 @@ template<typename _tIndex, typename _tValue>
 	controlTable.Controls	[viewport->IdGUIControl	].Area.Size				= {640, 480};
 	controlTable.States		[viewport->IdClient		].ImageInvertY			= true;
 
-	static constexpr const ::gpk::SCoord3<float>							cubeCenter									= {0.5f, 0.5f, 0.5f};
+	static constexpr const ::gpk::n3<float>							cubeCenter									= {0.5f, 0.5f, 0.5f};
 	::gpk::array_pod<uint8_t>												& remap										= app.ModelGeometry.PositionRemap;
 	::indexValues({&modelPositionsVertices[0].A, ::gpk::size(modelPositionsVertices) * 3}, app.ModelGeometry.Positions.Indices, app.ModelGeometry.Positions.Values, remap);
 	for(uint32_t iVertex = 0; iVertex < app.ModelGeometry.Positions.Values.size(); ++iVertex) {
-		::gpk::SCoord3<float>													& vertexToTransform					= app.ModelGeometry.Positions.Values[iVertex];
+		::gpk::n3<float>													& vertexToTransform					= app.ModelGeometry.Positions.Values[iVertex];
 		vertexToTransform													-= cubeCenter;
 	}
 	app.ModelGeometry.NormalsVertex.Values									= modelNormalVectors;
@@ -207,7 +207,7 @@ template<typename _tIndex, typename _tValue>
 		scene.ViewMatrix.LookAt(scene.Camera.Position, scene.Camera.Target, scene.CameraUp);
 		::gpk::ptr_obj<::gpk::SDialogViewport>									viewport									= {};
 		app.DialogMain.Controls[app.Viewport].as(viewport);
-		const ::gpk::SCoord2<uint32_t>											& offscreenMetrics							= gui.Controls.Controls[viewport->IdClient].Area.Size.Cast<uint32_t>();
+		const ::gpk::n2<uint32_t>											& offscreenMetrics							= gui.Controls.Controls[viewport->IdClient].Area.Size.Cast<uint32_t>();
 		scene.Projection.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, nearFar);
 		scene.Projection															= scene.ViewMatrix * scene.Projection;
 		scene.LightPos.Normalize();
@@ -238,7 +238,7 @@ template<typename _tIndex, typename _tValue>
 	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>		buffer3d									= app.Buffer3D;
 	::gpk::ptr_obj<::gpk::SDialogViewport>									viewport									= {};
 	app.DialogMain.Controls[app.Viewport].as(viewport);
-	const ::gpk::SCoord2<uint16_t>											& offscreenMetrics							= gui.Controls.Controls[viewport->IdClient].Area.Size.Cast<uint16_t>();
+	const ::gpk::n2<uint16_t>											& offscreenMetrics							= gui.Controls.Controls[viewport->IdClient].Area.Size.Cast<uint16_t>();
 	buffer3d->resize(offscreenMetrics.Cast<uint32_t>(), {0, 0, 0, 0}, (uint32_t)-1);
 
 	::gpk::array_pod<::gpk::STriangle3<float>>								& triangle3dList							= app.VertexCache.Triangle3dTransformed	;
@@ -254,7 +254,7 @@ template<typename _tIndex, typename _tValue>
 		camera																= app.Scene.Camera;
 	}
 
-	::gpk::SCoord3<float>													& lightPos									= app.Scene.LightPos;
+	::gpk::n3<float>													& lightPos									= app.Scene.LightPos;
 	for(uint32_t iTriangle = 0; iTriangle < countTriangles; ++iTriangle) {
 		::gpk::STriangle3<float>												& transformedTriangle						= triangle3dList[iTriangle];
 		transformedTriangle													=
@@ -266,7 +266,7 @@ template<typename _tIndex, typename _tValue>
 	}
 	::gpk::array_pod<::gpk::STriangle2<int32_t>>							triangle2dList								= {};
 	triangle2dList.resize(countTriangles);
-	const ::gpk::SCoord2<int32_t>											screenCenter								= {(int32_t)offscreenMetrics.x / 2, (int32_t)offscreenMetrics.y / 2};
+	const ::gpk::n2<int32_t>											screenCenter								= {(int32_t)offscreenMetrics.x / 2, (int32_t)offscreenMetrics.y / 2};
 	for(uint32_t iTriangle = 0; iTriangle < countTriangles; ++iTriangle) { // Maybe the scale
 		::gpk::STriangle3<float>												& transformedTriangle3D						= triangle3dList[iTriangle];
 		::gpk::STriangle2<int32_t>												& transformedTriangle2D						= triangle2dList[iTriangle];
@@ -277,14 +277,14 @@ template<typename _tIndex, typename _tValue>
 
 	}
 
-	::gpk::view_array<::gpk::SCoord3<float>>								normals										= {(::gpk::SCoord3<float>*)app.ModelGeometry.NormalsVertex.Values.begin(), app.ModelGeometry.NormalsVertex.Values.size() * 3};
+	::gpk::view_array<::gpk::n3<float>>								normals										= {(::gpk::n3<float>*)app.ModelGeometry.NormalsVertex.Values.begin(), app.ModelGeometry.NormalsVertex.Values.size() * 3};
 	for(uint32_t iVertex = 0; iVertex < app.ModelGeometry.Positions.Indices.size(); ++iVertex) {
 		double																	lightFactor									= normals[iVertex].Dot(lightPos);
 		triangle3dColorList[iVertex]										= (::gpk::RED * lightFactor).Clamp();
 	}
-	::gpk::array_pod<::gpk::SCoord2<int16_t>>								wireframePixelCoords;
-	::gpk::array_pod<::gpk::SCoord2<int16_t>>								trianglePixelCoords;
-	::gpk::SCoord3<float>													cameraFront										= (camera.Target - camera.Position).Normalize();
+	::gpk::array_pod<::gpk::n2<int16_t>>								wireframePixelCoords;
+	::gpk::array_pod<::gpk::n2<int16_t>>								trianglePixelCoords;
+	::gpk::n3<float>													cameraFront										= (camera.Target - camera.Position).Normalize();
 	::gpk::array_pod<::gpk::STriangle<float>>								triangleWeights;
 
 	for(uint32_t iTriangle = 0; iTriangle < 12; ++iTriangle) {
