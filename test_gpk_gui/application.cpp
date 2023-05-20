@@ -233,14 +233,14 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	//::gpk::STimer															timer;
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, exitSignal, "%s", "Exit requested by runtime.");
 	{
-		::gpk::mutex_guard														lock					(app.LockRender);
+		::std::lock_guard														lock					(app.LockRender);
 		app.Framework.RootWindow.BackBuffer									= app.Offscreen;
 	}
 	::gpk::SFramework														& framework				= app.Framework;
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(framework), "%s", "Exit requested by framework update.");
 	{
 		::gpk::SGUI																& gui					= *framework.GUI;
-		::gpk::mutex_guard														lock					(app.LockGUI);
+		::std::lock_guard														lock					(app.LockGUI);
 		::gpk::array_pod<uint32_t>												controlsToProcess			= {};
 		::gpk::guiGetProcessableControls(gui, controlsToProcess);
 		for(uint32_t iProcessable = 0, countControls = controlsToProcess.size(); iProcessable < countControls; ++iProcessable) {
@@ -286,12 +286,12 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	target->resize(app.Framework.RootWindow.Size, {0xFF, 0x40, 0x7F, 0xFF}, (uint32_t)-1);
 	//::gpk::clearTarget(*target);
 	{
-		::gpk::mutex_guard													lock					(app.LockGUI);
+		::std::lock_guard													lock					(app.LockGUI);
 		::gpk::controlDrawHierarchy(*app.Framework.GUI, 0, target->Color.View);
 		::gpk::grid_copy(target->Color.View, app.VerticalAtlas.View);
 	}
 	{
-		::gpk::mutex_guard													lock					(app.LockRender);
+		::std::lock_guard													lock					(app.LockRender);
 		app.Offscreen													= target;
 	}
 	//timer.Frame();

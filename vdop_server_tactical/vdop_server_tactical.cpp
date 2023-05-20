@@ -80,7 +80,7 @@ int													update				(SApplication & app, bool exitSignal)	{
 	(void)exitSignal;
 	//retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, exitSignal, "%s", "Exit requested by runtime.");
 	{
-		::gpk::mutex_guard									lock						(app.LockRender);
+		::std::lock_guard									lock						(app.LockRender);
 		app.Framework.RootWindow.BackBuffer				= app.Offscreen;
 	}
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework), "%s", "Exit requested by framework update.");
@@ -114,14 +114,14 @@ int													update				(SApplication & app, bool exitSignal)	{
 	::klib::presentASCIIBackBuffer();
 
 	{
-		::gpk::mutex_guard														lock						(app.TacticalServer.Mutex);
+		::std::lock_guard														lock						(app.TacticalServer.Mutex);
 		app.MessagesToProcess.resize(app.TacticalServer.Clients.size());
 		for(uint32_t iClient = 0, countClients = app.TacticalServer.Clients.size(); iClient < countClients; ++iClient) {
 			::gpk::ptr_nco<::gpk::SUDPConnection>									client						= app.TacticalServer.Clients[iClient];
 			if(client->State != ::gpk::UDP_CONNECTION_STATE_IDLE || 0 == client->KeyPing)
 				continue;
 			{
-				::gpk::mutex_guard														lockRecv					(client->Queue.MutexReceive);
+				::std::lock_guard														lockRecv					(client->Queue.MutexReceive);
 				for(int32_t iMessage = 0; iMessage < (int32_t)client->Queue.Received.size(); ++iMessage) {
 					if(client->Queue.Received[iMessage]->Command.Type == ::gpk::ENDPOINT_COMMAND_TYPE_RESPONSE)
 						continue;
@@ -144,7 +144,7 @@ int													update				(SApplication & app, bool exitSignal)	{
 			::gpk::vcu8									viewPayload					= messageReceived->Payload;
 			info_printf("Server connection %i received: %s.", iClient, viewPayload.begin());
 			{
-				::gpk::mutex_guard							lock						(app.TacticalServer.Mutex);
+				::std::lock_guard							lock						(app.TacticalServer.Mutex);
 				::gpk::pnco<::gpk::SUDPConnection>			client						= app.TacticalServer.Clients[iClient];
 				if(client->State != ::gpk::UDP_CONNECTION_STATE_IDLE)
 					continue;
@@ -173,11 +173,11 @@ int													draw					(SApplication & app) {
 	target->resize(app.Framework.RootWindow.Size, ::gpk::DARKGREEN, 0xFFFFFFFFU);
 
 	{
-		::gpk::mutex_guard														lock					(app.LockGUI);
+		::std::lock_guard														lock					(app.LockGUI);
 		::gpk::controlDrawHierarchy(*app.Framework.GUI, 0, target->Color.View);
 	}
 	{
-		::gpk::mutex_guard														lock					(app.LockRender);
+		::std::lock_guard														lock					(app.LockRender);
 		app.Offscreen														= target;
 	}
 

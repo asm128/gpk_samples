@@ -45,14 +45,14 @@ int													ssg::solarSystemSetup				(::ssg::SSolarSystemGame & solarSystem,
 	if (filename.size() && 0 == filename.size()) {
 		::gpk::SJSONFile					solarSystemFile			= {};
 		::gpk::jsonFileRead(solarSystemFile, filename);
-		::gpk::array_pod<int32_t>			stellarBodyIndices;
+		::gpk::ai32			stellarBodyIndices;
 		const uint32_t						stellarBodyCount		= ::gpk::jsonObjectKeyList(solarSystemFile.Reader, 0, stellarBodyIndices);
 		::gpk::view_array<const ::gpk::vcc>	jsonView				= solarSystemFile.Reader.View;
 		for(uint32_t iPlanet = 0; iPlanet < stellarBodyCount; ++iPlanet) {
 			const int32_t						jsonIndexStellarBody	= stellarBodyIndices[iPlanet];
 
 			planet.Name	= star.Name			= jsonView[jsonIndexStellarBody];
-			::gpk::array_pod<int32_t>			propertyIndices;
+			::gpk::ai32			propertyIndices;
 			//int32_t								iBodyValue				= ::gpk::jsonObjectValueGet(solarSystemFile.Reader, jsonIndexStellarBody, planet.Name);
 			const uint32_t						propertyCount			= ::gpk::jsonObjectKeyList(solarSystemFile.Reader, jsonIndexStellarBody + 2, propertyIndices);
 			for(uint32_t iProperty = 0; iProperty < propertyCount; ++iProperty) 
@@ -167,8 +167,8 @@ int													ssg::solarSystemSetup				(::ssg::SSolarSystemGame & solarSystem,
 			int32_t													iEntityPlanet				= solarSystem.Entities.push_back({iEntityOrbit, 0, (int32_t)iPlanet + 1, (int32_t)iPlanet + 1, (int32_t)iBodyPlanet});
 			solarSystem.Entities[iEntityOrbit].Children.push_back(iEntityPlanet);
 		}
-		for(uint32_t iRigidBody = 0; iRigidBody < solarSystem.Bodies.BodyFlags.size(); ++iRigidBody)
-			solarSystem.Bodies.BodyFlags[iRigidBody].Active	= true;
+		for(uint32_t iRigidBody = 0; iRigidBody < solarSystem.Bodies.Flags.size(); ++iRigidBody)
+			solarSystem.Bodies.Flags[iRigidBody].Active	= true;
 
 		::gpk::SColorBGRA										colors []						=
 			{ ::gpk::YELLOW

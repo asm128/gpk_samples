@@ -224,7 +224,7 @@
 	::gpk::STimer															timer;
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, exitSignal, "%s", "Exit requested by runtime.");
 	{
-		::gpk::mutex_guard														lock						(app.LockRender);
+		::std::lock_guard														lock						(app.LockRender);
 		app.Framework.RootWindow.BackBuffer									= app.Offscreen;
 	}
 	::gpk::SFramework														& framework					= app.Framework;
@@ -339,15 +339,15 @@
 	target.create();
 	target->resize(app.Framework.RootWindow.Size, ::gpk::LIGHTGRAY, 0xFFFFFFFFU);
 	{
-		::gpk::mutex_guard														lock					(app.Framework.LockGUI);
+		::std::lock_guard														lock					(app.Framework.LockGUI);
 		::gpk::controlDrawHierarchy(*app.Framework.GUI, 0, target->Color.View);
 	}
 	{
-		::gpk::mutex_guard														lock					(app.Framework.LockGUI);
+		::std::lock_guard														lock					(app.Framework.LockGUI);
 		::gpk::guiDraw(*app.DialogMain.GUI, target->Color.View);
 	}
 	{
-		::gpk::mutex_guard														lock					(app.LockRender);
+		::std::lock_guard														lock					(app.LockRender);
 		app.Offscreen														= target;
 	}
 	timer.Frame();

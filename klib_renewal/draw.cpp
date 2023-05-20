@@ -417,7 +417,7 @@ void										klib::drawAndPresentGame		(SGame& instanceGame, ::klib::SASCIITarg
 	::klib::printfToRectColored(target, ::klib::ASCII_COLOR_INDEX_CYAN		, bbHeight-2, 1, ::klib::SCREEN_LEFT, "Frames last second: %f."		, instanceGame.FrameTimer.FramesLastSecond	);
 	time_t											curTimeWithUnreliableSize		= 0;
 	{
-		::gpk::mutex_guard								thelock							(instanceGame.ServerTimeMutex);
+		::std::lock_guard								thelock							(instanceGame.ServerTimeMutex);
 		curTimeWithUnreliableSize					= instanceGame.ServerTime;
 	}
 	char											send_buffer[64]					= {};

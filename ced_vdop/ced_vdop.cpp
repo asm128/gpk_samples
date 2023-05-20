@@ -82,7 +82,7 @@ int													update				(SApplication & app, bool exitSignal)	{
 	(void)exitSignal;
 	//retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, exitSignal, "%s", "Exit requested by runtime.");
 	{
-		::gpk::mutex_guard									lock						(app.LockRender);
+		::std::lock_guard									lock						(app.LockRender);
 		app.Framework.RootWindow.BackBuffer				= app.Offscreen;
 	}
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework), "%s", "Exit requested by framework update.");
@@ -111,7 +111,7 @@ int													update				(SApplication & app, bool exitSignal)	{
 	::klib::getASCIIBackBuffer						(target);
 
 	{
-		::gpk::mutex_guard									lock						(app.LockRender);
+		::std::lock_guard									lock						(app.LockRender);
 		::klib::clearASCIIBackBuffer(' ', ::klib::ASCII_COLOR_INDEX_WHITE);
  		::klib::drawAndPresentGame(app.Game, target);
 	}
@@ -222,7 +222,7 @@ int													draw					(SApplication & app) {
 	matrixView											*= matrixViewport;
 
 	{
-		::gpk::mutex_guard										lock						(app.LockRender);
+		::std::lock_guard										lock						(app.LockRender);
 		::gpk::view_grid<char>									mapToDraw					= app.Game.GlobalDisplay.Screen.Color;
 		::gpk::view_grid<uint16_t>								mapColors					= app.Game.GlobalDisplay.Screen.DepthStencil;
 		matrixView.LookAt(app.TextOverlay.CameraPosition, app.TextOverlay.CameraTarget, app.TextOverlay.CameraUp);
@@ -246,7 +246,7 @@ int													draw					(SApplication & app) {
 	}
 
 	{
-		::gpk::mutex_guard										lock						(app.LockRender);
+		::std::lock_guard										lock						(app.LockRender);
 		::gpk::view_grid<char>									mapToDraw					= app.Game.TacticalDisplay.Screen.Color;
 		::gpk::view_grid<uint16_t>								mapColors					= app.Game.TacticalDisplay.Screen.DepthStencil;
 
@@ -284,11 +284,11 @@ int													draw					(SApplication & app) {
 	}
 
 	{
-		::gpk::mutex_guard														lock					(app.LockGUI);
+		::std::lock_guard														lock					(app.LockGUI);
 		::gpk::controlDrawHierarchy(*app.Framework.GUI, 0, target->Color.View);
 	}
 	{
-		::gpk::mutex_guard														lock					(app.LockRender);
+		::std::lock_guard														lock					(app.LockRender);
 		app.Offscreen														= target;
 	}
 

@@ -59,7 +59,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	::gpk::STimer															timer;
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, exitSignal, "Exit requested by runtime.");
 	{
-		::gpk::mutex_guard														lock						(app.LockRender);
+		::std::lock_guard														lock						(app.LockRender);
 		app.Framework.RootWindow.BackBuffer									= app.Offscreen;
 	}
 	::gpk::SFramework														& framework					= app.Framework;
@@ -80,14 +80,14 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 		}
 	}
 	{
-		::gpk::mutex_guard														lock						(app.Server.Mutex);
+		::std::lock_guard														lock						(app.Server.Mutex);
 		app.MessagesToProcess.resize(app.Server.Clients.size());
 		for(uint32_t iClient = 0, countClients = app.Server.Clients.size(); iClient < countClients; ++iClient) {
 			::gpk::pnco<::gpk::SUDPConnection>									client						= app.Server.Clients[iClient];
 			if(client->State != ::gpk::UDP_CONNECTION_STATE_IDLE || 0 == client->KeyPing)
 				continue;
 			{
-				::gpk::mutex_guard														lockRecv					(client->Queue.MutexReceive);
+				::std::lock_guard														lockRecv					(client->Queue.MutexReceive);
 				for(int32_t iMessage = 0; iMessage < (int32_t)client->Queue.Received.size(); ++iMessage) {
 					if(client->Queue.Received[iMessage]->Command.Type == ::gpk::ENDPOINT_COMMAND_TYPE_RESPONSE)
 						continue;
@@ -108,7 +108,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 			info_printf("Client %i received: %s.", iClient, viewPayload.begin());
 			sprintf_s(messageToSend, "Message arrived(true, true    ): %u", currentMessage++); 
 			{
-				::gpk::mutex_guard									lock						(app.Server.Mutex);
+				::std::lock_guard									lock						(app.Server.Mutex);
 				::gpk::pnco<::gpk::SUDPConnection>					client						= app.Server.Clients[iClient];
 				if(client->State != ::gpk::UDP_CONNECTION_STATE_IDLE)
 					continue;
@@ -138,11 +138,11 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	target.create();
 	target->resize(app.Framework.RootWindow.Size, {0xFF, 0x40, 0x7F, 0xFF}, (uint32_t)-1);
 	{
-		::gpk::mutex_guard														lock					(app.LockGUI);
+		::std::lock_guard														lock					(app.LockGUI);
 		::gpk::controlDrawHierarchy(*app.Framework.GUI, 0, target->Color.View);
 	}
 	{
-		::gpk::mutex_guard														lock					(app.LockRender);
+		::std::lock_guard														lock					(app.LockRender);
 		app.Offscreen														= target;
 	}
 	//timer.Frame();

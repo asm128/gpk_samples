@@ -7,6 +7,7 @@
 #include "gpk_sync.h"
 
 #include <time.h>
+#include <mutex>
 
 #ifndef __GAME_H__91827309126391263192312312354__
 #define __GAME_H__91827309126391263192312312354__
@@ -36,13 +37,14 @@ namespace klib
 
 	struct SWeightedDisplay {
 							::gpk::rt<char, uint16_t>	Screen					= {};
-							::gpk::SImage<float	>					DisplayWeights			= {};
-							::gpk::SImage<float	>					Speed					= {};
-							::gpk::SImage<float	>					SpeedTarget				= {};
+							::gpk::SImage<float	>		DisplayWeights			= {};
+							::gpk::SImage<float	>		Speed					= {};
+							::gpk::SImage<float	>		SpeedTarget				= {};
 
 		inline				::gpk::error_t							Resize					(::gpk::n2<uint32_t> newSize)															{
 			Screen			.resize(newSize, ' ', (uint16_t)::klib::ASCII_COLOR_INDEX_WHITE);
 			DisplayWeights	.resize(newSize, 0.0f);
+			Speed			.resize(newSize, 0.0f);
 			Speed			.resize(newSize, 0.0f);
 			SpeedTarget		.resize(newSize, 0.0f);
 			return 0;
