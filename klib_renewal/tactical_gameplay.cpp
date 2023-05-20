@@ -588,7 +588,7 @@ void																					klib::determineOutcome													(const ::klib::SEnti
 			currentPlayer.Tactical.Squad.Agents[iAgent]												= -1;
 			currentPlayer.Memorial.push_back(deadCharacter);
 			if(oldAgentIndex == (int32_t)(currentPlayer.Tactical.Army.size()-1))
-				currentPlayer.Tactical.Army.pop_back(0);
+				currentPlayer.Tactical.Army.pop_back();
 			else
 				currentPlayer.Tactical.Army[oldAgentIndex]												= {};
 		}
