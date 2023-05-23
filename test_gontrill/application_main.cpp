@@ -53,7 +53,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	return 0;
 }
 
-static				::gpk::error_t										setupSprite									(::gpk::img<::gpk::SColorBGRA> & textureToProcess, ::gpk::img<::gpk::SColorBGRA>& processed, ::gpk::n2<int32_t>& textureCenter, const ::gpk::view_const_string& filename)	{
+static				::gpk::error_t										setupSprite									(::gpk::img<::gpk::bgra> & textureToProcess, ::gpk::img<::gpk::bgra>& processed, ::gpk::n2<int32_t>& textureCenter, const ::gpk::view_const_string& filename)	{
 	gpk_necall(::gpk::pngFileLoad(filename, textureToProcess), "%s", "Failed to load sprite image.");
 	textureCenter															= (textureToProcess.View.metrics() / 2).Cast<int32_t>();
 	processed.View															= textureToProcess.View;
@@ -81,7 +81,7 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 		}
 	}
 
-	const ::gpk::view_grid<::gpk::SColorBGRA>									& fontAtlas									= app.Processed[GAME_TEXTURE_FONT_ATLAS].View;
+	const ::gpk::view_grid<::gpk::bgra>									& fontAtlas									= app.Processed[GAME_TEXTURE_FONT_ATLAS].View;
 	const ::gpk::n2<uint32_t>												& textureFontMetrics						= fontAtlas.metrics();
 	app.TextureFontMonochrome.resize(textureFontMetrics);
 	for(uint32_t y = 0, yMax = textureFontMetrics.y; y < yMax; ++y)
@@ -109,7 +109,7 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	::setupParticles();
 	ree_if	(errored(::updateSizeDependentResources	(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
 	ree_if	(errored(::setupSprites					(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
-	::gpk::view_grid<::gpk::SColorBGRA>											& fontAtlasView								= app.Processed[GAME_TEXTURE_FONT_ATLAS].View;
+	::gpk::view_grid<::gpk::bgra>											& fontAtlasView								= app.Processed[GAME_TEXTURE_FONT_ATLAS].View;
 	const ::gpk::n2<uint32_t>													& fontAtlasMetrics							= fontAtlasView.metrics();
 	for(uint32_t y = 0, yMax = fontAtlasMetrics.y; y < yMax; ++y)
 	for(uint32_t x = 0, xMax = fontAtlasMetrics.x; x < xMax; ++x) {

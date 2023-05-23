@@ -130,7 +130,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 
 			::gpk::error_t												draw					(::gme::SApplication & app)						{
 	::gpk::STimer																timer;
-	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>			target;
+	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>			target;
 	target.create();
 	target->resize(app.Framework.RootWindow.Size, {0xFF, 0x20, 0x6F, 0xCF}, (uint32_t)-1);
 	app.LobbyClient.Draw(target->Color);

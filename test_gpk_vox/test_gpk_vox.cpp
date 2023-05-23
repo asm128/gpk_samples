@@ -121,7 +121,7 @@ namespace gpk
 	static					::gpk::error_t									drawTriangle
 		( ::gpk::view_grid<uint32_t>						& targetDepth
 		, const ::gpk::SNearFar								& fNearFar
-		, const ::gpk::STriangle3<_tCoord>					& triangle
+		, const ::gpk::tri3<_tCoord>					& triangle
 		, ::gpk::apod<::gpk::n2<int16_t>>			& out_Points
 		) {
 		int32_t																		pixelsDrawn									= 0;
@@ -132,7 +132,7 @@ namespace gpk
 		for(float y = ::gpk::max(areaMin.y, 0.f), yStop = ::gpk::min(areaMax.y, (float)_targetMetrics.y); y < yStop; ++y)
 		for(float x = ::gpk::max(areaMin.x, 0.f); x < xStop; ++x) {
 			const ::gpk::n2<int32_t>												cellCurrent									= {(int32_t)x, (int32_t)y};
-			const ::gpk::STriangle2<int32_t>											triangle2D									=
+			const ::gpk::tri2<int32_t>											triangle2D									=
 				{ {(int32_t)triangle.A.x, (int32_t)triangle.A.y}
 				, {(int32_t)triangle.B.x, (int32_t)triangle.B.y}
 				, {(int32_t)triangle.C.x, (int32_t)triangle.C.y}
@@ -145,7 +145,7 @@ namespace gpk
 					continue;
 			}
 			const ::gpk::n2<double>												cellCurrentF								= {x, y};
-			::gpk::STriangle<double>												proportions									=
+			::gpk::tri<double>												proportions									=
 				{ ::gpk::orient2d3d({triangle.C.template Cast<double>(), triangle.B.template Cast<double>()}, cellCurrentF)	// notice how having to type "template" every time before "Cast" totally defeats the purpose of the template. I really find this rule very stupid and there is no situation in which the compiler is unable to resolve it from the code it already has.
 				, ::gpk::orient2d3d({triangle.A.template Cast<double>(), triangle.C.template Cast<double>()}, cellCurrentF)
 				, ::gpk::orient2d3d({triangle.B.template Cast<double>(), triangle.A.template Cast<double>()}, cellCurrentF)	// Determine barycentric coordinates
@@ -185,7 +185,7 @@ namespace gpk
 		, ::gpk::view<const _tIndex>						indices
 		, ::gpk::apod<::gpk::n2<int16_t>>				& out_Points
 		) {
-		return drawTriangle(targetDepth, fNearFar, ::gpk::STriangle3<_tCoord>{coordList[baseVertexIndex + indices[baseIndex + 0]], coordList[baseVertexIndex + indices[baseIndex + 1]], coordList[baseVertexIndex + indices[baseIndex + 2]]}, out_Points);
+		return drawTriangle(targetDepth, fNearFar, ::gpk::tri3<_tCoord>{coordList[baseVertexIndex + indices[baseIndex + 0]], coordList[baseVertexIndex + indices[baseIndex + 1]], coordList[baseVertexIndex + indices[baseIndex + 2]]}, out_Points);
 	}
 }
 
@@ -209,8 +209,8 @@ namespace gpk
 
 struct SFragmentCache {
 	::gpk::apod<::gpk::n2<int16_t>>			Points				[6]	= {};
-	::gpk::apod<::gpk::STriangle<float>>			TriangleWeights		[6]	= {};	
-	::gpk::view_grid<::gpk::SColorBGRA>					TargetPixels;
+	::gpk::apod<::gpk::tri<float>>			TriangleWeights		[6]	= {};	
+	::gpk::view_grid<::gpk::bgra>					TargetPixels;
 	::gpk::view_grid<uint32_t>							TargetDepth	;
 };
 
@@ -265,8 +265,8 @@ static	::gpk::error_t						drawVoxelFace
 		for(uint32_t iSlice = 0, countSlices = faceSlices.size(); iSlice < countSlices; ++iSlice) {
 			// Clear out output
 			::gpk::apod<::gpk::n2<int16_t>>			& facePixelCoords		= pixelCache.Points[iFace];
-			::gpk::apod<::gpk::STriangle<float>>			& faceTriangleWeights	= pixelCache.TriangleWeights[iFace];
-			::gpk::apod<::gpk::STriangle3<float>>			trianglePositions		= {};
+			::gpk::apod<::gpk::tri<float>>			& faceTriangleWeights	= pixelCache.TriangleWeights[iFace];
+			::gpk::apod<::gpk::tri3<float>>			trianglePositions		= {};
 			::gpk::apod<::gpk::SRange<uint32_t>>			triangleSlices			= {};
 			::gpk::apod<uint32_t>							triangleIndices			= {};
 			facePixelCoords		.clear();
@@ -277,7 +277,7 @@ static	::gpk::error_t						drawVoxelFace
 			const ::gpk::SRenderMaterialPaletted				& sliceMaterial			= voxelGeometry.Materials[faceSlice.Material];
 			for(uint32_t iIndex = 0, countIndices = faceSlice.Slice.Count; iIndex < countIndices; ++iIndex) {
 				uint32_t											offsetPositionIndex		= voxelGeometry.Geometry.PositionIndices[iIndex];
-				const ::gpk::STriangle3<float>						triangle				= 
+				const ::gpk::tri3<float>						triangle				= 
 					{ mVP.Transform((voxelGeometry.Geometry.Positions[voxelGeometry.Geometry.PositionIndices[offsetPositionIndex + 0]] + position))
 					, mVP.Transform((voxelGeometry.Geometry.Positions[voxelGeometry.Geometry.PositionIndices[offsetPositionIndex + 1]] + position))
 					, mVP.Transform((voxelGeometry.Geometry.Positions[voxelGeometry.Geometry.PositionIndices[offsetPositionIndex + 2]] + position))
@@ -297,8 +297,8 @@ static	::gpk::error_t						drawVoxelFace
 				const ::gpk::SRange<uint32_t>			slice						= triangleSlices[iTriangle];
 				// Process pixel fragments
 				for(uint32_t iPoint = slice.Offset, pixelCount = slice.Count + slice.Offset; iPoint < pixelCount; ++iPoint) {
-					const ::gpk::STriangle3<float>			& triangle					= trianglePositions[iTriangle];
-					const ::gpk::STriangle<float>			& triangleWeights			= faceTriangleWeights[iPoint];
+					const ::gpk::tri3<float>			& triangle					= trianglePositions[iTriangle];
+					const ::gpk::tri<float>			& triangleWeights			= faceTriangleWeights[iPoint];
 					const ::gpk::n2<int16_t>			pixelPosIn2DSpace			= facePixelCoords[iPoint];
 					const ::gpk::n3<float>				pixelPosIn3DSpace			
 						= triangle.A * triangleWeights.A
@@ -418,7 +418,7 @@ struct SCamera {
 					::gpk::error_t					draw								(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	::gpk::SFramework										& framework							= app.Framework;
 
-	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>	backBuffer							= app.BackBuffer;
+	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>	backBuffer							= app.BackBuffer;
 	if(backBuffer.get_ref() && backBuffer.get_ref()->References > 2)
 		return 0;
 

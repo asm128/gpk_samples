@@ -17,7 +17,7 @@ namespace gme // I'm gonna use a different namespace in order to test a few thin
 
 	struct SApplication {
 					::gpk::SFramework													Framework						;
-					::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>	Offscreen						;
+					::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>	Offscreen						;
 
 					int32_t																IdExit							= -1;
 
@@ -35,8 +35,8 @@ namespace gme // I'm gonna use a different namespace in order to test a few thin
 					char																StringFrameRateUpdate	[256]	= {};
 					char																StringFrameRateRender	[256]	= {};
 
-					::gpk::SImage<::gpk::SColorBGRA>									TextureMinimap					= {};
-					::gpk::array_obj<::gpk::SImage<::gpk::SColorBGRA>>					TexturesGND						= {};
+					::gpk::SImage<::gpk::bgra>									TextureMinimap					= {};
+					::gpk::array_obj<::gpk::SImage<::gpk::bgra>>					TexturesGND						= {};
 					::gpk::SModelPivot	<float>											GridPivot						= {};
 					::gpk::SScene														Scene;
 					::gpk::n3<float>												LightDirection					= {10, 5, 0};

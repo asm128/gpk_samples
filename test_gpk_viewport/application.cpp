@@ -13,7 +13,7 @@
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 
 // Vertex coordinates for cube faces
-stacxpr	const ::gpk::STriangle3<float>					modelPositionsVertices	[12]						=
+stacxpr	const ::gpk::tri3<float>					modelPositionsVertices	[12]						=
 	{ {{1.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}}	// Right	- first			?? I have no idea if this is correct lol
 	, {{1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 0.0f}}	// Right	- second		?? I have no idea if this is correct lol
 
@@ -33,7 +33,7 @@ stacxpr	const ::gpk::STriangle3<float>					modelPositionsVertices	[12]						=
 	, {{1.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 1.0f}}	// Top		- second
 	};
 
-stacxpr	const ::gpk::STriangle3<float>						modelNormalVectors		[12]						=
+stacxpr	const ::gpk::tri3<float>						modelNormalVectors		[12]						=
 	{ {{0.0f, 0.0f, -1.0f}	, {0.0f, 0.0f, -1.0f}	, {0.0f, 0.0f, -1.0f}}	// Right	- first			?? I have no idea if this is correct lol
 	, {{0.0f, 0.0f, -1.0f}	, {0.0f, 0.0f, -1.0f}	, {0.0f, 0.0f, -1.0f}}	// Right	- second		?? I have no idea if this is correct lol
 //		{					, , 										}
@@ -235,14 +235,14 @@ template<typename _tIndex, typename _tValue>
 	::gpk::SFramework														& framework									= app.Framework;
 	::gpk::SGUI																& gui										= *framework.GUI;
 
-	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>		buffer3d									= app.Buffer3D;
+	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>		buffer3d									= app.Buffer3D;
 	::gpk::ptr_obj<::gpk::SDialogViewport>									viewport									= {};
 	app.DialogMain.Controls[app.Viewport].as(viewport);
 	const ::gpk::n2<uint16_t>											& offscreenMetrics							= gui.Controls.Controls[viewport->IdClient].Area.Size.Cast<uint16_t>();
 	buffer3d->resize(offscreenMetrics.Cast<uint32_t>(), {0, 0, 0, 0}, (uint32_t)-1);
 
-	::gpk::array_pod<::gpk::STriangle3<float>>								& triangle3dList							= app.VertexCache.Triangle3dTransformed	;
-	::gpk::array_pod<::gpk::SColorBGRA>										& triangle3dColorList						= app.VertexCache.Triangle3dColorList	;
+	::gpk::array_pod<::gpk::tri3<float>>								& triangle3dList							= app.VertexCache.Triangle3dTransformed	;
+	::gpk::array_pod<::gpk::bgra>										& triangle3dColorList						= app.VertexCache.Triangle3dColorList	;
 	const uint32_t															countTriangles								= app.ModelGeometry.Positions.Indices.size() / 3;
 	triangle3dList		.resize(countTriangles);
 	triangle3dColorList	.resize(countTriangles * 3);
@@ -256,7 +256,7 @@ template<typename _tIndex, typename _tValue>
 
 	::gpk::n3<float>													& lightPos									= app.Scene.LightPos;
 	for(uint32_t iTriangle = 0; iTriangle < countTriangles; ++iTriangle) {
-		::gpk::STriangle3<float>												& transformedTriangle						= triangle3dList[iTriangle];
+		::gpk::tri3<float>												& transformedTriangle						= triangle3dList[iTriangle];
 		transformedTriangle													=
 			{ app.ModelGeometry.Positions.Values[app.ModelGeometry.Positions.Indices[iTriangle * 3 + 0]]
 			, app.ModelGeometry.Positions.Values[app.ModelGeometry.Positions.Indices[iTriangle * 3 + 1]]
@@ -264,12 +264,12 @@ template<typename _tIndex, typename _tValue>
 			};
 		::gpk::transform(transformedTriangle, projection);
 	}
-	::gpk::array_pod<::gpk::STriangle2<int32_t>>							triangle2dList								= {};
+	::gpk::array_pod<::gpk::tri2<int32_t>>							triangle2dList								= {};
 	triangle2dList.resize(countTriangles);
 	const ::gpk::n2<int32_t>											screenCenter								= {(int32_t)offscreenMetrics.x / 2, (int32_t)offscreenMetrics.y / 2};
 	for(uint32_t iTriangle = 0; iTriangle < countTriangles; ++iTriangle) { // Maybe the scale
-		::gpk::STriangle3<float>												& transformedTriangle3D						= triangle3dList[iTriangle];
-		::gpk::STriangle2<int32_t>												& transformedTriangle2D						= triangle2dList[iTriangle];
+		::gpk::tri3<float>												& transformedTriangle3D						= triangle3dList[iTriangle];
+		::gpk::tri2<int32_t>												& transformedTriangle2D						= triangle2dList[iTriangle];
 		transformedTriangle2D.A												= {(int32_t)transformedTriangle3D.A.x, (int32_t)transformedTriangle3D.A.y};
 		transformedTriangle2D.B												= {(int32_t)transformedTriangle3D.B.x, (int32_t)transformedTriangle3D.B.y};
 		transformedTriangle2D.C												= {(int32_t)transformedTriangle3D.C.x, (int32_t)transformedTriangle3D.C.y};
@@ -285,7 +285,7 @@ template<typename _tIndex, typename _tValue>
 	::gpk::array_pod<::gpk::n2<int16_t>>								wireframePixelCoords;
 	::gpk::array_pod<::gpk::n2<int16_t>>								trianglePixelCoords;
 	::gpk::n3<float>													cameraFront										= (camera.Target - camera.Position).Normalize();
-	::gpk::array_pod<::gpk::STriangle<float>>								triangleWeights;
+	::gpk::array_pod<::gpk::tri<float>>								triangleWeights;
 
 	for(uint32_t iTriangle = 0; iTriangle < 12; ++iTriangle) {
 		double																	lightFactor									= normals[iTriangle * 3].Dot(cameraFront);
@@ -293,7 +293,7 @@ template<typename _tIndex, typename _tValue>
 			continue;
 		//gerror_if(errored(::gpk::drawTriangle(buffer3d->Color.View, triangle3dColorList[iTriangle], triangle2dList[iTriangle])), "Not sure if these functions could ever fail");
 		trianglePixelCoords.clear();
-		::gpk::STriangle3<float>												transformedTriangle3D						= {};
+		::gpk::tri3<float>												transformedTriangle3D						= {};
 		transformedTriangle3D.A												= {(float)triangle2dList[iTriangle].A.x, (float)triangle2dList[iTriangle].A.y, triangle3dList[iTriangle].A.z};
 		transformedTriangle3D.B												= {(float)triangle2dList[iTriangle].B.x, (float)triangle2dList[iTriangle].B.y, triangle3dList[iTriangle].B.z};
 		transformedTriangle3D.C												= {(float)triangle2dList[iTriangle].C.x, (float)triangle2dList[iTriangle].C.y, triangle3dList[iTriangle].C.z};
@@ -311,7 +311,7 @@ template<typename _tIndex, typename _tValue>
 	gui.Controls.Controls[viewport->IdClient].Image						= buffer3d->Color.View;
 
 	// ---
-	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>		target;
+	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>		target;
 	target.create();
 	target->resize(app.Framework.RootWindow.Size, ::gpk::LIGHTGRAY, 0xFFFFFFFFU);
 	{

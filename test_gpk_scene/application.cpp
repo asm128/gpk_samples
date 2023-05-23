@@ -96,7 +96,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 
 			::gpk::error_t											draw					(::gme::SApplication & app)							{
 	//::gpk::STimer															timer;
-	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>		target;
+	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>		target;
 	target->resize(app.Framework.RootWindow.Size, 0x00102030U, 0xFFFFFFFFU);
 	for(uint32_t y = 0; y < target->Color.View.metrics().y / 3; ++y)
 	for(uint32_t x = 0; x < target->Color.View.metrics().x / 3; ++x) {

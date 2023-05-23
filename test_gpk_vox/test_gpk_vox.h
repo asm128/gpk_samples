@@ -13,7 +13,7 @@ struct SApplication {
 	::gpk::array_obj<::gpk::vcc>										VOXModelNames								= {};
 
 	int32_t																IdViewport									= -1;
-	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>	BackBuffer;
+	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>	BackBuffer;
 
 	HDC																	DrawingContext								= {};
 	HGLRC																GLRenderContext								= {}; 

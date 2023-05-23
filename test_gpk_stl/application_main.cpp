@@ -46,7 +46,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 
 	static constexpr const ::gpk::n3<float>								cubeCenter									= {0.5f, 0.5f, 0.5f};
 	for(uint32_t iTriangle = 0; iTriangle < app.CubePositions.size(); ++iTriangle) {
-		::gpk::STriangle3<float>													& transformedTriangle						= app.CubePositions[iTriangle];
+		::gpk::tri3<float>													& transformedTriangle						= app.CubePositions[iTriangle];
 		transformedTriangle														= stlFile.Triangles[iTriangle].Triangle;
 
 		float a = transformedTriangle.A.z
@@ -106,8 +106,8 @@ struct SCamera {
 	::gpk::SSTLFile											& stlFile									= app.STLFile;
 
 	//------------------------------------------------
-	::gpk::array_pod<::gpk::STriangle3<float>>				triangle3dList								= {};
-	::gpk::array_pod<::gpk::SColorBGRA>						triangle3dColorList							= {};
+	::gpk::array_pod<::gpk::tri3<float>>				triangle3dList								= {};
+	::gpk::array_pod<::gpk::bgra>						triangle3dColorList							= {};
 	triangle3dList.resize(app.CubePositions.size());
 	triangle3dColorList.resize(app.CubePositions.size());
 	::gpk::SMatrix4<float>									projection									= {};
@@ -141,16 +141,16 @@ struct SCamera {
 	viewport._44															= 1.0f;
 	projection																= projection * viewport.GetInverse();
 	for(uint32_t iTriangle = 0; iTriangle < app.CubePositions.size(); ++iTriangle) {
-		::gpk::STriangle3<float>													& transformedTriangle						= triangle3dList[iTriangle];
+		::gpk::tri3<float>													& transformedTriangle						= triangle3dList[iTriangle];
 		transformedTriangle														= app.CubePositions[iTriangle];
 		::gpk::transform(transformedTriangle, projection);
 	}
-	::gpk::array_pod<::gpk::STriangle2<int32_t>>								triangle2dList								= {};
+	::gpk::array_pod<::gpk::tri2<int32_t>>								triangle2dList								= {};
 	triangle2dList.resize(app.CubePositions.size());
 	const ::gpk::n2<int32_t>												screenCenter								= {(int32_t)offscreenMetrics.x / 2, (int32_t)offscreenMetrics.y / 2};
 	for(uint32_t iTriangle = 0; iTriangle < app.CubePositions.size(); ++iTriangle) { // Maybe the scale
-		::gpk::STriangle3<float>													& transformedTriangle3D						= triangle3dList[iTriangle];
-		::gpk::STriangle2<int32_t>													& transformedTriangle2D						= triangle2dList[iTriangle];
+		::gpk::tri3<float>													& transformedTriangle3D						= triangle3dList[iTriangle];
+		::gpk::tri2<int32_t>													& transformedTriangle2D						= triangle2dList[iTriangle];
 		transformedTriangle2D.A													= {(int32_t)transformedTriangle3D.A.x, (int32_t)transformedTriangle3D.A.y};
 		transformedTriangle2D.B													= {(int32_t)transformedTriangle3D.B.x, (int32_t)transformedTriangle3D.B.y};
 		transformedTriangle2D.C													= {(int32_t)transformedTriangle3D.C.x, (int32_t)transformedTriangle3D.C.y};

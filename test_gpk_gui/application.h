@@ -10,9 +10,9 @@ namespace gme // I'm gonna use a different namespace in order to test a few thin
 {
 	struct SApplication {
 					::gpk::SFramework														Framework							;
-					::gpk::SImage<::gpk::SColorBGRA>										TextureFont							= {};
-					::gpk::SImage<::gpk::SColorBGRA>										VerticalAtlas						;
-					::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>		Offscreen							= {};
+					::gpk::SImage<::gpk::bgra>										TextureFont							= {};
+					::gpk::SImage<::gpk::bgra>										VerticalAtlas						;
+					::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>		Offscreen							= {};
 
 					int32_t																	Palettes[::gpk::GUI_CONTROL_PALETTE_COUNT]	= {};
 

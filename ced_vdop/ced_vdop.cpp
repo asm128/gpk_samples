@@ -41,7 +41,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 
 	const ::gpk::n2<uint32_t>							metricsMap			= app.TextOverlay.MetricsMap;
 	const ::gpk::n2<uint32_t>							metricsLetter		= app.TextOverlay.MetricsLetter;
-	::gpk::SImage<::gpk::SColorBGRA>						fontImage;
+	::gpk::SImage<::gpk::bgra>						fontImage;
 	::gpk::pngFileLoad(::gpk::view_const_string{"../gpk_data/images/Codepage_437_24_12x12.png"}, fontImage);
 	::gpk::view_grid<::gpk::SGeometryQuads>					viewGeometries		= {app.TextOverlay.GeometryLetters, {16, 16}};
 	const uint32_t											imagePitch			= metricsLetter.x * metricsMap.x;
@@ -128,20 +128,20 @@ int													update				(SApplication & app, bool exitSignal)	{
 }
 
 static	int											drawPixels
-	( ::gpk::view_grid<::gpk::SColorBGRA>				targetPixels
-	, const ::gpk::STriangle3	<float>					& triangleWorld
+	( ::gpk::view_grid<::gpk::bgra>				targetPixels
+	, const ::gpk::tri3	<float>					& triangleWorld
 	, const ::gpk::n3		<float>					& normal
 	, const ::gpk::n3		<float>					& lightVector
 	, const ::gpk::SColorFloat							& texelColor
 	, ::gpk::array_pod<::gpk::n2<int16_t>>			& pixelCoords
-	, ::gpk::array_pod<::gpk::STriangle<float>>	& pixelVertexWeights
+	, ::gpk::array_pod<::gpk::tri<float>>	& pixelVertexWeights
 	, double											timeAnimation
 	) {
 	double													lightFactorDirectional		= normal.Dot(lightVector);
 	(void)lightFactorDirectional;
 	for(uint32_t iPixelCoord = 0; iPixelCoord < pixelCoords.size(); ++iPixelCoord) {
 		::gpk::n2<int16_t>									pixelCoord					= pixelCoords		[iPixelCoord];
-		const ::gpk::STriangle<float>					& vertexWeights				= pixelVertexWeights[iPixelCoord];
+		const ::gpk::tri<float>					& vertexWeights				= pixelVertexWeights[iPixelCoord];
 		const ::gpk::n3<float>								position					= ::gpk::triangleWeight(vertexWeights, triangleWorld);
 		double													factorWave					= (::gpk::max(0.0, sin(- timeAnimation * 4 + position.y * .75))) * .6;
 		double													factorWave2					= (::gpk::max(0.0, sin(- timeAnimation + position.x * .0125 + position.z * .125))) * .5;
@@ -151,7 +151,7 @@ static	int											drawPixels
 }
 
 int													draw3DCharacter
-	( const ::gpk::view_grid<::gpk::SColorBGRA>				& targetPixels
+	( const ::gpk::view_grid<::gpk::bgra>				& targetPixels
 	, const ::gpk::n2<uint32_t>						& metricsCharacter
 	, const ::gpk::n2<uint32_t>						& metricsMap
 	, const uint8_t											asciiCode
@@ -186,11 +186,11 @@ int													draw3DCharacter
 	for(uint32_t iTriangle = 0; iTriangle < geometry.Triangles.size(); ++iTriangle) {
 		drawCache.PixelCoords			.clear();
 		drawCache.PixelVertexWeights	.clear();
-		::gpk::STriangle3		<float>							triangle			= geometry.Triangles	[iTriangle];;
+		::gpk::tri3		<float>							triangle			= geometry.Triangles	[iTriangle];;
 		const ::gpk::n3	<float>							& normal			= geometry.Normals		[iTriangle / 2];
 		::gpk::drawQuadTriangle(targetPixels.metrics(), triangle, matrixTransformView, drawCache.PixelCoords, drawCache.PixelVertexWeights, depthBuffer);
 		::gpk::n3	<float>									xnormal				= matrixTransform.TransformDirection(normal).Normalize();
-		::gpk::STriangle3		<float>							triangleWorld		= triangle;
+		::gpk::tri3		<float>							triangleWorld		= triangle;
 		::gpk::transform(triangleWorld, matrixTransform);
 		::drawPixels(targetPixels, triangleWorld, xnormal, lightVector, color * .75, drawCache.PixelCoords, drawCache.PixelVertexWeights, timeAnimation);
 	}
@@ -198,10 +198,10 @@ int													draw3DCharacter
 }
 
 int													draw					(SApplication & app) {
-	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>		target;
+	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>		target;
 	target.create();
 	target->resize(app.Framework.RootWindow.Size, ::gpk::DARKGREEN, 0xFFFFFFFFU);
-	::gpk::view_grid<::gpk::SColorBGRA>						targetPixels			= target->Color;
+	::gpk::view_grid<::gpk::bgra>						targetPixels			= target->Color;
 	::gpk::view_grid<uint32_t>								depthBuffer				= target->DepthStencil;
 	app.TextOverlay.DrawCache							= {};
 

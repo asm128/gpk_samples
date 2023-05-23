@@ -13,7 +13,7 @@
 
 struct SDrawCache {
 	::gpk::apod<::gpk::n2<int32_t>>			PixelCoords				= {};
-	::gpk::apod<::gpk::STriangle<float>>	PixelVertexWeights		= {};
+	::gpk::apod<::gpk::tri<float>>	PixelVertexWeights		= {};
 	::gpk::apod<::gpk::n3<float>>			LightPointsModel		= {};
 	::gpk::apod<::gpk::bgra>				LightColorsModel		= {};
 };

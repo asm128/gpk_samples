@@ -42,7 +42,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 
 	const ::gpk::n2<uint32_t>							metricsMap						= app.TextOverlay.MetricsMap;
 	const ::gpk::n2<uint32_t>							metricsLetter					= app.TextOverlay.MetricsLetter;
-	::gpk::SImage<::gpk::SColorBGRA>						fontImage;
+	::gpk::SImage<::gpk::bgra>						fontImage;
 	::gpk::pngFileLoad(::gpk::view_const_string{"../gpk_data/images/Codepage_437_24_12x12.png"}, fontImage);
 	::gpk::view_grid<::gpk::SGeometryQuads>					viewGeometries					= {app.TextOverlay.GeometryLetters, {16, 16}};
 	const uint32_t											imagePitch						= metricsLetter.x * metricsMap.x;
@@ -168,7 +168,7 @@ int													update				(SApplication & app, bool exitSignal)	{
 }
 
 int													draw					(SApplication & app) {
-	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>		target;
+	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>		target;
 	target.create();
 	target->resize(app.Framework.RootWindow.Size, ::gpk::DARKGREEN, 0xFFFFFFFFU);
 

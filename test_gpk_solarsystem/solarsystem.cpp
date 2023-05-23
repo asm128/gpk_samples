@@ -24,7 +24,7 @@
 	return 0;
 }
 
-static	int											drawDebris			(::gpk::view_grid<::gpk::SColorBGRA> targetPixels, ::ssg::SDebris & debris, const ::gpk::SMatrix4<float> & matrixVPV, ::gpk::view_grid<uint32_t> depthBuffer)	{
+static	int											drawDebris			(::gpk::view_grid<::gpk::bgra> targetPixels, ::ssg::SDebris & debris, const ::gpk::SMatrix4<float> & matrixVPV, ::gpk::view_grid<uint32_t> depthBuffer)	{
 	::gpk::array_pod<::gpk::n2<int32_t>>				pixelCoords;
 	for(uint32_t iParticle = 0; iParticle < debris.Brightness.size(); ++iParticle) {
 		::gpk::SColorFloat										colorShot			= debris.Colors[iParticle % ::gpk::size(debris.Colors)];
@@ -91,7 +91,7 @@ int													updateEntityTransforms		(uint32_t iEntity, ::gpk::array_obj<::ss
 	return 0;
 }
 
-int													ssg::solarSystemUpdate			(ssg::SSolarSystemGame & solarSystem, double secondsLastFrame, ::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>> & target)	{
+int													ssg::solarSystemUpdate			(ssg::SSolarSystemGame & solarSystem, double secondsLastFrame, ::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>> & target)	{
 	// ------------------------------------------- Handle input
 	::gpk::SRigidBodyIntegrator								& bodies						= solarSystem.Bodies;
 	::ssg::SScene											& scene							= solarSystem.Scene;
@@ -133,7 +133,7 @@ int													ssg::solarSystemUpdate			(ssg::SSolarSystemGame & solarSystem, d
 	bodies.Integrate(secondsLastFrame);
 
 	//------------------------------------------- Transform and Draw
-	::gpk::view_grid<::gpk::SColorBGRA>						targetPixels				= target->Color.View;
+	::gpk::view_grid<::gpk::bgra>						targetPixels				= target->Color.View;
 	memset((void*)targetPixels.begin(), 0, sizeof(::gpk::SColorBGRA) * targetPixels.size());
 	::gpk::SColorBGRA										colorBackground		= {0x20, 0x8, 0x4};
 	//colorBackground									+= (colorBackground * (0.5 + (0.5 / 65535 * rand())) * ((rand() % 2) ? -1 : 1)) ;
@@ -154,7 +154,7 @@ int													ssg::solarSystemUpdate			(ssg::SSolarSystemGame & solarSystem, d
 	matrixView											*= matrixViewport;
 
 	::gpk::array_pod<::gpk::n2<int16_t>>				pixelCoords					= {};
-	::gpk::array_pod<::gpk::STriangle<float>>		pixelVertexWeights			= {};
+	::gpk::array_pod<::gpk::tri<float>>		pixelVertexWeights			= {};
 	::gpk::SModelMatrices									matrices					= {};
 	::gpk::view_grid<uint32_t>								depthBuffer					= target->DepthStencil.View;
 	memset(depthBuffer.begin(), -1, sizeof(uint32_t) * depthBuffer.size());
@@ -173,7 +173,7 @@ int													ssg::solarSystemUpdate			(ssg::SSolarSystemGame & solarSystem, d
 
 		matrices.Scale		.Scale			(scene.Pivot[entity.Model].Scale		, true);
 		matrices.Position	.SetTranslation	(scene.Pivot[entity.Model].Position	, true);
-		::gpk::view_grid<::gpk::SColorBGRA>						entityImage					= solarSystem.Images[entity.Images];
+		::gpk::view_grid<::gpk::bgra>						entityImage					= solarSystem.Images[entity.Images];
 		::gpk::SGeometryIndexedTriangles						& entityGeometry			= solarSystem.Geometries[entity.Geometry];
 		matrixTransform										= matrices.Scale * matrices.Position * matrixTransform;
 		::gpk::SMatrix4<float>									matrixTransformView			= matrixTransform * matrixView;

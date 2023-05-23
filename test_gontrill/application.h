@@ -54,8 +54,8 @@ struct SStuffToDraw {
 						::gpk::array_pod<::SParticleToDraw>															Debris										= {};
 						::gpk::array_pod<::gpk::n2<float>>														CollisionPoints								= {};
 
-						::gpk::array_obj<::gpk::view_grid<::gpk::SColorBGRA>>										TexturesPowerup0							= {};
-						::gpk::array_obj<::gpk::view_grid<::gpk::SColorBGRA>>										TexturesPowerup1							= {};
+						::gpk::array_obj<::gpk::view_grid<::gpk::bgra>>										TexturesPowerup0							= {};
+						::gpk::array_obj<::gpk::view_grid<::gpk::bgra>>										TexturesPowerup1							= {};
 };
 
 enum GAME_TEXTURE : int8_t
@@ -104,8 +104,8 @@ struct SApplication {
 
 						::gpk::SColorBGRA																			ColorBackground								= ::gpk::SColorFloat(.15f, .15f, .15f, 1.0f);
 
-						::gpk::array_static<::gpk::img<::gpk::SColorBGRA>				, GAME_TEXTURE_COUNT>		Original									= {};
-						::gpk::array_static<::gpk::img<::gpk::SColorBGRA>				, GAME_TEXTURE_COUNT>		Processed									= {};
+						::gpk::array_static<::gpk::img<::gpk::bgra>				, GAME_TEXTURE_COUNT>		Original									= {};
+						::gpk::array_static<::gpk::img<::gpk::bgra>				, GAME_TEXTURE_COUNT>		Processed									= {};
 						::gpk::array_static<::gpk::n2<int32_t>						, GAME_TEXTURE_COUNT>		TextureCenters								= {};
 						::gpk::n2<int32_t>																		PSOffsetFromShipCenter						= {};
 						::gpk::SImageMonochrome<uint32_t>															TextureFontMonochrome						= {};

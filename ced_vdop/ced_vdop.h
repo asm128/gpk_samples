@@ -13,9 +13,9 @@
 
 struct SDrawCache {
 	::gpk::array_pod<::gpk::n2<int16_t>>			PixelCoords				= {};
-	::gpk::array_pod<::gpk::STriangle<float>>			PixelVertexWeights		= {};
+	::gpk::array_pod<::gpk::tri<float>>			PixelVertexWeights		= {};
 	::gpk::array_pod<::gpk::n3<float>>				LightPointsModel		= {};
-	::gpk::array_pod<::gpk::SColorBGRA>					LightColorsModel		= {};
+	::gpk::array_pod<::gpk::bgra>					LightColorsModel		= {};
 };
 
 struct STextOverlay {

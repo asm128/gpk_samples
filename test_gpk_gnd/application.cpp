@@ -168,10 +168,10 @@
 				heightMinMax.Min												= ::gpk::min(gndData.lstTileGeometryData[iTile].fHeight[iHeight] * -1, heightMinMax.Min);
 			}
 		}
-	::gpk::SImage<::gpk::SColorBGRA>	minimapTemp;
+	::gpk::SImage<::gpk::bgra>	minimapTemp;
 	minimapTemp.resize(gndData.Metrics.Size);
 
-	::gpk::view_grid<::gpk::SColorBGRA>											& minimapView								= minimapTemp.View;
+	::gpk::view_grid<::gpk::bgra>											& minimapView								= minimapTemp.View;
 	const float																	heightRange									= heightMinMax.Max - heightMinMax.Min;
 	for(uint32_t y = 0, yMax = minimapView.metrics().y; y < yMax; ++y)
 	for(uint32_t x = 0, xMax = minimapView.metrics().x; x < xMax; ++x) {
@@ -315,7 +315,7 @@
 	, const ::gpk::n3<float>										& lightDir
 	, const ::gpk::SModelGND											& modelGND
 	, const ::gpk::SRSWWorldLight										& directionalLight
-	, const ::gpk::view_array<const ::gpk::SImage<::gpk::SColorBGRA>>	& textures
+	, const ::gpk::view_array<const ::gpk::SImage<::gpk::bgra>>	& textures
 	, const ::gpk::view_array<const ::gpk::SLightInfoRSW>				& lights
 	, bool																wireframe
 	);
@@ -323,7 +323,7 @@
 	::gpk::STimer															timer;
 	::gpk::SFramework														& framework									= app.Framework;
 	::gpk::SGUI																& gui										= *framework.GUI;
-	static ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>				buffer3D;
+	static ::gpk::SRenderTarget<::gpk::bgra, uint32_t>				buffer3D;
 	::gpk::ptr_obj<::gpk::SDialogViewport>									viewport									= {};
 	app.DialogMain.Controls[app.Viewport].as(viewport);
 	const ::gpk::n2<uint32_t>											& offscreenMetrics							= gui.Controls.Controls[viewport->IdClient].Area.Size.Cast<uint32_t>();
@@ -335,7 +335,7 @@
 
 	int32_t 																pixelsDrawn0								= drawGND(app.RenderCache, app.Scene.Transforms, app.Scene.Camera, buffer3D, app.GridPivot, app.LightDirection, app.GNDModel, app.RSWData.Light, app.TexturesGND, app.RSWData.RSWLights, checkbox->Checked);
 	gerror_if(errored(pixelsDrawn0), "??");
-	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>		target;
+	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>		target;
 	target.create();
 	target->resize(app.Framework.RootWindow.Size, ::gpk::LIGHTGRAY, 0xFFFFFFFFU);
 	{

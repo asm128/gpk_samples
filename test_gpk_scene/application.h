@@ -14,8 +14,8 @@ namespace gme // I'm gonna use a different namespace in order to test a few thin
 	struct SApplication {
 		::gpk::SFramework													Framework;
 
-		::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>	Offscreen					= {};
-		::gpk::array_obj<::gpk::SImage<::gpk::SColorBGRA>>					PNGImages					= {};
+		::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>	Offscreen					= {};
+		::gpk::array_obj<::gpk::SImage<::gpk::bgra>>					PNGImages					= {};
 		::gpk::SComponentScene												Scene						= {};
 
 		int32_t																IdModel						= -1;

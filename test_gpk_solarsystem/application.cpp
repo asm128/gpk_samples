@@ -69,9 +69,9 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Solar System Test");
 
 			::gpk::error_t											draw					(::gme::SApplication & app)							{
 	//::gpk::STimer															timer;
-	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>		target;
+	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>		target;
 	target->resize(app.Framework.RootWindow.Size, {}, (uint32_t)-1);
-	//::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>		targetGame;
+	//::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>		targetGame;
 	//targetGame->resize(app.Framework.RootWindow.Size / 2, {}, (uint32_t)-1);
 
 	::ssg::solarSystemUpdate(app.SolarSystemGame, app.Framework.Timer.LastTimeSeconds, target);

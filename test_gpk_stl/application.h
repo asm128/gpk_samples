@@ -8,10 +8,10 @@
 struct SApplication {
 						::gpk::SFramework								Framework									;
 
-						::gpk::SImage<::gpk::SColorBGRA>				TextureFont									= {};
+						::gpk::SImage<::gpk::bgra>				TextureFont									= {};
 						::gpk::SImageMonochrome<uint32_t>				TextureFontMonochrome						= {};
 						::gpk::SGUI										GUI											= {};
-						::gpk::array_pod<::gpk::STriangle3<float>>		CubePositions								= {};
+						::gpk::array_pod<::gpk::tri3<float>>		CubePositions								= {};
 						::gpk::SSTLFile									STLFile										= {};
 						int32_t											IdViewport									= -1;
 

@@ -33,7 +33,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 }
 
 // Vertex coordinates for cube faces
-static constexpr const ::gpk::STriangle3<float>						geometryCube	[12]						=
+static constexpr const ::gpk::tri3<float>						geometryCube	[12]						=
 	{ {{1.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}}	// Right	- first			?? I have no idea if this is correct lol
 	, {{1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 0.0f}}	// Right	- second		?? I have no idea if this is correct lol
 
@@ -62,7 +62,7 @@ static constexpr const ::gpk::STriangle3<float>						geometryCube	[12]						=
 
 	static constexpr const ::gpk::n3<float>								cubeCenter									= {0.5f, 0.5f, 0.5f};
 	for(uint32_t iTriangle = 0; iTriangle < 12; ++iTriangle) {
-		::gpk::STriangle3<float>													& transformedTriangle						= app.CubePositions[iTriangle];
+		::gpk::tri3<float>													& transformedTriangle						= app.CubePositions[iTriangle];
 		transformedTriangle														= geometryCube[iTriangle];
 		transformedTriangle.A													-= cubeCenter;
 		transformedTriangle.B													-= cubeCenter;
@@ -115,12 +115,12 @@ struct SCamera {
 					::gpk::error_t										draw										(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	::gpk::SFramework															& framework									= app.Framework;
 
-	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>			backBuffer;
+	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>			backBuffer;
 	backBuffer->resize(framework.RootWindow.BackBuffer->Color.metrics(), 0xFF000080, (uint32_t)-1);
 
 	//------------------------------------------------
-	::gpk::array_pod<::gpk::STriangle3<float>>									triangle3dList								= {};
-	::gpk::array_pod<::gpk::SColorBGRA>											triangle3dColorList							= {};
+	::gpk::array_pod<::gpk::tri3<float>>									triangle3dList								= {};
+	::gpk::array_pod<::gpk::bgra>											triangle3dColorList							= {};
 	triangle3dList.resize(12);
 	triangle3dColorList.resize(12);
 	::gpk::SMatrix4<float>														projection									= {};
@@ -154,16 +154,16 @@ struct SCamera {
 	viewport._44															= 1.0f;
 	projection																= projection * viewport.GetInverse();
 	for(uint32_t iTriangle = 0; iTriangle < 12; ++iTriangle) {
-		::gpk::STriangle3<float>													& transformedTriangle						= triangle3dList[iTriangle];
+		::gpk::tri3<float>													& transformedTriangle						= triangle3dList[iTriangle];
 		transformedTriangle														= app.CubePositions[iTriangle];
 		::gpk::transform(transformedTriangle, projection);
 	}
-	::gpk::array_pod<::gpk::STriangle2<int32_t>>								triangle2dList								= {};
+	::gpk::array_pod<::gpk::tri2<int32_t>>								triangle2dList								= {};
 	triangle2dList.resize(12);
 	const ::gpk::n2<int32_t>												screenCenter								= {(int32_t)offscreenMetrics.x / 2, (int32_t)offscreenMetrics.y / 2};
 	for(uint32_t iTriangle = 0; iTriangle < 12; ++iTriangle) { // Maybe the scale
-		::gpk::STriangle3<float>													& transformedTriangle3D						= triangle3dList[iTriangle];
-		::gpk::STriangle2<int32_t>													& transformedTriangle2D						= triangle2dList[iTriangle];
+		::gpk::tri3<float>													& transformedTriangle3D						= triangle3dList[iTriangle];
+		::gpk::tri2<int32_t>													& transformedTriangle2D						= triangle2dList[iTriangle];
 		transformedTriangle2D.A													= {(int32_t)transformedTriangle3D.A.x, (int32_t)transformedTriangle3D.A.y};
 		transformedTriangle2D.B													= {(int32_t)transformedTriangle3D.B.x, (int32_t)transformedTriangle3D.B.y};
 		transformedTriangle2D.C													= {(int32_t)transformedTriangle3D.C.x, (int32_t)transformedTriangle3D.C.y};
