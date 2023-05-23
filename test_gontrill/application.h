@@ -6,6 +6,7 @@
 #include "game.h"
 #include "spawner.h"
 #include "track.h"
+#include "gpk_line.h"
 
 #ifndef APPLICATION_H_098273498237423
 #define APPLICATION_H_098273498237423

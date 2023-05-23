@@ -3,7 +3,7 @@
 
 #include "CharacterPoints.h"
 
-#include "gpk_coord.h"
+#include "gpk_n3.h"
 
 #ifndef __GAMEBASE_H__98236498027346892734689273__
 #define __GAMEBASE_H__98236498027346892734689273__
