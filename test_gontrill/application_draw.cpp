@@ -8,7 +8,7 @@
 #define Y_PLUS -
 
 static	::gpk::error_t						drawShipHealthBar			(::gpk::v2<::gpk::bgra> target, ::SApplication & app, const ::gpk::n2f & centerEnemy, const ::gpk::n2<int32_t> & halfMetrics, uint32_t health, int32_t yOffset, const ::gpk::bgra & finalColor)											{
-	::gpk::SLine2<int32_t>							healthBar					= {};
+	::gpk::line2<int32_t>							healthBar					= {};
 	healthBar.A 								= {(int32_t)(centerEnemy.x  + .5f - halfMetrics.x), (int32_t)(centerEnemy.y Y_PLUS yOffset)};
 	healthBar.B									= healthBar.A; //{(int32_t)(centerEnemy.x  + .5f + halfMetrics.x), (int32_t)(centerEnemy.y + yOffset)};
 	healthBar.B.x								+= halfMetrics.x * 2;

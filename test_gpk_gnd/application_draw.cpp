@@ -3,6 +3,9 @@
 #include "gpk_dialog_controls.h"
 #include "gpk_scene.h"
 #include "gpk_ro_gnd.h"
+#include "gpk_line3.h"
+
+
 namespace gpk
 {
 	template<typename _tCoord>
@@ -247,9 +250,9 @@ static				::gpk::error_t										drawTriangles
 				}
 			}
 			if(wireframe) {
-				gerror_if(errored(::gpk::drawLine(targetView.metrics().Cast<uint16_t>(), ::gpk::SLine3<float>{renderCache.Triangle3dToDraw[iTriangle].A, renderCache.Triangle3dToDraw[iTriangle].B}, renderCache.WireframePixelCoords)), "Not sure if these functions could ever fail");
-				gerror_if(errored(::gpk::drawLine(targetView.metrics().Cast<uint16_t>(), ::gpk::SLine3<float>{renderCache.Triangle3dToDraw[iTriangle].B, renderCache.Triangle3dToDraw[iTriangle].C}, renderCache.WireframePixelCoords)), "Not sure if these functions could ever fail");
-				gerror_if(errored(::gpk::drawLine(targetView.metrics().Cast<uint16_t>(), ::gpk::SLine3<float>{renderCache.Triangle3dToDraw[iTriangle].C, renderCache.Triangle3dToDraw[iTriangle].A}, renderCache.WireframePixelCoords)), "Not sure if these functions could ever fail");
+				gerror_if(errored(::gpk::drawLine(targetView.metrics().Cast<uint16_t>(), ::gpk::line3<float>{renderCache.Triangle3dToDraw[iTriangle].A, renderCache.Triangle3dToDraw[iTriangle].B}, renderCache.WireframePixelCoords)), "Not sure if these functions could ever fail");
+				gerror_if(errored(::gpk::drawLine(targetView.metrics().Cast<uint16_t>(), ::gpk::line3<float>{renderCache.Triangle3dToDraw[iTriangle].B, renderCache.Triangle3dToDraw[iTriangle].C}, renderCache.WireframePixelCoords)), "Not sure if these functions could ever fail");
+				gerror_if(errored(::gpk::drawLine(targetView.metrics().Cast<uint16_t>(), ::gpk::line3<float>{renderCache.Triangle3dToDraw[iTriangle].C, renderCache.Triangle3dToDraw[iTriangle].A}, renderCache.WireframePixelCoords)), "Not sure if these functions could ever fail");
 			}
 		}
 	return 0;

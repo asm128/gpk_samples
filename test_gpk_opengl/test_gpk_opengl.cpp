@@ -401,24 +401,24 @@ struct SCamera {
 	//	if(lightFactor > 0)
 	//		continue;
 	//	gerror_if(errored(::gpk::drawTriangle(backBuffer->Color.View, triangle3dColorList[iTriangle], triangle2dList[iTriangle])), "Not sure if these functions could ever fail");
-	//	//::gpk::drawLine(backBuffer->Color.View, (::gpk::SColorBGRA)::gpk::GREEN	, ::gpk::SLine2<int32_t>{triangle2dList[iTriangle].A, triangle2dList[iTriangle].B});
-	//	//::gpk::drawLine(backBuffer->Color.View, (::gpk::SColorBGRA)::gpk::BLUE	, ::gpk::SLine2<int32_t>{triangle2dList[iTriangle].B, triangle2dList[iTriangle].C});
-	//	//::gpk::drawLine(backBuffer->Color.View, (::gpk::SColorBGRA)::gpk::RED	, ::gpk::SLine2<int32_t>{triangle2dList[iTriangle].C, triangle2dList[iTriangle].A});
+	//	//::gpk::drawLine(backBuffer->Color.View, (::gpk::SColorBGRA)::gpk::GREEN	, ::gpk::line2<int32_t>{triangle2dList[iTriangle].A, triangle2dList[iTriangle].B});
+	//	//::gpk::drawLine(backBuffer->Color.View, (::gpk::SColorBGRA)::gpk::BLUE	, ::gpk::line2<int32_t>{triangle2dList[iTriangle].B, triangle2dList[iTriangle].C});
+	//	//::gpk::drawLine(backBuffer->Color.View, (::gpk::SColorBGRA)::gpk::RED	, ::gpk::line2<int32_t>{triangle2dList[iTriangle].C, triangle2dList[iTriangle].A});
 	//	//trianglePixelCoords.clear(); ::gpk::drawTriangle(offscreenMetrics, triangle2dList[iTriangle], trianglePixelCoords);
 	//	//for(uint32_t iCoord = 0; iCoord < trianglePixelCoords.size(); ++iCoord)
 	//	//	::gpk::drawPixelLight(backBuffer->Color.View, trianglePixelCoords[iCoord], (::gpk::SColorBGRA)::gpk::BLUE, 0.05f, 2.5);
-	//	//wireframePixelCoords.clear(); ::gpk::drawLine(offscreenMetrics, ::gpk::SLine2<int32_t>{triangle2dList[iTriangle].A, triangle2dList[iTriangle].B}, wireframePixelCoords);
+	//	//wireframePixelCoords.clear(); ::gpk::drawLine(offscreenMetrics, ::gpk::line2<int32_t>{triangle2dList[iTriangle].A, triangle2dList[iTriangle].B}, wireframePixelCoords);
 	//	//for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord)
 	//	//	::gpk::drawPixelLight(backBuffer->Color.View, wireframePixelCoords[iCoord], (::gpk::SColorBGRA)::gpk::GREEN, 0.05f, 1.5);
-	//	//wireframePixelCoords.clear(); ::gpk::drawLine(offscreenMetrics, ::gpk::SLine2<int32_t>{triangle2dList[iTriangle].B, triangle2dList[iTriangle].C}, wireframePixelCoords);
+	//	//wireframePixelCoords.clear(); ::gpk::drawLine(offscreenMetrics, ::gpk::line2<int32_t>{triangle2dList[iTriangle].B, triangle2dList[iTriangle].C}, wireframePixelCoords);
 	//	//for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord)
 	//	//	::gpk::drawPixelLight(backBuffer->Color.View, wireframePixelCoords[iCoord], (::gpk::SColorBGRA)::gpk::CYAN, 0.05f, 1.5);
-	//	//wireframePixelCoords.clear(); ::gpk::drawLine(offscreenMetrics, ::gpk::SLine2<int32_t>{triangle2dList[iTriangle].C, triangle2dList[iTriangle].A}, wireframePixelCoords);
+	//	//wireframePixelCoords.clear(); ::gpk::drawLine(offscreenMetrics, ::gpk::line2<int32_t>{triangle2dList[iTriangle].C, triangle2dList[iTriangle].A}, wireframePixelCoords);
 	//	//for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord)
 	//	//	::gpk::drawPixelLight(backBuffer->Color.View, wireframePixelCoords[iCoord], (::gpk::SColorBGRA)::gpk::RED, 0.05f, 1.5);
-	//	::gpk::drawLine(offscreenMetrics, ::gpk::SLine2<int32_t>{triangle2dList[iTriangle].A, triangle2dList[iTriangle].B}, wireframePixelCoords);
-	//	::gpk::drawLine(offscreenMetrics, ::gpk::SLine2<int32_t>{triangle2dList[iTriangle].B, triangle2dList[iTriangle].C}, wireframePixelCoords);
-	//	::gpk::drawLine(offscreenMetrics, ::gpk::SLine2<int32_t>{triangle2dList[iTriangle].C, triangle2dList[iTriangle].A}, wireframePixelCoords);
+	//	::gpk::drawLine(offscreenMetrics, ::gpk::line2<int32_t>{triangle2dList[iTriangle].A, triangle2dList[iTriangle].B}, wireframePixelCoords);
+	//	::gpk::drawLine(offscreenMetrics, ::gpk::line2<int32_t>{triangle2dList[iTriangle].B, triangle2dList[iTriangle].C}, wireframePixelCoords);
+	//	::gpk::drawLine(offscreenMetrics, ::gpk::line2<int32_t>{triangle2dList[iTriangle].C, triangle2dList[iTriangle].A}, wireframePixelCoords);
 	//}
 	//for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord)
 	//	::gpk::drawPixelLight(backBuffer->Color.View, wireframePixelCoords[iCoord], (::gpk::SColorBGRA)::gpk::GREEN, 0.05f, 1.5);

@@ -6,7 +6,7 @@
 #include "game.h"
 #include "spawner.h"
 #include "track.h"
-#include "gpk_line.h"
+#include "gpk_line2.h"
 
 #ifndef APPLICATION_H_098273498237423
 #define APPLICATION_H_098273498237423
@@ -44,19 +44,19 @@ struct SParticleToDraw {
 struct SLaserToDraw {
 						int32_t																						IndexParticlePhysics;
 						int32_t																						IndexParticleInstance;
-						::gpk::SLine2<float>																		Segment;
+						::gpk::line2<float>																		Segment;
 };
 #pragma pack(pop)
 
 struct SStuffToDraw {
-						::gpk::array_pod<::SLaserToDraw>															ProjectilePaths								= {};
-						::gpk::array_pod<::SParticleToDraw>															Stars										= {};
-						::gpk::array_pod<::SParticleToDraw>															Thrust										= {};
-						::gpk::array_pod<::SParticleToDraw>															Debris										= {};
-						::gpk::array_pod<::gpk::n2<float>>														CollisionPoints								= {};
+						::gpk::apod<::SLaserToDraw>															ProjectilePaths								= {};
+						::gpk::apod<::SParticleToDraw>															Stars										= {};
+						::gpk::apod<::SParticleToDraw>															Thrust										= {};
+						::gpk::apod<::SParticleToDraw>															Debris										= {};
+						::gpk::apod<::gpk::n2<float>>														CollisionPoints								= {};
 
-						::gpk::array_obj<::gpk::view_grid<::gpk::bgra>>										TexturesPowerup0							= {};
-						::gpk::array_obj<::gpk::view_grid<::gpk::bgra>>										TexturesPowerup1							= {};
+						::gpk::aobj<::gpk::view_grid<::gpk::bgra>>										TexturesPowerup0							= {};
+						::gpk::aobj<::gpk::view_grid<::gpk::bgra>>										TexturesPowerup1							= {};
 };
 
 enum GAME_TEXTURE : int8_t
@@ -73,11 +73,11 @@ enum GAME_TEXTURE : int8_t
 	};
 
 struct SEffectsDelay {
-						double																						Thrust;
-						double																						Star;
+	double							Thrust;
+	double							Star;
 };
 
-static constexpr	const ::gpk::n2<uint16_t>																	GAME_SCREEN_SIZE							= {640 / 2 * 3, 360 / 2 * 3};
+static constexpr	const ::gpk::n2u16		GAME_SCREEN_SIZE				= {640 / 2 * 3, 360 / 2 * 3};
 
 struct SLevelState {
 	int32_t							Number;
@@ -85,37 +85,38 @@ struct SLevelState {
 };
 
 struct SApplication {
-	typedef				::gpk::SParticleSystem<::SGameParticle, float>												TParticleSystem;
-	typedef				TParticleSystem::TParticleInstance															TParticleInstance;
-	typedef				TParticleSystem::TIntegrator																TIntegrator;
-	typedef				TIntegrator::TParticle																		TParticle;
+	typedef	::gpk::SParticleSystem<::SGameParticle, float>	TParticleSystem;
+	typedef	TParticleSystem::TParticleInstance				TParticleInstance;
+	typedef	TParticleSystem::TIntegrator					TIntegrator;
+	typedef	TIntegrator::TParticle							TParticle;
 
-						::gpk::SFramework																			Framework									;
+	::gpk::SFramework				Framework									;
 
-						::SGame																						Game										= {};
-						::SLevelState																				Level										= {0, 0};
-						bool																						Playing										= true;
-						bool																						Paused										= true;
-						bool																						Debugging									= true;
+	::SGame							Game										= {};
+	::SLevelState					Level										= {0, 0};
+	bool							Playing										= true;
+	bool							Paused										= true;
+	bool							Debugging									= true;
 
-						TParticleSystem																				ParticleSystemThrust						= {};
-						TParticleSystem																				ParticleSystemProjectiles					= {};
-						TParticleSystem																				ParticleSystemDebris						= {};
-						TParticleSystem																				ParticleSystemStars							= {};
+	TParticleSystem					ParticleSystemThrust						= {};
+	TParticleSystem					ParticleSystemProjectiles					= {};
+	TParticleSystem					ParticleSystemDebris						= {};
+	TParticleSystem					ParticleSystemStars							= {};
 
-						::gpk::SColorBGRA																			ColorBackground								= ::gpk::SColorFloat(.15f, .15f, .15f, 1.0f);
+	::gpk::SColorBGRA				ColorBackground								= ::gpk::SColorFloat(.15f, .15f, .15f, 1.0f);
 
-						::gpk::array_static<::gpk::img<::gpk::bgra>				, GAME_TEXTURE_COUNT>		Original									= {};
-						::gpk::array_static<::gpk::img<::gpk::bgra>				, GAME_TEXTURE_COUNT>		Processed									= {};
-						::gpk::array_static<::gpk::n2<int32_t>						, GAME_TEXTURE_COUNT>		TextureCenters								= {};
-						::gpk::n2<int32_t>																		PSOffsetFromShipCenter						= {};
-						::gpk::SImageMonochrome<uint32_t>															TextureFontMonochrome						= {};
+	::gpk::astatic<::gpk::img<::gpk::bgra>	, GAME_TEXTURE_COUNT>		Original									= {};
+	::gpk::astatic<::gpk::img<::gpk::bgra>	, GAME_TEXTURE_COUNT>		Processed									= {};
+	::gpk::astatic<::gpk::n2i32				, GAME_TEXTURE_COUNT>		TextureCenters								= {};
 
-						::SStuffToDraw																				StuffToDraw									= {};
-						::gpk::array_pod<::gpk::n2<int16_t>>													CacheLinePoints								= {};
-						::SEffectsDelay																				EffectsDelay								= {};
+	::gpk::n2i32					PSOffsetFromShipCenter						= {};
+	::gpk::imgmono<uint32_t>		TextureFontMonochrome						= {};
 
-																													SApplication								(::gpk::SRuntimeValues& runtimeValues)			noexcept	: Framework(runtimeValues) {}
+	::SStuffToDraw					StuffToDraw									= {};
+	::gpk::apod<::gpk::n2i16>		CacheLinePoints								= {};
+	::SEffectsDelay					EffectsDelay								= {};
+
+									SApplication								(::gpk::SRuntimeValues& runtimeValues)			noexcept	: Framework(runtimeValues) {}
 };
 
 #endif // APPLICATION_H_098273498237423
