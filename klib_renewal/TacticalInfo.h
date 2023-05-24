@@ -3,7 +3,7 @@
 #include "PlayerControl.h"
 #include "TacticalTile.h"
 
-#include "gpk_coord.h"
+#include "gpk_n3.h"
 
 #ifndef __TACTICALINFO_H__9238640297346098273469823746982__
 #define __TACTICALINFO_H__9238640297346098273469823746982__
@@ -165,8 +165,8 @@ namespace klib
 		};
 	};
 
-	static constexpr	const uint32_t									GAME_MAP_DEPTH									= 36				;
-	static constexpr	const uint32_t									GAME_MAP_WIDTH									= (GAME_MAP_DEPTH * 2);
+	stacxpr	const uint32_t									GAME_MAP_DEPTH									= 36				;
+	stacxpr	const uint32_t									GAME_MAP_WIDTH									= (GAME_MAP_DEPTH * 2);
 
 	// This structure holds all the data that is only valid once we enter the tactical mode and that is of no use outside of it.
 	struct STacticalInfo {

@@ -23,15 +23,15 @@ namespace klib
 	GDEFINE_ENUM_VALUE(ENTITY_TYPE, STAGE_PROP	, 7);
 	GDEFINE_ENUM_VALUE(ENTITY_TYPE, ITEM		, 8);
 	GDEFINE_ENUM_VALUE(ENTITY_TYPE, TILE		, 9);
-	static constexpr		const SEntityPointsMultiplier		g_MultipliersItem			= {{ .125,  .125,  .125}, { .125,  .125,  .125}, { .125,  .125, { .125,  .125,  .125},  .125,  .125}, {.125, .125, .125,  .125}, 0.125, 0.85, 1.0};
-	static constexpr		const SEntityPointsMultiplier		g_MultipliersWeapon			= {{ .125,    .1, .0625}, { .125, .0625, .0625}, { .125,   .25, { .125,    .1,  .125}, .0625,   .25}, {.125,  .125, .125,   .1}, 0.125, 0.85, 1.0};
-	static constexpr		const SEntityPointsMultiplier		g_MultipliersArmor			= {{ .125,    .1,   .25}, { .125,    .1,   .25}, {.0625, .0625, { .125, .0625,  .125},  .125, .0625}, {.125, .0625, .125,   .1}, 0.125, 0.85, 1.0};
-	static constexpr		const SEntityPointsMultiplier		g_MultipliersProfession		= {{  .25,  .125, .0625}, {  .25,  .125, .0625}, { .125,  .125, {.0625,  .125, .0625},  .125,  .125}, {.125,    .1,   .1,   .1}, 0.125, 0.85, 1.0};
-	static constexpr		const SEntityPointsMultiplier		g_MultipliersAccessory		= {{ .125,   .25, .0625}, { .125,   .25, .0625}, { .125,    .1, {.0625, .0625,  .125},    .1,    .1}, {.125,  .125, .125, .125}, 0.125, 0.85, 1.0};
-	static constexpr		const SEntityPointsMultiplier		g_MultipliersVehicle		= {{.0625, .0625,   .25}, {.0625, .0625,   .25}, { .125,  .125, { .125,  .125,  .125},  .125,  .125}, {.125,    .1, .125,   .1},   0.1, 0.85, 1.0};
-	static constexpr		const SEntityPointsMultiplier		g_MultipliersFacility		= {{  .25,   .25,   .25}, {  .25,   .25,   .25}, {  .25,   .25, {  .25,   .25,   .25},   .25,   .25}, { .25,   .25,  .25,   .1}, 0.125, 0.85, 1.0};
-	static constexpr		const SEntityPointsMultiplier		g_MultipliersStageProp		= {{  .25,   .25,   .25}, {  .25,   .25,   .25}, {  .25,   .25, {  .25,   .25,   .25},   .25,   .25}, { .25,   .25,  .25,   .1}, 0.125, 0.85, 1.0};
-	static constexpr		const SEntityPointsMultiplier		g_MultipliersTile			= {{  .25,   .25,   .25}, {  .25,   .25,   .25}, {  .25,   .25, {  .25,   .25,   .25},   .25,   .25}, { .25,   .25,  .25,   .1}, 0.125, 0.85, 1.0};
+	stacxpr		const SEntityPointsMultiplier		g_MultipliersItem			= {{ .125,  .125,  .125}, { .125,  .125,  .125}, { .125,  .125, { .125,  .125,  .125},  .125,  .125}, {.125, .125, .125,  .125}, 0.125, 0.85, 1.0};
+	stacxpr		const SEntityPointsMultiplier		g_MultipliersWeapon			= {{ .125,    .1, .0625}, { .125, .0625, .0625}, { .125,   .25, { .125,    .1,  .125}, .0625,   .25}, {.125,  .125, .125,   .1}, 0.125, 0.85, 1.0};
+	stacxpr		const SEntityPointsMultiplier		g_MultipliersArmor			= {{ .125,    .1,   .25}, { .125,    .1,   .25}, {.0625, .0625, { .125, .0625,  .125},  .125, .0625}, {.125, .0625, .125,   .1}, 0.125, 0.85, 1.0};
+	stacxpr		const SEntityPointsMultiplier		g_MultipliersProfession		= {{  .25,  .125, .0625}, {  .25,  .125, .0625}, { .125,  .125, {.0625,  .125, .0625},  .125,  .125}, {.125,    .1,   .1,   .1}, 0.125, 0.85, 1.0};
+	stacxpr		const SEntityPointsMultiplier		g_MultipliersAccessory		= {{ .125,   .25, .0625}, { .125,   .25, .0625}, { .125,    .1, {.0625, .0625,  .125},    .1,    .1}, {.125,  .125, .125, .125}, 0.125, 0.85, 1.0};
+	stacxpr		const SEntityPointsMultiplier		g_MultipliersVehicle		= {{.0625, .0625,   .25}, {.0625, .0625,   .25}, { .125,  .125, { .125,  .125,  .125},  .125,  .125}, {.125,    .1, .125,   .1},   0.1, 0.85, 1.0};
+	stacxpr		const SEntityPointsMultiplier		g_MultipliersFacility		= {{  .25,   .25,   .25}, {  .25,   .25,   .25}, {  .25,   .25, {  .25,   .25,   .25},   .25,   .25}, { .25,   .25,  .25,   .1}, 0.125, 0.85, 1.0};
+	stacxpr		const SEntityPointsMultiplier		g_MultipliersStageProp		= {{  .25,   .25,   .25}, {  .25,   .25,   .25}, {  .25,   .25, {  .25,   .25,   .25},   .25,   .25}, { .25,   .25,  .25,   .1}, 0.125, 0.85, 1.0};
+	stacxpr		const SEntityPointsMultiplier		g_MultipliersTile			= {{  .25,   .25,   .25}, {  .25,   .25,   .25}, {  .25,   .25, {  .25,   .25,   .25},   .25,   .25}, { .25,   .25,  .25,   .1}, 0.125, 0.85, 1.0};
 
 #define DECLARE_ENTITY(_multipliers, _type, _name)																																	\
 	struct S##_name : public ::klib::SEntity { 																																		\

@@ -24,7 +24,7 @@ struct SWindowsConsoleInfo {
 static				::gpk::array_pod<uint8_t >			g_bufferClearCharacter							= {};
 static				::gpk::array_pod<uint16_t>			g_bufferClearColors								= {};
 static				::SWindowsConsoleInfo				g_ConsoleInfo									= {};
-static constexpr	const ::gpk::SColorRGBA				g_DefaultPalette	[]							= 
+stacxpr	const ::gpk::SColorRGBA				g_DefaultPalette	[]							= 
 	{ ::klib::ASCII_COLOR_0							
 	, ::klib::ASCII_COLOR_1							
 	, ::klib::ASCII_COLOR_2							

@@ -7,7 +7,7 @@
 namespace klib
 {
 	template<typename _tCell>
-	inline	void									clearGrid						(::gpk::view_grid<_tCell> grid, const _tCell& clearValue = ' ')		{ ::gpk::drawRectangle(grid, clearValue, ::gpk::SRectangle2<uint32_t>{{}, grid.metrics()}); }
+	inline	void									clearGrid						(::gpk::view_grid<_tCell> grid, const _tCell& clearValue = ' ')		{ ::gpk::drawRectangle(grid, clearValue, ::gpk::rect2<uint32_t>{{}, grid.metrics()}); }
 
 	template<typename _tCell>
 	inline			int32_t							valueToGrid						( ::gpk::view_grid<_tCell> grid, int32_t offsetLine, int32_t offsetColumn, ::klib::ALIGN_SCREEN align, const _tCell* values, int32_t valueCount, int32_t repeat = 0 )	{

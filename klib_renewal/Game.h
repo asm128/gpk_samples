@@ -121,7 +121,7 @@ namespace klib
 							int64_t									Value;
 	};
 #pragma pack(pop)
-	static constexpr const uint32_t		SHOP_EXIT_VALUE				= 0x7FFF;
+	stacxpr const uint32_t		SHOP_EXIT_VALUE				= 0x7FFF;
 
 	struct SBuyable {
 		int16_t							Definition;

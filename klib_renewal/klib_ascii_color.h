@@ -52,7 +52,7 @@ namespace klib
 		, ASCII_COLOR_INDEX_WHITE		= 15
 		};
 
-	static constexpr	const uint32_t			ASCII_COLOR_INDEX_ORANGE		= ::klib::ASCII_COLOR_INDEX_LIGHTGREY;
+	stacxpr	const uint32_t			ASCII_COLOR_INDEX_ORANGE		= ::klib::ASCII_COLOR_INDEX_LIGHTGREY;
 
 } // namespace
 

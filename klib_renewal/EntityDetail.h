@@ -28,8 +28,8 @@ namespace klib {
 		lineToGridColored(display, textAttributes, ::klib::ASCII_COLOR_INDEX_YELLOW, ++offsetY, offsetX, ::klib::SCREEN_LEFT, nameAndLevelText.begin(), (uint32_t)nameAndLevelText.size());
 
 		const SEntityPoints							entityPoints						= ::klib::getEntityPoints(table, entity);
-		static constexpr	const char				formatPoints	[]					= "%-21.21s: %-10.10s";
-		static constexpr	const char				formatCoins		[]					= "%-21.21s: %-11.11s";
+		stacxpr	const char				formatPoints	[]					= "%-21.21s: %-10.10s";
+		stacxpr	const char				formatCoins		[]					= "%-21.21s: %-11.11s";
 		char										formattedGauge	[32]				= {};
 		offsetY									+= 2;
 		bool										blankLine							= false;

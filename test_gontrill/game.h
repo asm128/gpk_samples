@@ -4,7 +4,7 @@
 #include "weapon.h"
 #include "ship.h"
 
-#include "gpk_coord.h"
+#include "gpk_n2.h"
 #include "gpk_view_bit.h"
 #include "gpk_array_static.h"
 
@@ -75,10 +75,10 @@ struct SProjectile {
 						int32_t																	ShipIndex;
 };
 
-static constexpr	const int32_t															MAX_PLAYERS															= 4;
-static constexpr	const int32_t															MAX_POWERUP															= 64;
-static constexpr	const int32_t															MAX_ENEMIES															= 128;
-static constexpr	const int32_t															MAX_PROJECTILES														= 512;
+stacxpr	const int32_t															MAX_PLAYERS															= 4;
+stacxpr	const int32_t															MAX_POWERUP															= 64;
+stacxpr	const int32_t															MAX_ENEMIES															= 128;
+stacxpr	const int32_t															MAX_PROJECTILES														= 512;
 
 template<size_t _sizeArray>
 struct SArrayElementState : public ::gpk::view_bit<uint64_t> {
@@ -98,7 +98,7 @@ template<size_t _sizeArray>
 	return -1;
 }
 
-static constexpr	const uint32_t															MAGIC_NUMBER														= 1397704771;
+stacxpr	const uint32_t															MAGIC_NUMBER														= 1397704771;
 
 template<uint32_t _sizeArray>
 struct SPropertiesPowerup		{

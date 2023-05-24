@@ -13,8 +13,8 @@
 
 #include <GL\Gl.h>
 
-static constexpr	const uint32_t										ASCII_SCREEN_WIDTH							= 132	;
-static constexpr	const uint32_t										ASCII_SCREEN_HEIGHT							= 50	;
+stacxpr	const uint32_t										ASCII_SCREEN_WIDTH							= 132	;
+stacxpr	const uint32_t										ASCII_SCREEN_HEIGHT							= 50	;
 
 GPK_DEFINE_APPLICATION_ENTRY_POINT_MT(::SApplication, "Title");
 
@@ -435,7 +435,7 @@ struct SCamera {
 
 	::gpk::SNearFar											nearFar										= {0.1f , 1000.0f};
 
-	static constexpr const ::gpk::n3<float>			cameraUp									= {0, 1, 0};	// ? cam't remember what is this. Radians? Eulers?
+	stacxpr const ::gpk::n3<float>			cameraUp									= {0, 1, 0};	// ? cam't remember what is this. Radians? Eulers?
 	::SCamera												camera										= {{100, 50, 0}, {25, 0, 25}};
 	//camera.Position *= 2.0f;
 	::gpk::n3<float>									lightPos									= {150, 50, 0};

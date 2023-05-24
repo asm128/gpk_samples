@@ -207,8 +207,8 @@ HWND IntiOpenGLForWindow(HWND hWnd, BYTE type, DWORD flags) {
 
 #include "gpk_app_impl.h"
 
-static constexpr	const uint32_t										ASCII_SCREEN_WIDTH							= 132	;
-static constexpr	const uint32_t										ASCII_SCREEN_HEIGHT							= 50	;
+stacxpr	const uint32_t										ASCII_SCREEN_WIDTH							= 132	;
+stacxpr	const uint32_t										ASCII_SCREEN_HEIGHT							= 50	;
 
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "Title");
 
@@ -230,7 +230,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 }
 
 // Vertex coordinates for cube faces
-static constexpr const ::gpk::tri3<float>						geometryCube	[12]						=
+stacxpr const ::gpk::tri3<float>						geometryCube	[12]						=
 	{ {{1.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}}	// Right	- first			?? I have no idea if this is correct lol
 	, {{1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 0.0f}}	// Right	- second		?? I have no idea if this is correct lol
 
@@ -300,7 +300,7 @@ static constexpr const ::gpk::tri3<float>						geometryCube	[12]						=
 	return 0;
 }
 
-static constexpr const ::gpk::n3<float>						geometryCubeNormals	[12]						=
+stacxpr const ::gpk::n3<float>						geometryCubeNormals	[12]						=
 	{ {0.0f, 0.0f, -1.0f}	// Right	- first			?? I have no idea if this is correct lol
 	, {0.0f, 0.0f, -1.0f}	// Right	- second		?? I have no idea if this is correct lol
 
@@ -351,7 +351,7 @@ struct SCamera {
 	//
 	//::gpk::SNearFar																nearFar										= {0.01f , 1000.0f};
 	//
-	//static constexpr const ::gpk::n3<float>								cameraUp									= {0, 1, 0};	// ? cam't remember what is this. Radians? Eulers?
+	//stacxpr const ::gpk::n3<float>								cameraUp									= {0, 1, 0};	// ? cam't remember what is this. Radians? Eulers?
 	//::SCamera																	camera										= {{10, 5, 0}, {}};
 	//::gpk::n3<float>														lightPos									= {10, 5, 0};
 	//static float																cameraRotation								= 0;

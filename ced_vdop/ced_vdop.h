@@ -28,9 +28,9 @@ struct STextOverlay {
 	::gpk::SMatrix4<float>								MatrixProjection		= {};
 	::SDrawCache										DrawCache				= {};
 
-	static constexpr	const ::gpk::n3<float>		ControlTranslation		= {0, 0, 20.0f};
-	static constexpr	const ::gpk::n2<uint32_t>	MetricsLetter			= {12, 12};
-	static constexpr	const ::gpk::n2<uint32_t>	MetricsMap				= {16, 16};
+	stacxpr	const ::gpk::n3<float>		ControlTranslation		= {0, 0, 20.0f};
+	stacxpr	const ::gpk::n2<uint32_t>	MetricsLetter			= {12, 12};
+	stacxpr	const ::gpk::n2<uint32_t>	MetricsMap				= {16, 16};
 };
 
 struct SApplication {

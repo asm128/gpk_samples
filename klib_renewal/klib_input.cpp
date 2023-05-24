@@ -5,8 +5,8 @@
 #endif
 
 ::gpk::error_t												klib::pollInput									(::klib::SInput& input)		{
-	static constexpr	const uint32_t								keyCount										= ::klib::SInput::KeyCount;
-	static constexpr	const uint32_t								buttonCount										= ::klib::SInput::ButtonCount;
+	stacxpr	const uint32_t								keyCount										= ::klib::SInput::KeyCount;
+	stacxpr	const uint32_t								buttonCount										= ::klib::SInput::ButtonCount;
 	memcpy(input.PreviousKeys, input.Keys, keyCount);
 #if defined(GPK_WINDOWS)
 	for(uint32_t i=0; i<keyCount; i++)

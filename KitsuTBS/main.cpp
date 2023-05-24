@@ -8,8 +8,8 @@ int											main							(int /*argc*/, char ** /*argv*/) {
 	// Set the new bits
 	_CrtSetDbgFlag(tmp);
 #endif
-	static constexpr	const uint32_t				ASCII_DISPLAY_HEIGHT			= 64;
-	static constexpr	const uint32_t				ASCII_DISPLAY_WIDTH				= ((uint32_t)(ASCII_DISPLAY_HEIGHT * 2.666666f));
+	stacxpr	const uint32_t				ASCII_DISPLAY_HEIGHT			= 64;
+	stacxpr	const uint32_t				ASCII_DISPLAY_WIDTH				= ((uint32_t)(ASCII_DISPLAY_HEIGHT * 2.666666f));
 	::klib::initASCIIScreen(ASCII_DISPLAY_WIDTH, ASCII_DISPLAY_HEIGHT);
 
 	::gpk::ptr_obj<::klib::SGame>					pInstancedGame					= {};

@@ -39,7 +39,7 @@ static				void												setupParticles								()																				{
 					::SApplication										* g_ApplicationInstance						= 0;
 
 static				::gpk::error_t										updateSizeDependentResources				(::SApplication& app)											{
-	//static constexpr	const ::gpk::n2u32										GAME_SCREEN_SIZE							= {640, 360};
+	//stacxpr	const ::gpk::n2u32										GAME_SCREEN_SIZE							= {640, 360};
 	::gpk::updateSizeDependentTarget(app.Framework.RootWindow.BackBuffer->Color, app.Framework.RootWindow.Size);
 	::gpk::updateSizeDependentTarget(app.Framework.RootWindow.BackBuffer->DepthStencil, app.Framework.RootWindow.Size);
 	return 0;
@@ -158,7 +158,7 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	gerror_if(errored(::drawShots		(target, app)), "Why??");	// --- Draw lasers
 	gerror_if(errored(::drawCollisions	(target, app)), "Why??");	// --- Draw debris particles
 
-	static constexpr	const ::gpk::n2i32		sizeCharCell								= {9, 16};
+	stacxpr	const ::gpk::n2i32		sizeCharCell								= {9, 16};
 	uint32_t									lineOffset									= 0;
 	static	const ::gpk::vcs					textLine0									= "W: Up, S: Down, A: Left, D: Right";
 	static	const ::gpk::vcs					textLine1									= "T: Shoot. Y: Thrust. U: Handbrake.";
@@ -168,7 +168,7 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	const ::gpk::n2<uint32_t>					& offscreenMetrics							= target.metrics();
 	::gpk::textLineDrawAlignedFixedSizeLit(target, app.TextureFontMonochrome.View, fontAtlasView.metrics(), lineOffset++, offscreenMetrics, sizeCharCell, textLine0, ::gpk::SColorBGRA{0, app.Framework.FrameInfo.FrameNumber % 0xFF, 0xFFU, 0xFFU});
 	::gpk::textLineDrawAlignedFixedSizeLit(target, app.TextureFontMonochrome.View, fontAtlasView.metrics(), lineOffset++, offscreenMetrics, sizeCharCell, textLine1, ::gpk::SColorBGRA{app.Framework.FrameInfo.FrameNumber % 0xFFU, 0xFFU, 0, 0xFFU});
-	::gpk::textLineDrawAlignedFixedSizeRGBA(target, fontAtlasView, lineOffset = offscreenMetrics.y / 16 - 1, offscreenMetrics, sizeCharCell, textLine2);
+	::gpk::textLineDrawAlignedFixedSize(target, fontAtlasView, lineOffset = offscreenMetrics.y / 16 - 1, offscreenMetrics, sizeCharCell, textLine2);
 	::gpk::textLineDrawAlignedFixedSizeLit(target, app.TextureFontMonochrome.View, fontAtlasView.metrics(), --lineOffset, offscreenMetrics, sizeCharCell, weaponProperties[app.Game.Ships.Weapon[0].IndexProperties].Name, ::gpk::SColorBGRA{app.Framework.FrameInfo.FrameNumber % 0xFFU, 0xFFU, 0, 0xFFU});
 	if(app.Debugging) {
 		::gpk::STimer							& timer										= framework.Timer;
@@ -178,21 +178,21 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 			, app.ParticleSystemProjectiles	.Instances.size()
 			, app.ParticleSystemThrust		.Instances.size()
 			);
-		::gpk::textLineDrawAlignedFixedSizeRGBA(target, fontAtlasView, --lineOffset, offscreenMetrics, sizeCharCell, {buffer, (uint32_t)lineLen});
+		::gpk::textLineDrawAlignedFixedSize(target, fontAtlasView, --lineOffset, offscreenMetrics, sizeCharCell, {buffer, (uint32_t)lineLen});
 		lineLen								= sprintf_s(buffer, "Stars fx count: %u. Debris fx count: %u. Projectiles fx count: %u."
 			, app.ParticleSystemStars		.Instances.size()
 			, app.ParticleSystemDebris		.Instances.size()
 			, app.ParticleSystemProjectiles	.Instances.size()
 			);
-		::gpk::textLineDrawAlignedFixedSizeRGBA(target, fontAtlasView, --lineOffset, offscreenMetrics, sizeCharCell, {buffer, (uint32_t)lineLen});
+		::gpk::textLineDrawAlignedFixedSize(target, fontAtlasView, --lineOffset, offscreenMetrics, sizeCharCell, {buffer, (uint32_t)lineLen});
 		lineLen								= sprintf_s(buffer, "Enemy count: %u. Projectile count: %u. Powerup count: %u."
 			, app.Game.CountEnemies
 			, app.Game.CountProjectiles
 			, app.Game.CountPowerups
 			);
-		::gpk::textLineDrawAlignedFixedSizeRGBA(target, fontAtlasView, --lineOffset, offscreenMetrics, sizeCharCell, {buffer, (uint32_t)lineLen});
+		::gpk::textLineDrawAlignedFixedSize(target, fontAtlasView, --lineOffset, offscreenMetrics, sizeCharCell, {buffer, (uint32_t)lineLen});
 		lineLen																	= sprintf_s(buffer, "FPS: %g. Last frame seconds: %g.", 1 / timer.LastTimeSeconds, timer.LastTimeSeconds);
-		::gpk::textLineDrawAlignedFixedSizeRGBA(target, fontAtlasView, --lineOffset, offscreenMetrics, sizeCharCell, {buffer, (uint32_t)lineLen});
+		::gpk::textLineDrawAlignedFixedSize(target, fontAtlasView, --lineOffset, offscreenMetrics, sizeCharCell, {buffer, (uint32_t)lineLen});
 	}
 	return 0;
 }

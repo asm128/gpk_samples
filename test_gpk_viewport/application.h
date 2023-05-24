@@ -24,7 +24,7 @@ namespace gme // I'm gonna use a different namespace in order to test a few thin
 	};
 
 	struct SViewportScene {
-		static constexpr	const ::gpk::n3<float>											CameraUp						= {0, 1, 0};	// ? cam't remember what is this. Radians? Eulers?
+		stacxpr	const ::gpk::n3<float>											CameraUp						= {0, 1, 0};	// ? cam't remember what is this. Radians? Eulers?
 							::gme::SCamera														Camera							= {{10, 5, 0}, {}};
 
 							::gpk::n3<float>												LightPos						= {10, 5, 0};

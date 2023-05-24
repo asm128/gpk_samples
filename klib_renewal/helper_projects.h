@@ -60,7 +60,7 @@ namespace klib
 		,	bool													bIsParallelDefinition
 		,	bool													bIsParallelModifier
 		) {
-		static constexpr	const ENTITY_TYPE			curType					= entity.getType();
+		stacxpr	const ENTITY_TYPE			curType					= entity.getType();
 		if(entity.Definition && -1 == researchCompleted.Definitions.FindElement(entity.Definition) && (bIsParallelDefinition || entity.Definition <= (researchCompleted.MaxResearch.Definition+1)) ) {
 			bool											bNotFound				= true;
 			for(uint32_t i=0, count = (uint32_t)queuedResearch.size(); i<count; ++i) {

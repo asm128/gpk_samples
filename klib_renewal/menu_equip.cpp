@@ -27,8 +27,8 @@ bool	klib::restrictedArmor				(::klib::SGameMessages& messages, ::klib::SGamePla
 bool	klib::restrictedAccessory			(::klib::SGameMessages& messages, ::klib::SGamePlayer& player, const ::klib::SEntityTables & tables, int32_t indexAgent, int16_t selectedChoice) { static const ::gpk::view_const_string modifierTypeName = "Crafting"	; ::klib::CCharacter& playerAgent = *player.Tactical.Army[indexAgent]; return ::klib::equipRestriction(messages, player.Inventory.Accessory		, selectedChoice, tables.Accessory	, player.Tactical.Research.Accessory	, playerAgent.Goods.CompletedResearch.Accessory	, modifierTypeName); };
 
 static	::klib::SGameState					drawEquipMenu						(::klib::SGame& instanceGame, const ::klib::SGameState& returnState) {
-	//static constexpr const uint32_t					MAX_BUY_ITEMS						= 1024;
-	//static constexpr const uint32_t					SHOP_EXIT_VALUE						= ((MAX_BUY_ITEMS)*2);
+	//stacxpr const uint32_t					MAX_BUY_ITEMS						= 1024;
+	//stacxpr const uint32_t					SHOP_EXIT_VALUE						= ((MAX_BUY_ITEMS)*2);
 #define MAX_BUY_ITEMS							1024
 	static klib::SMenuItem<int32_t>					menuItems[MAX_BUY_ITEMS+1]			= {};
 
@@ -162,7 +162,7 @@ static void								drawScore						(::gpk::view_grid<char> display, int32_t offse
 }
 
 ::klib::SGameState						drawEquip				(::klib::SGame& instanceGame, const ::klib::SGameState& returnState) {
-	static constexpr	const uint32_t		MAX_ENTITY_COLUMNS		= 4;
+	stacxpr	const uint32_t		MAX_ENTITY_COLUMNS		= 4;
 	::klib::SGamePlayer						& player				= instanceGame.Players[::klib::PLAYER_INDEX_USER];
 	::gpk::view_grid<char>					display					= instanceGame.GlobalDisplay.Screen.Color;
 	::gpk::view_grid<uint16_t>				textAttributes			= instanceGame.GlobalDisplay.Screen.DepthStencil;

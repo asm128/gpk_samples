@@ -36,7 +36,7 @@ static	::gpk::error_t						drawShipHealthBar			(::gpk::v2<::gpk::bgra> target, :
 	for(uint32_t iEnemy = 0, enemyCount = gameInstance.Enemies.Alive.size(); iEnemy < enemyCount; ++iEnemy) {
 		if(0 == gameInstance.Enemies.Alive[iEnemy])
 			continue;
-		static constexpr ::gpk::n2f						reference								= {1, 0};
+		stacxpr ::gpk::n2f						reference								= {1, 0};
 		::gpk::n2f										vector;
 		static double									beaconTimer								= 0;
 		beaconTimer									+= framework.FrameInfo.Seconds.LastFrame * 8;
@@ -150,7 +150,7 @@ static	const ::gpk::astatic<::gpk::bgra, WEAPON_TYPE_COUNT>	weaponTypeColorPalet
 	return 0;
 }
 					::gpk::error_t										drawBackground								(::gpk::v2<::gpk::bgra> target, ::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
-	::gpk::drawRectangle(target, app.ColorBackground, ::gpk::SRectangle2<uint32_t>{{}, target.metrics()});
+	::gpk::drawRectangle(target, app.ColorBackground, ::gpk::rect2<uint32_t>{{}, target.metrics()});
 	for(uint32_t iRay = 0, rayCount = app.StuffToDraw.Stars.size(); iRay < rayCount; ++iRay) {
 		::SParticleToDraw															& starToDraw								= app.StuffToDraw.Stars[iRay];
 		if(false == app.ParticleSystemStars.Instances[starToDraw.IndexParticleInstance].Binding.Lit)
@@ -226,8 +226,8 @@ static	::gpk::error_t										drawPowerup						(::gpk::v2<::gpk::bgra> target, 
 	return 0;
 }
 
-static constexpr	int32_t												PWERUP_HALF_WIDTH							= 6;
-static constexpr	const ::gpk::n2<int32_t>						squarePowerupLightPositions		[8]			=
+stacxpr	int32_t												PWERUP_HALF_WIDTH							= 6;
+stacxpr	const ::gpk::n2<int32_t>						squarePowerupLightPositions		[8]			=
 	{ ::gpk::n2<int32_t>{-PWERUP_HALF_WIDTH    , -PWERUP_HALF_WIDTH - 1}
 	, ::gpk::n2<int32_t>{-PWERUP_HALF_WIDTH - 1, -PWERUP_HALF_WIDTH}
 	, ::gpk::n2<int32_t>{-PWERUP_HALF_WIDTH - 1,  PWERUP_HALF_WIDTH - 1}
@@ -238,7 +238,7 @@ static constexpr	const ::gpk::n2<int32_t>						squarePowerupLightPositions		[8]	
 	, ::gpk::n2<int32_t>{ PWERUP_HALF_WIDTH - 1, -PWERUP_HALF_WIDTH - 1}
 	};
 
-static constexpr	const ::gpk::n2<int32_t>						diagonalPowerupLightPositions	[8]			=
+stacxpr	const ::gpk::n2<int32_t>						diagonalPowerupLightPositions	[8]			=
 	{ ::gpk::n2<int32_t>{-1, -PWERUP_HALF_WIDTH - 1}
 	, ::gpk::n2<int32_t>{ 0, -PWERUP_HALF_WIDTH - 1}
 	, ::gpk::n2<int32_t>{PWERUP_HALF_WIDTH, -1}

@@ -154,7 +154,7 @@ template<typename _tIndex, typename _tValue>
 	controlTable.Controls	[viewport->IdGUIControl	].Area.Size				= {640, 480};
 	controlTable.States		[viewport->IdClient		].ImageInvertY			= true;
 
-	static constexpr const ::gpk::n3<float>							cubeCenter									= {0.5f, 0.5f, 0.5f};
+	stacxpr const ::gpk::n3<float>							cubeCenter									= {0.5f, 0.5f, 0.5f};
 	::gpk::array_pod<uint8_t>												& remap										= app.ModelGeometry.PositionRemap;
 	::indexValues({&modelPositionsVertices[0].A, ::gpk::size(modelPositionsVertices) * 3}, app.ModelGeometry.Positions.Indices, app.ModelGeometry.Positions.Values, remap);
 	for(uint32_t iVertex = 0; iVertex < app.ModelGeometry.Positions.Values.size(); ++iVertex) {

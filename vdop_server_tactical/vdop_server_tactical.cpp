@@ -59,8 +59,8 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 	}
 
 
-	static constexpr const uint32_t							DEFAULT_ASCII_DISPLAY_HEIGHT	= 70;
-	static constexpr const uint32_t							DEFAULT_ASCII_DISPLAY_WIDTH		= (uint32_t)(DEFAULT_ASCII_DISPLAY_HEIGHT * 2.666666f);
+	stacxpr const uint32_t							DEFAULT_ASCII_DISPLAY_HEIGHT	= 70;
+	stacxpr const uint32_t							DEFAULT_ASCII_DISPLAY_WIDTH		= (uint32_t)(DEFAULT_ASCII_DISPLAY_HEIGHT * 2.666666f);
 	::klib::initASCIIScreen(DEFAULT_ASCII_DISPLAY_WIDTH, DEFAULT_ASCII_DISPLAY_HEIGHT);
 
 	app.Game.push_back({});

@@ -3,7 +3,7 @@
 //		Also useful for copy & paste operations in which you need to copy a bunch of variable or function names and you can't afford the time of copying them one by one.
 #include "application.h"
 #include "gpk_collision.h"
-#include "gpk_coord.h"
+#include "gpk_n2.h"
 
 					::gpk::error_t										updateInput									(::SApplication& app)											{
 	::gpk::SInput																& inputSystem								= *app.Framework.RootWindow.Input;
@@ -50,9 +50,9 @@
 }
 
 struct SAABBCache {
-						::gpk::line2<float>								RectangleSegments	[4]						= {};
-						::gpk::n2<float>								CollisionPoints		[4]						= {};
-						bool												Collision			[4]						= {};
+	::gpk::line2<float>	RectangleSegments	[4]		= {};
+	::gpk::n2<float>	CollisionPoints		[4]		= {};
+	bool				Collision			[4]		= {};
 };
 
 template<typename _tCoord>
@@ -509,7 +509,7 @@ static				::gpk::error_t										spawnPowOfRandomType						(::SGame & gameInsta
 						::spawnPowOfRandomType(gameInstance, gameInstance.Enemies.Position[iEnemy]);
 					continue;
 				}
-				static constexpr const ::gpk::n2<float>								reference									= {1, 0};
+				stacxpr const ::gpk::n2<float>								reference									= {1, 0};
 				::gpk::n2<float>														vector;
 				for(uint32_t iGhost = 0; iGhost < 5; ++iGhost) {
 					vector																	= reference * (64 * sin(app.Framework.FrameInfo.Seconds.Total));
