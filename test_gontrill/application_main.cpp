@@ -10,7 +10,8 @@
 #include "gpk_gui_text.h"
 #include "gpk_png.h"
 #include "gpk_json_expression.h"
-#include "gpk_storage.h"
+#include "gpk_file.h"
+#include "gpk_path.h"
 
 #include "gpk_app_impl.h"
 
@@ -158,18 +159,18 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	gerror_if(errored(::drawShots		(target, app)), "Why??");	// --- Draw lasers
 	gerror_if(errored(::drawCollisions	(target, app)), "Why??");	// --- Draw debris particles
 
-	stacxpr	const ::gpk::n2i32		sizeCharCell								= {9, 16};
-	uint32_t									lineOffset									= 0;
+	stacxpr	const ::gpk::n2u8					sizeCharCell								= {9, 16};
+	uint16_t									lineOffset									= 0;
 	static	const ::gpk::vcs					textLine0									= "W: Up, S: Down, A: Left, D: Right";
 	static	const ::gpk::vcs					textLine1									= "T: Shoot. Y: Thrust. U: Handbrake.";
 	static	const ::gpk::vcs					textLine2									= "Press ESC to exit or P to (un)pause.";
 	::gpk::SFramework							& framework									= app.Framework;
 	::gpk::v2<::gpk::bgra>						& fontAtlasView								= app.Processed[GAME_TEXTURE_FONT_ATLAS].View;
-	const ::gpk::n2<uint32_t>					& offscreenMetrics							= target.metrics();
-	::gpk::textLineDrawAlignedFixedSizeLit(target, app.TextureFontMonochrome.View, fontAtlasView.metrics(), lineOffset++, offscreenMetrics, sizeCharCell, textLine0, ::gpk::SColorBGRA{0, app.Framework.FrameInfo.FrameNumber % 0xFF, 0xFFU, 0xFFU});
-	::gpk::textLineDrawAlignedFixedSizeLit(target, app.TextureFontMonochrome.View, fontAtlasView.metrics(), lineOffset++, offscreenMetrics, sizeCharCell, textLine1, ::gpk::SColorBGRA{app.Framework.FrameInfo.FrameNumber % 0xFFU, 0xFFU, 0, 0xFFU});
+	const ::gpk::n2u16							& offscreenMetrics							= target.metrics().Cast<uint16_t>();
+	::gpk::textLineDrawAlignedFixedSizeLit(target, app.TextureFontMonochrome.View, fontAtlasView.metrics().Cast<uint16_t>(), lineOffset++, offscreenMetrics.Cast<uint16_t>(), sizeCharCell, textLine0, ::gpk::SColorBGRA{0, app.Framework.FrameInfo.FrameNumber % 0xFF, 0xFFU, 0xFFU});
+	::gpk::textLineDrawAlignedFixedSizeLit(target, app.TextureFontMonochrome.View, fontAtlasView.metrics().Cast<uint16_t>(), lineOffset++, offscreenMetrics.Cast<uint16_t>(), sizeCharCell, textLine1, ::gpk::SColorBGRA{app.Framework.FrameInfo.FrameNumber % 0xFFU, 0xFFU, 0, 0xFFU});
 	::gpk::textLineDrawAlignedFixedSize(target, fontAtlasView, lineOffset = offscreenMetrics.y / 16 - 1, offscreenMetrics, sizeCharCell, textLine2);
-	::gpk::textLineDrawAlignedFixedSizeLit(target, app.TextureFontMonochrome.View, fontAtlasView.metrics(), --lineOffset, offscreenMetrics, sizeCharCell, weaponProperties[app.Game.Ships.Weapon[0].IndexProperties].Name, ::gpk::SColorBGRA{app.Framework.FrameInfo.FrameNumber % 0xFFU, 0xFFU, 0, 0xFFU});
+	::gpk::textLineDrawAlignedFixedSizeLit(target, app.TextureFontMonochrome.View, fontAtlasView.metrics().Cast<uint16_t>(), --lineOffset, offscreenMetrics, sizeCharCell, weaponProperties[app.Game.Ships.Weapon[0].IndexProperties].Name, ::gpk::SColorBGRA{app.Framework.FrameInfo.FrameNumber % 0xFFU, 0xFFU, 0, 0xFFU});
 	if(app.Debugging) {
 		::gpk::STimer							& timer										= framework.Timer;
 		char									buffer		[512]							= {};

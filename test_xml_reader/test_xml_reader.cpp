@@ -1,7 +1,7 @@
 #define GPK_STDOUT_LOG_ENABLED
 
 #include "gpk_xml_reader.h"
-#include "gpk_storage.h"
+#include "gpk_file.h"
 
 #include <cstdio>
 

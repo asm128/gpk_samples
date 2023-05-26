@@ -6,17 +6,18 @@
 #define GPK_INFO_PRINTF_ENABLED
 
 #include "gpk_json.h"
-#include "gpk_storage.h"
+#include "gpk_path.h"
+#include "gpk_file.h"
 
 struct SConfigBuild {
-	::gpk::array_obj<::gpk::vcc>			LibFile;
+	::gpk::avcc							LibFile;
 };
 
 struct SBuildConfig {
-	::gpk::view_const_string				PathConfig						= {};
-	::gpk::view_const_string				FilenameConfig					= {};
-	::gpk::apod<char>						JsonConfigOfBuild				= {};
-	::gpk::SJSONReader						TreeConfigOfBuild				= {};
+	::gpk::vcs			PathConfig						= {};
+	::gpk::vcs			FilenameConfig					= {};
+	::gpk::apod<char>	JsonConfigOfBuild				= {};
+	::gpk::SJSONReader	TreeConfigOfBuild				= {};
 };
 
 static	::gpk::error_t					buildSources					(const ::SBuildConfig & app, const ::gpk::view_array<::gpk::array_pod<char>> & listOfSourceFileNames) {

@@ -110,7 +110,7 @@ struct SApplication {
 	::gpk::astatic<::gpk::n2i32				, GAME_TEXTURE_COUNT>		TextureCenters								= {};
 
 	::gpk::n2i32					PSOffsetFromShipCenter						= {};
-	::gpk::imgmono<uint32_t>		TextureFontMonochrome						= {};
+	::gpk::imgmonou64				TextureFontMonochrome						= {};
 
 	::SStuffToDraw					StuffToDraw									= {};
 	::gpk::apod<::gpk::n2i16>		CacheLinePoints								= {};

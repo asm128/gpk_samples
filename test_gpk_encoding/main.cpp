@@ -8,7 +8,7 @@
 #include "gpk_noise.h"
 #include "gpk_encoding.h"
 #include "gpk_deflate.h"
-#include "gpk_storage.h"
+#include "gpk_file.h"
 
 #include <string>
 
