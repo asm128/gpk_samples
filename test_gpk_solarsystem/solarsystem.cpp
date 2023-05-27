@@ -24,10 +24,10 @@
 	return 0;
 }
 
-static	int											drawDebris			(::gpk::view_grid<::gpk::bgra> targetPixels, ::ssg::SDebris & debris, const ::gpk::SMatrix4<float> & matrixVPV, ::gpk::view_grid<uint32_t> depthBuffer)	{
+static	int											drawDebris			(::gpk::view_grid<::gpk::bgra> targetPixels, ::ssg::SDebris & debris, const ::gpk::m4<float> & matrixVPV, ::gpk::view_grid<uint32_t> depthBuffer)	{
 	::gpk::array_pod<::gpk::n2<int32_t>>				pixelCoords;
 	for(uint32_t iParticle = 0; iParticle < debris.Brightness.size(); ++iParticle) {
-		::gpk::SColorFloat										colorShot			= debris.Colors[iParticle % ::gpk::size(debris.Colors)];
+		::gpk::rgbaf										colorShot			= debris.Colors[iParticle % ::gpk::size(debris.Colors)];
 		::gpk::n3<float>									starPos				= debris.Particles.Position[iParticle];
 		starPos												= matrixVPV.Transform(starPos);
 		const ::gpk::n2<int32_t>							pixelCoord			= {(int32_t)starPos.x, (int32_t)starPos.y};
@@ -40,7 +40,7 @@ static	int											drawDebris			(::gpk::view_grid<::gpk::bgra> targetPixels, :
 		uint32_t												depth				= uint32_t(starPos.z * 0xFFFFFFFFU);
 		if(depth > depthBuffer[pixelCoord.y][pixelCoord.x])
 			continue;
-		::gpk::SColorFloat											starFinalColor	= colorShot * debris.Brightness[iParticle];
+		::gpk::rgbaf											starFinalColor	= colorShot * debris.Brightness[iParticle];
 		starFinalColor.g										= ::gpk::max(0.0f, starFinalColor.g - (1.0f - ::gpk::min(1.0f, debris.Brightness[iParticle] * 2.5f * (1.0f / debris.Brightness.size() * iParticle * 2))));
 		starFinalColor.b										= ::gpk::max(0.0f, starFinalColor.b - (1.0f - ::gpk::min(1.0f, debris.Brightness[iParticle] * 2.5f * (1.0f / debris.Brightness.size() * iParticle * 1))));
 		//::gpk::setPixel(targetPixels, pixelCoord, starFinalColor);
@@ -62,8 +62,8 @@ static	int											drawDebris			(::gpk::view_grid<::gpk::bgra> targetPixels, :
 				//	continue;
 				blendVal											= depth;
 				double													finalBrightness					= 1.0-(brightDistance * brightUnit);
-				::gpk::SColorBGRA										& pixelVal						= targetPixels[blendPos.y][blendPos.x];
-				::gpk::SColorFloat										pixelColor						= starFinalColor * finalBrightness + pixelVal;
+				::gpk::bgra										& pixelVal						= targetPixels[blendPos.y][blendPos.x];
+				::gpk::rgbaf										pixelColor						= starFinalColor * finalBrightness + pixelVal;
 				pixelVal											= pixelColor.Clamp();
 			}
 		}
@@ -79,7 +79,7 @@ int													updateEntityTransforms		(uint32_t iEntity, ::gpk::array_obj<::ss
 		if(-1 == entity.Parent)
 			bodies.GetTransform(entity.Body, scene.Transform[iEntity]);
 		else {
-			::gpk::SMatrix4<float>									matrixBody					= {};
+			::gpk::m4<float>									matrixBody					= {};
 			bodies.GetTransform(entity.Body, matrixBody);
 			scene.Transform[iEntity]							= matrixBody * scene.Transform[entity.Parent];
 		}
@@ -134,8 +134,8 @@ int													ssg::solarSystemUpdate			(ssg::SSolarSystemGame & solarSystem, d
 
 	//------------------------------------------- Transform and Draw
 	::gpk::view_grid<::gpk::bgra>						targetPixels				= target->Color.View;
-	memset((void*)targetPixels.begin(), 0, sizeof(::gpk::SColorBGRA) * targetPixels.size());
-	::gpk::SColorBGRA										colorBackground		= {0x20, 0x8, 0x4};
+	memset((void*)targetPixels.begin(), 0, sizeof(::gpk::bgra) * targetPixels.size());
+	::gpk::bgra										colorBackground		= {0x20, 0x8, 0x4};
 	//colorBackground									+= (colorBackground * (0.5 + (0.5 / 65535 * rand())) * ((rand() % 2) ? -1 : 1)) ;
 	for(uint32_t y = 0; y < targetPixels.metrics().y; ++y) // Generate noise color for planet texture
 	for(uint32_t x = 0; x < targetPixels.metrics().x; ++x)
@@ -144,9 +144,9 @@ int													ssg::solarSystemUpdate			(ssg::SSolarSystemGame & solarSystem, d
 	::gpk::n3<float>									lightVector					= camera.Position;
 	lightVector.Normalize();
 
-	::gpk::SMatrix4<float>									matrixView					= {};
-	::gpk::SMatrix4<float>									matrixProjection			= {};
-	::gpk::SMatrix4<float>									matrixViewport				= {};
+	::gpk::m4<float>									matrixView					= {};
+	::gpk::m4<float>									matrixProjection			= {};
+	::gpk::m4<float>									matrixViewport				= {};
 	matrixView.LookAt(camera.Position, camera.Target, camera.Up);
 	matrixProjection.FieldOfView(::gpk::math_pi * .25, targetPixels.metrics().x / (double)targetPixels.metrics().y, ::gpk::SNearFar{0.1f, 10000.0f});
 	matrixViewport.ViewportLH(targetPixels.metrics().Cast<uint16_t>());
@@ -159,12 +159,12 @@ int													ssg::solarSystemUpdate			(ssg::SSolarSystemGame & solarSystem, d
 	::gpk::view_grid<uint32_t>								depthBuffer					= target->DepthStencil.View;
 	memset(depthBuffer.begin(), -1, sizeof(uint32_t) * depthBuffer.size());
 	::gpk::array_pod<::gpk::SLight3>						lightPoints;
-	::gpk::array_pod<::gpk::SColorFloat>					lightColors;
+	::gpk::array_pod<::gpk::rgbaf>					lightColors;
 	lightPoints.push_back({{0,0,0}, 10000});
 	lightColors.push_back(::gpk::WHITE);
 
 	for(uint32_t iEntity = 0; iEntity < solarSystem.Entities.size(); ++iEntity) {
-		::gpk::SMatrix4<float>									matrixTransform				= scene.Transform[iEntity];
+		::gpk::m4<float>									matrixTransform				= scene.Transform[iEntity];
 		const ::ssg::SEntity									& entity					= solarSystem.Entities[iEntity];
 		if(-1 == entity.Model)
 			continue;
@@ -176,7 +176,7 @@ int													ssg::solarSystemUpdate			(ssg::SSolarSystemGame & solarSystem, d
 		::gpk::view_grid<::gpk::bgra>						entityImage					= solarSystem.Images[entity.Images];
 		::gpk::SGeometryIndexedTriangles						& entityGeometry			= solarSystem.Geometries[entity.Geometry];
 		matrixTransform										= matrices.Scale * matrices.Position * matrixTransform;
-		::gpk::SMatrix4<float>									matrixTransformView			= matrixTransform * matrixView;
+		::gpk::m4<float>									matrixTransformView			= matrixTransform * matrixView;
 		for(uint32_t iTriangle = 0; iTriangle < entityGeometry.PositionIndices.size() / 3; ++iTriangle) {
 			pixelCoords			.clear();
 			pixelVertexWeights	.clear();

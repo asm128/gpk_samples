@@ -170,7 +170,7 @@ int													ssg::solarSystemSetup				(::ssg::SSolarSystemGame & solarSystem,
 		for(uint32_t iRigidBody = 0; iRigidBody < solarSystem.Bodies.Flags.size(); ++iRigidBody)
 			solarSystem.Bodies.Flags[iRigidBody].Active	= true;
 
-		::gpk::SColorBGRA										colors []						=
+		::gpk::bgra										colors []						=
 			{ ::gpk::YELLOW
 			, ::gpk::DARKRED
 			, ::gpk::ORANGE

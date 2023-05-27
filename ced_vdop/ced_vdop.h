@@ -25,7 +25,7 @@ struct STextOverlay {
 	::gpk::n3<float>								CameraPosition			= {.0001f, 1000.1f, -0.00001f};
 	::gpk::n3<float>								CameraUp				= {0, 0, 1};
 	::gpk::SGeometryQuads								GeometryLetters	[256]	= {};
-	::gpk::SMatrix4<float>								MatrixProjection		= {};
+	::gpk::m4<float>								MatrixProjection		= {};
 	::SDrawCache										DrawCache				= {};
 
 	stacxpr	const ::gpk::n3<float>		ControlTranslation		= {0, 0, 20.0f};

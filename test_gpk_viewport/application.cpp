@@ -212,7 +212,7 @@ template<typename _tIndex, typename _tValue>
 		scene.Projection															= scene.ViewMatrix * scene.Projection;
 		scene.LightPos.Normalize();
 
-		::gpk::SMatrix4<float>													mViewport									= {};
+		::gpk::m4<float>													mViewport									= {};
 		mViewport._11														= 2.0f / offscreenMetrics.x;
 		mViewport._22														= 2.0f / offscreenMetrics.y;
 		mViewport._33														= 1.0f / (float)(nearFar.Max - nearFar.Min);
@@ -246,7 +246,7 @@ template<typename _tIndex, typename _tValue>
 	const uint32_t															countTriangles								= app.ModelGeometry.Positions.Indices.size() / 3;
 	triangle3dList		.resize(countTriangles);
 	triangle3dColorList	.resize(countTriangles * 3);
-	::gpk::SMatrix4<float>													projection									;
+	::gpk::m4<float>													projection									;
 	::gme::SCamera															camera										;
 	{
 		::std::lock_guard														lockViewport								(app.LockViewport);
@@ -306,7 +306,7 @@ template<typename _tIndex, typename _tValue>
 		::gpk::drawLine(offscreenMetrics, ::gpk::line2<int32_t>{triangle2dList[iTriangle].C, triangle2dList[iTriangle].A}, wireframePixelCoords);
 	}
 	for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord)
-		::gpk::drawPixelLight(buffer3d->Color.View, wireframePixelCoords[iCoord], (::gpk::SColorBGRA)::gpk::GREEN, 0.05f, 1.5);
+		::gpk::drawPixelLight(buffer3d->Color.View, wireframePixelCoords[iCoord], (::gpk::bgra)::gpk::GREEN, 0.05f, 1.5);
 
 	gui.Controls.Controls[viewport->IdClient].Image						= buffer3d->Color.View;
 

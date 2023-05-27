@@ -29,8 +29,8 @@ namespace gme // I'm gonna use a different namespace in order to test a few thin
 
 							::gpk::n3<float>												LightPos						= {10, 5, 0};
 
-							::gpk::SMatrix4<float>												Projection						= {};
-							::gpk::SMatrix4<float>												ViewMatrix						= {};
+							::gpk::m4<float>												Projection						= {};
+							::gpk::m4<float>												ViewMatrix						= {};
 	};
 
 	struct SApplication {

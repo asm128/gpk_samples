@@ -103,7 +103,7 @@ struct SApplication {
 	TParticleSystem					ParticleSystemDebris						= {};
 	TParticleSystem					ParticleSystemStars							= {};
 
-	::gpk::SColorBGRA				ColorBackground								= ::gpk::SColorFloat(.15f, .15f, .15f, 1.0f);
+	::gpk::bgra				ColorBackground								= ::gpk::rgbaf(.15f, .15f, .15f, 1.0f);
 
 	::gpk::astatic<::gpk::img<::gpk::bgra>	, GAME_TEXTURE_COUNT>		Original									= {};
 	::gpk::astatic<::gpk::img<::gpk::bgra>	, GAME_TEXTURE_COUNT>		Processed									= {};

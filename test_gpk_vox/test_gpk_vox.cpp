@@ -192,13 +192,13 @@ namespace gpk
 ::gpk::error_t										drawVoxelFaceGeometry
 	( ::gpk::view_grid<uint32_t>								targetDepth
 	, ::gpk::apod<::gpk::n2<int16_t>>					& Points
-	, const ::gpk::n3<float>								& voxelPos
-	, const ::gpk::SMatrix4<float>								& mWVP
+	, const ::gpk::n3f32								& voxelPos
+	, const ::gpk::m4<float>								& mWVP
 	, const ::gpk::SNearFar										& nearFar
-	, const ::gpk::view<const ::gpk::n3<float>>		verticesRaw
+	, const ::gpk::view<const ::gpk::n3f32>		verticesRaw
 	, const ::gpk::view<const uint8_t>					& indices
 	) {
-	::gpk::n3<float>									vertices [4]				= {}; 
+	::gpk::n3f32									vertices [4]				= {}; 
 	for(uint32_t iVertex = 0; iVertex < 4; ++iVertex) {
 		vertices[iVertex] = mWVP.Transform(verticesRaw[iVertex] + voxelPos); 
 	}
@@ -216,34 +216,34 @@ struct SFragmentCache {
 
 static	::gpk::error_t						drawVoxelFace
 	( uint32_t						iFace
-	, const ::gpk::n3<float>	& voxelPos
-	, const ::gpk::n3<float>	& voxelCenter
-	, const ::gpk::SColorFloat		& cellColor
-	, const ::gpk::SMatrix4<float>	& mVP
+	, const ::gpk::n3f32	& voxelPos
+	, const ::gpk::n3f32	& voxelCenter
+	, const ::gpk::rgbaf		& cellColor
+	, const ::gpk::m4<float>	& mVP
 	, const ::gpk::SNearFar			& nearFar
-	, const ::gpk::n3<float>	& lightPosition
+	, const ::gpk::n3f32	& lightPosition
 	, const double					lightFactorDistance
-	, const ::gpk::SColorFloat		& colorAmbient
+	, const ::gpk::rgbaf		& colorAmbient
 	, ::SFragmentCache				& pixelCache
 	) {
 	pixelCache.Points			[iFace].clear();
 	pixelCache.TriangleWeights	[iFace].clear();
 
-	::gpk::view<const ::gpk::n3<float>>	rawVertices				= {&::gpk::VOXEL_FACE_VERTICES[iFace].A, 4};
+	::gpk::view<const ::gpk::n3f32>	rawVertices				= {&::gpk::VOXEL_FACE_VERTICES[iFace].A, 4};
 	::gpk::view<const uint8_t>				rawIndices				= ::gpk::VOXEL_FACE_INDICES[iFace];
 
 	::drawVoxelFaceGeometry(pixelCache.TargetDepth, pixelCache.Points[iFace], voxelPos, mVP, nearFar, rawVertices, rawIndices); 
 
-	::gpk::SColorFloat							faceColor	[6]				= {};
+	::gpk::rgbaf							faceColor	[6]				= {};
 	faceColor[iFace]						= colorAmbient * lightFactorDistance;
 	if(lightFactorDistance > 0) {
 		const double							lightFactorDirectional		= ::gpk::max(0.0, (lightPosition - voxelCenter).Normalize().Dot(::gpk::VOXEL_NORMALS[iFace]));	
-		::gpk::SColorFloat						colorDiffuse				= cellColor * lightFactorDirectional;
+		::gpk::rgbaf						colorDiffuse				= cellColor * lightFactorDirectional;
 		(faceColor[iFace] += colorDiffuse * lightFactorDistance).Clamp(); 
 	}
 	for(uint32_t iPoint = 0; iPoint < pixelCache.Points[iFace].size(); ++iPoint) {
 		::gpk::n2<int16_t>					point					= pixelCache.Points[iFace][iPoint];
-		::gpk::SColorFloat						finalColor				= faceColor[iFace];
+		::gpk::rgbaf						finalColor				= faceColor[iFace];
 		pixelCache.TargetPixels[pixelCache.TargetPixels.metrics().y - 1 - point.y][point.x]	= finalColor;
 	}
 
@@ -252,12 +252,12 @@ static	::gpk::error_t						drawVoxelFace
 
 ::gpk::error_t										drawVoxelModel						
 	( const ::gpk::SVoxelGeometry						& voxelGeometry
-	, const ::gpk::n3<float>						& position
-	, const ::gpk::SMatrix4<float>						& mVP
+	, const ::gpk::n3f32						& position
+	, const ::gpk::m4<float>						& mVP
 	, const ::gpk::SNearFar								& nearFar
-	, const ::gpk::n3<float>						& cameraPos
-	, const ::gpk::n3<float>						& cameraFront
-	, const ::gpk::n3<float>						& lightPosition
+	, const ::gpk::n3f32						& cameraPos
+	, const ::gpk::n3f32						& cameraFront
+	, const ::gpk::n3f32						& lightPosition
 	, ::SFragmentCache									& pixelCache
 	) {	
 	for(uint32_t iFace = 0; iFace < 6; ++iFace) {
@@ -291,7 +291,7 @@ static	::gpk::error_t						drawVoxelFace
 			}
 
 			const double							lightFactorAmbient			= .075;
-			const ::gpk::SColorFloat				colorAmbient				= sliceMaterial.Diffuse * lightFactorAmbient;
+			const ::gpk::rgbaf				colorAmbient				= sliceMaterial.Diffuse * lightFactorAmbient;
 			
 			for(uint32_t iTriangle = 0; iTriangle < triangleSlices.size(); ++iTriangle) {
 				const ::gpk::SRange<uint32_t>			slice						= triangleSlices[iTriangle];
@@ -300,23 +300,23 @@ static	::gpk::error_t						drawVoxelFace
 					const ::gpk::tri3<float>			& triangle					= trianglePositions[iTriangle];
 					const ::gpk::tri<float>			& triangleWeights			= faceTriangleWeights[iPoint];
 					const ::gpk::n2<int16_t>			pixelPosIn2DSpace			= facePixelCoords[iPoint];
-					const ::gpk::n3<float>				pixelPosIn3DSpace			
+					const ::gpk::n3f32				pixelPosIn3DSpace			
 						= triangle.A * triangleWeights.A
 						+ triangle.B * triangleWeights.B
 						+ triangle.C * triangleWeights.C
 						;
 
-					::gpk::n3<float>					lightDistance				= lightPosition - pixelPosIn3DSpace;
+					::gpk::n3f32					lightDistance				= lightPosition - pixelPosIn3DSpace;
 					const double							lightFactorDistance			= ::gpk::clamp(1.0 - lightDistance.Length() * .001, 0.0, 1.0);
-					::gpk::SColorFloat						faceColor					= colorAmbient * lightFactorDistance;
+					::gpk::rgbaf						faceColor					= colorAmbient * lightFactorDistance;
 					if(lightFactorDistance > 0 && lightFactorDistance < 0) {
 						const double							lightFactorDirectional		= ::gpk::max(0.0, lightDistance.Normalize().Dot(::gpk::VOXEL_NORMALS[iFace]));	
-						::gpk::SColorFloat						colorDiffuse				= sliceMaterial.Diffuse * lightFactorDirectional;
+						::gpk::rgbaf						colorDiffuse				= sliceMaterial.Diffuse * lightFactorDirectional;
 						(faceColor += colorDiffuse * lightFactorDistance).Clamp(); 
 					}
 
 					::gpk::n2<int16_t>					point					= pixelCache.Points[iFace][iPoint];
-					::gpk::SColorFloat						finalColor				= faceColor;
+					::gpk::rgbaf						finalColor				= faceColor;
 					pixelCache.TargetPixels[pixelCache.TargetPixels.metrics().y - 1 - point.y][point.x]	= finalColor;
 				}
 			}
@@ -336,21 +336,21 @@ static	::gpk::error_t						drawVoxelFace
 }
 ::gpk::error_t										drawVoxelModel						
 	( const ::gpk::SVoxelMap<uint8_t>					& voxelMap	
-	, const ::gpk::n3<float>						& position
-	, const ::gpk::SMatrix4<float>						& mVP
+	, const ::gpk::n3f32						& position
+	, const ::gpk::m4<float>						& mVP
 	, const ::gpk::SNearFar								& nearFar
-	, const ::gpk::n3<float>						& cameraPos
-	, const ::gpk::n3<float>						& cameraFront
-	, const ::gpk::n3<float>						& lightPosition
+	, const ::gpk::n3f32						& cameraPos
+	, const ::gpk::n3f32						& cameraFront
+	, const ::gpk::n3f32						& lightPosition
 	, ::SFragmentCache									& pixelCache
 	) {	
 	const ::gpk::view<const ::gpk::SVoxel<uint8_t>>	voxels						= voxelMap.Voxels;
-	::gpk::view<const ::gpk::SColorBGRA>				rgba						= voxelMap.Palette;
-	const ::gpk::n3<uint8_t>							dimensions					= voxelMap.Dimensions;
+	::gpk::view<const ::gpk::bgra>					rgba						= voxelMap.Palette;
+	const ::gpk::n3u8							dimensions					= voxelMap.Dimensions;
 	if(0 == rgba.size())
 		rgba												= ::gpk::VOX_PALETTE_DEFAULT;
 
-	::gpk::n3<float>									vertices		[8]			= {};
+	::gpk::n3f32									vertices		[8]			= {};
 	bool													culled						= true;
 	for(uint32_t i = 0; i < 8; ++i) {
 		vertices[i]											= ::gpk::VOXEL_VERTICES[i];
@@ -369,7 +369,7 @@ static	::gpk::error_t						drawVoxelFace
 
 	for(uint32_t iVoxel = 0; iVoxel < voxels.size(); ++iVoxel) {
 		const ::gpk::SVoxel<uint8_t>			voxel						= voxels[iVoxel];
-		const ::gpk::n3<float>				voxelPos					= position + voxel.Position.Cast<float>();
+		const ::gpk::n3f32				voxelPos					= position + voxel.Position.Cast<float>();
 		uint8_t									cellValue					= voxel.ColorIndex;
 		uint8_t									cellValues	[6]				= {};
 		//voxelMap.GetValue({voxel.Position.x, voxel.Position.y, voxel.Position.z}, cellValue);
@@ -384,11 +384,11 @@ static	::gpk::error_t						drawVoxelFace
 		if((voxelPos - cameraPos).Normalize().Dot(cameraFront) <= 0.5)
 			continue;
 
-		const ::gpk::SColorFloat				cellColor					= {rgba[voxel.ColorIndex ? voxel.ColorIndex - 1 : 0]};
+		const ::gpk::rgbaf				cellColor					= {rgba[voxel.ColorIndex ? voxel.ColorIndex - 1 : 0]};
 		bool									renderFaces	[6]				= {};
 		bool									hasFace						= false;
 		for(uint32_t iFace = 0; iFace < 6; ++iFace) {
-			::gpk::SColorBGRA						color						= rgba[cellValues[iFace] ? cellValues[iFace] - 1 : 0];
+			::gpk::bgra						color						= rgba[cellValues[iFace] ? cellValues[iFace] - 1 : 0];
 			if(0 == cellValues[iFace] || color.a < 0xFF)
 				hasFace = (renderFaces[iFace] = cameraFront.Dot(::gpk::VOXEL_NORMALS[iFace]) <= 0.35) || hasFace;
 		}
@@ -396,10 +396,10 @@ static	::gpk::error_t						drawVoxelFace
 		if(false == hasFace)
 			continue;
 
-		::gpk::n3<float>					voxelCenter					= voxelPos + ::gpk::n3<float>{.5f, .5f, .5f};
+		::gpk::n3f32					voxelCenter					= voxelPos + ::gpk::n3f32{.5f, .5f, .5f};
 		const double							lightFactorDistance			= ::gpk::clamp(1.0 - (lightPosition - voxelCenter).Length() * .001, 0.0, 1.0);
 		const double							lightFactorAmbient			= .075;
-		const ::gpk::SColorFloat				colorAmbient				= cellColor * lightFactorAmbient;
+		const ::gpk::rgbaf				colorAmbient				= cellColor * lightFactorAmbient;
 
 		for(uint32_t iFace = 0; iFace < 6; ++iFace) {
 			if(false == renderFaces[iFace]) 
@@ -412,7 +412,7 @@ static	::gpk::error_t						drawVoxelFace
 }
 
 struct SCamera {
-	::gpk::n3<float>								Position, Target;
+	::gpk::n3f32								Position, Target;
 };
 
 					::gpk::error_t					draw								(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
@@ -426,19 +426,19 @@ struct SCamera {
 	backBuffer->Color.View.fill(0x3060C0);
 	memset(backBuffer->DepthStencil.begin(), (uint32_t)-1, backBuffer->DepthStencil.View.byte_count());
 
-	::gpk::SMatrix4<float>									projection									= {};
-	::gpk::SMatrix4<float>									viewMatrix									= {};
+	::gpk::m4<float>									projection									= {};
+	::gpk::m4<float>									viewMatrix									= {};
 	projection.Identity();
 	::gpk::SFrameInfo										& frameInfo									= framework.FrameInfo;
-	const ::gpk::n3<float>								tilt										= {10, };	// ? cam't remember what is this. Radians? Eulers?
-	const ::gpk::n3<float>								rotation									= {0, (float)frameInfo.FrameNumber / 100, 0};
+	const ::gpk::n3f32								tilt										= {10, };	// ? cam't remember what is this. Radians? Eulers?
+	const ::gpk::n3f32								rotation									= {0, (float)frameInfo.FrameNumber / 100, 0};
 
 	::gpk::SNearFar											nearFar										= {0.1f , 1000.0f};
 
-	stacxpr const ::gpk::n3<float>			cameraUp									= {0, 1, 0};	// ? cam't remember what is this. Radians? Eulers?
+	stacxpr const ::gpk::n3f32			cameraUp									= {0, 1, 0};	// ? cam't remember what is this. Radians? Eulers?
 	::SCamera												camera										= {{100, 50, 0}, {25, 0, 25}};
 	//camera.Position *= 2.0f;
-	::gpk::n3<float>									lightPos									= {150, 50, 0};
+	::gpk::n3f32									lightPos									= {150, 50, 0};
 	static float											cameraRotation								= 0;
 	cameraRotation										+= (float)framework.RootWindow.Input->MouseCurrent.Deltas.x / 5.0f;
 	//camera.Position	.RotateY(cameraRotation);
@@ -455,11 +455,11 @@ struct SCamera {
 	lightPos.y *= (float)fabs(sin(frameInfo.Seconds.Total * .1f));
 
 	const ::gpk::n2<uint16_t>							screenCenter				= {(uint16_t)(offscreenMetrics.x / 2), (uint16_t)(offscreenMetrics.y / 2)};
-	::gpk::SMatrix4<float>									viewport									= {};
+	::gpk::m4<float>									viewport									= {};
 	viewport.ViewportLH(offscreenMetrics.Cast<uint16_t>());
 	projection											= projection * viewport;
 
-	::gpk::n3<float>									cameraFront					= (camera.Target - camera.Position).Normalize();
+	::gpk::n3f32									cameraFront					= (camera.Target - camera.Position).Normalize();
 
 	int32_t													zOffset						= 0;
 	int32_t													xOffset						= 0;
@@ -470,7 +470,7 @@ struct SCamera {
 	bool													drawFromSource				= true;
 	for(uint32_t iModel = 0; iModel < app.VOXModelMaps.size(); ++iModel) {
 		const ::gpk::SVoxelMap<uint8_t>							& voxelMap					= app.VOXModelMaps[iModel];
-		const ::gpk::n3<float>								position					= {(float)xOffset, 0.0f, (float)zOffset};
+		const ::gpk::n3f32								position					= {(float)xOffset, 0.0f, (float)zOffset};
 		if(drawFromSource) 
 			::drawVoxelModel(voxelMap, position, projection, nearFar, camera.Position, cameraFront, lightPos, pixelCache);
 		else {

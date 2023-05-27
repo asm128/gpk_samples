@@ -50,7 +50,7 @@ namespace ssg
 	};
 
 	struct SDebris	{
-		::gpk::SColorBGRA					Colors[4]			=
+		::gpk::bgra					Colors[4]			=
 			{ {0x80, 0xAF, 0xFF, }
 			, {0x40, 0xAF, 0xFF, }
 			, {0x80, 0xCF, 0xFF, }

@@ -98,9 +98,9 @@ int													update				(SApplication & app, bool exitSignal)	{
 		}
 	}
 	if(framework.RootWindow.Resized) {
-		::gpk::SMatrix4<float>									& matrixProjection	= app.TextOverlay.MatrixProjection;
+		::gpk::m4<float>									& matrixProjection	= app.TextOverlay.MatrixProjection;
 		matrixProjection.FieldOfView(::gpk::math_pi * .25, framework.RootWindow.Size.x / (double)framework.RootWindow.Size.y, 0.01, 500.0);
-		::gpk::SMatrix4<float>									matrixViewport		= {};
+		::gpk::m4<float>									matrixViewport		= {};
 		matrixViewport.ViewportLH(framework.RootWindow.Size.Cast<uint16_t>());
 		matrixProjection									*= matrixViewport;
 	}

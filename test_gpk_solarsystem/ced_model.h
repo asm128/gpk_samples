@@ -13,9 +13,9 @@ namespace ced
 	};
 
 	struct SModelMatrices {
-		::gpk::SMatrix4<float>								Scale		;
-		::gpk::SMatrix4<float>								Rotation	;
-		::gpk::SMatrix4<float>								Position	;
+		::gpk::m4<float>								Scale		;
+		::gpk::m4<float>								Rotation	;
+		::gpk::m4<float>								Position	;
 	};
 
 	struct SEntity {

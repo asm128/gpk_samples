@@ -100,9 +100,9 @@ int													update				(SApplication & app, bool exitSignal)	{
 		}
 	}
 	if(framework.RootWindow.Resized) {
-		::gpk::SMatrix4<float>									& matrixProjection			= app.TextOverlay.MatrixProjection;
+		::gpk::m4<float>									& matrixProjection			= app.TextOverlay.MatrixProjection;
 		matrixProjection.FieldOfView(::gpk::math_pi * .25, framework.RootWindow.Size.x / (double)framework.RootWindow.Size.y, 0.01, 500.0);
-		::gpk::SMatrix4<float>									matrixViewport				= {};
+		::gpk::m4<float>									matrixViewport				= {};
 		matrixViewport.ViewportLH(framework.RootWindow.Size.Cast<uint16_t>());
 		matrixProjection									*= matrixViewport;
 	}
@@ -132,7 +132,7 @@ static	int											drawPixels
 	, const ::gpk::tri3	<float>					& triangleWorld
 	, const ::gpk::n3		<float>					& normal
 	, const ::gpk::n3		<float>					& lightVector
-	, const ::gpk::SColorFloat							& texelColor
+	, const ::gpk::rgbaf							& texelColor
 	, ::gpk::array_pod<::gpk::n2<int16_t>>			& pixelCoords
 	, ::gpk::array_pod<::gpk::tri<float>>	& pixelVertexWeights
 	, double											timeAnimation
@@ -157,16 +157,16 @@ int													draw3DCharacter
 	, const uint8_t											asciiCode
 	, const ::gpk::n3<float>							& position
 	, const ::gpk::n3<float>							& lightVector
-	, const ::gpk::SMatrix4<float>							& matrixView
+	, const ::gpk::m4<float>							& matrixView
 	, const ::gpk::view_grid<const ::gpk::SGeometryQuads>	& viewGeometries
 	, ::SDrawCache											& drawCache
 	, ::gpk::view_grid<uint32_t>							& depthBuffer
 	, double												timeAnimation
-	, const ::gpk::SColorBGRA								& color
+	, const ::gpk::bgra								& color
 	)	{
-	::gpk::SMatrix4<float>									matrixScale				;
-	::gpk::SMatrix4<float>									matrixPosition			;
-	::gpk::SMatrix4<float>									matrixRotation			;
+	::gpk::m4<float>									matrixScale				;
+	::gpk::m4<float>									matrixPosition			;
+	::gpk::m4<float>									matrixRotation			;
 	matrixRotation.Identity();
 	::gpk::n3<float>									translation				= {};
 	translation.x										= float(position.x * metricsCharacter.x);
@@ -179,8 +179,8 @@ int													draw3DCharacter
 	if(asciiCode == 0xAC) { matrixRotation.RotationX(-::gpk::math_pi_2); translation.y += metricsCharacter.y / 2; }
 	matrixPosition	.SetTranslation	(translation, true);
 	matrixScale		.Scale			({1, 1, 1}, true);
-	::gpk::SMatrix4<float>									matrixTransform										= matrixScale * matrixRotation * matrixPosition;
-	::gpk::SMatrix4<float>									matrixTransformView									= matrixTransform * matrixView;
+	::gpk::m4<float>									matrixTransform										= matrixScale * matrixRotation * matrixPosition;
+	::gpk::m4<float>									matrixTransformView									= matrixTransform * matrixView;
 	const ::gpk::n2<uint32_t>							asciiCoords				= {asciiCode % metricsMap.x, asciiCode / metricsMap.x};
 	const ::gpk::SGeometryQuads								& geometry				= viewGeometries[asciiCoords.y][asciiCoords.x];
 	for(uint32_t iTriangle = 0; iTriangle < geometry.Triangles.size(); ++iTriangle) {
@@ -209,9 +209,9 @@ int													draw					(SApplication & app) {
 	::gpk::view_grid<::gpk::SGeometryQuads>					viewGeometries		= {app.TextOverlay.GeometryLetters, {16, 16}};
 	uint32_t												colorIndex			= 0;
 
-	::gpk::SMatrix4<float>									matrixView					= {};
-	::gpk::SMatrix4<float>									matrixProjection			= {};
-	::gpk::SMatrix4<float>									matrixViewport				= {};
+	::gpk::m4<float>									matrixView					= {};
+	::gpk::m4<float>									matrixProjection			= {};
+	::gpk::m4<float>									matrixViewport				= {};
 	matrixView		.Identity();
 	matrixProjection.Identity();
 	matrixViewport	.Identity();
@@ -236,7 +236,7 @@ int													draw					(SApplication & app) {
 			if(0 == asciiCode)
 				continue;
 			const uint16_t											asciiColor			= mapColors[y][x];
-			::gpk::SColorFloat										color					= (*app.Framework.GUI->Colors->Palette)[(asciiColor & 0xF)];//::gpk::COLOR_TABLE[((int)timeAnimation) % ::gpk::size(::gpk::COLOR_TABLE)];
+			::gpk::rgbaf										color					= (*app.Framework.GUI->Colors->Palette)[(asciiColor & 0xF)];//::gpk::COLOR_TABLE[((int)timeAnimation) % ::gpk::size(::gpk::COLOR_TABLE)];
 			::gpk::n3<float>									position			= offset;
 			position.x											+= x;
 			position.z											-= y;
@@ -274,7 +274,7 @@ int													draw					(SApplication & app) {
 			if(0 == asciiCode)
 				continue;
 			const uint16_t											asciiColor			= mapColors[y][x];
-			::gpk::SColorFloat										color					= (*app.Framework.GUI->Colors->Palette)[(asciiColor & 0xF)];//::gpk::COLOR_TABLE[((int)timeAnimation) % ::gpk::size(::gpk::COLOR_TABLE)];
+			::gpk::rgbaf										color					= (*app.Framework.GUI->Colors->Palette)[(asciiColor & 0xF)];//::gpk::COLOR_TABLE[((int)timeAnimation) % ::gpk::size(::gpk::COLOR_TABLE)];
 			::gpk::n3<float>									position			= offset;
 			position.x											+= x;
 			position.z											-= y;

@@ -87,7 +87,7 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	app.TextureFontMonochrome.resize(textureFontMetrics);
 	for(uint32_t y = 0, yMax = textureFontMetrics.y; y < yMax; ++y)
 	for(uint32_t x = 0, xMax = textureFontMetrics.x; x < xMax; ++x) {
-		const ::gpk::SColorBGRA														& pixelToTest								= fontAtlas[y][x];
+		const ::gpk::bgra														& pixelToTest								= fontAtlas[y][x];
 		app.TextureFontMonochrome.View[y * textureFontMetrics.x + x]
 		=	0 != pixelToTest.r
 		||	0 != pixelToTest.g
@@ -114,7 +114,7 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	const ::gpk::n2<uint32_t>													& fontAtlasMetrics							= fontAtlasView.metrics();
 	for(uint32_t y = 0, yMax = fontAtlasMetrics.y; y < yMax; ++y)
 	for(uint32_t x = 0, xMax = fontAtlasMetrics.x; x < xMax; ++x) {
-		::gpk::SColorBGRA															& curTexel									= fontAtlasView[y][x];
+		::gpk::bgra															& curTexel									= fontAtlasView[y][x];
 		if(curTexel.r == 0x00 && curTexel.g == 0x00 && curTexel.b == 0x00)
 			curTexel																= {0xFF, 0x00, 0xFF, 0xFF};
 	}
@@ -167,10 +167,10 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	::gpk::SFramework							& framework									= app.Framework;
 	::gpk::v2<::gpk::bgra>						& fontAtlasView								= app.Processed[GAME_TEXTURE_FONT_ATLAS].View;
 	const ::gpk::n2u16							& offscreenMetrics							= target.metrics().Cast<uint16_t>();
-	::gpk::textLineDrawAlignedFixedSizeLit(target, app.TextureFontMonochrome.View, fontAtlasView.metrics(), lineOffset++, offscreenMetrics.Cast<uint16_t>(), sizeCharCell, textLine0, ::gpk::SColorBGRA{0, app.Framework.FrameInfo.FrameNumber % 0xFF, 0xFFU, 0xFFU});
-	::gpk::textLineDrawAlignedFixedSizeLit(target, app.TextureFontMonochrome.View, fontAtlasView.metrics(), lineOffset++, offscreenMetrics.Cast<uint16_t>(), sizeCharCell, textLine1, ::gpk::SColorBGRA{app.Framework.FrameInfo.FrameNumber % 0xFFU, 0xFFU, 0, 0xFFU});
+	::gpk::textLineDrawAlignedFixedSizeLit(target, app.TextureFontMonochrome.View, fontAtlasView.metrics(), lineOffset++, offscreenMetrics, sizeCharCell, textLine0, ::gpk::bgra{0, app.Framework.FrameInfo.FrameNumber % 0xFF, 0xFFU, 0xFFU});
+	::gpk::textLineDrawAlignedFixedSizeLit(target, app.TextureFontMonochrome.View, fontAtlasView.metrics(), lineOffset++, offscreenMetrics, sizeCharCell, textLine1, ::gpk::bgra{app.Framework.FrameInfo.FrameNumber % 0xFFU, 0xFFU, 0, 0xFFU});
 	::gpk::textLineDrawAlignedFixedSize(target, fontAtlasView, lineOffset = offscreenMetrics.y / 16 - 1, offscreenMetrics, sizeCharCell, textLine2);
-	::gpk::textLineDrawAlignedFixedSizeLit(target, app.TextureFontMonochrome.View, fontAtlasView.metrics(), --lineOffset, offscreenMetrics, sizeCharCell, weaponProperties[app.Game.Ships.Weapon[0].IndexProperties].Name, ::gpk::SColorBGRA{app.Framework.FrameInfo.FrameNumber % 0xFFU, 0xFFU, 0, 0xFFU});
+	::gpk::textLineDrawAlignedFixedSizeLit(target, app.TextureFontMonochrome.View, fontAtlasView.metrics(), --lineOffset, offscreenMetrics, sizeCharCell, weaponProperties[app.Game.Ships.Weapon[0].IndexProperties].Name, ::gpk::bgra{app.Framework.FrameInfo.FrameNumber % 0xFFU, 0xFFU, 0, 0xFFU});
 	if(app.Debugging) {
 		::gpk::STimer							& timer										= framework.Timer;
 		char									buffer		[512]							= {};

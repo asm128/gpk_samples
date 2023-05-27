@@ -21,7 +21,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	gui.ThemeDefault												= app.PaletteColumn * iShades + app.PaletteRow;
 	gui.ColorModeDefault											= ::gpk::GUI_COLOR_MODE_3D;
 	int32_t																controlTestRoot			= ::gpk::controlCreate(gui);
-	const ::gpk::SColorBGRA												colorBase				= (*gui.Colors->Palette)[gui.ThemeDefault];
+	const ::gpk::bgra												colorBase				= (*gui.Colors->Palette)[gui.ThemeDefault];
 	::gpk::memcpy_s(app.Palettes, gui.Colors->DefaultColors.Storage);
 	app.Palettes[::gpk::GUI_CONTROL_PALETTE_NORMAL				]	= gui.Colors->Palettes.push_back({colorBase, {}, {}, {}, {}, {}, ::gpk::RED, {}, {}, {}, });// gui.DefaultColors.CONTROL_NORMAL				;
 	app.Palettes[::gpk::GUI_CONTROL_PALETTE_HOVER				]	= gui.Colors->Palettes.push_back({colorBase, {}, {}, {}, {}, {}, ::gpk::RED, {}, {}, {}, });// gui.DefaultColors.CONTROL_HOVER				;
@@ -199,7 +199,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	//		for(uint32_t x = 0; x < fontCharSize.x; ++x) {
 	//			const uint32_t												srcOffsetX									= iChar % 32 * fontCharSize.x;
 	//			const uint32_t												dstOffsetX									= 0;
-	//			const ::gpk::SColorBGRA										& srcColor									= app.TextureFont.View[srcOffsetY + y][srcOffsetX + x];
+	//			const ::gpk::bgra										& srcColor									= app.TextureFont.View[srcOffsetY + y][srcOffsetX + x];
 	//			verticalAtlas.View[dstOffsetY + y][dstOffsetX + x]		= srcColor;
 	//		}
 	//	}
@@ -208,7 +208,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	//gpk_necall(gui.FontTexture.resize(textureFontMetrics), "Whou would we failt ro resize=");
 	//for(uint32_t y = 0, yMax = textureFontMetrics.y; y < yMax; ++y)
 	//for(uint32_t x = 0, xMax = textureFontMetrics.x; x < xMax; ++x) {
-	//	const ::gpk::SColorBGRA											& srcColor									= verticalAtlas.View[y][x];//app.TextureFont.View[y][x];
+	//	const ::gpk::bgra											& srcColor									= verticalAtlas.View[y][x];//app.TextureFont.View[y][x];
 	//	gui.FontTexture.View[y * textureFontMetrics.x + x]
 	//		=	0 != srcColor.r
 	//		||	0 != srcColor.g

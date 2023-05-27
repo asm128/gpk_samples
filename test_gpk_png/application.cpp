@@ -70,7 +70,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 				sizesUncompressed.push_back(viewToRLE.size());
 				::gpk::rleEncode(viewToRLE, rleBuffer);
 				sizesRLE.push_back(rleBuffer.size());
-				const uint32_t											sizePNGInBytes			= viewToRLE.size() * sizeof(::gpk::SColorBGRA);
+				const uint32_t											sizePNGInBytes			= viewToRLE.size() * sizeof(::gpk::bgra);
 				//info_printf("--- RLE compression stats:"
 				//	"\nsizePNGRLE          : %u"
 				//	"\nsizePNGUncompressed : %u"
