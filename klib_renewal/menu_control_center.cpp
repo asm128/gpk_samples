@@ -441,7 +441,7 @@ int32_t drawWelcomeGUI(::klib::SGame& instanceGame) {
 		// Menu
 		static ::klib::SMenuHeader<::klib::SGameState>	menuControlCenter	({::klib::GAME_STATE_MENU_MAIN}, ::gpk::view_const_string{"Control Center"}, 28);
 		bool											bInCourse			= ::gpk::bit_true(instanceGame.Flags, ::klib::GAME_FLAGS_TACTICAL) || ::gpk::bit_true(instanceGame.Flags, ::klib::GAME_FLAGS_TACTICAL_REMOTE);
-		return ::klib::drawMenu(display.Color.View, display.DepthStencil.begin(), menuControlCenter, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{(bInCourse) ? ::klib::optionsControlCenterMissionInCourse : ::klib::optionsControlCenter}, instanceGame.FrameInput, returnValue);
+		return ::klib::drawMenu(display.Color.View, display.DepthStencil.begin(), menuControlCenter, ::gpk::view<const ::klib::SMenuItem<::klib::SGameState>>{(bInCourse) ? ::klib::optionsControlCenterMissionInCourse : ::klib::optionsControlCenter}, instanceGame.FrameInput, returnValue);
 	}
 	return returnValue;
 };

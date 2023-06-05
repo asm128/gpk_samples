@@ -29,7 +29,7 @@ static	::gpk::error_t								generate_output_qs				(::gpk::SCGIRuntimeValues & r
 	return 0;
 }
 
-static	::gpk::error_t								generate_output_cgi_env			(::gpk::apod<char> & output, ::gpk::view_array<const ::gpk::TKeyValConstString> environViews)					{
+static	::gpk::error_t								generate_output_cgi_env			(::gpk::apod<char> & output, ::gpk::view<const ::gpk::TKeyValConstString> environViews)					{
 	::gpk::apod<char>									buffer							= {};
 	output.push_back('{');
 	uint32_t												iComma							= 0;
@@ -51,7 +51,7 @@ static	::gpk::error_t								generate_output_cgi_env			(::gpk::apod<char> & outp
 	return 0;
 }
 
-static	::gpk::error_t								generate_output_process_env		(::gpk::apod<char> & output, ::gpk::view_array<const ::gpk::TKeyValConstString> environViews)					{
+static	::gpk::error_t								generate_output_process_env		(::gpk::apod<char> & output, ::gpk::view<const ::gpk::TKeyValConstString> environViews)					{
 	::gpk::apod<char>									buffer							= {};
 	output.push_back('{');
 	for(uint32_t iEnviron = 0; iEnviron < environViews.size(); ++iEnviron) {

@@ -300,7 +300,7 @@ stacxpr const ::gpk::tri3<float>						geometryCube	[12]						=
 	return 0;
 }
 
-stacxpr const ::gpk::n3<float>						geometryCubeNormals	[12]						=
+stacxpr const ::gpk::n3f32						geometryCubeNormals	[12]						=
 	{ {0.0f, 0.0f, -1.0f}	// Right	- first			?? I have no idea if this is correct lol
 	, {0.0f, 0.0f, -1.0f}	// Right	- second		?? I have no idea if this is correct lol
 
@@ -321,7 +321,7 @@ stacxpr const ::gpk::n3<float>						geometryCubeNormals	[12]						=
 	};
 
 struct SCamera {
-						::gpk::n3<float>								Position, Target;
+						::gpk::n3f32								Position, Target;
 };
 
 					::gpk::error_t										draw										(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
@@ -346,14 +346,14 @@ struct SCamera {
 	//::gpk::m4<float>														viewMatrix									= {};
 	//projection.Identity();
 	//::gpk::SFrameInfo															& frameInfo									= framework.FrameInfo;
-	//const ::gpk::n3<float>													tilt										= {10, };	// ? cam't remember what is this. Radians? Eulers?
-	//const ::gpk::n3<float>													rotation									= {0, (float)frameInfo.FrameNumber / 100, 0};
+	//const ::gpk::n3f32													tilt										= {10, };	// ? cam't remember what is this. Radians? Eulers?
+	//const ::gpk::n3f32													rotation									= {0, (float)frameInfo.FrameNumber / 100, 0};
 	//
 	//::gpk::SNearFar																nearFar										= {0.01f , 1000.0f};
 	//
-	//stacxpr const ::gpk::n3<float>								cameraUp									= {0, 1, 0};	// ? cam't remember what is this. Radians? Eulers?
+	//stacxpr const ::gpk::n3f32								cameraUp									= {0, 1, 0};	// ? cam't remember what is this. Radians? Eulers?
 	//::SCamera																	camera										= {{10, 5, 0}, {}};
-	//::gpk::n3<float>														lightPos									= {10, 5, 0};
+	//::gpk::n3f32														lightPos									= {10, 5, 0};
 	//static float																cameraRotation								= 0;
 	//cameraRotation															+= (float)framework.Input->MouseCurrent.Deltas.x / 5.0f;
 	////camera.Position	.RotateY(cameraRotation);
@@ -395,7 +395,7 @@ struct SCamera {
 	//}
 	//::gpk::array_pod<::gpk::n2<int32_t>>									trianglePixelCoords;
 	//::gpk::array_pod<::gpk::n2<int32_t>>									wireframePixelCoords;
-	//::gpk::n3<float> cameraFront = (camera.Target - camera.Position).Normalize();
+	//::gpk::n3f32 cameraFront = (camera.Target - camera.Position).Normalize();
 	//for(uint32_t iTriangle = 0; iTriangle < 12; ++iTriangle) {
 	//	double																		lightFactor									= geometryCubeNormals[iTriangle].Dot(cameraFront);
 	//	if(lightFactor > 0)

@@ -5,16 +5,16 @@
 
 namespace klib
 {
-	bool moveStep				(const ::klib::SEntityTables & entityTables, ::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players, STacticalPlayer& player, int8_t playerIndex, int32_t agentIndex, TEAM_TYPE teamId, STacticalBoard& board, ::gpk::n3<int32_t>& agentPosition, ::klib::SGameMessages & messages);
-	void endTurn				(const ::klib::SEntityTables & entityTables, ::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players, ::klib::SGameMessages & messages);
-	bool updateCurrentPlayer	(const ::klib::SEntityTables & entityTables, ::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players, ::klib::SGameMessages & messages);
-	void determineOutcome		(const ::klib::SEntityTables & entityTables, ::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players, ::klib::SGameMessages & messages, bool aborted);
-	bool isTacticalValid		(::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players);
-	void handleAgentDeath		(::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players, ::klib::CCharacter& deadTarget, ::klib::TEAM_TYPE teamId, ::klib::SGameMessages& messages);
-	void handleAgentDeath		(::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players, ::klib::CCharacter& deadTarget, ::klib::CCharacter& attacker, TEAM_TYPE teamId, ::klib::SGameMessages & messages);
-	bool isTacticalValid		(::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players);
+	bool moveStep				(const ::klib::SEntityTables & entityTables, ::klib::STacticalInfo & tacticalInfo, ::gpk::view<::klib::SGamePlayer> players, STacticalPlayer& player, int8_t playerIndex, int32_t agentIndex, TEAM_TYPE teamId, STacticalBoard& board, ::gpk::n3<int32_t>& agentPosition, ::klib::SGameMessages & messages);
+	void endTurn				(const ::klib::SEntityTables & entityTables, ::klib::STacticalInfo & tacticalInfo, ::gpk::view<::klib::SGamePlayer> players, ::klib::SGameMessages & messages);
+	bool updateCurrentPlayer	(const ::klib::SEntityTables & entityTables, ::klib::STacticalInfo & tacticalInfo, ::gpk::view<::klib::SGamePlayer> players, ::klib::SGameMessages & messages);
+	void determineOutcome		(const ::klib::SEntityTables & entityTables, ::klib::STacticalInfo & tacticalInfo, ::gpk::view<::klib::SGamePlayer> players, ::klib::SGameMessages & messages, bool aborted);
+	bool isTacticalValid		(::klib::STacticalInfo & tacticalInfo, ::gpk::view<::klib::SGamePlayer> players);
+	void handleAgentDeath		(::klib::STacticalInfo & tacticalInfo, ::gpk::view<::klib::SGamePlayer> players, ::klib::CCharacter& deadTarget, ::klib::TEAM_TYPE teamId, ::klib::SGameMessages& messages);
+	void handleAgentDeath		(::klib::STacticalInfo & tacticalInfo, ::gpk::view<::klib::SGamePlayer> players, ::klib::CCharacter& deadTarget, ::klib::CCharacter& attacker, TEAM_TYPE teamId, ::klib::SGameMessages & messages);
+	bool isTacticalValid		(::klib::STacticalInfo & tacticalInfo, ::gpk::view<::klib::SGamePlayer> players);
 
-	static int32_t												getAgentsInSight									(::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<const ::klib::SGamePlayer> players, const ::gpk::n3<int32_t>& origin, double range, SAgentsReference& agentsInRange)	{
+	static int32_t												getAgentsInSight									(::klib::STacticalInfo & tacticalInfo, ::gpk::view<const ::klib::SGamePlayer> players, const ::gpk::n3<int32_t>& origin, double range, SAgentsReference& agentsInRange)	{
 		agentsInRange												= {};
 		for(uint32_t iPlayer = 0, playerCount = tacticalInfo.Setup.TotalPlayers; iPlayer < playerCount; ++iPlayer) {
 			if(tacticalInfo.Setup.Players[iPlayer] == (::klib::PLAYER_INDEX)-1)
@@ -30,7 +30,7 @@ namespace klib
 					continue;
 
 				const ::gpk::n3<int32_t>									& coordAgent										= agent.Position;
-				const ::gpk::n3<float>										distance											= (coordAgent-origin).Cast<float>();
+				const ::gpk::n3f32										distance											= (coordAgent-origin).Cast<float>();
 				if(distance.Length() > range)
 					continue;
 

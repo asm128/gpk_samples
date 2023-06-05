@@ -87,7 +87,7 @@ void																	equipEntityMenu
 
 	printf(currentlyCarryingMessage.begin(), ::klib::getEntityName(table, currentEntity).begin(), currentEntity.Level);
 	menuItems[menuItemCount++]												= {256, "Exit this menu"};
-	int32_t																		selectedValue								= displayMenu(selectYourChoiceMessage, ::gpk::view_array<const ::klib::SMenuItem<int16_t>>{menuItems}, menuItemCount);
+	int32_t																		selectedValue								= displayMenu(selectYourChoiceMessage, ::gpk::view<const ::klib::SMenuItem<int16_t>>{menuItems}, menuItemCount);
 	if(selectedValue == 256)
 		return;
 
@@ -230,7 +230,7 @@ void																	labs										(const ::klib::SEntityTables & tables, ::klib
 	};
 
 	while (true) { // Wait for exit request
-		int																			tavernChoice								= displayMenu("You take a look at your collected samples..", ::gpk::view_array<const ::klib::SMenuItem<int32_t>>{tavernOptions});
+		int																			tavernChoice								= displayMenu("You take a look at your collected samples..", ::gpk::view<const ::klib::SMenuItem<int32_t>>{tavernOptions});
 
 			 if( 0	== tavernChoice ) {	researchWeaponDefinition		(tables.Weapon		, adventurer);	}	//
 		else if( 1	== tavernChoice ) {	researchWeaponModifier			(tables.Weapon		, adventurer);	}	//
@@ -264,7 +264,7 @@ void																	inspect										(const ::klib::SEntityTables & tables, ::k
 	};
 
 	while (true) { // Wait for exit request
-		int																			tavernChoice								= displayMenu("You wonder about what to do next..", ::gpk::view_array<const ::klib::SMenuItem<int32_t>>{tavernOptions});
+		int																			tavernChoice								= displayMenu("You wonder about what to do next..", ::gpk::view<const ::klib::SMenuItem<int32_t>>{tavernOptions});
 
 		// Interpret user input.
 			 if( 0 == tavernChoice ) {	displayWeapon		(tables, adventurer);	}	//
@@ -294,7 +294,7 @@ void																	arsenal										(const ::klib::SEntityTables & entityTable
 		};
 
 	while (true) { // Wait for exit request
-		int																			tavernChoice								= displayMenu("You wonder about what to do next..", ::gpk::view_array<const ::klib::SMenuItem<int32_t>>{tavernOptions});
+		int																			tavernChoice								= displayMenu("You wonder about what to do next..", ::gpk::view<const ::klib::SMenuItem<int32_t>>{tavernOptions});
 
 		// Interpret user input.
 			 if( 0 == tavernChoice ) {	menuEquipProfession	(entityTables.Profession, adventurer);	}	//
@@ -348,7 +348,7 @@ void																	tavern										(const ::klib::SEntityTables & entityTables
 		};
 
 	while (true) { // Wait for exit request
-		int																		tavernChoice								= displayMenu("You wonder about what to do next..", ::gpk::view_array<const ::klib::SMenuItem<int32_t>>{tavernOptions});
+		int																		tavernChoice								= displayMenu("You wonder about what to do next..", ::gpk::view<const ::klib::SMenuItem<int32_t>>{tavernOptions});
 
 			 if( 0 == tavernChoice ) {	::rest				(entityTables, adventurer);	}
 		else if( 1 == tavernChoice ) {	mercenaryJob		(entityTables, adventurer);	}
@@ -378,7 +378,7 @@ void																	mercenaryJob								(const ::klib::SEntityTables & tables, 
 	jobOptions[enemyCount-1].ReturnValue									= enemyCount;
 	jobOptions[enemyCount-1].Text											= "Back to tavern";
 
-	const int32_t																enemyType									= displayMenu("You decide to enroll for a mercenary job", ::gpk::view_array<const ::klib::SMenuItem<int32_t>>{jobOptions});
+	const int32_t																enemyType									= displayMenu("You decide to enroll for a mercenary job", ::gpk::view<const ::klib::SMenuItem<int32_t>>{jobOptions});
 
 	if(enemyCount == enemyType)	// This option cancels the loop which causes to exit to the tavern.
 		printf("Welcome back, %s.\n", adventurer.Name.begin());
@@ -420,7 +420,7 @@ void																	bar											(::klib::CCharacter& adventurer)						{
 	char																		menuTitle[128]								= {};
 	while (true) {	// break the loop in order to leave the shop
 		sprintf_s(menuTitle, "You have %lli coins", adventurer.Points.Coins);
-		const ::klib::SItem															selectedItem								= ::displayMenu(menuTitle, ::gpk::view_array<const ::klib::SMenuItem<::klib::SItem>>{itemOptions});
+		const ::klib::SItem															selectedItem								= ::displayMenu(menuTitle, ::gpk::view<const ::klib::SMenuItem<::klib::SItem>>{itemOptions});
 		if( selectedItem.Definition == klib::getFinalItemCount() ) {
 			printf("You leave the bar.\n");
 			break;

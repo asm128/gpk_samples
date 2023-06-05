@@ -28,7 +28,7 @@ static	int											drawDebris			(::gpk::view_grid<::gpk::bgra> targetPixels, :
 	::gpk::array_pod<::gpk::n2<int32_t>>				pixelCoords;
 	for(uint32_t iParticle = 0; iParticle < debris.Brightness.size(); ++iParticle) {
 		::gpk::rgbaf										colorShot			= debris.Colors[iParticle % ::gpk::size(debris.Colors)];
-		::gpk::n3<float>									starPos				= debris.Particles.Position[iParticle];
+		::gpk::n3f32									starPos				= debris.Particles.Position[iParticle];
 		starPos												= matrixVPV.Transform(starPos);
 		const ::gpk::n2<int32_t>							pixelCoord			= {(int32_t)starPos.x, (int32_t)starPos.y};
 		if( pixelCoord.y < 0 || pixelCoord.y >= (int32_t)targetPixels.metrics().y
@@ -107,7 +107,7 @@ int													ssg::solarSystemUpdate			(ssg::SSolarSystemGame & solarSystem, d
 
 
 	// ------------------------------------------- Handle input
-	::gpk::SCamera											& camera					= solarSystem.Scene.Camera;
+	::gpk::SCameraPoints									& camera					= solarSystem.Scene.Camera;
 #if defined(GPK_WINDOWS)
 	if(GetAsyncKeyState('Q')) camera.Position.z				-= (float)secondsLastFrame * (GetAsyncKeyState(VK_SHIFT) ? 100 : 10);
 	if(GetAsyncKeyState('E')) camera.Position.z				+= (float)secondsLastFrame * (GetAsyncKeyState(VK_SHIFT) ? 100 : 10);
@@ -115,16 +115,16 @@ int													ssg::solarSystemUpdate			(ssg::SSolarSystemGame & solarSystem, d
 	if(GetAsyncKeyState('W')) camera.Position				-= camera.Position / camera.Position.Length() * (GetAsyncKeyState(VK_SHIFT) ? 100 : 2) * secondsLastFrame;
 	if(GetAsyncKeyState('A')) camera.Position.RotateY( (GetAsyncKeyState(VK_SHIFT) ? 100 : 2) * secondsLastFrame);
 	if(GetAsyncKeyState('D')) camera.Position.RotateY(-(GetAsyncKeyState(VK_SHIFT) ? 100 : 2) * secondsLastFrame);
-	if(GetAsyncKeyState('0')) { ; camera.Target = scene.Transform[0 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::n3<float>{scene.Pivot[solarSystem.Entities[0 * 2].Model].Scale.x * 10, 0, 0}; }
-	if(GetAsyncKeyState('1')) { ; camera.Target = scene.Transform[1 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::n3<float>{scene.Pivot[solarSystem.Entities[1 * 2].Model].Scale.x * 10, 0, 0}; }
-	if(GetAsyncKeyState('2')) { ; camera.Target = scene.Transform[2 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::n3<float>{scene.Pivot[solarSystem.Entities[2 * 2].Model].Scale.x * 10, 0, 0}; }
-	if(GetAsyncKeyState('3')) { ; camera.Target = scene.Transform[3 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::n3<float>{scene.Pivot[solarSystem.Entities[3 * 2].Model].Scale.x * 10, 0, 0}; }
-	if(GetAsyncKeyState('4')) { ; camera.Target = scene.Transform[4 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::n3<float>{scene.Pivot[solarSystem.Entities[4 * 2].Model].Scale.x * 10, 0, 0}; }
-	if(GetAsyncKeyState('5')) { ; camera.Target = scene.Transform[5 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::n3<float>{scene.Pivot[solarSystem.Entities[5 * 2].Model].Scale.x * 10, 0, 0}; }
-	if(GetAsyncKeyState('6')) { ; camera.Target = scene.Transform[6 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::n3<float>{scene.Pivot[solarSystem.Entities[6 * 2].Model].Scale.x * 10, 0, 0}; }
-	if(GetAsyncKeyState('7')) { ; camera.Target = scene.Transform[7 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::n3<float>{scene.Pivot[solarSystem.Entities[7 * 2].Model].Scale.x * 10, 0, 0}; }
-	if(GetAsyncKeyState('8')) { ; camera.Target = scene.Transform[8 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::n3<float>{scene.Pivot[solarSystem.Entities[8 * 2].Model].Scale.x * 10, 0, 0}; }
-	if(GetAsyncKeyState('9')) { ; camera.Target = scene.Transform[9 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::n3<float>{scene.Pivot[solarSystem.Entities[9 * 2].Model].Scale.x * 10, 0, 0}; }
+	if(GetAsyncKeyState('0')) { ; camera.Target = scene.Transform[0 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::n3f32{scene.Pivot[solarSystem.Entities[0 * 2].Model].Scale.x * 10, 0, 0}; }
+	if(GetAsyncKeyState('1')) { ; camera.Target = scene.Transform[1 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::n3f32{scene.Pivot[solarSystem.Entities[1 * 2].Model].Scale.x * 10, 0, 0}; }
+	if(GetAsyncKeyState('2')) { ; camera.Target = scene.Transform[2 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::n3f32{scene.Pivot[solarSystem.Entities[2 * 2].Model].Scale.x * 10, 0, 0}; }
+	if(GetAsyncKeyState('3')) { ; camera.Target = scene.Transform[3 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::n3f32{scene.Pivot[solarSystem.Entities[3 * 2].Model].Scale.x * 10, 0, 0}; }
+	if(GetAsyncKeyState('4')) { ; camera.Target = scene.Transform[4 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::n3f32{scene.Pivot[solarSystem.Entities[4 * 2].Model].Scale.x * 10, 0, 0}; }
+	if(GetAsyncKeyState('5')) { ; camera.Target = scene.Transform[5 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::n3f32{scene.Pivot[solarSystem.Entities[5 * 2].Model].Scale.x * 10, 0, 0}; }
+	if(GetAsyncKeyState('6')) { ; camera.Target = scene.Transform[6 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::n3f32{scene.Pivot[solarSystem.Entities[6 * 2].Model].Scale.x * 10, 0, 0}; }
+	if(GetAsyncKeyState('7')) { ; camera.Target = scene.Transform[7 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::n3f32{scene.Pivot[solarSystem.Entities[7 * 2].Model].Scale.x * 10, 0, 0}; }
+	if(GetAsyncKeyState('8')) { ; camera.Target = scene.Transform[8 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::n3f32{scene.Pivot[solarSystem.Entities[8 * 2].Model].Scale.x * 10, 0, 0}; }
+	if(GetAsyncKeyState('9')) { ; camera.Target = scene.Transform[9 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::n3f32{scene.Pivot[solarSystem.Entities[9 * 2].Model].Scale.x * 10, 0, 0}; }
 #endif
 	solarSystem.SunFire.SpawnSpherical(100, {}, 5, 1, 10);
 
@@ -133,21 +133,22 @@ int													ssg::solarSystemUpdate			(ssg::SSolarSystemGame & solarSystem, d
 	bodies.Integrate(secondsLastFrame);
 
 	//------------------------------------------- Transform and Draw
-	::gpk::view_grid<::gpk::bgra>						targetPixels				= target->Color.View;
+	::gpk::view_grid<::gpk::bgra>		targetPixels				= target->Color.View;
 	memset((void*)targetPixels.begin(), 0, sizeof(::gpk::bgra) * targetPixels.size());
-	::gpk::bgra										colorBackground		= {0x20, 0x8, 0x4};
-	//colorBackground									+= (colorBackground * (0.5 + (0.5 / 65535 * rand())) * ((rand() % 2) ? -1 : 1)) ;
+	::gpk::bgra							colorBackground		= {0x20, 0x8, 0x4};
+	//colorBackground				+= (colorBackground * (0.5 + (0.5 / 65535 * rand())) * ((rand() % 2) ? -1 : 1)) ;
 	for(uint32_t y = 0; y < targetPixels.metrics().y; ++y) // Generate noise color for planet texture
 	for(uint32_t x = 0; x < targetPixels.metrics().x; ++x)
 		targetPixels.begin()[y * targetPixels.metrics().x + x]	= colorBackground;
 
-	::gpk::n3<float>									lightVector					= camera.Position;
+	::gpk::n3f32					lightVector					= camera.Position;
 	lightVector.Normalize();
 
-	::gpk::m4<float>									matrixView					= {};
-	::gpk::m4<float>									matrixProjection			= {};
-	::gpk::m4<float>									matrixViewport				= {};
-	matrixView.LookAt(camera.Position, camera.Target, camera.Up);
+	::gpk::m4<float>					matrixView					= {};
+	::gpk::m4<float>					matrixProjection			= {};
+	::gpk::m4<float>					matrixViewport				= {};
+	stacxpr	::gpk::n3f32				cameraUp		= {0, 1};
+	matrixView.LookAt(camera.Position, camera.Target, cameraUp);
 	matrixProjection.FieldOfView(::gpk::math_pi * .25, targetPixels.metrics().x / (double)targetPixels.metrics().y, ::gpk::SNearFar{0.1f, 10000.0f});
 	matrixViewport.ViewportLH(targetPixels.metrics().Cast<uint16_t>());
 	matrixView											*= matrixProjection;

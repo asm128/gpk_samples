@@ -244,7 +244,7 @@ static	int64_t										getEnemyCoinsForTerrainFun							(::klib::SGame& instanc
 	return totalAgents ? maxCoins : 1;	// totalAgents / 4
 }
 
-void									recalculateAgentsInRangeAndSight					(::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players);
+void									recalculateAgentsInRangeAndSight					(::klib::STacticalInfo & tacticalInfo, ::gpk::view<::klib::SGamePlayer> players);
 
 ::gpk::error_t							klib::initTacticalMap								(::klib::SGame& instanceGame)																	{
 	STacticalInfo											& tacticalInfo										= instanceGame.TacticalInfo;
@@ -400,7 +400,7 @@ static const ::klib::STacticalSetup					tacticalSetupForCampaign							=
 
 void												getDefaultTacticalSetupForCampaign					(::klib::STacticalSetup& tacticalSetup)							{ tacticalSetup = ::tacticalSetupForCampaign; }
 
-uint32_t											resolveNextPlayer									(const ::klib::SEntityTables & entityTables, ::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players, ::klib::SGameMessages & messages);
+uint32_t											resolveNextPlayer									(const ::klib::SEntityTables & entityTables, ::klib::STacticalInfo & tacticalInfo, ::gpk::view<::klib::SGamePlayer> players, ::klib::SGameMessages & messages);
 bool												initCampaignPlayers									(::klib::SGame & instanceGame)									{
 	::klib::STacticalInfo									& tacticalInfo										= instanceGame.TacticalInfo;
 	::klib::STacticalSetup									& tacticalSetup										= tacticalInfo.Setup;

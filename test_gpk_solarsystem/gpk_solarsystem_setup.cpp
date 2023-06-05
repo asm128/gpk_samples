@@ -47,7 +47,7 @@ int													ssg::solarSystemSetup				(::ssg::SSolarSystemGame & solarSystem,
 		::gpk::jsonFileRead(solarSystemFile, filename);
 		::gpk::ai32			stellarBodyIndices;
 		const uint32_t						stellarBodyCount		= ::gpk::jsonObjectKeyList(solarSystemFile.Reader, 0, stellarBodyIndices);
-		::gpk::view_array<const ::gpk::vcc>	jsonView				= solarSystemFile.Reader.View;
+		::gpk::view<const ::gpk::vcc>	jsonView				= solarSystemFile.Reader.View;
 		for(uint32_t iPlanet = 0; iPlanet < stellarBodyCount; ++iPlanet) {
 			const int32_t						jsonIndexStellarBody	= stellarBodyIndices[iPlanet];
 
@@ -208,6 +208,6 @@ int													ssg::solarSystemSetup				(::ssg::SSolarSystemGame & solarSystem,
 	}
 	solarSystem.Scene.Camera.Target					= {};
 	solarSystem.Scene.Camera.Position				= {-0.000001f, 500, -1000};
-	solarSystem.Scene.Camera.Up						= {0, 1, 0};
+	//solarSystem.Scene.Camera.Up						= {0, 1, 0};
 	return 0;
 }

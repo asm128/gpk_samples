@@ -223,7 +223,7 @@ void																	senseMenu					(const ::klib::SEntityTables & tables, ::klib
 		};
 
 	while (true) { // Wait for exit request
-		int																			tavernChoice				= displayMenu(::gpk::view_const_string{"You wonder about what to do next.."}, ::gpk::view_array<const ::klib::SMenuItem<int>>{tavernOptions});
+		int																			tavernChoice				= displayMenu(::gpk::view_const_string{"You wonder about what to do next.."}, ::gpk::view<const ::klib::SMenuItem<int>>{tavernOptions});
 
 		// Interpret user input.
 			 if( 1 == tavernChoice )	{	displayWeapon					(tables, enemy);									}	//
@@ -353,7 +353,7 @@ TURN_OUTCOME															playerTurn					(const ::klib::SEntityTables & tables,
 		printStatuses			(currentEnemy, messages);
 		printBonuses			(currentEnemy, messages);
 
-		const TURN_ACTION															actionChoice				= displayMenu("It's your turn to make a move", ::gpk::view_array<const ::klib::SMenuItem<TURN_ACTION>>{combatOptions});
+		const TURN_ACTION															actionChoice				= displayMenu("It's your turn to make a move", ::gpk::view<const ::klib::SMenuItem<TURN_ACTION>>{combatOptions});
 		turnOutcome																= characterTurn(tables, messages, actionChoice, adventurer, currentEnemy, false);
 	}
 	return turnOutcome;
@@ -446,7 +446,7 @@ int32_t																	selectItemsPlayer						(::klib::CCharacter& user)							
 	}
 	itemOptions[user.Goods.Inventory.Items.size()].ReturnValue				= user.Goods.Inventory.Items.size();
 	itemOptions[user.Goods.Inventory.Items.size()].Text						= "Back to combat options";
-	indexInventory															= displayMenu(user.Goods.Inventory.Items.size() + 1, "Select an item to use", ::gpk::view_array<const ::klib::SMenuItem<int32_t>>{itemOptions});
+	indexInventory															= displayMenu(user.Goods.Inventory.Items.size() + 1, "Select an item to use", ::gpk::view<const ::klib::SMenuItem<int32_t>>{itemOptions});
 
 	if(indexInventory == (int32_t)user.Goods.Inventory.Items.Slots.size())	// exit option
 		indexInventory															= user.Goods.Inventory.Items.size();	// Exit menu

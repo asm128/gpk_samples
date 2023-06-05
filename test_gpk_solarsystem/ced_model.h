@@ -7,9 +7,9 @@
 namespace ced
 {
 	struct SModel3 {
-		::gpk::n3<float>								Scale		;
-		::gpk::n3<float>								Rotation	;
-		::gpk::n3<float>								Position	;
+		::gpk::n3f32								Scale		;
+		::gpk::n3f32								Rotation	;
+		::gpk::n3f32								Position	;
 	};
 
 	struct SModelMatrices {
@@ -24,9 +24,9 @@ namespace ced
 	};
 
 	struct SCamera {
-		::gpk::n3<float>								Position			= {-0.000001f, 100, 0};
-		::gpk::n3<float>								Target				= {};
-		::gpk::n3<float>								Up					= {0, 1, 0};
+		::gpk::n3f32								Position			= {-0.000001f, 100, 0};
+		::gpk::n3f32								Target				= {};
+		::gpk::n3f32								Up					= {0, 1, 0};
 	};
 
 

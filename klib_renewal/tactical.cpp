@@ -355,7 +355,7 @@ void																drawPlayerInfo									(::klib::SGame& instanceGame)								
 	::klib::lineToGridColored(displayGlobal.Color, displayGlobal.DepthStencil, messageColor, 3, tacticalDisplayX+1, ::klib::SCREEN_RIGHT, selectionText.begin());
 }
 
-bool																	shoot											(::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players, int32_t tacticalPlayer, int32_t squadAgent, ::klib::SGameMessages & messages)					{
+bool																	shoot											(::klib::STacticalInfo & tacticalInfo, ::gpk::view<::klib::SGamePlayer> players, int32_t tacticalPlayer, int32_t squadAgent, ::klib::SGameMessages & messages)					{
 	::klib::SGamePlayer																& playerShooter									= players[tacticalInfo.Setup.Players[tacticalPlayer]];
 	::klib::CCharacter															& agentShooter									= *playerShooter.Tactical.Army[playerShooter.Tactical.Squad.Agents[squadAgent]];
 
@@ -415,8 +415,8 @@ bool																	shoot											(::klib::STacticalInfo & tacticalInfo, ::gp
 	return true;
 }
 
-		::klib::TURN_ACTION												selectAIAction									(::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players);
-inline	::klib::TURN_ACTION												selectRemoteAction								(::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players)	{
+		::klib::TURN_ACTION												selectAIAction									(::klib::STacticalInfo & tacticalInfo, ::gpk::view<::klib::SGamePlayer> players);
+inline	::klib::TURN_ACTION												selectRemoteAction								(::klib::STacticalInfo & tacticalInfo, ::gpk::view<::klib::SGamePlayer> players)	{
 	return selectAIAction(tacticalInfo, players);
 }
 
@@ -426,7 +426,7 @@ enum CHARACTER_TURN_ACTION
 	, CHARACTER_TURN_ACTION_INVENTORY
 	};
 
-static CHARACTER_TURN_ACTION											characterTurn									(const ::klib::SEntityTables & entityTables, ::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players, ::klib::TURN_ACTION combatOption, ::klib::SGameMessages & messages)	{
+static CHARACTER_TURN_ACTION											characterTurn									(const ::klib::SEntityTables & entityTables, ::klib::STacticalInfo & tacticalInfo, ::gpk::view<::klib::SGamePlayer> players, ::klib::TURN_ACTION combatOption, ::klib::SGameMessages & messages)	{
 	::klib::SGamePlayer																& currentPlayer									= players[tacticalInfo.Setup.Players[tacticalInfo.CurrentPlayer]];
 	//bool																		bNotCanceled									= true;
 	CHARACTER_TURN_ACTION														result											= CHARACTER_TURN_ACTION_CONTINUE;
@@ -463,7 +463,7 @@ static CHARACTER_TURN_ACTION											characterTurn									(const ::klib::SEnt
 
 				::gpk::n3<int32_t>														coordPlayer										= playerAgent.Position;
 				::gpk::n3<int32_t>														coordTarget										= targetAgent.Position;
-				::gpk::n3<float>														distance										= (coordTarget-coordPlayer).Cast<float>();
+				::gpk::n3f32														distance										= (coordTarget-coordPlayer).Cast<float>();
 
 				const ::klib::SEntityPoints													& playerAgentPoints								= playerAgent.FinalPoints;
 				const ::klib::SEntityFlags													& playerAgentFlags								= playerAgent.FinalFlags;
@@ -596,7 +596,7 @@ int32_t																	drawInventoryMenu								(::klib::SGame& instanceGame, :
 	//int32_t																		initMenu										=
 		::initInventoryMenu(adventurer, itemOptions, false, false);
 	static ::klib::SDrawMenuState												menuState;
-	::gpk::view_array<const ::klib::SMenuItem<int32_t>>							menuItems										= {itemOptions, characterInventory.Items.Slots.size()};
+	::gpk::view<const ::klib::SMenuItem<int32_t>>							menuItems										= {itemOptions, characterInventory.Items.Slots.size()};
 	int32_t																		countMenuItems									= menuItems.size();
 	return ::klib::drawMenu(menuState, globalDisplay.Color.View, globalDisplay.DepthStencil.begin(), menuTitle, menuItems, instanceGame.FrameInput, countMenuItems, -1, 50);
 
@@ -703,7 +703,7 @@ static	void															updateBullets									(::klib::SGame & instanceGame, d
 		if(fActualSpeed >= 0.25)
 			fActualSpeed															= 0.25;
 		::klib::STacticalCoord														& bulletPos										= bullets[iBullet].Position;
-		::gpk::n3<float>														& bulletDir										= bullets[iBullet].Direction;
+		::gpk::n3f32														& bulletDir										= bullets[iBullet].Direction;
 		bulletPos.Offset.AddScaled(bulletDir, fActualSpeed);
 		::klib::SBullet																newBullet										= bullets[iBullet];
 		::klib::STacticalCoord														& newBulletPos									= newBullet.Position;
@@ -813,7 +813,7 @@ static	void															updateBullets									(::klib::SGame & instanceGame, d
 								continue;
 
 							const ::gpk::n3<int32_t>	currentCoord	= {x, y, z};
-							const ::gpk::n3<float>		distance		= (currentCoord-newAOE.Position.Cell).Cast<float>();
+							const ::gpk::n3f32		distance		= (currentCoord-newAOE.Position.Cell).Cast<float>();
 							double							length			= distance.Length();
 							if((length + 1.0000000000001) > newAOE.RadiusOrHalfSize)
 								continue;
@@ -830,17 +830,17 @@ static	void															updateBullets									(::klib::SGame & instanceGame, d
 									continue;
 								tileGeometry.fHeight[0]		-= (float)(newAOE.RadiusOrHalfSize/2*(1.0-proportion));
 
-								length						= ::gpk::n3<float>{distance.x+1, distance.y, distance.z}.Length();
+								length						= ::gpk::n3f32{distance.x+1, distance.y, distance.z}.Length();
 								proportion					= length/newAOE.RadiusOrHalfSize;
 								if(proportion <= 1.0)
 									tileGeometry.fHeight[1]		-= (float)(newAOE.RadiusOrHalfSize/2*(1.0-proportion));
 
-								length						= ::gpk::n3<float>{distance.x, distance.y, distance.z+1}.Length();
+								length						= ::gpk::n3f32{distance.x, distance.y, distance.z+1}.Length();
 								proportion					= length/newAOE.RadiusOrHalfSize;
 								if(proportion <= 1.0)
 									tileGeometry.fHeight[2]		-= (float)(newAOE.RadiusOrHalfSize/2*(1.0-proportion));
 
-								length						= ::gpk::n3<float>{distance.x+1, distance.y, distance.z+1}.Length();
+								length						= ::gpk::n3f32{distance.x+1, distance.y, distance.z+1}.Length();
 								proportion					= length/newAOE.RadiusOrHalfSize;
 								if(proportion <= 1.0)
 									tileGeometry.fHeight[3]		-= (float)(newAOE.RadiusOrHalfSize/2*(1.0-proportion));
@@ -866,7 +866,7 @@ static	void															updateBullets									(::klib::SGame & instanceGame, d
 						::klib::CCharacter						& agentVictim			= *playerVictim.Tactical.Army[playerVictim.Tactical.Squad.Agents[agentsInRange.Agents[iAgentInRange].Agent.AgentIndex]];
 						//::gpk::n3<int32_t> distance = agentVictim.Position-newAOE.Position.Cell;
 						const ::gpk::n3<int32_t>			& coordAgent			= agentVictim.Position;
-						const ::gpk::n3<float>				distance				= (coordAgent - newAOE.Position.Cell).Cast<float>();
+						const ::gpk::n3f32				distance				= (coordAgent - newAOE.Position.Cell).Cast<float>();
 						double									length					= distance.Length();
 						if(length > newAOE.RadiusOrHalfSize)
 							continue;
@@ -954,7 +954,7 @@ bool																	initTacticalGame								(::klib::SGame& instanceGame);
  			else if(instanceGame.State.Substate == ::klib::GAME_SUBSTATE_EQUIPMENT) {
 				menuTitle.append_string(" - Equipment");
 				static ::klib::SDrawMenuState		menuState;
-				exitState						= ::klib::drawMenu(menuState, instanceGame.GlobalDisplay.Screen.Color.View, globalDisplay.DepthStencil.begin(), menuTitle, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{::klib::optionsCombatTurnEquip}, instanceGame.FrameInput, {::klib::GAME_STATE_TACTICAL_CONTROL, ::klib::GAME_SUBSTATE_MAIN}, exitState, 20);
+				exitState						= ::klib::drawMenu(menuState, instanceGame.GlobalDisplay.Screen.Color.View, globalDisplay.DepthStencil.begin(), menuTitle, ::gpk::view<const ::klib::SMenuItem<::klib::SGameState>>{::klib::optionsCombatTurnEquip}, instanceGame.FrameInput, {::klib::GAME_STATE_TACTICAL_CONTROL, ::klib::GAME_SUBSTATE_MAIN}, exitState, 20);
 				selectedAction					= ::klib::TURN_ACTION_CONTINUE;
 			}
 			else {
@@ -964,7 +964,7 @@ bool																	initTacticalGame								(::klib::SGame& instanceGame);
 					instanceGame.LogError();
 				}
 				static ::klib::SDrawMenuState		menuState;
-				selectedAction					= ::klib::drawMenu(menuState, instanceGame.GlobalDisplay.Screen.Color.View, globalDisplay.DepthStencil.begin(), menuTitle, ::gpk::view_array<const ::klib::SMenuItem<::klib::TURN_ACTION>>{::klib::optionsCombatTurn}, instanceGame.FrameInput, ::klib::TURN_ACTION_MENUS, ::klib::TURN_ACTION_CONTINUE, 20);
+				selectedAction					= ::klib::drawMenu(menuState, instanceGame.GlobalDisplay.Screen.Color.View, globalDisplay.DepthStencil.begin(), menuTitle, ::gpk::view<const ::klib::SMenuItem<::klib::TURN_ACTION>>{::klib::optionsCombatTurn}, instanceGame.FrameInput, ::klib::TURN_ACTION_MENUS, ::klib::TURN_ACTION_CONTINUE, 20);
 			}
 		}
 		else if(currentPlayer.Tactical.Control.Type == ::klib::PLAYER_CONTROL_AI)  {
@@ -977,7 +977,7 @@ bool																	initTacticalGame								(::klib::SGame& instanceGame);
 			selectedAction = ::selectRemoteAction(tacticalInfo, instanceGame.Players);
 	}
 	else {
-		::gpk::n3<float>				bulletPos				= {0.0f,0.0f,0.0f};
+		::gpk::n3f32				bulletPos				= {0.0f,0.0f,0.0f};
 		const ::klib::SBullet				& bulletToPrint			= tacticalInfo.Board.Shots.Bullet[0];
 		bulletPos.x						= bulletToPrint.Position.Cell.x + bulletToPrint.Position.Offset.x;
 		bulletPos.y						= bulletToPrint.Position.Cell.y + bulletToPrint.Position.Offset.y;

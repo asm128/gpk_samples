@@ -119,7 +119,7 @@ int32_t												klib::reinitBuyMenus		(const ::klib::SEntityTables & entityTa
 
 	if(::klib::GAME_SUBSTATE_MAIN == instanceGame.State.Substate) {
 		static ::klib::SMenuHeader<::klib::SGameState>		menuBuy								({::klib::GAME_STATE_WELCOME_COMMANDER}, ::gpk::view_const_string{"Order Menu"}, 26);
-		return ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.Color.View, instanceGame.GlobalDisplay.Screen.DepthStencil.begin(), menuBuy, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{::klib::optionsBuy}, instanceGame.FrameInput, instanceGame.State);
+		return ::klib::drawMenu(instanceGame.GlobalDisplay.Screen.Color.View, instanceGame.GlobalDisplay.Screen.DepthStencil.begin(), menuBuy, ::gpk::view<const ::klib::SMenuItem<::klib::SGameState>>{::klib::optionsBuy}, instanceGame.FrameInput, instanceGame.State);
 	}
 	else
 		return ::drawBuyMenu(instanceGame, returnState);

@@ -37,7 +37,7 @@ int32_t																displayInventoryMenu						(klib::CCharacter& adventurer, 
 	itemOptions[adventurer.Goods.Inventory.Items.Slots.size()].ReturnValue	= adventurer.Goods.Inventory.Items.Slots.size();
 	itemOptions[adventurer.Goods.Inventory.Items.Slots.size()].Text			= exitOption;
 
-	return displayMenu(adventurer.Goods.Inventory.Items.Slots.size() + 1, menuTitle, ::gpk::view_array<const ::klib::SMenuItem<int32_t>>{itemOptions});
+	return displayMenu(adventurer.Goods.Inventory.Items.Slots.size() + 1, menuTitle, ::gpk::view<const ::klib::SMenuItem<int32_t>>{itemOptions});
 }
 
 // Combat is executed from the mercenary job menu and executes the battle turns until one of the combatants is dead.

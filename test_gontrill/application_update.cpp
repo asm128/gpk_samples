@@ -285,7 +285,7 @@ static				::gpk::error_t										addParticle
 	,	const ::gpk::n2<float>									& particlePosition
 	,	const ::gpk::n2<float>									& particleDirection
 	,	float														speed
-	,	const ::gpk::view_array<::SApplication::TParticle>			& particleDefinitions
+	,	const ::gpk::view<::SApplication::TParticle>			& particleDefinitions
 	)
 {
 	int32_t																		indexParticleInstance						= ::gpk::addParticle(particleType, particleInstances, particleIntegrator, particleDefinitions[particleType.Type]);
@@ -324,7 +324,7 @@ static				::gpk::error_t										addProjectile								(::SGame & gameInstance, 
 template <size_t _sizeAlive>
 static				::gpk::error_t										updateSpawnShots
 	( ::SApplication											& app
-	, const ::gpk::view_array<::SApplication::TParticle>		& particleDefinitions
+	, const ::gpk::view<::SApplication::TParticle>		& particleDefinitions
 	, uint32_t													maxShips
 	, const ::gpk::array_static<::gpk::n2<float>, _sizeAlive>	& positions
 	, ::gpk::array_static<double, _sizeAlive>					& weaponDelay
@@ -372,7 +372,7 @@ static				::gpk::error_t										updateSpawnShots
 
 					::gpk::error_t										updateSpawn
 	( ::SApplication										& app
-	, const ::gpk::view_array<::SApplication::TParticle>	& particleDefinitions
+	, const ::gpk::view<::SApplication::TParticle>	& particleDefinitions
 	)
 {
 	::gpk::SFramework															& framework									= app.Framework;
@@ -463,7 +463,7 @@ static				::gpk::error_t										spawnPowOfRandomType						(::SGame & gameInsta
 
 					::gpk::error_t										updateShots
 	( ::SApplication										& app
-	, const ::gpk::view_array<::SApplication::TParticle>	& particleDefinitions
+	, const ::gpk::view<::SApplication::TParticle>	& particleDefinitions
 	)
 {
 	::SGame																		& gameInstance								= app.Game;

@@ -170,13 +170,13 @@ static	void							updateState					(::klib::SGame& instanceGame, const ::klib::SG
 	switch(instanceGame.State.State) {
 	case ::klib::GAME_STATE_MENU_MAIN			:
 		if( ::gpk::bit_true(instanceGame.Flags, ::klib::GAME_FLAGS_STARTED) )
-			newAction = ::processMenuReturn(::klib::drawMenu(globalDisplay.Color.View, globalDisplay.DepthStencil.begin(), menuMainInGame, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsMainInGame}, instanceGame.FrameInput, instanceGame.State));
+			newAction = ::processMenuReturn(::klib::drawMenu(globalDisplay.Color.View, globalDisplay.DepthStencil.begin(), menuMainInGame, ::gpk::view<const ::klib::SMenuItem<::klib::SGameState>>{optionsMainInGame}, instanceGame.FrameInput, instanceGame.State));
 		else
-			newAction = ::processMenuReturn(::klib::drawMenu(globalDisplay.Color.View, globalDisplay.DepthStencil.begin(), menuMain, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsMain}, instanceGame.FrameInput, instanceGame.State));
+			newAction = ::processMenuReturn(::klib::drawMenu(globalDisplay.Color.View, globalDisplay.DepthStencil.begin(), menuMain, ::gpk::view<const ::klib::SMenuItem<::klib::SGameState>>{optionsMain}, instanceGame.FrameInput, instanceGame.State));
 		break;
 
-	case ::klib::GAME_STATE_MENU_OPTIONS		: { newAction = ::processMenuReturn(::klib::drawMenu	(globalDisplay.Color.View, globalDisplay.DepthStencil.begin(), menuConfig	, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsConfig}, instanceGame.FrameInput, instanceGame.State ));	}break;
-	case ::klib::GAME_STATE_MENU_SELL			: { newAction = ::processMenuReturn(::klib::drawMenu	(globalDisplay.Color.View, globalDisplay.DepthStencil.begin(), menuSell		, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{optionsSell}, instanceGame.FrameInput, instanceGame.State ));	}break;
+	case ::klib::GAME_STATE_MENU_OPTIONS		: { newAction = ::processMenuReturn(::klib::drawMenu	(globalDisplay.Color.View, globalDisplay.DepthStencil.begin(), menuConfig	, ::gpk::view<const ::klib::SMenuItem<::klib::SGameState>>{optionsConfig}, instanceGame.FrameInput, instanceGame.State ));	}break;
+	case ::klib::GAME_STATE_MENU_SELL			: { newAction = ::processMenuReturn(::klib::drawMenu	(globalDisplay.Color.View, globalDisplay.DepthStencil.begin(), menuSell		, ::gpk::view<const ::klib::SMenuItem<::klib::SGameState>>{optionsSell}, instanceGame.FrameInput, instanceGame.State ));	}break;
 	case ::klib::GAME_STATE_MENU_EQUIPMENT		: { newAction = ::processMenuReturn(::drawEquip				(instanceGame, instanceGame.State));	} break;
 	case ::klib::GAME_STATE_TACTICAL_CONTROL	: { newAction = ::processMenuReturn(::drawTacticalScreen	(instanceGame, instanceGame.State));	} break;
 	case ::klib::GAME_STATE_MENU_SQUAD_SETUP	: { newAction = ::processMenuReturn(::drawSquadSetupMenu	(instanceGame));						} break;

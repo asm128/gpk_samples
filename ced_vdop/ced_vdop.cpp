@@ -142,7 +142,7 @@ static	int											drawPixels
 	for(uint32_t iPixelCoord = 0; iPixelCoord < pixelCoords.size(); ++iPixelCoord) {
 		::gpk::n2<int16_t>									pixelCoord					= pixelCoords		[iPixelCoord];
 		const ::gpk::tri<float>					& vertexWeights				= pixelVertexWeights[iPixelCoord];
-		const ::gpk::n3<float>								position					= ::gpk::triangleWeight(vertexWeights, triangleWorld);
+		const ::gpk::n3f32								position					= ::gpk::triangleWeight(vertexWeights, triangleWorld);
 		double													factorWave					= (::gpk::max(0.0, sin(- timeAnimation * 4 + position.y * .75))) * .6;
 		double													factorWave2					= (::gpk::max(0.0, sin(- timeAnimation + position.x * .0125 + position.z * .125))) * .5;
 		::gpk::setPixel(targetPixels, pixelCoord, (targetPixels[pixelCoord.Cast<uint32_t>()] * .25) + (texelColor * (lightFactorDirectional * 2) + texelColor * factorWave + texelColor * factorWave2));
@@ -155,8 +155,8 @@ int													draw3DCharacter
 	, const ::gpk::n2<uint32_t>						& metricsCharacter
 	, const ::gpk::n2<uint32_t>						& metricsMap
 	, const uint8_t											asciiCode
-	, const ::gpk::n3<float>							& position
-	, const ::gpk::n3<float>							& lightVector
+	, const ::gpk::n3f32							& position
+	, const ::gpk::n3f32							& lightVector
 	, const ::gpk::m4<float>							& matrixView
 	, const ::gpk::view_grid<const ::gpk::SGeometryQuads>	& viewGeometries
 	, ::SDrawCache											& drawCache
@@ -168,7 +168,7 @@ int													draw3DCharacter
 	::gpk::m4<float>									matrixPosition			;
 	::gpk::m4<float>									matrixRotation			;
 	matrixRotation.Identity();
-	::gpk::n3<float>									translation				= {};
+	::gpk::n3f32									translation				= {};
 	translation.x										= float(position.x * metricsCharacter.x);
 	translation.z										= float(position.z * metricsCharacter.y);
 	if(asciiCode == 0x05) { matrixRotation.RotationX(-::gpk::math_pi_2); translation.y += metricsCharacter.y / 2; }
@@ -228,8 +228,8 @@ int													draw					(SApplication & app) {
 		matrixView.LookAt(app.TextOverlay.CameraPosition, app.TextOverlay.CameraTarget, app.TextOverlay.CameraUp);
 		matrixView											*= matrixProjection;
 		matrixView											*= matrixViewport;
-		::gpk::n3<float>									offset			= {};//app.TextOverlay.ControlTranslation;
-		offset												-= ::gpk::n3<float>{mapToDraw.metrics().x * .5f, 0, mapToDraw.metrics().y * .5f * -1.f};
+		::gpk::n3f32									offset			= {};//app.TextOverlay.ControlTranslation;
+		offset												-= ::gpk::n3f32{mapToDraw.metrics().x * .5f, 0, mapToDraw.metrics().y * .5f * -1.f};
 		for(uint32_t y = 0; y < mapToDraw.metrics().y; ++y)
 		for(uint32_t x = 0; x < mapToDraw.metrics().x; ++x) {
 			const uint8_t											asciiCode			= mapToDraw[y][x];
@@ -237,7 +237,7 @@ int													draw					(SApplication & app) {
 				continue;
 			const uint16_t											asciiColor			= mapColors[y][x];
 			::gpk::rgbaf										color					= (*app.Framework.GUI->Colors->Palette)[(asciiColor & 0xF)];//::gpk::COLOR_TABLE[((int)timeAnimation) % ::gpk::size(::gpk::COLOR_TABLE)];
-			::gpk::n3<float>									position			= offset;
+			::gpk::n3f32									position			= offset;
 			position.x											+= x;
 			position.z											-= y;
 			draw3DCharacter(targetPixels, app.TextOverlay.MetricsLetter, app.TextOverlay.MetricsMap, asciiCode, position, app.TextOverlay.LightVector0, matrixView, viewGeometries, app.TextOverlay.DrawCache, depthBuffer, app.Framework.FrameInfo.Seconds.Total, color);
@@ -254,10 +254,10 @@ int													draw					(SApplication & app) {
 			matrixView.LookAt(app.TextOverlay.CameraPosition, app.TextOverlay.CameraTarget, app.TextOverlay.CameraUp);
 		else {
 			::klib::SGamePlayer											& player			= app.Game.Players[app.Game.TacticalInfo.Setup.Players[app.Game.TacticalInfo.CurrentPlayer]];
-			::gpk::n3<float>									agentPosition		= player.Tactical.Army[player.Tactical.Squad.Agents[player.Tactical.Selection.PlayerUnit]]->Position.Cast<float>();
+			::gpk::n3f32									agentPosition		= player.Tactical.Army[player.Tactical.Squad.Agents[player.Tactical.Selection.PlayerUnit]]->Position.Cast<float>();
 			agentPosition.Scale({1, 1, -1});
-			agentPosition										-= ::gpk::n3<float>{mapToDraw.metrics().x * .5f, 0, mapToDraw.metrics().y * .5f * -1.f};
-			::gpk::n3<float>									cameraPosition		= agentPosition;
+			agentPosition										-= ::gpk::n3f32{mapToDraw.metrics().x * .5f, 0, mapToDraw.metrics().y * .5f * -1.f};
+			::gpk::n3f32									cameraPosition		= agentPosition;
 			agentPosition.Scale(12);
 			cameraPosition										+= {-24, 6, -24};
 			cameraPosition.Scale(12);
@@ -266,8 +266,8 @@ int													draw					(SApplication & app) {
 		matrixView											*= matrixProjection;
 		matrixView											*= matrixViewport;
 
-		::gpk::n3<float>									offset			= {};//app.TextOverlay.ControlTranslation;
-		offset												-= ::gpk::n3<float>{mapToDraw.metrics().x * .5f, 0, mapToDraw.metrics().y * .5f * -1.f};
+		::gpk::n3f32									offset			= {};//app.TextOverlay.ControlTranslation;
+		offset												-= ::gpk::n3f32{mapToDraw.metrics().x * .5f, 0, mapToDraw.metrics().y * .5f * -1.f};
 		for(uint32_t y = 0; y < mapToDraw.metrics().y; ++y)
 		for(uint32_t x = 0; x < mapToDraw.metrics().x; ++x) {
 			const uint8_t											asciiCode			= mapToDraw[y][x];
@@ -275,7 +275,7 @@ int													draw					(SApplication & app) {
 				continue;
 			const uint16_t											asciiColor			= mapColors[y][x];
 			::gpk::rgbaf										color					= (*app.Framework.GUI->Colors->Palette)[(asciiColor & 0xF)];//::gpk::COLOR_TABLE[((int)timeAnimation) % ::gpk::size(::gpk::COLOR_TABLE)];
-			::gpk::n3<float>									position			= offset;
+			::gpk::n3f32									position			= offset;
 			position.x											+= x;
 			position.z											-= y;
 			draw3DCharacter(targetPixels, app.TextOverlay.MetricsLetter, app.TextOverlay.MetricsMap, asciiCode, position, app.TextOverlay.LightVector0, matrixView, viewGeometries, app.TextOverlay.DrawCache, depthBuffer, app.Framework.FrameInfo.Seconds.Total, color);

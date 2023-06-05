@@ -10,7 +10,7 @@
 
 
 #if defined(GPK_WINDOWS)
-					::gpk::error_t						klib::asciiDisplayTitleSet						(const ::gpk::view_array<const char>& title)															{ return (0 == SetConsoleTitle(title.begin() ? title.begin() : "")) ? -1 : 0; }
+					::gpk::error_t						klib::asciiDisplayTitleSet						(const ::gpk::view<const char>& title)															{ return (0 == SetConsoleTitle(title.begin() ? title.begin() : "")) ? -1 : 0; }
 
 struct SWindowsConsoleInfo {
 						::CONSOLE_FONT_INFOEX				InfoFontOriginal								= {sizeof(::CONSOLE_FONT_INFOEX)};
@@ -78,7 +78,7 @@ stacxpr	const ::gpk::SColorRGBA				g_DefaultPalette	[]							=
 
 					::gpk::error_t						klib::asciiDisplayResize						(uint32_t width, uint32_t height)																		{ return ::initWindowsConsoleProperties(width, height, (const ::gpk::SColorRGBA*)g_ConsoleInfo.InfoScreenBufferCurrent.ColorTable); }
 					::gpk::error_t						klib::asciiDisplayPaletteReset					()																										{ return ::initWindowsConsoleProperties(g_ConsoleInfo.InfoScreenBufferCurrent.dwSize.X, g_ConsoleInfo.InfoScreenBufferCurrent.dwSize.Y, g_DefaultPalette); }
-					::gpk::error_t						klib::asciiDisplayPaletteSet					(const ::gpk::view_array<::gpk::SColorRGBA>& palette)													{
+					::gpk::error_t						klib::asciiDisplayPaletteSet					(const ::gpk::view<::gpk::SColorRGBA>& palette)													{
 	ree_if(palette.size() < 16, "Palette too small. 16 colors are required for the console palette to be valid.");
 	return ::initWindowsConsoleProperties(g_ConsoleInfo.InfoScreenBufferCurrent.dwSize.X, g_ConsoleInfo.InfoScreenBufferCurrent.dwSize.Y, palette.begin());
 }
@@ -120,7 +120,7 @@ stacxpr	const ::gpk::SColorRGBA				g_DefaultPalette	[]							=
 	return 0;
 }
 
-					::gpk::error_t						klib::asciiDisplayPresent						(const ::gpk::view_array<const uint8_t>& characters, const ::gpk::view_array<const uint16_t>& colors)	{ 
+					::gpk::error_t						klib::asciiDisplayPresent						(const ::gpk::view<const uint8_t>& characters, const ::gpk::view<const uint16_t>& colors)	{ 
 	ree_if(false == ::g_ConsoleInfo.Created, "Cannot present console if the console wasn't created!");
 	const ::HANDLE												handleConsoleOut								= ::GetStdHandle( STD_OUTPUT_HANDLE );	// Get console output handle	
 	const ::CONSOLE_SCREEN_BUFFER_INFOEX						& csbiInfo										= g_ConsoleInfo.InfoScreenBufferCurrent;

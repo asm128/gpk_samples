@@ -14,7 +14,7 @@ template <typename _TEquipClass, typename _TInventory, typename _TResearched>
 void																		research
 	( ::klib::SEntityContainer<_TInventory>			& equipInventory
 	, ::klib::SEntityContainer<_TResearched>		& researchedList
-	, const ::gpk::view_array<const _TEquipClass>	& table
+	, const ::gpk::view<const _TEquipClass>	& table
 	, _TInventory									& adventurerMaxEquip
 	, bool											bIsModifier
 	, bool											bIsProgressive
@@ -105,7 +105,7 @@ void																		research
 	menuItems[menuItemCount++]												= {maxItemCount, "Exit this menu"};
 
 	sprintf_s(menuItemText, "%s", selectItemToResearch.begin());
-	int32_t																		selectedValue											= displayMenu(menuItemText, ::gpk::view_array<const ::klib::SMenuItem<int32_t>>{menuItems}, menuItemCount);
+	int32_t																		selectedValue											= displayMenu(menuItemText, ::gpk::view<const ::klib::SMenuItem<int32_t>>{menuItems}, menuItemCount);
 
 	if(maxItemCount == selectedValue) {
 		printf("You exit the labs.\n");

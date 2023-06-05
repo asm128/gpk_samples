@@ -14,20 +14,20 @@
 struct SDrawCache {
 	::gpk::apod<::gpk::n2<int32_t>>			PixelCoords				= {};
 	::gpk::apod<::gpk::tri<float>>	PixelVertexWeights		= {};
-	::gpk::apod<::gpk::n3<float>>			LightPointsModel		= {};
+	::gpk::apod<::gpk::n3f32>			LightPointsModel		= {};
 	::gpk::apod<::gpk::bgra>				LightColorsModel		= {};
 };
 
 struct STextOverlay {
-	::gpk::n3<float>						LightVector0			= {-15, 50, -15};
-	::gpk::n3<float>						CameraTarget			= {0, 0, 0};
-	::gpk::n3<float>						CameraPosition			= {.0001f, 1000.1f, -0.00001f};
-	::gpk::n3<float>						CameraUp				= {0, 0, 1};
+	::gpk::n3f32						LightVector0			= {-15, 50, -15};
+	::gpk::n3f32						CameraTarget			= {0, 0, 0};
+	::gpk::n3f32						CameraPosition			= {.0001f, 1000.1f, -0.00001f};
+	::gpk::n3f32						CameraUp				= {0, 0, 1};
 	::gpk::SGeometryQuads					GeometryLetters	[256]	= {};
 	::gpk::m4<float>						MatrixProjection		= {};
 	::SDrawCache							DrawCache				= {};
 
-	stacxpr	::gpk::n3<float>				ControlTranslation		= {0, 0, 20.0f};
+	stacxpr	::gpk::n3f32				ControlTranslation		= {0, 0, 20.0f};
 	stacxpr	::gpk::n2<uint32_t>				MetricsLetter			= {12, 12};
 	stacxpr	::gpk::n2<uint32_t>				MetricsMap				= {16, 16};
 };

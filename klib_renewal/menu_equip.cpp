@@ -203,7 +203,7 @@ static void								drawScore						(::gpk::view_grid<char> display, int32_t offse
 
 	static ::klib::SDrawMenuState				menuState;
 	if(::klib::GAME_SUBSTATE_MAIN == instanceGame.State.Substate)
-		actualReturnState = ::klib::drawMenu(menuState, instanceGame.GlobalDisplay.Screen.Color.View, instanceGame.GlobalDisplay.Screen.DepthStencil.begin(), menuTitle, ::gpk::view_array<const ::klib::SMenuItem<::klib::SGameState>>{::klib::optionsEquip}, instanceGame.FrameInput, {::klib::GAME_STATE_MENU_SQUAD_SETUP}, instanceGame.State, 30);
+		actualReturnState = ::klib::drawMenu(menuState, instanceGame.GlobalDisplay.Screen.Color.View, instanceGame.GlobalDisplay.Screen.DepthStencil.begin(), menuTitle, ::gpk::view<const ::klib::SMenuItem<::klib::SGameState>>{::klib::optionsEquip}, instanceGame.FrameInput, {::klib::GAME_STATE_MENU_SQUAD_SETUP}, instanceGame.State, 30);
 	else {
 		if( player.Tactical.Selection.PlayerUnit >= (int16_t)player.Tactical.Squad.Agents.size())
 			player.Tactical.Selection.PlayerUnit = -1;

@@ -106,7 +106,7 @@ void									klib::handleResearchStep
 }
 
 template <typename _tEntity>
-static int32_t							setupMenuItem					(::klib::SEntityResearch & menuItemValue, bool bModifier, int32_t index, ::klib::ENTITY_TYPE type, ::gpk::view_const_char labelEntityType, const ::klib::SEntityContainer<int16_t> & place, const ::gpk::view_array<const ::klib::SEntityRecord<_tEntity>> & records, ::gpk::view_const_char text) {
+static int32_t							setupMenuItem					(::klib::SEntityResearch & menuItemValue, bool bModifier, int32_t index, ::klib::ENTITY_TYPE type, ::gpk::vcc labelEntityType, const ::klib::SEntityContainer<int16_t> & place, const ::gpk::view<const ::klib::SEntityRecord<_tEntity>> & records, ::gpk::view_const_char text) {
 	char										composite	[256]				= {};
 	menuItemValue.ResearchIndex				= index;
 	int64_t										priceUnit						= records[place[index].Entity].Points.PriceBuy / 2;
@@ -123,8 +123,8 @@ int32_t									klib::getResearchableItems
 	(	const ::klib::SEntityTables								& entityTables
 	,	const ::klib::SCharacterInventory						& playerInventory
 	,	const ::klib::SCharacterResearch						& researchCompleted
-	,	const ::gpk::view_array<const ::klib::SEntityResearch>	& queuedResearch
-	,	const ::gpk::view_array<const ::klib::CCharacter*>		& playerArmy
+	,	const ::gpk::view<const ::klib::SEntityResearch>	& queuedResearch
+	,	const ::gpk::view<const ::klib::CCharacter*>		& playerArmy
 	,	::gpk::array_obj<::klib::SEntityResearch>				& menuItemsValue
 	,	::gpk::array_obj<::gpk::apod<char>>				& menuItemsText
 	) {
@@ -227,7 +227,7 @@ int32_t									klib::getResearchableItems
 	(	const ::klib::SEntityTables								& entityTables
 	,	const ::klib::SCharacterInventory						& playerInventory
 	,	const ::klib::SCharacterResearch						& researchCompleted
-	,	const ::gpk::view_array<const ::klib::CCharacter*>		& playerArmy
+	,	const ::gpk::view<const ::klib::CCharacter*>		& playerArmy
 	,	::gpk::array_obj<::klib::SEntityResearch>				& menuItemsValue
 	,	::gpk::array_obj<::gpk::apod<char>>				& menuItemsText
 	) {

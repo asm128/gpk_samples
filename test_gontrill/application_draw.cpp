@@ -211,7 +211,7 @@ static	const ::gpk::bgra								powerupFamilyColorPalette []				=
 	, ::gpk::RED
 	};
 
-static	::gpk::error_t										drawPowerup						(::gpk::v2<::gpk::bgra> target, POWERUP_FAMILY powFamily, const ::gpk::view_array<::gpk::view_grid<::gpk::bgra>>& texturePowerup, const ::gpk::n2<int32_t>& textureCenterPowerup, const ::gpk::n2f& powPosition, const ::gpk::view_array<const ::gpk::n2<int32_t>>& lightPos, double time)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
+static	::gpk::error_t										drawPowerup						(::gpk::v2<::gpk::bgra> target, POWERUP_FAMILY powFamily, const ::gpk::view<::gpk::view_grid<::gpk::bgra>>& texturePowerup, const ::gpk::n2<int32_t>& textureCenterPowerup, const ::gpk::n2f& powPosition, const ::gpk::view<const ::gpk::n2<int32_t>>& lightPos, double time)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	::gpk::n2<int32_t>														position									= powPosition.Cast<int32_t>();
 	for(uint32_t iTex = 0, textureCount = texturePowerup.size(); iTex < textureCount; ++iTex)
 		gerror_if(errored(::gpk::grid_copy_alpha(target, texturePowerup[iTex], position - textureCenterPowerup, {0xFF, 0, 0xFF, 0xFF})), "I believe this never fails.");
@@ -261,7 +261,7 @@ stacxpr	const ::gpk::n2<int32_t>						diagonalPowerupLightPositions	[8]			=
 		POWERUP_FAMILY																powFamily									= gameInstance.Powerups.Family[iPow];
 		::gpk::n2<int32_t>														position									= gameInstance.Powerups.Position[iPow].Cast<int32_t>();
 		::gpk::n2<int32_t>														lightPos [8]								;
-		::gpk::view_array<::gpk::view_grid<::gpk::bgra>>						texturePowerup								;
+		::gpk::view<::gpk::view_grid<::gpk::bgra>>						texturePowerup								;
 		::gpk::n2<int32_t>														textureCenterPowerup						;
 		if(powFamily == POWERUP_FAMILY_HEALTH || powFamily == POWERUP_FAMILY_BUFF) { // draw square powerup box
 			for(uint32_t i = 0; i < ::gpk::size(lightPos); ++i)

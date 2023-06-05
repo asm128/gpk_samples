@@ -93,22 +93,22 @@ namespace klib
 
 	//
 	struct SSquadManager {
-		::gpk::array_pod<::klib::SSquad>				Squads;
+		::gpk::apod<::klib::SSquad>					Squads;
 
-		int32_t											Create				()										{ int32_t newIndex = Squads.push_back({}); return newIndex; }
-		int32_t											Delete				(int32_t idSquad)						{ return Squads.remove(idSquad); }
-		int32_t											SquadSize			(int32_t idSquad)						{ return Squads[idSquad].Size; }
-		int32_t											SquadResize			(int32_t idSquad, uint32_t newSize)		{ gthrow_if(newSize > Squads[idSquad].Agents.size(), "Cannot resize squad to %i. Squad too large.", ); return Squads[idSquad].Size = newSize; }
+		int32_t										Create				()										{ int32_t newIndex = Squads.push_back({}); return newIndex; }
+		int32_t										Delete				(int32_t idSquad)						{ return Squads.remove(idSquad); }
+		int32_t										SquadSize			(int32_t idSquad)						{ return Squads[idSquad].Size; }
+		int32_t										SquadResize			(int32_t idSquad, uint32_t newSize)		{ gthrow_if(newSize > Squads[idSquad].Agents.size(), "Cannot resize squad to %i. Squad too large.", ); return Squads[idSquad].Size = newSize; }
 
-		::gpk::view_array<int16_t					>	Agents				(int32_t idSquad)						{ ::klib::SSquad & squad = Squads[idSquad]; return {squad.Agents			.begin(), squad.Size}; }
-		::gpk::view_array<::klib::STileCharacter	>	TargetAgents		(int32_t idSquad)						{ ::klib::SSquad & squad = Squads[idSquad]; return {squad.TargetAgents		.begin(), squad.Size}; }
-		::gpk::view_array<::gpk::n3i32				>	TargetPositions		(int32_t idSquad)						{ ::klib::SSquad & squad = Squads[idSquad]; return {squad.TargetPositions	.begin(), squad.Size}; }
-		::gpk::view_array<::klib::AGENT_STATE		>	AgentStates			(int32_t idSquad)						{ ::klib::SSquad & squad = Squads[idSquad]; return {squad.AgentStates		.begin(), squad.Size}; }
-		::gpk::view_array<::klib::SAgentActions		>	ActionsLeft			(int32_t idSquad)						{ ::klib::SSquad & squad = Squads[idSquad]; return {squad.ActionsLeft		.begin(), squad.Size}; }
-		::gpk::view_array<::klib::SAgentsReference	>	AgentsInRange		(int32_t idSquad)						{ ::klib::SSquad & squad = Squads[idSquad]; return {squad.AgentsInRange		.begin(), squad.Size}; }
-		::gpk::view_array<::klib::SAgentsReference	>	AgentsInSight		(int32_t idSquad)						{ ::klib::SSquad & squad = Squads[idSquad]; return {squad.AgentsInSight		.begin(), squad.Size}; }
-		::gpk::view_array<::klib::SAgentReference	>	AgentsInSquadSight	(int32_t idSquad)						{ ::klib::SSquad & squad = Squads[idSquad]; return {squad.AgentsInSquadSight.Agents.begin(), squad.AgentsInSquadSight.Count}; }
-		int8_t											LockedAgent			(int32_t idSquad)						{ ::klib::SSquad & squad = Squads[idSquad]; return squad.LockedAgent; }
+		::gpk::view<int16_t						>	Agents				(int32_t idSquad)						{ ::klib::SSquad & squad = Squads[idSquad]; return {squad.Agents			.begin(), squad.Size}; }
+		::gpk::view<::klib::STileCharacter		>	TargetAgents		(int32_t idSquad)						{ ::klib::SSquad & squad = Squads[idSquad]; return {squad.TargetAgents		.begin(), squad.Size}; }
+		::gpk::view<::gpk::n3i32				>	TargetPositions		(int32_t idSquad)						{ ::klib::SSquad & squad = Squads[idSquad]; return {squad.TargetPositions	.begin(), squad.Size}; }
+		::gpk::view<::klib::AGENT_STATE			>	AgentStates			(int32_t idSquad)						{ ::klib::SSquad & squad = Squads[idSquad]; return {squad.AgentStates		.begin(), squad.Size}; }
+		::gpk::view<::klib::SAgentActions		>	ActionsLeft			(int32_t idSquad)						{ ::klib::SSquad & squad = Squads[idSquad]; return {squad.ActionsLeft		.begin(), squad.Size}; }
+		::gpk::view<::klib::SAgentsReference	>	AgentsInRange		(int32_t idSquad)						{ ::klib::SSquad & squad = Squads[idSquad]; return {squad.AgentsInRange		.begin(), squad.Size}; }
+		::gpk::view<::klib::SAgentsReference	>	AgentsInSight		(int32_t idSquad)						{ ::klib::SSquad & squad = Squads[idSquad]; return {squad.AgentsInSight		.begin(), squad.Size}; }
+		::gpk::view<::klib::SAgentReference		>	AgentsInSquadSight	(int32_t idSquad)						{ ::klib::SSquad & squad = Squads[idSquad]; return {squad.AgentsInSquadSight.Agents.begin(), squad.AgentsInSquadSight.Count}; }
+		int8_t										LockedAgent			(int32_t idSquad)						{ ::klib::SSquad & squad = Squads[idSquad]; return squad.LockedAgent; }
 
 	};
 }

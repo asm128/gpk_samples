@@ -20,7 +20,7 @@ struct SBuildConfig {
 	::gpk::SJSONReader	TreeConfigOfBuild				= {};
 };
 
-static	::gpk::error_t					buildSources					(const ::SBuildConfig & app, const ::gpk::view_array<::gpk::array_pod<char>> & listOfSourceFileNames) {
+static	::gpk::error_t					buildSources					(const ::SBuildConfig & app, const ::gpk::view<::gpk::array_pod<char>> & listOfSourceFileNames) {
 	(void)app;
 	char										bufferFormat [4096]				= {};
 	for(uint32_t iFile = 0; iFile < listOfSourceFileNames.size(); ++iFile) {

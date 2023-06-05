@@ -54,7 +54,7 @@ stacxpr	const ::gpk::tri3<float>						modelNormalVectors		[12]						=
 	};
 
 template<typename _tIndex, typename _tValue>
-					::gpk::error_t									indexValues									(const ::gpk::view_array<const _tValue> & in_values, ::gpk::array_pod<_tIndex> & out_indices, ::gpk::array_pod<_tValue> & out_values, ::gpk::array_pod<_tIndex> & out_remap){
+					::gpk::error_t									indexValues									(const ::gpk::view<const _tValue> & in_values, ::gpk::array_pod<_tIndex> & out_indices, ::gpk::array_pod<_tValue> & out_values, ::gpk::array_pod<_tIndex> & out_remap){
 	for(uint32_t iValue = 0; iValue < in_values.size(); ++iValue) {
 		bool																	bFound										= false;
 		const _tValue															& in_value									= in_values[iValue];
@@ -154,11 +154,11 @@ template<typename _tIndex, typename _tValue>
 	controlTable.Controls	[viewport->IdGUIControl	].Area.Size				= {640, 480};
 	controlTable.States		[viewport->IdClient		].ImageInvertY			= true;
 
-	stacxpr const ::gpk::n3<float>							cubeCenter									= {0.5f, 0.5f, 0.5f};
+	stacxpr const ::gpk::n3f32							cubeCenter									= {0.5f, 0.5f, 0.5f};
 	::gpk::array_pod<uint8_t>												& remap										= app.ModelGeometry.PositionRemap;
 	::indexValues({&modelPositionsVertices[0].A, ::gpk::size(modelPositionsVertices) * 3}, app.ModelGeometry.Positions.Indices, app.ModelGeometry.Positions.Values, remap);
 	for(uint32_t iVertex = 0; iVertex < app.ModelGeometry.Positions.Values.size(); ++iVertex) {
-		::gpk::n3<float>													& vertexToTransform					= app.ModelGeometry.Positions.Values[iVertex];
+		::gpk::n3f32													& vertexToTransform					= app.ModelGeometry.Positions.Values[iVertex];
 		vertexToTransform													-= cubeCenter;
 	}
 	app.ModelGeometry.NormalsVertex.Values									= modelNormalVectors;
@@ -254,7 +254,7 @@ template<typename _tIndex, typename _tValue>
 		camera																= app.Scene.Camera;
 	}
 
-	::gpk::n3<float>													& lightPos									= app.Scene.LightPos;
+	::gpk::n3f32													& lightPos									= app.Scene.LightPos;
 	for(uint32_t iTriangle = 0; iTriangle < countTriangles; ++iTriangle) {
 		::gpk::tri3<float>												& transformedTriangle						= triangle3dList[iTriangle];
 		transformedTriangle													=
@@ -277,14 +277,14 @@ template<typename _tIndex, typename _tValue>
 
 	}
 
-	::gpk::view_array<::gpk::n3<float>>								normals										= {(::gpk::n3<float>*)app.ModelGeometry.NormalsVertex.Values.begin(), app.ModelGeometry.NormalsVertex.Values.size() * 3};
+	::gpk::view<::gpk::n3f32>								normals										= {(::gpk::n3f32*)app.ModelGeometry.NormalsVertex.Values.begin(), app.ModelGeometry.NormalsVertex.Values.size() * 3};
 	for(uint32_t iVertex = 0; iVertex < app.ModelGeometry.Positions.Indices.size(); ++iVertex) {
 		double																	lightFactor									= normals[iVertex].Dot(lightPos);
 		triangle3dColorList[iVertex]										= (::gpk::RED * lightFactor).Clamp();
 	}
 	::gpk::array_pod<::gpk::n2<int16_t>>								wireframePixelCoords;
 	::gpk::array_pod<::gpk::n2<int16_t>>								trianglePixelCoords;
-	::gpk::n3<float>													cameraFront										= (camera.Target - camera.Position).Normalize();
+	::gpk::n3f32													cameraFront										= (camera.Target - camera.Position).Normalize();
 	::gpk::array_pod<::gpk::tri<float>>								triangleWeights;
 
 	for(uint32_t iTriangle = 0; iTriangle < 12; ++iTriangle) {

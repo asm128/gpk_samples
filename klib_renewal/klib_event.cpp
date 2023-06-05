@@ -83,8 +83,8 @@ static	::gpk::error_t					eventProcessBuy				(const ::klib::SGameEvent & event, 
 	const int32_t								item						= (int32_t) (((uint64_t)event.Value) & 0x7FFFFFFF);
 	bool										sold						= false;
 	::klib::SBuyable							buyable						= {-1, -1, LLONG_MAX, LLONG_MAX, "Invalid item"};
-	::gpk::view_array<const ::klib::SMenuItem<::klib::SBuyable>>	menuItems					= {};
-	::gpk::view_array<const ::klib::CCharacter>	menuCharacters				= {};
+	::gpk::view<const ::klib::SMenuItem<::klib::SBuyable>>	menuItems					= {};
+	::gpk::view<const ::klib::CCharacter>	menuCharacters				= {};
 	switch(event.GameState.Substate) {
 	case ::klib::GAME_SUBSTATE_ACCESSORY	: { menuItems = shopMenus.MenuItemsAccessory	; buyable = menuItems[item].ReturnValue; sold = 0 == buyEntity(buyable, player, player.Inventory.Accessory	, messages); break; }
 	case ::klib::GAME_SUBSTATE_STAGEPROP	: { menuItems = shopMenus.MenuItemsStageProp	; buyable = menuItems[item].ReturnValue; sold = 0 == buyEntity(buyable, player, player.Inventory.StageProp	, messages); break; }

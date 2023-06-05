@@ -75,7 +75,7 @@ int												main											(int argc, char **argv)											{
 		printf("\n-- Game Over! --\n");
 		::displayScore(adventurer.Score);
 
-		bPlayAgain										= ::displayMenu("Play again? ..", ::gpk::view_array<const ::klib::SMenuItem<int32_t>>{playAgainMenu}) ? true : false;
+		bPlayAgain										= ::displayMenu("Play again? ..", ::gpk::view<const ::klib::SMenuItem<int32_t>>{playAgainMenu}) ? true : false;
 	}
 
 	if( pAdventurer )

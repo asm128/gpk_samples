@@ -18,7 +18,7 @@ void									klib::boardToDisplay			(::klib::SGame& instanceGame, const STactica
 		bool										bInRange				= false;
 		double										initialSight			= 0.0;
 		double										finalSight				= 0.0;
-		::gpk::n3<float>						currentTilePos			= currentCoord.Cast<float>();
+		::gpk::n3f32						currentTilePos			= currentCoord.Cast<float>();
 
 		if(false == bFogOfWar)
 			bInRange								= true;
@@ -41,7 +41,7 @@ void									klib::boardToDisplay			(::klib::SGame& instanceGame, const STactica
 						continue;
 
 					::gpk::n3<int32_t>						coordPlayer				= playerAgent.Position;
-					::gpk::n3<float>						distance				= currentTilePos - coordPlayer.Cast<float>();;
+					::gpk::n3f32						distance				= currentTilePos - coordPlayer.Cast<float>();;
 
 					SEntityPoints								playerAgentPoints		= playerAgent.FinalPoints	;
 					SEntityFlags								playerAgentFlags		= playerAgent.FinalFlags	;
@@ -243,7 +243,7 @@ void									klib::boardToDisplay			(::klib::SGame& instanceGame, const STactica
 		for(uint32_t iAOE = 0, countAOE = board.AreaOfEffect.AOE.size(); iAOE <countAOE; ++iAOE) {
 			const ::klib::SAOE						& aoeInstance			= board.AreaOfEffect.AOE[iAOE];
 			const ::gpk::n3<int32_t>& aoeCell = aoeInstance.Position.Cell;
-			::gpk::n3<float> aoePos = {(float)aoeCell.x, (float)aoeCell.y, (float)aoeCell.z};
+			::gpk::n3f32 aoePos = {(float)aoeCell.x, (float)aoeCell.y, (float)aoeCell.z};
 			aoePos += aoeInstance.Position.Offset;
 
 			bool failBVTest =

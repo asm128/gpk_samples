@@ -56,7 +56,7 @@ namespace klib
 		(	::klib::SResearchGroup		<_EntityType>				& researchableItems
 		,	const _EntityType										& entity
 		,	const ::klib::SResearchGroup<_EntityType>				& researchCompleted
-		,	const ::gpk::view_array		<const SEntityResearch>		& queuedResearch
+		,	const ::gpk::view		<const SEntityResearch>		& queuedResearch
 		,	bool													bIsParallelDefinition
 		,	bool													bIsParallelModifier
 		) {
@@ -96,7 +96,7 @@ namespace klib
 		(	::klib::SResearchGroup			<_EntityType>			& researchableItems
 		,	const ::klib::SEntityContainer	<_EntityType>			& playerInventory
 		,	const ::klib::SResearchGroup	<_EntityType>			& researchCompleted
-		,	const ::gpk::view_array			<const SEntityResearch>	& queuedResearch
+		,	const ::gpk::view			<const SEntityResearch>	& queuedResearch
 		,	bool													bIsParallelDefinition
 		,	bool													bIsParallelModifier
 		) {
@@ -112,7 +112,7 @@ namespace klib
 		,	const _EntityType										& equippedEntity
 		,	const ::klib::SEntityContainer	<_EntityType>			& agentInventory
 		,	const ::klib::SResearchGroup	<_EntityType>			& researchCompleted
-		,	const ::gpk::view_array			<const SEntityResearch>	& queuedResearch
+		,	const ::gpk::view			<const SEntityResearch>	& queuedResearch
 		,	bool													bIsParallelDefinition
 		,	bool													bIsParallelModifier
 		) {
@@ -126,7 +126,7 @@ namespace klib
 		(	::klib::SResearchGroup			<_EntityType>			& researchableItems
 		,	const ::klib::SEntityContainer	<_EntityType>			& agentInventory
 		,	const ::klib::SResearchGroup	<_EntityType>			& researchCompleted
-		,	const ::gpk::view_array			<const SEntityResearch>	& queuedResearch
+		,	const ::gpk::view			<const SEntityResearch>	& queuedResearch
 		,	bool													bIsParallelDefinition
 		,	bool													bIsParallelModifier
 		) {

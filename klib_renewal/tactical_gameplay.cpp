@@ -13,7 +13,7 @@ static int32_t												getAgentsInTeamSight								(::klib::SAgentsReference&
 	return agentsAdded;
 }
 
-static int32_t												getAgentsInRange									(::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players, const ::gpk::n3<int32_t>& origin, double range, ::klib::SAgentsReference& agentsInRange)	{
+static int32_t												getAgentsInRange									(::klib::STacticalInfo & tacticalInfo, ::gpk::view<::klib::SGamePlayer> players, const ::gpk::n3<int32_t>& origin, double range, ::klib::SAgentsReference& agentsInRange)	{
 	agentsInRange												= {};
 	for(uint32_t iPlayer = 0, playerCount = tacticalInfo.Setup.TotalPlayers; iPlayer < playerCount; ++iPlayer) {
 		if(tacticalInfo.Setup.Players[iPlayer] == (::klib::PLAYER_INDEX)-1)
@@ -32,7 +32,7 @@ static int32_t												getAgentsInRange									(::klib::STacticalInfo & tact
 			const ::klib::SEntityFlags										& playerAgentFlags									= agent.FinalFlags;
 
 			const ::gpk::n3<int32_t>									& coordAgent										= agent.Position;
-			const ::gpk::n3<float>										distance											= (coordAgent-origin).Cast<float>();
+			const ::gpk::n3f32										distance											= (coordAgent-origin).Cast<float>();
 			if(distance.Length() > range && ::gpk::bit_false(playerAgentFlags.Tech.AttackType, ::klib::ATTACK_TYPE_RANGED))
 				continue;
 
@@ -44,7 +44,7 @@ static int32_t												getAgentsInRange									(::klib::STacticalInfo & tact
 	return agentsInRange.Count;
 }
 
-void														recalculateAgentsInRangeAndSight					(::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players)																	{
+void														recalculateAgentsInRangeAndSight					(::klib::STacticalInfo & tacticalInfo, ::gpk::view<::klib::SGamePlayer> players)																	{
 	::memset(&tacticalInfo.AgentsInTeamSight[0], 0, sizeof(tacticalInfo.AgentsInTeamSight));
 	for(uint32_t iPlayer=0; iPlayer < tacticalInfo.Setup.TotalPlayers; ++iPlayer) 	{
 		if(tacticalInfo.Setup.Players[iPlayer] == (::klib::PLAYER_INDEX)-1)
@@ -72,7 +72,7 @@ void														recalculateAgentsInRangeAndSight					(::klib::STacticalInfo & 
 }
 
 // Returns
-bool														klib::moveStep										(const ::klib::SEntityTables & entityTables, ::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players, ::klib::STacticalPlayer& player, int8_t playerIndex, int32_t agentIndex, TEAM_TYPE teamId, STacticalBoard& board, ::gpk::n3<int32_t>& agentPosition_, ::klib::SGameMessages & messages) {
+bool														klib::moveStep										(const ::klib::SEntityTables & entityTables, ::klib::STacticalInfo & tacticalInfo, ::gpk::view<::klib::SGamePlayer> players, ::klib::STacticalPlayer& player, int8_t playerIndex, int32_t agentIndex, TEAM_TYPE teamId, STacticalBoard& board, ::gpk::n3<int32_t>& agentPosition_, ::klib::SGameMessages & messages) {
 	if(agentPosition_ == player.Squad.TargetPositions[agentIndex])
 		return player.Squad.ActionsLeft[agentIndex].Moves <= 0;	// I added this just in case but currently there is no situation in which this function is called when the agent is in the target position already.
 	else if(::gpk::bit_false(player.Squad.AgentStates[agentIndex], ::klib::AGENT_STATE_MOVE))
@@ -135,11 +135,11 @@ bool														klib::moveStep										(const ::klib::SEntityTables & entityT
 		for(uint32_t iAOE = 0, countAOE = board.AreaOfEffect.AOE.size(); iAOE < countAOE; ++iAOE) {
 			const ::klib::SAOE												& aoeInstance										= board.AreaOfEffect.AOE[iAOE];
 			const ::gpk::n3<int32_t>									aoeCell												= aoeInstance.Position.Cell;
-			::gpk::n3<float>											aoePos												= aoeCell.Cast<float>();
+			::gpk::n3f32											aoePos												= aoeCell.Cast<float>();
 			aoePos.x													+= aoeInstance.Position.Offset.x;
 			aoePos.y													+= aoeInstance.Position.Offset.y;
 			aoePos.z													+= aoeInstance.Position.Offset.z;
-			::gpk::n3<float>											currentTilePos										= playerAgent.Position.Cast<float>();
+			::gpk::n3f32											currentTilePos										= playerAgent.Position.Cast<float>();
 			if((aoePos - currentTilePos).Length() <= aoeInstance.RadiusOrHalfSize && aoeInstance.StatusInflict)
 				::klib::applyAttackStatus(entityTables, messages, playerAgent, aoeInstance.StatusInflict, aoeInstance.Level, ::gpk::view_const_string{"Area of effect"});
 		}
@@ -162,7 +162,7 @@ bool														klib::moveStep										(const ::klib::SEntityTables & entityT
 	return (bArrived && finalPosition == player.Squad.TargetPositions[agentIndex]);
 }
 
-bool									klib::isTacticalValid			(::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players)	{
+bool									klib::isTacticalValid			(::klib::STacticalInfo & tacticalInfo, ::gpk::view<::klib::SGamePlayer> players)	{
 	bool										bResult							= false;
 	for(uint32_t iPlayer=0, playerCount = tacticalInfo.Setup.TotalPlayers; iPlayer<playerCount; ++iPlayer ) {
 		if(tacticalInfo.Setup.Players[iPlayer] == -1)
@@ -215,7 +215,7 @@ static	bool							fixAgentSelection			(::klib::STacticalPlayer&	currentPlayer)		
 	return true;
 }
 
-uint32_t								resolveNextPlayer			(const ::klib::SEntityTables & entityTables, ::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players, ::klib::SGameMessages & messages)																	{
+uint32_t								resolveNextPlayer			(const ::klib::SEntityTables & entityTables, ::klib::STacticalInfo & tacticalInfo, ::gpk::view<::klib::SGamePlayer> players, ::klib::SGameMessages & messages)																	{
 	::klib::STacticalSetup						& tacticalSetup				= tacticalInfo.Setup;
 	int32_t										currentPlayerSlot			= -1;
 
@@ -270,7 +270,7 @@ uint32_t								resolveNextPlayer			(const ::klib::SEntityTables & entityTables,
 
 // Ending the turn resets action and movement counters and executes minimal AI for selecting another unit.
 // This function changes the value of STacticalInfo::CurrentPlayer.
-void									klib::endTurn															(const ::klib::SEntityTables & entityTables, ::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players, ::klib::SGameMessages & messages)		{
+void									klib::endTurn															(const ::klib::SEntityTables & entityTables, ::klib::STacticalInfo & tacticalInfo, ::gpk::view<::klib::SGamePlayer> players, ::klib::SGameMessages & messages)		{
 	for(uint32_t iPlayer=0, playerCount=tacticalInfo.Setup.TotalPlayers; iPlayer < playerCount; ++iPlayer) {
 		if(-1 == tacticalInfo.Setup.Players[iPlayer])
 			continue;
@@ -339,8 +339,8 @@ void									klib::endTurn															(const ::klib::SEntityTables & entityTa
 	tacticalInfo.CurrentPlayer																= (int8_t)resolveNextPlayer(entityTables, tacticalInfo, players, messages);	// Change current player.
 }
 
-void																					selectAIDestination														(::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players);
-bool																					klib::updateCurrentPlayer												(const ::klib::SEntityTables & entityTables, ::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players, ::klib::SGameMessages & messages)																	{
+void																					selectAIDestination														(::klib::STacticalInfo & tacticalInfo, ::gpk::view<::klib::SGamePlayer> players);
+bool																					klib::updateCurrentPlayer												(const ::klib::SEntityTables & entityTables, ::klib::STacticalInfo & tacticalInfo, ::gpk::view<::klib::SGamePlayer> players, ::klib::SGameMessages & messages)																	{
 	::klib::STacticalPlayer																		& currentPlayer															= players[tacticalInfo.Setup.Players[tacticalInfo.CurrentPlayer]].Tactical;	// the current player is only valid in this scope. After this code the current player can change
 
 	if( !::fixAgentSelection(currentPlayer) )
@@ -387,7 +387,7 @@ void																					pickupEntities
 	}
 }
 
-void																					distributeDropsForVictoriousTeam										(const ::klib::SEntityTables & entityTables, ::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players, ::klib::TEAM_TYPE teamVictorious, ::klib::SGameMessages & messages)											{
+void																					distributeDropsForVictoriousTeam										(const ::klib::SEntityTables & entityTables, ::klib::STacticalInfo & tacticalInfo, ::gpk::view<::klib::SGamePlayer> players, ::klib::TEAM_TYPE teamVictorious, ::klib::SGameMessages & messages)											{
 	uint32_t																					totalWinners															= 0;
 	::gpk::array_static<int32_t, ::klib::MAX_TACTICAL_PLAYERS>									indexWinners															= {};
 	::memset(&indexWinners[0], -1, sizeof(::klib::PLAYER_INDEX) * indexWinners.size());
@@ -550,7 +550,7 @@ void																					distributeDropsForVictoriousTeam										(const ::klib
 	}
 }
 
-void																					klib::determineOutcome													(const ::klib::SEntityTables & entityTables, ::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players, ::klib::SGameMessages & messages, bool aborted)																	{
+void																					klib::determineOutcome													(const ::klib::SEntityTables & entityTables, ::klib::STacticalInfo & tacticalInfo, ::gpk::view<::klib::SGamePlayer> players, ::klib::SGameMessages & messages, bool aborted)																	{
 	::klib::TEAM_TYPE																			teamVictorious															= ::klib::TEAM_TYPE_SPECTATOR;
 	if(aborted)  {
 		messages.UserMessage																	= ::gpk::view_const_string{"Mission aborted."};
@@ -630,7 +630,7 @@ template<typename _TEntity>
 	}
 }
 
-void																					klib::handleAgentDeath													(::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players, ::klib::CCharacter& deadTarget, ::klib::TEAM_TYPE teamId, ::klib::SGameMessages& messages)	{
+void																					klib::handleAgentDeath													(::klib::STacticalInfo & tacticalInfo, ::gpk::view<::klib::SGamePlayer> players, ::klib::CCharacter& deadTarget, ::klib::TEAM_TYPE teamId, ::klib::SGameMessages& messages)	{
 	::klib::SCharacterInventory																	& targetInventory														= deadTarget.Goods.Inventory;
 	::klib::SCharacterEquip																		& targetEquip															= deadTarget.CurrentEquip;
 	::klib::SMapInventory																		& mapDrops																= tacticalInfo.Drops;
@@ -669,7 +669,7 @@ void																					klib::handleAgentDeath													(::klib::STacticalIn
 	::recalculateAgentsInRangeAndSight(tacticalInfo, players);
 }
 
-void																					klib::handleAgentDeath													(::klib::STacticalInfo & tacticalInfo, ::gpk::view_array<::klib::SGamePlayer> players, ::klib::CCharacter& deadTarget, ::klib::CCharacter& attacker, ::klib::TEAM_TYPE teamId, ::klib::SGameMessages & messages)	{
+void																					klib::handleAgentDeath													(::klib::STacticalInfo & tacticalInfo, ::gpk::view<::klib::SGamePlayer> players, ::klib::CCharacter& deadTarget, ::klib::CCharacter& attacker, ::klib::TEAM_TYPE teamId, ::klib::SGameMessages & messages)	{
 	::klib::handleAgentDeath(tacticalInfo, players, deadTarget, teamId, messages);
 	++attacker.Score.EnemiesKilled;
 }

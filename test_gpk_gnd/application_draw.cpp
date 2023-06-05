@@ -78,7 +78,7 @@ namespace gpk
 	, const ::gpk::n3<double>							& lightDir
 	, const ::gpk::rgbaf								& diffuseColor
 	, const ::gpk::rgbaf								& ambientColor
-	, const ::gpk::view_array<const ::gpk::SLightInfoRSW>	& lights
+	, const ::gpk::view<const ::gpk::SLightInfoRSW>	& lights
 	) {	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	const ::gpk::tri3<float>												& normals									= renderCache.TransformedNormalsVertex[iTriangle];
 	::gpk::tri3<double>													weightedNormals								=
@@ -107,7 +107,7 @@ namespace gpk
 	 ) {
 		for(uint32_t iLight = 0; iLight < lights.size(); ++iLight) {
 			const ::gpk::SLightInfoRSW													& rswLight									= lights[iLight];
-			::gpk::n3<float>														rswColor									= rswLight.Color * (1.0 - (rswLight.Position.Cast<double>() - interpolatedPosition).Length() / 10.0);
+			::gpk::n3f32														rswColor									= rswLight.Color * (1.0 - (rswLight.Position.Cast<double>() - interpolatedPosition).Length() / 10.0);
 			lightColor																+= ::gpk::rgbaf(rswColor.x, rswColor.y, rswColor.z, 1.0f) / 2.0;
 		}
 		interpolatedBGRA														= (directionalColor + lightColor + (ambientColor / 2.0)).Clamp();
@@ -124,7 +124,7 @@ namespace gpk
 			const ::gpk::SLightInfoRSW													& rswLight									= lights[rand() % lights.size()];
 			double																		distFactor									= 1.0 - (rswLight.Position.Cast<double>() - interpolatedPosition).Length() / 10.0;
 			if(distFactor > 0) {
-				::gpk::n3<float>														rswColor									= rswLight.Color * distFactor;
+				::gpk::n3f32														rswColor									= rswLight.Color * distFactor;
 				lightColor																+= srcTexel * ::gpk::rgbaf(rswColor.x, rswColor.y, rswColor.z, 1.0f) / 2.0;
 			}
 		}
@@ -138,8 +138,8 @@ namespace gpk
 }
 
 static				::gpk::error_t										transformTriangles
-	( const ::gpk::view_array<::gpk::tri<uint32_t>>	& vertexIndexList
-	, const ::gpk::view_array<::gpk::n3<float>>				& vertices
+	( const ::gpk::view<::gpk::tri<uint32_t>>	& vertexIndexList
+	, const ::gpk::view<::gpk::n3f32>				& vertices
 	, const ::gpk::SNearFar									& nearFar
 	, const ::gpk::m4<float>									& xWorld
 	, const ::gpk::m4<float>									& xWV
@@ -179,8 +179,8 @@ static				::gpk::error_t										transformTriangles
 }
 
 static				::gpk::error_t										transformNormals
-	( const ::gpk::view_array<::gpk::tri<uint32_t>>	& vertexIndexList
-	, const ::gpk::view_array<::gpk::n3<float>>				& normals
+	( const ::gpk::view<::gpk::tri<uint32_t>>	& vertexIndexList
+	, const ::gpk::view<::gpk::n3f32>				& normals
 	, const ::gpk::m4<float>									& xWorld
 	, ::gpk::SRenderCache											& renderCache
 	) {	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
@@ -204,23 +204,23 @@ static				::gpk::error_t										transformNormals
 }
 
 static				::gpk::error_t										drawTriangles
-	( const ::gpk::view_array<::gpk::tri<uint32_t>>			& vertexIndexList
-	, const ::gpk::view_array<::gpk::n3<float>>				& vertices
-	, const ::gpk::view_array<::gpk::n2<float>>				& uvs
+	( const ::gpk::view<::gpk::tri<uint32_t>>			& vertexIndexList
+	, const ::gpk::view<::gpk::n3f32>				& vertices
+	, const ::gpk::view<::gpk::n2<float>>				& uvs
 	, const ::gpk::view_grid	<::gpk::bgra>					& textureView
 	, const ::gpk::SNearFar											& nearFar
-	, const ::gpk::n3<float>									& lightDir
+	, const ::gpk::n3f32									& lightDir
 	, ::gpk::SRenderCache											& renderCache
 	, ::gpk::view_grid<uint32_t>									& targetDepthView
 	, ::gpk::view_grid<::gpk::bgra>							& targetView
 	, const ::gpk::rgbaf										& diffuseColor
 	, const ::gpk::rgbaf										& ambientColor
-	, const ::gpk::view_array<const ::gpk::SLightInfoRSW>			& lights
+	, const ::gpk::view<const ::gpk::SLightInfoRSW>			& lights
 	, uint32_t														* pixelsDrawn
 	, uint32_t														* pixelsSkipped
 	, bool															wireframe
 	) {	// ---
-		//const ::gpk::n3<float>													& lightDir									= app.LightDirection;
+		//const ::gpk::n3f32													& lightDir									= app.LightDirection;
 		for(uint32_t iTriangle = 0, triCount = renderCache.Triangle3dIndices.size(); iTriangle < triCount; ++iTriangle) { //
 			renderCache.TrianglePixelCoords.clear();
 			renderCache.TrianglePixelWeights.clear();
@@ -243,7 +243,7 @@ static				::gpk::error_t										drawTriangles
 				const ::gpk::n2<int16_t>												& pixelCoord								= renderCache.TrianglePixelCoords	[iPixel];
 				const ::gpk::tri<float>												& pixelWeights								= renderCache.TrianglePixelWeights	[iPixel];
 				if(false == wireframe) {
-					if(0 == ::drawPixelGND(renderCache, targetView[pixelCoord.y][pixelCoord.x], pixelWeights, triangle3DPositions, triangle3DUVs, textureView, iTriangle, lightDir.Cast<double>(), diffuseColor, ambientColor, ::gpk::view_array<const ::gpk::SLightInfoRSW>{lights.begin(), ::gpk::min(lights.size(), 8U)}))
+					if(0 == ::drawPixelGND(renderCache, targetView[pixelCoord.y][pixelCoord.x], pixelWeights, triangle3DPositions, triangle3DUVs, textureView, iTriangle, lightDir.Cast<double>(), diffuseColor, ambientColor, ::gpk::view<const ::gpk::SLightInfoRSW>{lights.begin(), ::gpk::min(lights.size(), 8U)}))
 						++*pixelsDrawn;
 					else
 						++*pixelsSkipped;
@@ -285,11 +285,11 @@ static				::gpk::error_t										drawTriangles
 	, ::gpk::SSceneCamera												& camera
 	, ::gpk::SRenderTarget<::gpk::bgra, uint32_t>					& target
 	, const ::gpk::SModelPivot<float>									& modelPivot
-	, const ::gpk::n3<float>										& lightDir
+	, const ::gpk::n3f32										& lightDir
 	, const ::gpk::SModelGND											& modelGND
 	, const ::gpk::SRSWWorldLight										& directionalLight
-	, const ::gpk::view_array<const ::gpk::SImage<::gpk::bgra>>	& textures
-	, const ::gpk::view_array<const ::gpk::SLightInfoRSW>				& lights
+	, const ::gpk::view<const ::gpk::SImage<::gpk::bgra>>	& textures
+	, const ::gpk::view<const ::gpk::SLightInfoRSW>				& lights
 	, bool																wireframe
 	) {	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	::gpk::view_grid<::gpk::bgra>											& offscreen									= target.Color.View;
