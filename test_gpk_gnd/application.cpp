@@ -158,7 +158,7 @@
 
 	::gpk::SGNDFileContents					& gndData									= app.GNDData;
 		// -- Generate minimap
-	::gpk::SMinMax<float>					heightMinMax								= {};
+	::gpk::minmax<float>					heightMinMax								= {};
 	for(uint32_t iTile = 0; iTile < gndData.lstTileGeometryData.size(); ++iTile)
 		if(gndData.lstTileGeometryData[iTile].SkinMapping.SkinIndexTop != -1) {
 			for(uint32_t iHeight = 0; iHeight < 4; ++iHeight) {
@@ -225,15 +225,15 @@
 		::std::lock_guard														lock						(app.LockRender);
 		app.Framework.RootWindow.BackBuffer									= app.Offscreen;
 	}
-	::gpk::SFramework				& framework					= app.Framework;
+	::gpk::SFramework			& framework		= app.Framework;
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework), "%s", "Exit requested by framework update.");
 
-	::gpk::SGUI						& gui						= *framework.GUI;
-	::gpk::array_pod<uint32_t>												controlsToProcess			= {};
+	::gpk::SGUI					& gui				= *framework.GUI;
+	::gpk::au32					controlsToProcess	= {};
 	::gpk::guiGetProcessableControls(gui, controlsToProcess);
 	for(uint32_t iProcessable = 0, countControls = controlsToProcess.size(); iProcessable < countControls; ++iProcessable) {
-		uint32_t																iControl					= controlsToProcess[iProcessable];
-		const ::gpk::SControlState												& controlState				= gui.Controls.States[iControl];
+		uint32_t					iControl		= controlsToProcess[iProcessable];
+		const ::gpk::SControlState	& controlState	= gui.Controls.States[iControl];
 		if(controlState.Execute) {
 			info_printf("Executed %u.", iControl);
 			if(iControl == (uint32_t)app.IdExit)
@@ -244,9 +244,9 @@
 	app.DialogMain.Update();
 
 	//----------------------------------------------
-	::gpk::SFrameInfo								& frameInfo									= framework.FrameInfo;
-	bool											updateProjection							= false;
-	::gpk::SWindow					& mainWindow						= framework.RootWindow;
+	::gpk::SFrameInfo			& frameInfo			= framework.FrameInfo;
+	bool						updateProjection	= false;
+	::gpk::SWindow				& mainWindow		= framework.RootWindow;
 	if(mainWindow.Input->KeyboardCurrent.KeyState[VK_ADD		])	{ updateProjection = true; app.Scene.Camera.Angle += frameInfo.Seconds.LastFrame; }
 	if(mainWindow.Input->KeyboardCurrent.KeyState[VK_SUBTRACT	])	{ updateProjection = true; app.Scene.Camera.Angle -= frameInfo.Seconds.LastFrame; }
 	if(mainWindow.Input->KeyboardCurrent.KeyState['Q'])				{ updateProjection = true; app.Scene.Camera.Points.Position.x += (float)frameInfo.Seconds.LastFrame * 10; }
