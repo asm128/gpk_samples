@@ -13,24 +13,24 @@
 
 #include <GL\Gl.h>
 
-stacxpr	const uint32_t										ASCII_SCREEN_WIDTH							= 132	;
-stacxpr	const uint32_t										ASCII_SCREEN_HEIGHT							= 50	;
+stacxpr	uint32_t			ASCII_SCREEN_WIDTH		= 132	;
+stacxpr	uint32_t			ASCII_SCREEN_HEIGHT		= 50	;
 
 GPK_DEFINE_APPLICATION_ENTRY_POINT_MT(::SApplication, "Title");
 
 // --- Cleanup application resources.
-::gpk::error_t				cleanup		(::SApplication& app)											{
+::gpk::error_t			cleanup		(::SApplication& app)											{
 	// --- when the rendering context is no longer needed ...   
  	// make the rendering context not current  
 	::gpk::mainWindowDestroy(app.Framework.RootWindow);
 	return 0;
 }
 
-::gpk::error_t				setup		(::SApplication & app)											{
+::gpk::error_t			setup		(::SApplication & app)											{
 	::gpk::SFramework				& framework									= app.Framework;
 	::gpk::SWindow					& mainWindow								= framework.RootWindow;
 	mainWindow.Size														= {1280, 720};
-	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)), "Failed to create main window why?!");
+	es_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
 
 	framework.RootWindow.BackBuffer->resize(mainWindow.Size);
 
@@ -79,7 +79,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT_MT(::SApplication, "Title");
 	return 0;
 }
 
-::gpk::error_t				update		(::SApplication& app, bool systemRequestedExit)					{
+::gpk::error_t			update		(::SApplication& app, bool systemRequestedExit)					{
 	retval_ginfo_if(1, systemRequestedExit, "Exiting because the runtime asked for close. We could also ignore this value and just continue execution if we don't want to exit.");
 	::gpk::SWindow					& mainWindow								= app.Framework.RootWindow;
 	for(uint32_t iEvent = 0; iEvent < mainWindow.EventQueue.size(); ++iEvent) {
@@ -119,7 +119,7 @@ namespace gpk
 {
 	template<typename _tCoord>
 	static					::gpk::error_t									drawTriangle
-		( ::gpk::view_grid<uint32_t>	& targetDepth
+		( ::gpk::v2u32	& targetDepth
 		, const ::gpk::SNearFar			& fNearFar
 		, const ::gpk::tri3<_tCoord>	& triangle
 		, ::gpk::apod<::gpk::n2i16>		& out_Points
@@ -144,11 +144,11 @@ namespace gpk
 				if(w0 <= -1 || w1 <= -1 || w2 <= -1) // ---- If p is on or inside all edges, render pixel.
 					continue;
 			}
-			const ::gpk::n2<double>												cellCurrentF								= {x, y};
+			const ::gpk::n2f64												cellCurrentF								= {x, y};
 			::gpk::tri<double>												proportions									=
-				{ ::gpk::orient2d3d({triangle.C.template Cast<double>(), triangle.B.template Cast<double>()}, cellCurrentF)	// notice how having to type "template" every time before "Cast" totally defeats the purpose of the template. I really find this rule very stupid and there is no situation in which the compiler is unable to resolve it from the code it already has.
-				, ::gpk::orient2d3d({triangle.A.template Cast<double>(), triangle.C.template Cast<double>()}, cellCurrentF)
-				, ::gpk::orient2d3d({triangle.B.template Cast<double>(), triangle.A.template Cast<double>()}, cellCurrentF)	// Determine barycentric coordinates
+				{ ::gpk::orient2d3d({triangle.C.f64(), triangle.B.f64()}, cellCurrentF)	// notice how having to type "template" every time before "Cast" totally defeats the purpose of the template. I really find this rule very stupid and there is no situation in which the compiler is unable to resolve it from the code it already has.
+				, ::gpk::orient2d3d({triangle.A.f64(), triangle.C.f64()}, cellCurrentF)
+				, ::gpk::orient2d3d({triangle.B.f64(), triangle.A.f64()}, cellCurrentF)	// Determine barycentric coordinates
 				};
 			double																		proportABC									= proportions.A + proportions.B + proportions.C; //(w0, w1, w2)
 			if(proportABC == 0)
@@ -176,27 +176,27 @@ namespace gpk
 
 	template<typename _tCoord, typename _tIndex>
 	static	inline			::gpk::error_t									drawTriangleIndexed
-		( ::gpk::view_grid<uint32_t>							& targetDepth
-		, const ::gpk::SNearFar									& fNearFar // fFar
-		//, double												fNear
-		, uint32_t												baseIndex
-		, uint32_t												baseVertexIndex
-		, ::gpk::view<const ::gpk::n3<_tCoord>>		coordList
-		, ::gpk::view<const _tIndex>						indices
+		( ::gpk::v2u32							& targetDepth
+		, const ::gpk::SNearFar					& fNearFar // fFar
+		//, double								fNear
+		, uint32_t								baseIndex
+		, uint32_t								baseVertexIndex
+		, ::gpk::view<const ::gpk::n3<_tCoord>>	coordList
+		, ::gpk::view<const _tIndex>			indices
 		, ::gpk::apod<::gpk::n2i16>				& out_Points
 		) {
 		return drawTriangle(targetDepth, fNearFar, ::gpk::tri3<_tCoord>{coordList[baseVertexIndex + indices[baseIndex + 0]], coordList[baseVertexIndex + indices[baseIndex + 1]], coordList[baseVertexIndex + indices[baseIndex + 2]]}, out_Points);
 	}
 }
 
-::gpk::error_t										drawVoxelFaceGeometry
-	( ::gpk::view_grid<uint32_t>								targetDepth
-	, ::gpk::apod<::gpk::n2i16>					& Points
-	, const ::gpk::n3f32								& voxelPos
-	, const ::gpk::m4<float>								& mWVP
-	, const ::gpk::SNearFar										& nearFar
-	, const ::gpk::view<const ::gpk::n3f32>		verticesRaw
-	, const ::gpk::view<const uint8_t>					& indices
+static	::gpk::error_t	drawVoxelFaceGeometry
+	( ::gpk::v2u32							targetDepth
+	, ::gpk::apod<::gpk::n2i16>				& Points
+	, const ::gpk::n3f32					& voxelPos
+	, const ::gpk::m4f32					& mWVP
+	, const ::gpk::SNearFar					& nearFar
+	, const ::gpk::view<const ::gpk::n3f32>	verticesRaw
+	, const ::gpk::vcu8						& indices
 	) {
 	::gpk::n3f32									vertices [4]				= {}; 
 	for(uint32_t iVertex = 0; iVertex < 4; ++iVertex) {
@@ -208,29 +208,29 @@ namespace gpk
 }
 
 struct SFragmentCache {
-	::gpk::apod<::gpk::n2i16>			Points				[6]	= {};
-	::gpk::apod<::gpk::trif32>			TriangleWeights		[6]	= {};	
-	::gpk::view_grid<::gpk::bgra>					TargetPixels;
-	::gpk::view_grid<uint32_t>							TargetDepth	;
+	::gpk::apod<::gpk::n2i16>		Points				[6]	= {};
+	::gpk::apod<::gpk::trif32>		TriangleWeights		[6]	= {};	
+	::gpk::view_grid<::gpk::bgra>	TargetPixels;
+	::gpk::v2u32					TargetDepth	;
 };
 
-static	::gpk::error_t						drawVoxelFace
-	( uint32_t						iFace
-	, const ::gpk::n3f32	& voxelPos
-	, const ::gpk::n3f32	& voxelCenter
+static	::gpk::error_t	drawVoxelFace
+	( uint32_t					iFace
+	, const ::gpk::n3f32		& voxelPos
+	, const ::gpk::n3f32		& voxelCenter
 	, const ::gpk::rgbaf		& cellColor
-	, const ::gpk::m4<float>	& mVP
-	, const ::gpk::SNearFar			& nearFar
-	, const ::gpk::n3f32	& lightPosition
-	, const double					lightFactorDistance
+	, const ::gpk::m4f32		& mVP
+	, const ::gpk::SNearFar		& nearFar
+	, const ::gpk::n3f32		& lightPosition
+	, const double				lightFactorDistance
 	, const ::gpk::rgbaf		& colorAmbient
-	, ::SFragmentCache				& pixelCache
+	, ::SFragmentCache			& pixelCache
 	) {
 	pixelCache.Points			[iFace].clear();
 	pixelCache.TriangleWeights	[iFace].clear();
 
 	::gpk::view<const ::gpk::n3f32>	rawVertices				= {&::gpk::VOXEL_FACE_VERTICES[iFace].A, 4};
-	::gpk::view<const uint8_t>				rawIndices				= ::gpk::VOXEL_FACE_INDICES[iFace];
+	::gpk::vcu8						rawIndices				= ::gpk::VOXEL_FACE_INDICES[iFace];
 
 	::drawVoxelFaceGeometry(pixelCache.TargetDepth, pixelCache.Points[iFace], voxelPos, mVP, nearFar, rawVertices, rawIndices); 
 
@@ -253,7 +253,7 @@ static	::gpk::error_t						drawVoxelFace
 static	::gpk::error_t	drawVoxelModel						
 	( const ::gpk::SVoxelGeometry	& voxelGeometry
 	, const ::gpk::n3f32			& position
-	, const ::gpk::m4<float>		& mVP
+	, const ::gpk::m4f32			& mVP
 	, const ::gpk::n3f32			& lightPosition
 	, ::SFragmentCache				& pixelCache
 	) {	
@@ -402,7 +402,7 @@ struct SCamera {
 	::gpk::n3f32			Position, Target;
 };
 
-::gpk::error_t				draw		(::SApplication& app)	{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
+::gpk::error_t			draw		(::SApplication& app)	{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	::gpk::SFramework				& framework			= app.Framework;
 
 	::gpk::pobj<::gpk::rtbgra8d32>	backBuffer		= app.BackBuffer;

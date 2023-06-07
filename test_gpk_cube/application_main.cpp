@@ -26,7 +26,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 }
 
 // --- Cleanup application resources.
-::gpk::error_t				cleanup		(::SApplication& app)											{
+::gpk::error_t			cleanup		(::SApplication& app)											{
 	::gpk::mainWindowDestroy(app.Framework.RootWindow);
 	g_ApplicationInstance													= 0;
 	return 0;
@@ -53,12 +53,12 @@ stacxpr const ::gpk::tri3<float>						geometryCube	[12]						=
 	, {{1.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 1.0f}}	// Top		- second
 	};
 
-::gpk::error_t				setup		(::SApplication& app)											{
+::gpk::error_t			setup		(::SApplication& app)											{
 	g_ApplicationInstance													= &app;
 	::gpk::SFramework				& framework									= app.Framework;
 	::gpk::SWindow					& mainWindow								= framework.RootWindow;
 	mainWindow.Size														= {640, 480};
-	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)), "Failed to create main window why?!");
+	es_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
 
 	stacxpr const ::gpk::n3f32								cubeCenter									= {0.5f, 0.5f, 0.5f};
 	for(uint32_t iTriangle = 0; iTriangle < 12; ++iTriangle) {
@@ -72,7 +72,7 @@ stacxpr const ::gpk::tri3<float>						geometryCube	[12]						=
 	return 0;
 }
 
-::gpk::error_t				update		(::SApplication& app, bool systemRequestedExit)					{
+::gpk::error_t			update		(::SApplication& app, bool systemRequestedExit)					{
 	retval_ginfo_if(1, systemRequestedExit, "Exiting because the runtime asked for close. We could also ignore this value and just continue execution if we don't want to exit.");
 	::gpk::error_t																frameworkResult								= ::gpk::updateFramework(app.Framework);
 	ree_if(errored(frameworkResult), "Unknown error.");
@@ -112,10 +112,10 @@ struct SCamera {
 						::gpk::n3f32								Position, Target;
 };
 
-::gpk::error_t				draw		(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
+::gpk::error_t			draw		(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	::gpk::SFramework				& framework									= app.Framework;
 
-	::gpk::pobj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>			backBuffer;
+	::gpk::pobj<::gpk::rtbgra8d32>	backBuffer;
 	backBuffer->resize(framework.RootWindow.BackBuffer->Color.metrics(), 0xFF000080, (uint32_t)-1);
 
 	//------------------------------------------------
@@ -181,7 +181,7 @@ struct SCamera {
 		double																		lightFactor									= geometryCubeNormals[iTriangle].Dot(cameraFront);
 		if(lightFactor > 0)
 			continue;
-		gerror_if(errored(::gpk::drawTriangle(backBuffer->Color.View, triangle3dColorList[iTriangle], triangle2dList[iTriangle])), "Not sure if these functions could ever fail");
+		es_if(errored(::gpk::drawTriangle(backBuffer->Color.View, triangle3dColorList[iTriangle], triangle2dList[iTriangle])));
 		//::gpk::drawLine(backBuffer->Color.View, (::gpk::bgra)::gpk::GREEN	, ::gpk::line2<int32_t>{triangle2dList[iTriangle].A, triangle2dList[iTriangle].B});
 		//::gpk::drawLine(backBuffer->Color.View, (::gpk::bgra)::gpk::BLUE	, ::gpk::line2<int32_t>{triangle2dList[iTriangle].B, triangle2dList[iTriangle].C});
 		//::gpk::drawLine(backBuffer->Color.View, (::gpk::bgra)::gpk::RED	, ::gpk::line2<int32_t>{triangle2dList[iTriangle].C, triangle2dList[iTriangle].A});

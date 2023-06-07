@@ -9,16 +9,16 @@
 namespace gme // I'm gonna use a different namespace in order to test a few things about the macros.
 {
 	struct SApplication {
-		::gpk::SFramework													Framework;
-		::gpk::pobj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>	Offscreen					= {};
-		::gpk::array_obj<::gpk::SImage<::gpk::bgra>>					PNGImages					= {};
+		::gpk::SFramework				Framework;
+		::gpk::pobj<::gpk::rtbgra8d32>	Offscreen		= {};
+		::gpk::aobj<::gpk::img8bgra>	PNGImages		= {};
 
-		int32_t																IdExit						= -1;
+		int32_t							IdExit			= -1;
 
-		::std::mutex														LockGUI;
-		::std::mutex														LockRender;
+		::std::mutex					LockGUI;
+		::std::mutex					LockRender;
 
-																			SApplication				(::gpk::SRuntimeValues& runtimeValues)	: Framework(runtimeValues)		{}
+										SApplication	(::gpk::SRuntimeValues& runtimeValues)	: Framework(runtimeValues)		{}
 	};
 } // namespace
 

@@ -148,60 +148,60 @@ namespace klib
 #pragma pack(pop)
 
 	struct SMapAOE {
-		::gpk::array_pod<SAOE>										AOE												= {};
-		::gpk::array_pod<::gpk::n3<int32_t>>					Coords											= {};
+		::gpk::apod<SAOE>			AOE						= {};
+		::gpk::apod<::gpk::n3i32>	Coords					= {};
 	};
 
 	struct STacticalBoard {
-		::klib::SMapShots											Shots											= {};
-		::klib::SMapAOE												AreaOfEffect									= {};
-		::klib::SGameTiles											Tiles											= {};
+		::klib::SMapShots			Shots				= {};
+		::klib::SMapAOE				AreaOfEffect		= {};
+		::klib::SGameTiles			Tiles				= {};
 
-		inline	int32_t												Resize											(::gpk::n2<uint32_t> newSize)	{ return Tiles.Resize(newSize); }
-		void														Clear											()									{
+		inline	int32_t				Resize				(::gpk::n2<uint32_t> newSize)	{ return Tiles.Resize(newSize); }
+		void						Clear				()								{
 			Tiles.Clear();
-			Shots														= {};
-			AreaOfEffect												= {};
+			Shots						= {};
+			AreaOfEffect				= {};
 		};
 	};
 
-	stacxpr	const uint32_t									GAME_MAP_DEPTH									= 36				;
-	stacxpr	const uint32_t									GAME_MAP_WIDTH									= (GAME_MAP_DEPTH * 2);
+	stacxpr	uint32_t		GAME_MAP_DEPTH		= 36;
+	stacxpr	uint32_t		GAME_MAP_WIDTH		= GAME_MAP_DEPTH * 2;
 
 	// This structure holds all the data that is only valid once we enter the tactical mode and that is of no use outside of it.
 	struct STacticalInfo {
-		STacticalSetup											Setup											= {};
-		int8_t													CurrentPlayer									= -1;	// this is an index to the local "Players" member (not SGame::Players!)
-		int8_t													CurrentTeam										= -1;	// this is an index to the local "Players" member (not SGame::Players!)
-		int8_t													CurrentPlayerPerTeam	[MAX_TACTICAL_PLAYERS]	= {};
-		SAgentsReference										AgentsInTeamSight		[MAX_TACTICAL_PLAYERS]	= {};
-		STacticalBoard											Board											= {};
-		SMapInventory											Drops											= {};
+		STacticalSetup			Setup											= {};
+		int8_t					CurrentPlayer									= -1;	// this is an index to the local "Players" member (not SGame::Players!)
+		int8_t					CurrentTeam										= -1;	// this is an index to the local "Players" member (not SGame::Players!)
+		int8_t					CurrentPlayerPerTeam	[MAX_TACTICAL_PLAYERS]	= {};
+		SAgentsReference		AgentsInTeamSight		[MAX_TACTICAL_PLAYERS]	= {};
+		STacticalBoard			Board											= {};
+		SMapInventory			Drops											= {};
 
-		inline	int32_t											ResizeBoard										(::gpk::n2<uint32_t> newSize)							{ Board.Resize(newSize); }
-		bool													AddBullet										(const SBullet& newBullet)									{
+		inline	int32_t			ResizeBoard		(::gpk::n2u32 newSize)							{ Board.Resize(newSize); }
+		bool					AddBullet		(const SBullet & newBullet)									{
 			Board.Shots.Bullet.push_back(newBullet);
 			Board.Shots.Coords.push_back(newBullet.Position.Cell);
 			return true;
 		}
 
-		bool													AddAOE											(const SAOE& newAOE)										{
+		bool					AddAOE			(const SAOE & newAOE)										{
 			Board.AreaOfEffect.AOE		.push_back(newAOE);
 			Board.AreaOfEffect.Coords	.push_back(newAOE.Position.Cell);
 			return true;
 		}
 
-		void													Clear											()															{
+		void					Clear			()															{
 			Setup.Clear();
-			CurrentPlayer											= -1;
-			CurrentTeam												= -1;
-			Drops													= SMapInventory();
+			CurrentPlayer			= -1;
+			CurrentTeam				= -1;
+			Drops					= SMapInventory();
 			memset(CurrentPlayerPerTeam	, -1, sizeof(int8_t				) * ::gpk::size(CurrentPlayerPerTeam	));
 			memset(AgentsInTeamSight	,  0, sizeof(SAgentsReference	) * ::gpk::size(AgentsInTeamSight		));
 			Board.Clear();
 		}
 
-		bool													HasDrops										(const ::gpk::n3<int32_t>& coord)	const	noexcept	{
+		bool					HasDrops		(const ::gpk::n3i32 & coord)	const	noexcept	{
 			return ( (Board.Tiles.Entities.Coins[coord.z][coord.x] != 0)
 				|| (-1) != Drops.CoordsProfession	.find(coord)
 				|| (-1) != Drops.CoordsWeapon		.find(coord)

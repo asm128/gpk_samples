@@ -9,17 +9,17 @@
 
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 
-::gpk::error_t				cleanup		(::gme::SApplication & app)							{
+::gpk::error_t			cleanup		(::gme::SApplication & app)							{
 	::gpk::mainWindowDestroy(app.Framework.RootWindow);
 	::gpk::clientDisconnect(app.LobbyClient.Client);
 	::gpk::tcpipShutdown();
 	::gpk::sleep(100);
 	return 0;
 }
-::gpk::error_t				setup		(::gme::SApplication & app)						{
+::gpk::error_t			setup		(::gme::SApplication & app)						{
 	::gpk::SFramework				& framework					= app.Framework;
 	::gpk::SWindow					& mainWindow				= framework.RootWindow;
-	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)), "Failed to create main window why?!");
+	es_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
 	::gpk::SGUI						& gui						= *framework.GUI;
 	app.IdExit					= ::gpk::controlCreate(gui);
 	::gpk::SControl					& controlExit				= gui.Controls.Controls[app.IdExit];
@@ -45,7 +45,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 			gwarn_if(errored(::gpk::jsonExpressionResolve(::gpk::vcs{"application.test_udp_client.remote_ip"}, jsonReader, 0, jsonIP)), "Failed to load config from json! Last contents found: %s.", jsonIP.begin())
 			else {
 				info_printf("Remote IP: %s.", jsonIP.begin());
-				gerror_if(errored(::gpk::tcpipAddress(jsonIP, {}, app.LobbyClient.Client.AddressConnect)), "Failed to read IP address from JSON config file: %s.", jsonIP.begin());	// turn the string into a SIPv4 struct.
+				e_if(errored(::gpk::tcpipAddress(jsonIP, {}, app.LobbyClient.Client.AddressConnect)), "Failed to read IP address from JSON config file: %s.", jsonIP.begin());	// turn the string into a SIPv4 struct.
 			}
 		}
 		{ // load port from config file
@@ -62,7 +62,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	//::gpk::clientConnect(app.LobbyClient.Client);
 	return 0;
 }
-::gpk::error_t				update		(::gme::SApplication & app, bool exitSignal)	{
+::gpk::error_t			update		(::gme::SApplication & app, bool exitSignal)	{
 	::gpk::STimer					timer;
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, exitSignal, "Exit requested by runtime.");
 	{
@@ -128,7 +128,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	return 0;
 }
 
-::gpk::error_t				draw		(::gme::SApplication & app)						{
+::gpk::error_t			draw		(::gme::SApplication & app)						{
 	::gpk::STimer					timer;
 	::gpk::pobj<::gpk::rtbgra8d32>	target;
 	target.create();
@@ -137,7 +137,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	//::gpk::clearTarget(*target);
 	{
 		::std::lock_guard				lock		(app.LockGUI);
-		::gpk::controlDrawHierarchy(*app.Framework.GUI, 0, target->Color.View);
+		::gpk::guiDraw(*app.Framework.GUI, target->Color.View);
 	}
 	{
 		::std::lock_guard				lock		(app.LockRender);

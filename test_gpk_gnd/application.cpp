@@ -10,15 +10,15 @@
 
  GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 
-::gpk::error_t				cleanup		(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.RootWindow); }
-::gpk::error_t				setup		(::gme::SApplication & app)						{
+::gpk::error_t			cleanup		(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.RootWindow); }
+::gpk::error_t			setup		(::gme::SApplication & app)						{
 	::gpk::SFramework				& framework					= app.Framework;
 	::gpk::SWindow					& mainWindow				= framework.RootWindow;
 	framework.Settings.GUIZoom											= false;
 	app.Framework.GUI													= app.DialogMain.GUI;
 	app.DialogMain.Input												= mainWindow.Input;
 	mainWindow.Size														= {1024, 768};
-	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)), "Failed to create main window. %s.", "why?!");
+	es_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
 	::gpk::SGUI						& gui						= *framework.GUI;
 	gui.ColorModeDefault												= ::gpk::GUI_COLOR_MODE_3D;
 	gui.ThemeDefault													= ::gpk::ASCII_COLOR_DARKGREEN * 16 + 7;
@@ -94,7 +94,7 @@
 	for(uint32_t iRSM = 0; iRSM < (uint32_t)rswData.RSWModels.size(); ++iRSM){
 		::gpk::SRSMFileContents														& rsmData									= app.RSMData[iRSM];
 		sprintf_s(temp, "%s%s%s", ragnaPath, "model\\", &rswData.RSWModels[iRSM].Filename[0]);
-		gerror_if(errored(::gpk::rsmFileLoad(rsmData, ::gpk::view_const_string(temp))), "Failed to load file: %s.", temp);
+		e_if(errored(::gpk::rsmFileLoad(rsmData, ::gpk::vcs(temp))), "Failed to load file: %s.", temp);
 	}
 	for(uint32_t iLight = 0; iLight < rswData.RSWLights.size(); ++iLight) {
 		rswData.RSWLights[iLight].Position										*= 1.0 / app.GNDData.Metrics.TileScale;
@@ -105,7 +105,7 @@
 	app.TexturesGND.resize(app.GNDData.TextureNames.size());
 	for(uint32_t iTex = 0; iTex < app.GNDData.TextureNames.size(); ++ iTex) {
 		sprintf_s(temp, "%s%s%s", ragnaPath, "texture\\", &app.GNDData.TextureNames[iTex][0]);
-		gerror_if(errored(::gpk::bmpFileLoad(::gpk::view_const_string(temp), app.TexturesGND[iTex])), "Not found? %s.", temp);
+		e_if(errored(::gpk::bmpFileLoad(::gpk::view_const_string(temp), app.TexturesGND[iTex])), "Not found? %s.", temp);
 	}
 
 	app.GNDModel.Nodes.resize(app.GNDData.TextureNames.size() * 6);
@@ -122,26 +122,24 @@
 	// Blend normals.
 	for(uint32_t y = 0; y < app.GNDData.Metrics.Size.y - 1; ++y)
 	for(uint32_t x = 0; x < app.GNDData.Metrics.Size.x - 1; ++x) {
-		const ::gpk::STileGeometryGND												& tileGeometry0								= tileGeometryView[y][x];
-		const ::gpk::STileGeometryGND												& tileGeometry1								= tileGeometryView[y][x + 1];
-		const ::gpk::STileGeometryGND												& tileGeometry2								= tileGeometryView[y + 1][x];
-		const ::gpk::STileGeometryGND												& tileGeometry3								= tileGeometryView[y + 1][x + 1];
-
-		const ::gpk::STileMapping													& tileMapping0								= app.GNDModel.TileMapping.View[y + 0][x + 0];
-		const ::gpk::STileMapping													& tileMapping1								= app.GNDModel.TileMapping.View[y + 0][x + 1];
-		const ::gpk::STileMapping													& tileMapping2								= app.GNDModel.TileMapping.View[y + 1][x + 0];
-		const ::gpk::STileMapping													& tileMapping3								= app.GNDModel.TileMapping.View[y + 1][x + 1];
-
-		const bool																	processTile0								= (tileGeometry0.SkinMapping.SkinIndexTop != -1);// && (app.GNDData.lstTileTextureData[tileGeometry0.SkinMapping.SkinIndexTop].TextureIndex != -1);
-		const bool																	processTile1								= (tileGeometry1.SkinMapping.SkinIndexTop != -1) && tileGeometry0.SkinMapping.SkinIndexFront == -1;// && (app.GNDData.lstTileTextureData[tileGeometry1.SkinMapping.SkinIndexTop].TextureIndex != -1);
-		const bool																	processTile2								= (tileGeometry2.SkinMapping.SkinIndexTop != -1) && tileGeometry0.SkinMapping.SkinIndexRight == -1;// && (app.GNDData.lstTileTextureData[tileGeometry2.SkinMapping.SkinIndexTop].TextureIndex != -1);
-		const bool																	processTile3								= (tileGeometry3.SkinMapping.SkinIndexTop != -1) && (tileGeometry0.SkinMapping.SkinIndexFront == -1 && tileGeometry0.SkinMapping.SkinIndexRight == -1);// && (app.GNDData.lstTileTextureData[tileGeometry3.SkinMapping.SkinIndexTop].TextureIndex != -1);
-		const int32_t																texIndex0									= processTile0 ? app.GNDData.lstTileTextureData[tileGeometry0.SkinMapping.SkinIndexTop].TextureIndex : -1;
-		const int32_t																texIndex1									= processTile1 ? app.GNDData.lstTileTextureData[tileGeometry1.SkinMapping.SkinIndexTop].TextureIndex : -1;
-		const int32_t																texIndex2									= processTile2 ? app.GNDData.lstTileTextureData[tileGeometry2.SkinMapping.SkinIndexTop].TextureIndex : -1;
-		const int32_t																texIndex3									= processTile3 ? app.GNDData.lstTileTextureData[tileGeometry3.SkinMapping.SkinIndexTop].TextureIndex : -1;
-		::gpk::n3f32														normal										= {};
-		uint32_t																	divisor										= 0;
+		const ::gpk::STileGeometryGND	& tileGeometry0			= tileGeometryView[y][x];
+		const ::gpk::STileGeometryGND	& tileGeometry1			= tileGeometryView[y][x + 1];
+		const ::gpk::STileGeometryGND	& tileGeometry2			= tileGeometryView[y + 1][x];
+		const ::gpk::STileGeometryGND	& tileGeometry3			= tileGeometryView[y + 1][x + 1];
+		const ::gpk::STileMapping		& tileMapping0			= app.GNDModel.TileMapping.View[y + 0][x + 0];
+		const ::gpk::STileMapping		& tileMapping1			= app.GNDModel.TileMapping.View[y + 0][x + 1];
+		const ::gpk::STileMapping		& tileMapping2			= app.GNDModel.TileMapping.View[y + 1][x + 0];
+		const ::gpk::STileMapping		& tileMapping3			= app.GNDModel.TileMapping.View[y + 1][x + 1];
+		const bool						processTile0			= (tileGeometry0.SkinMapping.SkinIndexTop != -1);// && (app.GNDData.lstTileTextureData[tileGeometry0.SkinMapping.SkinIndexTop].TextureIndex != -1);
+		const bool						processTile1			= (tileGeometry1.SkinMapping.SkinIndexTop != -1) && tileGeometry0.SkinMapping.SkinIndexFront == -1;// && (app.GNDData.lstTileTextureData[tileGeometry1.SkinMapping.SkinIndexTop].TextureIndex != -1);
+		const bool						processTile2			= (tileGeometry2.SkinMapping.SkinIndexTop != -1) && tileGeometry0.SkinMapping.SkinIndexRight == -1;// && (app.GNDData.lstTileTextureData[tileGeometry2.SkinMapping.SkinIndexTop].TextureIndex != -1);
+		const bool						processTile3			= (tileGeometry3.SkinMapping.SkinIndexTop != -1) && (tileGeometry0.SkinMapping.SkinIndexFront == -1 && tileGeometry0.SkinMapping.SkinIndexRight == -1);// && (app.GNDData.lstTileTextureData[tileGeometry3.SkinMapping.SkinIndexTop].TextureIndex != -1);
+		const int32_t					texIndex0				= processTile0 ? app.GNDData.lstTileTextureData[tileGeometry0.SkinMapping.SkinIndexTop].TextureIndex : -1;
+		const int32_t					texIndex1				= processTile1 ? app.GNDData.lstTileTextureData[tileGeometry1.SkinMapping.SkinIndexTop].TextureIndex : -1;
+		const int32_t					texIndex2				= processTile2 ? app.GNDData.lstTileTextureData[tileGeometry2.SkinMapping.SkinIndexTop].TextureIndex : -1;
+		const int32_t					texIndex3				= processTile3 ? app.GNDData.lstTileTextureData[tileGeometry3.SkinMapping.SkinIndexTop].TextureIndex : -1;
+		::gpk::n3f32					normal					= {};
+		uint32_t						divisor					= 0;
 		if(processTile0) { ++divisor; ::gpk::SModelNodeGND & gndNode0 = app.GNDModel.Nodes[texIndex0]; normal += gndNode0.Normals[tileMapping0.VerticesTop[3]]; }
 		if(processTile1) { ++divisor; ::gpk::SModelNodeGND & gndNode1 = app.GNDModel.Nodes[texIndex1]; normal += gndNode1.Normals[tileMapping1.VerticesTop[2]]; }
 		if(processTile2) { ++divisor; ::gpk::SModelNodeGND & gndNode2 = app.GNDModel.Nodes[texIndex2]; normal += gndNode2.Normals[tileMapping2.VerticesTop[1]]; }
@@ -154,24 +152,24 @@
 			if(processTile3) { ::gpk::SModelNodeGND	& gndNode3 = app.GNDModel.Nodes[texIndex3]; gndNode3.Normals[tileMapping3.VerticesTop[0]] = normal; }
 		}
 	}
-	app.Scene.Camera.Points.Position										= {0, 30, -20};
-	app.Scene.Camera.NearFar.Max											= 1000.0f;
-	app.Scene.Camera.NearFar.Min											= 0.001f;
+	app.Scene.Camera.Points.Position	= {0, 30, -20};
+	app.Scene.Camera.NearFar.Max		= 1000.0f;
+	app.Scene.Camera.NearFar.Min		= 0.001f;
 
-	::gpk::SGNDFileContents														& gndData									= app.GNDData;
+	::gpk::SGNDFileContents					& gndData									= app.GNDData;
 		// -- Generate minimap
-	::gpk::SMinMax<float>														heightMinMax								= {};
+	::gpk::SMinMax<float>					heightMinMax								= {};
 	for(uint32_t iTile = 0; iTile < gndData.lstTileGeometryData.size(); ++iTile)
 		if(gndData.lstTileGeometryData[iTile].SkinMapping.SkinIndexTop != -1) {
 			for(uint32_t iHeight = 0; iHeight < 4; ++iHeight) {
-				heightMinMax.Max												= ::gpk::max(gndData.lstTileGeometryData[iTile].fHeight[iHeight] * -1, heightMinMax.Max);
-				heightMinMax.Min												= ::gpk::min(gndData.lstTileGeometryData[iTile].fHeight[iHeight] * -1, heightMinMax.Min);
+				heightMinMax.Max			= ::gpk::max(gndData.lstTileGeometryData[iTile].fHeight[iHeight] * -1, heightMinMax.Max);
+				heightMinMax.Min			= ::gpk::min(gndData.lstTileGeometryData[iTile].fHeight[iHeight] * -1, heightMinMax.Min);
 			}
 		}
-	::gpk::SImage<::gpk::bgra>	minimapTemp;
+	::gpk::img8bgra				minimapTemp;
 	minimapTemp.resize(gndData.Metrics.Size);
 
-	::gpk::view_grid<::gpk::bgra>											& minimapView								= minimapTemp.View;
+	::gpk::v2<::gpk::bgra>											& minimapView								= minimapTemp.View;
 	const float																	heightRange									= heightMinMax.Max - heightMinMax.Min;
 	for(uint32_t y = 0, yMax = minimapView.metrics().y; y < yMax; ++y)
 	for(uint32_t x = 0, xMax = minimapView.metrics().x; x < xMax; ++x) {
@@ -220,7 +218,7 @@
 	return 0;
 }
 
-::gpk::error_t				update		(::gme::SApplication & app, bool exitSignal)	{
+::gpk::error_t			update		(::gme::SApplication & app, bool exitSignal)	{
 	::gpk::STimer															timer;
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, exitSignal, "%s", "Exit requested by runtime.");
 	{
@@ -306,24 +304,24 @@
 	return 0;
 }
 
-			::gpk::error_t											drawGND
-	( ::gpk::SRenderCache												& renderCache
-	, ::gpk::SSceneTransforms											& transforms
-	, ::gpk::SSceneCamera												& camera
-	, ::gpk::SWindow::TOffscreen										& target
-	, const ::gpk::SModelPivot<float>									& modelPivot
-	, const ::gpk::n3f32										& lightDir
-	, const ::gpk::SModelGND											& modelGND
-	, const ::gpk::SRSWWorldLight										& directionalLight
-	, const ::gpk::view<const ::gpk::SImage<::gpk::bgra>>	& textures
-	, const ::gpk::view<const ::gpk::SLightInfoRSW>				& lights
-	, bool																wireframe
+::gpk::error_t				drawGND
+	( ::gpk::SRenderCache						& renderCache
+	, ::gpk::SSceneTransforms					& transforms
+	, ::gpk::SSceneCamera						& camera
+	, ::gpk::SWindow::TOffscreen				& target
+	, const ::gpk::SModelPivot<float>			& modelPivot
+	, const ::gpk::n3f32						& lightDir
+	, const ::gpk::SModelGND					& modelGND
+	, const ::gpk::SRSWWorldLight				& directionalLight
+	, const ::gpk::view<const ::gpk::img8bgra>	& textures
+	, const ::gpk::view<const ::gpk::SLightInfoRSW>	& lights
+	, bool											wireframe
 	);
-::gpk::error_t				draw		(::gme::SApplication & app)							{
+::gpk::error_t			draw		(::gme::SApplication & app)							{
 	::gpk::STimer															timer;
 	::gpk::SFramework				& framework									= app.Framework;
 	::gpk::SGUI						& gui										= *framework.GUI;
-	static ::gpk::SRenderTarget<::gpk::bgra, uint32_t>				buffer3D;
+	static ::gpk::rtbgra8d32				buffer3D;
 	::gpk::pobj<::gpk::SDialogViewport>									viewport									= {};
 	app.DialogMain.Controls[app.Viewport].as(viewport);
 	const ::gpk::n2<uint32_t>											& offscreenMetrics							= gui.Controls.Controls[viewport->IdClient].Area.Size.Cast<uint32_t>();
@@ -334,13 +332,13 @@
 	app.DialogMain.Controls[app.CheckBox].as(checkbox);
 
 	int32_t 																pixelsDrawn0								= drawGND(app.RenderCache, app.Scene.Transforms, app.Scene.Camera, buffer3D, app.GridPivot, app.LightDirection, app.GNDModel, app.RSWData.Light, app.TexturesGND, app.RSWData.RSWLights, checkbox->Checked);
-	gerror_if(errored(pixelsDrawn0), "??");
-	::gpk::pobj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>		target;
+	es_if(errored(pixelsDrawn0));
+	::gpk::pobj<::gpk::rtbgra8d32>	target;
 	target.create();
 	target->resize(app.Framework.RootWindow.Size, ::gpk::LIGHTGRAY, 0xFFFFFFFFU);
 	{
 		::std::lock_guard														lock					(app.Framework.LockGUI);
-		::gpk::controlDrawHierarchy(*app.Framework.GUI, 0, target->Color.View);
+		::gpk::guiDraw(*app.Framework.GUI, target->Color.View);
 	}
 	{
 		::std::lock_guard														lock					(app.Framework.LockGUI);

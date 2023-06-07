@@ -287,8 +287,8 @@ int							main						()			{
 			double													timeTotal					= 0;
 			for(uint32_t iRound = 0; iRound < rounds; ++iRound)
 				for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {
-					gerror_if(errored(::test_encrypt_cbc((::gpk::AES_LEVEL)iAESLevel)), "%s", "Algorithm got broken?");
-					gerror_if(errored(::test_decrypt_cbc((::gpk::AES_LEVEL)iAESLevel)), "%s", "Algorithm got broken?");
+					es_if(errored(::test_encrypt_cbc((::gpk::AES_LEVEL)iAESLevel)));
+					es_if(errored(::test_decrypt_cbc((::gpk::AES_LEVEL)iAESLevel)));
 					timer.Frame();
 					timeTotal											+= timer.LastTimeSeconds;
 				}
@@ -299,8 +299,8 @@ int							main						()			{
 			double													timeTotal					= 0;
 			for(uint32_t iRound = 0; iRound < rounds; ++iRound)
 				for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {
-					gerror_if(errored(::test_encrypt_ctr((::gpk::AES_LEVEL)iAESLevel)), "%s", "Algorithm got broken?");
-					gerror_if(errored(::test_decrypt_ctr((::gpk::AES_LEVEL)iAESLevel)), "%s", "Algorithm got broken?");
+					es_if(errored(::test_encrypt_ctr((::gpk::AES_LEVEL)iAESLevel)));
+					es_if(errored(::test_decrypt_ctr((::gpk::AES_LEVEL)iAESLevel)));
 					timer.Frame();
 					timeTotal											+= timer.LastTimeSeconds;
 				}
@@ -311,8 +311,8 @@ int							main						()			{
 			double													timeTotal					= 0;
 			for(uint32_t iRound = 0; iRound < rounds; ++iRound)
 				for(uint32_t iTest = 0; iTest < ::gpk::size(testStrings); ++iTest) {
-					gerror_if(errored(::test_decrypt_ecb((::gpk::AES_LEVEL)iAESLevel)), "%s", "Algorithm got broken?");
-					gerror_if(errored(::test_encrypt_ecb((::gpk::AES_LEVEL)iAESLevel)), "%s", "Algorithm got broken?");
+					es_if(errored(::test_decrypt_ecb((::gpk::AES_LEVEL)iAESLevel)));
+					es_if(errored(::test_encrypt_ecb((::gpk::AES_LEVEL)iAESLevel)));
 					timer.Frame();
 					timeTotal											+= timer.LastTimeSeconds;
 				}
@@ -324,8 +324,8 @@ int							main						()			{
 	for(uint32_t iAESLevel = 0; iAESLevel < 3; ++iAESLevel) {
 		::gpk::aobj<::gpk::au8>			encodedList;
 		::gpk::aobj<::gpk::au8>			decodedList;
-		gpk_necall(encodedList.resize(rounds * ::gpk::size(testStrings)), "%s", "Out of memory?");
-		gpk_necall(decodedList.resize(rounds * ::gpk::size(testStrings)), "%s", "Out of memory?");
+		gpk_necs(encodedList.resize(rounds * ::gpk::size(testStrings)));
+		gpk_necs(decodedList.resize(rounds * ::gpk::size(testStrings)));
 		{
 			::gpk::STimer											timer;
 			double													timeTotal					= 0;

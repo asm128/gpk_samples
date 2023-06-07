@@ -10,16 +10,16 @@
 
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 
-::gpk::error_t				cleanup		(::SApplication & app)						{
+::gpk::error_t			cleanup		(::SApplication & app)						{
 	::klib::shutdownASCIIScreen();
 	return ::gpk::mainWindowDestroy(app.Framework.RootWindow);
 }
 
-::gpk::error_t				setup		(::SApplication & app)						{
+::gpk::error_t			setup		(::SApplication & app)						{
 	::gpk::SFramework				& framework						= app.Framework;
 	::gpk::SWindow					& mainWindow					= framework.RootWindow;
 	mainWindow.Size														= {1280, 720};
-	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)), "Failed to create main window. %s.", "why?!");
+	es_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
 	{ // Build the exit button
 		::gpk::SGUI						& gui								= *framework.GUI;
 		gui.ColorModeDefault		= ::gpk::GUI_COLOR_MODE_3D;
@@ -43,27 +43,27 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 	}
 	srand((uint32_t)time(0));
 
-	const ::gpk::n2<uint32_t>							metricsMap						= app.TextOverlay.MetricsMap;
-	const ::gpk::n2<uint32_t>							metricsLetter					= app.TextOverlay.MetricsLetter;
-	::gpk::SImage<::gpk::bgra>						fontImage;
+	const ::gpk::n2u32							metricsMap						= app.TextOverlay.MetricsMap;
+	const ::gpk::n2u32							metricsLetter					= app.TextOverlay.MetricsLetter;
+	::gpk::img8bgra								fontImage;
 	::gpk::pngFileLoad(::gpk::vcs{"../gpk_data/images/Codepage_437_24_12x12.png"}, fontImage);
-	::gpk::view_grid<::gpk::SGeometryQuads>					viewGeometries					= {app.TextOverlay.GeometryLetters, {16, 16}};
-	const uint32_t											imagePitch						= metricsLetter.x * metricsMap.x;
+	::gpk::view2d<::gpk::SGeometryQuads>		viewGeometries					= {app.TextOverlay.GeometryLetters, {16, 16}};
+	const uint32_t								imagePitch						= metricsLetter.x * metricsMap.x;
 
-	::gpk::array_pod<::gpk::STile>							tiles;
+	::gpk::apod<::gpk::STile>					tiles;
 	for(uint32_t y = 0; y < metricsMap.y; ++y)
 	for(uint32_t x = 0; x < metricsMap.x; ++x) {
 		tiles.clear();
-		const uint32_t											asciiCode			= y * app.TextOverlay.MetricsMap.x + x;
-		const ::gpk::n2<uint32_t>							asciiCoords			= {asciiCode %		metricsMap.x, asciiCode / app.TextOverlay.MetricsMap.x};
-		const uint32_t											offsetPixelCoord	= (asciiCoords.y *	metricsLetter.y) * imagePitch + (asciiCoords.x * app.TextOverlay.MetricsLetter.x);
+		const uint32_t								asciiCode			= y * app.TextOverlay.MetricsMap.x + x;
+		const ::gpk::n2u32							asciiCoords			= {asciiCode %		metricsMap.x, asciiCode / app.TextOverlay.MetricsMap.x};
+		const uint32_t								offsetPixelCoord	= (asciiCoords.y *	metricsLetter.y) * imagePitch + (asciiCoords.x * app.TextOverlay.MetricsLetter.x);
 		::gpk::geometryBuildTileListFromImage({&fontImage.Texels[offsetPixelCoord], app.TextOverlay.MetricsLetter}, tiles, app.TextOverlay.MetricsLetter.x * app.TextOverlay.MetricsMap.x);
 		::gpk::geometryBuildGridFromTileList(app.TextOverlay.GeometryLetters[asciiCode], ::gpk::view_grid<::gpk::STile>{tiles.begin(), app.TextOverlay.MetricsLetter}, {}, {1, 6.0f, 1});
 	}
 
 
-	stacxpr const uint32_t							DEFAULT_ASCII_DISPLAY_HEIGHT	= 70;
-	stacxpr const uint32_t							DEFAULT_ASCII_DISPLAY_WIDTH		= (uint32_t)(DEFAULT_ASCII_DISPLAY_HEIGHT * 2.666666f);
+	stacxpr uint32_t		DEFAULT_ASCII_DISPLAY_HEIGHT	= 70;
+	stacxpr uint32_t		DEFAULT_ASCII_DISPLAY_WIDTH		= (uint32_t)(DEFAULT_ASCII_DISPLAY_HEIGHT * 2.666666f);
 	::klib::initASCIIScreen(DEFAULT_ASCII_DISPLAY_WIDTH, DEFAULT_ASCII_DISPLAY_HEIGHT);
 
 	app.Game.push_back({});
@@ -77,8 +77,8 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 	return 0;
 }
 
-int													update				(SApplication & app, bool exitSignal)	{
-	::gpk::SFramework				& framework			= app.Framework;
+::gpk::error_t			update		(SApplication & app, bool exitSignal)	{
+	::gpk::SFramework				& framework	= app.Framework;
 	//::gpk::STimer															timer;
 	(void)exitSignal;
 	//retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, exitSignal, "%s", "Exit requested by runtime.");
@@ -171,13 +171,13 @@ int													update				(SApplication & app, bool exitSignal)	{
 }
 
 int													draw					(SApplication & app) {
-	::gpk::pobj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>		target;
+	::gpk::pobj<::gpk::rtbgra8d32>	target;
 	target.create();
 	target->resize(app.Framework.RootWindow.Size, ::gpk::DARKGREEN, 0xFFFFFFFFU);
 
 	{
 		::std::lock_guard														lock					(app.LockGUI);
-		::gpk::controlDrawHierarchy(*app.Framework.GUI, 0, target->Color.View);
+		::gpk::guiDraw(*app.Framework.GUI, target->Color.View);
 	}
 	{
 		::std::lock_guard														lock					(app.LockRender);

@@ -12,12 +12,12 @@
 
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 
-::gpk::error_t				cleanup		(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.RootWindow); }
-::gpk::error_t				setup		(::gme::SApplication & app)						{
+::gpk::error_t			cleanup		(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.RootWindow); }
+::gpk::error_t			setup		(::gme::SApplication & app)						{
 	::gpk::SFramework				& framework							= app.Framework;
 	::gpk::SWindow					& mainWindow						= framework.RootWindow;
 	mainWindow.Size								= {1280, 720};
-	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)), "Failed to create main window. %s.", "why?!");
+	es_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
 	{ // Build the exit button
 		::gpk::SGUI										& gui								= *framework.GUI;
 		gui.ColorModeDefault						= ::gpk::GUI_COLOR_MODE_3D;
@@ -66,7 +66,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 	return 0;
 }
 
-::gpk::error_t				update		(::gme::SApplication & app, bool exitSignal)	{
+::gpk::error_t			update		(::gme::SApplication & app, bool exitSignal)	{
 	//::gpk::STimer															timer;
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, exitSignal, "%s", "Exit requested by runtime.");
 	{
@@ -94,16 +94,16 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 	return 0;
 }
 
-::gpk::error_t				draw		(::gme::SApplication & app)							{
+::gpk::error_t			draw		(::gme::SApplication & app)							{
 	//::gpk::STimer															timer;
-	::gpk::pobj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>		target;
+	::gpk::pobj<::gpk::rtbgra8d32>	target;
 	target->resize(app.Framework.RootWindow.Size, 0x00102030U, 0xFFFFFFFFU);
 	for(uint32_t y = 0; y < target->Color.View.metrics().y / 3; ++y)
 	for(uint32_t x = 0; x < target->Color.View.metrics().x / 3; ++x) {
 		//target->Color.View[y * 3][x * 3]									= uint32_t(::gpk::noise1DBase(y * target->Color.View.metrics().x + x + app.Framework.FrameInfo.Microseconds.Total) + app.Framework.FrameInfo.Seconds.Total) | 0xFF000000;
 	}
 
-	gerror_if(errored(::gpk::nodeRendererDraw(app.Scene.Renderer, 0, target->Color, target->DepthStencil)), "%s", "Failed to render geometry nodes.");
+	es_if(errored(::gpk::nodeRendererDraw(app.Scene.Renderer, 0, target->Color, target->DepthStencil)));
 
 	//::gpk::array_pod<ubyte_t>												bytesPNG				= 0;
 	//::gpk::pngFileWrite(target->Color.View, bytesPNG);
@@ -117,7 +117,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 	//::gpk::clearTarget(*target);
 	{
 		::std::lock_guard														lock					(app.LockGUI);
-		::gpk::controlDrawHierarchy(*app.Framework.GUI, 0, target->Color.View);
+		::gpk::guiDraw(*app.Framework.GUI, target->Color.View);
 	}
 	{
 		::std::lock_guard														lock					(app.LockRender);

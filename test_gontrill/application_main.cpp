@@ -47,7 +47,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 }
 
 // --- Cleanup application resources.
-::gpk::error_t				cleanup		(::SApplication& app)											{
+::gpk::error_t			cleanup		(::SApplication& app)											{
 
 	app;
 	g_ApplicationInstance													= 0;
@@ -101,12 +101,12 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	return 0;
 }
 
-::gpk::error_t				setup		(::SApplication& app)											{
+::gpk::error_t			setup		(::SApplication& app)											{
 	//_CrtSetBreakAlloc(120);
 	g_ApplicationInstance													= &app;
 	::gpk::SFramework				& framework									= app.Framework;
 	framework.RootWindow.Size												= {1280, 720};
-	gerror_if(errored(::gpk::mainWindowCreate(framework.RootWindow, framework.RuntimeValues.PlatformDetail, framework.RootWindow.Input)), "Failed to create main window why?!");
+	es_if(errored(::gpk::mainWindowCreate(framework.RootWindow, framework.RuntimeValues.PlatformDetail, framework.RootWindow.Input)));
 	::setupParticles();
 	ree_if	(errored(::updateSizeDependentResources	(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
 	ree_if	(errored(::setupSprites					(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
@@ -149,15 +149,15 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 ::gpk::error_t							drawShips									(::gpk::v2<::gpk::bgra> target, ::SApplication & app);
 ::gpk::error_t							drawCrosshair								(::gpk::v2<::gpk::bgra> target, ::SApplication & app);
 ::gpk::error_t							drawCollisions								(::gpk::v2<::gpk::bgra> target, ::SApplication & app);
-::gpk::error_t				draw		(::SApplication & app)											{
+::gpk::error_t			draw		(::SApplication & app)											{
 	::gpk::v2<::gpk::bgra>						target										= app.Framework.RootWindow.BackBuffer->Color;
-	gerror_if(errored(::drawBackground	(target, app)), "Why??");	// --- Draw stars
-	gerror_if(errored(::drawPowerups	(target, app)), "Why??");	// --- Draw powerups
-	gerror_if(errored(::drawShips		(target, app)), "Why??");	// --- Draw ship
-	gerror_if(errored(::drawCrosshair	(target, app)), "Why??");	// --- Draw crosshair
-	gerror_if(errored(::drawThrust		(target, app)), "Why??");	// --- Draw propulsion engine
-	gerror_if(errored(::drawShots		(target, app)), "Why??");	// --- Draw lasers
-	gerror_if(errored(::drawCollisions	(target, app)), "Why??");	// --- Draw debris particles
+	es_if(errored(::drawBackground	(target, app)));	// --- Draw stars
+	es_if(errored(::drawPowerups	(target, app)));	// --- Draw powerups
+	es_if(errored(::drawShips		(target, app)));	// --- Draw ship
+	es_if(errored(::drawCrosshair	(target, app)));	// --- Draw crosshair
+	es_if(errored(::drawThrust		(target, app)));	// --- Draw propulsion engine
+	es_if(errored(::drawShots		(target, app)));	// --- Draw lasers
+	es_if(errored(::drawCollisions	(target, app)));	// --- Draw debris particles
 
 	stacxpr	const ::gpk::n2u8					sizeCharCell								= {9, 16};
 	uint16_t									lineOffset									= 0;
@@ -198,37 +198,37 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	return 0;
 }
 
-::gpk::error_t										removeDeadStuff								(::SApplication & app);
-::gpk::error_t										updateInput									(::SApplication & app);
-::gpk::error_t										updateShots									(::SApplication & app, const ::gpk::v1<::SApplication::TParticleSystem::TIntegrator::TParticle> & particleDefinitions);
-::gpk::error_t										updateSpawn									(::SApplication & app, const ::gpk::v1<::SApplication::TParticleSystem::TIntegrator::TParticle> & particleDefinitions);
-::gpk::error_t										updateShips									(::SApplication & app);
-::gpk::error_t										updateEnemies								(::SApplication & app);
-::gpk::error_t										updateParticles								(::SApplication & app);
-::gpk::error_t										updateGUI									(::SApplication & app);
-::gpk::error_t				update		(::SApplication & app, bool systemRequestedExit)					{
+::gpk::error_t				removeDeadStuff	(::SApplication & app);
+::gpk::error_t				updateInput		(::SApplication & app);
+::gpk::error_t				updateShots		(::SApplication & app, const ::gpk::v1<::SApplication::TParticleSystem::TIntegrator::TParticle> & particleDefinitions);
+::gpk::error_t				updateSpawn		(::SApplication & app, const ::gpk::v1<::SApplication::TParticleSystem::TIntegrator::TParticle> & particleDefinitions);
+::gpk::error_t				updateShips		(::SApplication & app);
+::gpk::error_t				updateEnemies	(::SApplication & app);
+::gpk::error_t				updateParticles	(::SApplication & app);
+::gpk::error_t				updateGUI		(::SApplication & app);
+::gpk::error_t			update			(::SApplication & app, bool systemRequestedExit)					{
 	retval_ginfo_if(1, systemRequestedExit, "Exiting because the runtime asked for close. We could also ignore this value and just continue execution if we don't want to exit.");
-	::gpk::SFramework				& framework									= app.Framework;
-	::gpk::error_t																frameworkResult								= ::gpk::updateFramework(framework);
-	ree_if(errored(frameworkResult), "Unknown error.");
-	rvi_if(1, frameworkResult == 1, "Framework requested close. Terminating execution.");
+	::gpk::SFramework				& framework		= app.Framework;
+	::gpk::error_t					frameworkResult	= ::gpk::updateFramework(framework);
+	rees_if(errored(frameworkResult));
+	rvis_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == frameworkResult);
 
-	ree_if(errored(::updateSizeDependentResources	(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
-	gerror_if(errored(::updateInput					(app)), "Unknown error.");
+	ree_if(errored(::updateSizeDependentResources(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
+	es_if(errored(::updateInput(app)));
 	if(app.Paused)
 		return 0;
 
 	// update background
-	const float																	windDirection								= (float)(sin(framework.FrameInfo.Seconds.Total / 10.0) * .5 + .5);
-	app.ColorBackground.g									= (uint8_t)(windDirection * (app.ColorBackground.b / 3.0));
-	app.ColorBackground.r									= (uint8_t)(windDirection * (app.ColorBackground.b / 3.0));
+	const float						windDirection	= float(sin(framework.FrameInfo.Seconds.Total / 10.0) * .5 + .5);
+	app.ColorBackground.g		= (uint8_t)(windDirection * (app.ColorBackground.b / 3.0));
+	app.ColorBackground.r		= (uint8_t)(windDirection * (app.ColorBackground.b / 3.0));
 
-	gerror_if(errored(::removeDeadStuff	(app)), "Unknown error.");
-	gerror_if(errored(::updateParticles	(app)), "Unknown error.");
-	gerror_if(errored(::updateSpawn		(app, particleDefinitions)), "Unknown error.");
-	gerror_if(errored(::updateShips		(app)), "Unknown error.");
-	gerror_if(errored(::updateEnemies	(app)), "Unknown error.");
-	gerror_if(errored(::updateShots		(app, particleDefinitions)), "Unknown error.");
-	gerror_if(errored(::updateGUI		(app)), "Unknown error.");
+	es_if(errored(::removeDeadStuff	(app)));
+	es_if(errored(::updateParticles	(app)));
+	es_if(errored(::updateSpawn		(app, particleDefinitions)));
+	es_if(errored(::updateShips		(app)));
+	es_if(errored(::updateEnemies	(app)));
+	es_if(errored(::updateShots		(app, particleDefinitions)));
+	es_if(errored(::updateGUI		(app)));
 	return 0;
 }

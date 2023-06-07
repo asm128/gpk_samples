@@ -34,8 +34,8 @@ namespace klib
 	};
 
 	struct STerrainTiles {
-				::gpk::SImage<::klib::STileGeometry		>			Geometry;
-				::gpk::SImage<::klib::STopologyDetail	>			Topology;
+				::gpk::img<::klib::STileGeometry	>			Geometry;
+				::gpk::img<::klib::STopologyDetail	>			Topology;
 
 		inline	int32_t												Resize			(::gpk::n2<uint32_t> newSize)											{
 			Geometry.resize(newSize, {});
@@ -48,9 +48,9 @@ namespace klib
 	};
 
 	struct SEntityTiles {
-				::gpk::SImage<STileCharacter>						Agents	;
-				::gpk::SImage<STileProp		>						Props	;
-				::gpk::SImage<int64_t		>						Coins	;
+				::gpk::img<STileCharacter	>	Agents	;
+				::gpk::img<STileProp		>	Props	;
+				::gpk::img<int64_t			>	Coins	;
 
 		inline	int32_t												Resize			(::gpk::n2<uint32_t> newSize)											{
 			Agents	.resize(newSize, {(::klib::TEAM_TYPE)-1, -1, -1, -1} );

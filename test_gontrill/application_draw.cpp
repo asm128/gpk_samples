@@ -47,7 +47,7 @@ static	::gpk::error_t						drawShipHealthBar			(::gpk::v2<::gpk::bgra> target, :
 			::gpk::n2<int32_t>								dstOffset								= (gameInstance.Enemies.Position[iEnemy] + vector).Cast<int32_t>() - app.TextureCenters[GAME_TEXTURE_ENEMY];
 			//if constexpr((Y_PLUS 1) == -1)
 			//	dstOffset.y *= -1;
-			gerror_if(errored(::gpk::grid_copy_alpha(viewOffscreen, enemyView, dstOffset, {0xFF, 0, 0xFF, 0xFF})), "I believe this never fails.");
+			es_if(errored(::gpk::grid_copy_alpha(viewOffscreen, enemyView, dstOffset, {0xFF, 0, 0xFF, 0xFF})));
 			{ // Draw ghost light
 				::gpk::n2f										centerPowerup							= gameInstance.Enemies.Position[iEnemy] + vector;
 				::gpk::n2f										lightCrosshair							= centerPowerup + ::gpk::n2f{(float)indexPositionsX[selectedPos], 0.0f};
@@ -61,7 +61,7 @@ static	::gpk::error_t						drawShipHealthBar			(::gpk::v2<::gpk::bgra> target, :
 			continue;
 		const ::gpk::n2f								& centerEnemy								= gameInstance.Enemies.Position[iEnemy];
 		const ::SHealthPoints							& enemyHealth								= gameInstance.Enemies.Health[iEnemy];
-		gerror_if(errored(::gpk::grid_copy_alpha(viewOffscreen, enemyView, centerEnemy.Cast<int32_t>() - app.TextureCenters[GAME_TEXTURE_ENEMY], {0xFF, 0, 0xFF, 0xFF})), "I believe this never fails.");
+		es_if(errored(::gpk::grid_copy_alpha(viewOffscreen, enemyView, centerEnemy.Cast<int32_t>() - app.TextureCenters[GAME_TEXTURE_ENEMY], {0xFF, 0, 0xFF, 0xFF})));
 		::drawShipHealthBar(target, app, centerEnemy, halfMetricsEnemy, enemyHealth.Health, (int32_t)(halfMetricsEnemy2y	), ::gpk::GREEN);
 		::drawShipHealthBar(target, app, centerEnemy, halfMetricsEnemy, enemyHealth.Shield, (int32_t)(halfMetricsEnemy2y - 2), ::gpk::CYAN );
 	}
@@ -75,7 +75,7 @@ static	::gpk::error_t						drawShipHealthBar			(::gpk::v2<::gpk::bgra> target, :
 		::gpk::n2<int32_t>														halfMetricsShip								= (shipView.metrics() / 2).Cast<int32_t>();
 		int32_t																		halfMetricsShip2y							= halfMetricsShip.y;
 		::gpk::n2<int32_t>														dstOffset									= gameInstance.Ships.Position[iShip].Cast<int32_t>() - app.TextureCenters[GAME_TEXTURE_SHIP0 + iShip];
-		gerror_if(errored(::gpk::grid_copy_alpha(viewOffscreen, shipView, dstOffset, {0xFF, 0, 0xFF, 0xFF})), "I believe this never fails.");
+		es_if(errored(::gpk::grid_copy_alpha(viewOffscreen, shipView, dstOffset, {0xFF, 0, 0xFF, 0xFF})));
 		::drawShipHealthBar(target, app, centerShip, halfMetricsShip, enemyHealth.Health, (int32_t)(halfMetricsShip2y		), ::gpk::GREEN);
 		::drawShipHealthBar(target, app, centerShip, halfMetricsShip, enemyHealth.Shield, (int32_t)(halfMetricsShip2y - 2	), ::gpk::CYAN );
 	}
@@ -214,7 +214,7 @@ static	const ::gpk::bgra								powerupFamilyColorPalette []				=
 static	::gpk::error_t										drawPowerup						(::gpk::v2<::gpk::bgra> target, POWERUP_FAMILY powFamily, const ::gpk::view<::gpk::view_grid<::gpk::bgra>>& texturePowerup, const ::gpk::n2<int32_t>& textureCenterPowerup, const ::gpk::n2f& powPosition, const ::gpk::view<const ::gpk::n2<int32_t>>& lightPos, double time)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	::gpk::n2<int32_t>														position									= powPosition.Cast<int32_t>();
 	for(uint32_t iTex = 0, textureCount = texturePowerup.size(); iTex < textureCount; ++iTex)
-		gerror_if(errored(::gpk::grid_copy_alpha(target, texturePowerup[iTex], position - textureCenterPowerup, {0xFF, 0, 0xFF, 0xFF})), "I believe this never fails.");
+		es_if(errored(::gpk::grid_copy_alpha(target, texturePowerup[iTex], position - textureCenterPowerup, {0xFF, 0, 0xFF, 0xFF})));
 	::gpk::n2<int32_t>															centerPowerup								= position;
 	uint32_t																	lightIndex									= (uint32_t)time % (lightPos.size() / 2);
 	const ::gpk::n2<int32_t>												& selectedLightPos0							= lightPos[lightIndex + 0]
@@ -332,7 +332,7 @@ static				::gpk::error_t										drawCrosshairAligned						(::gpk::v2<::gpk::bg
 		::gpk::n2<int32_t>														posXHair									= gameInstance.PositionCrosshair[iShip].Cast<int32_t>();
 		if(false == gameInstance.Ships.LineOfFire[iShip])
 			::drawCrosshairDiagonal(target, beaconTimer, posXHair);
-		gerror_if(errored(::gpk::grid_copy_alpha(framework.RootWindow.BackBuffer->Color.View, app.Processed[GAME_TEXTURE_CROSSHAIR].View, posXHair - app.TextureCenters[GAME_TEXTURE_CROSSHAIR], {0xFF, 0, 0xFF, 0xFF})), "I believe this never fails.");
+		es_if(errored(::gpk::grid_copy_alpha(framework.RootWindow.BackBuffer->Color.View, app.Processed[GAME_TEXTURE_CROSSHAIR].View, posXHair - app.TextureCenters[GAME_TEXTURE_CROSSHAIR], {0xFF, 0, 0xFF, 0xFF})));
 		if(gameInstance.Ships.LineOfFire[iShip])
 			::drawCrosshairAligned(target, beaconTimer, posXHair);
 	}

@@ -10,11 +10,11 @@
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 
 
-::gpk::error_t				setup		(::gme::SApplication & app)						{
+::gpk::error_t			setup		(::gme::SApplication & app)						{
 	::gpk::SFramework				& framework				= app.Framework;
 	::gpk::SWindow					& mainWindow			= framework.RootWindow;
 	mainWindow.Size														= {1280, 720};
-	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)), "Failed to create main window. %s", " why?!");
+	es_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
 	::gpk::SGUI						& gui					= *framework.GUI;
 
 	const int32_t														iShades					= 16;
@@ -188,7 +188,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	//}
 
 	//char															bmpFileName2	[]							= "Codepage-437-24.bmp";
-	//gerror_if(errored(::gpk::bmpOrBmgLoad(bmpFileName2, app.TextureFont)), "");
+	//es_if(errored(::gpk::bmpOrBmgLoad(bmpFileName2, app.TextureFont)), "");
 	//::gpk::SImage<::gpk::bgra>								& verticalAtlas								= app.VerticalAtlas;
 	//const ::gpk::n2<uint32_t>									fontCharSize								= {9, 16};
 	//verticalAtlas.resize(fontCharSize.x, fontCharSize.y * 256);
@@ -229,7 +229,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	return 0;
 }
 
-::gpk::error_t				update		(::gme::SApplication & app, bool exitSignal)	{
+::gpk::error_t			update		(::gme::SApplication & app, bool exitSignal)	{
 	//::gpk::STimer															timer;
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, exitSignal, "%s", "Exit requested by runtime.");
 	{
@@ -278,21 +278,21 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	return 0;
 }
 
-::gpk::error_t				cleanup		(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.RootWindow); }
-::gpk::error_t				draw		(::gme::SApplication & app)						{
-	::gpk::STimer															timer;
-	::gpk::pobj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>		target;
+::gpk::error_t			cleanup		(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.RootWindow); }
+::gpk::error_t			draw		(::gme::SApplication & app)						{
+	::gpk::STimer					timer;
+	::gpk::pobj<::gpk::rtbgra8d32>	target;
 	target.create();
 	target->resize(app.Framework.RootWindow.Size, {0xFF, 0x40, 0x7F, 0xFF}, (uint32_t)-1);
 	//::gpk::clearTarget(*target);
 	{
-		::std::lock_guard													lock					(app.LockGUI);
-		::gpk::controlDrawHierarchy(*app.Framework.GUI, 0, target->Color.View);
+		::std::lock_guard				lock					(app.LockGUI);
+		::gpk::guiDraw(*app.Framework.GUI, target->Color.View);
 		::gpk::grid_copy(target->Color.View, app.VerticalAtlas.View);
 	}
 	{
-		::std::lock_guard													lock					(app.LockRender);
-		app.Offscreen													= target;
+		::std::lock_guard				lock					(app.LockRender);
+		app.Offscreen				= target;
 	}
 	//timer.Frame();
 	//warning_printf("Draw time: %f.", (float)timer.LastTimeSeconds);

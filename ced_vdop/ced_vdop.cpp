@@ -10,16 +10,16 @@
 
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 
-::gpk::error_t				cleanup		(::SApplication & app)						{
+::gpk::error_t			cleanup		(::SApplication & app)						{
 	::klib::shutdownASCIIScreen();
 	return ::gpk::mainWindowDestroy(app.Framework.RootWindow);
 }
 
-::gpk::error_t				setup		(::SApplication & app)						{
+::gpk::error_t			setup		(::SApplication & app)						{
 	::gpk::SFramework				& framework						= app.Framework;
 	::gpk::SWindow					& mainWindow					= framework.RootWindow;
 	mainWindow.Size										= {1280, 720};
-	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)), "Failed to create main window. %s.", "why?!");
+	es_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
 	{ // Build the exit button
 		::gpk::SGUI											& gui								= *framework.GUI;
 		gui.ColorModeDefault							= ::gpk::GUI_COLOR_MODE_3D;
@@ -39,20 +39,20 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 	}
 	srand((uint32_t)time(0));
 
-	const ::gpk::n2<uint32_t>							metricsMap			= app.TextOverlay.MetricsMap;
-	const ::gpk::n2<uint32_t>							metricsLetter		= app.TextOverlay.MetricsLetter;
-	::gpk::SImage<::gpk::bgra>						fontImage;
+	const ::gpk::n2<uint32_t>		metricsMap			= app.TextOverlay.MetricsMap;
+	const ::gpk::n2<uint32_t>		metricsLetter		= app.TextOverlay.MetricsLetter;
+	::gpk::img<::gpk::bgra>			fontImage;
 	::gpk::pngFileLoad(::gpk::vcs{"../gpk_data/images/Codepage_437_24_12x12.png"}, fontImage);
-	::gpk::view_grid<::gpk::SGeometryQuads>					viewGeometries		= {app.TextOverlay.GeometryLetters, {16, 16}};
-	const uint32_t											imagePitch			= metricsLetter.x * metricsMap.x;
+	::gpk::v2<::gpk::SGeometryQuads>viewGeometries		= {app.TextOverlay.GeometryLetters, {16, 16}};
+	const uint32_t					imagePitch			= metricsLetter.x * metricsMap.x;
 
-	::gpk::array_pod<::gpk::STile>							tiles;
+	::gpk::apod<::gpk::STile>		tiles;
 	for(uint32_t y = 0; y < metricsMap.y; ++y)
 	for(uint32_t x = 0; x < metricsMap.x; ++x) {
 		tiles.clear();
-		const uint32_t											asciiCode			= y * app.TextOverlay.MetricsMap.x + x;
-		const ::gpk::n2<uint32_t>							asciiCoords			= {asciiCode %		metricsMap.x, asciiCode / app.TextOverlay.MetricsMap.x};
-		const uint32_t											offsetPixelCoord	= (asciiCoords.y *	metricsLetter.y) * imagePitch + (asciiCoords.x * app.TextOverlay.MetricsLetter.x);
+		const uint32_t					asciiCode			= y * app.TextOverlay.MetricsMap.x + x;
+		const ::gpk::n2<uint32_t>		asciiCoords			= {asciiCode %		metricsMap.x, asciiCode / app.TextOverlay.MetricsMap.x};
+		const uint32_t					offsetPixelCoord	= (asciiCoords.y *	metricsLetter.y) * imagePitch + (asciiCoords.x * app.TextOverlay.MetricsLetter.x);
 		::gpk::geometryBuildTileListFromImage({&fontImage.Texels[offsetPixelCoord], app.TextOverlay.MetricsLetter}, tiles, app.TextOverlay.MetricsLetter.x * app.TextOverlay.MetricsMap.x);
 		::gpk::geometryBuildGridFromTileList(app.TextOverlay.GeometryLetters[asciiCode], ::gpk::view_grid<::gpk::STile>{tiles.begin(), app.TextOverlay.MetricsLetter}, {}, {1, 6.0f, 1});
 	}
@@ -76,8 +76,8 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 	return 0;
 }
 
-int													update				(SApplication & app, bool exitSignal)	{
-	::gpk::SFramework				& framework			= app.Framework;
+::gpk::error_t			update		(SApplication & app, bool exitSignal)	{
+	::gpk::SFramework				& framework	= app.Framework;
 	//::gpk::STimer															timer;
 	(void)exitSignal;
 	//retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, exitSignal, "%s", "Exit requested by runtime.");
@@ -128,20 +128,20 @@ int													update				(SApplication & app, bool exitSignal)	{
 }
 
 static	int											drawPixels
-	( ::gpk::view_grid<::gpk::bgra>				targetPixels
-	, const ::gpk::tri3	<float>					& triangleWorld
-	, const ::gpk::n3		<float>					& normal
-	, const ::gpk::n3		<float>					& lightVector
-	, const ::gpk::rgbaf							& texelColor
-	, ::gpk::array_pod<::gpk::n2<int16_t>>			& pixelCoords
-	, ::gpk::array_pod<::gpk::tri<float>>	& pixelVertexWeights
+	( ::gpk::v2<::gpk::bgra>		targetPixels
+	, const ::gpk::tri3f32			& triangleWorld
+	, const ::gpk::n3f32			& normal
+	, const ::gpk::n3f32			& lightVector
+	, const ::gpk::rgbaf			& texelColor
+	, ::gpk::apod<::gpk::n2i16>		& pixelCoords
+	, ::gpk::apod<::gpk::trif32>	& pixelVertexWeights
 	, double											timeAnimation
 	) {
 	double													lightFactorDirectional		= normal.Dot(lightVector);
 	(void)lightFactorDirectional;
 	for(uint32_t iPixelCoord = 0; iPixelCoord < pixelCoords.size(); ++iPixelCoord) {
-		::gpk::n2<int16_t>									pixelCoord					= pixelCoords		[iPixelCoord];
-		const ::gpk::tri<float>					& vertexWeights				= pixelVertexWeights[iPixelCoord];
+		::gpk::n2i16									pixelCoord					= pixelCoords		[iPixelCoord];
+		const ::gpk::trif32					& vertexWeights				= pixelVertexWeights[iPixelCoord];
 		const ::gpk::n3f32								position					= ::gpk::triangleWeight(vertexWeights, triangleWorld);
 		double													factorWave					= (::gpk::max(0.0, sin(- timeAnimation * 4 + position.y * .75))) * .6;
 		double													factorWave2					= (::gpk::max(0.0, sin(- timeAnimation + position.x * .0125 + position.z * .125))) * .5;
@@ -151,26 +151,26 @@ static	int											drawPixels
 }
 
 int													draw3DCharacter
-	( const ::gpk::view_grid<::gpk::bgra>				& targetPixels
-	, const ::gpk::n2<uint32_t>						& metricsCharacter
-	, const ::gpk::n2<uint32_t>						& metricsMap
-	, const uint8_t											asciiCode
-	, const ::gpk::n3f32							& position
-	, const ::gpk::n3f32							& lightVector
-	, const ::gpk::m4<float>							& matrixView
-	, const ::gpk::view_grid<const ::gpk::SGeometryQuads>	& viewGeometries
-	, ::SDrawCache											& drawCache
-	, ::gpk::view_grid<uint32_t>							& depthBuffer
-	, double												timeAnimation
-	, const ::gpk::bgra								& color
+	( const ::gpk::v2<::gpk::bgra>	& targetPixels
+	, const ::gpk::n2u32			& metricsCharacter
+	, const ::gpk::n2u32			& metricsMap
+	, const uint8_t					asciiCode
+	, const ::gpk::n3f32			& position
+	, const ::gpk::n3f32			& lightVector
+	, const ::gpk::m4f32			& matrixView
+	, const ::gpk::v2<const ::gpk::SGeometryQuads>	& viewGeometries
+	, ::SDrawCache					& drawCache
+	, ::gpk::v2u32					& depthBuffer
+	, double						timeAnimation
+	, const ::gpk::bgra				& color
 	)	{
-	::gpk::m4<float>									matrixScale				;
-	::gpk::m4<float>									matrixPosition			;
-	::gpk::m4<float>									matrixRotation			;
+	::gpk::m4f32					matrixScale				;
+	::gpk::m4f32					matrixPosition			;
+	::gpk::m4f32					matrixRotation			;
 	matrixRotation.Identity();
-	::gpk::n3f32									translation				= {};
-	translation.x										= float(position.x * metricsCharacter.x);
-	translation.z										= float(position.z * metricsCharacter.y);
+	::gpk::n3f32					translation				= {};
+	translation.x				= float(position.x * metricsCharacter.x);
+	translation.z				= float(position.z * metricsCharacter.y);
 	if(asciiCode == 0x05) { matrixRotation.RotationX(-::gpk::math_pi_2); translation.y += metricsCharacter.y / 2; }
 	if(asciiCode == 0x0B) { matrixRotation.RotationX(-::gpk::math_pi_2); translation.y += metricsCharacter.y / 2; }
 	if(asciiCode == 0x0C) { matrixRotation.RotationX(-::gpk::math_pi_2); translation.y += metricsCharacter.y / 2; }
@@ -198,7 +198,7 @@ int													draw3DCharacter
 }
 
 int													draw					(SApplication & app) {
-	::gpk::pobj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>		target;
+	::gpk::pobj<::gpk::rtbgra8d32>	target;
 	target.create();
 	target->resize(app.Framework.RootWindow.Size, ::gpk::DARKGREEN, 0xFFFFFFFFU);
 	::gpk::view_grid<::gpk::bgra>						targetPixels			= target->Color;
@@ -284,12 +284,12 @@ int													draw					(SApplication & app) {
 	}
 
 	{
-		::std::lock_guard														lock					(app.LockGUI);
-		::gpk::controlDrawHierarchy(*app.Framework.GUI, 0, target->Color.View);
+		::std::lock_guard			lock					(app.LockGUI);
+		::gpk::guiDraw(*app.Framework.GUI, target->Color.View);
 	}
 	{
-		::std::lock_guard														lock					(app.LockRender);
-		app.Offscreen														= target;
+		::std::lock_guard			lock					(app.LockRender);
+		app.Offscreen			= target;
 	}
 
 	return 0;

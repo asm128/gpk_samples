@@ -9,17 +9,17 @@
 
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 
-::gpk::error_t				cleanup		(::gme::SApplication & app)						{
+::gpk::error_t			cleanup		(::gme::SApplication & app)						{
 	app.LobbyServer.Stop();
 	::gpk::mainWindowDestroy(app.Framework.RootWindow);
 	::gpk::tcpipShutdown();
 	return 0;
 }
 
-::gpk::error_t				setup		(::gme::SApplication & app)						{
+::gpk::error_t			setup		(::gme::SApplication & app)						{
 	::gpk::SFramework				& framework					= app.Framework;
 	::gpk::SWindow					& mainWindow				= framework.RootWindow;
-	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)), "Failed to create main window why?!");
+	es_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
 	::gpk::SGUI						& gui						= *framework.GUI;
 	app.IdExit															= ::gpk::controlCreate(gui);
 	::gpk::SControl					& controlExit				= gui.Controls.Controls[app.IdExit];
@@ -56,7 +56,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	return 0;
 }
 
-::gpk::error_t				update		(::gme::SApplication & app, bool exitSignal)	{
+::gpk::error_t			update		(::gme::SApplication & app, bool exitSignal)	{
 	::gpk::STimer															timer;
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, exitSignal, "Exit requested by runtime.");
 	{
@@ -131,14 +131,14 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	return 0;
 }
 
-::gpk::error_t				draw		(::gme::SApplication & app)						{
+::gpk::error_t			draw		(::gme::SApplication & app)						{
 	::gpk::STimer					timer;
 	::gpk::pobj<::gpk::rtbgra8d32>	target;
 	target.create();
 	target->resize(app.Framework.RootWindow.Size, {0xFF, 0x40, 0x7F, 0xFF}, (uint32_t)-1);
 	{
 		::std::lock_guard				lock				(app.LockGUI);
-		::gpk::controlDrawHierarchy(*app.Framework.GUI, 0, target->Color.View);
+		::gpk::guiDraw(*app.Framework.GUI, target->Color.View);
 	}
 	{
 		::std::lock_guard				lock				(app.LockRender);

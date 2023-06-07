@@ -37,8 +37,8 @@ namespace gme // I'm gonna use a different namespace in order to test a few thin
 							::std::mutex														LockRender						;
 
 							::gpk::SFramework													Framework;
-							::gpk::pobj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>	Offscreen						= {};
-							::gpk::array_obj<::gpk::SImage<::gpk::bgra>>					PNGImages						= {};
+							::gpk::pobj<::gpk::rtbgra8d32>	Offscreen						= {};
+							::gpk::aobj<::gpk::img8bgra>					PNGImages						= {};
 
 							int32_t																IdExit							= -1;
 
@@ -51,7 +51,7 @@ namespace gme // I'm gonna use a different namespace in order to test a few thin
 							//::gpk::tri3<float>											CubePositions	[12]			= {};
 							::gpk::SModelGeometryIndexed<float, uint8_t>						ModelGeometry;
 
-							::gpk::pobj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>	Buffer3D;
+							::gpk::pobj<::gpk::rtbgra8d32>	Buffer3D;
 							SVertexCache														VertexCache;
 
 							int32_t																IdFrameRateUpdate				= -1;

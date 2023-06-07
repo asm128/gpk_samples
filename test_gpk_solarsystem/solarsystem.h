@@ -219,7 +219,7 @@ namespace ssg
 	};
 
 	::gpk::error_t									solarSystemSetup				(::ssg::SSolarSystemGame & sunsystem, const ::gpk::vcc & filename);
-	::gpk::error_t									solarSystemUpdate				(::ssg::SSolarSystemGame & sunsystem, double secondsLastFrame, ::gpk::pobj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>> & target);
+	::gpk::error_t									solarSystemUpdate				(::ssg::SSolarSystemGame & sunsystem, double secondsLastFrame, ::gpk::pobj<::gpk::rtbgra8d32> & target);
 
 } // namespace
 

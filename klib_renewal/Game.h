@@ -14,8 +14,8 @@
 
 namespace klib
 {
-	static				double										getFinalSight			(double initialSight, const CCharacter& playerAgent)						{
-		double																finalSight				= initialSight;
+	static	double	getFinalSight	(double initialSight, const CCharacter& playerAgent)						{
+		double				finalSight		= initialSight;
 		if(::gpk::bit_true(playerAgent.ActiveBonus.Status.Status, COMBAT_STATUS_SHOCK	))	finalSight *= 1.5	;
 		if(::gpk::bit_true(playerAgent.ActiveBonus.Status.Status, COMBAT_STATUS_BURN	))	finalSight *= 1.3	;
 		if(::gpk::bit_true(playerAgent.ActiveBonus.Status.Status, COMBAT_STATUS_RAGE	))	finalSight *= 1.2	;
@@ -32,16 +32,16 @@ namespace klib
 #define SIGHT_OFFSET	1.7
 #define RANGE_OFFSET	1.7
 
-	static inline		double						getFinalSight			(const CCharacter& playerAgent, const SEntityPoints& playerAgentPoints)						{	return getFinalSight(playerAgentPoints.Fitness	.Sight + SIGHT_OFFSET, playerAgent);	}
-	static inline		double						getFinalRange			(const CCharacter& playerAgent, const SEntityPoints& playerAgentPoints)						{	return getFinalSight(playerAgentPoints.Attack	.Range + RANGE_OFFSET, playerAgent);	}
+	stainli	double	getFinalSight	(const CCharacter & playerAgent, const SEntityPoints & playerAgentPoints)	{ return getFinalSight(playerAgentPoints.Fitness.Sight + SIGHT_OFFSET, playerAgent); }
+	stainli	double	getFinalRange	(const CCharacter & playerAgent, const SEntityPoints & playerAgentPoints)	{ return getFinalSight(playerAgentPoints.Attack .Range + RANGE_OFFSET, playerAgent); }
 
 	struct SWeightedDisplay {
-							::gpk::rt<char, uint16_t>	Screen					= {};
-							::gpk::SImage<float	>		DisplayWeights			= {};
-							::gpk::SImage<float	>		Speed					= {};
-							::gpk::SImage<float	>		SpeedTarget				= {};
+		::gpk::rt<char, uint16_t>	Screen					= {};
+		::gpk::imgf32				DisplayWeights			= {};
+		::gpk::imgf32				Speed					= {};
+		::gpk::imgf32				SpeedTarget				= {};
 
-		inline				::gpk::error_t							Resize					(::gpk::n2<uint32_t> newSize)															{
+		inline	::gpk::error_t		Resize					(::gpk::n2u32 newSize) {
 			Screen			.resize(newSize, ' ', (uint16_t)::klib::ASCII_COLOR_INDEX_WHITE);
 			DisplayWeights	.resize(newSize, 0.0f);
 			Speed			.resize(newSize, 0.0f);
@@ -49,7 +49,7 @@ namespace klib
 			SpeedTarget		.resize(newSize, 0.0f);
 			return 0;
 		}
-		inline				void									Clear					()																							{
+		inline	void				Clear					() {
 			::klib::clearGrid(Screen.Color			.View, ' ');
 			::klib::clearGrid(Screen.DepthStencil	.View, (uint16_t)::klib::ASCII_COLOR_INDEX_WHITE);
 			::klib::clearGrid(DisplayWeights		.View, 0.0f);
@@ -79,10 +79,10 @@ namespace klib
 
 	// Game Flags tell us about the current state of the application.
 	GDEFINE_ENUM_TYPE(GAME_EFFECT, uint8_t);
-	GDEFINE_ENUM_VALUE(GAME_EFFECT, FOGOFWAR	, 0x01		);
-	GDEFINE_ENUM_VALUE(GAME_EFFECT, TEAMONLY	, 0x02		);
-	GDEFINE_ENUM_VALUE(GAME_EFFECT, AOEFFECT	, 0x04		);
-	GDEFINE_ENUM_VALUE(GAME_EFFECT, CHEATSON	, 0x08		);
+	GDEFINE_ENUM_VALUE(GAME_EFFECT, FOGOFWAR, 0x01);
+	GDEFINE_ENUM_VALUE(GAME_EFFECT, TEAMONLY, 0x02);
+	GDEFINE_ENUM_VALUE(GAME_EFFECT, AOEFFECT, 0x04);
+	GDEFINE_ENUM_VALUE(GAME_EFFECT, CHEATSON, 0x08);
 
 	// Game cheats.
 	GDEFINE_ENUM_TYPE(GAME_CHEAT, uint16_t);
@@ -113,22 +113,22 @@ namespace klib
 	GDEFINE_ENUM_VALUE(GAME_EVENT, CANCEL	, 0x02);
 
 	struct SGameEvent {
-							::klib::GAME_EVENT						Event;
-							::klib::SGameState						GameState;
-							//::klib::ENTITY_TYPE						EntityType;
-							//::klib::ENTITY_GRADE					EntityGrade;
-							//::klib::SEntity							Entity;
-							int64_t									Value;
+		::klib::GAME_EVENT		Event;
+		::klib::SGameState		GameState;
+		//::klib::ENTITY_TYPE	EntityType;
+		//::klib::ENTITY_GRADE	EntityGrade;
+		//::klib::SEntity		Entity;
+		int64_t					Value;
 	};
 #pragma pack(pop)
-	stacxpr const uint32_t		SHOP_EXIT_VALUE				= 0x7FFF;
+	stacxpr	uint32_t		SHOP_EXIT_VALUE				= 0x7FFF;
 
 	struct SBuyable {
-		int16_t							Definition;
-		int16_t							Grade;
-		int64_t							Price;
-		int64_t							MaintenanceCost;
-		::gpk::array_pod<char>		Name;
+		int16_t					Definition;
+		int16_t					Grade;
+		int64_t					Price;
+		int64_t					MaintenanceCost;
+		::gpk::apod<char>		Name;
 	};
 
 	struct SShopMenus {
@@ -152,83 +152,83 @@ namespace klib
 		::klib::SMenuHeader<::klib::SBuyable>	MenuItem					= {{::klib::SHOP_EXIT_VALUE},	::gpk::view_const_string{"Item"			" a la carte"}, 48};
 		::klib::SMenuHeader<::klib::SBuyable>	MenuAgent					= {{::klib::SHOP_EXIT_VALUE},	::gpk::view_const_string{"Agent"		" a la carte"}, 48};
 
-		::gpk::array_pod<char>				NamesAccessory		[256]	= {};
-		::gpk::array_pod<char>				NamesStageProp		[256]	= {};
-		::gpk::array_pod<char>				NamesFacility		[256]	= {};
-		::gpk::array_pod<char>				NamesVehicle		[256]	= {};
-		::gpk::array_pod<char>				NamesProfession		[256]	= {};
-		::gpk::array_pod<char>				NamesWeapon			[256]	= {};
-		::gpk::array_pod<char>				NamesArmor			[256]	= {};
-		::gpk::array_pod<char>				NamesItem			[256]	= {};
-		::gpk::array_pod<char>				NamesAgent			[256]	= {};
+		::gpk::apod<char>				NamesAccessory		[256]	= {};
+		::gpk::apod<char>				NamesStageProp		[256]	= {};
+		::gpk::apod<char>				NamesFacility		[256]	= {};
+		::gpk::apod<char>				NamesVehicle		[256]	= {};
+		::gpk::apod<char>				NamesProfession		[256]	= {};
+		::gpk::apod<char>				NamesWeapon			[256]	= {};
+		::gpk::apod<char>				NamesArmor			[256]	= {};
+		::gpk::apod<char>				NamesItem			[256]	= {};
+		::gpk::apod<char>				NamesAgent			[256]	= {};
 	};
 
-	::gpk::error_t												initBuyMenus		(const ::klib::SEntityTables & entityTables, ::klib::SShopMenus& menus);
-	::gpk::error_t												reinitBuyMenus		(const ::klib::SEntityTables & entityTables, ::klib::SCharacterInventory & playerInventory, ::klib::SShopMenus& menus);
+	::gpk::error_t					initBuyMenus		(const ::klib::SEntityTables & entityTables, ::klib::SShopMenus& menus);
+	::gpk::error_t					reinitBuyMenus		(const ::klib::SEntityTables & entityTables, ::klib::SCharacterInventory & playerInventory, ::klib::SShopMenus& menus);
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------
 	struct SGame {
-							// Game Flags tell us about the			current state of the application.
-							::klib::GAME_FLAGS						Flags							= (::klib::GAME_FLAGS)(::klib::GAME_FLAGS_NETWORK_ENABLED | ::klib::GAME_FLAGS_TURN_BUSY);
-							::klib::GAME_MODE						Mode							= ::klib::GAME_MODE_CAMPAIGN;	// This is the default because it's the only available mode at the moment
-							::klib::SGameState						State							= {::klib::GAME_STATE_MENU_MAIN,};
-							::klib::SGameState						PreviousState					= {::klib::GAME_STATE_MENU_MAIN,};
-							uint64_t								ServerTime						= 0;
-							int64_t									Seed							= 0;
+		// Game Flags tell us about the			current state of the application.
+		::klib::GAME_FLAGS						Flags							= (::klib::GAME_FLAGS)(::klib::GAME_FLAGS_NETWORK_ENABLED | ::klib::GAME_FLAGS_TURN_BUSY);
+		::klib::GAME_MODE						Mode							= ::klib::GAME_MODE_CAMPAIGN;	// This is the default because it's the only available mode at the moment
+		::klib::SGameState						State							= {::klib::GAME_STATE_MENU_MAIN,};
+		::klib::SGameState						PreviousState					= {::klib::GAME_STATE_MENU_MAIN,};
+		uint64_t								ServerTime						= 0;
+		int64_t									Seed							= 0;
 
-							::klib::SGamePlayer						Players[MAX_PLAYER_TYPES]		= {};
+		::klib::SGamePlayer						Players[MAX_PLAYER_TYPES]		= {};
 
-							::klib::SInput							FrameInput						= {};
-							::klib::STimer							FrameTimer						= {};
+		::klib::SInput							FrameInput						= {};
+		::klib::STimer							FrameTimer						= {};
 
-							// Tactical board.
-							::klib::STacticalInfo					TacticalInfo					= {};
+		// Tactical board.
+		::klib::STacticalInfo					TacticalInfo					= {};
 
-							// Displays.
-							::klib::SWeightedDisplay				TacticalDisplay					= {};
-							::klib::SWeightedDisplay				GlobalDisplay					= {};
+		// Displays.
+		::klib::SWeightedDisplay				TacticalDisplay					= {};
+		::klib::SWeightedDisplay				GlobalDisplay					= {};
 
-							// Feedback messages.
-							::klib::SGameMessages					Messages;
-							::gpk::array_pod<::klib::SGameEvent>	Events;
+		// Feedback messages.
+		::klib::SGameMessages					Messages;
+		::gpk::array_pod<::klib::SGameEvent>	Events;
 
-							// For the special effect
-							::klib::SEntityTables					EntityTables					= {};
+		// For the special effect
+		::klib::SEntityTables					EntityTables					= {};
 
-							::std::mutex							PlayerMutex						= {};
-							::std::mutex							ServerTimeMutex					= {};
+		::std::mutex							PlayerMutex						= {};
+		::std::mutex							ServerTimeMutex					= {};
 
-							::klib::SShopMenus						ShopMenus;
+		::klib::SShopMenus						ShopMenus;
 
-							void									ClearDisplays					()																						{
+		void									ClearDisplays					()																						{
 			TacticalDisplay	.Clear();
 			GlobalDisplay	.Clear();
 		}
 
-		inline				void									LogAuxStateMessage				()	{ Messages.LogAuxStateMessage	(); }
-		inline				void									LogAuxMessage					()	{ Messages.LogAuxMessage		(); }
-		inline				void									LogAuxSuccess					()	{ Messages.LogAuxSuccess		(); }
-		inline				void									LogAuxError						()	{ Messages.LogAuxError			(); }
-		inline				void									LogAuxMiss						()	{ Messages.LogAuxMiss			(); }
+		inline	void		LogAuxStateMessage				()	{ Messages.LogAuxStateMessage	(); }
+		inline	void		LogAuxMessage					()	{ Messages.LogAuxMessage		(); }
+		inline	void		LogAuxSuccess					()	{ Messages.LogAuxSuccess		(); }
+		inline	void		LogAuxError						()	{ Messages.LogAuxError			(); }
+		inline	void		LogAuxMiss						()	{ Messages.LogAuxMiss			(); }
 
-		inline				void									LogStateMessage					()	{ Messages.LogStateMessage	(); }
-		inline				void									LogMessage						()	{ Messages.LogMessage		(); }
-		inline				void									LogSuccess						()	{ Messages.LogSuccess		(); }
-		inline				void									LogError						()	{ Messages.LogError			(); }
-		inline				void									LogMiss							()	{ Messages.LogMiss			(); }
-		inline				void									ClearMessages					()	{ Messages.ClearMessages	(); }
+		inline	void		LogStateMessage					()	{ Messages.LogStateMessage	(); }
+		inline	void		LogMessage						()	{ Messages.LogMessage		(); }
+		inline	void		LogSuccess						()	{ Messages.LogSuccess		(); }
+		inline	void		LogError						()	{ Messages.LogError			(); }
+		inline	void		LogMiss							()	{ Messages.LogMiss			(); }
+		inline	void		ClearMessages					()	{ Messages.ClearMessages	(); }
 	};	// struct
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------
 	// functions
-						::gpk::error_t							initGame						(::klib::SGame & instanceGame);
-						::gpk::error_t							resetGame						(::klib::SGame & instanceGame);
-						::gpk::error_t							eventProcess					(::klib::SGame & instanceGame);
-						::gpk::error_t							initTacticalMap					(::klib::SGame & instanceGame);
-						::gpk::error_t							handleMissionEnd				(::klib::SGame & instanceGame);
-						::gpk::error_t							showMenu						(::klib::SGame & instanceGame);
-	static inline		::klib::PLAYER_INDEX					getCurrentPlayerIndex			(const ::klib::STacticalInfo& tacticalInfo)				{ return ( tacticalInfo.CurrentPlayer == -1) ? (::klib::PLAYER_INDEX)-1 : tacticalInfo.Setup.Players[tacticalInfo.CurrentPlayer]; }
-						int64_t									missionCost						(const ::klib::SGamePlayer& player, const SSquad& squadSetup, uint32_t maxAgents = ::klib::MAX_AGENT_SQUAD_SLOTS);
+	::gpk::error_t							initGame						(::klib::SGame & instanceGame);
+	::gpk::error_t							resetGame						(::klib::SGame & instanceGame);
+	::gpk::error_t							eventProcess					(::klib::SGame & instanceGame);
+	::gpk::error_t							initTacticalMap					(::klib::SGame & instanceGame);
+	::gpk::error_t							handleMissionEnd				(::klib::SGame & instanceGame);
+	::gpk::error_t							showMenu						(::klib::SGame & instanceGame);
+	stainli	::klib::PLAYER_INDEX			getCurrentPlayerIndex			(const ::klib::STacticalInfo& tacticalInfo)				{ return ( tacticalInfo.CurrentPlayer == -1) ? (::klib::PLAYER_INDEX)-1 : tacticalInfo.Setup.Players[tacticalInfo.CurrentPlayer]; }
+	int64_t									missionCost						(const ::klib::SGamePlayer& player, const SSquad& squadSetup, uint32_t maxAgents = ::klib::MAX_AGENT_SQUAD_SLOTS);
 } // namespace
 
 #endif // __GAME_H__91827309126391263192312312354__

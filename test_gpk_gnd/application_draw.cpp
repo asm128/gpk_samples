@@ -225,7 +225,7 @@ static				::gpk::error_t										drawTriangles
 			renderCache.TrianglePixelCoords.clear();
 			renderCache.TrianglePixelWeights.clear();
 			const ::gpk::tri3<float>												& tri3DToDraw								= renderCache.Triangle3dToDraw[iTriangle];
-			gerror_if(errored(::gpk::drawTriangle(targetDepthView, nearFar, tri3DToDraw, renderCache.TrianglePixelCoords, renderCache.TrianglePixelWeights)), "Not sure if these functions could ever fail");
+			es_if(errored(::gpk::drawTriangle(targetDepthView, nearFar, tri3DToDraw, renderCache.TrianglePixelCoords, renderCache.TrianglePixelWeights)));
 			++renderCache.TrianglesDrawn;
 			const ::gpk::tri<uint32_t>										& vertexIndices								= vertexIndexList[renderCache.Triangle3dIndices[iTriangle]];
 			const ::gpk::tri3<float>												triangle3DPositions							=
@@ -250,9 +250,9 @@ static				::gpk::error_t										drawTriangles
 				}
 			}
 			if(wireframe) {
-				gerror_if(errored(::gpk::drawLine(targetView.metrics().Cast<uint16_t>(), ::gpk::line3<float>{renderCache.Triangle3dToDraw[iTriangle].A, renderCache.Triangle3dToDraw[iTriangle].B}, renderCache.WireframePixelCoords)), "Not sure if these functions could ever fail");
-				gerror_if(errored(::gpk::drawLine(targetView.metrics().Cast<uint16_t>(), ::gpk::line3<float>{renderCache.Triangle3dToDraw[iTriangle].B, renderCache.Triangle3dToDraw[iTriangle].C}, renderCache.WireframePixelCoords)), "Not sure if these functions could ever fail");
-				gerror_if(errored(::gpk::drawLine(targetView.metrics().Cast<uint16_t>(), ::gpk::line3<float>{renderCache.Triangle3dToDraw[iTriangle].C, renderCache.Triangle3dToDraw[iTriangle].A}, renderCache.WireframePixelCoords)), "Not sure if these functions could ever fail");
+				es_if(errored(::gpk::drawLine(targetView.metrics().Cast<uint16_t>(), ::gpk::line3<float>{renderCache.Triangle3dToDraw[iTriangle].A, renderCache.Triangle3dToDraw[iTriangle].B}, renderCache.WireframePixelCoords)));
+				es_if(errored(::gpk::drawLine(targetView.metrics().Cast<uint16_t>(), ::gpk::line3<float>{renderCache.Triangle3dToDraw[iTriangle].B, renderCache.Triangle3dToDraw[iTriangle].C}, renderCache.WireframePixelCoords)));
+				es_if(errored(::gpk::drawLine(targetView.metrics().Cast<uint16_t>(), ::gpk::line3<float>{renderCache.Triangle3dToDraw[iTriangle].C, renderCache.Triangle3dToDraw[iTriangle].A}, renderCache.WireframePixelCoords)));
 			}
 		}
 	return 0;
@@ -283,12 +283,12 @@ static				::gpk::error_t										drawTriangles
 	( ::gpk::SRenderCache												& renderCache
 	, ::gpk::SSceneTransforms											& transforms
 	, ::gpk::SSceneCamera												& camera
-	, ::gpk::SRenderTarget<::gpk::bgra, uint32_t>					& target
+	, ::gpk::rtbgra8d32					& target
 	, const ::gpk::SModelPivot<float>									& modelPivot
 	, const ::gpk::n3f32										& lightDir
 	, const ::gpk::SModelGND											& modelGND
 	, const ::gpk::SRSWWorldLight										& directionalLight
-	, const ::gpk::view<const ::gpk::SImage<::gpk::bgra>>	& textures
+	, const ::gpk::view<const ::gpk::img8bgra>	& textures
 	, const ::gpk::view<const ::gpk::SLightInfoRSW>				& lights
 	, bool																wireframe
 	) {	// --- This function will draw some coloured symbols in each cell of the ASCII screen.

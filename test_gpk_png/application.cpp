@@ -12,27 +12,27 @@
 
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 
-::gpk::error_t				cleanup		(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.RootWindow); }
-::gpk::error_t				setup		(::gme::SApplication & app)						{
+::gpk::error_t			cleanup		(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.RootWindow); }
+::gpk::error_t			setup		(::gme::SApplication & app)						{
 	::gpk::SFramework				& framework							= app.Framework;
 	::gpk::SWindow					& mainWindow						= framework.RootWindow;
 	mainWindow.Size														= {1280, 720};
-	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)), "Failed to create main window. %s.", "why?!");
+	es_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
 	{ // Build the exit button
-		::gpk::SGUI																& gui								= *framework.GUI;
-		gui.ColorModeDefault												= ::gpk::GUI_COLOR_MODE_3D;
-		gui.ThemeDefault													= ::gpk::ASCII_COLOR_DARKGREEN * 16 + 7;
-		app.IdExit															= ::gpk::controlCreate(gui);
-		::gpk::SControl															& controlExit						= gui.Controls.Controls[app.IdExit];
-		controlExit.Area													= {{}, {64, 20}};
-		controlExit.Border													= {10, 10, 10, 10};
-		controlExit.Margin													= {1, 1, 1, 1};
-		controlExit.Align													= ::gpk::ALIGN_BOTTOM_RIGHT;
-		::gpk::SControlText														& controlText						= gui.Controls.Text[app.IdExit];
-		controlText.Text													= "Exit";
-		controlText.Align													= ::gpk::ALIGN_CENTER;
-		::gpk::SControlConstraints												& controlConstraints				= gui.Controls.Constraints[app.IdExit];
-		controlConstraints.AttachSizeToControl								= {app.IdExit, -1};
+		::gpk::SGUI									& gui								= *framework.GUI;
+		gui.ColorModeDefault					= ::gpk::GUI_COLOR_MODE_3D;
+		gui.ThemeDefault						= ::gpk::ASCII_COLOR_DARKGREEN * 16 + 7;
+		app.IdExit								= ::gpk::controlCreate(gui);
+		::gpk::SControl								& controlExit						= gui.Controls.Controls[app.IdExit];
+		controlExit.Area						= {{}, {64, 20}};
+		controlExit.Border						= {10, 10, 10, 10};
+		controlExit.Margin						= {1, 1, 1, 1};
+		controlExit.Align						= ::gpk::ALIGN_BOTTOM_RIGHT;
+		::gpk::SControlText							& controlText						= gui.Controls.Text[app.IdExit];
+		controlText.Text						= "Exit";
+		controlText.Align						= ::gpk::ALIGN_CENTER;
+		::gpk::SControlConstraints					& controlConstraints				= gui.Controls.Constraints[app.IdExit];
+		controlConstraints.AttachSizeToControl	= {app.IdExit, -1};
 		::gpk::controlSetParent(gui, app.IdExit, -1);
 	}
 
@@ -55,7 +55,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 				::gpk::jsonExpressionResolve({subscriptExpression, lenExpression}, jsonReader, indexJSONNodeArrayPNGFileNames, fileNamePNG);
 				fullPathPNG.clear();
 				::gpk::pathNameCompose(pathPNGSuite, fileNamePNG, fullPathPNG);
-				gerror_if(errored(::gpk::pngFileLoad(pngDataCacheForFasterLoad, {fullPathPNG.begin(), fullPathPNG.size()}, app.PNGImages[iFile])), "Failed to load file: %s.", fullPathPNG.begin());
+				e_if(errored(::gpk::pngFileLoad(pngDataCacheForFasterLoad, {fullPathPNG.begin(), fullPathPNG.size()}, app.PNGImages[iFile])), "Failed to load file: %s.", fullPathPNG.begin());
 			}
 		}
 		{
@@ -96,15 +96,15 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 	return 0;
 }
 
-::gpk::error_t				update		(::gme::SApplication & app, bool exitSignal)	{
+::gpk::error_t			update		(::gme::SApplication & app, bool exitSignal)	{
 	//::gpk::STimer															timer;
-	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, exitSignal, "%s", "Exit requested by runtime.");
+	rvis_if(::gpk::APPLICATION_STATE_EXIT, exitSignal);
 	{
 		::std::lock_guard														lock						(app.LockRender);
 		app.Framework.RootWindow.BackBuffer									= app.Offscreen;
 	}
 	::gpk::SFramework				& framework					= app.Framework;
-	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework), "%s", "Exit requested by framework update.");
+	rvis_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework));
 
 	::gpk::SGUI						& gui						= *framework.GUI;
 	::gpk::array_pod<uint32_t>												controlsToProcess			= {};
@@ -123,10 +123,10 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 	return 0;
 }
 
-::gpk::error_t				draw		(::gme::SApplication & app)							{
+::gpk::error_t			draw		(::gme::SApplication & app)							{
 	//::gpk::STimer															timer;
 	(void)app;
-	::gpk::pobj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>		target;
+	::gpk::pobj<::gpk::rtbgra8d32>	target;
 	target.create();
 	target->resize(app.Framework.RootWindow.Size, {}, 0xFFFFFFFFU);
 	for(uint32_t y = 0; y < target->Color.View.metrics().y; ++y)
@@ -136,8 +136,8 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 	}
 
 	for(uint32_t iFile = 0; iFile < app.PNGImages.size(); ++iFile) {
-		const uint32_t															offsetX					= (iFile * 64);
-		::gpk::n2<uint32_t>												position				= {offsetX % (target->Color.View.metrics().x - 64), offsetX / (target->Color.View.metrics().x - 64) * 64};
+		const uint32_t		offsetX			= (iFile * 64);
+		::gpk::n2u32		position		= {offsetX % (target->Color.View.metrics().x - 64), offsetX / (target->Color.View.metrics().x - 64) * 64};
 		::gpk::grid_copy_blend(target->Color.View, app.PNGImages[iFile].View, position);
 		//::gpk::grid_scale_alpha(target->Color.View, app.PNGImages[iFile].View, position.Cast<int32_t>(), app.PNGImages[iFile].View.metrics().Cast<int32_t>() * (1 + (.01 * iFile)));
 	}
@@ -153,12 +153,13 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 
 	//::gpk::clearTarget(*target);
 	{
-		::std::lock_guard														lock					(app.LockGUI);
-		::gpk::controlDrawHierarchy(*app.Framework.GUI, 0, target->Color.View);
+		::std::lock_guard		lock					(app.LockGUI);
+
+		::gpk::guiDraw(*app.Framework.GUI, target->Color.View);
 	}
 	{
-		::std::lock_guard														lock					(app.LockRender);
-		app.Offscreen														= target;
+		::std::lock_guard		lock					(app.LockRender);
+		app.Offscreen		= target;
 	}
 	//timer.Frame();
 	//warning_printf("Draw time: %f.", (float)timer.LastTimeSeconds);
