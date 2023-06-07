@@ -34,19 +34,19 @@ static	int											primalityTest						(uint64_t number)						{
 	return 1;
 }
 
-int													main						()			{
-	::gpk::vcs												 signatureToEncode []	=
+int							main						()			{
+	::gpk::vcs						signatureToEncode []	=
 		{ "Last Chance! - CGI Interceptor - asm128 (c) 2009-2019",
 		};
 	{
-		::gpk::au8												testBytes;
-		::gpk::au8												loadedBytes;
-		::gpk::vcs												fileName					= "test_secure.bin";
-		::gpk::vcu8												key							= {(const uint8_t*)signatureToEncode->begin(), 32};
-		gpk_necall(::gpk::fileToMemory("klib_renewal.lib", testBytes), "%s", "Failed to open test file.");
-		gerror_if(errored(::gpk::fileFromMemorySecure	(testBytes, fileName, key, true)	), "Failed to save secure file: %s.", ::gpk::toString(fileName).begin());
-		gerror_if(errored(::gpk::fileToMemorySecure		(loadedBytes, fileName, key, true)			), "Failed to read secure file: %s.", ::gpk::toString(fileName).begin());
-		gerror_if(loadedBytes != testBytes, "Test failed: %s - %s.", "", "");//::gpk::toString(loadedBytes).begin(), signatureToEncode[0].begin());
+		::gpk::au8						testBytes;
+		::gpk::au8						loadedBytes;
+		::gpk::vcs						fileName					= "test_secure.bin";
+		::gpk::vcu8						key							= {(const uint8_t*)signatureToEncode->begin(), 32};
+		gpk_necs(::gpk::fileToMemory("klib_renewal.lib", testBytes));
+		es_if(errored(::gpk::fileFromMemorySecure	(fileName, key, true, testBytes)));
+		es_if(errored(::gpk::fileToMemorySecure		(fileName, key, true, loadedBytes)));
+		es_if(loadedBytes != testBytes);
 	}
 	//const char  a[ ] = "TGFzdCBDaGFuY2UhIC0gQ0dJIEludGVyY2VwdG9yIC0gYXNtMTI4IChjKSAyMDA5LTIwMTkA";
 	::gpk::au8 signaturesEncoded [::gpk::size(signatureToEncode)]	= {};

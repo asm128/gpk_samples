@@ -175,7 +175,7 @@ int													ssg::solarSystemUpdate			(ssg::SSolarSystemGame & solarSystem, d
 		matrices.Scale		.Scale			(scene.Pivot[entity.Model].Scale		, true);
 		matrices.Position	.SetTranslation	(scene.Pivot[entity.Model].Position	, true);
 		::gpk::view_grid<::gpk::bgra>						entityImage					= solarSystem.Images[entity.Images];
-		::gpk::SGeometryIndexedTriangles						& entityGeometry			= solarSystem.Geometries[entity.Geometry];
+		::gpk::STrianglesIndexed						& entityGeometry			= solarSystem.Geometries[entity.Geometry];
 		matrixTransform										= matrices.Scale * matrices.Position * matrixTransform;
 		::gpk::m4<float>									matrixTransformView			= matrixTransform * matrixView;
 		for(uint32_t iTriangle = 0; iTriangle < entityGeometry.PositionIndices.size() / 3; ++iTriangle) {

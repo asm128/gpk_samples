@@ -215,7 +215,7 @@ namespace ssg
 		::gpk::SRigidBodyIntegrator						Bodies							= {};
 		::gpk::aobj<::ssg::SEntity>						Entities						= {};
 		::gpk::aobj<::gpk::img<::gpk::bgra>>			Images							= {};
-		::gpk::aobj<::gpk::SGeometryIndexedTriangles>	Geometries						= {};
+		::gpk::aobj<::gpk::STrianglesIndexed>	Geometries						= {};
 	};
 
 	::gpk::error_t									solarSystemSetup				(::ssg::SSolarSystemGame & sunsystem, const ::gpk::vcc & filename);
