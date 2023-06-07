@@ -105,7 +105,7 @@ template <size_t _sizeAlive>
 	return 0;
 }
 					::gpk::error_t										updateShips									(::SApplication & app)			{
-	::gpk::SFramework															& framework									= app.Framework;
+	::gpk::SFramework				& framework									= app.Framework;
 	::SGame																		& gameInstance			 					= app.Game;
 	const ::gpk::n2<uint32_t>												& offscreenMetrics							= framework.RootWindow.BackBuffer->Color.View.metrics();
 	for(uint32_t iShip = 0, shipCount = gameInstance.ShipsPlaying; iShip < shipCount; ++iShip) { // Update ship positions
@@ -227,7 +227,7 @@ static				::gpk::error_t										updateEffectParticles						(float lastFrameSec
 }
 
 static				::gpk::error_t										integrateParticleVelocity					(::SApplication& app)											{
-	::gpk::SFramework															& framework									= app.Framework;
+	::gpk::SFramework				& framework									= app.Framework;
 	const float																	lastFrameSeconds							= (float)framework.FrameInfo.Seconds.LastFrame;
 	ree_if(errored(app.ParticleSystemThrust			.Integrator.Integrate(lastFrameSeconds, framework.FrameInfo.Seconds.LastFrameHalfSquared)), "Not sure why would this fail.");
 	ree_if(errored(app.ParticleSystemDebris			.Integrator.Integrate(lastFrameSeconds, framework.FrameInfo.Seconds.LastFrameHalfSquared)), "Not sure why would this fail.");
@@ -238,7 +238,7 @@ static				::gpk::error_t										integrateParticleVelocity					(::SApplication&
 
 					::gpk::error_t										updateParticles								(::SApplication& app)											{
 	gpk_necall(::integrateParticleVelocity(app), "???");
-	::gpk::SFramework															& framework									= app.Framework;
+	::gpk::SFramework				& framework									= app.Framework;
 	::gpk::clear
 		( app.StuffToDraw.ProjectilePaths
 		, app.StuffToDraw.CollisionPoints
@@ -334,7 +334,7 @@ static				::gpk::error_t										updateSpawnShots
 	, PLAYER_TYPE												playerType
 	)
 {
-	::gpk::SFramework															& framework									= app.Framework;
+	::gpk::SFramework				& framework									= app.Framework;
 	::SGame																		& gameInstance								= app.Game;
 	::gpk::array_pod<::SApplication::TParticleInstance>							& particleInstances							= app.ParticleSystemProjectiles.Instances;
 	::SApplication::TIntegrator													& particleIntegrator						= app.ParticleSystemProjectiles.Integrator;
@@ -375,7 +375,7 @@ static				::gpk::error_t										updateSpawnShots
 	, const ::gpk::view<::SApplication::TParticle>	& particleDefinitions
 	)
 {
-	::gpk::SFramework															& framework									= app.Framework;
+	::gpk::SFramework				& framework									= app.Framework;
 	auto																		& offscreen									= framework.RootWindow.BackBuffer->Color;
 	// Add some effect particles
 	app.EffectsDelay.Thrust									+= framework.FrameInfo.Seconds.LastFrame;
@@ -637,7 +637,7 @@ static				::gpk::error_t												spawnEnemy										(::SGame & gameInstance,
 }
 
 					::gpk::error_t												updateEnemies									(::SApplication & app)			{
-	::gpk::SFramework																	& framework										= app.Framework;
+	::gpk::SFramework				& framework										= app.Framework;
 	const ::gpk::n2<uint32_t>														& offscreenMetrics								= framework.RootWindow.BackBuffer->Color.View.metrics();
 	::SGame																				& gameInstance									= app.Game;
 	gameInstance.GhostTimer															+= framework.FrameInfo.Seconds.LastFrame;

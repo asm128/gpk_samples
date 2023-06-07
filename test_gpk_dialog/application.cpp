@@ -9,27 +9,27 @@
 
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 
-			::gpk::error_t											cleanup						(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.RootWindow); }
-			::gpk::error_t											setup						(::gme::SApplication & app)						{
-	::gpk::SFramework														& framework					= app.Framework;
-	::gpk::SWindow															& mainWindow				= framework.RootWindow;
+::gpk::error_t				cleanup		(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.RootWindow); }
+::gpk::error_t				setup		(::gme::SApplication & app)						{
+	::gpk::SFramework				& framework					= app.Framework;
+	::gpk::SWindow					& mainWindow				= framework.RootWindow;
 	app.Framework.GUI													= app.DialogMain.GUI;
 	app.DialogMain.Input												= mainWindow.Input;
 	mainWindow.Size														= {800, 600};
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)), "Failed to create main window. %s.", "why?!");
-	::gpk::SGUI																& gui						= *framework.GUI;
+	::gpk::SGUI						& gui						= *framework.GUI;
 	gui.ColorModeDefault												= ::gpk::GUI_COLOR_MODE_3D;
 	gui.ThemeDefault													= ::gpk::ASCII_COLOR_DARKGREEN * 16 + 7;
 	app.IdExit															= ::gpk::controlCreate(gui);
-	::gpk::SControl															& controlExit				= gui.Controls.Controls[app.IdExit];
+	::gpk::SControl					& controlExit				= gui.Controls.Controls[app.IdExit];
 	controlExit.Area													= {{}, {64, 20}};
 	controlExit.Border													= {10, 10, 10, 10};
 	controlExit.Margin													= {1, 1, 1, 1};
 	controlExit.Align													= ::gpk::ALIGN_BOTTOM_RIGHT;
-	::gpk::SControlText														& controlText				= gui.Controls.Text[app.IdExit];
+	::gpk::SControlText				& controlText				= gui.Controls.Text[app.IdExit];
 	controlText.Text													= "Exit";
 	controlText.Align													= ::gpk::ALIGN_CENTER;
-	::gpk::SControlConstraints												& controlConstraints		= gui.Controls.Constraints[app.IdExit];
+	::gpk::SControlConstraints		& controlConstraints		= gui.Controls.Constraints[app.IdExit];
 	controlConstraints.AttachSizeToControl								= {app.IdExit, -1};
 	::gpk::controlSetParent(gui, app.IdExit, -1);
 
@@ -43,7 +43,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	controlTable.Controls[tuner->IdGUIControl].Area.Size.y	=  20;
 	tuner->SetValue(0);
 
-	::gpk::ptr_obj<::gpk::SDialogSlider>									slider						= {};
+	::gpk::pobj<::gpk::SDialogSlider>									slider						= {};
 	app.Slider															= ::gpk::sliderCreate(app.DialogMain, slider);
 	slider->ValueLimits.Min												= 0;
 	slider->ValueLimits.Max												= 255;
@@ -51,29 +51,29 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	controlTable.Controls[slider->IdGUIControl].Area.Size.x	= 128;
 	controlTable.Controls[slider->IdGUIControl].Area.Size.y	= 8;
 
-	::gpk::ptr_obj<::gpk::SDialogCheckBox>									checkbox					= {};
+	::gpk::pobj<::gpk::SDialogCheckBox>									checkbox					= {};
 	app.CheckBox														= ::gpk::checkBoxCreate(app.DialogMain, checkbox);
 	controlTable.Controls[checkbox->IdGUIControl].Area.Offset	= {128, 256};
 
 
-	::gpk::ptr_obj<::gpk::SDialogViewport>									viewport					= {};
+	::gpk::pobj<::gpk::SDialogViewport>									viewport					= {};
 	app.Viewport														= ::gpk::viewportCreate(app.DialogMain, viewport);
 	controlTable.Controls[viewport->IdGUIControl].Area.Offset	= {320, 128};
 	controlTable.Controls[viewport->IdGUIControl].Area.Size		= {320, 200};
 	return 0;
 }
 
-			::gpk::error_t											update						(::gme::SApplication & app, bool exitSignal)	{
+::gpk::error_t				update		(::gme::SApplication & app, bool exitSignal)	{
 	//::gpk::STimer															timer;
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, exitSignal, "%s", "Exit requested by runtime.");
 	{
 		::std::lock_guard														lock						(app.LockRender);
 		app.Framework.RootWindow.BackBuffer									= app.Offscreen;
 	}
-	::gpk::SFramework														& framework					= app.Framework;
+	::gpk::SFramework				& framework					= app.Framework;
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework), "%s", "Exit requested by framework update.");
 
-	::gpk::SGUI																& gui						= *framework.GUI;
+	::gpk::SGUI						& gui						= *framework.GUI;
 	::gpk::array_pod<uint32_t>												controlsToProcess			= {};
 	::gpk::guiGetProcessableControls(gui, controlsToProcess);
 	for(uint32_t iProcessable = 0, countControls = controlsToProcess.size(); iProcessable < countControls; ++iProcessable) {
@@ -92,9 +92,9 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	return 0;
 }
 
-			::gpk::error_t											draw					(::gme::SApplication & app)							{
+::gpk::error_t				draw		(::gme::SApplication & app)							{
 	//::gpk::STimer															timer;
-	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>		target;
+	::gpk::pobj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>		target;
 	target.create();
 	target->resize(app.Framework.RootWindow.Size, ::gpk::LIGHTGRAY, 0xFFFFFFFFU);
 	{

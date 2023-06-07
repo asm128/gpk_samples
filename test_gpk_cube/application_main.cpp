@@ -26,7 +26,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 }
 
 // --- Cleanup application resources.
-					::gpk::error_t										cleanup										(::SApplication& app)											{
+::gpk::error_t				cleanup		(::SApplication& app)											{
 	::gpk::mainWindowDestroy(app.Framework.RootWindow);
 	g_ApplicationInstance													= 0;
 	return 0;
@@ -53,10 +53,10 @@ stacxpr const ::gpk::tri3<float>						geometryCube	[12]						=
 	, {{1.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 1.0f}}	// Top		- second
 	};
 
-					::gpk::error_t										setup										(::SApplication& app)											{
+::gpk::error_t				setup		(::SApplication& app)											{
 	g_ApplicationInstance													= &app;
-	::gpk::SFramework															& framework									= app.Framework;
-	::gpk::SWindow																& mainWindow								= framework.RootWindow;
+	::gpk::SFramework				& framework									= app.Framework;
+	::gpk::SWindow					& mainWindow								= framework.RootWindow;
 	mainWindow.Size														= {640, 480};
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)), "Failed to create main window why?!");
 
@@ -72,7 +72,7 @@ stacxpr const ::gpk::tri3<float>						geometryCube	[12]						=
 	return 0;
 }
 
-					::gpk::error_t										update										(::SApplication& app, bool systemRequestedExit)					{
+::gpk::error_t				update		(::SApplication& app, bool systemRequestedExit)					{
 	retval_ginfo_if(1, systemRequestedExit, "Exiting because the runtime asked for close. We could also ignore this value and just continue execution if we don't want to exit.");
 	::gpk::error_t																frameworkResult								= ::gpk::updateFramework(app.Framework);
 	ree_if(errored(frameworkResult), "Unknown error.");
@@ -80,7 +80,7 @@ stacxpr const ::gpk::tri3<float>						geometryCube	[12]						=
 	ree_if(errored(::updateSizeDependentResources(app)), "Cannot update offscreen and this could cause an invalid memory access later on.");
 	//-----------------------------
 	::gpk::STimer																& timer										= app.Framework.Timer;
-	::gpk::SWindow																& mainWindow								= app.Framework.RootWindow;
+	::gpk::SWindow					& mainWindow								= app.Framework.RootWindow;
 	char																		buffer		[256]							= {};
 	sprintf_s(buffer, "[%u x %u]. FPS: %g. Last frame seconds: %g.", mainWindow.Size.x, mainWindow.Size.y, 1 / timer.LastTimeSeconds, timer.LastTimeSeconds);
 	::HWND																		windowHandle								= mainWindow.PlatformDetail.WindowHandle;
@@ -112,10 +112,10 @@ struct SCamera {
 						::gpk::n3f32								Position, Target;
 };
 
-					::gpk::error_t										draw										(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
-	::gpk::SFramework															& framework									= app.Framework;
+::gpk::error_t				draw		(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
+	::gpk::SFramework				& framework									= app.Framework;
 
-	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>			backBuffer;
+	::gpk::pobj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>			backBuffer;
 	backBuffer->resize(framework.RootWindow.BackBuffer->Color.metrics(), 0xFF000080, (uint32_t)-1);
 
 	//------------------------------------------------

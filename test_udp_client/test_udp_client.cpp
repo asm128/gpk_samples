@@ -9,27 +9,27 @@
 
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 
-			::gpk::error_t											cleanup					(::gme::SApplication & app)							{
+::gpk::error_t				cleanup		(::gme::SApplication & app)							{
 	::gpk::clientDisconnect(app.Client);
 	::gpk::tcpipShutdown();
 	::gpk::mainWindowDestroy(app.Framework.RootWindow);
 	return 0;
 }
-			::gpk::error_t											setup						(::gme::SApplication & app)						{
-	::gpk::SFramework														& framework					= app.Framework;
-	::gpk::SWindow															& mainWindow				= framework.RootWindow;
+::gpk::error_t				setup		(::gme::SApplication & app)						{
+	::gpk::SFramework				& framework					= app.Framework;
+	::gpk::SWindow					& mainWindow				= framework.RootWindow;
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)), "Failed to create main window why?!");
-	::gpk::SGUI																& gui						= *framework.GUI;
+	::gpk::SGUI						& gui						= *framework.GUI;
 	app.IdExit															= ::gpk::controlCreate(gui);
-	::gpk::SControl															& controlExit				= gui.Controls.Controls[app.IdExit];
+	::gpk::SControl					& controlExit				= gui.Controls.Controls[app.IdExit];
 	controlExit.Area													= {{0, 0}, {64, 20}};
 	controlExit.Border													= {1, 1, 1, 1};
 	controlExit.Margin													= {1, 1, 1, 1};
 	controlExit.Align													= ::gpk::ALIGN_BOTTOM_RIGHT;
-	::gpk::SControlText														& controlText				= gui.Controls.Text[app.IdExit];
+	::gpk::SControlText				& controlText				= gui.Controls.Text[app.IdExit];
 	controlText.Text													= "Exit";
 	controlText.Align													= ::gpk::ALIGN_CENTER;
-	::gpk::SControlConstraints												& controlConstraints		= gui.Controls.Constraints[app.IdExit];
+	::gpk::SControlConstraints		& controlConstraints		= gui.Controls.Constraints[app.IdExit];
 	controlConstraints.AttachSizeToText.y								= app.IdExit;
 	controlConstraints.AttachSizeToText.x								= app.IdExit;
 	::gpk::controlSetParent(gui, app.IdExit, -1);
@@ -61,17 +61,17 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	::gpk::clientConnect(app.Client);
 	return 0;
 }
-			::gpk::error_t											update						(::gme::SApplication & app, bool exitSignal)	{
+::gpk::error_t				update		(::gme::SApplication & app, bool exitSignal)	{
 	::gpk::STimer															timer;
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, exitSignal, "Exit requested by runtime.");
 	{
 		::std::lock_guard														lock						(app.LockRender);
 		app.Framework.RootWindow.BackBuffer									= app.Offscreen;
 	}
-	::gpk::SFramework														& framework					= app.Framework;
+	::gpk::SFramework				& framework					= app.Framework;
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework), "Exit requested by framework update.");
 
-	::gpk::SGUI																& gui						= *framework.GUI;
+	::gpk::SGUI						& gui						= *framework.GUI;
 	::gpk::array_pod<uint32_t>												controlsToProcess			= {};
 	::gpk::guiGetProcessableControls(gui, controlsToProcess);
 	for(uint32_t iControl = 0, countControls = controlsToProcess.size(); iControl < countControls; ++iControl) {
@@ -130,9 +130,9 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	return 0;
 }
 
-			::gpk::error_t												draw					(::gme::SApplication & app)						{
+::gpk::error_t				draw		(::gme::SApplication & app)						{
 	::gpk::STimer																timer;
-	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>			target;
+	::gpk::pobj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>			target;
 	target.create();
 	target->resize(app.Framework.RootWindow.Size, {0xFF, 0x40, 0x7F, 0xFF}, (uint32_t)-1);
 	//::gpk::clearTarget(*target);

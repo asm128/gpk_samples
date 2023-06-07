@@ -47,7 +47,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 }
 
 // --- Cleanup application resources.
-					::gpk::error_t										cleanup										(::SApplication& app)											{
+::gpk::error_t				cleanup		(::SApplication& app)											{
 
 	app;
 	g_ApplicationInstance													= 0;
@@ -101,10 +101,10 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	return 0;
 }
 
-					::gpk::error_t										setup										(::SApplication& app)											{
+::gpk::error_t				setup		(::SApplication& app)											{
 	//_CrtSetBreakAlloc(120);
 	g_ApplicationInstance													= &app;
-	::gpk::SFramework															& framework									= app.Framework;
+	::gpk::SFramework				& framework									= app.Framework;
 	framework.RootWindow.Size												= {1280, 720};
 	gerror_if(errored(::gpk::mainWindowCreate(framework.RootWindow, framework.RuntimeValues.PlatformDetail, framework.RootWindow.Input)), "Failed to create main window why?!");
 	::setupParticles();
@@ -149,7 +149,7 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 ::gpk::error_t							drawShips									(::gpk::v2<::gpk::bgra> target, ::SApplication & app);
 ::gpk::error_t							drawCrosshair								(::gpk::v2<::gpk::bgra> target, ::SApplication & app);
 ::gpk::error_t							drawCollisions								(::gpk::v2<::gpk::bgra> target, ::SApplication & app);
-::gpk::error_t							draw										(::SApplication & app)											{
+::gpk::error_t				draw		(::SApplication & app)											{
 	::gpk::v2<::gpk::bgra>						target										= app.Framework.RootWindow.BackBuffer->Color;
 	gerror_if(errored(::drawBackground	(target, app)), "Why??");	// --- Draw stars
 	gerror_if(errored(::drawPowerups	(target, app)), "Why??");	// --- Draw powerups
@@ -164,7 +164,7 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	static	const ::gpk::vcs					textLine0									= "W: Up, S: Down, A: Left, D: Right";
 	static	const ::gpk::vcs					textLine1									= "T: Shoot. Y: Thrust. U: Handbrake.";
 	static	const ::gpk::vcs					textLine2									= "Press ESC to exit or P to (un)pause.";
-	::gpk::SFramework							& framework									= app.Framework;
+	::gpk::SFramework				& framework									= app.Framework;
 	::gpk::v2<::gpk::bgra>						& fontAtlasView								= app.Processed[GAME_TEXTURE_FONT_ATLAS].View;
 	const ::gpk::n2u16							& offscreenMetrics							= target.metrics().Cast<uint16_t>();
 	::gpk::textLineDrawAlignedFixedSizeLit(target, app.TextureFontMonochrome.View, fontAtlasView.metrics(), lineOffset++, offscreenMetrics, sizeCharCell, textLine0, ::gpk::bgra{0, app.Framework.FrameInfo.FrameNumber % 0xFF, 0xFFU, 0xFFU});
@@ -206,9 +206,9 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 ::gpk::error_t										updateEnemies								(::SApplication & app);
 ::gpk::error_t										updateParticles								(::SApplication & app);
 ::gpk::error_t										updateGUI									(::SApplication & app);
-::gpk::error_t										update										(::SApplication & app, bool systemRequestedExit)					{
+::gpk::error_t				update		(::SApplication & app, bool systemRequestedExit)					{
 	retval_ginfo_if(1, systemRequestedExit, "Exiting because the runtime asked for close. We could also ignore this value and just continue execution if we don't want to exit.");
-	::gpk::SFramework															& framework									= app.Framework;
+	::gpk::SFramework				& framework									= app.Framework;
 	::gpk::error_t																frameworkResult								= ::gpk::updateFramework(framework);
 	ree_if(errored(frameworkResult), "Unknown error.");
 	rvi_if(1, frameworkResult == 1, "Framework requested close. Terminating execution.");

@@ -10,16 +10,16 @@
 
  GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 
-			::gpk::error_t											cleanup						(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.RootWindow); }
-			::gpk::error_t											setup						(::gme::SApplication & app)						{
-	::gpk::SFramework														& framework					= app.Framework;
-	::gpk::SWindow															& mainWindow				= framework.RootWindow;
+::gpk::error_t				cleanup		(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.RootWindow); }
+::gpk::error_t				setup		(::gme::SApplication & app)						{
+	::gpk::SFramework				& framework					= app.Framework;
+	::gpk::SWindow					& mainWindow				= framework.RootWindow;
 	framework.Settings.GUIZoom											= false;
 	app.Framework.GUI													= app.DialogMain.GUI;
 	app.DialogMain.Input												= mainWindow.Input;
 	mainWindow.Size														= {1024, 768};
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)), "Failed to create main window. %s.", "why?!");
-	::gpk::SGUI																& gui						= *framework.GUI;
+	::gpk::SGUI						& gui						= *framework.GUI;
 	gui.ColorModeDefault												= ::gpk::GUI_COLOR_MODE_3D;
 	gui.ThemeDefault													= ::gpk::ASCII_COLOR_DARKGREEN * 16 + 7;
 	{
@@ -69,12 +69,12 @@
 	controlTable.Controls[tuner->IdGUIControl].Area.Size.y				=  20;
 	tuner->SetValue(0);
 
-	::gpk::ptr_obj<::gpk::SDialogCheckBox>									checkbox					= {};
+	::gpk::pobj<::gpk::SDialogCheckBox>									checkbox					= {};
 	app.CheckBox														= ::gpk::checkBoxCreate(app.DialogMain, checkbox);
 	controlTable.Controls[checkbox->IdGUIControl].Area.Offset			= {128, 256};
 
 
-	::gpk::ptr_obj<::gpk::SDialogViewport>									viewport					= {};
+	::gpk::pobj<::gpk::SDialogViewport>									viewport					= {};
 	app.Viewport														= ::gpk::viewportCreate(app.DialogMain, viewport);
 	controlTable.Controls	[viewport->IdGUIControl].Area.Offset		= {320, 128};
 	controlTable.Controls	[viewport->IdGUIControl].Area.Size			= {640, 480};
@@ -195,7 +195,7 @@
 	controlTable.Controls	[viewport->IdClient].Image				= app.TextureMinimap.View;
 	controlTable.Controls	[viewport->IdClient].ImageAlign			= ::gpk::ALIGN_TOP_LEFT;
 
-	::gpk::ptr_obj<::gpk::SDialogSlider>									sliderH						= {};
+	::gpk::pobj<::gpk::SDialogSlider>									sliderH						= {};
 	app.SliderH															= ::gpk::sliderCreate(app.DialogMain, sliderH);
 	sliderH->ValueLimits.Min											= 0;
 	sliderH->ValueLimits.Max											= app.TextureMinimap.View.metrics().x / 2;
@@ -206,7 +206,7 @@
 	controlTable.Constraints[sliderH->IdGUIControl].DockToControl.Left	= viewport->IdGUIControl;
 	//::gpk::controlSetParent(gui, sliderH->IdGUIControl, viewport->IdGUIControl);
 
-	::gpk::ptr_obj<::gpk::SDialogSlider>									sliderV						= {};
+	::gpk::pobj<::gpk::SDialogSlider>									sliderV						= {};
 	app.SliderV															= ::gpk::sliderCreate(app.DialogMain, sliderV);
 	sliderV->ValueLimits.Min											= 0;
 	sliderV->ValueLimits.Max											= app.TextureMinimap.View.metrics().y / 2;
@@ -220,17 +220,17 @@
 	return 0;
 }
 
-			::gpk::error_t											update						(::gme::SApplication & app, bool exitSignal)	{
+::gpk::error_t				update		(::gme::SApplication & app, bool exitSignal)	{
 	::gpk::STimer															timer;
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, exitSignal, "%s", "Exit requested by runtime.");
 	{
 		::std::lock_guard														lock						(app.LockRender);
 		app.Framework.RootWindow.BackBuffer									= app.Offscreen;
 	}
-	::gpk::SFramework														& framework					= app.Framework;
+	::gpk::SFramework				& framework					= app.Framework;
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework), "%s", "Exit requested by framework update.");
 
-	::gpk::SGUI																& gui						= *framework.GUI;
+	::gpk::SGUI						& gui						= *framework.GUI;
 	::gpk::array_pod<uint32_t>												controlsToProcess			= {};
 	::gpk::guiGetProcessableControls(gui, controlsToProcess);
 	for(uint32_t iProcessable = 0, countControls = controlsToProcess.size(); iProcessable < countControls; ++iProcessable) {
@@ -248,7 +248,7 @@
 	//----------------------------------------------
 	::gpk::SFrameInfo								& frameInfo									= framework.FrameInfo;
 	bool											updateProjection							= false;
-	::gpk::SWindow									& mainWindow						= framework.RootWindow;
+	::gpk::SWindow					& mainWindow						= framework.RootWindow;
 	if(mainWindow.Input->KeyboardCurrent.KeyState[VK_ADD		])	{ updateProjection = true; app.Scene.Camera.Angle += frameInfo.Seconds.LastFrame; }
 	if(mainWindow.Input->KeyboardCurrent.KeyState[VK_SUBTRACT	])	{ updateProjection = true; app.Scene.Camera.Angle -= frameInfo.Seconds.LastFrame; }
 	if(mainWindow.Input->KeyboardCurrent.KeyState['Q'])				{ updateProjection = true; app.Scene.Camera.Points.Position.x += (float)frameInfo.Seconds.LastFrame * 10; }
@@ -285,9 +285,9 @@
 	app.GridPivot.Scale										= {1, -1, -1};
 	app.GridPivot.Orientation.Normalize();
 
-	::gpk::ptr_obj<::gpk::SDialogSlider>									slider									= {};
+	::gpk::pobj<::gpk::SDialogSlider>									slider									= {};
 	app.DialogMain.Controls[app.SliderH].as(slider);
-	::gpk::ptr_obj<::gpk::SDialogViewport>									viewport									= {};
+	::gpk::pobj<::gpk::SDialogViewport>									viewport									= {};
 	app.DialogMain.Controls[app.ViewportMinimap].as(viewport);
 	gui.Controls.Controls[viewport->IdClient].ImageOffset.x				= (int16_t)slider->ValueCurrent;
 	::gpk::controlMetricsInvalidate(gui, slider->IdGUIControl);
@@ -319,23 +319,23 @@
 	, const ::gpk::view<const ::gpk::SLightInfoRSW>				& lights
 	, bool																wireframe
 	);
-			::gpk::error_t											draw					(::gme::SApplication & app)							{
+::gpk::error_t				draw		(::gme::SApplication & app)							{
 	::gpk::STimer															timer;
-	::gpk::SFramework														& framework									= app.Framework;
-	::gpk::SGUI																& gui										= *framework.GUI;
+	::gpk::SFramework				& framework									= app.Framework;
+	::gpk::SGUI						& gui										= *framework.GUI;
 	static ::gpk::SRenderTarget<::gpk::bgra, uint32_t>				buffer3D;
-	::gpk::ptr_obj<::gpk::SDialogViewport>									viewport									= {};
+	::gpk::pobj<::gpk::SDialogViewport>									viewport									= {};
 	app.DialogMain.Controls[app.Viewport].as(viewport);
 	const ::gpk::n2<uint32_t>											& offscreenMetrics							= gui.Controls.Controls[viewport->IdClient].Area.Size.Cast<uint32_t>();
 
 	buffer3D.resize(offscreenMetrics, {0, 0, 0, 0}, 0xFFFFFFFF);
 	gui.Controls.Controls[viewport->IdClient].Image						= buffer3D.Color.View;
-	::gpk::ptr_obj<::gpk::SDialogCheckBox>			checkbox;
+	::gpk::pobj<::gpk::SDialogCheckBox>			checkbox;
 	app.DialogMain.Controls[app.CheckBox].as(checkbox);
 
 	int32_t 																pixelsDrawn0								= drawGND(app.RenderCache, app.Scene.Transforms, app.Scene.Camera, buffer3D, app.GridPivot, app.LightDirection, app.GNDModel, app.RSWData.Light, app.TexturesGND, app.RSWData.RSWLights, checkbox->Checked);
 	gerror_if(errored(pixelsDrawn0), "??");
-	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>		target;
+	::gpk::pobj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>		target;
 	target.create();
 	target->resize(app.Framework.RootWindow.Size, ::gpk::LIGHTGRAY, 0xFFFFFFFFU);
 	{

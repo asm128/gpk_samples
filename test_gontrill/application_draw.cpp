@@ -25,7 +25,7 @@ static	::gpk::error_t						drawShipHealthBar			(::gpk::v2<::gpk::bgra> target, :
 //
 ::gpk::error_t								drawShips								(::gpk::v2<::gpk::bgra> target, ::SApplication & app)											{
 	::SGame											& gameInstance							= app.Game;
-	::gpk::SFramework								& framework								= app.Framework;
+	::gpk::SFramework				& framework								= app.Framework;
 	::gpk::view_grid<::gpk::bgra>				& viewOffscreen							= framework.RootWindow.BackBuffer->Color.View;
 	// ---- Draw enemy ships
 	const ::gpk::view_grid<::gpk::bgra>		& enemyView								= app.Processed[GAME_TEXTURE_ENEMY].View;
@@ -250,7 +250,7 @@ stacxpr	const ::gpk::n2<int32_t>						diagonalPowerupLightPositions	[8]			=
 	};
 
 					::gpk::error_t										drawPowerups								(::gpk::v2<::gpk::bgra> target, ::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
-	::gpk::SFramework															& framework									= app.Framework;
+	::gpk::SFramework				& framework									= app.Framework;
 	static double																timer										= 0;
 	timer																	+= framework.FrameInfo.Seconds.LastFrame * 2;
 	::SGame																		& gameInstance								= app.Game;
@@ -322,7 +322,7 @@ static				::gpk::error_t										drawCrosshairAligned						(::gpk::v2<::gpk::bg
 	return 0;
 }
 					::gpk::error_t										drawCrosshair								(::gpk::v2<::gpk::bgra> target, ::SApplication & app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
-	::gpk::SFramework															& framework									= app.Framework;
+	::gpk::SFramework				& framework									= app.Framework;
 	static double																beaconTimer									= 0;
 	beaconTimer																+= framework.FrameInfo.Seconds.LastFrame * 10;
 	::SGame																		& gameInstance								= app.Game;

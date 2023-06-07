@@ -220,7 +220,7 @@ int32_t drawAgentList
 	, int32_t														offsetY
 	, int32_t														offsetX
 	, int32_t														selectedRow
-	, const ::gpk::array_obj<::gpk::ptr_obj<::klib::CCharacter>>	& army
+	, const ::gpk::array_obj<::gpk::pobj<::klib::CCharacter>>	& army
 	) {
 	int32_t											actualRowsDisplayed				= 0;
 	selectedRow									&= ~0x80000000;

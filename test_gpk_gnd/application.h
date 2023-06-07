@@ -17,7 +17,7 @@ namespace gme // I'm gonna use a different namespace in order to test a few thin
 
 	struct SApplication {
 					::gpk::SFramework													Framework						;
-					::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>	Offscreen						;
+					::gpk::pobj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>	Offscreen						;
 
 					int32_t																IdExit							= -1;
 

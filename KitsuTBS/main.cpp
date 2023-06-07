@@ -12,7 +12,7 @@ int											main							(int /*argc*/, char ** /*argv*/) {
 	stacxpr	const uint32_t				ASCII_DISPLAY_WIDTH				= ((uint32_t)(ASCII_DISPLAY_HEIGHT * 2.666666f));
 	::klib::initASCIIScreen(ASCII_DISPLAY_WIDTH, ASCII_DISPLAY_HEIGHT);
 
-	::gpk::ptr_obj<::klib::SGame>					pInstancedGame					= {};
+	::gpk::pobj<::klib::SGame>					pInstancedGame					= {};
 	pInstancedGame->GlobalDisplay	.Resize({ASCII_DISPLAY_WIDTH, ASCII_DISPLAY_HEIGHT});
 	pInstancedGame->TacticalDisplay	.Resize({::klib::GAME_MAP_WIDTH, ::klib::GAME_MAP_DEPTH});
 

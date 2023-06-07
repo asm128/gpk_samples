@@ -97,7 +97,7 @@ static	::gpk::error_t					eventProcessBuy				(const ::klib::SGameEvent & event, 
 	case ::klib::GAME_SUBSTATE_CHARACTER	: {
 		menuItems								= shopMenus.MenuItemsAgent;
 		buyable									= menuItems[item].ReturnValue;
-		::gpk::ptr_obj<::klib::CCharacter>			newCharacter;
+		::gpk::pobj<::klib::CCharacter>			newCharacter;
 		menuCharacters							= {::klib::enemyDefinitions, 4};
 		newCharacter.create(menuCharacters[item]);
 		bool										bFoundFreeCharacterSlot		= false;

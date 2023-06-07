@@ -441,7 +441,7 @@ bool												initCampaignPlayers									(::klib::SGame & instanceGame)						
 
 			//if( 0 == playerAI.Army[playerAI.Squad.Agents[iSquadAgentSlot]] )
 			//{
-				::gpk::ptr_obj<::klib::CCharacter>										newAgent											;
+				::gpk::pobj<::klib::CCharacter>										newAgent											;
 				newAgent.create(::klib::enemyDefinitions[1+rand()%3]);
 				playerAI.Army[playerAI.Squad.Agents[iSquadAgentSlot]] = newAgent;
 			//}

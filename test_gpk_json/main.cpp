@@ -41,7 +41,7 @@
 
 	info_printf("---------------------------- Linear iteration: %u objects.", jsonReader.Token.size());
 	::gpk::array_pod<char>						outputJson;
-	::gpk::ptr_obj<::gpk::SJSONNode>				root							= jsonReader.Tree[0];
+	::gpk::pobj<::gpk::SJSONNode>				root							= jsonReader.Tree[0];
 	::printNode(root, testJson);
 
 	info_printf("---------------------------- Linear iteration: %u objects.", jsonReader.Token.size());
@@ -61,7 +61,7 @@
 	const ::gpk::view_const_string					test_key						= "Bleh";
 	info_printf("---------------------------- Access test. Test key: %s", test_key.begin());
 	::gpk::error_t									indexOfFirstObject				= ::gpk::jsonArrayValueGet(*root, 0);
-	::gpk::ptr_obj<::gpk::SJSONNode>				object							= jsonReader.Tree[indexOfFirstObject];
+	::gpk::pobj<::gpk::SJSONNode>				object							= jsonReader.Tree[indexOfFirstObject];
 	::gpk::error_t									indexOfElement					= ::gpk::jsonObjectValueGet(*object, jsonReader.View, test_key);
 	gpk_necall((uint32_t)indexOfElement >= jsonReader.View.size(), "Test key '%s' not found: %i.", test_key.begin(), indexOfElement);
 	const gpk::SJSONToken							& node							= jsonReader.Token	[indexOfElement];
@@ -74,7 +74,7 @@
 }
 
 	::gpk::error_t						testJSONFormatter			(::gpk::SJSONReader & jsonReader, const ::gpk::view_const_char format, const ::gpk::view_const_char inputJson)			{
-	::gpk::ptr_obj<::gpk::SJSONNode>			root						= jsonReader.Tree[0];
+	::gpk::pobj<::gpk::SJSONNode>			root						= jsonReader.Tree[0];
 	::printNode(root, inputJson);
 	const ::gpk::error_t						indexOfFirstObject			= 0;
 	info_printf("Test format:\n%s", format.begin());

@@ -91,7 +91,7 @@ int													updateEntityTransforms		(uint32_t iEntity, ::gpk::array_obj<::ss
 	return 0;
 }
 
-int													ssg::solarSystemUpdate			(ssg::SSolarSystemGame & solarSystem, double secondsLastFrame, ::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>> & target)	{
+int													ssg::solarSystemUpdate			(ssg::SSolarSystemGame & solarSystem, double secondsLastFrame, ::gpk::pobj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>> & target)	{
 	// ------------------------------------------- Handle input
 	::gpk::SRigidBodyIntegrator								& bodies						= solarSystem.Bodies;
 	::ssg::SScene											& scene							= solarSystem.Scene;

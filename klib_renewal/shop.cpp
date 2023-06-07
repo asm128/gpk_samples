@@ -89,7 +89,7 @@ int32_t												klib::reinitBuyMenus		(const ::klib::SEntityTables & entityTa
 	else if( selectedIndex == -1 )
 		return returnState;
 
-	::gpk::ptr_obj<::klib::CCharacter> newCharacter;
+	::gpk::pobj<::klib::CCharacter> newCharacter;
 	switch(instanceGame.State.Substate) {
 	case ::klib::GAME_SUBSTATE_ACCESSORY	: instanceGame.Events.push_back({::klib::GAME_EVENT_CONFIRM, instanceGame.State, selectedIndex}); break;
 	case ::klib::GAME_SUBSTATE_STAGEPROP	: instanceGame.Events.push_back({::klib::GAME_EVENT_CONFIRM, instanceGame.State, selectedIndex}); break;

@@ -244,12 +244,12 @@ struct SWearables {
 
 	for(uint32_t iPlayer=0, count=1/*MAX_PLAYER_TYPES*/; iPlayer < count; ++iPlayer) {
 		::klib::SGamePlayer												& player						= instanceGame.Players[iPlayer]	= SGamePlayer();
-		::gpk::ptr_obj<::klib::CCharacter> newAgent;// = ::klib::enemyDefinitions[1 + ::rand() % (::gpk::size(klib::enemyDefinitions)-1)];
+		::gpk::pobj<::klib::CCharacter> newAgent;// = ::klib::enemyDefinitions[1 + ::rand() % (::gpk::size(klib::enemyDefinitions)-1)];
 		newAgent.create(::klib::enemyDefinitions[1 + ::rand() % (::gpk::size(klib::enemyDefinitions)-1)]);
 
 		for(uint32_t iAgent=0, agentCount=CAMPAIGN_AGENT_COUNT*2; iAgent<agentCount; iAgent++) {
 			int32_t iAgentType = (int32_t)((iAgent < CAMPAIGN_AGENT_COUNT) ? ::gpk::size(klib::enemyDefinitions)-iAgent-2 : 1);
-			::gpk::ptr_obj<::klib::CCharacter>							newAgentNext;
+			::gpk::pobj<::klib::CCharacter>							newAgentNext;
 			newAgentNext.create(klib::enemyDefinitions[iAgentType]);
 			::klib::CCharacter											& adventurer					= *newAgentNext;
 			::klib::setupAgent(instanceGame.EntityTables, adventurer, adventurer);

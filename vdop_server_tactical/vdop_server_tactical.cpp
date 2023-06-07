@@ -10,32 +10,35 @@
 
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 
-::gpk::error_t										cleanup							(::SApplication & app)						{
+::gpk::error_t				cleanup		(::SApplication & app)						{
 	::klib::shutdownASCIIScreen();
 	return ::gpk::mainWindowDestroy(app.Framework.RootWindow);
 }
 
-::gpk::error_t										setup							(::SApplication & app)						{
-	::gpk::SFramework										& framework						= app.Framework;
-	::gpk::SWindow											& mainWindow					= framework.RootWindow;
+::gpk::error_t				setup		(::SApplication & app)						{
+	::gpk::SFramework				& framework						= app.Framework;
+	::gpk::SWindow					& mainWindow					= framework.RootWindow;
 	mainWindow.Size														= {1280, 720};
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)), "Failed to create main window. %s.", "why?!");
 	{ // Build the exit button
-		::gpk::SGUI												& gui								= *framework.GUI;
-		gui.ColorModeDefault								= ::gpk::GUI_COLOR_MODE_3D;
-		gui.ThemeDefault									= ::gpk::ASCII_COLOR_DARKGREEN * 16 + 7;
+		::gpk::SGUI						& gui								= *framework.GUI;
+		gui.ColorModeDefault		= ::gpk::GUI_COLOR_MODE_3D;
+		gui.ThemeDefault			= ::gpk::ASCII_COLOR_DARKGREEN * 16 + 7;
 
-		app.IdExit											= ::gpk::controlCreate(gui);
-		::gpk::SControl											& controlExit						= gui.Controls.Controls[app.IdExit];
-		controlExit.Area									= {{}, {64, 20}};
-		controlExit.Border									= {10, 10, 10, 10};
-		controlExit.Margin									= {1, 1, 1, 1};
-		controlExit.Align									= ::gpk::ALIGN_BOTTOM_RIGHT;
-		::gpk::SControlText										& controlText						= gui.Controls.Text[app.IdExit];
-		controlText.Text									= "Exit";
-		controlText.Align									= ::gpk::ALIGN_CENTER;
-		::gpk::SControlConstraints								& controlConstraints				= gui.Controls.Constraints[app.IdExit];
-		controlConstraints.AttachSizeToControl				= {app.IdExit, -1};
+		app.IdExit					= ::gpk::controlCreate(gui);
+
+		::gpk::SControl					& controlExit						= gui.Controls.Controls[app.IdExit];
+		controlExit.Area			= {{}, {64, 20}};
+		controlExit.Border			= {10, 10, 10, 10};
+		controlExit.Margin			= {1, 1, 1, 1};
+		controlExit.Align			= ::gpk::ALIGN_BOTTOM_RIGHT;
+
+		::gpk::SControlText				& controlText						= gui.Controls.Text[app.IdExit];
+		controlText.Text			= "Exit";
+		controlText.Align			= ::gpk::ALIGN_CENTER;
+
+		::gpk::SControlConstraints		& controlConstraints				= gui.Controls.Constraints[app.IdExit];
+		controlConstraints.AttachSizeToControl	= {app.IdExit, -1};
 		::gpk::controlSetParent(gui, app.IdExit, -1);
 	}
 	srand((uint32_t)time(0));
@@ -43,7 +46,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 	const ::gpk::n2<uint32_t>							metricsMap						= app.TextOverlay.MetricsMap;
 	const ::gpk::n2<uint32_t>							metricsLetter					= app.TextOverlay.MetricsLetter;
 	::gpk::SImage<::gpk::bgra>						fontImage;
-	::gpk::pngFileLoad(::gpk::view_const_string{"../gpk_data/images/Codepage_437_24_12x12.png"}, fontImage);
+	::gpk::pngFileLoad(::gpk::vcs{"../gpk_data/images/Codepage_437_24_12x12.png"}, fontImage);
 	::gpk::view_grid<::gpk::SGeometryQuads>					viewGeometries					= {app.TextOverlay.GeometryLetters, {16, 16}};
 	const uint32_t											imagePitch						= metricsLetter.x * metricsMap.x;
 
@@ -75,7 +78,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 }
 
 int													update				(SApplication & app, bool exitSignal)	{
-	::gpk::SFramework										& framework			= app.Framework;
+	::gpk::SFramework				& framework			= app.Framework;
 	//::gpk::STimer															timer;
 	(void)exitSignal;
 	//retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, exitSignal, "%s", "Exit requested by runtime.");
@@ -85,7 +88,7 @@ int													update				(SApplication & app, bool exitSignal)	{
 	}
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework), "%s", "Exit requested by framework update.");
 
-	::gpk::SGUI												& gui						= *framework.GUI;
+	::gpk::SGUI						& gui						= *framework.GUI;
 	::gpk::array_pod<uint32_t>								controlsToProcess			= {};
 	::gpk::guiGetProcessableControls(gui, controlsToProcess);
 	for(uint32_t iControl = 0, countControls = controlsToProcess.size(); iControl < countControls; ++iControl) {
@@ -98,14 +101,14 @@ int													update				(SApplication & app, bool exitSignal)	{
 		}
 	}
 	if(framework.RootWindow.Resized) {
-		::gpk::m4<float>									& matrixProjection	= app.TextOverlay.MatrixProjection;
+		::gpk::m4<float>					& matrixProjection	= app.TextOverlay.MatrixProjection;
 		matrixProjection.FieldOfView(::gpk::math_pi * .25, framework.RootWindow.Size.x / (double)framework.RootWindow.Size.y, 0.01, 500.0);
-		::gpk::m4<float>									matrixViewport		= {};
+		::gpk::m4<float>					matrixViewport		= {};
 		matrixViewport.ViewportLH(framework.RootWindow.Size.Cast<uint16_t>());
-		matrixProjection									*= matrixViewport;
+		matrixProjection				*= matrixViewport;
 	}
-	::klib::SASCIITarget							target;
-	::klib::getASCIIBackBuffer						(target);
+	::klib::SASCIITarget				target;
+	::klib::getASCIIBackBuffer(target);
 	::klib::clearASCIIBackBuffer(' ', ::klib::ASCII_COLOR_INDEX_WHITE);
 	if(app.Game.size()) {
 		::klib::pollInput(app.Game[0]->FrameInput);
@@ -114,10 +117,10 @@ int													update				(SApplication & app, bool exitSignal)	{
 	::klib::presentASCIIBackBuffer();
 
 	{
-		::std::lock_guard														lock						(app.TacticalServer.Mutex);
+		::std::lock_guard					lock						(app.TacticalServer.Mutex);
 		app.MessagesToProcess.resize(app.TacticalServer.Clients.size());
 		for(uint32_t iClient = 0, countClients = app.TacticalServer.Clients.size(); iClient < countClients; ++iClient) {
-			::gpk::ptr_nco<::gpk::SUDPConnection>									client						= app.TacticalServer.Clients[iClient];
+			::gpk::pnco<::gpk::SUDPConnection>	client						= app.TacticalServer.Clients[iClient];
 			if(client->State != ::gpk::UDP_CONNECTION_STATE_IDLE || 0 == client->KeyPing)
 				continue;
 			{
@@ -125,7 +128,7 @@ int													update				(SApplication & app, bool exitSignal)	{
 				for(int32_t iMessage = 0; iMessage < (int32_t)client->Queue.Received.size(); ++iMessage) {
 					if(client->Queue.Received[iMessage]->Command.Type == ::gpk::ENDPOINT_COMMAND_TYPE_RESPONSE)
 						continue;
-					::gpk::ptr_obj<::gpk::SUDPMessage>							messageReceived				= client->Queue.Received[iMessage];
+					::gpk::pobj<::gpk::SUDPMessage>							messageReceived				= client->Queue.Received[iMessage];
 					gpk_necall(app.MessagesToProcess[iClient].push_back(messageReceived), "%s", "Out of memory?");
 					client->Queue.Received.remove_unordered(iMessage--);
 				}
@@ -168,7 +171,7 @@ int													update				(SApplication & app, bool exitSignal)	{
 }
 
 int													draw					(SApplication & app) {
-	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>		target;
+	::gpk::pobj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>		target;
 	target.create();
 	target->resize(app.Framework.RootWindow.Size, ::gpk::DARKGREEN, 0xFFFFFFFFU);
 

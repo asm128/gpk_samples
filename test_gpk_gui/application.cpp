@@ -10,12 +10,12 @@
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 
 
-::gpk::error_t													setup					(::gme::SApplication & app)						{
-	::gpk::SFramework													& framework				= app.Framework;
-	::gpk::SWindow														& mainWindow			= framework.RootWindow;
+::gpk::error_t				setup		(::gme::SApplication & app)						{
+	::gpk::SFramework				& framework				= app.Framework;
+	::gpk::SWindow					& mainWindow			= framework.RootWindow;
 	mainWindow.Size														= {1280, 720};
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)), "Failed to create main window. %s", " why?!");
-	::gpk::SGUI															& gui					= *framework.GUI;
+	::gpk::SGUI						& gui					= *framework.GUI;
 
 	const int32_t														iShades					= 16;
 	gui.ThemeDefault												= app.PaletteColumn * iShades + app.PaletteRow;
@@ -31,7 +31,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	app.Palettes[::gpk::GUI_CONTROL_PALETTE_SELECTED_PRESSED	]	= gui.Colors->Palettes.push_back({colorBase, {}, {}, {}, {}, {}, ::gpk::RED, {}, {}, {}, });// gui.DefaultColors.CONTROL_SELECTED_PRESSED	;
 	app.Palettes[::gpk::GUI_CONTROL_PALETTE_OUTDATED			]	= gui.Colors->Palettes.push_back({colorBase, {}, {}, {}, {}, {}, ::gpk::RED, {}, {}, {}, });// gui.DefaultColors.CONTROL_OUTDATED			;
 
-	::gpk::SControl														& controlRoot			= gui.Controls.Controls[controlTestRoot];
+	::gpk::SControl					& controlRoot			= gui.Controls.Controls[controlTestRoot];
 	controlRoot.Area												= {{0, 0}, {320, 240}};
 	controlRoot.Border												= {4, 4, 4, 4};
 	controlRoot.Margin												= {20, 20, 20, 10};
@@ -229,14 +229,14 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	return 0;
 }
 
-::gpk::error_t														update					(::gme::SApplication & app, bool exitSignal)	{
+::gpk::error_t				update		(::gme::SApplication & app, bool exitSignal)	{
 	//::gpk::STimer															timer;
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, exitSignal, "%s", "Exit requested by runtime.");
 	{
 		::std::lock_guard														lock					(app.LockRender);
 		app.Framework.RootWindow.BackBuffer									= app.Offscreen;
 	}
-	::gpk::SFramework														& framework				= app.Framework;
+	::gpk::SFramework				& framework				= app.Framework;
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(framework), "%s", "Exit requested by framework update.");
 	{
 		::gpk::SGUI																& gui					= *framework.GUI;
@@ -278,10 +278,10 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	return 0;
 }
 
-::gpk::error_t														cleanup					(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.RootWindow); }
-::gpk::error_t														draw					(::gme::SApplication & app)						{
+::gpk::error_t				cleanup		(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.RootWindow); }
+::gpk::error_t				draw		(::gme::SApplication & app)						{
 	::gpk::STimer															timer;
-	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>		target;
+	::gpk::pobj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>		target;
 	target.create();
 	target->resize(app.Framework.RootWindow.Size, {0xFF, 0x40, 0x7F, 0xFF}, (uint32_t)-1);
 	//::gpk::clearTarget(*target);

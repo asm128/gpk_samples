@@ -19,16 +19,16 @@ stacxpr	const uint32_t										ASCII_SCREEN_HEIGHT							= 50	;
 GPK_DEFINE_APPLICATION_ENTRY_POINT_MT(::SApplication, "Title");
 
 // --- Cleanup application resources.
-					::gpk::error_t										cleanup										(::SApplication& app)											{
+::gpk::error_t				cleanup		(::SApplication& app)											{
 	// --- when the rendering context is no longer needed ...   
  	// make the rendering context not current  
 	::gpk::mainWindowDestroy(app.Framework.RootWindow);
 	return 0;
 }
 
-					::gpk::error_t										setup										(::SApplication & app)											{
-	::gpk::SFramework															& framework									= app.Framework;
-	::gpk::SWindow																& mainWindow								= framework.RootWindow;
+::gpk::error_t				setup		(::SApplication & app)											{
+	::gpk::SFramework				& framework									= app.Framework;
+	::gpk::SWindow					& mainWindow								= framework.RootWindow;
 	mainWindow.Size														= {1280, 720};
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)), "Failed to create main window why?!");
 
@@ -57,7 +57,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT_MT(::SApplication, "Title");
 	for(uint32_t iModel = 0; iModel < voxModels.size(); ++iModel) {
 		gpk_vox_info_printf("Constructing %s.", app.VOXModelNames[iModel].begin());
 
-		const ::gpk::ptr_obj<::gpk::SVOXData>		& voxFile			= voxModels[iModel];
+		const ::gpk::pobj<::gpk::SVOXData>		& voxFile			= voxModels[iModel];
 		::gpk::SVoxelMap<uint8_t>					& chunkMap			= app.VOXModelMaps[iModel];
 		auto										coord				= voxFile->GetDimensions();
 		chunkMap.Palette						= voxFile->GetBGRA();
@@ -79,9 +79,9 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT_MT(::SApplication, "Title");
 	return 0;
 }
 
-					::gpk::error_t										update										(::SApplication& app, bool systemRequestedExit)					{
+::gpk::error_t				update		(::SApplication& app, bool systemRequestedExit)					{
 	retval_ginfo_if(1, systemRequestedExit, "Exiting because the runtime asked for close. We could also ignore this value and just continue execution if we don't want to exit.");
-	::gpk::SWindow																& mainWindow								= app.Framework.RootWindow;
+	::gpk::SWindow					& mainWindow								= app.Framework.RootWindow;
 	for(uint32_t iEvent = 0; iEvent < mainWindow.EventQueue.size(); ++iEvent) {
 		switch(mainWindow.EventQueue[iEvent].Type) {
 		case ::gpk::SYSEVENT_WINDOW_ACTIVATE:
@@ -402,8 +402,8 @@ struct SCamera {
 	::gpk::n3f32			Position, Target;
 };
 
-::gpk::error_t			draw				(::SApplication& app)	{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
-	::gpk::SFramework			& framework			= app.Framework;
+::gpk::error_t				draw		(::SApplication& app)	{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
+	::gpk::SFramework				& framework			= app.Framework;
 
 	::gpk::pobj<::gpk::rtbgra8d32>	backBuffer		= app.BackBuffer;
 	if(backBuffer.get_ref() && backBuffer.get_ref()->References > 2)

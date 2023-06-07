@@ -31,7 +31,7 @@ static	::gpk::error_t					buildSources					(const ::SBuildConfig & app, const ::
 	return 0;
 }
 
-static	::gpk::error_t					buildProjects					(const ::SBuildConfig & app, int32_t indexOfBuildObject, const ::gpk::view_const_string & projectCollection, const ::gpk::view_const_string & extension) {
+static	::gpk::error_t					buildProjects					(const ::SBuildConfig & app, int32_t indexOfBuildObject, const ::gpk::vcs & projectCollection, const ::gpk::view_const_string & extension) {
 	::gpk::SPathContents						treeOfSolution;
 	int32_t										indexLibNode					= ::gpk::jsonObjectValueGet(*app.TreeConfigOfBuild[indexOfBuildObject], app.TreeConfigOfBuild.View, projectCollection);
 	if(-1 == indexLibNode)
@@ -64,11 +64,11 @@ static	::gpk::error_t					buildProjects					(const ::SBuildConfig & app, int32_t
 	return 0;
 }
 
-static	::gpk::error_t								buildConfig						(const SBuildConfig & app) {
-	const ::gpk::view_const_string							extension						= ".cpp";
-	::gpk::ptr_nco<::gpk::SJSONNode>						rootJSONArray					= app.TreeConfigOfBuild[0];
+static	::gpk::error_t	buildConfig						(const SBuildConfig & app) {
+	const ::gpk::vcs			extension						= ".cpp";
+	::gpk::pnco<::gpk::SJSONNode>	rootJSONArray				= app.TreeConfigOfBuild[0];
 	for(uint32_t iBuild = 0, countBuilds = ::gpk::jsonArraySize(*rootJSONArray); iBuild < countBuilds; ++iBuild) {
-		const int32_t											indexOfBuildObject				= ::gpk::jsonArrayValueGet(*rootJSONArray, iBuild);
+		const int32_t				indexOfBuildObject				= ::gpk::jsonArrayValueGet(*rootJSONArray, iBuild);
 		e_if(::gpk::failed(::buildProjects(app, indexOfBuildObject, "libs", extension)), "%s", "");
 		e_if(::gpk::failed(::buildProjects(app, indexOfBuildObject, "dlls", extension)), "%s", "");
 		e_if(::gpk::failed(::buildProjects(app, indexOfBuildObject, "exes", extension)), "%s", "");
@@ -76,15 +76,15 @@ static	::gpk::error_t								buildConfig						(const SBuildConfig & app) {
 	return 0;
 }
 
-static	int											appMain						(::gpk::vcs filenameConfig)			{
+static	int				appMain			(::gpk::vcs filenameConfig)			{
 	{ // Build single configuration
-		SBuildConfig											configBuild					= {};
-		configBuild.FilenameConfig							= filenameConfig;
+		SBuildConfig				configBuild					= {};
+		configBuild.FilenameConfig	= filenameConfig;
 		{	// load file.
-			ree_if		(::gpk::fileToMemory(configBuild.FilenameConfig, configBuild.JsonConfigOfBuild), "Failed to open build file: '%s'.", configBuild.FilenameConfig.begin());
+			ree_if(::gpk::fileToMemory(configBuild.FilenameConfig, configBuild.JsonConfigOfBuild), "Failed to open build file: '%s'.", configBuild.FilenameConfig.begin());
 		}
 		{	// process json
-			ree_if		(::gpk::jsonParse(configBuild.TreeConfigOfBuild, {configBuild.JsonConfigOfBuild.begin(), configBuild.JsonConfigOfBuild.size()})
+			ree_if(::gpk::jsonParse(configBuild.TreeConfigOfBuild, {configBuild.JsonConfigOfBuild.begin(), configBuild.JsonConfigOfBuild.size()})
 				, "Failed to process configuration file: %s. Path: %s. Contents:\n%s"
 				, ::gpk::toString(configBuild.FilenameConfig	).begin()
 				, ::gpk::toString(configBuild.PathConfig		).begin()
@@ -97,8 +97,8 @@ static	int											appMain						(::gpk::vcs filenameConfig)			{
 				, ::gpk::toString(configBuild.PathConfig		).begin()
 				, ::gpk::toString(configBuild.JsonConfigOfBuild	).begin()
 			);
-			int32_t													indexOfLastSlash			= ::gpk::findLastSlash(configBuild.FilenameConfig);
-			configBuild.PathConfig								= (-1 == indexOfLastSlash) ? "./" : ::gpk::view_const_string{configBuild.FilenameConfig.begin(), (uint32_t)indexOfLastSlash};
+			int32_t						indexOfLastSlash			= ::gpk::findLastSlash(configBuild.FilenameConfig);
+			configBuild.PathConfig	= (-1 == indexOfLastSlash) ? "./" : ::gpk::view_const_string{configBuild.FilenameConfig.begin(), (uint32_t)indexOfLastSlash};
 			gpk_necall	(::buildConfig(configBuild)
 				, "Build failed. Configuration file: %s. Path: %s. Contents:\n%s"
 				, ::gpk::toString(configBuild.FilenameConfig	).begin()
@@ -110,7 +110,7 @@ static	int											appMain						(::gpk::vcs filenameConfig)			{
 	return 0;
 }
 
-int													main							(int argc, char** argv)			{
+int						main			(int argc, char** argv)			{
 	ree_if(argc < 2, "USAGE: \n\t%s [path/to/solution]", argv[0]);
 	return ::appMain({argv[1], (uint32_t)-1});
 }

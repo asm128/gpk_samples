@@ -34,7 +34,7 @@ namespace klib
 		::klib::SCharacterResearch								Research					= {};
 		::klib::SCharacterScore									Score						= {};
 		::gpk::apod<char>								Name						= ::gpk::view_const_string{"Kasparov"};
-		::gpk::array_obj<::gpk::ptr_obj<::klib::CCharacter>>	Army						= {};
+		::gpk::array_obj<::gpk::pobj<::klib::CCharacter>>	Army						= {};
 		//---------------
 		bool													SelectNextAgent				()													{
 			uint32_t													count						= 0;

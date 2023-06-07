@@ -9,39 +9,39 @@
 
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 
-			::gpk::error_t											cleanup					(::gme::SApplication & app)							{
+::gpk::error_t				cleanup		(::gme::SApplication & app)							{
 	::gpk::mainWindowDestroy(app.Framework.RootWindow);
 	::gpk::clientDisconnect(app.LobbyClient.Client);
 	::gpk::tcpipShutdown();
 	::gpk::sleep(100);
 	return 0;
 }
-			::gpk::error_t											setup						(::gme::SApplication & app)						{
-	::gpk::SFramework														& framework					= app.Framework;
-	::gpk::SWindow															& mainWindow				= framework.RootWindow;
+::gpk::error_t				setup		(::gme::SApplication & app)						{
+	::gpk::SFramework				& framework					= app.Framework;
+	::gpk::SWindow					& mainWindow				= framework.RootWindow;
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)), "Failed to create main window why?!");
-	::gpk::SGUI																& gui						= *framework.GUI;
-	app.IdExit															= ::gpk::controlCreate(gui);
-	::gpk::SControl															& controlExit				= gui.Controls.Controls[app.IdExit];
-	controlExit.Area													= {{0, 0}, {64, 20}};
-	controlExit.Border													= {1, 1, 1, 1};
-	controlExit.Margin													= {1, 1, 1, 1};
-	controlExit.Align													= ::gpk::ALIGN_BOTTOM_RIGHT;
-	::gpk::SControlText														& controlText				= gui.Controls.Text[app.IdExit];
-	controlText.Text													= "Exit";
-	controlText.Align													= ::gpk::ALIGN_CENTER;
-	::gpk::SControlConstraints												& controlConstraints		= gui.Controls.Constraints[app.IdExit];
-	controlConstraints.AttachSizeToText.y								= app.IdExit;
-	controlConstraints.AttachSizeToText.x								= app.IdExit;
+	::gpk::SGUI						& gui						= *framework.GUI;
+	app.IdExit					= ::gpk::controlCreate(gui);
+	::gpk::SControl					& controlExit				= gui.Controls.Controls[app.IdExit];
+	controlExit.Area			= {{0, 0}, {64, 20}};
+	controlExit.Border			= {1, 1, 1, 1};
+	controlExit.Margin			= {1, 1, 1, 1};
+	controlExit.Align			= ::gpk::ALIGN_BOTTOM_RIGHT;
+	::gpk::SControlText				& controlText				= gui.Controls.Text[app.IdExit];
+	controlText.Text			= "Exit";
+	controlText.Align			= ::gpk::ALIGN_CENTER;
+	::gpk::SControlConstraints		& controlConstraints		= gui.Controls.Constraints[app.IdExit];
+	controlConstraints.AttachSizeToText.y	= app.IdExit;
+	controlConstraints.AttachSizeToText.x	= app.IdExit;
 	::gpk::controlSetParent(gui, app.IdExit, -1);
 	gpk_necall(::gpk::tcpipInitialize(), "Failed to initialize network subsystem: '%s'.", "Unknown error");
 
-	app.LobbyClient.Client.AddressConnect											= {};
+	app.LobbyClient.Client.AddressConnect	= {};
 	::gpk::tcpipAddress(9998, 0, ::gpk::TRANSPORT_PROTOCOL_UDP, app.LobbyClient.Client.AddressConnect);	// If loading the remote IP from the json fails, we fall back to the local address.
 	{ // attempt to load address from config file.
-		const ::gpk::SJSONReader												& jsonReader						= framework.JSONConfig.Reader;
+		const ::gpk::SJSONReader		& jsonReader				= framework.JSONConfig.Reader;
 		{ //
-			::gpk::view_const_string												jsonIP								= {};
+			::gpk::vcs						jsonIP						= {};
 			gwarn_if(errored(::gpk::jsonExpressionResolve(::gpk::vcs{"application.test_udp_client.remote_ip"}, jsonReader, 0, jsonIP)), "Failed to load config from json! Last contents found: %s.", jsonIP.begin())
 			else {
 				info_printf("Remote IP: %s.", jsonIP.begin());
@@ -49,12 +49,12 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 			}
 		}
 		{ // load port from config file
-			::gpk::view_const_string												jsonPort							= {};
+			::gpk::vcs						jsonPort					= {};
 			gwarn_if(errored(::gpk::jsonExpressionResolve(::gpk::vcs{"application.test_udp_client.remote_port"}, jsonReader, 0, jsonPort)), "Failed to load config from json! Last contents found: %s.", jsonPort.begin())
 			else {
-				uint64_t																port;
+				uint64_t						port;
 				::gpk::parseIntegerDecimal(jsonPort, &port);
-				app.LobbyClient.Client.AddressConnect.Port										= (uint16_t)port;
+				app.LobbyClient.Client.AddressConnect.Port	= (uint16_t)port;
 				info_printf("Remote port: %u.", (uint32_t)port);
 			}
 		}
@@ -62,23 +62,23 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	//::gpk::clientConnect(app.LobbyClient.Client);
 	return 0;
 }
-			::gpk::error_t											update						(::gme::SApplication & app, bool exitSignal)	{
-	::gpk::STimer															timer;
+::gpk::error_t				update		(::gme::SApplication & app, bool exitSignal)	{
+	::gpk::STimer					timer;
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, exitSignal, "Exit requested by runtime.");
 	{
-		::std::lock_guard														lock						(app.LockRender);
-		app.Framework.RootWindow.BackBuffer									= app.Offscreen;
+		::std::lock_guard				lock						(app.LockRender);
+		app.Framework.RootWindow.BackBuffer	= app.Offscreen;
 	}
-	::gpk::SFramework														& framework					= app.Framework;
+	::gpk::SFramework				& framework					= app.Framework;
 	app.LobbyClient.Update(framework.RootWindow.Input, framework.RootWindow.EventQueue);
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework), "Exit requested by framework update.");
 
-	::gpk::SGUI																& gui						= *framework.GUI;
-	::gpk::array_pod<uint32_t>												controlsToProcess			= {};
+	::gpk::SGUI						& gui						= *framework.GUI;
+	::gpk::array_pod<uint32_t>		controlsToProcess			= {};
 	::gpk::guiGetProcessableControls(gui, controlsToProcess);
 	for(uint32_t iControl = 0, countControls = controlsToProcess.size(); iControl < countControls; ++iControl) {
-		uint32_t																idControl					= controlsToProcess[iControl];
-		const ::gpk::SControlState												& controlState				= gui.Controls.States[idControl];
+		uint32_t						idControl					= controlsToProcess[iControl];
+		const ::gpk::SControlState		& controlState				= gui.Controls.States[idControl];
 		if(controlState.Execute) {
 			info_printf("Executed %u.", idControl);
 			if(idControl == (uint32_t)app.IdExit)
@@ -92,11 +92,11 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	if(false)
 	{
 		//if(bSend) {
-			::gpk::connectionPushData(app.LobbyClient.Client, app.LobbyClient.Client.Queue, "Message arrived!", true, true	  , 32);
+			::gpk::connectionPushData(app.LobbyClient.Client, app.LobbyClient.Client.Queue, "Message arrived!", true, true, 32);
 		//	bSend = false;
 		//}
-		::gpk::connectionPushData(app.LobbyClient.Client, app.LobbyClient.Client.Queue, "Message arrived! 2", false, true , 0);
-		::gpk::connectionPushData(app.LobbyClient.Client, app.LobbyClient.Client.Queue, "Message arrived! 3", true, false , 0);
+		::gpk::connectionPushData(app.LobbyClient.Client, app.LobbyClient.Client.Queue, "Message arrived! 2", false, true, 0);
+		::gpk::connectionPushData(app.LobbyClient.Client, app.LobbyClient.Client.Queue, "Message arrived! 3", true, false, 0);
 		::gpk::connectionPushData(app.LobbyClient.Client, app.LobbyClient.Client.Queue, "Message arrived! 4", false, false, 0);
 		::gpk::clientUpdate(app.LobbyClient.Client);
 		::gpk::sleep(1);
@@ -128,20 +128,20 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	return 0;
 }
 
-			::gpk::error_t												draw					(::gme::SApplication & app)						{
-	::gpk::STimer																timer;
-	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>			target;
+::gpk::error_t				draw		(::gme::SApplication & app)						{
+	::gpk::STimer					timer;
+	::gpk::pobj<::gpk::rtbgra8d32>	target;
 	target.create();
 	target->resize(app.Framework.RootWindow.Size, {0xFF, 0x20, 0x6F, 0xCF}, (uint32_t)-1);
 	app.LobbyClient.Draw(target->Color);
 	//::gpk::clearTarget(*target);
 	{
-		::std::lock_guard															lock					(app.LockGUI);
+		::std::lock_guard				lock		(app.LockGUI);
 		::gpk::controlDrawHierarchy(*app.Framework.GUI, 0, target->Color.View);
 	}
 	{
-		::std::lock_guard															lock					(app.LockRender);
-		app.Offscreen															= target;
+		::std::lock_guard				lock		(app.LockRender);
+		app.Offscreen				= target;
 	}
 	//timer.Frame();
 	//warning_printf("Draw time: %f.", (float)timer.LastTimeSeconds);

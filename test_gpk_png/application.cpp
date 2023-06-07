@@ -12,10 +12,10 @@
 
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 
-			::gpk::error_t											cleanup								(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.RootWindow); }
-			::gpk::error_t											setup								(::gme::SApplication & app)						{
-	::gpk::SFramework														& framework							= app.Framework;
-	::gpk::SWindow															& mainWindow						= framework.RootWindow;
+::gpk::error_t				cleanup		(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.RootWindow); }
+::gpk::error_t				setup		(::gme::SApplication & app)						{
+	::gpk::SFramework				& framework							= app.Framework;
+	::gpk::SWindow					& mainWindow						= framework.RootWindow;
 	mainWindow.Size														= {1280, 720};
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)), "Failed to create main window. %s.", "why?!");
 	{ // Build the exit button
@@ -96,17 +96,17 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 	return 0;
 }
 
-			::gpk::error_t											update						(::gme::SApplication & app, bool exitSignal)	{
+::gpk::error_t				update		(::gme::SApplication & app, bool exitSignal)	{
 	//::gpk::STimer															timer;
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, exitSignal, "%s", "Exit requested by runtime.");
 	{
 		::std::lock_guard														lock						(app.LockRender);
 		app.Framework.RootWindow.BackBuffer									= app.Offscreen;
 	}
-	::gpk::SFramework														& framework					= app.Framework;
+	::gpk::SFramework				& framework					= app.Framework;
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework), "%s", "Exit requested by framework update.");
 
-	::gpk::SGUI																& gui						= *framework.GUI;
+	::gpk::SGUI						& gui						= *framework.GUI;
 	::gpk::array_pod<uint32_t>												controlsToProcess			= {};
 	::gpk::guiGetProcessableControls(gui, controlsToProcess);
 	for(uint32_t iControl = 0, countControls = controlsToProcess.size(); iControl < countControls; ++iControl) {
@@ -123,10 +123,10 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 	return 0;
 }
 
-			::gpk::error_t											draw					(::gme::SApplication & app)							{
+::gpk::error_t				draw		(::gme::SApplication & app)							{
 	//::gpk::STimer															timer;
 	(void)app;
-	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>		target;
+	::gpk::pobj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>		target;
 	target.create();
 	target->resize(app.Framework.RootWindow.Size, {}, 0xFFFFFFFFU);
 	for(uint32_t y = 0; y < target->Color.View.metrics().y; ++y)

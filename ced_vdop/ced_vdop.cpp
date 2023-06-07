@@ -10,14 +10,14 @@
 
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 
-::gpk::error_t										cleanup							(::SApplication & app)						{
+::gpk::error_t				cleanup		(::SApplication & app)						{
 	::klib::shutdownASCIIScreen();
 	return ::gpk::mainWindowDestroy(app.Framework.RootWindow);
 }
 
-::gpk::error_t										setup							(::SApplication & app)						{
-	::gpk::SFramework										& framework						= app.Framework;
-	::gpk::SWindow											& mainWindow					= framework.RootWindow;
+::gpk::error_t				setup		(::SApplication & app)						{
+	::gpk::SFramework				& framework						= app.Framework;
+	::gpk::SWindow					& mainWindow					= framework.RootWindow;
 	mainWindow.Size										= {1280, 720};
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)), "Failed to create main window. %s.", "why?!");
 	{ // Build the exit button
@@ -42,7 +42,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 	const ::gpk::n2<uint32_t>							metricsMap			= app.TextOverlay.MetricsMap;
 	const ::gpk::n2<uint32_t>							metricsLetter		= app.TextOverlay.MetricsLetter;
 	::gpk::SImage<::gpk::bgra>						fontImage;
-	::gpk::pngFileLoad(::gpk::view_const_string{"../gpk_data/images/Codepage_437_24_12x12.png"}, fontImage);
+	::gpk::pngFileLoad(::gpk::vcs{"../gpk_data/images/Codepage_437_24_12x12.png"}, fontImage);
 	::gpk::view_grid<::gpk::SGeometryQuads>					viewGeometries		= {app.TextOverlay.GeometryLetters, {16, 16}};
 	const uint32_t											imagePitch			= metricsLetter.x * metricsMap.x;
 
@@ -77,7 +77,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 }
 
 int													update				(SApplication & app, bool exitSignal)	{
-	::gpk::SFramework										& framework			= app.Framework;
+	::gpk::SFramework				& framework			= app.Framework;
 	//::gpk::STimer															timer;
 	(void)exitSignal;
 	//retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, exitSignal, "%s", "Exit requested by runtime.");
@@ -87,7 +87,7 @@ int													update				(SApplication & app, bool exitSignal)	{
 	}
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework), "%s", "Exit requested by framework update.");
 
-	::gpk::SGUI												& gui						= *framework.GUI;
+	::gpk::SGUI						& gui						= *framework.GUI;
 	::gpk::array_pod<uint32_t>								controlsToProcess			= {};
 	::gpk::guiGetProcessableControls(gui, controlsToProcess);
 	for(uint32_t iControl = 0, countControls = controlsToProcess.size(); iControl < countControls; ++iControl) {
@@ -198,7 +198,7 @@ int													draw3DCharacter
 }
 
 int													draw					(SApplication & app) {
-	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>		target;
+	::gpk::pobj<::gpk::SRenderTarget<::gpk::bgra, uint32_t>>		target;
 	target.create();
 	target->resize(app.Framework.RootWindow.Size, ::gpk::DARKGREEN, 0xFFFFFFFFU);
 	::gpk::view_grid<::gpk::bgra>						targetPixels			= target->Color;
