@@ -3,7 +3,7 @@
 #include "gpk_dialog.h"
 #include "gpk_camera.h"
 #include "gpk_matrix.h"
-#include "gpk_geometry.h"
+#include "gpk_scene.h"
 
 #include <mutex>
 

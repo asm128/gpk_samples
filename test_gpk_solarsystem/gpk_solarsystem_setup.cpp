@@ -2,6 +2,7 @@
 #include "gpk_json.h"
 #include "gpk_stdstring.h"
 #include "gpk_label.h"
+#include "gpk_png.h"
 
 struct SPlanet {
 	float	Mass				;
@@ -29,9 +30,14 @@ stacxpr const double	PLANET_ORBITALINCLINATION	[::ssg::PLANET_COUNT]	=	{	7.0				
 stacxpr const double	PLANET_ORBITALECCENTRICITY	[::ssg::PLANET_COUNT]	=	{	0.205f				, 0.007f			, 0.017f			, 0.094f			, 0.049f				, 0.057f				, 0.046f				, 0.011f				, 0.244f			};
 stacxpr const char*	PLANET_IMAGE				[::ssg::PLANET_COUNT]	=	{	"mercury_color.png"	, "venus_color.png"	, "earth_color.png"	, "mars_color.png"	, "jupiter_color.png"	, "saturn_color.png"	, "uranus_color.png"	, "neptune_color.png"	, "pluto_color.png"	};
 
-int													ssg::solarSystemSetup				(::ssg::SSolarSystemGame & solarSystem, const ::gpk::vcc & filename)	{
+int						ssg::solarSystemSetup				(::ssg::SSolarSystemGame & solarSystem, const ::gpk::vcc & filename)	{
 	solarSystem.Geometries.resize(1);
-	::gpk::geometryBuildSphere(solarSystem.Geometries[0], 16U, 16U, 1, {});
+	::gpk::SParamsSphere	params			= {};
+	params.Stacks		= 16;
+	params.Slices		= 16;
+	params.Radius		= 1;
+	params.Center		= {};
+	::gpk::geometryBuildSphere(solarSystem.Geometries[0], params);
 //	::gpk::geometryBuildFromSTL();
 
 	SPlanet													planet								= {};

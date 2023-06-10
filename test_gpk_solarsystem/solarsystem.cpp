@@ -1,6 +1,6 @@
 #include "solarsystem.h"
+#include "gpk_geometry_draw.h"
 #include "gpk_png.h"
-#include "gpk_image.h"
 #include "gpk_ptr.h"
 #include "gpk_stl.h"
 
@@ -11,68 +11,70 @@
 #if defined(GPK_WINDOWS)
 #	include <Windows.h>
 #endif
+#include "gpk_raster_lh.h"
 
-::gpk::error_t							geometryBuildFromSTL			(const ::gpk::SSTLFile & stlFile, ::gpk::SGeometryTriangles & geometry) {
-	geometry.Triangles		.resize(stlFile.Triangles.size());
-	geometry.Normals		.resize(stlFile.Triangles.size());
-	geometry.TextureCoords	.resize(stlFile.Triangles.size());
-	for(uint32_t iTriangle = 0; iTriangle < stlFile.Triangles.size(); ++iTriangle) {
-		geometry.Normals		[iTriangle] = {stlFile.Triangles[iTriangle].Normal, stlFile.Triangles[iTriangle].Normal, stlFile.Triangles[iTriangle].Normal};
-		geometry.Triangles		[iTriangle] = stlFile.Triangles[iTriangle].Triangle;
-		geometry.TextureCoords	[iTriangle] = {};
-	}
-	return 0;
-}
+//static	::gpk::error_t	geometryBuildFromSTL			(const ::gpk::SSTLFile & stlFile, ::gpk::SGeometryTriangles & geometry) {
+//	geometry.Triangles		.resize(stlFile.Triangles.size());
+//	geometry.Normals		.resize(stlFile.Triangles.size());
+//	geometry.TextureCoords	.resize(stlFile.Triangles.size());
+//	for(uint32_t iTriangle = 0; iTriangle < stlFile.Triangles.size(); ++iTriangle) {
+//		geometry.Normals		[iTriangle] = {stlFile.Triangles[iTriangle].Normal, stlFile.Triangles[iTriangle].Normal, stlFile.Triangles[iTriangle].Normal};
+//		geometry.Triangles		[iTriangle] = stlFile.Triangles[iTriangle].Triangle;
+//		geometry.TextureCoords	[iTriangle] = {};
+//	}
+//	return 0;
+//}
 
-static	int											drawDebris			(::gpk::view_grid<::gpk::bgra> targetPixels, ::ssg::SDebris & debris, const ::gpk::m4<float> & matrixVPV, ::gpk::view_grid<uint32_t> depthBuffer)	{
-	::gpk::array_pod<::gpk::n2<int32_t>>				pixelCoords;
+static	::gpk::error_t	drawDebris			(::gpk::view_grid<::gpk::bgra> targetPixels, ::ssg::SDebris & debris, const ::gpk::m4<float> & matrixVPV, ::gpk::view_grid<uint32_t> depthBuffer)	{
+	::gpk::apod<::gpk::n2i32>	pixelCoords;
 	for(uint32_t iParticle = 0; iParticle < debris.Brightness.size(); ++iParticle) {
-		::gpk::rgbaf										colorShot			= debris.Colors[iParticle % ::gpk::size(debris.Colors)];
-		::gpk::n3f32									starPos				= debris.Particles.Position[iParticle];
-		starPos												= matrixVPV.Transform(starPos);
-		const ::gpk::n2<int32_t>							pixelCoord			= {(int32_t)starPos.x, (int32_t)starPos.y};
+		::gpk::rgbaf				colorShot			= debris.Colors[iParticle % ::gpk::size(debris.Colors)];
+		::gpk::n3f32				starPos				= debris.Particles.Position[iParticle];
+		starPos					= matrixVPV.Transform(starPos);
+		const ::gpk::n2i32			pixelCoord			= {(int32_t)starPos.x, (int32_t)starPos.y};
 		if( pixelCoord.y < 0 || pixelCoord.y >= (int32_t)targetPixels.metrics().y
 		 || pixelCoord.x < 0 || pixelCoord.x >= (int32_t)targetPixels.metrics().x
 		)
 			continue;
 		if(starPos.z > 1 || starPos.z < 0)
 			continue;
-		uint32_t												depth				= uint32_t(starPos.z * 0xFFFFFFFFU);
+		uint32_t					depth				= uint32_t(starPos.z * 0xFFFFFFFFU);
 		if(depth > depthBuffer[pixelCoord.y][pixelCoord.x])
 			continue;
-		::gpk::rgbaf											starFinalColor	= colorShot * debris.Brightness[iParticle];
-		starFinalColor.g										= ::gpk::max(0.0f, starFinalColor.g - (1.0f - ::gpk::min(1.0f, debris.Brightness[iParticle] * 2.5f * (1.0f / debris.Brightness.size() * iParticle * 2))));
-		starFinalColor.b										= ::gpk::max(0.0f, starFinalColor.b - (1.0f - ::gpk::min(1.0f, debris.Brightness[iParticle] * 2.5f * (1.0f / debris.Brightness.size() * iParticle * 1))));
+
+		::gpk::rgbaf				starFinalColor		= colorShot * debris.Brightness[iParticle];
+		starFinalColor.g		= ::gpk::max(0.0f, starFinalColor.g - (1.0f - ::gpk::min(1.0f, debris.Brightness[iParticle] * 2.5f * (1.0f / debris.Brightness.size() * iParticle * 2))));
+		starFinalColor.b		= ::gpk::max(0.0f, starFinalColor.b - (1.0f - ::gpk::min(1.0f, debris.Brightness[iParticle] * 2.5f * (1.0f / debris.Brightness.size() * iParticle * 1))));
 		//::gpk::setPixel(targetPixels, pixelCoord, starFinalColor);
-		const	double											brightRadius		= 2.0;
-		const	double											brightRadiusSquared	= brightRadius * brightRadius;
-		double													brightUnit			= 1.0 / brightRadiusSquared;
+		const double				brightRadius		= 2.0;
+		const double				brightRadiusSquared	= brightRadius * brightRadius;
+		double						brightUnit			= 1.0 / brightRadiusSquared;
 		for(int32_t y = (int32_t)-brightRadius - 1; y < (int32_t)brightRadius + 1; ++y)
 		for(int32_t x = (int32_t)-brightRadius - 1; x < (int32_t)brightRadius + 1; ++x) {
-			::gpk::n2<float>									brightPos			= {(float)x, (float)y};
-			const double											brightDistance		= brightPos.LengthSquared();
+			::gpk::n2f32				brightPos			= {(float)x, (float)y};
+			const double				brightDistance		= brightPos.LengthSquared();
 			if(brightDistance <= brightRadiusSquared) {
-				::gpk::n2<int32_t>									blendPos			= pixelCoord + (brightPos).Cast<int32_t>();
+				::gpk::n2i32				blendPos			= pixelCoord + (brightPos).Cast<int32_t>();
 				if( blendPos.y < 0 || blendPos.y >= (int32_t)targetPixels.metrics().y
 				 || blendPos.x < 0 || blendPos.x >= (int32_t)targetPixels.metrics().x
 				)
 					continue;
-				uint32_t												& blendVal			= depthBuffer[blendPos.y][blendPos.x];
+				uint32_t					& blendVal			= depthBuffer[blendPos.y][blendPos.x];
 				//if(depth > blendVal)
 				//	continue;
-				blendVal											= depth;
-				double													finalBrightness					= 1.0-(brightDistance * brightUnit);
-				::gpk::bgra										& pixelVal						= targetPixels[blendPos.y][blendPos.x];
-				::gpk::rgbaf										pixelColor						= starFinalColor * finalBrightness + pixelVal;
-				pixelVal											= pixelColor.Clamp();
+				blendVal				= depth;
+				double						finalBrightness		= 1.0 - (brightDistance * brightUnit);
+				::gpk::bgra					& pixelVal			= targetPixels[blendPos.y][blendPos.x];
+				::gpk::rgbaf				pixelColor			= starFinalColor * finalBrightness + pixelVal;
+				pixelVal				= pixelColor.Clamp();
 			}
 		}
 	}
 	return 0;
 }
 
-int													updateEntityTransforms		(uint32_t iEntity, ::gpk::array_obj<::ssg::SEntity> & entities, ssg::SScene & scene, ::gpk::SRigidBodyIntegrator & bodies)	{
-	const ssg::SEntity										& entity					= entities[iEntity];
+static	::gpk::error_t	updateEntityTransforms		(uint32_t iEntity, ::gpk::array_obj<::ssg::SEntity> & entities, ssg::SScene & scene, ::gpk::SRigidBodyIntegrator & bodies)	{
+	const ssg::SEntity			& entity					= entities[iEntity];
 	if(-1 == entity.Body)
 		scene.Transform[iEntity]							= (-1 == entity.Parent) ? bodies.MatrixIdentity4 : scene.Transform[entity.Parent];
 	else {
@@ -154,13 +156,13 @@ int													ssg::solarSystemUpdate			(ssg::SSolarSystemGame & solarSystem, d
 	matrixView											*= matrixProjection;
 	matrixView											*= matrixViewport;
 
-	::gpk::array_pod<::gpk::n2<int16_t>>				pixelCoords					= {};
-	::gpk::array_pod<::gpk::tri<float>>		pixelVertexWeights			= {};
-	::gpk::SModelMatrices									matrices					= {};
-	::gpk::view_grid<uint32_t>								depthBuffer					= target->DepthStencil.View;
+	::gpk::apod<::gpk::n2i16>			pixelCoords					= {};
+	::gpk::apod<::gpk::trif32>			pixelVertexWeights			= {};
+	::gpk::SModelMatrices				matrices					= {};
+	::gpk::v2u32						depthBuffer					= target->DepthStencil.View;
 	memset(depthBuffer.begin(), -1, sizeof(uint32_t) * depthBuffer.size());
-	::gpk::array_pod<::gpk::SLight3>						lightPoints;
-	::gpk::array_pod<::gpk::rgbaf>					lightColors;
+	::gpk::apod<::gpk::SLight3>						lightPoints;
+	::gpk::apod<::gpk::rgbaf>					lightColors;
 	lightPoints.push_back({{0,0,0}, 10000});
 	lightColors.push_back(::gpk::WHITE);
 
