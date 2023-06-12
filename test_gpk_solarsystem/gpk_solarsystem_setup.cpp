@@ -62,7 +62,7 @@ int						ssg::solarSystemSetup				(::ssg::SSolarSystemGame & solarSystem, const 
 			//int32_t								iBodyValue				= ::gpk::jsonObjectValueGet(solarSystemFile.Reader, jsonIndexStellarBody, planet.Name);
 			const uint32_t						propertyCount			= ::gpk::jsonObjectKeyList(solarSystemFile.Reader, jsonIndexStellarBody + 2, propertyIndices);
 			for(uint32_t iProperty = 0; iProperty < propertyCount; ++iProperty) 
-				::gpk::tolower(::gpk::view_char{(char*)jsonView[propertyIndices[iProperty]].begin(), star.Name.size()});
+				::gpk::tolower(::gpk::view<char>{(char*)jsonView[propertyIndices[iProperty]].begin(), star.Name.size()});
 
 			int32_t								iTypeValue				= ::gpk::jsonObjectValueGet(solarSystemFile.Reader, jsonIndexStellarBody + 2, "type");
 			STELLAR_BODY						bodyType				= (0 == strncmp(jsonView[iTypeValue].begin(), "star", 4)) ? STELLAR_BODY_STAR : STELLAR_BODY_PLANET;

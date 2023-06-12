@@ -46,7 +46,7 @@ int							main						()			{
 		gpk_necs(::gpk::fileToMemory("klib_renewal.lib", testBytes));
 		es_if(errored(::gpk::fileFromMemorySecure	(fileName, key, true, testBytes)));
 		es_if(errored(::gpk::fileToMemorySecure		(fileName, key, true, loadedBytes)));
-		es_if(loadedBytes != testBytes);
+		es_if(loadedBytes != ::gpk::vcu8{testBytes});
 	}
 	//const char  a[ ] = "TGFzdCBDaGFuY2UhIC0gQ0dJIEludGVyY2VwdG9yIC0gYXNtMTI4IChjKSAyMDA5LTIwMTkA";
 	::gpk::au8 signaturesEncoded [::gpk::size(signatureToEncode)]	= {};

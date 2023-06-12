@@ -494,11 +494,11 @@ static const ::gpk::vcs								fileNames []								=
 
 int main() {
 	::gpk::au8						fileBytes;
-	::gpk::array_static<char, 256>		pathNameData		= {"../gpk_data"};
-	::gpk::array_static<char, 256>		folderNameVox		= {"vox"};
-	char								pathToLoad[4096]	= {};
-	uint64_t							timeStart			= ::gpk::timeCurrentInMs();
-	::gpk::array_pobj<::gpk::SVOXData>	voxModels;
+	::gpk::astatic<char, 256>		pathNameData		= {"../gpk_data"};
+	::gpk::astatic<char, 256>		folderNameVox		= {"vox"};
+	char							pathToLoad[4096]	= {};
+	uint64_t						timeStart			= ::gpk::timeCurrentInMs();
+	::gpk::apobj<::gpk::SVOXData>	voxModels;
 	for(uint32_t iModel = 0; iModel < ::gpk::size(fileNames); ++iModel) { 
 		const gpk::vcc					fileName			= fileNames[iModel];
 		sprintf_s(pathToLoad, "%s/%s/%s", pathNameData.Storage, folderNameVox.Storage, fileName.begin());

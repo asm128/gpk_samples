@@ -21,11 +21,11 @@ bool																	equipEntityIfResearched
 	, const ::klib::SResearchGroup	<_tEntity>	& completedResearchAgent
 	, const ::klib::SEntityTable	<_tEntity>	& table
 	, _tEntity									& equippedEntity
-	, const ::gpk::view_const_char				& cantAccessDefinitionError
-	, const ::gpk::view_const_char				& cantAccessModifierError
-	, const ::gpk::view_const_char				& storeOldWeaponMessage
-	, const ::gpk::view_const_char				& equipNewWeaponMessage
-	, const ::gpk::view_const_char				& researchTypeString
+	, const ::gpk::vcc				& cantAccessDefinitionError
+	, const ::gpk::vcc				& cantAccessModifierError
+	, const ::gpk::vcc				& storeOldWeaponMessage
+	, const ::gpk::vcc				& equipNewWeaponMessage
+	, const ::gpk::vcc				& researchTypeString
 	)
 {
 	if(slotIndex >= entityContainer.size()) //invalid index do nothing.
@@ -61,14 +61,14 @@ void																	equipEntityMenu
 	, const ::klib::SResearchGroup	<_tEntity>	& completedResearch
 	, const ::klib::SEntityTable	<_tEntity>	& table
 	, _tEntity									& currentEntity
-	, const ::gpk::view_const_char				& noWeaponMessage
-	, const ::gpk::view_const_char				& currentlyCarryingMessage
-	, const ::gpk::view_const_char				& selectYourChoiceMessage
-	, const ::gpk::view_const_char				& cantAccessDefinitionError
-	, const ::gpk::view_const_char				& cantAccessModifierError
-	, const ::gpk::view_const_char				& storeOldWeaponMessage
-	, const ::gpk::view_const_char				& equipNewWeaponMessage
-	, const ::gpk::view_const_char				& researchTypeString
+	, const ::gpk::vcc				& noWeaponMessage
+	, const ::gpk::vcc				& currentlyCarryingMessage
+	, const ::gpk::vcc				& selectYourChoiceMessage
+	, const ::gpk::vcc				& cantAccessDefinitionError
+	, const ::gpk::vcc				& cantAccessModifierError
+	, const ::gpk::vcc				& storeOldWeaponMessage
+	, const ::gpk::vcc				& equipNewWeaponMessage
+	, const ::gpk::vcc				& researchTypeString
 	)
 {
 	if( 0 == characterInventory.size() )	{
@@ -448,9 +448,9 @@ void																	bar											(::klib::CCharacter& adventurer)						{
 template<typename _tEntity>
 void																	displayCharacterEquip
 	( const _tEntity														& equip
-	, const ::gpk::view_const_char											& messageFormat
-	, const ::gpk::view_const_char											& adventurerName
-	, const ::gpk::view_const_char											& weaponName
+	, const ::gpk::vcc											& messageFormat
+	, const ::gpk::vcc											& adventurerName
+	, const ::gpk::vcc											& weaponName
 	, const ::klib::SEntityTable<_tEntity>									& table
 	)
 {
@@ -492,7 +492,7 @@ void																	displayResume								(::klib::CCharacter& adventurer)						
 	finalFlags.Print();
 }
 
-void																	displayInventory							(const ::klib::SEntityContainer<klib::SItem>& inventory, const ::gpk::view_const_char& characterName)												{
+void																	displayInventory							(const ::klib::SEntityContainer<klib::SItem>& inventory, const ::gpk::vcc& characterName)												{
 	printf("\n-- %s's inventory --\n", characterName.begin());
 	if(inventory.size()) {
 		printf("You look at the remaining supplies...\n");

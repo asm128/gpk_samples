@@ -3,12 +3,12 @@
 
 #include <algorithm>
 
-::klib::SLifePoints		klib::applyShieldableDamage	(const ::klib::SEntityTables & tables, ::klib::SGameMessages & messages, CCharacter& target, int32_t damageDealt, const ::gpk::view_const_char& sourceName) {
+::klib::SLifePoints		klib::applyShieldableDamage	(const ::klib::SEntityTables & tables, ::klib::SGameMessages & messages, CCharacter& target, int32_t damageDealt, const ::gpk::vcc& sourceName) {
 	return applyShieldableDamage(tables, messages, target, damageDealt, getArmorAbsorption(tables.Armor, target.CurrentEquip.Armor), sourceName);
 }
 
 // Returns final passthrough damage (not blocked by shield) to use by vampire and reflect effects.
-::klib::SLifePoints		klib::applyShieldableDamage	(const ::klib::SEntityTables & tables, ::klib::SGameMessages & messages, CCharacter& target, int32_t damageDealt, int32_t absorptionRate, const ::gpk::view_const_char& sourceName) {
+::klib::SLifePoints		klib::applyShieldableDamage	(const ::klib::SEntityTables & tables, ::klib::SGameMessages & messages, CCharacter& target, int32_t damageDealt, int32_t absorptionRate, const ::gpk::vcc& sourceName) {
 	if(0 >= target.Points.LifeCurrent.Health)	// This character is already dead
 		return {};
 
@@ -104,7 +104,7 @@
 }
 
 
-::klib::COMBAT_STATUS			klib::applyAttackStatus			(const ::klib::SEntityTables & tables, ::klib::SGameMessages & messages, ::klib::CCharacter& target, COMBAT_STATUS weaponStatus, int32_t absorbChance, int32_t turnCount, const ::gpk::view_const_char & sourceName)		{
+::klib::COMBAT_STATUS			klib::applyAttackStatus			(const ::klib::SEntityTables & tables, ::klib::SGameMessages & messages, ::klib::CCharacter& target, COMBAT_STATUS weaponStatus, int32_t absorbChance, int32_t turnCount, const ::gpk::vcc & sourceName)		{
 	if(::klib::COMBAT_STATUS_NONE == weaponStatus || 0 >= target.Points.LifeCurrent.Health)
 		return ::klib::COMBAT_STATUS_NONE;
 
@@ -124,7 +124,7 @@
 		if(0 == (bitStatus & weaponStatus))
 			continue;
 
-		::gpk::view_const_char				statusLabel						= ::gpk::get_value_label(bitStatus);
+		::gpk::vcc				statusLabel						= ::gpk::get_value_label(bitStatus);
 
 		if(bitStatus & targetFinalFlags.Status.Immunity) {
 			sprintf_s(messages.Aux, "%s is immune to %s!", target.Name.begin(), statusLabel.begin());
@@ -149,7 +149,7 @@
 	return appliedStatus;
 }
 
-::klib::COMBAT_STATUS		klib::applyAttackStatus			(const ::klib::SEntityTables & tables, ::klib::SGameMessages & messages, ::klib::CCharacter& target, COMBAT_STATUS weaponStatus, int32_t turnCount, const ::gpk::view_const_char & sourceName) {
+::klib::COMBAT_STATUS		klib::applyAttackStatus			(const ::klib::SEntityTables & tables, ::klib::SGameMessages & messages, ::klib::CCharacter& target, COMBAT_STATUS weaponStatus, int32_t turnCount, const ::gpk::vcc & sourceName) {
 	if(::klib::COMBAT_STATUS_NONE == weaponStatus || 0 >= target.Points.LifeCurrent.Health)
 		return ::klib::COMBAT_STATUS_NONE;
 
@@ -169,7 +169,7 @@
 	return result;
 }
 
-int32_t						klib::applyArmorReflect			(const ::klib::SEntityTables & tables, ::klib::SGameMessages & messages, ::klib::CCharacter& attacker, CCharacter& targetReflecting, int32_t damageDealt, const ::gpk::view_const_char & sourceName) {
+int32_t						klib::applyArmorReflect			(const ::klib::SEntityTables & tables, ::klib::SGameMessages & messages, ::klib::CCharacter& attacker, CCharacter& targetReflecting, int32_t damageDealt, const ::gpk::vcc & sourceName) {
 	const ::klib::SEntityFlags		& targetFinalFlags				= targetReflecting.FinalFlags	;
 	if( 0 == damageDealt
 	 ||	0 == (targetFinalFlags.Effect.Defend & DEFEND_EFFECT_REFLECT)
@@ -203,7 +203,7 @@ int32_t						klib::applyArmorReflect			(const ::klib::SEntityTables & tables, ::
 	return finalDamage.Health;
 }
 
-static	_Check_return_ int64_t				applyWeaponLeech			(::klib::SGameMessages & messages, ::klib::ATTACK_EFFECT testEffectBit, ::klib::ATTACK_EFFECT attackerWeaponEffect, int32_t finalPassthroughDamage, int32_t maxPoints, int64_t currentPoints, const ::gpk::view_const_char& attackerName, const ::gpk::view_const_char& targetName, const ::gpk::view_const_char& attackerWeaponName, const ::gpk::view_const_char& pointName, const ::gpk::view_const_char& gainVerb, const ::gpk::view_const_char& loseVerb ) {
+static	_Check_return_ int64_t				applyWeaponLeech			(::klib::SGameMessages & messages, ::klib::ATTACK_EFFECT testEffectBit, ::klib::ATTACK_EFFECT attackerWeaponEffect, int32_t finalPassthroughDamage, int32_t maxPoints, int64_t currentPoints, const ::gpk::vcc& attackerName, const ::gpk::vcc& targetName, const ::gpk::vcc& attackerWeaponName, const ::gpk::vcc& pointName, const ::gpk::vcc& gainVerb, const ::gpk::vcc& loseVerb ) {
 	if(attackerWeaponEffect & testEffectBit) {
 		int64_t						actualHPGained				= ::gpk::min((int64_t)finalPassthroughDamage, ::gpk::max(0LL, maxPoints - ::gpk::max(0LL, currentPoints)));
 		if(actualHPGained > 0)
@@ -241,7 +241,7 @@ static	_Check_return_ ::klib::SLifePoints	applyUnshieldableDamage		(const ::klib
 	return finalDamage;
 }
 
-::klib::SLifePoints						klib::applySuccessfulHit			(const ::klib::SEntityTables & tables, ::klib::SGameMessages & messages, ::klib::CCharacter& attacker, ::klib::CCharacter& target, int32_t damage, bool bAddStatus, ::klib::COMBAT_STATUS grenadeStatus, int32_t statusTurns, const ::gpk::view_const_char& sourceName) {
+::klib::SLifePoints						klib::applySuccessfulHit			(const ::klib::SEntityTables & tables, ::klib::SGameMessages & messages, ::klib::CCharacter& attacker, ::klib::CCharacter& target, int32_t damage, bool bAddStatus, ::klib::COMBAT_STATUS grenadeStatus, int32_t statusTurns, const ::gpk::vcc& sourceName) {
 	SLifePoints									finalDamage							= ::klib::applyShieldableDamage(tables, messages, target, damage, sourceName);
 	::klib::applyArmorReflect(tables, messages, attacker, target, finalDamage.Shield, sourceName);
 
@@ -273,7 +273,7 @@ static	_Check_return_ ::klib::SLifePoints	applyUnshieldableDamage		(const ::klib
 	return finalDamage;
 }
 
-void								klib::applyWeaponLeechEffects	(const ::klib::SEntityTables & tables, ::klib::SGameMessages & messages, ::klib::CCharacter& attacker, ::klib::CCharacter& targetReflecting, const SLifePoints& finalDamage, const ::gpk::view_const_char& sourceName) {
+void								klib::applyWeaponLeechEffects	(const ::klib::SEntityTables & tables, ::klib::SGameMessages & messages, ::klib::CCharacter& attacker, ::klib::CCharacter& targetReflecting, const SLifePoints& finalDamage, const ::gpk::vcc& sourceName) {
 	::klib::SEntityPoints					& attackerPoints				= attacker.FinalPoints;
 	::klib::SEntityFlags					& attackerFlags					= attacker.FinalFlags;
 	attacker.Points.LifeCurrent.Health	= (int32_t)::applyWeaponLeech(messages, ::klib::ATTACK_EFFECT_LEECH_HEALTH	, attackerFlags.Effect.Attack, finalDamage.Health	, attackerPoints.LifeMax.Health	, attacker.Points.LifeCurrent.Health	, attacker.Name, targetReflecting.Name, sourceName, ::gpk::view_const_string{"Health"	}, ::gpk::view_const_string{"drains"}, ::gpk::view_const_string{"loses"});
@@ -284,7 +284,7 @@ void								klib::applyWeaponLeechEffects	(const ::klib::SEntityTables & tables,
 	targetReflecting	.Recalculate(tables);
 }
 
-void								klib::applySuccessfulWeaponHit	(const ::klib::SEntityTables & tables, ::klib::SGameMessages & messages, ::klib::CCharacter& attacker, ::klib::CCharacter& targetReflecting, int32_t damageDealt, const ::gpk::view_const_char& sourceName) {
+void								klib::applySuccessfulWeaponHit	(const ::klib::SEntityTables & tables, ::klib::SGameMessages & messages, ::klib::CCharacter& attacker, ::klib::CCharacter& targetReflecting, int32_t damageDealt, const ::gpk::vcc& sourceName) {
 	if(targetReflecting.FinalFlags.Effect.Defend & ::klib::DEFEND_EFFECT_BLIND)	{
 		const ::gpk::apod<char>			armorName						= getEntityName(tables.Armor, targetReflecting.CurrentEquip.Armor);
 		applyAttackStatus(tables, messages, attacker, ::klib::COMBAT_STATUS_BLIND, 1, {armorName.begin(), (uint32_t)armorName.size()});
@@ -364,7 +364,7 @@ bool								klib::attack					(const ::klib::SEntityTables & tables, ::klib::SGam
 	return true;
 };
 
-static	void						applyTurnBonus					(const ::klib::SEntityTables & tables, ::klib::SGameMessages & messages, ::klib::CCharacter& character, int32_t& characterCurrentPoint, const int32_t characterMaxPoint, const int32_t combatBonus, const ::gpk::view_const_char& characterName, const ::gpk::view_const_char& pointName, const ::gpk::view_const_char & sourceName) {
+static	void						applyTurnBonus					(const ::klib::SEntityTables & tables, ::klib::SGameMessages & messages, ::klib::CCharacter& character, int32_t& characterCurrentPoint, const int32_t characterMaxPoint, const int32_t combatBonus, const ::gpk::vcc& characterName, const ::gpk::vcc& pointName, const ::gpk::vcc & sourceName) {
 	if(combatBonus > 0 && characterCurrentPoint < characterMaxPoint) {
 		sprintf_s(messages.Aux, "%s gains %u %s from %s.", characterName.begin(), combatBonus, pointName.begin(), ::gpk::toString(sourceName).begin());
 		messages.LogAuxMessage();
@@ -379,7 +379,7 @@ static	void						applyTurnBonus					(const ::klib::SEntityTables & tables, ::kli
 	}
 }
 
-void								klib::applyCombatBonus		(const ::klib::SEntityTables & tables, ::klib::SGameMessages & messages, ::klib::CCharacter& character, const ::klib::SEntityPoints& combatBonus, const ::gpk::view_const_char& sourceName) {
+void								klib::applyCombatBonus		(const ::klib::SEntityTables & tables, ::klib::SGameMessages & messages, ::klib::CCharacter& character, const ::klib::SEntityPoints& combatBonus, const ::gpk::vcc& sourceName) {
 	if(0 >= character.Points.LifeCurrent.Health)	// This character is already dead
 		return;
 
@@ -407,7 +407,7 @@ void								klib::applyCombatBonus		(const ::klib::SEntityTables & tables, ::kli
 	}
 };
 
-static	void				applyRegenBonus					(::klib::SGameMessages & messages, ::klib::PASSIVE_EFFECT testEffectBit, ::klib::PASSIVE_EFFECT characterActiveEffects, int32_t maxPoints, int32_t& characterCurrentPoints, const ::gpk::view_const_char& pointName, const ::gpk::view_const_char& armorName) {
+static	void				applyRegenBonus					(::klib::SGameMessages & messages, ::klib::PASSIVE_EFFECT testEffectBit, ::klib::PASSIVE_EFFECT characterActiveEffects, int32_t maxPoints, int32_t& characterCurrentPoints, const ::gpk::vcc& pointName, const ::gpk::vcc& armorName) {
 	if((testEffectBit & characterActiveEffects) && (characterCurrentPoints < maxPoints)) {
 		int32_t						pointsToAdd						= maxPoints / 20;
 		pointsToAdd				= ::gpk::max(1, ::gpk::min(pointsToAdd, maxPoints-characterCurrentPoints));
@@ -419,7 +419,7 @@ static	void				applyRegenBonus					(::klib::SGameMessages & messages, ::klib::PA
 }
 
 
-static	void				applyPassive					(const ::klib::SEntityTables & tables, ::klib::SGameMessages & messages, ::klib::CCharacter& character, ::klib::PASSIVE_EFFECT equipmentEffects, const ::gpk::view_const_char& sourceName) {
+static	void				applyPassive					(const ::klib::SEntityTables & tables, ::klib::SGameMessages & messages, ::klib::CCharacter& character, ::klib::PASSIVE_EFFECT equipmentEffects, const ::gpk::vcc& sourceName) {
 	const ::klib::SEntityPoints				& characterFinalPoints			= character.FinalPoints;
 
 	::applyRegenBonus(messages, ::klib::PASSIVE_EFFECT_LIFE_REGEN		,	equipmentEffects,	characterFinalPoints.LifeMax.Health	,	character.Points.LifeCurrent.Health	, ::gpk::view_const_string{"Health"	}, sourceName);

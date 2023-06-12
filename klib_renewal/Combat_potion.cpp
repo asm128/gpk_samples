@@ -1,7 +1,7 @@
 #include "Item.h"
 #include "Combat.h"
 
-static	bool							potionRestore						(const ::klib::SEntityTables & tables, ::klib::SGameMessages & messages, ::klib::CCharacter& potionDrinker, const int32_t potionGrade, const int32_t maxPoints, int32_t& currentPoints, const ::gpk::view_const_char& pointName)				{
+static	bool							potionRestore						(const ::klib::SEntityTables & tables, ::klib::SGameMessages & messages, ::klib::CCharacter& potionDrinker, const int32_t potionGrade, const int32_t maxPoints, int32_t& currentPoints, const ::gpk::vcc& pointName)				{
 	if(maxPoints <= currentPoints) {
 		sprintf_s(messages.Aux, "Your %s is full!", pointName.begin());
 		messages.LogAuxMessage();
@@ -23,7 +23,7 @@ static	bool							potionRestore						(const ::klib::SEntityTables & tables, ::kl
 	return true;
 }
 
-static	bool							potionAttackBonus					(const ::klib::SEntityTables & tables, ::klib::SGameMessages & messages, ::klib::CCharacter& potionDrinker, const int32_t potionGrade, int32_t& currentPoints, int32_t& turnsLeft, const ::gpk::view_const_char& pointName)					{
+static	bool							potionAttackBonus					(const ::klib::SEntityTables & tables, ::klib::SGameMessages & messages, ::klib::CCharacter& potionDrinker, const int32_t potionGrade, int32_t& currentPoints, int32_t& turnsLeft, const ::gpk::vcc& pointName)					{
 	int32_t										pointsGainedBase					= 5*potionGrade;
 	int32_t										pointsGainedExtra					= pointsGainedBase>>2;
 

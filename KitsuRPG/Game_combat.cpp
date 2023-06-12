@@ -7,7 +7,7 @@
 
 bool																	useItems					(const ::klib::SEntityTables & tables, ::klib::SGameMessages & message, ::klib::CCharacter& user, ::klib::CCharacter& target, bool bIsAIControlled);	// While in combat, displays a list of the available items to use.
 
-bool																	escape						(const ::gpk::view_const_char& escaperName, ::klib::SCharacterScore& escaperScore)									{
+bool																	escape						(const ::gpk::vcc& escaperName, ::klib::SCharacterScore& escaperScore)									{
 	printf("%s tries to escape!\n", escaperName.begin());
 	if ((rand() % 100) < 30) {
 		++escaperScore.EscapesSucceeded;
@@ -280,7 +280,7 @@ static	void															printStatuses				(const ::klib::CCharacter& character,
 		if(0 == (statusBit & character.ActiveBonus.Status.Status))
 			continue;
 
-		const ::gpk::view_const_char												statusLabel					= ::gpk::get_value_label(statusBit);
+		const ::gpk::vcc												statusLabel					= ::gpk::get_value_label(statusBit);
 		sprintf_s(messages.Aux, "%s is affected by \"%s\" for the next %u turn(s).\n", character.Name.begin(), statusLabel.begin(), character.ActiveBonus.Status.TurnsLeft[iStatus]);
 	}
 }

@@ -6,7 +6,7 @@
 	::klib::SGamePlayer													& player											= instanceGame.Players[::klib::PLAYER_INDEX_USER];
 
 	::gpk::array_obj<::gpk::array_pod<char>>							menuItems											= {};
-	::gpk::array_obj<::gpk::view_const_char>							menuItemsView										= {};
+	::gpk::array_obj<::gpk::vcc>							menuItemsView										= {};
 	menuItems		.resize(player.Tactical.Squad.Size);
 	menuItemsView	.resize(menuItems.size());
 	static int32_t														maxNameLen											= 0;
@@ -30,7 +30,7 @@
 		, instanceGame.GlobalDisplay.Screen.Color.View
 		, instanceGame.GlobalDisplay.Screen.DepthStencil.begin()
 		, ::gpk::view_const_string{"Squad setup"}
-		, ::gpk::view<const ::gpk::view_const_char>{menuItemsView.begin(), menuItemsView.size()}
+		, ::gpk::view<const ::gpk::vcc>{menuItemsView.begin(), menuItemsView.size()}
 		, instanceGame.FrameInput
 		, -1
 		, ::gpk::max(24, maxNameLen+4)

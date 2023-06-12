@@ -126,7 +126,7 @@ int								main							()						{
 		::gpk::apod<char>			strLine = headerLines[iLine];
 		strLine.push_back(0);
 		printf("\n%s", strLine.begin());
-		if(0 <= ::gpk::find_sequence_pod(::gpk::vcs{"chunked"}, ::gpk::view_const_char{strLine}))
+		if(0 <= ::gpk::find_sequence_pod(::gpk::vcs{"chunked"}, ::gpk::vcc{strLine}))
 			bChunked					= true;
 	}
 

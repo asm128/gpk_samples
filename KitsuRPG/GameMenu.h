@@ -21,7 +21,7 @@ static inline int64_t										getNumericInput							()																									
 }
 
 template <typename _ReturnType>
-_ReturnType													displayMenu								(size_t optionCount, const ::gpk::view_const_char& title, const ::gpk::view<const ::klib::SMenuItem<_ReturnType>> menuItems)		{
+_ReturnType													displayMenu								(size_t optionCount, const ::gpk::vcc& title, const ::gpk::view<const ::klib::SMenuItem<_ReturnType>> menuItems)		{
 	optionCount													= (optionCount < menuItems.size()) ? optionCount : menuItems.size(); // Fix optionCount to the maximum size of the array if optionCount is higher than the allowed size.
 
 	while (true) {	// Query for user input until a valid selection is made
@@ -45,7 +45,7 @@ _ReturnType													displayMenu								(size_t optionCount, const ::gpk::vie
 }
 
 template <typename _ReturnType>
-_ReturnType													displayMenu								(const ::gpk::view_const_char& title, const ::gpk::view<const ::klib::SMenuItem<_ReturnType>> menuItems, int32_t maxItems = ~0U)		{
+_ReturnType													displayMenu								(const ::gpk::vcc& title, const ::gpk::view<const ::klib::SMenuItem<_ReturnType>> menuItems, int32_t maxItems = ~0U)		{
 	return displayMenu((menuItems.size() > (uint32_t)maxItems) ? maxItems : menuItems.size(), title, menuItems);
 }
 

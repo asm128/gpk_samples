@@ -60,9 +60,9 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 		const int32_t													lenText						= (int32_t)sprintf_s(buffer, "(%u)", controlTestChild0);
 		controlText	.Text											= {::gpk::label(buffer).begin(), (uint32_t)lenText};
 		//= {0 == (iChild % 4), 0 == (iChild % 5)};
-		gui.Controls.States	[controlTestChild0].Disabled			= 0 == (iChild % 9);
-		gui.Controls.Modes	[controlTestChild0].Design				= iChild % 2;
-		gui.Controls.Modes	[controlTestChild0].NoHoverEffect		= iChild % 2;
+		gui.Controls.Modes	[controlTestChild0].Disabled			= 0 == (iChild % 9);
+		gui.Controls.Modes	[controlTestChild0].NoHover				= iChild % 2;
+		gui.Controls.Draw	[controlTestChild0].Design				= iChild % 2;
 		switch(iChild % 9) {
 		case 0: control.Align = ::gpk::ALIGN_TOP_LEFT		; controlText.Align = ::gpk::ALIGN_BOTTOM_RIGHT		; break;
 		case 1: control.Align = ::gpk::ALIGN_CENTER_TOP		; controlText.Align = ::gpk::ALIGN_CENTER_BOTTOM	; break;
@@ -245,13 +245,13 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 		::gpk::guiGetProcessableControls(gui, controlsToProcess);
 		for(uint32_t iProcessable = 0, countControls = controlsToProcess.size(); iProcessable < countControls; ++iProcessable) {
 			uint32_t																iControl					= controlsToProcess[iProcessable];
-			if(gui.Controls.States[iControl].Execute) {
+			if(gui.Controls.Events[iControl].Execute) {
 				info_printf("Executed %u.", iControl);
 				if(iControl == (uint32_t)app.IdExit)
 					return 1;
 				else if(iControl == (uint32_t)app.IdMode) {
 					for(uint32_t iChild = 0; iChild < gui.Controls.Controls.size(); ++iChild)
-						gui.Controls.Modes[iChild].ColorMode							= gui.Controls.Modes[iChild].ColorMode == ::gpk::GUI_COLOR_MODE_FLAT ? ::gpk::GUI_COLOR_MODE_3D : ::gpk::GUI_COLOR_MODE_FLAT;
+						gui.Controls.Draw[iChild].ColorMode							= gui.Controls.Draw[iChild].ColorMode == ::gpk::GUI_COLOR_MODE_Flat ? ::gpk::GUI_COLOR_MODE_3D : ::gpk::GUI_COLOR_MODE_Flat;
 				}
 				else if(iControl == (uint32_t)app.IdTheme) {
 					++gui.ThemeDefault;
@@ -260,7 +260,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 				}
 				else if(iControl == (uint32_t)app.IdNewPalette) {
 					for(uint32_t iChild = 0; iChild < gui.Controls.Controls.size(); ++iChild)
-						gui.Controls.Modes[iChild].UseNewPalettes						= gui.Controls.Modes[iChild].UseNewPalettes ? 0 : 1;
+						gui.Controls.Draw[iChild].UseNewPalettes						= gui.Controls.Draw[iChild].UseNewPalettes ? 0 : 1;
 				}
 				else if(iControl > (uint32_t)app.IdMode) {
 					gui.Controls.Controls[5].ColorTheme								= int16_t(iControl - app.IdNewPalette);

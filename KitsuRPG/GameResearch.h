@@ -18,12 +18,12 @@ void																		research
 	, _TInventory									& adventurerMaxEquip
 	, bool											bIsModifier
 	, bool											bIsProgressive
-	, const ::gpk::view_const_char					& itemFormat
-	, const ::gpk::view_const_char					& allResearchComplete
-	, const ::gpk::view_const_char					& noResearchAvailable
-	, const ::gpk::view_const_char					& selectItemToResearch
-	, const ::gpk::view_const_char					& startResearching
-	, const ::gpk::view_const_char					& doneResearching
+	, const ::gpk::vcc					& itemFormat
+	, const ::gpk::vcc					& allResearchComplete
+	, const ::gpk::vcc					& noResearchAvailable
+	, const ::gpk::vcc					& selectItemToResearch
+	, const ::gpk::vcc					& startResearching
+	, const ::gpk::vcc					& doneResearching
 	)
 {
 	if(researchedList.size() >= table.size() - 1) {	// No more research items in the game.

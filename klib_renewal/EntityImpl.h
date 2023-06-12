@@ -33,16 +33,16 @@ namespace klib
 	stacxpr		const SEntityPointsMultiplier		g_MultipliersStageProp		= {{  .25,   .25,   .25}, {  .25,   .25,   .25}, {  .25,   .25, {  .25,   .25,   .25},   .25,   .25}, { .25,   .25,  .25,   .1}, 0.125, 0.85, 1.0};
 	stacxpr		const SEntityPointsMultiplier		g_MultipliersTile			= {{  .25,   .25,   .25}, {  .25,   .25,   .25}, {  .25,   .25, {  .25,   .25,   .25},   .25,   .25}, { .25,   .25,  .25,   .1}, 0.125, 0.85, 1.0};
 
-#define DECLARE_ENTITY(_multipliers, _type, _name)																																	\
-	struct S##_name : public ::klib::SEntity { 																																		\
-		using					::klib::SEntity					::SEntity; 																											\
-																																													\
-		inline constexpr										S##_name						()																				{}	\
-		inline constexpr										S##_name						(const SEntity& other)									: SEntity(other)		{}	\
-																																													\
-		static inline constexpr	::klib::ENTITY_TYPE				getType							()														{ return _type;			}	\
-		static inline constexpr	::klib::SEntityPointsMultiplier	getMultipliers					()														{ return _multipliers;	}	\
-		static					const ::gpk::view_const_char &	getName							()														{ static const ::gpk::view_const_char & name = ::gpk::view_const_string{#_name}; return name; }	\
+#define DECLARE_ENTITY(_multipliers, _type, _name)										\
+	struct S##_name : public ::klib::SEntity { 											\
+		using					::klib::SEntity					::SEntity; 				\
+																						\
+		inline constexpr										S##_name		()	{}	\
+		inline constexpr										S##_name		(const SEntity& other)	: SEntity(other) {}	\
+																												\
+		static inline constexpr	::klib::ENTITY_TYPE				getType			()	{ return _type; }			\
+		static inline constexpr	::klib::SEntityPointsMultiplier	getMultipliers	()	{ return _multipliers; }	\
+		static					const ::gpk::vcc &				getName			()	{ static const ::gpk::vcc & name = ::gpk::vcs{#_name}; return name; }	\
 	};
 
 	DECLARE_ENTITY(g_MultipliersProfession	, ENTITY_TYPE_PROFESSION	, Profession	);

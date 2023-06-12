@@ -425,7 +425,7 @@ void										klib::drawAndPresentGame		(SGame& instanceGame, ::klib::SASCIITarg
 
 	::gpk::apod<char>						serverTime						= ::gpk::view_const_string{"Server time: "};
 	serverTime.append_string({send_buffer, (uint32_t)strlen(send_buffer) - 1});
-	serverTime									= ::gpk::view_const_char{serverTime.begin(), serverTime.size() - 2};
+	serverTime									= ::gpk::vcc{serverTime.begin(), serverTime.size() - 2};
 	::klib::printfToRectColored(target, ::klib::ASCII_COLOR_INDEX_CYAN		, bbHeight-2, 0, ::klib::SCREEN_CENTER, "%s.", serverTime.begin());
 	::klib::printfToRectColored(target, ::klib::ASCII_COLOR_INDEX_DARKGREY	, bbHeight-1, 0, ::klib::SCREEN_CENTER, "%s.", instanceGame.Messages.StateMessage.begin());
 
@@ -763,7 +763,7 @@ void									klib::drawSquadSlots					(SGame& instanceGame)																					
 	}
 }
 
-static int32_t							processInput						(const ::klib::SInput& frameInput, int32_t actualOffsetX, uint32_t targetHeight, ::klib::SDrawMenuState& localPersistentState, bool& bResetMenuStuff, bool& bResetTitle, int32_t lineOffset, uint32_t actualOptionCount, uint32_t pageCount, int32_t numberCharsAvailable, const int32_t noActionValue, bool disableEscKeyClose, const ::gpk::view_const_char& exitText)	{
+static int32_t							processInput						(const ::klib::SInput& frameInput, int32_t actualOffsetX, uint32_t targetHeight, ::klib::SDrawMenuState& localPersistentState, bool& bResetMenuStuff, bool& bResetTitle, int32_t lineOffset, uint32_t actualOptionCount, uint32_t pageCount, int32_t numberCharsAvailable, const int32_t noActionValue, bool disableEscKeyClose, const ::gpk::vcc& exitText)	{
 	bool										bMouseOverExit						= mouseOver({(int32_t)frameInput.Mouse.Deltas.x, (int32_t)frameInput.Mouse.Deltas.y}, {actualOffsetX - 4, (int32_t)targetHeight-MENU_ROFFSET-1}, (int32_t)exitText.size()+4);
 	int32_t										resultVal							= noActionValue;
 	if(localPersistentState.CurrentPage < (pageCount-1) && (frameInput.Keys[VK_NEXT] || frameInput.Keys[VK_RIGHT]))
@@ -837,15 +837,15 @@ int32_t													drawMenu
 	, uint16_t													* targetAttributes
 	, int32_t													& lineOffset
 	, const ::gpk::n2<int32_t>								mousePos
-	, const ::gpk::view_const_char								& title
-	, const ::gpk::view_array<const ::gpk::view_const_char>		& menuItems
+	, const ::gpk::vcc								& title
+	, const ::gpk::view_array<const ::gpk::vcc>		& menuItems
 	, const uint32_t											actualOptionCount
 	, const uint32_t											itemOffset
 	, const bool												multipage
 	, const uint32_t											pageCount
 	, const uint32_t											numberCharsAvailable
 	, uint32_t													rowWidth
-	, const ::gpk::view_const_char								& exitText
+	, const ::gpk::vcc								& exitText
 	) {
 	const uint32_t												targetWidth											= targetASCII.metrics().x;
 	const uint32_t												targetHeight										= targetASCII.metrics().y;
@@ -915,7 +915,7 @@ int32_t													drawMenu
 	return 0;
 }
 
-int32_t												klib::drawMenu											(::klib::SDrawMenuState	& localPersistentState, ::gpk::v2c display, uint16_t* targetAttributes, const ::gpk::view_const_char& title, const ::gpk::view_array<const ::gpk::view_const_char> & menuItems, const ::klib::SInput& frameInput, const int32_t noActionValue, uint32_t rowWidth, bool disableEscKeyClose, const ::gpk::view_const_char& exitText) {
+int32_t												klib::drawMenu											(::klib::SDrawMenuState	& localPersistentState, ::gpk::v2c display, uint16_t* targetAttributes, const ::gpk::vcc& title, const ::gpk::view_array<const ::gpk::vcc> & menuItems, const ::klib::SInput& frameInput, const int32_t noActionValue, uint32_t rowWidth, bool disableEscKeyClose, const ::gpk::vcc& exitText) {
 	drawMenu_globals.Timer.Frame();
 	const uint32_t												targetWidth											= display.metrics().x;
 	const uint32_t												targetHeight										= display.metrics().y;

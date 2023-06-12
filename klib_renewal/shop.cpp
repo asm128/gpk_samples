@@ -5,7 +5,7 @@
 #include "Enemy.h"
 
 template <typename _tEntity>
-static int32_t										reinitBuyMenuItem			(::klib::SMenuItem<::klib::SBuyable> & menuItem, const ::gpk::view_const_char & nameItem, const ::klib::SEntityContainer<_tEntity> & inventory) {
+static int32_t										reinitBuyMenuItem			(::klib::SMenuItem<::klib::SBuyable> & menuItem, const ::gpk::vcc & nameItem, const ::klib::SEntityContainer<_tEntity> & inventory) {
 	char													preformatted	[256]		= {};
 	int32_t													indexElement				= inventory.FindElement({menuItem.ReturnValue.Definition, 0, menuItem.ReturnValue.Grade, -1});
 	char													strCount		[32];
@@ -55,9 +55,9 @@ int32_t												klib::reinitBuyMenus		(const ::klib::SEntityTables & entityTa
 
 ::klib::SGameState									drawBuyMenu					(::klib::SGame& instanceGame, const ::klib::SGameState& returnState) {
 	::klib::SShopMenus										& menus						= instanceGame.ShopMenus;
-	::gpk::view_const_char									menuTitle;
+	::gpk::vcc									menuTitle;
 	static ::klib::SDrawMenuState							menuState;
-	::gpk::array_obj<::gpk::view_const_char>				menuItemsText;
+	::gpk::array_obj<::gpk::vcc>				menuItemsText;
 	switch(instanceGame.State.Substate) {
 	case ::klib::GAME_SUBSTATE_ACCESSORY	: { menuTitle = menus.MenuAccessory	.Title; for(uint32_t iItem = 0; iItem < ::gpk::size(menus.NamesAccessory	); ++iItem) { if(0 == menus.MenuItemsAccessory	[iItem].Text.size()) break; menuItemsText.push_back(menus.MenuItemsAccessory	[iItem].Text); } break; }
 	case ::klib::GAME_SUBSTATE_STAGEPROP	: { menuTitle = menus.MenuStageProp	.Title; for(uint32_t iItem = 0; iItem < ::gpk::size(menus.NamesStageProp	); ++iItem) { if(0 == menus.MenuItemsStageProp	[iItem].Text.size()) break; menuItemsText.push_back(menus.MenuItemsStageProp	[iItem].Text); } break; }

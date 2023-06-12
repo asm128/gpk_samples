@@ -152,7 +152,7 @@ template<typename _tIndex, typename _tValue>
 	app.Viewport														= ::gpk::viewportCreate(app.DialogMain, viewport);
 	controlTable.Controls	[viewport->IdGUIControl	].Area.Offset			= {320, 128};
 	controlTable.Controls	[viewport->IdGUIControl	].Area.Size				= {640, 480};
-	controlTable.States		[viewport->IdClient		].ImageInvertY			= true;
+	controlTable.Controls	[viewport->IdClient		].ImageInvertY			= true;
 
 	stacxpr const ::gpk::n3f32							cubeCenter									= {0.5f, 0.5f, 0.5f};
 	::gpk::array_pod<uint8_t>												& remap										= app.ModelGeometry.PositionRemap;
@@ -166,22 +166,22 @@ template<typename _tIndex, typename _tValue>
 }
 
 ::gpk::error_t			update		(::gme::SApplication & app, bool exitSignal)	{
-	static ::gpk::STimer													timer;
+	static ::gpk::STimer		timer;
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, exitSignal, "%s", "Exit requested by runtime.");
 	{
-		::std::lock_guard														lock										(app.LockRender);
-		app.Framework.RootWindow.BackBuffer									= app.Offscreen;
+		::std::lock_guard			lock			(app.LockRender);
+		app.Framework.RootWindow.BackBuffer	= app.Offscreen;
 	}
-	::gpk::SFramework				& framework									= app.Framework;
+	::gpk::SFramework			& framework		= app.Framework;
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework), "%s", "Exit requested by framework update.");
 
-	::gpk::SGUI						& gui										= *framework.GUI;
-	::gpk::array_pod<uint32_t>												controlsToProcess							= {};
-	::gpk::guiGetProcessableControls(gui, controlsToProcess);
-	for(uint32_t iProcessable = 0, countControls = controlsToProcess.size(); iProcessable < countControls; ++iProcessable) {
-		uint32_t																iControl									= controlsToProcess[iProcessable];
-		const ::gpk::SControlState												& controlState								= gui.Controls.States[iControl];
-		if(controlState.Execute) {
+	::gpk::SGUI					& gui			= *framework.GUI;
+	::gpk::au32					toProcess		= {};
+	::gpk::guiGetProcessableControls(gui, toProcess);
+	for(uint32_t iProcessable = 0, countControls = toProcess.size(); iProcessable < countControls; ++iProcessable) {
+		uint32_t					iControl		= toProcess[iProcessable];
+		const ::gpk::SControlEvent	& controlEvent	= gui.Controls.Events[iControl];
+		if(controlEvent.Execute) {
 			info_printf("Executed %u.", iControl);
 			if(iControl == (uint32_t)app.IdExit)
 				return 1;

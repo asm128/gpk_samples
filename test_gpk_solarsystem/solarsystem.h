@@ -4,8 +4,8 @@
 #include "gpk_rigidbody.h"
 #include "gpk_particle.h"
 
-#include "gpk_image.h"
 #include "gpk_ptr_obj.h"
+#include "gpk_image_color.h"
 
 #ifndef SOLARSYSTEM_H_92837423798
 #define SOLARSYSTEM_H_92837423798

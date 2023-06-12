@@ -50,7 +50,7 @@ int32_t drawList(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> text
 	char formatRow[128] = {};
 	sprintf_s(formatRow, "%%-%i.%is", width, width);
 	for(uint32_t iRow = 0; iRow < rowCount; ++iRow) {
-		const ::gpk::view_const_char		& rowText		= listItems[iRow].Text;
+		const ::gpk::vcc		& rowText		= listItems[iRow].Text;
 		::klib::printfToGridColored(display, textAttributes, (uint16_t)listItems[iRow].Color, offsetY, offsetX, ::klib::SCREEN_LEFT, formatRow, rowText.begin());
 	}
 	return 0;
@@ -114,7 +114,7 @@ int32_t processSliderInput(const ::klib::SInput& frameInput, int32_t offsetY, in
 	return 0;
 }
 
-int32_t drawValueSlider(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int32_t offsetY, int32_t offsetX, int64_t value, int32_t labelMaxLen, const ::gpk::view_const_char & controlLabel ) {
+int32_t drawValueSlider(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int32_t offsetY, int32_t offsetX, int64_t value, int32_t labelMaxLen, const ::gpk::vcc & controlLabel ) {
 	char preformatted[16] = {};
 
 	sprintf_s(preformatted, "%%-%i.%is:", labelMaxLen, labelMaxLen);	; printfToGridColored(display, textAttributes, ::klib::ASCII_COLOR_INDEX_GREEN<<0	, offsetY, offsetX+00				, ::klib::SCREEN_LEFT, preformatted	, controlLabel.begin());
@@ -171,7 +171,7 @@ int32_t												drawEquipDetail
 	, ::gpk::view_grid<uint16_t>			textAttributes
 	, int32_t								offsetY
 	, int32_t								offsetX
-	, const ::gpk::view_const_char			& entityTypeName
+	, const ::gpk::vcc			& entityTypeName
 	, const _TEntity						& entity
 	, const ::klib::SEntityTable<_TEntity>	& table
 	) {
@@ -194,7 +194,7 @@ int32_t										drawEquipList
 ,	int32_t										offsetY
 ,	int32_t										offsetX
 ,	int32_t										selectedRow
-,	const ::gpk::view_const_char				& entityTypeName
+,	const ::gpk::vcc				& entityTypeName
 ,	const ::klib::SEntityContainer	<_tEntity>	& entityContainer
 ,	const ::klib::SEntityTable		<_tEntity>	& table
 ) {
@@ -245,7 +245,7 @@ int32_t drawAgentList
 
 //
 int32_t										drawEquipList					(::klib::SEntityTables & tables, ::klib::ENTITY_TYPE entityType, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, const ::klib::SGamePlayer& player, int32_t offsetY, int32_t offsetX, int32_t selectedRow) {
-	const ::gpk::view_const_char					labelet						= ::gpk::get_value_label(entityType);
+	const ::gpk::vcc					labelet						= ::gpk::get_value_label(entityType);
 
 	switch(entityType) {
 	case ::klib::ENTITY_TYPE_CHARACTER	:	drawAgentList(display, textAttributes, player, offsetY	, offsetX + entityType, selectedRow, player.Tactical.Army); break;
@@ -279,7 +279,7 @@ int32_t processEquipInput(::klib::ENTITY_TYPE entityType, const ::klib::SInput& 
 }
 
 int32_t			drawEquipDetail		(const ::klib::SEntityTables & tables, ::klib::ENTITY_TYPE entityType, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, const ::klib::CCharacter& agent, int32_t offsetY, int32_t offsetX) {
-	const ::gpk::view_const_char					labelSelectedEquip = ::gpk::get_value_label(entityType);
+	const ::gpk::vcc					labelSelectedEquip = ::gpk::get_value_label(entityType);
 	switch(entityType) {
 	case ::klib::ENTITY_TYPE_CHARACTER	:	displayDetailedAgentSlot(tables, display, textAttributes, offsetY, offsetX, agent, (::klib::ASCII_COLOR_INDEX_YELLOW << 4)| ::klib::ASCII_COLOR_INDEX_BLUE );	break;
 	case ::klib::ENTITY_TYPE_PROFESSION	:	::drawEquipDetail(display, textAttributes, offsetY, offsetX, labelSelectedEquip, agent.CurrentEquip.Profession, tables.Profession	); break;
@@ -356,7 +356,7 @@ int32_t drawWelcomeGUI(::klib::SGame& instanceGame) {
 					}
 					else {//if(tempRow != -1)
 						int32_t offsetX = 45*2;
-						const ::gpk::view_const_char			labelSelectedEquip = ::gpk::get_value_label(selectedEntityType);
+						const ::gpk::vcc			labelSelectedEquip = ::gpk::get_value_label(selectedEntityType);
 						switch(selectedEntityType) {
 						case ::klib::ENTITY_TYPE_CHARACTER	:	if(player.Tactical.Army[indexRow]) displayDetailedAgentSlot(instanceGame.EntityTables, display, textAttributes, startY, offsetX, *player.Tactical.Army[indexRow], (::klib::ASCII_COLOR_INDEX_YELLOW << 4)| ::klib::ASCII_COLOR_INDEX_BLUE);	break;
 						case ::klib::ENTITY_TYPE_PROFESSION	:	drawEquipDetail(display, textAttributes, startY, offsetX, labelSelectedEquip, player.Inventory.Profession	[indexRow].Entity, instanceGame.EntityTables.Profession	);	break;

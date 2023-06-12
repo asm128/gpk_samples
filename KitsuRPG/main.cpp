@@ -22,7 +22,7 @@
 #include <Windows.h>
 
 // Sets up initial equipment and items for the player to carry or wear.
-void											initPlayerCharacter								(const ::klib::SEntityTables & tables, klib::CCharacter& adventurer, const ::gpk::view_const_char& name);
+void											initPlayerCharacter								(const ::klib::SEntityTables & tables, klib::CCharacter& adventurer, const ::gpk::vcc& name);
 
 // This function seeds the rand() and enters the tavern() after initializing the player.
 // If the player leaves the tavern() it means the game was requested to close.
@@ -85,7 +85,7 @@ int												main											(int argc, char **argv)											{
 }
 
 //
-void											createPlayerCharacter							(klib::CCharacter& adventurer, const ::gpk::view_const_char& name)			{
+void											createPlayerCharacter							(klib::CCharacter& adventurer, const ::gpk::vcc& name)			{
 	::klib::CCharacter									* tempadventurer								= new klib::CCharacter(4, 50, 1, 100, {1,4}, {}, {klib::COMBAT_STATUS_NONE, klib::COMBAT_STATUS_STUN}, name);
 	adventurer										= *tempadventurer;
 	delete(tempadventurer);
@@ -102,7 +102,7 @@ void											researchEquipped								(klib::CCharacter& agent)										{
 }
 
 //
-void											initPlayerCharacter								(const ::klib::SEntityTables & tables, ::klib::CCharacter& adventurer, const ::gpk::view_const_char& name)			{
+void											initPlayerCharacter								(const ::klib::SEntityTables & tables, ::klib::CCharacter& adventurer, const ::gpk::vcc& name)			{
 	::createPlayerCharacter(adventurer, name);
 	::klib::SCharacterEquip								& currentEquip									= adventurer.CurrentEquip;
 	adventurer.Goods.CompletedResearch				= klib::SCharacterResearch();

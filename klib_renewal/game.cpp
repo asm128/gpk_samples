@@ -26,7 +26,7 @@
 }
 
 // Set up a nice prompt
-static	::gpk::error_t					prompt					(::gpk::apod<char>& userInput, const ::gpk::view_const_char& displayText, ::klib::SASCIITarget& asciiTarget) {
+static	::gpk::error_t					prompt					(::gpk::apod<char>& userInput, const ::gpk::vcc& displayText, ::klib::SASCIITarget& asciiTarget) {
 	::klib::asciiTargetClear(asciiTarget, ' ', ::klib::ASCII_COLOR_INDEX_GREEN);
 	uint32_t									screenWidth				=	asciiTarget.Width()
 		,										screenHeight			=	asciiTarget.Height()
@@ -93,7 +93,7 @@ int64_t								klib::missionCost				(const SGamePlayer& player, const SSquad& sq
 	::klib::SASCIITarget					asciiTarget;
 	::klib::getASCIIBackBuffer(asciiTarget);
 
-	::prompt(instanceGame.Players[::klib::PLAYER_INDEX_USER].Tactical.Name, ::gpk::view_const_char{"Enter your name:"}, asciiTarget);
+	::prompt(instanceGame.Players[::klib::PLAYER_INDEX_USER].Tactical.Name, ::gpk::vcc{"Enter your name:"}, asciiTarget);
 	::std::string							password;
 	//::prompt(password, "Enter password:");
 	::gpk::bit_set	(instanceGame.Flags, ::klib::GAME_FLAGS_STARTED);

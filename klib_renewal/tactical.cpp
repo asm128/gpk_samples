@@ -589,7 +589,7 @@ int32_t																	initInventoryMenu								(::klib::CCharacter& adventurer
 	return 0;
 }
 
-int32_t																	drawInventoryMenu								(::klib::SGame& instanceGame, ::klib::CCharacter& adventurer, const ::gpk::view_const_char& menuTitle)								{
+int32_t																	drawInventoryMenu								(::klib::SGame& instanceGame, ::klib::CCharacter& adventurer, const ::gpk::vcc& menuTitle)								{
 	::klib::SMenuItem<int32_t>													itemOptions[4096]								= {};
 	::gpk::SRenderTarget<char, uint16_t>										& globalDisplay									= instanceGame.GlobalDisplay.Screen;
 	::klib::SCharacterInventory													& characterInventory							= adventurer.Goods.Inventory;
@@ -602,7 +602,7 @@ int32_t																	drawInventoryMenu								(::klib::SGame& instanceGame, :
 
 };
 
-::klib::TURN_ACTION														useItems										(::klib::SGame& instanceGame, ::klib::SGameMessages & messages, ::klib::SGamePlayer& player, ::klib::CCharacter& user, const ::gpk::view_const_char& menuTitle, bool bIsAIControlled) {
+::klib::TURN_ACTION														useItems										(::klib::SGame& instanceGame, ::klib::SGameMessages & messages, ::klib::SGamePlayer& player, ::klib::CCharacter& user, const ::gpk::vcc& menuTitle, bool bIsAIControlled) {
 	int32_t																		indexInventory									= ~0U;
 	bool																		bUsedItem										= false;
 	if(!bIsAIControlled)  {

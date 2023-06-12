@@ -115,7 +115,7 @@ namespace klib
 						::gpk::apod<char>		Name					= ::gpk::view_const_string{"Unnamed"};
 
 														CCharacter				()						= default;
-														CCharacter				(int maxHP, int hitChance, int attack, int coins, SFitnessPoints speed, SEntityEffect characterEffect, SEntityStatus characterStatus, const ::gpk::view_const_char& name)
+														CCharacter				(int maxHP, int hitChance, int attack, int coins, SFitnessPoints speed, SEntityEffect characterEffect, SEntityStatus characterStatus, const ::gpk::vcc& name)
 		: SCharacter	(maxHP, hitChance, attack, coins, speed, characterEffect, characterStatus)
 		, Position		({})
 		, Name			(name)
@@ -159,7 +159,7 @@ namespace klib
 		, const ::klib::SEntityTable<_EntityType>		& table
 		, const ::klib::SResearchGroup<_EntityType>		& playerCompletedResearch
 		, const ::klib::SResearchGroup<_EntityType>		& agentCompletedResearch
-		, const ::gpk::view_const_char					& modifierTypeName
+		, const ::gpk::vcc					& modifierTypeName
 		) {
 		const _EntityType									& selectedItem	= playerInventory[selectedChoice].Entity;
 		::gpk::error_t										restriction		= ::klib::equipRestriction(selectedItem, playerCompletedResearch, agentCompletedResearch);
@@ -217,7 +217,7 @@ namespace klib
 		, const ::klib::SResearchGroup<_EntityType>		& playerCompletedResearch
 		, const ::klib::SResearchGroup<_EntityType>		& agentCompletedResearch
 		, const ::klib::SEntityTable<_EntityType>		& table
-		, const ::gpk::view_const_char					& modifierTypeName
+		, const ::gpk::vcc					& modifierTypeName
 		, ::klib::SGameMessages							& messages
 		) {
 		if(::klib::equipRestriction(messages, playerInventory, selectedChoice, table, playerCompletedResearch, agentCompletedResearch, modifierTypeName))

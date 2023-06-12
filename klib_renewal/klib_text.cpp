@@ -9,7 +9,7 @@ bool								klib::getMessageSlow	(::klib::SMessageSlow & message, const char* te
 	}
 	float									& nextTick				= message.NextTick;
 	uint32_t								& tickCount				= message.TickCount;
-	::gpk::view_const_char					text					= {textToPrint, sizeToPrint};
+	::gpk::vcc					text					= {textToPrint, sizeToPrint};
 	if(memcmp(message.Message, textToPrint, ::gpk::max(0, ::gpk::min((int32_t)sizeToPrint, outputLen - 1)))) {
 		resetCursorString(message.Message);
 		outputLen							= (uint32_t)strlen(message.Message);

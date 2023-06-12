@@ -41,13 +41,13 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	{ // load port from config file
 		gwarn_if(errored(::gpk::jsonExpressionResolve(::gpk::vcs{"application.test_udp_server.listen_port"}, jsonReader, 0, jsonPort)), "Failed to load config from json! Last contents found: %s.", jsonPort.begin())
 		else {
-			::gpk::parseIntegerDecimal(jsonPort, &port);
+			::gpk::parseIntegerDecimal(jsonPort, port);
 			info_printf("Remote port: %u.", (uint32_t)port);
 		}
 		jsonPort															= {};
 		gwarn_if(errored(::gpk::jsonExpressionResolve(::gpk::vcs{"application.test_udp_server.adapter"}, jsonReader, 0, jsonPort)), "Failed to load config from json! Last contents found: %s.", jsonPort.begin())
 		else {
-			::gpk::parseIntegerDecimal(jsonPort, &adapter);
+			::gpk::parseIntegerDecimal(jsonPort, adapter);
 			info_printf("Adapter: %u.", (uint32_t)adapter);
 		}
 	}
@@ -56,29 +56,30 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 }
 
 ::gpk::error_t			update		(::gme::SApplication & app, bool exitSignal)	{
-	::gpk::STimer															timer;
+	::gpk::STimer				timer;
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, exitSignal, "Exit requested by runtime.");
 	{
-		::std::lock_guard														lock						(app.LockRender);
+		::std::lock_guard			lock						(app.LockRender);
 		app.Framework.RootWindow.BackBuffer									= app.Offscreen;
 	}
-	::gpk::SFramework				& framework					= app.Framework;
+	::gpk::SFramework			& framework					= app.Framework;
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework), "Exit requested by framework update.");
-	::gpk::SGUI						& gui						= *framework.GUI;
-	::gpk::array_pod<uint32_t>												controlsToProcess			= {};
-	::gpk::guiGetProcessableControls(gui, controlsToProcess);
-	static	uint32_t														currentMessage;
-	char																	messageToSend	[256]		= {};
 
-	for(uint32_t iControl = 0, countControls = controlsToProcess.size(); iControl < countControls; ++iControl) {
-		uint32_t																idControl					= controlsToProcess[iControl];
-		const ::gpk::SControlState												& controlState				= gui.Controls.States[idControl];
-		if(controlState.Execute) {
-			info_printf("Executed %u.", idControl);
-			if(idControl == (uint32_t)app.IdExit)
+	::gpk::SGUI					& gui			= *framework.GUI;
+	::gpk::au32					toProcess		= {};
+	::gpk::guiGetProcessableControls(gui, toProcess);
+	for(uint32_t iProcessable = 0, countControls = toProcess.size(); iProcessable < countControls; ++iProcessable) {
+		uint32_t					iControl		= toProcess[iProcessable];
+		const ::gpk::SControlEvent	& controlEvent	= gui.Controls.Events[iControl];
+		if(controlEvent.Execute) {
+			info_printf("Executed %u.", iControl);
+			if(iControl == (uint32_t)app.IdExit)
 				return 1;
 		}
 	}
+
+	static	uint32_t														currentMessage;
+	char																	messageToSend	[256]		= {};
 	{
 		::std::lock_guard														lock						(app.Server.Mutex);
 		app.MessagesToProcess.resize(app.Server.Clients.size());

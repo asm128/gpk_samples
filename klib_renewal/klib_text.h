@@ -64,11 +64,11 @@ namespace klib
 		float								NextTick				= 0.0f;
 		uint32_t							TickCount				= 0;
 	};
-	static inline	void				resetCursorString		(::gpk::view_char message)			{ message[message[1] = 0] = '_'; }
+	static inline	void				resetCursorString		(::gpk::view<char> message)			{ message[message[1] = 0] = '_'; }
 	static inline	void				resetCursorString		(::klib::SMessageSlow & message)	{ return resetCursorString(message.Message); }
 
 	bool								getMessageSlow			(::klib::SMessageSlow & message, const char* textToPrint, uint32_t sizeToPrint, double lastFrameSeconds, double limit = 0.025f);
-	static inline	bool				getMessageSlow			(::klib::SMessageSlow & message, const ::gpk::view_const_char & textToPrint, double lastFrameSeconds, double limit = 0.025f)	{ return getMessageSlow(message, textToPrint.begin(), textToPrint.size(), lastFrameSeconds, limit); }
+	static inline	bool				getMessageSlow			(::klib::SMessageSlow & message, const ::gpk::vcc & textToPrint, double lastFrameSeconds, double limit = 0.025f)	{ return getMessageSlow(message, textToPrint.begin(), textToPrint.size(), lastFrameSeconds, limit); }
 } // namespace
 
 #endif // KLIB_TEXT_H_923649827346982746982346298734623

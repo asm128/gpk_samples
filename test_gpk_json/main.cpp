@@ -6,9 +6,9 @@
 #include "gpk_json.h"
 #include "gpk_json_expression.h"
 
-::gpk::error_t								printNode						(::gpk::SJSONNode* node, const ::gpk::view_const_char& testJson)			{
+::gpk::error_t								printNode						(::gpk::SJSONNode* node, const ::gpk::vcc& testJson)			{
 	const ::gpk::array_pod<char>						viewPrintable					= ::gpk::toString({&testJson[node->Token->Span.Begin], node->Token->Span.End - node->Token->Span.Begin});
-	const ::gpk::view_const_char						viewTokenType					= ::gpk::get_value_label(node->Token->Type);
+	const ::gpk::vcc						viewTokenType					= ::gpk::get_value_label(node->Token->Type);
 	//info_printf("Entering JSON node type: %u (%s). Node Span: {%u, %u}. Parent index: %u. Object index: %u. Text: %s", node->Token->Type, viewTokenType.begin(), node->Token->Span.Begin, node->Token->Span.End, node->Token->ParentIndex, node->ObjectIndex, viewPrintable.begin());
 	for(uint32_t iChildren = 0; iChildren < node->Children.size(); ++iChildren)
 		::printNode(node->Children[iChildren], testJson);
@@ -51,7 +51,7 @@
 		 || ::gpk::JSON_TYPE_KEY	== node.Type
 		 )
 			continue;
-		::gpk::view_const_char							view							= jsonReader.View[iNode];
+		::gpk::vcc							view							= jsonReader.View[iNode];
 		char											bufferFormat [8192]				= {};
 		uint32_t										lenString						= view.size();
 		sprintf_s(bufferFormat, "Node type: %%u (%%s). Node Span: {%%u, %%u}. Parent index: %%u. Object index: %%u. Text: %%%u.%us", lenString, lenString);
@@ -65,7 +65,7 @@
 	::gpk::error_t									indexOfElement					= ::gpk::jsonObjectValueGet(*object, jsonReader.View, test_key);
 	gpk_necall((uint32_t)indexOfElement >= jsonReader.View.size(), "Test key '%s' not found: %i.", test_key.begin(), indexOfElement);
 	const gpk::SJSONToken							& node							= jsonReader.Token	[indexOfElement];
-	::gpk::view_const_char							view							= jsonReader.View	[indexOfElement - 1];	// get the parent in order to retrieve the view with the surrounding in the case of strings "".
+	::gpk::vcc							view							= jsonReader.View	[indexOfElement - 1];	// get the parent in order to retrieve the view with the surrounding in the case of strings "".
 	char											bufferFormat [8192]				= {};
 	uint32_t										lenString						= view.size();
 	sprintf_s(bufferFormat, "Found test value {'%%s':%%%u.%us}. Node type: %%u (%%s). Node Span: {%%u, %%u}. Parent index: %%u. Object index: %%u.", lenString, lenString);
@@ -73,7 +73,7 @@
 	return 0;
 }
 
-	::gpk::error_t						testJSONFormatter			(::gpk::SJSONReader & jsonReader, const ::gpk::view_const_char format, const ::gpk::view_const_char inputJson)			{
+	::gpk::error_t						testJSONFormatter			(::gpk::SJSONReader & jsonReader, const ::gpk::vcc format, const ::gpk::vcc inputJson)			{
 	::gpk::pobj<::gpk::SJSONNode>			root						= jsonReader.Tree[0];
 	::printNode(root, inputJson);
 	const ::gpk::error_t						indexOfFirstObject			= 0;
@@ -86,8 +86,8 @@
 
 	::gpk::error_t						testJSONExpression
 	(	const ::gpk::SJSONReader			& jsonReader
-	,	const ::gpk::view_const_char		expression
-	,	const ::gpk::view_const_char		expected
+	,	const ::gpk::vcc		expression
+	,	const ::gpk::vcc		expected
 	) {
 	info_printf("Testing expression: %s", ::gpk::toString(expression).begin());
 	::gpk::view_const_string						result;

@@ -53,7 +53,7 @@ namespace klib
 		ITEM_TYPE											Type;
 		PROPERTY_TYPE										Property;
 		int64_t												Price;
-		::gpk::view_const_char								Name;
+		::gpk::vcc								Name;
 	};
 
 	static	const CItem									itemDescriptions[]			=
@@ -87,7 +87,7 @@ namespace klib
 	,	CItem{ITEM_TYPE_GRENADE	,	PROPERTY_TYPE_EMP											,	10, ::gpk::view_const_string{"EMP Grenade"				}}
 	};
 	struct CItemGrade {
-		::gpk::view_const_char								Name;
+		::gpk::vcc								Name;
 	};
 
 	static	const ::gpk::array_static<CItemGrade, 5>	itemGrades				=
@@ -104,7 +104,7 @@ namespace klib
 	struct CItemV2 {
 		ITEM_TYPE											Type;
 		int64_t												Price;
-		::gpk::view_const_char								Name;
+		::gpk::vcc								Name;
 	};
 
 

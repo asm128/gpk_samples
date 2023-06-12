@@ -16,7 +16,7 @@ void																displayVehicle								(const ::klib::SEntityTables & tables,
 void																displayProfession							(const ::klib::SEntityTables & tables, const klib::CCharacter			& adventurer);	//
 void																displayFacility								(const ::klib::SEntityTables & tables, const klib::CCharacter			& adventurer);	//
 void																displayScore								(const ::klib::SCharacterScore	& adventurer);	// Displays the player's character points and statistics.
-void																displayInventory							(const ::klib::SEntityContainer<klib::SItem>& inventory, const ::gpk::view_const_char& characterName);
+void																displayInventory							(const ::klib::SEntityContainer<klib::SItem>& inventory, const ::gpk::vcc& characterName);
 template <size_t _Size1, size_t _Size2>
 int32_t																displayInventoryMenu						(klib::CCharacter& adventurer, const char (&menuTitle)[_Size1], const char (&exitOption)[_Size2], bool bPrintPrice=false, bool bSellPrice=true)			{
 	::klib::SMenuItem<int32_t>												itemOptions	[4096+1]						= {};

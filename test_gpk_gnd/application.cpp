@@ -76,9 +76,9 @@
 
 	::gpk::pobj<::gpk::SDialogViewport>									viewport					= {};
 	app.Viewport														= ::gpk::viewportCreate(app.DialogMain, viewport);
-	controlTable.Controls	[viewport->IdGUIControl].Area.Offset		= {320, 128};
-	controlTable.Controls	[viewport->IdGUIControl].Area.Size			= {640, 480};
-	controlTable.States		[viewport->IdClient].ImageInvertY			= true;
+	controlTable.Controls[viewport->IdGUIControl].Area.Offset		= {320, 128};
+	controlTable.Controls[viewport->IdGUIControl].Area.Size			= {640, 480};
+	controlTable.Controls[viewport->IdClient].ImageInvertY			= true;
 
 
 	//---------------------------
@@ -188,7 +188,7 @@
 	app.ViewportMinimap												= ::gpk::viewportCreate(app.DialogMain, viewport);
 	controlTable.Controls	[viewport->IdGUIControl].Area.Offset	= {0, 0};
 	controlTable.Controls	[viewport->IdGUIControl].Align			= ::gpk::ALIGN_RIGHT;
-	controlTable.States		[viewport->IdClient].ImageInvertY		= true;
+	controlTable.Controls	[viewport->IdClient].ImageInvertY		= true;
 	::gpk::viewportAdjustSize(controlTable.Controls[viewport->IdGUIControl].Area.Size, minimapTemp.metrics().Cast<int16_t>() * 2);
 	controlTable.Controls	[viewport->IdClient].Image				= app.TextureMinimap.View;
 	controlTable.Controls	[viewport->IdClient].ImageAlign			= ::gpk::ALIGN_TOP_LEFT;
@@ -228,18 +228,19 @@
 	::gpk::SFramework			& framework		= app.Framework;
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework), "%s", "Exit requested by framework update.");
 
-	::gpk::SGUI					& gui				= *framework.GUI;
-	::gpk::au32					controlsToProcess	= {};
-	::gpk::guiGetProcessableControls(gui, controlsToProcess);
-	for(uint32_t iProcessable = 0, countControls = controlsToProcess.size(); iProcessable < countControls; ++iProcessable) {
-		uint32_t					iControl		= controlsToProcess[iProcessable];
-		const ::gpk::SControlState	& controlState	= gui.Controls.States[iControl];
-		if(controlState.Execute) {
+	::gpk::SGUI					& gui			= *framework.GUI;
+	::gpk::au32					toProcess		= {};
+	::gpk::guiGetProcessableControls(gui, toProcess);
+	for(uint32_t iProcessable = 0, countControls = toProcess.size(); iProcessable < countControls; ++iProcessable) {
+		uint32_t					iControl		= toProcess[iProcessable];
+		const ::gpk::SControlEvent	& controlEvent	= gui.Controls.Events[iControl];
+		if(controlEvent.Execute) {
 			info_printf("Executed %u.", iControl);
 			if(iControl == (uint32_t)app.IdExit)
 				return 1;
 		}
 	}
+
 
 	app.DialogMain.Update();
 

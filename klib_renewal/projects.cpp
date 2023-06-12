@@ -106,7 +106,7 @@ void									klib::handleResearchStep
 }
 
 template <typename _tEntity>
-static int32_t							setupMenuItem					(::klib::SEntityResearch & menuItemValue, bool bModifier, int32_t index, ::klib::ENTITY_TYPE type, ::gpk::vcc labelEntityType, const ::klib::SEntityContainer<int16_t> & place, const ::gpk::view<const ::klib::SEntityRecord<_tEntity>> & records, ::gpk::view_const_char text) {
+static int32_t							setupMenuItem					(::klib::SEntityResearch & menuItemValue, bool bModifier, int32_t index, ::klib::ENTITY_TYPE type, ::gpk::vcc labelEntityType, const ::klib::SEntityContainer<int16_t> & place, const ::gpk::view<const ::klib::SEntityRecord<_tEntity>> & records, ::gpk::vcc text) {
 	char										composite	[256]				= {};
 	menuItemValue.ResearchIndex				= index;
 	int64_t										priceUnit						= records[place[index].Entity].Points.PriceBuy / 2;
@@ -180,7 +180,7 @@ int32_t									klib::getResearchableItems
 	menuItemsText	.reserve(MAX_RESEARCH_ITEMS);
 	menuItemsValue	.reserve(MAX_RESEARCH_ITEMS);
 
-	::gpk::view_const_char						labelEntityType				= {};
+	::gpk::vcc						labelEntityType				= {};
 	char										precompose			[256]	= {};
 
 	::klib::SEntityResearch						menuItemValue				= {};
@@ -275,7 +275,7 @@ int32_t									klib::getResearchableItems
 	menuItemsText	.reserve(MAX_RESEARCH_ITEMS);
 	menuItemsValue	.reserve(MAX_RESEARCH_ITEMS);
 	char										precompose			[256]							= {};
-	::gpk::view_const_char						labelEntityType										= {};
+	::gpk::vcc						labelEntityType										= {};
 
 	::klib::SEntityResearch						menuItemValue										= {};
 
