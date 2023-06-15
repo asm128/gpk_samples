@@ -230,13 +230,13 @@ template<typename _tIndex, typename _tValue>
 }
 
 
-::gpk::error_t			draw		(::gme::SApplication & app)							{
-	static ::gpk::STimer													timer;
-	::gpk::SFramework				& framework									= app.Framework;
-	::gpk::SGUI						& gui										= *framework.GUI;
+::gpk::error_t			draw			(::gme::SApplication & app)							{
+	static ::gpk::STimer		timer;
+	::gpk::SFramework			& framework		= app.Framework;
+	::gpk::SGUI					& gui			= *framework.GUI;
 
-	::gpk::pobj<::gpk::rtbgra8d32>	buffer3d									= app.Buffer3D;
-	::gpk::pobj<::gpk::SDialogViewport>									viewport									= {};
+	::gpk::pobj<::gpk::rtbgra8d32>	buffer3d	= app.Buffer3D;
+	::gpk::pobj<::gpk::SDialogViewport>	viewport	= {};
 	app.DialogMain.Controls[app.Viewport].as(viewport);
 	const ::gpk::n2<uint16_t>											& offscreenMetrics							= gui.Controls.Placement[viewport->IdClient].Area.Size.Cast<uint16_t>();
 	buffer3d->resize(offscreenMetrics.Cast<uint32_t>(), {0, 0, 0, 0}, (uint32_t)-1);
@@ -324,8 +324,6 @@ template<typename _tIndex, typename _tValue>
 	}
 	timer.Frame();
 	snprintf(app.StringFrameRateRender, ::gpk::size(app.StringFrameRateRender), "Last frame time (render): %fs.", (float)timer.LastTimeSeconds);
-	gui.Controls.Text[app.IdFrameRateRender].Text							= app.StringFrameRateRender;
-	::gpk::controlMetricsInvalidate(gui, app.IdFrameRateRender);
-	framework.RootWindow.Repaint										= true;
+	::gpk::controlTextSet(gui, app.IdFrameRateRender, app.StringFrameRateRender);
 	return 0;
 }

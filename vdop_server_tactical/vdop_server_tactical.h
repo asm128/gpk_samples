@@ -89,7 +89,7 @@ struct SApplication {
 	::gpk::SFramework								Framework;
 	::gpk::pobj<::gpk::rt<::gpk::bgra, uint32_t>>	Offscreen			= {};
 
-	int32_t											IdExit				= -1;
+	::gpk::cid_t					IdExit				= -1;
 
 	::std::mutex									LockGUI;
 	::std::mutex									LockRender;

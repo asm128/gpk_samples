@@ -16,12 +16,12 @@ namespace gme // I'm gonna use a different namespace in order to test a few thin
 
 		int16_t							Palettes[::gpk::GUI_CONTROL_PALETTE_COUNT]	= {};
 
-		int32_t							IdExit								= -1;
-		int32_t							IdMode								= -1;
-		int32_t							IdTheme								= -1;
-		int32_t							IdNewPalette						= -1;
-		int32_t							PaletteRow							= 10;
-		int32_t							PaletteColumn						= 16;
+		::gpk::cid_t					IdExit								= -1;
+		::gpk::cid_t					IdMode								= -1;
+		::gpk::cid_t					IdTheme								= -1;
+		::gpk::cid_t					IdNewPalette						= -1;
+		::gpk::cid_t					PaletteRow							= 10;
+		::gpk::cid_t					PaletteColumn						= 16;
 		char							RowText	[64][3]						=
 			{ "00"
 			, "01"

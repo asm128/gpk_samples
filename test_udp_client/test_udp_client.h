@@ -10,18 +10,18 @@
 namespace gme // I'm gonna use a different namespace in order to test a few things about the macros.
 {
 	struct SApplication {
-		::gpk::SFramework													Framework;
-		::gpk::pobj<::gpk::rtbgra8d32>	Offscreen							= {};
+		::gpk::SFramework				Framework;
+		::gpk::pobj<::gpk::rtbgra8d32>	Offscreen		= {};
 
-		int32_t																IdExit								= -1;
+		::gpk::cid_t					IdExit			= -1;
 
-		::std::mutex														LockGUI;
-		::std::mutex														LockRender;
+		::std::mutex					LockGUI;
+		::std::mutex					LockRender;
 
-		::gpk::SUDPClient													Client;
-		::gpk::SUDPClient													ClientTest1;
+		::gpk::SUDPClient				Client;
+		::gpk::SUDPClient				ClientTest1;
 
-																			SApplication						(::gpk::SRuntimeValues& runtimeValues)	: Framework(runtimeValues)		{}
+										SApplication	(::gpk::SRuntimeValues& runtimeValues)	: Framework(runtimeValues)		{}
 	};
 } // namespace
 

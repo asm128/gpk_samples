@@ -13,55 +13,55 @@
 namespace gme // I'm gonna use a different namespace in order to test a few things about the macros.
 {
 	struct SVertexCache {
-							::gpk::array_pod<::gpk::tri3<float>>							Triangle3dTransformed						= {};
-							::gpk::array_pod<::gpk::bgra>									Triangle3dColorList							= {};
+		::gpk::apod<::gpk::tri3<float>>	Triangle3dTransformed			= {};
+		::gpk::apod<::gpk::bgra>		Triangle3dColorList				= {};
 	};
 
 	struct SCamera {
-							::gpk::n3f32												Position;
-							::gpk::n3f32												Target;
-							::gpk::minmaxf32														NearFar							= {0.01f , 1000.0f};
+		::gpk::n3f32					Position;
+		::gpk::n3f32					Target;
+		::gpk::minmaxf32				NearFar							= {0.01f , 1000.0f};
 	};
 
 	struct SViewportScene {
-		stacxpr	const ::gpk::n3f32											CameraUp						= {0, 1, 0};	// ? cam't remember what is this. Radians? Eulers?
-							::gme::SCamera														Camera							= {{10, 5, 0}, {}};
+		stacxpr	const ::gpk::n3f32		CameraUp						= {0, 1, 0};	// ? cam't remember what is this. Radians? Eulers?
+		::gme::SCamera					Camera							= {{10, 5, 0}, {}};
 
-							::gpk::n3f32												LightPos						= {10, 5, 0};
+		::gpk::n3f32					LightPos						= {10, 5, 0};
 
-							::gpk::m4<float>												Projection						= {};
-							::gpk::m4<float>												ViewMatrix						= {};
+		::gpk::m4<float>				Projection						= {};
+		::gpk::m4<float>				ViewMatrix						= {};
 	};
 
 	struct SApplication {
-							::std::mutex														LockRender						;
+		::std::mutex					LockRender						;
 
-							::gpk::SFramework													Framework;
-							::gpk::pobj<::gpk::rtbgra8d32>	Offscreen						= {};
-							::gpk::aobj<::gpk::img8bgra>					PNGImages						= {};
+		::gpk::SFramework				Framework;
+		::gpk::pobj<::gpk::rtbgra8d32>	Offscreen						= {};
+		::gpk::aobj<::gpk::img8bgra>	PNGImages						= {};
 
-							int32_t																IdExit							= -1;
+		::gpk::cid_t					IdExit							= -1;
 
-							::std::mutex														LockViewport					;
-							::gpk::SDialog														DialogMain						= {};
-							int32_t																Slider							= -1;
-							int32_t																NumericTuner					= -1;
-							int32_t																CheckBox						= -1;
-							int32_t																Viewport						= -1;
-							//::gpk::tri3<float>											CubePositions	[12]			= {};
-							::gpk::SModelGeometryIndexed<float, uint8_t>						ModelGeometry;
+		::std::mutex					LockViewport					;
+		::gpk::SDialog					DialogMain						= {};
+		::gpk::cid_t					Slider							= -1;
+		::gpk::cid_t					NumericTuner					= -1;
+		::gpk::cid_t					CheckBox						= -1;
+		::gpk::cid_t					Viewport						= -1;
+		//::gpk::tri3<float>			CubePositions	[12]			= {};
+		::gpk::SModelGeometryIndexed<float, uint8_t>	ModelGeometry;
 
-							::gpk::pobj<::gpk::rtbgra8d32>	Buffer3D;
-							SVertexCache														VertexCache;
+		::gpk::pobj<::gpk::rtbgra8d32>	Buffer3D;
+		SVertexCache					VertexCache;
 
-							int32_t																IdFrameRateUpdate				= -1;
-							int32_t																IdFrameRateRender				= -1;
-							char																StringFrameRateUpdate	[256]	= {};
-							char																StringFrameRateRender	[256]	= {};
+		::gpk::cid_t					IdFrameRateUpdate				= -1;
+		::gpk::cid_t					IdFrameRateRender				= -1;
+		char							StringFrameRateUpdate	[256]	= {};
+		char							StringFrameRateRender	[256]	= {};
 
-							SViewportScene														Scene;
+		SViewportScene					Scene;
 
-																								SApplication				(::gpk::SRuntimeValues& runtimeValues)	: Framework(runtimeValues)		{}
+										SApplication					(::gpk::SRuntimeValues& runtimeValues)	: Framework(runtimeValues)		{}
 	};
 } // namespace
 
