@@ -27,7 +27,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 
 		app.IdExit					= ::gpk::controlCreate(gui);
 
-		::gpk::SControl					& controlExit						= gui.Controls.Controls[app.IdExit];
+		::gpk::SControlPlacement					& controlExit						= gui.Controls.Placement[app.IdExit];
 		controlExit.Area			= {{}, {64, 20}};
 		controlExit.Border			= {10, 10, 10, 10};
 		controlExit.Margin			= {1, 1, 1, 1};
@@ -89,7 +89,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework), "%s", "Exit requested by framework update.");
 
 	::gpk::SGUI					& gui			= *framework.GUI;
-	::gpk::au32					toProcess		= {};
+	::gpk::acid					toProcess		= {};
 	::gpk::guiGetProcessableControls(gui, toProcess);
 	for(uint32_t iProcessable = 0, countControls = toProcess.size(); iProcessable < countControls; ++iProcessable) {
 		uint32_t					iControl		= toProcess[iProcessable];

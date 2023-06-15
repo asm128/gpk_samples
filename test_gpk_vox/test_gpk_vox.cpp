@@ -82,15 +82,15 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT_MT(::SApplication, "Title");
 ::gpk::error_t			update		(::SApplication& app, bool systemRequestedExit)					{
 	retval_ginfo_if(1, systemRequestedExit, "Exiting because the runtime asked for close. We could also ignore this value and just continue execution if we don't want to exit.");
 	::gpk::SWindow					& mainWindow								= app.Framework.RootWindow;
-	for(uint32_t iEvent = 0; iEvent < mainWindow.EventQueue.size(); ++iEvent) {
-		switch(mainWindow.EventQueue[iEvent].Type) {
+	for(uint32_t iEvent = 0; iEvent < mainWindow.EventQueueOld.size(); ++iEvent) {
+		switch(mainWindow.EventQueueOld[iEvent].Type) {
 		case ::gpk::SYSEVENT_WINDOW_ACTIVATE:
 			break;
 		case ::gpk::SYSEVENT_WINDOW_DEACTIVATE:
 			break;
 		case ::gpk::SYSEVENT_SYSKEY_DOWN:
 		case ::gpk::SYSEVENT_KEY_DOWN:
-			switch(mainWindow.EventQueue[iEvent].Data[0]) {
+			switch(mainWindow.EventQueueOld[iEvent].Data[0]) {
 			case VK_RETURN:
 				if(GetAsyncKeyState(VK_MENU) & 0xFFF0)
 					gpk_necs(::gpk::fullScreenToggle(mainWindow));
@@ -120,7 +120,7 @@ namespace gpk
 	template<typename _tCoord>
 	static					::gpk::error_t									drawTriangle
 		( ::gpk::v2u32	& targetDepth
-		, const ::gpk::SNearFar			& fNearFar
+		, const ::gpk::minmaxf32		& fNearFar
 		, const ::gpk::tri3<_tCoord>	& triangle
 		, ::gpk::apod<::gpk::n2i16>		& out_Points
 		) {
@@ -177,7 +177,7 @@ namespace gpk
 	template<typename _tCoord, typename _tIndex>
 	static	inline			::gpk::error_t									drawTriangleIndexed
 		( ::gpk::v2u32							& targetDepth
-		, const ::gpk::SNearFar					& fNearFar // fFar
+		, const ::gpk::minmaxf32					& fNearFar // fFar
 		//, double								fNear
 		, uint32_t								baseIndex
 		, uint32_t								baseVertexIndex
@@ -194,7 +194,7 @@ static	::gpk::error_t	drawVoxelFaceGeometry
 	, ::gpk::apod<::gpk::n2i16>				& Points
 	, const ::gpk::n3f32					& voxelPos
 	, const ::gpk::m4f32					& mWVP
-	, const ::gpk::SNearFar					& nearFar
+	, const ::gpk::minmaxf32					& nearFar
 	, const ::gpk::view<const ::gpk::n3f32>	verticesRaw
 	, const ::gpk::vcu8						& indices
 	) {
@@ -220,7 +220,7 @@ static	::gpk::error_t	drawVoxelFace
 	, const ::gpk::n3f32		& voxelCenter
 	, const ::gpk::rgbaf		& cellColor
 	, const ::gpk::m4f32		& mVP
-	, const ::gpk::SNearFar		& nearFar
+	, const ::gpk::minmaxf32		& nearFar
 	, const ::gpk::n3f32		& lightPosition
 	, const double				lightFactorDistance
 	, const ::gpk::rgbaf		& colorAmbient
@@ -325,7 +325,7 @@ static	::gpk::error_t	drawVoxelModel
 	( const ::gpk::SVoxelMap<uint8_t>	& voxelMap	
 	, const ::gpk::n3f32				& position
 	, const ::gpk::m4f32				& mVP
-	, const ::gpk::SNearFar				& nearFar
+	, const ::gpk::minmaxf32				& nearFar
 	, const ::gpk::n3f32				& cameraPos
 	, const ::gpk::n3f32				& cameraFront
 	, const ::gpk::n3f32				& lightPosition
@@ -420,7 +420,7 @@ struct SCamera {
 	const ::gpk::n3f32								tilt										= {10, };	// ? cam't remember what is this. Radians? Eulers?
 	const ::gpk::n3f32								rotation									= {0, (float)frameInfo.FrameNumber / 100, 0};
 
-	::gpk::SNearFar											nearFar										= {0.1f , 1000.0f};
+	::gpk::minmaxf32											nearFar										= {0.1f , 1000.0f};
 
 	stacxpr const ::gpk::n3f32			cameraUp									= {0, 1, 0};	// ? cam't remember what is this. Radians? Eulers?
 	::SCamera												camera										= {{100, 50, 0}, {25, 0, 25}};

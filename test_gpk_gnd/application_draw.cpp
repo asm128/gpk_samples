@@ -10,11 +10,11 @@ namespace gpk
 {
 	template<typename _tCoord>
 	static					::gpk::error_t									drawTriangle
-		( ::gpk::view_grid<uint32_t>						& targetDepth
-		, const ::gpk::SNearFar								& fNearFar
-		, const ::gpk::tri3<_tCoord>					& triangle
-		, ::gpk::array_pod<::gpk::n2<int16_t>>			& out_Points
-		, ::gpk::array_pod<::gpk::tri<float>>			& triangleWeights
+		( ::gpk::v2u32					& targetDepth
+		, const ::gpk::minmaxf32		& fNearFar
+		, const ::gpk::tri3<_tCoord>	& triangle
+		, ::gpk::apod<::gpk::n2i16>		& out_Points
+		, ::gpk::apod<::gpk::trif32>	& triangleWeights
 		) {
 		int32_t																		pixelsDrawn									= 0;
 		const ::gpk::n2<uint32_t>												& _targetMetrics							= targetDepth.metrics();
@@ -68,16 +68,16 @@ namespace gpk
 	}
 }
 					::gpk::error_t										drawPixelGND
-	( ::gpk::SRenderCache									& renderCache
-	, ::gpk::bgra										& targetColorCell
-	, const ::gpk::tri<float>						& pixelWeights
-	, const ::gpk::tri3<float>						& positions
-	, const ::gpk::tri2<float>						& uvs
-	, const ::gpk::view_grid<::gpk::bgra>				& textureColors
-	, int32_t												iTriangle
-	, const ::gpk::n3<double>							& lightDir
-	, const ::gpk::rgbaf								& diffuseColor
-	, const ::gpk::rgbaf								& ambientColor
+	( ::gpk::SRenderCache		& renderCache
+	, ::gpk::bgra				& targetColorCell
+	, const ::gpk::trif32		& pixelWeights
+	, const ::gpk::tri3f32		& positions
+	, const ::gpk::tri2f32		& uvs
+	, const ::gpk::v2bgra		& textureColors
+	, int32_t					iTriangle
+	, const ::gpk::n3f64		& lightDir
+	, const ::gpk::rgbaf		& diffuseColor
+	, const ::gpk::rgbaf		& ambientColor
 	, const ::gpk::view<const ::gpk::SLightInfoRSW>	& lights
 	) {	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	const ::gpk::tri3<float>												& normals									= renderCache.TransformedNormalsVertex[iTriangle];
@@ -140,7 +140,7 @@ namespace gpk
 static				::gpk::error_t										transformTriangles
 	( const ::gpk::view<::gpk::tri<uint32_t>>	& vertexIndexList
 	, const ::gpk::view<::gpk::n3f32>				& vertices
-	, const ::gpk::SNearFar									& nearFar
+	, const ::gpk::minmaxf32									& nearFar
 	, const ::gpk::m4<float>									& xWorld
 	, const ::gpk::m4<float>									& xWV
 	, const ::gpk::m4<float>									& xProjection
@@ -208,7 +208,7 @@ static				::gpk::error_t										drawTriangles
 	, const ::gpk::view<::gpk::n3f32>				& vertices
 	, const ::gpk::view<::gpk::n2<float>>				& uvs
 	, const ::gpk::view_grid	<::gpk::bgra>					& textureView
-	, const ::gpk::SNearFar											& nearFar
+	, const ::gpk::minmaxf32											& nearFar
 	, const ::gpk::n3f32									& lightDir
 	, ::gpk::SRenderCache											& renderCache
 	, ::gpk::view_grid<uint32_t>									& targetDepthView
@@ -280,17 +280,17 @@ static				::gpk::error_t										drawTriangles
 }
 
 					::gpk::error_t										drawGND
-	( ::gpk::SRenderCache												& renderCache
-	, ::gpk::SSceneTransforms											& transforms
-	, ::gpk::SSceneCamera												& camera
-	, ::gpk::rtbgra8d32					& target
-	, const ::gpk::SModelPivot<float>									& modelPivot
-	, const ::gpk::n3f32										& lightDir
-	, const ::gpk::SModelGND											& modelGND
-	, const ::gpk::SRSWWorldLight										& directionalLight
-	, const ::gpk::view<const ::gpk::img8bgra>	& textures
-	, const ::gpk::view<const ::gpk::SLightInfoRSW>				& lights
-	, bool																wireframe
+	( ::gpk::SRenderCache							& renderCache
+	, ::gpk::SSceneTransforms						& transforms
+	, ::gpk::SSceneCamera							& camera
+	, ::gpk::rtbgra8d32								& target
+	, const ::gpk::SModelPivot<float>				& modelPivot
+	, const ::gpk::n3f32							& lightDir
+	, const ::gpk::SModelGND						& modelGND
+	, const ::gpk::SRSWWorldLight					& directionalLight
+	, const ::gpk::view<const ::gpk::img8bgra>		& textures
+	, const ::gpk::view<const ::gpk::SLightInfoRSW>	& lights
+	, bool											wireframe
 	) {	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	::gpk::view_grid<::gpk::bgra>											& offscreen									= target.Color.View;
 	const ::gpk::n2<uint32_t>												& offscreenMetrics							= offscreen.metrics();
@@ -303,7 +303,7 @@ static				::gpk::error_t										drawTriangles
 	xRotation.Identity();
 	::gpk::m4<float>														xWorld										= {};
 	xWorld.Identity();
-	const ::gpk::SNearFar														& nearFar									= camera.NearFar;
+	const ::gpk::minmaxf32														& nearFar									= camera.NearFar;
 	uint32_t																	& pixelsDrawn								= renderCache.PixelsDrawn	= 0;
 	uint32_t																	& pixelsSkipped								= renderCache.PixelsSkipped	= 0;
 	renderCache.WireframePixelCoords.clear();

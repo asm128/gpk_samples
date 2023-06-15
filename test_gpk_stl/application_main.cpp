@@ -117,7 +117,7 @@ struct SCamera {
 	const ::gpk::n3f32								tilt										= {10, };	// ? cam't remember what is this. Radians? Eulers?
 	const ::gpk::n3f32								rotation									= {0, (float)frameInfo.FrameNumber / 100, 0};
 
-	::gpk::SNearFar											nearFar										= {0.01f , 1000.0f};
+	::gpk::minmaxf32											nearFar										= {0.01f , 1000.0f};
 
 	stacxpr const ::gpk::n3f32			cameraUp									= {0, 1, 0};	// ? cam't remember what is this. Radians? Eulers?
 	::SCamera												camera										= {{150, 75, 0}, {}};

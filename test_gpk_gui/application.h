@@ -14,7 +14,7 @@ namespace gme // I'm gonna use a different namespace in order to test a few thin
 		::gpk::img8bgra					VerticalAtlas						;
 		::gpk::pobj<::gpk::rtbgra8d32>	Offscreen							= {};
 
-		int32_t							Palettes[::gpk::GUI_CONTROL_PALETTE_COUNT]	= {};
+		int16_t							Palettes[::gpk::GUI_CONTROL_PALETTE_COUNT]	= {};
 
 		int32_t							IdExit								= -1;
 		int32_t							IdMode								= -1;

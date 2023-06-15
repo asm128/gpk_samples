@@ -151,7 +151,7 @@ int													ssg::solarSystemUpdate			(ssg::SSolarSystemGame & solarSystem, d
 	::gpk::m4<float>					matrixViewport				= {};
 	stacxpr	::gpk::n3f32				cameraUp		= {0, 1};
 	matrixView.LookAt(camera.Position, camera.Target, cameraUp);
-	matrixProjection.FieldOfView(::gpk::math_pi * .25, targetPixels.metrics().x / (double)targetPixels.metrics().y, ::gpk::SNearFar{0.1f, 10000.0f});
+	matrixProjection.FieldOfView(::gpk::math_pi * .25, targetPixels.metrics().x / (double)targetPixels.metrics().y, ::gpk::minmaxf32{0.1f, 10000.0f});
 	matrixViewport.ViewportLH(targetPixels.metrics().Cast<uint16_t>());
 	matrixView											*= matrixProjection;
 	matrixView											*= matrixViewport;

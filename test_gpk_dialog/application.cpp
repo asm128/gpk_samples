@@ -21,7 +21,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	gui.ColorModeDefault												= ::gpk::GUI_COLOR_MODE_3D;
 	gui.ThemeDefault													= ::gpk::ASCII_COLOR_DARKGREEN * 16 + 7;
 	app.IdExit															= ::gpk::controlCreate(gui);
-	::gpk::SControl					& controlExit				= gui.Controls.Controls[app.IdExit];
+	::gpk::SControlPlacement					& controlExit				= gui.Controls.Placement[app.IdExit];
 	controlExit.Area													= {{}, {64, 20}};
 	controlExit.Border													= {10, 10, 10, 10};
 	controlExit.Margin													= {1, 1, 1, 1};
@@ -37,29 +37,29 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	app.NumericTuner													= ::gpk::tunerCreate(app.DialogMain, tuner);
 	tuner->ValueLimits.Min												= 100;
 	tuner->ValueLimits.Max												= 200;
-	::gpk::SGUIControlTable    & controlTable = gui.Controls;
-	controlTable.Controls[tuner->IdGUIControl].Area.Offset	= {128, 192};
-	controlTable.Controls[tuner->IdGUIControl].Area.Size.x	= 128;
-	controlTable.Controls[tuner->IdGUIControl].Area.Size.y	=  20;
+	::gpk::SControlTable		    & controlTable = gui.Controls;
+	controlTable.Placement[tuner->IdGUIControl].Area.Offset	= {128, 192};
+	controlTable.Placement[tuner->IdGUIControl].Area.Size.x	= 128;
+	controlTable.Placement[tuner->IdGUIControl].Area.Size.y	=  20;
 	tuner->SetValue(0);
 
 	::gpk::pobj<::gpk::SDialogSlider>									slider						= {};
 	app.Slider															= ::gpk::sliderCreate(app.DialogMain, slider);
 	slider->ValueLimits.Min												= 0;
 	slider->ValueLimits.Max												= 255;
-	controlTable.Controls[slider->IdGUIControl].Area.Offset	= {128, 128};
-	controlTable.Controls[slider->IdGUIControl].Area.Size.x	= 128;
-	controlTable.Controls[slider->IdGUIControl].Area.Size.y	= 8;
+	controlTable.Placement[slider->IdGUIControl].Area.Offset	= {128, 128};
+	controlTable.Placement[slider->IdGUIControl].Area.Size.x	= 128;
+	controlTable.Placement[slider->IdGUIControl].Area.Size.y	= 8;
 
 	::gpk::pobj<::gpk::SDialogCheckBox>									checkbox					= {};
 	app.CheckBox														= ::gpk::checkBoxCreate(app.DialogMain, checkbox);
-	controlTable.Controls[checkbox->IdGUIControl].Area.Offset	= {128, 256};
+	controlTable.Placement[checkbox->IdGUIControl].Area.Offset	= {128, 256};
 
 
 	::gpk::pobj<::gpk::SDialogViewport>									viewport					= {};
 	app.Viewport														= ::gpk::viewportCreate(app.DialogMain, viewport);
-	controlTable.Controls[viewport->IdGUIControl].Area.Offset	= {320, 128};
-	controlTable.Controls[viewport->IdGUIControl].Area.Size		= {320, 200};
+	controlTable.Placement[viewport->IdGUIControl].Area.Offset	= {320, 128};
+	controlTable.Placement[viewport->IdGUIControl].Area.Size		= {320, 200};
 	return 0;
 }
 
@@ -74,7 +74,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework), "%s", "Exit requested by framework update.");
 
 	::gpk::SGUI					& gui			= *framework.GUI;
-	::gpk::au32					toProcess		= {};
+	::gpk::acid					toProcess		= {};
 	::gpk::guiGetProcessableControls(gui, toProcess);
 	for(uint32_t iProcessable = 0, countControls = toProcess.size(); iProcessable < countControls; ++iProcessable) {
 		uint32_t					iControl		= toProcess[iProcessable];

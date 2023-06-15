@@ -33,7 +33,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 }
 
 // Vertex coordinates for cube faces
-stacxpr const ::gpk::tri3<float>						geometryCube	[12]						=
+stacxpr const ::gpk::tri3f32						geometryCube	[12]						=
 	{ {{1.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}}	// Right	- first			?? I have no idea if this is correct lol
 	, {{1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 0.0f}}	// Right	- second		?? I have no idea if this is correct lol
 
@@ -62,7 +62,7 @@ stacxpr const ::gpk::tri3<float>						geometryCube	[12]						=
 
 	stacxpr const ::gpk::n3f32								cubeCenter									= {0.5f, 0.5f, 0.5f};
 	for(uint32_t iTriangle = 0; iTriangle < 12; ++iTriangle) {
-		::gpk::tri3<float>													& transformedTriangle						= app.CubePositions[iTriangle];
+		::gpk::tri3f32													& transformedTriangle						= app.CubePositions[iTriangle];
 		transformedTriangle														= geometryCube[iTriangle];
 		transformedTriangle.A													-= cubeCenter;
 		transformedTriangle.B													-= cubeCenter;
@@ -119,18 +119,18 @@ struct SCamera {
 	backBuffer->resize(framework.RootWindow.BackBuffer->Color.metrics(), 0xFF000080, (uint32_t)-1);
 
 	//------------------------------------------------
-	::gpk::array_pod<::gpk::tri3<float>>									triangle3dList								= {};
-	::gpk::array_pod<::gpk::bgra>											triangle3dColorList							= {};
+	::gpk::apod<::gpk::tri3f32>									triangle3dList								= {};
+	::gpk::apod<::gpk::bgra>											triangle3dColorList							= {};
 	triangle3dList.resize(12);
 	triangle3dColorList.resize(12);
-	::gpk::m4<float>														projection									= {};
-	::gpk::m4<float>														viewMatrix									= {};
+	::gpk::m4f32														projection									= {};
+	::gpk::m4f32														viewMatrix									= {};
 	projection.Identity();
 	::gpk::SFrameInfo															& frameInfo									= framework.FrameInfo;
 	const ::gpk::n3f32													tilt										= {10, };	// ? cam't remember what is this. Radians? Eulers?
 	const ::gpk::n3f32													rotation									= {0, (float)frameInfo.FrameNumber / 100, 0};
 
-	::gpk::SNearFar																nearFar										= {0.01f , 1000.0f};
+	::gpk::minmaxf32													nearFar										= {0.01f , 1000.0f};
 
 	stacxpr const ::gpk::n3f32								cameraUp									= {0, 1, 0};	// ? cam't remember what is this. Radians? Eulers?
 	::SCamera																	camera										= {{10, 5, 0}, {}};
@@ -146,7 +146,7 @@ struct SCamera {
 	projection																= viewMatrix * projection;
 	lightPos.Normalize();
 
-	::gpk::m4<float>														viewport									= {};
+	::gpk::m4f32														viewport									= {};
 	viewport._11															= 2.0f / offscreenMetrics.x;
 	viewport._22															= 2.0f / offscreenMetrics.y;
 	viewport._33															= 1.0f / (float)(nearFar.Max - nearFar.Min);
@@ -154,15 +154,15 @@ struct SCamera {
 	viewport._44															= 1.0f;
 	projection																= projection * viewport.GetInverse();
 	for(uint32_t iTriangle = 0; iTriangle < 12; ++iTriangle) {
-		::gpk::tri3<float>													& transformedTriangle						= triangle3dList[iTriangle];
+		::gpk::tri3f32													& transformedTriangle						= triangle3dList[iTriangle];
 		transformedTriangle														= app.CubePositions[iTriangle];
 		::gpk::transform(transformedTriangle, projection);
 	}
-	::gpk::array_pod<::gpk::tri2<int32_t>>								triangle2dList								= {};
+	::gpk::apod<::gpk::tri2<int32_t>>								triangle2dList								= {};
 	triangle2dList.resize(12);
 	const ::gpk::n2<int32_t>												screenCenter								= {(int32_t)offscreenMetrics.x / 2, (int32_t)offscreenMetrics.y / 2};
 	for(uint32_t iTriangle = 0; iTriangle < 12; ++iTriangle) { // Maybe the scale
-		::gpk::tri3<float>													& transformedTriangle3D						= triangle3dList[iTriangle];
+		::gpk::tri3f32													& transformedTriangle3D						= triangle3dList[iTriangle];
 		::gpk::tri2<int32_t>													& transformedTriangle2D						= triangle2dList[iTriangle];
 		transformedTriangle2D.A													= {(int32_t)transformedTriangle3D.A.x, (int32_t)transformedTriangle3D.A.y};
 		transformedTriangle2D.B													= {(int32_t)transformedTriangle3D.B.x, (int32_t)transformedTriangle3D.B.y};
@@ -174,8 +174,8 @@ struct SCamera {
 		double																		lightFactor									= geometryCubeNormals[iTriangle].Dot(lightPos);
 		triangle3dColorList[iTriangle]											= (::gpk::RED * lightFactor).Clamp();
 	}
-	::gpk::array_pod<::gpk::n2<int16_t>>									trianglePixelCoords;
-	::gpk::array_pod<::gpk::n2<int16_t>>									wireframePixelCoords;
+	::gpk::apod<::gpk::n2<int16_t>>									trianglePixelCoords;
+	::gpk::apod<::gpk::n2<int16_t>>									wireframePixelCoords;
 	::gpk::n3f32														cameraFront					= (camera.Target - camera.Position).Normalize();
 	for(uint32_t iTriangle = 0; iTriangle < 12; ++iTriangle) {
 		double																		lightFactor									= geometryCubeNormals[iTriangle].Dot(cameraFront);

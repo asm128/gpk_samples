@@ -22,7 +22,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	es_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
 	::gpk::SGUI						& gui						= *framework.GUI;
 	app.IdExit					= ::gpk::controlCreate(gui);
-	::gpk::SControl					& controlExit				= gui.Controls.Controls[app.IdExit];
+	::gpk::SControlPlacement					& controlExit				= gui.Controls.Placement[app.IdExit];
 	controlExit.Area			= {{0, 0}, {64, 20}};
 	controlExit.Border			= {1, 1, 1, 1};
 	controlExit.Margin			= {1, 1, 1, 1};
@@ -70,11 +70,11 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 		app.Framework.RootWindow.BackBuffer	= app.Offscreen;
 	}
 	::gpk::SFramework				& framework					= app.Framework;
-	app.LobbyClient.Update(framework.RootWindow.Input, framework.RootWindow.EventQueue);
+	app.LobbyClient.Update(framework.RootWindow.Input, framework.RootWindow.EventQueueOld);
 	rvis_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework));
 
 	::gpk::SGUI					& gui			= *framework.GUI;
-	::gpk::au32					toProcess		= {};
+	::gpk::acid					toProcess		= {};
 	::gpk::guiGetProcessableControls(gui, toProcess);
 	for(uint32_t iProcessable = 0, countControls = toProcess.size(); iProcessable < countControls; ++iProcessable) {
 		uint32_t					iControl		= toProcess[iProcessable];

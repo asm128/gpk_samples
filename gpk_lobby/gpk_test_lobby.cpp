@@ -2,7 +2,7 @@
 #include "gpk_bitmap_file.h"
 #include "gpk_tcpip.h"
 #include "gpk_parse.h"
-#include "gpk_gui_control.h"
+#include "gpk_gui_control_list.h"
 
 //#define GPK_AVOID_LOCAL_APPLICATION_MODULE_MODEL_EXECUTABLE_RUNTIME
 #include "gpk_app_impl.h"
@@ -22,7 +22,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	es_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
 	::gpk::SGUI						& gui						= *framework.GUI;
 	app.IdExit															= ::gpk::controlCreate(gui);
-	::gpk::SControl					& controlExit				= gui.Controls.Controls[app.IdExit];
+	::gpk::SControlPlacement					& controlExit				= gui.Controls.Placement[app.IdExit];
 	controlExit.Area			= {{0, 0}, {64, 20}};
 	controlExit.Border			= {1, 1, 1, 1};
 	controlExit.Margin			= {1, 1, 1, 1};
@@ -66,7 +66,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	::gpk::SFramework				& framework					= app.Framework;
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework), "Exit requested by framework update.");
 	::gpk::SGUI					& gui			= *framework.GUI;
-	::gpk::au32					toProcess		= {};
+	::gpk::acid					toProcess		= {};
 	::gpk::guiGetProcessableControls(gui, toProcess);
 	for(uint32_t iProcessable = 0, countControls = toProcess.size(); iProcessable < countControls; ++iProcessable) {
 		uint32_t					iControl		= toProcess[iProcessable];
