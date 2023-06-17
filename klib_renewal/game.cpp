@@ -82,35 +82,35 @@ int64_t								klib::missionCost				(const SGamePlayer& player, const SSquad& sq
 	return 0;
 }
 
-::gpk::error_t							klib::resetGame(SGame& instanceGame) {
+::gpk::error_t			klib::resetGame(SGame& instanceGame) {
 	instanceGame.Messages.UserLog.clear();
 	::klib::initGame(instanceGame);
 
 	//::klib::clearASCIIBackBuffer(' ', COLOR_WHITE);
 
 	// Set up a nice prompt
-	::gpk::apod<char>				playerName;
-	::klib::SASCIITarget					asciiTarget;
+	::gpk::apod<char>			playerName;
+	::klib::SASCIITarget		asciiTarget;
 	::klib::getASCIIBackBuffer(asciiTarget);
 
 	::prompt(instanceGame.Players[::klib::PLAYER_INDEX_USER].Tactical.Name, ::gpk::vcc{"Enter your name:"}, asciiTarget);
-	::std::string							password;
+	::std::string				password;
 	//::prompt(password, "Enter password:");
-	::gpk::bit_set	(instanceGame.Flags, ::klib::GAME_FLAGS_STARTED);
-	::gpk::bit_clear(instanceGame.Flags, ::klib::GAME_FLAGS_TACTICAL);	// Tell the system that the tactical mode is over.
-	::gpk::bit_clear(instanceGame.Flags, ::klib::GAME_FLAGS_TACTICAL_REMOTE);
+	instanceGame.Flags		= ::gpk::bit_set  (instanceGame.Flags, ::klib::GAME_FLAGS_STARTED);
+	instanceGame.Flags		= ::gpk::bit_clear(instanceGame.Flags, ::klib::GAME_FLAGS_TACTICAL);	// Tell the system that the tactical mode is over.
+	instanceGame.Flags		= ::gpk::bit_clear(instanceGame.Flags, ::klib::GAME_FLAGS_TACTICAL_REMOTE);
 	return 0;
 }
 
 struct SWearables {
-	::klib::SProfession						Profession			= {0, 0, 1, -1};
-	::klib::SWeapon							Weapon				= {0, 0, 1, -1};
-	::klib::SArmor							Armor				= {0, 0, 1, -1};
-	::klib::SAccessory						Accessory			= {0, 0, 1, -1};
+	::klib::SProfession		Profession			= {0, 0, 1, -1};
+	::klib::SWeapon			Weapon				= {0, 0, 1, -1};
+	::klib::SArmor			Armor				= {0, 0, 1, -1};
+	::klib::SAccessory		Accessory			= {0, 0, 1, -1};
 };
 
 // Sets up initial equipment and items for the player to carry or wear.
-::gpk::error_t							klib::initGame		(SGame& instanceGame) {
+::gpk::error_t			klib::initGame		(SGame& instanceGame) {
 	instanceGame.EntityTables.Profession	= {definitionsProfession, modifiersProfession	};
 	instanceGame.EntityTables.Weapon		= {definitionsWeapon	, modifiersWeapon		};
 	instanceGame.EntityTables.Armor			= {definitionsArmor		, modifiersArmor		};
@@ -129,19 +129,19 @@ struct SWearables {
 	info_printf("sizeof(SCharacterScore): %u"						, (uint32_t) sizeof(::klib::SCharacterScore)									);
 	info_printf("sizeof(SCharacterGoods): %u"						, (uint32_t) sizeof(::klib::SCharacterGoods)									);
 	info_printf("sizeof(SCharacter): %u"							, (uint32_t) sizeof(::klib::SCharacter)											);
-	info_printf("sizeof(SCharacter)-sizeof(SCharacterGoods): %u"	, (uint32_t)(sizeof(::klib::SCharacter)		- sizeof(::klib::SCharacterGoods))	);
-	info_printf("sizeof(SGamePlayer): %u"								, (uint32_t) sizeof(::klib::SGamePlayer)											);
-	info_printf("sizeof(SGamePlayer)-sizeof(SCharacterGoods): %u"		, (uint32_t)(sizeof(::klib::SGamePlayer)		- sizeof(::klib::SCharacterGoods))	);
+	info_printf("sizeof(SCharacter)-sizeof(SCharacterGoods): %u"	, (uint32_t)(sizeof(::klib::SCharacter) - sizeof(::klib::SCharacterGoods))		);
+	info_printf("sizeof(SGamePlayer): %u"							, (uint32_t) sizeof(::klib::SGamePlayer)										);
+	info_printf("sizeof(SGamePlayer)-sizeof(SCharacterGoods): %u"	, (uint32_t)(sizeof(::klib::SGamePlayer) - sizeof(::klib::SCharacterGoods))		);
 	info_printf("sizeof(STacticalInfo): %u"							, (uint32_t) sizeof(::klib::STacticalInfo)										);
 	info_printf("sizeof(STacticalBoard): %u"						, (uint32_t) sizeof(::klib::STacticalBoard)										);
 	info_printf("sizeof(SMapInventory): %u"							, (uint32_t) sizeof(::klib::SMapInventory)										);
-	info_printf("sizeof(STacticalInfo)-sizeof(SMapInventory): %u"	, (uint32_t)(sizeof(::klib::STacticalInfo)	- sizeof(::klib::SMapInventory))	);
-	info_printf("sizeof(STacticalInfo)-sizeof(STacticalBoard): %u"	, (uint32_t)(sizeof(::klib::STacticalInfo)	- sizeof(::klib::STacticalBoard))	);
+	info_printf("sizeof(STacticalInfo)-sizeof(SMapInventory): %u"	, (uint32_t)(sizeof(::klib::STacticalInfo) - sizeof(::klib::SMapInventory))		);
+	info_printf("sizeof(STacticalInfo)-sizeof(STacticalBoard): %u"	, (uint32_t)(sizeof(::klib::STacticalInfo) - sizeof(::klib::STacticalBoard))	);
 	info_printf("sizeof(SGame): %u"									, (uint32_t) sizeof(::klib::SGame)												);
 
-	::gpk::bit_clear(instanceGame.Flags, GAME_FLAGS_STARTED			);
-	::gpk::bit_clear(instanceGame.Flags, GAME_FLAGS_TACTICAL			);
-	::gpk::bit_clear(instanceGame.Flags, GAME_FLAGS_TACTICAL_REMOTE	);
+	instanceGame.Flags = ::gpk::bit_clear(instanceGame.Flags, GAME_FLAGS_STARTED			);
+	instanceGame.Flags = ::gpk::bit_clear(instanceGame.Flags, GAME_FLAGS_TACTICAL			);
+	instanceGame.Flags = ::gpk::bit_clear(instanceGame.Flags, GAME_FLAGS_TACTICAL_REMOTE	);
 	instanceGame.Seed										= time(0);
 	::srand((unsigned int)instanceGame.Seed);
 	static ::klib::SMessageSlow					slowMessage						= {};
@@ -353,6 +353,6 @@ struct SWearables {
 	::klib::reinitBuyMenus(instanceGame.EntityTables, instanceGame.Players[::klib::PLAYER_INDEX_USER].Inventory, instanceGame.ShopMenus);
 
 	::klib::initTacticalMap(instanceGame);
-	::gpk::bit_set(instanceGame.Flags, GAME_FLAGS_RUNNING);
+	instanceGame.Flags = ::gpk::bit_set(instanceGame.Flags, GAME_FLAGS_RUNNING);
 	return 0;
 }

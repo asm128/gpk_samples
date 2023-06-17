@@ -382,7 +382,7 @@ bool																	shoot											(::klib::STacticalInfo & tacticalInfo, ::gp
 	else if(::gpk::bit_true(agentShooter.FinalFlags.Tech.ProjectileClass	, ::klib::PROJECTILE_CLASS_RAY		)) PlaySound("..\\gpk_data\\sounds\\Gun_Shot-Marvin-1140816320.wav"					, 0, SND_ASYNC | SND_FILENAME);
 
 	for(int32_t iBullet=0; iBullet<totalBullets; ++iBullet) {
-		::gpk::bit_clear(playerShooter.Tactical.Squad.AgentStates[squadAgent], ::klib::AGENT_STATE_MOVE);
+		playerShooter.Tactical.Squad.AgentStates[squadAgent] = ::gpk::bit_clear(playerShooter.Tactical.Squad.AgentStates[squadAgent], ::klib::AGENT_STATE_MOVE);
 		::klib::SBullet																newBullet;
 		newBullet.Position.Cell													= {agentShooter.Position.x, agentShooter.Position.y, agentShooter.Position.z};
 		newBullet.Position.Offset												= {.5f, .75f, .5f};
@@ -688,7 +688,7 @@ int32_t																	drawInventoryMenu								(::klib::SGame& instanceGame, :
 
 static	::klib::SGameState												endMission										( ::klib::SGame & instanceGame, bool aborted)						{
 	::klib::determineOutcome(instanceGame.EntityTables, instanceGame.TacticalInfo, instanceGame.Players, instanceGame.Messages, aborted);						// Determine outcome before exiting tactical mode.
-	::gpk::bit_clear(instanceGame.Flags, ::klib::GAME_FLAGS_TACTICAL);	// Tell the system that the tactical mode is over.
+	instanceGame.Flags = ::gpk::bit_clear(instanceGame.Flags, ::klib::GAME_FLAGS_TACTICAL);	// Tell the system that the tactical mode is over.
 	return {::klib::GAME_STATE_WELCOME_COMMANDER};
 }
 
@@ -895,7 +895,7 @@ bool																	initTacticalGame								(::klib::SGame& instanceGame);
 	::klib::SGameState															exitState										= returnState;
 	if(false == ::gpk::bit_true(instanceGame.Flags, ::klib::GAME_FLAGS_TACTICAL)) {
 		if(false == ::initTacticalGame(instanceGame)) {
-			::gpk::bit_clear(instanceGame.Flags, ::klib::GAME_FLAGS_TACTICAL);
+			instanceGame.Flags = ::gpk::bit_clear(instanceGame.Flags, ::klib::GAME_FLAGS_TACTICAL);
 			return {::klib::GAME_STATE_WELCOME_COMMANDER};
 		}
 		//int32_t finalCost = ::klib::missionCost(instanceGame.Players[PLAYER_INDEX_USER], instanceGame.Players[PLAYER_INDEX_USER].Squad, instanceGame.Players[PLAYER_INDEX_USER].Squad.Size);

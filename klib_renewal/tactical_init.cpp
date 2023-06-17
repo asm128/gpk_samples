@@ -53,14 +53,6 @@ void												fillCellsFromNoise									(::gpk::view_grid<_tCell> grid, const
 	}
 }
 
-bool												initCampaignGame									(::klib::SGame& instanceGame);
-bool												initTacticalGame									(::klib::SGame& instanceGame) {
-	if(instanceGame.Mode == ::klib::GAME_MODE_CAMPAIGN)
-		return ::initCampaignGame(instanceGame);
-
-	return false;
-}
-
 //static bool											isEnemyTeam											(TEAM_TYPE teamIdCurrent, TEAM_TYPE teamIdPossibleEnemy) { return isRelevantTeam(teamIdPossibleEnemy) && (teamIdCurrent != teamIdPossibleEnemy); }
 
 void												deployCampaignAgents
@@ -490,18 +482,25 @@ bool												initCampaignPlayers									(::klib::SGame & instanceGame)						
 	return false;
 }
 
-bool												initCampaignGame									(::klib::SGame& instanceGame)											{
-	::klib::STacticalInfo									& tacticalInfo										= instanceGame.TacticalInfo;
+bool						initCampaignGame									(::klib::SGame & instanceGame)											{
+	::klib::STacticalInfo			& tacticalInfo										= instanceGame.TacticalInfo;
 	tacticalInfo.Clear();
 
-	::klib::STacticalSetup									& tacticalSetup										= tacticalInfo.Setup;
+	::klib::STacticalSetup			& tacticalSetup										= tacticalInfo.Setup;
 	::getDefaultTacticalSetupForCampaign(tacticalSetup);
-	tacticalSetup.Seed									= instanceGame.Seed + instanceGame.Players[::klib::PLAYER_INDEX_USER].Tactical.Score.BattlesWon;
+	tacticalSetup.Seed			= instanceGame.Seed + instanceGame.Players[::klib::PLAYER_INDEX_USER].Tactical.Score.BattlesWon;
 	::initCampaignPlayers(instanceGame);
 	::klib::initTacticalMap(instanceGame);
 	::klib::drawTacticalBoard(instanceGame, tacticalInfo, instanceGame.TacticalDisplay.Screen.Color, instanceGame.TacticalDisplay.Screen.DepthStencil, ::klib::PLAYER_INDEX_USER, ::klib::TEAM_TYPE_CIVILIAN, instanceGame.Players[::klib::PLAYER_INDEX_USER].Tactical.Selection, true);
 
-	::gpk::bit_set(instanceGame.Flags, ::klib::GAME_FLAGS_TACTICAL);
-	tacticalInfo.CurrentPlayer							= (int8_t)::resolveNextPlayer(instanceGame.EntityTables, tacticalInfo, instanceGame.Players, instanceGame.Messages);
+	instanceGame.Flags			= ::gpk::bit_set(instanceGame.Flags, ::klib::GAME_FLAGS_TACTICAL);
+	tacticalInfo.CurrentPlayer	= (int8_t)::resolveNextPlayer(instanceGame.EntityTables, tacticalInfo, instanceGame.Players, instanceGame.Messages);
 	return true;
+}
+
+bool						initTacticalGame									(::klib::SGame& instanceGame) {
+	if(instanceGame.Mode == ::klib::GAME_MODE_CAMPAIGN)
+		return ::initCampaignGame(instanceGame);
+
+	return false;
 }

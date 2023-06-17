@@ -108,16 +108,8 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 
 	::gpk::SGUI					& gui			= *framework.GUI;
 	::gpk::acid					toProcess		= {};
-	::gpk::guiGetProcessableControls(gui, toProcess);
-	for(uint32_t iProcessable = 0, countControls = toProcess.size(); iProcessable < countControls; ++iProcessable) {
-		uint32_t					iControl		= toProcess[iProcessable];
-		const ::gpk::SControlEvent	& controlEvent	= gui.Controls.Events[iControl];
-		if(controlEvent.Execute) {
-			info_printf("Executed %u.", iControl);
-			if(iControl == (uint32_t)app.IdExit)
-				return 1;
-		}
-	}
+	if(1 == ::gpk::guiProcessControls(gui, [&app](::gpk::cid_t iControl) { return one_if(iControl == app.IdExit); }))
+		return 1;
 	//timer.Frame();
 	//warning_printf("Update time: %f.", (float)timer.LastTimeSeconds);
 	return 0;

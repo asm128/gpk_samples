@@ -297,7 +297,7 @@ void									klib::endTurn															(const ::klib::SEntityTables & entityTa
 			playerToClear.Squad.ActionsLeft[iAgent].Actions							= 1;
 			playerToClear.Squad.TargetPositions[iAgent]								= character.Position;
 
-			::gpk::bit_clear(playerToClear.Squad.AgentStates[iAgent], ::klib::AGENT_STATE_MOVE);
+			playerToClear.Squad.AgentStates[iAgent] = ::gpk::bit_clear(playerToClear.Squad.AgentStates[iAgent], ::klib::AGENT_STATE_MOVE);
 
 			::klib::applyTurnStatusAndBonusesAndSkipTurn(entityTables, messages, character);
 			++character.Score.TurnsPlayed;
@@ -355,7 +355,7 @@ bool																					klib::updateCurrentPlayer												(const ::klib::SEn
 	if( currentPlayer.Squad.TargetPositions[currentPlayer.Selection.PlayerUnit] != currentAgentPosition && (0 < currentPlayer.Squad.ActionsLeft[currentPlayer.Selection.PlayerUnit].Moves) ) {
 		bHasArrived																				= ::klib::moveStep(entityTables, tacticalInfo, players, currentPlayer, tacticalInfo.CurrentPlayer, currentPlayer.Selection.PlayerUnit, tacticalInfo.Setup.TeamPerPlayer[tacticalInfo.CurrentPlayer], tacticalInfo.Board, currentAgentPosition, messages);
 		if(bHasArrived)
-			::gpk::bit_clear(currentPlayer.Squad.AgentStates[currentPlayer.Selection.PlayerUnit], ::klib::AGENT_STATE_MOVE);
+			currentPlayer.Squad.AgentStates[currentPlayer.Selection.PlayerUnit] = ::gpk::bit_clear(currentPlayer.Squad.AgentStates[currentPlayer.Selection.PlayerUnit], ::klib::AGENT_STATE_MOVE);
 	}
 
 	if(currentPlayer.Control.Type != ::klib::PLAYER_CONTROL_AI)
@@ -366,7 +366,7 @@ bool																					klib::updateCurrentPlayer												(const ::klib::SEn
 		return false;
 	if( bHasArrived && (0 < currentPlayer.Squad.ActionsLeft[currentPlayer.Selection.PlayerUnit].Moves) ) {
 		::selectAIDestination(tacticalInfo, players);
-		::gpk::bit_set(currentPlayer.Squad.AgentStates[currentPlayer.Selection.PlayerUnit], ::klib::AGENT_STATE_MOVE);
+		currentPlayer.Squad.AgentStates[currentPlayer.Selection.PlayerUnit] = ::gpk::bit_set(currentPlayer.Squad.AgentStates[currentPlayer.Selection.PlayerUnit], ::klib::AGENT_STATE_MOVE);
 	}
 	return true;
 }

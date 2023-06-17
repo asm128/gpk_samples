@@ -200,7 +200,7 @@ static	void							updateState					(::klib::SGame& instanceGame, const ::klib::SG
 		break;
 	case ::klib::GAME_STATE_EXIT		:
 		instanceGame.Messages.StateMessage	= ::gpk::view_const_string{"Exiting game..."};
-		::gpk::bit_clear(instanceGame.Flags, ::klib::GAME_FLAGS_RUNNING);
+		instanceGame.Flags = ::gpk::bit_clear(instanceGame.Flags, ::klib::GAME_FLAGS_RUNNING);
 		newAction							= instanceGame.State;
 		break;
 

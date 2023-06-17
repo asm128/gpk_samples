@@ -465,9 +465,9 @@ void										klib::drawAndPresentGame		(SGame& instanceGame, ::klib::SASCIITarg
 	// Check for help display
 	if(keyTimerAccum.Accumulate(keyTimer.LastTimeSeconds) && instanceGame.FrameInput.Keys[VK_F1]) {
 		if(::gpk::bit_true(instanceGame.Flags, GAME_FLAGS_HELPON))
-			::gpk::bit_clear(instanceGame.Flags, GAME_FLAGS_HELPON);
+			instanceGame.Flags = ::gpk::bit_clear(instanceGame.Flags, GAME_FLAGS_HELPON);
 		else
-			::gpk::bit_set(instanceGame.Flags, GAME_FLAGS_HELPON);
+			instanceGame.Flags = ::gpk::bit_set(instanceGame.Flags, GAME_FLAGS_HELPON);
 		keyTimerAccum.Value								= 0;
 	}
 }

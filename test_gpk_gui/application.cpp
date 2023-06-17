@@ -232,46 +232,43 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 
 ::gpk::error_t			update		(::gme::SApplication & app, bool exitSignal)	{
 	//::gpk::STimer															timer;
-	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, exitSignal, "%s", "Exit requested by runtime.");
+	rvis_if(::gpk::APPLICATION_STATE_EXIT, exitSignal);
 	{
 		::std::lock_guard			lock					(app.LockRender);
 		app.Framework.RootWindow.BackBuffer	= app.Offscreen;
 	}
 	::gpk::SFramework			& framework				= app.Framework;
-	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(framework), "%s", "Exit requested by framework update.");
+	rvis_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(framework));
 	{
 		::gpk::SGUI					& gui					= *framework.GUI;
 		::std::lock_guard			lock					(app.LockGUI);
-		::gpk::acid					controlsToProcess		= {};
-		::gpk::guiGetProcessableControls(gui, controlsToProcess);
-		for(uint32_t iProcessable = 0, countControls = controlsToProcess.size(); iProcessable < countControls; ++iProcessable) {
-			uint32_t																iControl					= controlsToProcess[iProcessable];
-			if(gui.Controls.Events[iControl].Execute) {
-				info_printf("Executed %u.", iControl);
-				if(iControl == (uint32_t)app.IdExit)
-					return 1;
-				else if(iControl == (uint32_t)app.IdMode) {
-					for(uint32_t iChild = 0; iChild < gui.Controls.States.size(); ++iChild)
-						gui.Controls.Draw[iChild].ColorMode							= gui.Controls.Draw[iChild].ColorMode == ::gpk::GUI_COLOR_MODE_Flat ? ::gpk::GUI_COLOR_MODE_3D : ::gpk::GUI_COLOR_MODE_Flat;
-				}
-				else if(iControl == (uint32_t)app.IdTheme) {
-					++gui.ThemeDefault;
-					if(gui.ThemeDefault >= gui.Colors->ControlThemes->size())
-						gui.ThemeDefault												= 0;
-				}
-				else if(iControl == (uint32_t)app.IdNewPalette) {
-					for(uint32_t iChild = 0; iChild < gui.Controls.States.size(); ++iChild)
-						gui.Controls.Draw[iChild].UseNewPalettes						= gui.Controls.Draw[iChild].UseNewPalettes ? 0 : 1;
-				}
-				else if(iControl > (uint32_t)app.IdMode) {
-					gui.Controls.Draw[5].ColorTheme								= int16_t(iControl - app.IdNewPalette);
-					if(gui.Controls.Draw[5].ColorTheme >= (int32_t)gui.Colors->Palette->size())
-						gui.Controls.Draw[5].ColorTheme								= 10;
-					for(uint32_t iChild = 0; iChild < gui.Controls.Children[5].size(); ++iChild)
-						gui.Controls.Draw[gui.Controls.Children[5][iChild]].ColorTheme = gui.Controls.Draw[5].ColorTheme;
-				}
+		if(1 == ::gpk::guiProcessControls(gui, [&gui, &app](::gpk::cid_t iControl) {
+			info_printf("Executed %u.", iControl);
+			if(iControl == app.IdExit)
+				return 1;
+			else if(iControl == app.IdMode) {
+				for(uint32_t iChild = 0; iChild < gui.Controls.States.size(); ++iChild)
+					gui.Controls.Draw[iChild].ColorMode							= gui.Controls.Draw[iChild].ColorMode == ::gpk::GUI_COLOR_MODE_Flat ? ::gpk::GUI_COLOR_MODE_3D : ::gpk::GUI_COLOR_MODE_Flat;
 			}
-		}
+			else if(iControl == app.IdTheme) {
+				++gui.ThemeDefault;
+				if(gui.ThemeDefault >= gui.Colors->ControlThemes->size())
+					gui.ThemeDefault												= 0;
+			}
+			else if(iControl == app.IdNewPalette) {
+				for(uint32_t iChild = 0; iChild < gui.Controls.States.size(); ++iChild)
+					gui.Controls.Draw[iChild].UseNewPalettes						= gui.Controls.Draw[iChild].UseNewPalettes ? 0 : 1;
+			}
+			else if(iControl > app.IdMode) {
+				gui.Controls.Draw[5].ColorTheme								= int16_t(iControl - app.IdNewPalette);
+				if(gui.Controls.Draw[5].ColorTheme >= (int32_t)gui.Colors->Palette->size())
+					gui.Controls.Draw[5].ColorTheme								= 10;
+				for(uint32_t iChild = 0; iChild < gui.Controls.Children[5].size(); ++iChild)
+					gui.Controls.Draw[gui.Controls.Children[5][iChild]].ColorTheme = gui.Controls.Draw[5].ColorTheme;
+			}
+			return 0;
+		}))
+			return 1;
 	}
 	::gpk::sleep(1);
 	//timer.Frame();

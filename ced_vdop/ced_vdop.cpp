@@ -80,25 +80,18 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 	::gpk::SFramework				& framework	= app.Framework;
 	//::gpk::STimer															timer;
 	(void)exitSignal;
-	//retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, exitSignal, "%s", "Exit requested by runtime.");
+	//rvis_if(::gpk::APPLICATION_STATE_EXIT, exitSignal);
 	{
 		::std::lock_guard									lock						(app.LockRender);
 		app.Framework.RootWindow.BackBuffer				= app.Offscreen;
 	}
-	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework), "%s", "Exit requested by framework update.");
+	rvis_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework));
 
 	::gpk::SGUI					& gui			= *framework.GUI;
 	::gpk::acid					toProcess		= {};
-	::gpk::guiGetProcessableControls(gui, toProcess);
-	for(uint32_t iProcessable = 0, countControls = toProcess.size(); iProcessable < countControls; ++iProcessable) {
-		uint32_t					iControl		= toProcess[iProcessable];
-		const ::gpk::SControlEvent	& controlEvent	= gui.Controls.Events[iControl];
-		if(controlEvent.Execute) {
-			info_printf("Executed %u.", iControl);
-			if(iControl == (uint32_t)app.IdExit)
-				return 1;
-		}
-	}
+	if(1 == ::gpk::guiProcessControls(gui, [&app](::gpk::cid_t iControl) { return one_if(iControl == app.IdExit); }))
+		return 1;
+
 	if(framework.RootWindow.Resized) {
 		::gpk::m4<float>									& matrixProjection			= app.TextOverlay.MatrixProjection;
 		matrixProjection.FieldOfView(::gpk::math_pi * .25, framework.RootWindow.Size.x / (double)framework.RootWindow.Size.y, 0.01, 500.0);

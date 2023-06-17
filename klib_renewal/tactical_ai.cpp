@@ -209,7 +209,7 @@ void													selectAIDestination										(::klib::STacticalInfo & tacticalI
 		}
 	}
 	else if(0 < currentPlayer.Tactical.Squad.ActionsLeft[currentPlayer.Tactical.Selection.PlayerUnit].Moves)
-		::gpk::bit_set(currentPlayer.Tactical.Squad.AgentStates[currentPlayer.Tactical.Selection.PlayerUnit], ::klib::AGENT_STATE_MOVE);
+		currentPlayer.Tactical.Squad.AgentStates[currentPlayer.Tactical.Selection.PlayerUnit] = ::gpk::bit_set(currentPlayer.Tactical.Squad.AgentStates[currentPlayer.Tactical.Selection.PlayerUnit], ::klib::AGENT_STATE_MOVE);
 
 	return result;
 }
