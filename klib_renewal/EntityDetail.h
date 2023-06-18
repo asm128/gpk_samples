@@ -7,8 +7,8 @@
 namespace klib {
 	template <typename _TEntity>
 	void									drawEntityDetail
-		( ::gpk::view_grid<char>									display
-		, ::gpk::view_grid<uint16_t>								textAttributes
+		( ::gpk::gchar									display
+		, ::gpk::gu16								textAttributes
 		, int32_t													offsetY
 		, int32_t													offsetX
 		, const SEntity												& entity

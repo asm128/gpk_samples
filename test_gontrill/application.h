@@ -24,39 +24,39 @@ enum PARTICLE_TYPE : int8_t
 
 #pragma pack(push, 1)
 struct SGameParticle {
-						PARTICLE_TYPE																				Type										= (PARTICLE_TYPE)-1;
-						PLAYER_TYPE																					TypePlayer									= (PLAYER_TYPE	)-1;
-						WEAPON_TYPE																					TypeWeapon									= (WEAPON_TYPE	)-1;
-						int8_t																						IndexWeapon									= -1;
-						int8_t																						Padding										= 0;
-						uint32_t																					OwnerIndex									= (uint32_t		)-1;
-						float																						TimeLived									= 0;
-						bool																						Lit											= true;
+	PARTICLE_TYPE		Type					= (PARTICLE_TYPE)-1;
+	PLAYER_TYPE			TypePlayer				= (PLAYER_TYPE	)-1;
+	WEAPON_TYPE			TypeWeapon				= (WEAPON_TYPE	)-1;
+	int8_t				IndexWeapon				= -1;
+	int8_t				Padding					= 0;
+	uint32_t			OwnerIndex				= (uint32_t		)-1;
+	float				TimeLived				= 0;
+	bool				Lit						= true;
 };
 
 struct SParticleToDraw {
-						int32_t																						IndexParticlePhysics;
-						int32_t																						IndexParticleInstance;
-						float																						TimeLived;
-						::gpk::n2<int32_t>																		Position;
+	int32_t				IndexParticlePhysics;
+	int32_t				IndexParticleInstance;
+	float				TimeLived;
+	::gpk::n2i32		Position;
 };
 
 struct SLaserToDraw {
-						int32_t																						IndexParticlePhysics;
-						int32_t																						IndexParticleInstance;
-						::gpk::line2<float>																		Segment;
+	int32_t				IndexParticlePhysics;
+	int32_t				IndexParticleInstance;
+	::gpk::line2f32		Segment;
 };
 #pragma pack(pop)
 
 struct SStuffToDraw {
-						::gpk::apod<::SLaserToDraw>															ProjectilePaths								= {};
-						::gpk::apod<::SParticleToDraw>															Stars										= {};
-						::gpk::apod<::SParticleToDraw>															Thrust										= {};
-						::gpk::apod<::SParticleToDraw>															Debris										= {};
-						::gpk::apod<::gpk::n2<float>>														CollisionPoints								= {};
+	::gpk::apod<::SLaserToDraw>		ProjectilePaths		= {};
+	::gpk::apod<::SParticleToDraw>	Stars				= {};
+	::gpk::apod<::SParticleToDraw>	Thrust				= {};
+	::gpk::apod<::SParticleToDraw>	Debris				= {};
+	::gpk::apod<::gpk::n2f32>		CollisionPoints		= {};
 
-						::gpk::aobj<::gpk::view_grid<::gpk::bgra>>										TexturesPowerup0							= {};
-						::gpk::aobj<::gpk::view_grid<::gpk::bgra>>										TexturesPowerup1							= {};
+	::gpk::aobj<::gpk::g8bgra>		TexturesPowerup0	= {};
+	::gpk::aobj<::gpk::g8bgra>		TexturesPowerup1	= {};
 };
 
 enum GAME_TEXTURE : int8_t
@@ -77,7 +77,7 @@ struct SEffectsDelay {
 	double							Star;
 };
 
-stacxpr	const ::gpk::n2u16		GAME_SCREEN_SIZE				= {640 / 2 * 3, 360 / 2 * 3};
+stacxpr	const ::gpk::n2u16		GAME_SCREEN_SIZE	= {640 / 2 * 3, 360 / 2 * 3};
 
 struct SLevelState {
 	int32_t							Number;
@@ -90,33 +90,33 @@ struct SApplication {
 	typedef	TParticleSystem::TIntegrator					TIntegrator;
 	typedef	TIntegrator::TParticle							TParticle;
 
-	::gpk::SFramework				Framework									;
+	::gpk::SFramework			Framework					;
 
-	::SGame							Game										= {};
-	::SLevelState					Level										= {0, 0};
-	bool							Playing										= true;
-	bool							Paused										= true;
-	bool							Debugging									= true;
+	::SGame						Game						= {};
+	::SLevelState				Level						= {0, 0};
+	bool						Playing						= true;
+	bool						Paused						= true;
+	bool						Debugging					= true;
 
-	TParticleSystem					ParticleSystemThrust						= {};
-	TParticleSystem					ParticleSystemProjectiles					= {};
-	TParticleSystem					ParticleSystemDebris						= {};
-	TParticleSystem					ParticleSystemStars							= {};
+	TParticleSystem				ParticleSystemThrust		= {};
+	TParticleSystem				ParticleSystemProjectiles	= {};
+	TParticleSystem				ParticleSystemDebris		= {};
+	TParticleSystem				ParticleSystemStars			= {};
 
-	::gpk::bgra				ColorBackground								= ::gpk::rgbaf(.15f, .15f, .15f, 1.0f);
+	::gpk::bgra					ColorBackground				= ::gpk::rgbaf(.15f, .15f, .15f, 1.0f);
 
-	::gpk::astatic<::gpk::img<::gpk::bgra>	, GAME_TEXTURE_COUNT>		Original									= {};
-	::gpk::astatic<::gpk::img<::gpk::bgra>	, GAME_TEXTURE_COUNT>		Processed									= {};
-	::gpk::astatic<::gpk::n2i32				, GAME_TEXTURE_COUNT>		TextureCenters								= {};
+	::gpk::astatic<::gpk::img8bgra, GAME_TEXTURE_COUNT>		Original		= {};
+	::gpk::astatic<::gpk::img8bgra, GAME_TEXTURE_COUNT>		Processed		= {};
+	::gpk::astatic<::gpk::n2i32, GAME_TEXTURE_COUNT>		TextureCenters	= {};
 
-	::gpk::n2i32					PSOffsetFromShipCenter						= {};
-	::gpk::imgmonou64				TextureFontMonochrome						= {};
+	::gpk::n2i32				PSOffsetFromShipCenter		= {};
+	::gpk::imgmonou64			TextureFontMonochrome		= {};
 
-	::SStuffToDraw					StuffToDraw									= {};
-	::gpk::apod<::gpk::n2i16>		CacheLinePoints								= {};
-	::SEffectsDelay					EffectsDelay								= {};
+	::SStuffToDraw				StuffToDraw					= {};
+	::gpk::apod<::gpk::n2i16>	CacheLinePoints				= {};
+	::SEffectsDelay				EffectsDelay				= {};
 
-									SApplication								(::gpk::SRuntimeValues& runtimeValues)			noexcept	: Framework(runtimeValues) {}
+								SApplication				(::gpk::SRuntimeValues& runtimeValues)			noexcept	: Framework(runtimeValues) {}
 };
 
 #endif // APPLICATION_H_098273498237423

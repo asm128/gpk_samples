@@ -119,7 +119,7 @@ namespace gpk
 {
 	template<typename _tCoord>
 	static					::gpk::error_t									drawTriangle
-		( ::gpk::v2u32	& targetDepth
+		( ::gpk::gu32	& targetDepth
 		, const ::gpk::minmaxf32		& fNearFar
 		, const ::gpk::tri3<_tCoord>	& triangle
 		, ::gpk::apod<::gpk::n2i16>		& out_Points
@@ -176,8 +176,8 @@ namespace gpk
 
 	template<typename _tCoord, typename _tIndex>
 	static	inline			::gpk::error_t									drawTriangleIndexed
-		( ::gpk::v2u32							& targetDepth
-		, const ::gpk::minmaxf32					& fNearFar // fFar
+		( ::gpk::gu32							& targetDepth
+		, const ::gpk::minmaxf32				& fNearFar // fFar
 		//, double								fNear
 		, uint32_t								baseIndex
 		, uint32_t								baseVertexIndex
@@ -190,7 +190,7 @@ namespace gpk
 }
 
 static	::gpk::error_t	drawVoxelFaceGeometry
-	( ::gpk::v2u32							targetDepth
+	( ::gpk::gu32							targetDepth
 	, ::gpk::apod<::gpk::n2i16>				& Points
 	, const ::gpk::n3f32					& voxelPos
 	, const ::gpk::m4f32					& mWVP
@@ -208,10 +208,10 @@ static	::gpk::error_t	drawVoxelFaceGeometry
 }
 
 struct SFragmentCache {
-	::gpk::apod<::gpk::n2i16>		Points				[6]	= {};
-	::gpk::apod<::gpk::trif32>		TriangleWeights		[6]	= {};	
-	::gpk::view_grid<::gpk::bgra>	TargetPixels;
-	::gpk::v2u32					TargetDepth	;
+	::gpk::apod<::gpk::n2i16>	Points				[6]	= {};
+	::gpk::apod<::gpk::trif32>	TriangleWeights		[6]	= {};	
+	::gpk::g8bgra				TargetPixels;
+	::gpk::gu32					TargetDepth	;
 };
 
 static	::gpk::error_t	drawVoxelFace

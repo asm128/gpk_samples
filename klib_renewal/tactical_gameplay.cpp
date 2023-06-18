@@ -107,7 +107,7 @@ bool														klib::moveStep										(const ::klib::SEntityTables & entityT
 	}
 	player.Squad.ActionsLeft[agentIndex].Moves					= movesLeft;
 
-	::gpk::view_grid<::klib::STileCharacter>						terrainAgents										= board.Tiles.Entities.Agents;
+	::gpk::grid<::klib::STileCharacter>						terrainAgents										= board.Tiles.Entities.Agents;
 	bool															bArrived											= true;
 	if( initialPosition == finalPosition ) {	// If we didn't move yet is because we're stuck.
 		bArrived													= false;

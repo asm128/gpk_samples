@@ -43,7 +43,7 @@
 #include "klib_random_generator.h"
 
 template<typename _tCell>
-void												fillCellsFromNoise									(::gpk::view_grid<_tCell> grid, const _tCell& value, int64_t seed, int32_t diceFaces=10)														{
+void												fillCellsFromNoise									(::gpk::grid<_tCell> grid, const _tCell & value, int64_t seed, int32_t diceFaces=10)														{
 	_tCell													* cells												= grid.begin();
 	for(uint32_t i = 0, count = grid.size();  i < count; ++i) {
 		double													noise												= ::gpk::noiseNormal1D(i + 1, seed);
@@ -59,7 +59,7 @@ void												deployCampaignAgents
 	( ::klib::STacticalPlayer							& player
 	, const int8_t										playerIndex
 	, ::klib::STacticalSetup							& tacticalSetup
-	, const ::gpk::view_grid<::klib::STopologyDetail>	terrainTopology
+	, const ::gpk::grid<::klib::STopologyDetail>	terrainTopology
 	, ::klib::SEntityTiles								& terrainEntities
 	)
 {
@@ -143,7 +143,7 @@ void												deployCampaignAgents
 	}
 }
 
-void												generateTopology									(::gpk::view_grid<::klib::STopologyDetail>	terrainTopology, int64_t seed )		{
+void												generateTopology									(::gpk::grid<::klib::STopologyDetail>	terrainTopology, int64_t seed )		{
 	//const uint32_t											terrainWidth										= terrainTopology.metrics().x
 	//	,													terrainDepth										= terrainTopology.metrics().y
 	//	;
@@ -157,7 +157,7 @@ void												generateTopology									(::gpk::view_grid<::klib::STopologyDeta
 //
 void												populateProps
 	( const ::klib::SEntityTable<::klib::SStageProp>	& entityTable
-	, ::gpk::view_grid<::klib::STopologyDetail>			terrainTopology
+	, ::gpk::grid<::klib::STopologyDetail>			terrainTopology
 	, ::klib::SEntityTiles								& terrainEntities
 	, int64_t											seed
 	, int64_t											maxCoins
@@ -243,7 +243,7 @@ void									recalculateAgentsInRangeAndSight					(::klib::STacticalInfo & tacti
 	tacticalInfo.Board.Clear();
 	tacticalInfo.Board.Resize({::klib::GAME_MAP_WIDTH, ::klib::GAME_MAP_DEPTH});
 
-	::gpk::view_grid<::klib::STopologyDetail>				terrainTopology										= tacticalInfo.Board.Tiles.Terrain.Topology;
+	::gpk::grid<::klib::STopologyDetail>				terrainTopology										= tacticalInfo.Board.Tiles.Terrain.Topology;
 	SEntityTiles											& terrainEntities									= tacticalInfo.Board.Tiles.Entities;
 	int64_t													seed												= tacticalInfo.Setup.Seed;
 

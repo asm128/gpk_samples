@@ -110,7 +110,7 @@
 
 	app.GNDModel.Nodes.resize(app.GNDData.TextureNames.size() * 6);
 	app.GNDModel.TileMapping.resize(app.GNDData.Metrics.Size);
-	::gpk::view_grid<::gpk::STileGeometryGND>									tileGeometryView							= {app.GNDData.lstTileGeometryData.begin(), app.GNDData.Metrics.Size};
+	::gpk::grid<::gpk::STileGeometryGND>									tileGeometryView							= {app.GNDData.lstTileGeometryData.begin(), app.GNDData.Metrics.Size};
 	for(uint32_t iTex = 0, texCount = app.GNDData.TextureNames.size(); iTex < texCount; ++iTex) {
 		int32_t indexTop	= iTex + app.GNDData.TextureNames.size() * ::gpk::TILE_FACE_FACING_TOP		; gpk_necall(::gpk::gndGenerateFaceGeometry(app.GNDData.lstTileTextureData, app.GNDData.lstTileGeometryData, app.GNDData.Metrics,::gpk::TILE_FACE_FACING_TOP	, iTex, app.GNDModel.Nodes[indexTop		], app.GNDModel.TileMapping.View), "");
 		int32_t indexFront	= iTex + app.GNDData.TextureNames.size() * ::gpk::TILE_FACE_FACING_FRONT	; gpk_necall(::gpk::gndGenerateFaceGeometry(app.GNDData.lstTileTextureData, app.GNDData.lstTileGeometryData, app.GNDData.Metrics,::gpk::TILE_FACE_FACING_FRONT	, iTex, app.GNDModel.Nodes[indexFront	], app.GNDModel.TileMapping.View), "");
@@ -169,15 +169,15 @@
 	::gpk::img8bgra				minimapTemp;
 	minimapTemp.resize(gndData.Metrics.Size);
 
-	::gpk::v2<::gpk::bgra>											& minimapView								= minimapTemp.View;
-	const float																	heightRange									= heightMinMax.Max - heightMinMax.Min;
+	::gpk::g8bgra				& minimapView								= minimapTemp.View;
+	const float					heightRange									= heightMinMax.Max - heightMinMax.Min;
 	for(uint32_t y = 0, yMax = minimapView.metrics().y; y < yMax; ++y)
 	for(uint32_t x = 0, xMax = minimapView.metrics().x; x < xMax; ++x) {
-		float																		fAverageHeight								= 0;
+		float						fAverageHeight								= 0;
 		for(uint32_t iHeight = 0; iHeight < 4; ++iHeight)
-			fAverageHeight															+= tileGeometryView[y][x].fHeight[iHeight] * -1;
-		fAverageHeight															*= .25f;
-		float																		colorRatio										= (fAverageHeight - heightMinMax.Min) / heightRange;
+			fAverageHeight			+= tileGeometryView[y][x].fHeight[iHeight] * -1;
+		fAverageHeight			*= .25f;
+		float						colorRatio										= (fAverageHeight - heightMinMax.Min) / heightRange;
 		//minimapView[y][minimapView.metrics().x - 1 - x]							= ((fAverageHeight < 0) ? ::gpk::WHITE : ::gpk::BLUE) * colorRatio;
 		minimapView[minimapView.metrics().y - 1 - y][x]							= ::gpk::WHITE * colorRatio;
 	}

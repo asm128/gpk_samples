@@ -7,7 +7,7 @@
 
 #define Y_PLUS -
 
-static	::gpk::error_t						drawShipHealthBar			(::gpk::v2<::gpk::bgra> target, ::SApplication & app, const ::gpk::n2f32 & centerEnemy, const ::gpk::n2<int32_t> & halfMetrics, uint32_t health, int32_t yOffset, const ::gpk::bgra & finalColor)											{
+static	::gpk::error_t						drawShipHealthBar			(::gpk::g8bgra target, ::SApplication & app, const ::gpk::n2f32 & centerEnemy, const ::gpk::n2<int32_t> & halfMetrics, uint32_t health, int32_t yOffset, const ::gpk::bgra & finalColor)											{
 	::gpk::line2<int32_t>							healthBar					= {};
 	healthBar.A 								= {(int32_t)(centerEnemy.x  + .5f - halfMetrics.x), (int32_t)(centerEnemy.y Y_PLUS yOffset)};
 	healthBar.B									= healthBar.A; //{(int32_t)(centerEnemy.x  + .5f + halfMetrics.x), (int32_t)(centerEnemy.y + yOffset)};
@@ -23,12 +23,12 @@ static	::gpk::error_t						drawShipHealthBar			(::gpk::v2<::gpk::bgra> target, :
 	return 0;
 }
 //
-::gpk::error_t								drawShips								(::gpk::v2<::gpk::bgra> target, ::SApplication & app)											{
+::gpk::error_t								drawShips								(::gpk::g8bgra target, ::SApplication & app)											{
 	::SGame											& gameInstance							= app.Game;
 	::gpk::SFramework				& framework								= app.Framework;
-	::gpk::view_grid<::gpk::bgra>				& viewOffscreen							= framework.RootWindow.BackBuffer->Color.View;
+	::gpk::g8bgra				& viewOffscreen							= framework.RootWindow.BackBuffer->Color.View;
 	// ---- Draw enemy ships
-	const ::gpk::view_grid<::gpk::bgra>		& enemyView								= app.Processed[GAME_TEXTURE_ENEMY].View;
+	const ::gpk::g8bgra		& enemyView								= app.Processed[GAME_TEXTURE_ENEMY].View;
 	char											indexPositionsX[]						= {0, 1, 2, 3, 2, 1, 0, -1, -2, -3, -2, -1};
 	const ::gpk::n2<int32_t>						halfMetricsEnemy						= (enemyView.metrics() / 2).Cast<int32_t>();
 	int32_t											halfMetricsEnemy2y						= halfMetricsEnemy.y;
@@ -69,7 +69,7 @@ static	::gpk::error_t						drawShipHealthBar			(::gpk::v2<::gpk::bgra> target, :
 	for(uint32_t iShip = 0, shipCount = gameInstance.ShipsPlaying; iShip < shipCount; ++iShip) {
 		if(0 == gameInstance.Ships.Alive[iShip])
 			continue;
-		const ::gpk::v2<::gpk::bgra>											& shipView									= app.Processed[GAME_TEXTURE_SHIP0 + iShip].View;
+		const ::gpk::g8bgra											& shipView									= app.Processed[GAME_TEXTURE_SHIP0 + iShip].View;
 		const ::gpk::n2f32														& centerShip								= gameInstance.Ships.Position	[iShip];
 		const ::SHealthPoints														& enemyHealth								= gameInstance.Ships.Health	[iShip];
 		::gpk::n2<int32_t>														halfMetricsShip								= (shipView.metrics() / 2).Cast<int32_t>();
@@ -93,7 +93,7 @@ static	::gpk::error_t						drawShipHealthBar			(::gpk::v2<::gpk::bgra> target, :
 	return 0;
 }
 
-					::gpk::error_t										drawCollisions								(::gpk::v2<::gpk::bgra> target, ::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
+					::gpk::error_t										drawCollisions								(::gpk::g8bgra target, ::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	for(uint32_t iRay = 0, rayCount = app.StuffToDraw.CollisionPoints.size(); iRay < rayCount; ++iRay) {
 		const ::gpk::n2f32													& pointToDraw									= app.StuffToDraw.CollisionPoints[iRay];
 		::gpk::drawPixelLight(target, pointToDraw, ::gpk::bgra(::gpk::ORANGE), .15f, 3.0f);
@@ -127,7 +127,7 @@ static	const ::gpk::astatic<::gpk::bgra, WEAPON_TYPE_COUNT>	weaponTypeColorPalet
 	, ::gpk::bgra{::gpk::WHITE			} // WEAPON_TYPE_GRAVITY
 	};
 
-::gpk::error_t										drawShots									(::gpk::v2<::gpk::bgra> target, ::SApplication & app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
+::gpk::error_t										drawShots									(::gpk::g8bgra target, ::SApplication & app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	for(uint32_t iRay = 0, rayCount = app.StuffToDraw.ProjectilePaths.size(); iRay < rayCount; ++iRay) {
 		const ::SLaserToDraw														& laserToDraw								= app.StuffToDraw.ProjectilePaths[iRay];
 		app.CacheLinePoints.clear();
@@ -149,7 +149,7 @@ static	const ::gpk::astatic<::gpk::bgra, WEAPON_TYPE_COUNT>	weaponTypeColorPalet
 	}
 	return 0;
 }
-					::gpk::error_t										drawBackground								(::gpk::v2<::gpk::bgra> target, ::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
+					::gpk::error_t										drawBackground								(::gpk::g8bgra target, ::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	::gpk::drawRectangle(target, app.ColorBackground, ::gpk::rect2<uint32_t>{{}, target.metrics()});
 	for(uint32_t iRay = 0, rayCount = app.StuffToDraw.Stars.size(); iRay < rayCount; ++iRay) {
 		::SParticleToDraw															& starToDraw								= app.StuffToDraw.Stars[iRay];
@@ -173,7 +173,7 @@ static	const ::gpk::astatic<::gpk::bgra, WEAPON_TYPE_COUNT>	weaponTypeColorPalet
 	}
 	return 0;
 }
-					::gpk::error_t										drawThrust								(::gpk::v2<::gpk::bgra> target, ::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
+					::gpk::error_t										drawThrust								(::gpk::g8bgra target, ::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	::SGame																		& gameInstance								= app.Game;
 	for(uint32_t iThrust = 0, particleCount = (uint32_t)app.StuffToDraw.Thrust.size(); iThrust < particleCount; ++iThrust) {
 		::SParticleToDraw															& thrustToDraw								= app.StuffToDraw.Thrust[iThrust];
@@ -211,7 +211,7 @@ static	const ::gpk::bgra								powerupFamilyColorPalette []				=
 	, ::gpk::RED
 	};
 
-static	::gpk::error_t										drawPowerup						(::gpk::v2<::gpk::bgra> target, POWERUP_FAMILY powFamily, const ::gpk::view<::gpk::view_grid<::gpk::bgra>>& texturePowerup, const ::gpk::n2<int32_t>& textureCenterPowerup, const ::gpk::n2f32& powPosition, const ::gpk::view<const ::gpk::n2<int32_t>>& lightPos, double time)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
+static	::gpk::error_t										drawPowerup						(::gpk::g8bgra target, POWERUP_FAMILY powFamily, const ::gpk::view<::gpk::g8bgra>& texturePowerup, const ::gpk::n2<int32_t>& textureCenterPowerup, const ::gpk::n2f32& powPosition, const ::gpk::view<const ::gpk::n2<int32_t>>& lightPos, double time)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	::gpk::n2<int32_t>														position									= powPosition.Cast<int32_t>();
 	for(uint32_t iTex = 0, textureCount = texturePowerup.size(); iTex < textureCount; ++iTex)
 		es_if(errored(::gpk::grid_copy_alpha(target, texturePowerup[iTex], position - textureCenterPowerup, {0xFF, 0, 0xFF, 0xFF})));
@@ -249,7 +249,7 @@ stacxpr	const ::gpk::n2<int32_t>						diagonalPowerupLightPositions	[8]			=
 	, ::gpk::n2<int32_t>{-PWERUP_HALF_WIDTH - 1, -1}
 	};
 
-					::gpk::error_t										drawPowerups								(::gpk::v2<::gpk::bgra> target, ::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
+					::gpk::error_t										drawPowerups								(::gpk::g8bgra target, ::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	::gpk::SFramework				& framework									= app.Framework;
 	static double																timer										= 0;
 	timer																	+= framework.FrameInfo.Seconds.LastFrame * 2;
@@ -261,7 +261,7 @@ stacxpr	const ::gpk::n2<int32_t>						diagonalPowerupLightPositions	[8]			=
 		POWERUP_FAMILY																powFamily									= gameInstance.Powerups.Family[iPow];
 		::gpk::n2<int32_t>														position									= gameInstance.Powerups.Position[iPow].Cast<int32_t>();
 		::gpk::n2<int32_t>														lightPos [8]								;
-		::gpk::view<::gpk::view_grid<::gpk::bgra>>						texturePowerup								;
+		::gpk::view<::gpk::g8bgra>						texturePowerup								;
 		::gpk::n2<int32_t>														textureCenterPowerup						;
 		if(powFamily == POWERUP_FAMILY_HEALTH || powFamily == POWERUP_FAMILY_BUFF) { // draw square powerup box
 			for(uint32_t i = 0; i < ::gpk::size(lightPos); ++i)
@@ -281,7 +281,7 @@ stacxpr	const ::gpk::n2<int32_t>						diagonalPowerupLightPositions	[8]			=
 }
 
 
-static				::gpk::error_t										drawCrosshairDiagonal						(::gpk::v2<::gpk::bgra> target, double beaconTimer, const ::gpk::n2<int32_t>	& centerCrosshair)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
+static				::gpk::error_t										drawCrosshairDiagonal						(::gpk::g8bgra target, double beaconTimer, const ::gpk::n2<int32_t>	& centerCrosshair)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	int32_t																		halfWidth									= 10 - ((int32_t)beaconTimer % 11);
 	::gpk::n2<int32_t>															lightCrosshair []							=
 		{ centerCrosshair + ::gpk::n2<int32_t>{ halfWidth,  halfWidth }
@@ -296,7 +296,7 @@ static				::gpk::error_t										drawCrosshairDiagonal						(::gpk::v2<::gpk::b
 	return 0;
 }
 
-static				::gpk::error_t										drawCrosshairAligned						(::gpk::v2<::gpk::bgra> target, double beaconTimer, const ::gpk::n2<int32_t>	& centerCrosshair)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
+static				::gpk::error_t										drawCrosshairAligned						(::gpk::g8bgra target, double beaconTimer, const ::gpk::n2<int32_t>	& centerCrosshair)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	const int32_t																halfWidth									= 10 - ((int32_t)beaconTimer % 11);
 	const ::gpk::n2<int32_t>													lightCrosshair []							=
 		{ centerCrosshair + ::gpk::n2<int32_t>{-1, -halfWidth - 1}
@@ -321,7 +321,7 @@ static				::gpk::error_t										drawCrosshairAligned						(::gpk::v2<::gpk::bg
 	}
 	return 0;
 }
-					::gpk::error_t										drawCrosshair								(::gpk::v2<::gpk::bgra> target, ::SApplication & app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
+					::gpk::error_t										drawCrosshair								(::gpk::g8bgra target, ::SApplication & app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	::gpk::SFramework				& framework									= app.Framework;
 	static double																beaconTimer									= 0;
 	beaconTimer																+= framework.FrameInfo.Seconds.LastFrame * 10;

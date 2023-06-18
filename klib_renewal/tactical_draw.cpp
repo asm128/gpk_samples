@@ -1,6 +1,6 @@
 #include "tactical_draw.h"
 
-void									klib::boardToDisplay			(::klib::SGame& instanceGame, const STacticalBoard& board, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int8_t indexBoardPlayer, TEAM_TYPE teamId, const SPlayerSelection& selection, bool bFogOfWar)	{
+void									klib::boardToDisplay			(::klib::SGame& instanceGame, const STacticalBoard& board, ::gpk::gchar display, ::gpk::gu16 textAttributes, int8_t indexBoardPlayer, TEAM_TYPE teamId, const SPlayerSelection& selection, bool bFogOfWar)	{
 	const STacticalInfo							& tacticalInfo			= instanceGame.TacticalInfo;
 	const STacticalSetup						& tacticalSetup			= tacticalInfo.Setup;
 
@@ -145,7 +145,7 @@ void									klib::boardToDisplay			(::klib::SGame& instanceGame, const STactica
 				textAttributes	[z][x] |= bSwaps[10] ? ::klib::ASCII_COLOR_INDEX_YELLOW : ::klib::ASCII_COLOR_INDEX_BLACK;
 			}
 			else if(wallLabel == instanceGame.EntityTables.StageProp.Definitions[board.Tiles.Entities.Props[z][x].Definition].Name){
-				display			[z][x] = ::klib::getASCIIWall(instanceGame.EntityTables.StageProp.Definitions, ::gpk::view_grid<const STileProp>{board.Tiles.Entities.Props.Texels.begin(), board.Tiles.Entities.Props.metrics()}, x, z);
+				display			[z][x] = ::klib::getASCIIWall(instanceGame.EntityTables.StageProp.Definitions, {board.Tiles.Entities.Props.Texels.begin(), board.Tiles.Entities.Props.metrics()}, x, z);
 				textAttributes	[z][x] |= ::klib::ASCII_COLOR_INDEX_BLACK;
 			}
 			else {
@@ -284,7 +284,7 @@ void									klib::boardToDisplay			(::klib::SGame& instanceGame, const STactica
 	}
 }
 
-void									klib::drawTacticalBoard				(::klib::SGame& instanceGame, STacticalInfo& tacticalInfo, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int8_t playerIndex, TEAM_TYPE teamId, const SPlayerSelection& selection, bool bFogOfWar)			{
+void									klib::drawTacticalBoard				(::klib::SGame& instanceGame, STacticalInfo& tacticalInfo, ::gpk::gchar display, ::gpk::gu16 textAttributes, int8_t playerIndex, TEAM_TYPE teamId, const SPlayerSelection& selection, bool bFogOfWar)			{
 	char										hiddenTile						= 0;//-78;
 	memset(display.begin(), hiddenTile, display.area());
 

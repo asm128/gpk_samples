@@ -6,15 +6,15 @@
 
 using namespace klib;
 
-static	void								drawIntro											(SGame& instanceGame);
+static	void	drawIntro					(SGame& instanceGame);
 
-void										klib::printMultipageHelp							(char* targetASCII, uint32_t targetWidth, uint32_t targetHeight, uint32_t currentPage, uint32_t pageCount, uint32_t posXOffset)					{
-	static const ::gpk::view_const_string			textToShow[3]										=
+void			klib::printMultipageHelp	(char* targetASCII, uint32_t targetWidth, uint32_t targetHeight, uint32_t currentPage, uint32_t pageCount, uint32_t posXOffset)					{
+	static const ::gpk::vcs			textToShow[3]										=
 		{	"Page down: Next page."
 		,	"Page up: Previous page."
 		,	"Page up: Previous page. Page down: Next page"
 		};
-	::gpk::view_const_string						selectedText;
+	::gpk::vcs						selectedText;
 		 if(currentPage == 0)							selectedText										= textToShow[0];
 	else if(currentPage == (pageCount-1))				selectedText										= textToShow[1];
 	else												selectedText										= textToShow[2];
@@ -22,8 +22,8 @@ void										klib::printMultipageHelp							(char* targetASCII, uint32_t target
 }
 
 // Currently what this function is lacking is the ability to receive negative offsets.
-template<typename _TCell>
-void										blitGrid						(::gpk::view_grid<_TCell> source, int32_t offsetY, uint32_t offsetX, _TCell* target, size_t targetWidth, size_t targetHeight, int32_t rowPitch=-1)	{
+template<typename _tCell>
+void										blitGrid						(::gpk::grid<_tCell> source, int32_t offsetY, uint32_t offsetX, _tCell * target, size_t targetWidth, size_t targetHeight, int32_t rowPitch=-1)	{
 	size_t											actualWidth						= ::gpk::min(source.metrics().x, ::gpk::max(0U, (uint32_t)targetWidth - offsetX));
 	if(rowPitch < 0)
 		rowPitch									= (int32_t)targetWidth;
@@ -176,8 +176,8 @@ void drawRainBackground( ::klib::SWeightedDisplay& display, double lastTimeSecon
 	return drawFireBackground( display, lastTimeSeconds*1.5, 0, 20, true, false );
 }
 
-template<typename _TCell>
-void										drawDisplay						(::gpk::view_grid<_TCell> source, uint32_t offsetY, uint32_t offsetX, ::klib::SASCIITarget& asciiTarget)	{ ::blitGrid(source, offsetY, offsetX, (_TCell*)asciiTarget.Characters.begin(), asciiTarget.Characters.metrics().x, asciiTarget.Characters.metrics().y); }
+template<typename _tCell>
+void										drawDisplay						(::gpk::grid<_tCell> source, uint32_t offsetY, uint32_t offsetX, ::klib::SASCIITarget & asciiTarget)	{ ::blitGrid(source, offsetY, offsetX, (_tCell*)asciiTarget.Characters.begin(), asciiTarget.Characters.metrics().x, asciiTarget.Characters.metrics().y); }
 static void									drawStateBackground				( SGame& instanceGame )																						{
 	switch(instanceGame.State.State) {
 	case	GAME_STATE_MENU_MAIN		:	drawIntro(instanceGame);																	; break;
@@ -423,7 +423,7 @@ void										klib::drawAndPresentGame		(SGame& instanceGame, ::klib::SASCIITarg
 	char											send_buffer[64]					= {};
 	ctime_s(send_buffer, sizeof(send_buffer), &curTimeWithUnreliableSize);
 
-	::gpk::apod<char>						serverTime						= ::gpk::view_const_string{"Server time: "};
+	::gpk::apod<char>						serverTime						= ::gpk::vcs{"Server time: "};
 	serverTime.append_string({send_buffer, (uint32_t)strlen(send_buffer) - 1});
 	serverTime									= ::gpk::vcc{serverTime.begin(), serverTime.size() - 2};
 	::klib::printfToRectColored(target, ::klib::ASCII_COLOR_INDEX_CYAN		, bbHeight-2, 0, ::klib::SCREEN_CENTER, "%s.", serverTime.begin());
@@ -476,7 +476,7 @@ static void									drawIntro						( SGame& instanceGame ) {
 	drawFireBackground(instanceGame.TacticalDisplay, instanceGame.FrameTimer.LastTimeSeconds);
 	int32_t											displayDepth					= (int32_t)instanceGame.TacticalDisplay.Screen.metrics().y;
 
-	static const	::gpk::view_const_string		words			[]				= {"Vulgar", "Display", "of", "Power"};
+	static const	::gpk::vcs		words			[]				= {"Vulgar", "Display", "of", "Power"};
 	for( uint32_t i=0; i < ::gpk::size(words); ++i) {
 		uint32_t										offsetY							= (uint32_t)((displayDepth >> 1)-(::gpk::size(words) >> 1) + i * 2);
 		//uint32_t										offsetX							=
@@ -485,11 +485,11 @@ static void									drawIntro						( SGame& instanceGame ) {
 }
 
 
-char										klib::getASCIIWall				(const ::gpk::view_array<const ::klib::SEntityRecord<::klib::SStageProp>> definitions, const ::gpk::view_grid<const STileProp>& propGrid, int32_t x, int32_t z) {
+char										klib::getASCIIWall				(const ::gpk::view_array<const ::klib::SEntityRecord<::klib::SStageProp>> definitions, const ::gpk::grid<const STileProp>& propGrid, int32_t x, int32_t z) {
 	::klib::SASCIIWallConnection					connection						= {false};
 
 	char											result							= '-';
-	static	const ::gpk::view_const_string			labelWall						= "Wall";
+	static	const ::gpk::vcs			labelWall						= "Wall";
 
 	bool											bIsReinforced					= propGrid[z][x].Modifier > 0;
 
@@ -576,53 +576,53 @@ uint16_t									klib::getStatusColor		( COMBAT_STATUS status, bool bSwap, uint1
 	return defaultColor;
 }
 
-static int32_t							displayEntityStatus				(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int32_t offsetY, int32_t offsetX, const SEntityStatus& entityStatus)										{
+static int32_t							displayEntityStatus				(::gpk::gchar display, ::gpk::gu16 textAttributes, int32_t offsetY, int32_t offsetX, const SEntityStatus& entityStatus)										{
 	int32_t										iLine							= 0;
-	if(entityStatus.Inflict		)	iLine += displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityStatus.Inflict	, MAX_COMBAT_STATUS_COUNT, ::klib::ASCII_COLOR_INDEX_YELLOW, ::klib::ASCII_COLOR_INDEX_RED	, ::gpk::view_const_string{"- Inflicts: %-14.14s"});
-	if(entityStatus.Immunity	)	iLine += displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityStatus.Immunity	, MAX_COMBAT_STATUS_COUNT, ::klib::ASCII_COLOR_INDEX_YELLOW, ::klib::ASCII_COLOR_INDEX_CYAN	, ::gpk::view_const_string{"- Immunity: %-14.14s"});
+	if(entityStatus.Inflict		)	iLine += displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityStatus.Inflict	, MAX_COMBAT_STATUS_COUNT, ::klib::ASCII_COLOR_INDEX_YELLOW, ::klib::ASCII_COLOR_INDEX_RED	, ::gpk::vcs{"- Inflicts: %-14.14s"});
+	if(entityStatus.Immunity	)	iLine += displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityStatus.Immunity	, MAX_COMBAT_STATUS_COUNT, ::klib::ASCII_COLOR_INDEX_YELLOW, ::klib::ASCII_COLOR_INDEX_CYAN	, ::gpk::vcs{"- Immunity: %-14.14s"});
 
 	return iLine;
 }
 
-static int32_t							displayEntityEffect				(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int32_t offsetY, int32_t offsetX, const SEntityEffect& entityEffect)										{
+static int32_t							displayEntityEffect				(::gpk::gchar display, ::gpk::gu16 textAttributes, int32_t offsetY, int32_t offsetX, const SEntityEffect& entityEffect)										{
 	int32_t										iLine							= 0;
-	if(entityEffect.Attack	)	iLine += displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityEffect.Attack		, MAX_ATTACK_EFFECT_COUNT	, ::klib::ASCII_COLOR_INDEX_YELLOW, ::klib::ASCII_COLOR_INDEX_RED	, ::gpk::view_const_string{"- Attack effect: %-14.14s"	});
-	if(entityEffect.Defend	)	iLine += displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityEffect.Defend		, MAX_DEFEND_EFFECT_COUNT	, ::klib::ASCII_COLOR_INDEX_YELLOW, ::klib::ASCII_COLOR_INDEX_CYAN	, ::gpk::view_const_string{"- Defend effect: %-14.14s"	});
-	if(entityEffect.Passive	)	iLine += displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityEffect.Passive	, MAX_PASSIVE_EFFECT_COUNT	, ::klib::ASCII_COLOR_INDEX_YELLOW, ::klib::ASCII_COLOR_INDEX_GREEN	, ::gpk::view_const_string{"- Passive effect: %-14.14s"	});
+	if(entityEffect.Attack	)	iLine += displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityEffect.Attack		, MAX_ATTACK_EFFECT_COUNT	, ::klib::ASCII_COLOR_INDEX_YELLOW, ::klib::ASCII_COLOR_INDEX_RED	, ::gpk::vcs{"- Attack effect: %-14.14s"	});
+	if(entityEffect.Defend	)	iLine += displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityEffect.Defend		, MAX_DEFEND_EFFECT_COUNT	, ::klib::ASCII_COLOR_INDEX_YELLOW, ::klib::ASCII_COLOR_INDEX_CYAN	, ::gpk::vcs{"- Defend effect: %-14.14s"	});
+	if(entityEffect.Passive	)	iLine += displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityEffect.Passive	, MAX_PASSIVE_EFFECT_COUNT	, ::klib::ASCII_COLOR_INDEX_YELLOW, ::klib::ASCII_COLOR_INDEX_GREEN	, ::gpk::vcs{"- Passive effect: %-14.14s"	});
 
 	return iLine;
 }
 
-static int32_t							displayEntityTechnology			(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int32_t offsetY, int32_t offsetX, const SEntityGrade& entityTech)											{
+static int32_t							displayEntityTechnology			(::gpk::gchar display, ::gpk::gu16 textAttributes, int32_t offsetY, int32_t offsetX, const SEntityGrade& entityTech)											{
 	int32_t										iLine							= 0;
-	if(entityTech.Tech				) iLine	+= displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityTech.Tech				, MAX_ENTITY_TECHNOLOGY_COUNT	, ::klib::ASCII_COLOR_INDEX_YELLOW, ::klib::ASCII_COLOR_INDEX_GREEN	, ::gpk::view_const_string{"- Technology: %-14.14s"			});
-	if(entityTech.Grade				) iLine	+= displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityTech.Grade				, 3								, ::klib::ASCII_COLOR_INDEX_YELLOW, ::klib::ASCII_COLOR_INDEX_GREEN	, ::gpk::view_const_string{"- Grade: %-14.14s"				});
-	if(entityTech.AttackType		) iLine	+= displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityTech.AttackType			, MAX_ATTACK_TYPE_COUNT			, ::klib::ASCII_COLOR_INDEX_YELLOW, ::klib::ASCII_COLOR_INDEX_RED	, ::gpk::view_const_string{"- Attack type: %-14.14s"		});
-	if(entityTech.ProjectileClass	) iLine	+= displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityTech.ProjectileClass	, MAX_PROJECTILE_CLASS_COUNT	, ::klib::ASCII_COLOR_INDEX_YELLOW, ::klib::ASCII_COLOR_INDEX_RED	, ::gpk::view_const_string{"- Projectile Class: %-14.14s"	});
-	if(entityTech.AmmoEffect		) iLine	+= displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityTech.AmmoEffect			, MAX_AMMO_EFFECT_COUNT			, ::klib::ASCII_COLOR_INDEX_YELLOW, ::klib::ASCII_COLOR_INDEX_RED	, ::gpk::view_const_string{"- Ammo Effect: %-14.14s"		});
+	if(entityTech.Tech				) iLine	+= displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityTech.Tech				, MAX_ENTITY_TECHNOLOGY_COUNT	, ::klib::ASCII_COLOR_INDEX_YELLOW, ::klib::ASCII_COLOR_INDEX_GREEN	, ::gpk::vcs{"- Technology: %-14.14s"			});
+	if(entityTech.Grade				) iLine	+= displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityTech.Grade				, 3								, ::klib::ASCII_COLOR_INDEX_YELLOW, ::klib::ASCII_COLOR_INDEX_GREEN	, ::gpk::vcs{"- Grade: %-14.14s"				});
+	if(entityTech.AttackType		) iLine	+= displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityTech.AttackType			, MAX_ATTACK_TYPE_COUNT			, ::klib::ASCII_COLOR_INDEX_YELLOW, ::klib::ASCII_COLOR_INDEX_RED	, ::gpk::vcs{"- Attack type: %-14.14s"		});
+	if(entityTech.ProjectileClass	) iLine	+= displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityTech.ProjectileClass	, MAX_PROJECTILE_CLASS_COUNT	, ::klib::ASCII_COLOR_INDEX_YELLOW, ::klib::ASCII_COLOR_INDEX_RED	, ::gpk::vcs{"- Projectile Class: %-14.14s"	});
+	if(entityTech.AmmoEffect		) iLine	+= displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, entityTech.AmmoEffect			, MAX_AMMO_EFFECT_COUNT			, ::klib::ASCII_COLOR_INDEX_YELLOW, ::klib::ASCII_COLOR_INDEX_RED	, ::gpk::vcs{"- Ammo Effect: %-14.14s"		});
 
 	return iLine;
 }
 
-void									klib::displayStatusEffectsAndTechs	(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int32_t offsetY, int32_t offsetX, CCharacter& character)													{
+void									klib::displayStatusEffectsAndTechs	(::gpk::gchar display, ::gpk::gu16 textAttributes, int32_t offsetY, int32_t offsetX, CCharacter& character)													{
 	int32_t										iLine							= 0;
 	if(character.Flags.Tech.Gender)
-		iLine									+= displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, character.Flags.Tech.Gender, 2	, ::klib::ASCII_COLOR_INDEX_YELLOW, ::klib::ASCII_COLOR_INDEX_GREEN	, ::gpk::view_const_string{"- Gender: %-13.13s"});
+		iLine									+= displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, character.Flags.Tech.Gender, 2	, ::klib::ASCII_COLOR_INDEX_YELLOW, ::klib::ASCII_COLOR_INDEX_GREEN	, ::gpk::vcs{"- Gender: %-13.13s"});
 	iLine									+= displayEntityTechnology	(display, textAttributes, offsetY+iLine, offsetX, character.FinalFlags.Tech		);
 	iLine									+= displayEntityStatus		(display, textAttributes, offsetY+iLine, offsetX, character.FinalFlags.Status	);
 	iLine									+= displayEntityEffect		(display, textAttributes, offsetY+iLine, offsetX, character.FinalFlags.Effect	);
 
-	iLine += displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, character.ActiveBonus.Status.Status, MAX_COMBAT_STATUS_COUNT, ::klib::ASCII_COLOR_INDEX_YELLOW, ::klib::ASCII_COLOR_INDEX_RED, ::gpk::view_const_string{"- Inflicted: %-14.14s"});
+	iLine += displayFlag(display, textAttributes, {offsetX, offsetY+iLine}, character.ActiveBonus.Status.Status, MAX_COMBAT_STATUS_COUNT, ::klib::ASCII_COLOR_INDEX_YELLOW, ::klib::ASCII_COLOR_INDEX_RED, ::gpk::vcs{"- Inflicted: %-14.14s"});
 }
 
-static void								displayEmptySlot				(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int32_t offsetY, int32_t offsetX, int32_t agentIndex)																			{
+static void								displayEmptySlot				(::gpk::gchar display, ::gpk::gu16 textAttributes, int32_t offsetY, int32_t offsetX, int32_t agentIndex)																			{
 	static const size_t							LINE_SIZE						= 30;
 	uint16_t									color							= ::klib::ASCII_COLOR_INDEX_GREEN;
 	printfToGridColored(display, textAttributes, color, offsetY, offsetX, ::klib::SCREEN_LEFT, "-- Agent #%i: %-14.14s --", agentIndex, "Open position");
 	valueToGrid(textAttributes, offsetY, offsetX+13, ::klib::SCREEN_LEFT, &(color = ::klib::ASCII_COLOR_INDEX_DARKCYAN), 1, LINE_SIZE-14);
 }
 
-static void								displayResumedAgentSlot			(const ::klib::SEntityTables & tables, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int32_t offsetY, int32_t offsetX, int32_t agentIndex, CCharacter& character)													{
+static void								displayResumedAgentSlot			(const ::klib::SEntityTables & tables, ::gpk::gchar display, ::gpk::gu16 textAttributes, int32_t offsetY, int32_t offsetX, int32_t agentIndex, CCharacter& character)													{
 	static const char							formatAgentTitle	[]			= "-- Agent #%i:" " %-34.34s --"	;
 	static const char							formatAgentCoins	[]			= "%-21.21s: %-11.11s"				;
 	static const char							formatAgentPoints	[]			= "%-21.21s: %-10.10s"				;
@@ -673,7 +673,7 @@ static void								displayResumedAgentSlot			(const ::klib::SEntityTables & tabl
 	valueToGrid(textAttributes, offsetY, offsetX+23, ::klib::SCREEN_LEFT, &(color = ::klib::ASCII_COLOR_INDEX_ORANGE), 1, 11);
 }
 
-void									klib::displayDetailedAgentSlot		(const ::klib::SEntityTables & tables, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int32_t offsetY, int32_t offsetX, const CCharacter& character, uint16_t color)										{
+void									klib::displayDetailedAgentSlot		(const ::klib::SEntityTables & tables, ::gpk::gchar display, ::gpk::gu16 textAttributes, int32_t offsetY, int32_t offsetX, const CCharacter& character, uint16_t color)										{
 	static const char							formatAgentTitle	[]			= " - %-34.34s"			;
 	static const char							formatAgentEquip	[]			= "%-36.36s Lv. %i"		;
 	static const char							formatAgentPoints	[]			= "%-21.21s: %-10.10s"	;
@@ -724,7 +724,7 @@ void									klib::displayDetailedAgentSlot		(const ::klib::SEntityTables & tabl
 	sprintf_s(formattedGauge, "%lli"	, agentFinalPoints.CostMaintenance				); printfToGrid(display, ++offsetY, offsetX, ::klib::SCREEN_LEFT, formatAgentCoins, "- Total Cost"		, formattedGauge); valueToGrid(textAttributes, offsetY, offsetX+23, ::klib::SCREEN_LEFT, &(color = ::klib::ASCII_COLOR_INDEX_ORANGE), 1, 11);
 }
 
-void									klib::displayAgentSlot					(const ::klib::SEntityTables & tables, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int32_t offsetY, int32_t offsetX, int32_t agentIndex, CCharacter& character, bool bShort, uint16_t color)	{
+void									klib::displayAgentSlot					(const ::klib::SEntityTables & tables, ::gpk::gchar display, ::gpk::gu16 textAttributes, int32_t offsetY, int32_t offsetX, int32_t agentIndex, CCharacter& character, bool bShort, uint16_t color)	{
 	if( bShort )
 		::displayResumedAgentSlot		(tables, display, textAttributes, offsetY, offsetX, agentIndex, character);
 	else
@@ -825,33 +825,33 @@ static int32_t							processInput						(const ::klib::SInput& frameInput, int32_
 
 
 struct SDrawMenuGlobals {
-							::klib::STimer					Timer;
-							::klib::SAccumulator<double>	Accumulator;
+	::klib::STimer					Timer;
+	::klib::SAccumulator<double>	Accumulator;
 };
 
 static SDrawMenuGlobals	drawMenu_globals = {{}, {0, 0.30}};
 
-int32_t													drawMenu
-	( ::klib::SDrawMenuState									& localPersistentState
-	, ::gpk::v2c												targetASCII
-	, uint16_t													* targetAttributes
-	, int32_t													& lineOffset
-	, const ::gpk::n2<int32_t>								mousePos
-	, const ::gpk::vcc								& title
-	, const ::gpk::view_array<const ::gpk::vcc>		& menuItems
-	, const uint32_t											actualOptionCount
-	, const uint32_t											itemOffset
-	, const bool												multipage
-	, const uint32_t											pageCount
-	, const uint32_t											numberCharsAvailable
-	, uint32_t													rowWidth
-	, const ::gpk::vcc								& exitText
+static	int32_t		drawMenu
+	( ::klib::SDrawMenuState				& localPersistentState
+	, ::gpk::gchar							targetASCII
+	, uint16_t								* targetAttributes
+	, int32_t								& lineOffset
+	, const ::gpk::n2i32					mousePos
+	, const ::gpk::vcc						& title
+	, const ::gpk::view<const ::gpk::vcc>	& menuItems
+	, const uint32_t						actualOptionCount
+	, const uint32_t						itemOffset
+	, const bool							multipage
+	, const uint32_t						pageCount
+	, const uint32_t						numberCharsAvailable
+	, uint32_t								rowWidth
+	, const ::gpk::vcc						& exitText
 	) {
-	const uint32_t												targetWidth											= targetASCII.metrics().x;
-	const uint32_t												targetHeight										= targetASCII.metrics().y;
-	const int32_t												clearOffset											= (int32_t)(targetHeight - MENU_ROFFSET - 2 - 9);
+	const uint32_t			targetWidth											= targetASCII.metrics().x;
+	const uint32_t			targetHeight										= targetASCII.metrics().y;
+	const int32_t			clearOffset											= (int32_t)(targetHeight - MENU_ROFFSET - 2 - 9);
 
-	::gpk::apod<char>									clearString											;
+	::gpk::apod<char>		clearString											;
 	clearString.resize(::gpk::max(rowWidth, 64U), ' ');
 	for(int32_t i = -2, count = (int32_t)targetHeight-clearOffset; i<count; ++i)
 		::klib::printfToRectColored(targetASCII.begin(), targetWidth, targetHeight, targetAttributes, (::klib::ASCII_COLOR_INDEX_BLACK << 4) | ::klib::ASCII_COLOR_INDEX_YELLOW, clearOffset+i, 0, ::klib::SCREEN_CENTER, "%s", clearString.begin()); // clear all lines where we're going to draw
@@ -915,7 +915,7 @@ int32_t													drawMenu
 	return 0;
 }
 
-int32_t												klib::drawMenu											(::klib::SDrawMenuState	& localPersistentState, ::gpk::v2c display, uint16_t* targetAttributes, const ::gpk::vcc& title, const ::gpk::view_array<const ::gpk::vcc> & menuItems, const ::klib::SInput& frameInput, const int32_t noActionValue, uint32_t rowWidth, bool disableEscKeyClose, const ::gpk::vcc& exitText) {
+int32_t												klib::drawMenu											(::klib::SDrawMenuState	& localPersistentState, ::gpk::gchar display, uint16_t* targetAttributes, const ::gpk::vcc& title, const ::gpk::view_array<const ::gpk::vcc> & menuItems, const ::klib::SInput& frameInput, const int32_t noActionValue, uint32_t rowWidth, bool disableEscKeyClose, const ::gpk::vcc& exitText) {
 	drawMenu_globals.Timer.Frame();
 	const uint32_t												targetWidth											= display.metrics().x;
 	const uint32_t												targetHeight										= display.metrics().y;

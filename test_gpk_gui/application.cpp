@@ -61,9 +61,9 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 		controlText	.Text			= {::gpk::label(buffer).begin(), (uint32_t)lenText};
 		//= {0 == (iChild % 4), 0 == (iChild % 5)};
 		gui.Controls.SetDisabled(controlTestChild0,	0 == (iChild % 9));
-		gui.Controls.Modes	[controlTestChild0].NoHover				= 
-		gui.Controls.Draw	[controlTestChild0].NoClient			= 
-		gui.Controls.Draw	[controlTestChild0].NoBorder			= iChild % 2;
+		gui.Controls.States	[controlTestChild0].Mask		&= ~::gpk::GUI_CONTROL_FLAG_Hovered;
+		gui.Controls.Draw	[controlTestChild0].NoClient	= 
+		gui.Controls.Draw	[controlTestChild0].NoBorder	= iChild % 2;
 		switch(iChild % 9) {
 		case 0: control.Align = ::gpk::ALIGN_TOP_LEFT		; controlText.Align = ::gpk::ALIGN_BOTTOM_RIGHT		; break;
 		case 1: control.Align = ::gpk::ALIGN_CENTER_TOP		; controlText.Align = ::gpk::ALIGN_CENTER_BOTTOM	; break;

@@ -1,6 +1,6 @@
 #define GPK_STDOUT_LOG_ENABLED
 #include "gpk_vox.h"
-#include "gpk_ptr.h"
+#include "gpk_array_ptr.h"
 
 static const ::gpk::vcs								fileNames []								=
 	{ "alien_bot1.vox"

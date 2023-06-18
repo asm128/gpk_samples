@@ -121,8 +121,8 @@ namespace klib
 	}
 
 	uint16_t								getStatusColor			(::klib::COMBAT_STATUS status, bool bSwap, uint16_t defaultColor);
-	void									boardToDisplay			(::klib::SGame& instanceGame, const STacticalBoard& board, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int8_t indexBoardPlayer	, TEAM_TYPE teamId, const SPlayerSelection& selection, bool bFogOfWar);
-	void									drawTacticalBoard		(::klib::SGame& instanceGame, STacticalInfo& tacticalInfo, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int8_t playerIndex		, TEAM_TYPE teamId, const SPlayerSelection& selection, bool bFogOfWar);
+	void									boardToDisplay			(::klib::SGame& instanceGame, const STacticalBoard& board, ::gpk::gchar display, ::gpk::gu16 textAttributes, int8_t indexBoardPlayer	, TEAM_TYPE teamId, const SPlayerSelection & selection, bool bFogOfWar);
+	void									drawTacticalBoard		(::klib::SGame& instanceGame, STacticalInfo& tacticalInfo, ::gpk::gchar display, ::gpk::gu16 textAttributes, int8_t playerIndex		, TEAM_TYPE teamId, const SPlayerSelection & selection, bool bFogOfWar);
 }
 
 #endif // __TACTICAL_DRAW_H__2309748209346029374609821764__

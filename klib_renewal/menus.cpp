@@ -66,7 +66,7 @@ static	void						handleSubstateChange				(::klib::SGame& instanceGame, const ::k
 	//resetCursorString(instanceGame.SlowMessage);	we shuold leave this out unless it becomes a need. This is because it turns screen transitions into an annoyance.
 }
 
-static	void						drawTacticalMap						(::klib::SGame& instanceGame, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes) {
+static	void						drawTacticalMap						(::klib::SGame& instanceGame, ::gpk::gchar display, ::gpk::gu16 textAttributes) {
 	klib::drawTacticalBoard(instanceGame, instanceGame.TacticalInfo, display, textAttributes, ::klib::PLAYER_INDEX_USER, ::klib::TEAM_TYPE_CIVILIAN, instanceGame.Players[::klib::PLAYER_INDEX_USER].Tactical.Selection, false);
 }
 

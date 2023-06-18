@@ -136,7 +136,7 @@ static	::klib::SGameState					drawEquipMenu						(::klib::SGame& instanceGame, c
 	return retVal;
 }
 
-static void								drawScore						(::gpk::view_grid<char> display, int32_t offsetY, int32_t offsetX, const ::klib::SCharacterScore& score)																{
+static void								drawScore						(::gpk::gchar display, int32_t offsetY, int32_t offsetX, const ::klib::SCharacterScore& score)																{
 	//char										buffer[128]						= {};
 	char										bufferValues	[64]			= {};
 	const char									format			[]				= "- %-21.21s: %-12.12s";
@@ -164,8 +164,8 @@ static void								drawScore						(::gpk::view_grid<char> display, int32_t offse
 ::klib::SGameState						drawEquip				(::klib::SGame& instanceGame, const ::klib::SGameState& returnState) {
 	stacxpr	const uint32_t		MAX_ENTITY_COLUMNS		= 4;
 	::klib::SGamePlayer						& player				= instanceGame.Players[::klib::PLAYER_INDEX_USER];
-	::gpk::view_grid<char>					display					= instanceGame.GlobalDisplay.Screen.Color;
-	::gpk::view_grid<uint16_t>				textAttributes			= instanceGame.GlobalDisplay.Screen.DepthStencil;
+	::gpk::gchar					display					= instanceGame.GlobalDisplay.Screen.Color;
+	::gpk::gu16				textAttributes			= instanceGame.GlobalDisplay.Screen.DepthStencil;
 
 	::klib::SGameState						actualReturnState		= returnState;
 	::gpk::apod<char>				menuTitle				= ::gpk::view_const_string{"Agent Setup"};

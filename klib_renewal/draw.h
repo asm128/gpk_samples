@@ -10,10 +10,10 @@
 namespace klib
 {
 
-	void				drawFireBackground			( ::klib::SWeightedDisplay& display, double lastTimeSeconds, uint32_t disturbance = 2, uint32_t disappearChanceDivisor=10, bool bReverse=false, bool bDontSlowdown=true );
+	void				drawFireBackground			( ::klib::SWeightedDisplay & display, double lastTimeSeconds, uint32_t disturbance = 2, uint32_t disappearChanceDivisor=10, bool bReverse=false, bool bDontSlowdown=true );
 
-	template<typename _TCell, size_t _LineCount>
-	SGameState			drawCredits					(_TCell* display, uint32_t width, uint32_t depth, double lastFrameTime, const ::gpk::view_const_string (&namesCredits)[_LineCount], const SGameState& returnValue) {
+	template<typename _tCell, size_t _LineCount>
+	SGameState			drawCredits					(_tCell * display, uint32_t width, uint32_t depth, double lastFrameTime, const ::gpk::view_const_string (&namesCredits)[_LineCount], const SGameState & returnValue) {
 		static double			offset						= (double)depth;
 		int32_t					curLine						= (int32_t)offset;
 		static int32_t			maxDifference				= curLine;
@@ -34,8 +34,8 @@ namespace klib
 		return returnValue;
 	}
 
-	template<typename _TCell, size_t _LineCount>
-	SGameState drawCredits(::gpk::view_grid<_TCell> display, double lastFrameTime, const ::gpk::view_const_string (&namesCredits)[_LineCount], const SGameState& returnValue) {
+	template<typename _tCell, size_t _LineCount>
+	SGameState drawCredits(::gpk::grid<_tCell> display, double lastFrameTime, const ::gpk::view_const_string (&namesCredits)[_LineCount], const SGameState & returnValue) {
 		return ::klib::drawCredits(&display[0][0], display.metrics().x, display.metrics().y, lastFrameTime, namesCredits, returnValue);
 	}
 

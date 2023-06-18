@@ -90,7 +90,7 @@ namespace klib
 		}
 	};
 
-			char												getASCIIWall	(const ::gpk::view<const ::klib::SEntityRecord<::klib::SStageProp>> definitions, const ::gpk::view_grid<const STileProp>& propGrid, int32_t x, int32_t z);
+			char												getASCIIWall	(const ::gpk::view<const ::klib::SEntityRecord<::klib::SStageProp>> definitions, const ::gpk::grid<const STileProp> & propGrid, int32_t x, int32_t z);
 };
 
 

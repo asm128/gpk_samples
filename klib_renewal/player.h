@@ -2,7 +2,7 @@
 #include "Character.h"
 #include "CharacterTile.h"
 #include "PlayerControl.h"
-#include "gpk_ptr.h"
+#include "gpk_array_ptr.h"
 #include "projects.h"
 
 

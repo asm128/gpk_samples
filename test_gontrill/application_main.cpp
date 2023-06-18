@@ -82,7 +82,7 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 		}
 	}
 
-	const ::gpk::view_grid<::gpk::bgra>									& fontAtlas									= app.Processed[GAME_TEXTURE_FONT_ATLAS].View;
+	const ::gpk::g8bgra									& fontAtlas									= app.Processed[GAME_TEXTURE_FONT_ATLAS].View;
 	const ::gpk::n2<uint32_t>												& textureFontMetrics						= fontAtlas.metrics();
 	app.TextureFontMonochrome.resize(textureFontMetrics);
 	for(uint32_t y = 0, yMax = textureFontMetrics.y; y < yMax; ++y)
@@ -110,7 +110,7 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	::setupParticles();
 	ree_if	(errored(::updateSizeDependentResources	(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
 	ree_if	(errored(::setupSprites					(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
-	::gpk::view_grid<::gpk::bgra>											& fontAtlasView								= app.Processed[GAME_TEXTURE_FONT_ATLAS].View;
+	::gpk::g8bgra											& fontAtlasView								= app.Processed[GAME_TEXTURE_FONT_ATLAS].View;
 	const ::gpk::n2<uint32_t>													& fontAtlasMetrics							= fontAtlasView.metrics();
 	for(uint32_t y = 0, yMax = fontAtlasMetrics.y; y < yMax; ++y)
 	for(uint32_t x = 0, xMax = fontAtlasMetrics.x; x < xMax; ++x) {
@@ -142,15 +142,15 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	return 0;
 }
 
-::gpk::error_t							drawBackground								(::gpk::v2<::gpk::bgra> target, ::SApplication & app);
-::gpk::error_t							drawShots									(::gpk::v2<::gpk::bgra> target, ::SApplication & app);
-::gpk::error_t							drawThrust									(::gpk::v2<::gpk::bgra> target, ::SApplication & app);
-::gpk::error_t							drawPowerups								(::gpk::v2<::gpk::bgra> target, ::SApplication & app);
-::gpk::error_t							drawShips									(::gpk::v2<::gpk::bgra> target, ::SApplication & app);
-::gpk::error_t							drawCrosshair								(::gpk::v2<::gpk::bgra> target, ::SApplication & app);
-::gpk::error_t							drawCollisions								(::gpk::v2<::gpk::bgra> target, ::SApplication & app);
+::gpk::error_t							drawBackground								(::gpk::g8bgra target, ::SApplication & app);
+::gpk::error_t							drawShots									(::gpk::g8bgra target, ::SApplication & app);
+::gpk::error_t							drawThrust									(::gpk::g8bgra target, ::SApplication & app);
+::gpk::error_t							drawPowerups								(::gpk::g8bgra target, ::SApplication & app);
+::gpk::error_t							drawShips									(::gpk::g8bgra target, ::SApplication & app);
+::gpk::error_t							drawCrosshair								(::gpk::g8bgra target, ::SApplication & app);
+::gpk::error_t							drawCollisions								(::gpk::g8bgra target, ::SApplication & app);
 ::gpk::error_t			draw		(::SApplication & app)											{
-	::gpk::v2<::gpk::bgra>						target										= app.Framework.RootWindow.BackBuffer->Color;
+	::gpk::g8bgra						target										= app.Framework.RootWindow.BackBuffer->Color;
 	es_if(errored(::drawBackground	(target, app)));	// --- Draw stars
 	es_if(errored(::drawPowerups	(target, app)));	// --- Draw powerups
 	es_if(errored(::drawShips		(target, app)));	// --- Draw ship
@@ -165,7 +165,7 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	static	const ::gpk::vcs					textLine1									= "T: Shoot. Y: Thrust. U: Handbrake.";
 	static	const ::gpk::vcs					textLine2									= "Press ESC to exit or P to (un)pause.";
 	::gpk::SFramework				& framework									= app.Framework;
-	::gpk::v2<::gpk::bgra>						& fontAtlasView								= app.Processed[GAME_TEXTURE_FONT_ATLAS].View;
+	::gpk::g8bgra						& fontAtlasView								= app.Processed[GAME_TEXTURE_FONT_ATLAS].View;
 	const ::gpk::n2u16							& offscreenMetrics							= target.metrics().Cast<uint16_t>();
 	::gpk::textLineDrawAlignedFixedSizeLit(target, app.TextureFontMonochrome.View, fontAtlasView.metrics(), lineOffset++, offscreenMetrics, sizeCharCell, textLine0, ::gpk::bgra{0, app.Framework.FrameInfo.FrameNumber % 0xFF, 0xFFU, 0xFFU});
 	::gpk::textLineDrawAlignedFixedSizeLit(target, app.TextureFontMonochrome.View, fontAtlasView.metrics(), lineOffset++, offscreenMetrics, sizeCharCell, textLine1, ::gpk::bgra{app.Framework.FrameInfo.FrameNumber % 0xFFU, 0xFFU, 0, 0xFFU});

@@ -43,7 +43,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 	const ::gpk::n2<uint32_t>		metricsLetter		= app.TextOverlay.MetricsLetter;
 	::gpk::img<::gpk::bgra>			fontImage;
 	::gpk::pngFileLoad(::gpk::vcs{"../gpk_data/images/Codepage_437_24_12x12.png"}, fontImage);
-	::gpk::v2<::gpk::SGeometryQuads>viewGeometries		= {app.TextOverlay.GeometryLetters, {16, 16}};
+	::gpk::grid<::gpk::SGeometryQuads>viewGeometries		= {app.TextOverlay.GeometryLetters, {16, 16}};
 	const uint32_t					imagePitch			= metricsLetter.x * metricsMap.x;
 
 	::gpk::apod<::gpk::STile>		tiles;
@@ -54,7 +54,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 		const ::gpk::n2<uint32_t>		asciiCoords			= {asciiCode %		metricsMap.x, asciiCode / app.TextOverlay.MetricsMap.x};
 		const uint32_t					offsetPixelCoord	= (asciiCoords.y *	metricsLetter.y) * imagePitch + (asciiCoords.x * app.TextOverlay.MetricsLetter.x);
 		::gpk::geometryBuildTileListFromImage({&fontImage.Texels[offsetPixelCoord], app.TextOverlay.MetricsLetter}, tiles, app.TextOverlay.MetricsLetter.x * app.TextOverlay.MetricsMap.x);
-		::gpk::geometryBuildGridFromTileList(app.TextOverlay.GeometryLetters[asciiCode], ::gpk::view_grid<::gpk::STile>{tiles.begin(), app.TextOverlay.MetricsLetter}, {}, {1, 6.0f, 1});
+		::gpk::geometryBuildGridFromTileList(app.TextOverlay.GeometryLetters[asciiCode], ::gpk::grid<::gpk::STile>{tiles.begin(), app.TextOverlay.MetricsLetter}, {}, {1, 6.0f, 1});
 	}
 
 
@@ -121,7 +121,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 }
 
 static	int											drawPixels
-	( ::gpk::v2<::gpk::bgra>		targetPixels
+	( ::gpk::g8bgra		targetPixels
 	, const ::gpk::tri3f32			& triangleWorld
 	, const ::gpk::n3f32			& normal
 	, const ::gpk::n3f32			& lightVector
@@ -144,16 +144,16 @@ static	int											drawPixels
 }
 
 int													draw3DCharacter
-	( const ::gpk::v2<::gpk::bgra>	& targetPixels
+	( const ::gpk::g8bgra	& targetPixels
 	, const ::gpk::n2u32			& metricsCharacter
 	, const ::gpk::n2u32			& metricsMap
 	, const uint8_t					asciiCode
 	, const ::gpk::n3f32			& position
 	, const ::gpk::n3f32			& lightVector
 	, const ::gpk::m4f32			& matrixView
-	, const ::gpk::v2<const ::gpk::SGeometryQuads>	& viewGeometries
+	, const ::gpk::grid<const ::gpk::SGeometryQuads>	& viewGeometries
 	, ::SDrawCache					& drawCache
-	, ::gpk::v2u32					& depthBuffer
+	, ::gpk::gu32					& depthBuffer
 	, double						timeAnimation
 	, const ::gpk::bgra				& color
 	)	{
@@ -194,12 +194,12 @@ int													draw					(SApplication & app) {
 	::gpk::pobj<::gpk::rtbgra8d32>	target;
 	target.create();
 	target->resize(app.Framework.RootWindow.Size, ::gpk::DARKGREEN, 0xFFFFFFFFU);
-	::gpk::view_grid<::gpk::bgra>						targetPixels			= target->Color;
-	::gpk::view_grid<uint32_t>								depthBuffer				= target->DepthStencil;
+	::gpk::grid<::gpk::bgra>						targetPixels			= target->Color;
+	::gpk::grid<uint32_t>								depthBuffer				= target->DepthStencil;
 	app.TextOverlay.DrawCache							= {};
 
 	app.TextOverlay.LightVector0.Normalize();
-	::gpk::view_grid<::gpk::SGeometryQuads>					viewGeometries		= {app.TextOverlay.GeometryLetters, {16, 16}};
+	::gpk::grid<::gpk::SGeometryQuads>					viewGeometries		= {app.TextOverlay.GeometryLetters, {16, 16}};
 	uint32_t												colorIndex			= 0;
 
 	::gpk::m4<float>									matrixView					= {};
@@ -216,8 +216,8 @@ int													draw					(SApplication & app) {
 
 	{
 		::std::lock_guard										lock						(app.LockRender);
-		::gpk::view_grid<char>									mapToDraw					= app.Game.GlobalDisplay.Screen.Color;
-		::gpk::view_grid<uint16_t>								mapColors					= app.Game.GlobalDisplay.Screen.DepthStencil;
+		::gpk::grid<char>									mapToDraw					= app.Game.GlobalDisplay.Screen.Color;
+		::gpk::grid<uint16_t>								mapColors					= app.Game.GlobalDisplay.Screen.DepthStencil;
 		matrixView.LookAt(app.TextOverlay.CameraPosition, app.TextOverlay.CameraTarget, app.TextOverlay.CameraUp);
 		matrixView											*= matrixProjection;
 		matrixView											*= matrixViewport;
@@ -240,8 +240,8 @@ int													draw					(SApplication & app) {
 
 	{
 		::std::lock_guard										lock						(app.LockRender);
-		::gpk::view_grid<char>									mapToDraw					= app.Game.TacticalDisplay.Screen.Color;
-		::gpk::view_grid<uint16_t>								mapColors					= app.Game.TacticalDisplay.Screen.DepthStencil;
+		::gpk::grid<char>									mapToDraw					= app.Game.TacticalDisplay.Screen.Color;
+		::gpk::grid<uint16_t>								mapColors					= app.Game.TacticalDisplay.Screen.DepthStencil;
 
 		if((app.Game.State.State != ::klib::GAME_STATE_START_MISSION && app.Game.State.State != ::klib::GAME_STATE_TACTICAL_CONTROL) || 0 > app.Game.TacticalInfo.CurrentPlayer)
 			matrixView.LookAt(app.TextOverlay.CameraPosition, app.TextOverlay.CameraTarget, app.TextOverlay.CameraUp);

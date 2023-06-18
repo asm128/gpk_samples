@@ -47,7 +47,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 	const ::gpk::n2u32							metricsLetter					= app.TextOverlay.MetricsLetter;
 	::gpk::img8bgra								fontImage;
 	::gpk::pngFileLoad(::gpk::vcs{"../gpk_data/images/Codepage_437_24_12x12.png"}, fontImage);
-	::gpk::view2d<::gpk::SGeometryQuads>		viewGeometries					= {app.TextOverlay.GeometryLetters, {16, 16}};
+	::gpk::grid<::gpk::SGeometryQuads>		viewGeometries					= {app.TextOverlay.GeometryLetters, {16, 16}};
 	const uint32_t								imagePitch						= metricsLetter.x * metricsMap.x;
 
 	::gpk::apod<::gpk::STile>					tiles;
@@ -58,7 +58,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 		const ::gpk::n2u32							asciiCoords			= {asciiCode %		metricsMap.x, asciiCode / app.TextOverlay.MetricsMap.x};
 		const uint32_t								offsetPixelCoord	= (asciiCoords.y *	metricsLetter.y) * imagePitch + (asciiCoords.x * app.TextOverlay.MetricsLetter.x);
 		::gpk::geometryBuildTileListFromImage({&fontImage.Texels[offsetPixelCoord], app.TextOverlay.MetricsLetter}, tiles, app.TextOverlay.MetricsLetter.x * app.TextOverlay.MetricsMap.x);
-		::gpk::geometryBuildGridFromTileList(app.TextOverlay.GeometryLetters[asciiCode], ::gpk::view_grid<::gpk::STile>{tiles.begin(), app.TextOverlay.MetricsLetter}, {}, {1, 6.0f, 1});
+		::gpk::geometryBuildGridFromTileList(app.TextOverlay.GeometryLetters[asciiCode], {tiles.begin(), app.TextOverlay.MetricsLetter}, {}, {1, 6.0f, 1});
 	}
 
 

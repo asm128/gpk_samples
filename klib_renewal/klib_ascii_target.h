@@ -1,5 +1,5 @@
 /// Copyright 2017 - asm128
-#include "gpk_view_grid.h"
+#include "gpk_grid.h"
 #include "gpk_color.h"
 #include "klib_ascii_color.h"
 
@@ -10,8 +10,8 @@ namespace klib
 {
 #pragma pack(push, 1)
 	struct SASCIITarget {
-		::gpk::v2<uint8_t>		Characters			= {};
-		::gpk::v2<uint16_t>		Colors				= {};
+		::gpk::gu8				Characters			= {};
+		::gpk::gu16				Colors				= {};
 
 		inlcxpr	uint32_t		Width				()		const	noexcept	{ return Characters.metrics().x; }
 		inlcxpr	uint32_t		Height				()		const	noexcept	{ return Characters.metrics().y; }

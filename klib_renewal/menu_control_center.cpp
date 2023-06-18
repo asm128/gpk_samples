@@ -35,7 +35,7 @@ _TReturn processListInput(const ::klib::SInput& frameInput, const SListItem<_TRe
 }
 
 template <typename _TReturn, size_t _SizeList>
-int32_t drawList(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, const SListItem<_TReturn> (&listItems)[_SizeList], uint32_t rowCount, int32_t offsetX, int32_t offsetY, int32_t width) {
+int32_t drawList(::gpk::gchar display, ::gpk::gu16 textAttributes, const SListItem<_TReturn> (&listItems)[_SizeList], uint32_t rowCount, int32_t offsetX, int32_t offsetY, int32_t width) {
 	char formatRow[128] = {};
 	sprintf_s(formatRow, "%%-%i.%is", width, width);
 	rowCount = ::gpk::min((uint32_t)_SizeList, rowCount);
@@ -46,7 +46,7 @@ int32_t drawList(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> text
 }
 
 template <typename _TReturn>
-int32_t drawList(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, const ::gpk::array_obj<SListItem<_TReturn>>& listItems, uint32_t rowCount, int32_t offsetX, int32_t offsetY, int32_t width) {
+int32_t drawList(::gpk::gchar display, ::gpk::gu16 textAttributes, const ::gpk::array_obj<SListItem<_TReturn>>& listItems, uint32_t rowCount, int32_t offsetX, int32_t offsetY, int32_t width) {
 	char formatRow[128] = {};
 	sprintf_s(formatRow, "%%-%i.%is", width, width);
 	for(uint32_t iRow = 0; iRow < rowCount; ++iRow) {
@@ -75,7 +75,7 @@ int32_t processEquipAgentInput(const ::klib::SInput& frameInput, const ::klib::S
 	return indexEquip;
 }
 
-int32_t							drawAgentResume				(const ::klib::SEntityTables & tables, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, const ::klib::CCharacter& agent, int32_t offsetY, int32_t offsetX, int32_t selectedAgentField) {
+int32_t							drawAgentResume				(const ::klib::SEntityTables & tables, ::gpk::gchar display, ::gpk::gu16 textAttributes, const ::klib::CCharacter& agent, int32_t offsetY, int32_t offsetX, int32_t selectedAgentField) {
 	char								preformatted0[12]			= {};
 	char								preformatted1[12]			= {};
 	char								formatted[64]				= {};
@@ -114,7 +114,7 @@ int32_t processSliderInput(const ::klib::SInput& frameInput, int32_t offsetY, in
 	return 0;
 }
 
-int32_t drawValueSlider(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, int32_t offsetY, int32_t offsetX, int64_t value, int32_t labelMaxLen, const ::gpk::vcc & controlLabel ) {
+int32_t drawValueSlider(::gpk::gchar display, ::gpk::gu16 textAttributes, int32_t offsetY, int32_t offsetX, int64_t value, int32_t labelMaxLen, const ::gpk::vcc & controlLabel ) {
 	char preformatted[16] = {};
 
 	sprintf_s(preformatted, "%%-%i.%is:", labelMaxLen, labelMaxLen);	; printfToGridColored(display, textAttributes, ::klib::ASCII_COLOR_INDEX_GREEN<<0	, offsetY, offsetX+00				, ::klib::SCREEN_LEFT, preformatted	, controlLabel.begin());
@@ -124,7 +124,7 @@ int32_t drawValueSlider(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_
 	return 0;
 };
 
-static	void drawBalance(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, const ::klib::SInput& frameInput, ::klib::SGamePlayer& player, int32_t offsetX, int32_t offsetY) {
+static	void drawBalance(::gpk::gchar display, ::gpk::gu16 textAttributes, const ::klib::SInput& frameInput, ::klib::SGamePlayer& player, int32_t offsetX, int32_t offsetY) {
 	// Budgets
 	printfToGridColored(display, textAttributes, ::klib::ASCII_COLOR_INDEX_YELLOW << 4, offsetY, offsetX+14, ::klib::SCREEN_LEFT, "%s", "    Project budgets   ");
 	drawValueSlider		(display	, textAttributes, offsetY+2, offsetX+14, player.Projects.BudgetProduction	.Money	, 10, "Production");
@@ -167,8 +167,8 @@ static	void drawBalance(::gpk::view_grid<char> display, ::gpk::view_grid<uint16_
 
 template <typename _TEntity>
 int32_t												drawEquipDetail
-	( ::gpk::view_grid<char>				display
-	, ::gpk::view_grid<uint16_t>			textAttributes
+	( ::gpk::gchar				display
+	, ::gpk::gu16			textAttributes
 	, int32_t								offsetY
 	, int32_t								offsetX
 	, const ::gpk::vcc			& entityTypeName
@@ -189,8 +189,8 @@ int32_t												drawEquipDetail
 
 template <typename _tEntity>
 int32_t										drawEquipList
-(	::gpk::view_grid<char>						display
-,	::gpk::view_grid<uint16_t>					textAttributes
+(	::gpk::gchar						display
+,	::gpk::gu16					textAttributes
 ,	int32_t										offsetY
 ,	int32_t										offsetX
 ,	int32_t										selectedRow
@@ -214,8 +214,8 @@ int32_t										drawEquipList
 }
 
 int32_t drawAgentList
-	( ::gpk::view_grid<char>										display
-	, ::gpk::view_grid<uint16_t>									textAttributes
+	( ::gpk::gchar										display
+	, ::gpk::gu16									textAttributes
 	, const ::klib::SGamePlayer										& player
 	, int32_t														offsetY
 	, int32_t														offsetX
@@ -244,7 +244,7 @@ int32_t drawAgentList
 }
 
 //
-int32_t										drawEquipList					(::klib::SEntityTables & tables, ::klib::ENTITY_TYPE entityType, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, const ::klib::SGamePlayer& player, int32_t offsetY, int32_t offsetX, int32_t selectedRow) {
+int32_t										drawEquipList					(::klib::SEntityTables & tables, ::klib::ENTITY_TYPE entityType, ::gpk::gchar display, ::gpk::gu16 textAttributes, const ::klib::SGamePlayer& player, int32_t offsetY, int32_t offsetX, int32_t selectedRow) {
 	const ::gpk::vcc					labelet						= ::gpk::get_value_label(entityType);
 
 	switch(entityType) {
@@ -278,7 +278,7 @@ int32_t processEquipInput(::klib::ENTITY_TYPE entityType, const ::klib::SInput& 
 	return tempRow;
 }
 
-int32_t			drawEquipDetail		(const ::klib::SEntityTables & tables, ::klib::ENTITY_TYPE entityType, ::gpk::view_grid<char> display, ::gpk::view_grid<uint16_t> textAttributes, const ::klib::CCharacter& agent, int32_t offsetY, int32_t offsetX) {
+int32_t			drawEquipDetail		(const ::klib::SEntityTables & tables, ::klib::ENTITY_TYPE entityType, ::gpk::gchar display, ::gpk::gu16 textAttributes, const ::klib::CCharacter& agent, int32_t offsetY, int32_t offsetX) {
 	const ::gpk::vcc					labelSelectedEquip = ::gpk::get_value_label(entityType);
 	switch(entityType) {
 	case ::klib::ENTITY_TYPE_CHARACTER	:	displayDetailedAgentSlot(tables, display, textAttributes, offsetY, offsetX, agent, (::klib::ASCII_COLOR_INDEX_YELLOW << 4)| ::klib::ASCII_COLOR_INDEX_BLUE );	break;
@@ -294,8 +294,8 @@ int32_t			drawEquipDetail		(const ::klib::SEntityTables & tables, ::klib::ENTITY
 
 int32_t drawWelcomeGUI(::klib::SGame& instanceGame) {
 
-	::gpk::view_grid<char>				display					= instanceGame.GlobalDisplay.Screen.Color;
-	::gpk::view_grid<uint16_t>			textAttributes			= instanceGame.GlobalDisplay.Screen.DepthStencil;
+	::gpk::gchar				display					= instanceGame.GlobalDisplay.Screen.Color;
+	::gpk::gu16			textAttributes			= instanceGame.GlobalDisplay.Screen.DepthStencil;
 
 	int32_t								startY					= 1;
 

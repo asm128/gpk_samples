@@ -9,46 +9,46 @@
 namespace gpk
 {
 	template<typename _tCoord>
-	static					::gpk::error_t									drawTriangle
-		( ::gpk::v2u32					& targetDepth
+	static	::gpk::error_t	drawTriangle
+		( ::gpk::gu32					& targetDepth
 		, const ::gpk::minmaxf32		& fNearFar
 		, const ::gpk::tri3<_tCoord>	& triangle
 		, ::gpk::apod<::gpk::n2i16>		& out_Points
 		, ::gpk::apod<::gpk::trif32>	& triangleWeights
 		) {
-		int32_t																		pixelsDrawn									= 0;
-		const ::gpk::n2<uint32_t>												& _targetMetrics							= targetDepth.metrics();
-		::gpk::n2	<float>														areaMin										= {(float)::gpk::min(::gpk::min(triangle.A.x, triangle.B.x), triangle.C.x), (float)::gpk::min(::gpk::min(triangle.A.y, triangle.B.y), triangle.C.y)};
-		::gpk::n2	<float>														areaMax										= {(float)::gpk::max(::gpk::max(triangle.A.x, triangle.B.x), triangle.C.x), (float)::gpk::max(::gpk::max(triangle.A.y, triangle.B.y), triangle.C.y)};
-		const float																	xStop										= ::gpk::min(areaMax.x, (float)_targetMetrics.x);
+		int32_t						pixelsDrawn			= 0;
+		const ::gpk::n2u32			& _targetMetrics	= targetDepth.metrics();
+		::gpk::n2f32				areaMin				= {(float)::gpk::min(::gpk::min(triangle.A.x, triangle.B.x), triangle.C.x), (float)::gpk::min(::gpk::min(triangle.A.y, triangle.B.y), triangle.C.y)};
+		::gpk::n2f32				areaMax				= {(float)::gpk::max(::gpk::max(triangle.A.x, triangle.B.x), triangle.C.x), (float)::gpk::max(::gpk::max(triangle.A.y, triangle.B.y), triangle.C.y)};
+		const float					xStop				= ::gpk::min(areaMax.x, (float)_targetMetrics.x);
 		for(float y = ::gpk::max(areaMin.y, 0.f), yStop = ::gpk::min(areaMax.y, (float)_targetMetrics.y); y < yStop; ++y)
 		for(float x = ::gpk::max(areaMin.x, 0.f); x < xStop; ++x) {
-			const ::gpk::n2<int32_t>												cellCurrent									= {(int32_t)x, (int32_t)y};
-			const ::gpk::tri2<int32_t>											triangle2D									=
+			const ::gpk::n2i32			cellCurrent			= {(int32_t)x, (int32_t)y};
+			const ::gpk::tri2i32		triangle2D			=
 				{ {(int32_t)triangle.A.x, (int32_t)triangle.A.y}
 				, {(int32_t)triangle.B.x, (int32_t)triangle.B.y}
 				, {(int32_t)triangle.C.x, (int32_t)triangle.C.y}
 				};
 			{
-				int32_t																		w0											= ::gpk::orient2d({triangle2D.B, triangle2D.A}, cellCurrent);	// Determine barycentric coordinates
-				int32_t																		w1											= ::gpk::orient2d({triangle2D.C, triangle2D.B}, cellCurrent);
-				int32_t																		w2											= ::gpk::orient2d({triangle2D.A, triangle2D.C}, cellCurrent);
+				int32_t						w0					= ::gpk::orient2d({triangle2D.B, triangle2D.A}, cellCurrent);	// Determine barycentric coordinates
+				int32_t						w1					= ::gpk::orient2d({triangle2D.C, triangle2D.B}, cellCurrent);
+				int32_t						w2					= ::gpk::orient2d({triangle2D.A, triangle2D.C}, cellCurrent);
 				if(w0 <= -1 || w1 <= -1 || w2 <= -1) // ---- If p is on or inside all edges, render pixel.
 					continue;
 			}
-			const ::gpk::n2<float>											cellCurrentF								= {x, y};
-			::gpk::tri<float>												proportions									=
+			const ::gpk::n2<float>		cellCurrentF								= {x, y};
+			::gpk::tri<float>			proportions									=
 				{ ::gpk::orient2d3d({triangle.C, triangle.B}, cellCurrentF)	// notice how having to type "template" every time before "Cast" totally defeats the purpose of the template. I really find this rule very stupid and there is no situation in which the compiler is unable to resolve it from the code it already has.
 				, ::gpk::orient2d3d({triangle.A, triangle.C}, cellCurrentF)
 				, ::gpk::orient2d3d({triangle.B, triangle.A}, cellCurrentF)	// Determine barycentric coordinates
 				};
-			float																proportABC									= proportions.A + proportions.B + proportions.C; //(w0, w1, w2)
+			float						proportABC									= proportions.A + proportions.B + proportions.C; //(w0, w1, w2)
 			if(proportABC <= 0)
 				continue;
-			proportions.A															/= proportABC;
-			proportions.B															/= proportABC;
-			proportions.C															= 1.0f - (proportions.A + proportions.B);
-			float																finalZ
+			proportions.A					/= proportABC;
+			proportions.B					/= proportABC;
+			proportions.C					= 1.0f - (proportions.A + proportions.B);
+			float						finalZ
 				= triangle.A.z * proportions.A
 				+ triangle.B.z * proportions.B
 				+ triangle.C.z * proportions.C
@@ -73,7 +73,7 @@ namespace gpk
 	, const ::gpk::trif32		& pixelWeights
 	, const ::gpk::tri3f32		& positions
 	, const ::gpk::tri2f32		& uvs
-	, const ::gpk::v2bgra		& textureColors
+	, const ::gpk::g8bgra		& textureColors
 	, int32_t					iTriangle
 	, const ::gpk::n3f64		& lightDir
 	, const ::gpk::rgbaf		& diffuseColor
@@ -203,24 +203,24 @@ static				::gpk::error_t										transformNormals
 	return 0;
 }
 
-static				::gpk::error_t										drawTriangles
-	( const ::gpk::view<::gpk::tri<uint32_t>>			& vertexIndexList
+static	::gpk::error_t		drawTriangles
+	( const ::gpk::view<::gpk::triu32>				& vertexIndexList
 	, const ::gpk::view<::gpk::n3f32>				& vertices
-	, const ::gpk::view<::gpk::n2<float>>				& uvs
-	, const ::gpk::view_grid	<::gpk::bgra>					& textureView
-	, const ::gpk::minmaxf32											& nearFar
-	, const ::gpk::n3f32									& lightDir
-	, ::gpk::SRenderCache											& renderCache
-	, ::gpk::view_grid<uint32_t>									& targetDepthView
-	, ::gpk::view_grid<::gpk::bgra>							& targetView
-	, const ::gpk::rgbaf										& diffuseColor
-	, const ::gpk::rgbaf										& ambientColor
-	, const ::gpk::view<const ::gpk::SLightInfoRSW>			& lights
-	, uint32_t														* pixelsDrawn
-	, uint32_t														* pixelsSkipped
-	, bool															wireframe
+	, const ::gpk::view<::gpk::n2f32>				& uvs
+	, const ::gpk::g8bgra							& textureView
+	, const ::gpk::minmaxf32						& nearFar
+	, const ::gpk::n3f32							& lightDir
+	, ::gpk::SRenderCache							& renderCache
+	, ::gpk::gu32									& targetDepthView
+	, ::gpk::g8bgra									& targetView
+	, const ::gpk::rgbaf							& diffuseColor
+	, const ::gpk::rgbaf							& ambientColor
+	, const ::gpk::view<const ::gpk::SLightInfoRSW>	& lights
+	, uint32_t										* pixelsDrawn
+	, uint32_t										* pixelsSkipped
+	, bool											wireframe
 	) {	// ---
-		//const ::gpk::n3f32													& lightDir									= app.LightDirection;
+		//const ::gpk::n3f32			& lightDir									= app.LightDirection;
 		for(uint32_t iTriangle = 0, triCount = renderCache.Triangle3dIndices.size(); iTriangle < triCount; ++iTriangle) { //
 			renderCache.TrianglePixelCoords.clear();
 			renderCache.TrianglePixelWeights.clear();
@@ -292,7 +292,7 @@ static				::gpk::error_t										drawTriangles
 	, const ::gpk::view<const ::gpk::SLightInfoRSW>	& lights
 	, bool											wireframe
 	) {	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
-	::gpk::view_grid<::gpk::bgra>											& offscreen									= target.Color.View;
+	::gpk::g8bgra											& offscreen									= target.Color.View;
 	const ::gpk::n2<uint32_t>												& offscreenMetrics							= offscreen.metrics();
 	::updateTransforms(transforms, camera, offscreenMetrics);
 
@@ -317,7 +317,7 @@ static				::gpk::error_t										drawTriangles
 	xWorld		.SetTranslation	(modelPivot.Position, false);
 	for(uint32_t iGNDTexture = 0; iGNDTexture < textures.size(); ++iGNDTexture) {
 		for(uint32_t iFacingDirection = 0; iFacingDirection < 6; ++iFacingDirection) {
-			const ::gpk::view_grid<::gpk::bgra>									& gndNodeTexture							= textures[iGNDTexture].View;
+			const ::gpk::g8bgra									& gndNodeTexture							= textures[iGNDTexture].View;
 			const ::gpk::SModelNodeGND													& gndNode									= modelGND.Nodes[textures.size() * iFacingDirection + iGNDTexture];
 			::gpk::clear
 				( renderCache.Triangle3dWorld
