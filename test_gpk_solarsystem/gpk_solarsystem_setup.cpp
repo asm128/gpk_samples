@@ -15,56 +15,56 @@ struct SPlanet {
 	float	OrbitalInclination	;
 	float	OrbitalEccentricity	;
 	float	Images				;
-};															
+};
 
 																				//	- Mercury			- Venus				- Earth				- Mars				- Jupiter				- Saturn				- Uranus				- Neptune				- Pluto
-stacxpr const double	PLANET_MASSES				[::ssg::PLANET_COUNT]	=	{	0.330f				, 4.87f				, 5.97f				, 0.642f			, 1899					, 568					, 86.8f					, 102					, 0.0125f			};
-stacxpr const double	PLANET_SCALES				[::ssg::PLANET_COUNT]	=	{	4879				, 12104				, 12756				, 6792				, 142984				, 120536				, 51118					, 49528					, 2390				};
-stacxpr const double	PLANET_DAY					[::ssg::PLANET_COUNT]	=	{	4222.6f				, 2802.0f			, 23.9f				, 24.7f				, 9.9f					, 10.7f					, 17.2f					, 16.1f					, 153.3f			};
-stacxpr const double	PLANET_AXIALTILT			[::ssg::PLANET_COUNT]	=	{	0.01f				, 177.4f			, 23.4f				, 25.2f				, 3.1f					, 26.7f					, 97.8f					, 28.3f					, 122.5f			};
-stacxpr const double	PLANET_DISTANCE				[::ssg::PLANET_COUNT]	=	{	57.9f				, 108.2f			, 149.6f			, 227.9f			, 778.6f				, 1433.5f				, 2872.5f				, 4495.1f				, 5870.0f			};
+stacxpr double			PLANET_MASSES				[::ssg::PLANET_COUNT]	=	{	0.330f				, 4.87f				, 5.97f				, 0.642f			, 1899					, 568					, 86.8f					, 102					, 0.0125f			};
+stacxpr double			PLANET_SCALES				[::ssg::PLANET_COUNT]	=	{	4879				, 12104				, 12756				, 6792				, 142984				, 120536				, 51118					, 49528					, 2390				};
+stacxpr double			PLANET_DAY					[::ssg::PLANET_COUNT]	=	{	4222.6f				, 2802.0f			, 23.9f				, 24.7f				, 9.9f					, 10.7f					, 17.2f					, 16.1f					, 153.3f			};
+stacxpr double			PLANET_AXIALTILT			[::ssg::PLANET_COUNT]	=	{	0.01f				, 177.4f			, 23.4f				, 25.2f				, 3.1f					, 26.7f					, 97.8f					, 28.3f					, 122.5f			};
+stacxpr double			PLANET_DISTANCE				[::ssg::PLANET_COUNT]	=	{	57.9f				, 108.2f			, 149.6f			, 227.9f			, 778.6f				, 1433.5f				, 2872.5f				, 4495.1f				, 5870.0f			};
 
-stacxpr const double	PLANET_ORBITALPERIOD		[::ssg::PLANET_COUNT]	=	{	88.0f				, 224.7f			, 365.2f			, 687.0f			, 4331					, 10747					, 30589					, 59800					, 90588				};
-stacxpr const double	PLANET_ORBITALVELOCITY		[::ssg::PLANET_COUNT]	=	{	47.9f				, 35.0f				, 29.8f				, 24.1f				, 13.1f					, 9.7f					, 6.8f					, 5.4f					, 4.7f				};
-stacxpr const double	PLANET_ORBITALINCLINATION	[::ssg::PLANET_COUNT]	=	{	7.0					, 3.4f				, 0.0f				, 1.9f				, 1.3f					, 2.5f					, 0.8f					, 1.8f					, 17.2f				};
-stacxpr const double	PLANET_ORBITALECCENTRICITY	[::ssg::PLANET_COUNT]	=	{	0.205f				, 0.007f			, 0.017f			, 0.094f			, 0.049f				, 0.057f				, 0.046f				, 0.011f				, 0.244f			};
+stacxpr double			PLANET_ORBITALPERIOD		[::ssg::PLANET_COUNT]	=	{	88.0f				, 224.7f			, 365.2f			, 687.0f			, 4331					, 10747					, 30589					, 59800					, 90588				};
+stacxpr double			PLANET_ORBITALVELOCITY		[::ssg::PLANET_COUNT]	=	{	47.9f				, 35.0f				, 29.8f				, 24.1f				, 13.1f					, 9.7f					, 6.8f					, 5.4f					, 4.7f				};
+stacxpr double			PLANET_ORBITALINCLINATION	[::ssg::PLANET_COUNT]	=	{	7.0					, 3.4f				, 0.0f				, 1.9f				, 1.3f					, 2.5f					, 0.8f					, 1.8f					, 17.2f				};
+stacxpr double			PLANET_ORBITALECCENTRICITY	[::ssg::PLANET_COUNT]	=	{	0.205f				, 0.007f			, 0.017f			, 0.094f			, 0.049f				, 0.057f				, 0.046f				, 0.011f				, 0.244f			};
 stacxpr const char*		PLANET_IMAGE				[::ssg::PLANET_COUNT]	=	{	"mercury_color.png"	, "venus_color.png"	, "earth_color.png"	, "mars_color.png"	, "jupiter_color.png"	, "saturn_color.png"	, "uranus_color.png"	, "neptune_color.png"	, "pluto_color.png"	};
 
-int						ssg::solarSystemSetup				(::ssg::SSolarSystemGame & solarSystem, const ::gpk::vcc & filename)	{
+::gpk::error_t			ssg::solarSystemSetup	(::ssg::SSolarSystemGame & solarSystem, const ::gpk::vcc & filename) {
 	solarSystem.Geometries.resize(1);
-	::gpk::SParamsSphere		params			= {};
-	params.CellCount	= {16, 16};
-	params.Radius		= 1;
-	params.Origin		= {};
+	::gpk::SParamsSphere		params					= {};
+	params.CellCount		= {16, 16};
+	params.Radius			= 1;
+	params.Origin			= {};
 	::gpk::geometryBuildSphere(solarSystem.Geometries[0], params);
 //	::gpk::geometryBuildFromSTL();
 
-	SPlanet													planet								= {};
-	SPlanetDetail											planetdetail						= {};
-	SStar													star								= {};
-	SStarDetail												stardetail							= {};
+	SPlanet						planet					= {};
+	SPlanetDetail				planetdetail			= {};
+	SStar						star					= {};
+	SStarDetail					stardetail				= {};
 
-	::gpk::SRigidBodyIntegrator								& bodies							= solarSystem.Bodies;
-	::ssg::SScene											& scene								= solarSystem.Scene;
+	::gpk::SRigidBodyIntegrator	& bodies				= solarSystem.Bodies;
+	::ssg::SScene				& scene					= solarSystem.Scene;
 	//if constexpr(false && filename.size()) {
 	if (filename.size() && 0 == filename.size()) {
-		::gpk::SJSONFile					solarSystemFile			= {};
+		::gpk::SJSONFile			solarSystemFile			= {};
 		::gpk::jsonFileRead(solarSystemFile, filename);
-		::gpk::ai32			stellarBodyIndices;
-		const uint32_t						stellarBodyCount		= ::gpk::jsonObjectKeyList(solarSystemFile.Reader, 0, stellarBodyIndices);
-		::gpk::view<const ::gpk::vcc>	jsonView				= solarSystemFile.Reader.View;
+		::gpk::ai32					stellarBodyIndices;
+		const uint32_t				stellarBodyCount		= ::gpk::jsonObjectKeyList(solarSystemFile.Reader, 0, stellarBodyIndices);
+		::gpk::vcvcc				jsonView				= solarSystemFile.Reader.View;
 		for(uint32_t iPlanet = 0; iPlanet < stellarBodyCount; ++iPlanet) {
-			const int32_t						jsonIndexStellarBody	= stellarBodyIndices[iPlanet];
+			const int32_t				jsonIndexStellarBody	= stellarBodyIndices[iPlanet];
 
-			planet.Name	= star.Name			= jsonView[jsonIndexStellarBody];
-			::gpk::ai32			propertyIndices;
-			//int32_t								iBodyValue				= ::gpk::jsonObjectValueGet(solarSystemFile.Reader, jsonIndexStellarBody, planet.Name);
-			const uint32_t						propertyCount			= ::gpk::jsonObjectKeyList(solarSystemFile.Reader, jsonIndexStellarBody + 2, propertyIndices);
+			planet.Name	= star.Name	= jsonView[jsonIndexStellarBody];
+			::gpk::ai32					propertyIndices;
+			//int32_t					iBodyValue				= ::gpk::jsonObjectValueGet(solarSystemFile.Reader, jsonIndexStellarBody, planet.Name);
+			const uint32_t				propertyCount			= ::gpk::jsonObjectKeyList(solarSystemFile.Reader, jsonIndexStellarBody + 2, propertyIndices);
 			for(uint32_t iProperty = 0; iProperty < propertyCount; ++iProperty) 
 				::gpk::tolower(::gpk::view<char>{(char*)jsonView[propertyIndices[iProperty]].begin(), star.Name.size()});
 
-			int32_t								iTypeValue				= ::gpk::jsonObjectValueGet(solarSystemFile.Reader, jsonIndexStellarBody + 2, "type");
-			STELLAR_BODY						bodyType				= (0 == strncmp(jsonView[iTypeValue].begin(), "star", 4)) ? STELLAR_BODY_STAR : STELLAR_BODY_PLANET;
+			int32_t						iTypeValue				= ::gpk::jsonObjectValueGet(solarSystemFile.Reader, jsonIndexStellarBody + 2, "type");
+			STELLAR_BODY				bodyType				= (0 == strncmp(jsonView[iTypeValue].begin(), "star", 4)) ? STELLAR_BODY_STAR : STELLAR_BODY_PLANET;
 			switch(bodyType) {
 			case STELLAR_BODY_STAR	: { 
 				{ int32_t iValue = ::gpk::jsonObjectValueGet(solarSystemFile.Reader, jsonIndexStellarBody + 2, "mass"					); stardetail.Mass					= uint32_t(solarSystemFile.Reader.Token[iValue].Value); }
@@ -211,8 +211,8 @@ int						ssg::solarSystemSetup				(::ssg::SSolarSystemGame & solarSystem, const 
 		//}
 		bodies.Integrate((365 * 4 + 1) * 10);	// Update physics
 	}
-	solarSystem.Scene.Camera.Target					= {};
-	solarSystem.Scene.Camera.Position				= {-0.000001f, 500, -1000};
-	//solarSystem.Scene.Camera.Up						= {0, 1, 0};
+	solarSystem.Scene.Camera.Target		= {};
+	solarSystem.Scene.Camera.Position	= {-0.000001f, 500, -1000};
+	//solarSystem.Scene.Camera.Up			= {0, 1, 0};
 	return 0;
 }
