@@ -257,7 +257,7 @@ stacxpr const ::gpk::tri3<float>						geometryCube	[12]						=
 	mainWindow.Size										= {640, 480};
 	es_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
 
-	stacxpr ::gpk::n3f										cubeCenter									= {0.5f, 0.5f, 0.5f};
+	stacxpr ::gpk::n3f32										cubeCenter									= {0.5f, 0.5f, 0.5f};
 	for(uint32_t iTriangle = 0; iTriangle < 12; ++iTriangle) {
 		::gpk::tri3<float>													& transformedTriangle						= app.CubePositions[iTriangle];
 		transformedTriangle														= geometryCube[iTriangle];
