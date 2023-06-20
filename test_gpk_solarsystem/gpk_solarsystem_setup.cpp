@@ -17,7 +17,7 @@ struct SPlanet {
 	float	Images				;
 };															
 
-																						//	- Mercury			- Venus				- Earth				- Mars				- Jupiter				- Saturn				- Uranus				- Neptune				- Pluto
+																				//	- Mercury			- Venus				- Earth				- Mars				- Jupiter				- Saturn				- Uranus				- Neptune				- Pluto
 stacxpr const double	PLANET_MASSES				[::ssg::PLANET_COUNT]	=	{	0.330f				, 4.87f				, 5.97f				, 0.642f			, 1899					, 568					, 86.8f					, 102					, 0.0125f			};
 stacxpr const double	PLANET_SCALES				[::ssg::PLANET_COUNT]	=	{	4879				, 12104				, 12756				, 6792				, 142984				, 120536				, 51118					, 49528					, 2390				};
 stacxpr const double	PLANET_DAY					[::ssg::PLANET_COUNT]	=	{	4222.6f				, 2802.0f			, 23.9f				, 24.7f				, 9.9f					, 10.7f					, 17.2f					, 16.1f					, 153.3f			};
@@ -28,15 +28,14 @@ stacxpr const double	PLANET_ORBITALPERIOD		[::ssg::PLANET_COUNT]	=	{	88.0f				, 
 stacxpr const double	PLANET_ORBITALVELOCITY		[::ssg::PLANET_COUNT]	=	{	47.9f				, 35.0f				, 29.8f				, 24.1f				, 13.1f					, 9.7f					, 6.8f					, 5.4f					, 4.7f				};
 stacxpr const double	PLANET_ORBITALINCLINATION	[::ssg::PLANET_COUNT]	=	{	7.0					, 3.4f				, 0.0f				, 1.9f				, 1.3f					, 2.5f					, 0.8f					, 1.8f					, 17.2f				};
 stacxpr const double	PLANET_ORBITALECCENTRICITY	[::ssg::PLANET_COUNT]	=	{	0.205f				, 0.007f			, 0.017f			, 0.094f			, 0.049f				, 0.057f				, 0.046f				, 0.011f				, 0.244f			};
-stacxpr const char*	PLANET_IMAGE				[::ssg::PLANET_COUNT]	=	{	"mercury_color.png"	, "venus_color.png"	, "earth_color.png"	, "mars_color.png"	, "jupiter_color.png"	, "saturn_color.png"	, "uranus_color.png"	, "neptune_color.png"	, "pluto_color.png"	};
+stacxpr const char*		PLANET_IMAGE				[::ssg::PLANET_COUNT]	=	{	"mercury_color.png"	, "venus_color.png"	, "earth_color.png"	, "mars_color.png"	, "jupiter_color.png"	, "saturn_color.png"	, "uranus_color.png"	, "neptune_color.png"	, "pluto_color.png"	};
 
 int						ssg::solarSystemSetup				(::ssg::SSolarSystemGame & solarSystem, const ::gpk::vcc & filename)	{
 	solarSystem.Geometries.resize(1);
-	::gpk::SParamsSphere	params			= {};
-	params.Stacks		= 16;
-	params.Slices		= 16;
+	::gpk::SParamsSphere		params			= {};
+	params.CellCount	= {16, 16};
 	params.Radius		= 1;
-	params.Center		= {};
+	params.Origin		= {};
 	::gpk::geometryBuildSphere(solarSystem.Geometries[0], params);
 //	::gpk::geometryBuildFromSTL();
 
