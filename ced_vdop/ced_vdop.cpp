@@ -77,10 +77,11 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 }
 
 ::gpk::error_t			update		(SApplication & app, bool exitSignal)	{
+	rvis_if(::gpk::APPLICATION_STATE_EXIT, exitSignal);
+
 	::gpk::SFramework				& framework	= app.Framework;
 	//::gpk::STimer															timer;
 	(void)exitSignal;
-	//rvis_if(::gpk::APPLICATION_STATE_EXIT, exitSignal);
 	{
 		::std::lock_guard									lock						(app.LockRender);
 		app.Framework.RootWindow.BackBuffer				= app.Offscreen;

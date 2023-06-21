@@ -35,7 +35,6 @@ stacxpr const char*		PLANET_IMAGE				[::ssg::PLANET_COUNT]	=	{	"mercury_color.pn
 	::gpk::SParamsSphere		params					= {};
 	params.CellCount		= {16, 16};
 	params.Radius			= 1;
-	params.Origin			= {};
 	::gpk::geometryBuildSphere(solarSystem.Geometries[0], params);
 //	::gpk::geometryBuildFromSTL();
 
@@ -114,8 +113,8 @@ stacxpr const char*		PLANET_IMAGE				[::ssg::PLANET_COUNT]	=	{	"mercury_color.pn
 			}
 
 			{ 
-				int32_t iValue	= ::gpk::jsonObjectValueGet(solarSystemFile.Reader, jsonIndexStellarBody + 2, "parent"); 
-				int32_t iBody	= -1;
+				int32_t					iValue			= ::gpk::jsonObjectValueGet(solarSystemFile.Reader, jsonIndexStellarBody + 2, "parent"); 
+				int32_t					iBody			= -1;
 				if(iValue >= 0) {
 					iBody	= ::gpk::createOrbiter(bodies
 						, planetdetail.Mass						
@@ -130,10 +129,10 @@ stacxpr const char*		PLANET_IMAGE				[::ssg::PLANET_COUNT]	=	{	"mercury_color.pn
 				}
 			}
 			{ // Set up rigid body
-				::ssg::SModelPivot										model							= {};
-				const float												scale							= (bodyType == STELLAR_BODY_STAR) ? 10.0f : float(1.0 / PLANET_SCALES[ssg::PLANET_EARTH] * planetdetail.Diameter);
-				model.Scale											= {scale, scale, scale};
-				model.Position										= {0, 0.5f};
+				::ssg::SModelPivot		model				= {};
+				const float				scale				= (bodyType == STELLAR_BODY_STAR) ? 10.0f : float(1.0 / PLANET_SCALES[ssg::PLANET_EARTH] * planetdetail.Diameter);
+				model.Scale			= {scale, scale, scale};
+				model.Position		= {0, 0.5f};
 				scene.Pivot.push_back(model);
 			}
 
@@ -143,12 +142,12 @@ stacxpr const char*		PLANET_IMAGE				[::ssg::PLANET_COUNT]	=	{	"mercury_color.pn
 	else {
 		solarSystem.Scene.Pivot.resize(::ssg::PLANET_COUNT + 1); //
 		for(uint32_t iModel = 0; iModel < solarSystem.Scene.Pivot.size(); ++iModel) {
-			int32_t													iPlanet							= iModel - 1;
+			int32_t						iPlanet							= iModel - 1;
 			{ // Set up rigid body
-				::ssg::SModelPivot										& model							= scene.Pivot[iModel];
-				const float												scale							= (0 == iModel) ? 10.0f : float(1.0 / PLANET_SCALES[ssg::PLANET_EARTH] * PLANET_SCALES[iPlanet]);
-				model.Scale											= {scale, scale, scale};
-				model.Position										= {0, 0.5f};
+				::ssg::SModelPivot			& model							= scene.Pivot[iModel];
+				const float					scale							= (0 == iModel) ? 10.0f : float(1.0 / PLANET_SCALES[ssg::PLANET_EARTH] * PLANET_SCALES[iPlanet]);
+				model.Scale				= {scale, scale, scale};
+				model.Position			= {0, 0.5f};
 			}
 			if(iModel) { // Set up rigid body
 				/*int32_t iBody = */::gpk::createOrbiter(bodies

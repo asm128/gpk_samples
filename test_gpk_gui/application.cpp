@@ -61,7 +61,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 		controlText	.Text			= {::gpk::label(buffer).begin(), (uint32_t)lenText};
 		//= {0 == (iChild % 4), 0 == (iChild % 5)};
 		gui.Controls.SetDisabled(controlTestChild0,	0 == (iChild % 9));
-		gui.Controls.States	[controlTestChild0].Mask		&= ~::gpk::GUI_CONTROL_FLAG_Hovered;
+		//gui.Controls.States	[controlTestChild0].Mask		&= ~::gpk::GUI_CONTROL_FLAG_Hovered;
 		gui.Controls.Draw	[controlTestChild0].NoClient	= 
 		gui.Controls.Draw	[controlTestChild0].NoBorder	= iChild % 2;
 		switch(iChild % 9) {
