@@ -3,6 +3,7 @@
 #include "gpk_png.h"
 #include "gpk_array_ptr.h"
 #include "gpk_stl.h"
+#include "gpk_geometry_buffers.h"
 
 #include <cstring>
 #include <cstdint>
@@ -177,7 +178,7 @@ int													ssg::solarSystemUpdate			(ssg::SSolarSystemGame & solarSystem, d
 		matrices.Scale		.Scale			(scene.Pivot[entity.Model].Scale		, true);
 		matrices.Position	.SetTranslation	(scene.Pivot[entity.Model].Position	, true);
 		::gpk::g8bgra						entityImage					= solarSystem.Images[entity.Images];
-		::gpk::STrianglesIndexed						& entityGeometry			= solarSystem.Geometries[entity.Geometry];
+		::gpk::SGeometryBuffers				& entityGeometry			= solarSystem.Geometries[entity.Geometry];
 		matrixTransform										= matrices.Scale * matrices.Position * matrixTransform;
 		::gpk::m4<float>									matrixTransformView			= matrixTransform * matrixView;
 		for(uint32_t iTriangle = 0; iTriangle < entityGeometry.PositionIndices.size() / 3; ++iTriangle) {

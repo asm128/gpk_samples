@@ -70,7 +70,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 		app.Framework.RootWindow.BackBuffer	= app.Offscreen;
 	}
 	::gpk::SFramework				& framework					= app.Framework;
-	app.LobbyClient.Update(framework.RootWindow.Input, framework.RootWindow.EventQueueOld);
+	app.LobbyClient.Update(framework.RootWindow.Input, framework.RootWindow.EventQueue);
 	rvis_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework));
 
 	::gpk::SGUI					& gui			= *framework.GUI;

@@ -79,23 +79,34 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT_MT(::SApplication, "Title");
 	return 0;
 }
 
+static	::gpk::error_t	processKeyboardEvent	(::SApplication & app, const ::gpk::SEventView<::gpk::EVENT_KEYBOARD> & screenEvent) { 
+	switch(screenEvent.Type) {
+	default: break;
+	case ::gpk::EVENT_KEYBOARD_Down:
+	case ::gpk::EVENT_KEYBOARD_SysDown:
+		switch(screenEvent.Data[0]) {
+		case VK_RETURN:
+			if(GetAsyncKeyState(VK_MENU) & 0xFFF0)
+				gpk_necs(::gpk::fullScreenToggle(app.Framework.RootWindow));
+			break;
+		}
+		break;
+	}
+	return 0;
+}
+
+static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SSystemEvent & sysEvent) { 
+	switch(sysEvent.Type) {
+	default: break;
+	case ::gpk::SYSTEM_EVENT_Keyboard	: es_if(errored(::gpk::eventExtractAndHandle<::gpk::EVENT_KEYBOARD>(sysEvent, [&app](const ::gpk::SEventView<::gpk::EVENT_KEYBOARD> & screenEvent) { return ::processKeyboardEvent(app, screenEvent); }))); break;
+	}
+	return 0;
+}
+
 ::gpk::error_t			update		(::SApplication& app, bool systemRequestedExit)					{
 	retval_ginfo_if(1, systemRequestedExit, "Exiting because the runtime asked for close. We could also ignore this value and just continue execution if we don't want to exit.");
 	::gpk::SWindow					& mainWindow								= app.Framework.RootWindow;
-	for(uint32_t iEvent = 0; iEvent < mainWindow.EventQueueOld.size(); ++iEvent) {
-		switch(mainWindow.EventQueueOld[iEvent].Type) {
-		case ::gpk::SYSEVENT_SYSKEY_DOWN:
-		case ::gpk::SYSEVENT_KEY_DOWN:
-			switch(mainWindow.EventQueueOld[iEvent].Data[0]) {
-			case VK_RETURN:
-				if(GetAsyncKeyState(VK_MENU) & 0xFFF0)
-					gpk_necs(::gpk::fullScreenToggle(mainWindow));
-				break;
-			case VK_F4:
-				return 1;
-			}
-		}
-	}
+	gpk_necs(mainWindow.EventQueue.for_each([&app](const ::gpk::pobj<::gpk::SSystemEvent> & sysEvent) { return ::processSystemEvent(app, *sysEvent); }));
 
 	::gpk::error_t																frameworkResult								= ::gpk::updateFramework(app.Framework);
 	ree_if(errored(frameworkResult), "Unknown error.");

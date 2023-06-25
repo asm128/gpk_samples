@@ -5,7 +5,7 @@
 #include "gpk_particle.h"
 
 #include "gpk_ptr_obj.h"
-#include "gpk_image_color.h"
+#include "gpk_img_color.h"
 
 #ifndef SOLARSYSTEM_H_92837423798
 #define SOLARSYSTEM_H_92837423798
@@ -209,13 +209,13 @@ namespace ssg
 	};
 
 	struct SSolarSystemGame {
-		::ssg::SSolarSystem								SolarSystem						= {};
-		::ssg::SDebris									SunFire							= {};
-		::ssg::SScene									Scene							= {};
-		::gpk::SRigidBodyIntegrator						Bodies							= {};
-		::gpk::aobj<::ssg::SEntity>						Entities						= {};
-		::gpk::aobj<::gpk::img<::gpk::bgra>>			Images							= {};
-		::gpk::aobj<::gpk::STrianglesIndexed>	Geometries						= {};
+		::ssg::SSolarSystem						SolarSystem						= {};
+		::ssg::SDebris							SunFire							= {};
+		::ssg::SScene							Scene							= {};
+		::gpk::SRigidBodyIntegrator				Bodies							= {};
+		::gpk::aobj<::ssg::SEntity>				Entities						= {};
+		::gpk::aobj<::gpk::img<::gpk::bgra>>	Images							= {};
+		::gpk::aobj<::gpk::SGeometryBuffers>	Geometries						= {};
 	};
 
 	::gpk::error_t									solarSystemSetup				(::ssg::SSolarSystemGame & sunsystem, const ::gpk::vcc & filename);
