@@ -2,8 +2,8 @@
 #include "gpk_vox.h"
 #include "gpk_framework.h"
 
-#ifndef APPLICATION_H_098273498237423
-#define APPLICATION_H_098273498237423
+#ifndef APPLICATION_H_23627
+#define APPLICATION_H_23627
 
 struct SApplication {
 	::gpk::SFramework													Framework									;
@@ -512,4 +512,4 @@ static const ::gpk::vcs								fileNames []								=
 	////, "veh_wagon4.vox"
 	};
 
-#endif // APPLICATION_H_098273498237423
+#endif // APPLICATION_H_23627

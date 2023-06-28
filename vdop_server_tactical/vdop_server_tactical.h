@@ -8,8 +8,8 @@
 
 #include "draw.h"
 
-#ifndef CED_DEMO_08_H_298837492837
-#define CED_DEMO_08_H_298837492837
+#ifndef CED_DEMO_08_H_23627
+#define CED_DEMO_08_H_23627
 
 struct SDrawCache {
 	::gpk::apod<::gpk::n2<int32_t>>			PixelCoords				= {};
@@ -105,4 +105,4 @@ struct SApplication {
 													SApplication		(::gpk::SRuntimeValues & runtimeValues)	: Framework(runtimeValues)		{}
 };
 
-#endif // CED_DEMO_08_H_298837492837
+#endif // CED_DEMO_08_H_23627

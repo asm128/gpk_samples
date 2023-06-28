@@ -1,7 +1,7 @@
 #include "gpk_noise.h"
 
-#ifndef KLIB_RANDOM_GENERATOR_H_29843293874
-#define KLIB_RANDOM_GENERATOR_H_29843293874
+#ifndef KLIB_RANDOM_GENERATOR_H_23627
+#define KLIB_RANDOM_GENERATOR_H_23627
 
 namespace klib 
 {
@@ -42,4 +42,4 @@ namespace klib
 #pragma pack(pop)
 } // namespace
 
-#endif // KLIB_RANDOM_GENERATOR_H_29843293874
+#endif // KLIB_RANDOM_GENERATOR_H_23627

@@ -1,7 +1,7 @@
 #include "gpk_array.h"
 
-#ifndef TRACK_H_9283749823
-#define TRACK_H_9283749823
+#ifndef TRACK_H_23627
+#define TRACK_H_23627
 
 #pragma pack(push, 1)
 enum TRACK_EVENT_TYPE : int32_t
@@ -52,4 +52,4 @@ struct STrackState {
 //						STrackEventTable							Table								;
 //};
 
-#endif // TRACK_H_9283749823
+#endif // TRACK_H_23627

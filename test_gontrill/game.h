@@ -8,8 +8,8 @@
 #include "gpk_view_bit.h"
 #include "gpk_array_static.h"
 
-#ifndef GAME_H_982374982374
-#define GAME_H_982374982374
+#ifndef GAME_H_23627
+#define GAME_H_23627
 
 #pragma pack(push, 1)
 
@@ -175,4 +175,4 @@ struct SGame {
 							};
 };
 
-#endif // GAME_H_982374982374
+#endif // GAME_H_23627

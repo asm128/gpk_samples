@@ -12,46 +12,46 @@
 
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 
-::gpk::error_t			cleanup		(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.RootWindow); }
-::gpk::error_t			setup		(::gme::SApplication & app)						{
-	::gpk::SFramework				& framework							= app.Framework;
-	::gpk::SWindow					& mainWindow						= framework.RootWindow;
-	mainWindow.Size														= {1280, 720};
+::gpk::error_t			cleanup			(::gme::SApplication & app)	{ return ::gpk::mainWindowDestroy(app.Framework.RootWindow); }
+::gpk::error_t			setup			(::gme::SApplication & app)	{
+	::gpk::SFramework			& framework		= app.Framework;
+	::gpk::SWindow				& mainWindow	= framework.RootWindow;
+	mainWindow.Size			= {1280, 720};
 	es_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
 	{ // Build the exit button
-		::gpk::SGUI									& gui								= *framework.GUI;
-		gui.ColorModeDefault					= ::gpk::GUI_COLOR_MODE_3D;
-		gui.ThemeDefault						= ::gpk::ASCII_COLOR_DARKGREEN * 16 + 7;
-		app.IdExit								= ::gpk::controlCreate(gui);
-		::gpk::SControlPlacement								& controlExit						= gui.Controls.Placement[app.IdExit];
-		controlExit.Area						= {{}, {64, 20}};
-		controlExit.Border						= {10, 10, 10, 10};
-		controlExit.Margin						= {1, 1, 1, 1};
-		controlExit.Align						= ::gpk::ALIGN_BOTTOM_RIGHT;
-		::gpk::SControlText							& controlText						= gui.Controls.Text[app.IdExit];
-		controlText.Text						= "Exit";
-		controlText.Align						= ::gpk::ALIGN_CENTER;
-		::gpk::SControlConstraints					& controlConstraints				= gui.Controls.Constraints[app.IdExit];
+		::gpk::SGUI					& gui			= *framework.GUI;
+		gui.ColorModeDefault	= ::gpk::GUI_COLOR_MODE_3D;
+		gui.ThemeDefault		= ::gpk::ASCII_COLOR_DARKGREEN * 16 + 7;
+		app.IdExit				= ::gpk::controlCreate(gui);
+		::gpk::SControlPlacement	& controlExit	= gui.Controls.Placement[app.IdExit];
+		controlExit.Area		= {{}, {64, 20}};
+		controlExit.Border		= {10, 10, 10, 10};
+		controlExit.Margin		= {1, 1, 1, 1};
+		controlExit.Align		= ::gpk::ALIGN_BOTTOM_RIGHT;
+		::gpk::SControlText			& controlText	= gui.Controls.Text[app.IdExit];
+		controlText.Text		= "Exit";
+		controlText.Align		= ::gpk::ALIGN_CENTER;
+		::gpk::SControlConstraints	& controlConstraints	= gui.Controls.Constraints[app.IdExit];
 		controlConstraints.AttachSizeToControl	= {app.IdExit, -1};
 		::gpk::controlSetParent(gui, app.IdExit, -1);
 	}
 
 	{
-		::gpk::SPNGData															pngDataCacheForFasterLoad;
-		::gpk::view_const_string												pathPNGSuite						= {};
+		::gpk::SPNGData				pngDataCacheForFasterLoad;
+		::gpk::view_const_string	pathPNGSuite		 {};
 		{
-			const ::gpk::SJSONReader												& jsonReader						= framework.JSONConfig.Reader;
+			const ::gpk::SJSONReader	& jsonReader	= framework.JSONConfig.Reader;
 			gpk_necall(::gpk::jsonExpressionResolve(::gpk::vcs{"assets.pngsuite.path"}, jsonReader, 0, pathPNGSuite), "Failed to get path of PNG files! Last contents found: %s.", pathPNGSuite.begin());
 			info_printf("Path to PNG test files: %s.", ::gpk::toString(pathPNGSuite).begin());
-			::gpk::view_const_string												fileNamePNG							= {};
-			const int32_t															indexJSONNodeArrayPNGFileNames		= ::gpk::jsonExpressionResolve(::gpk::vcs{"application.gpk_test_png.images"}, jsonReader, 0, fileNamePNG);
-			const uint32_t															countFilesToLoad					= (uint32_t)::gpk::jsonArraySize(*jsonReader.Tree[indexJSONNodeArrayPNGFileNames]);
+			::gpk::view_const_string	fileNamePNG							= {};
+			const int32_t				indexJSONNodeArrayPNGFileNames		= ::gpk::jsonExpressionResolve(::gpk::vcs{"application.gpk_test_png.images"}, jsonReader, 0, fileNamePNG);
+			const uint32_t				countFilesToLoad					= (uint32_t)::gpk::jsonArraySize(*jsonReader.Tree[indexJSONNodeArrayPNGFileNames]);
 			gpk_necall(app.PNGImages.resize(countFilesToLoad), "Failed to resize array for %u PNG files.", countFilesToLoad);
-			::gpk::apod<char>												expression							= {};
-			::gpk::apod<char>												fullPathPNG							= {};
-			char																	subscriptExpression	[64]			= {};
+			::gpk::apod<char>			expression							= {};
+			::gpk::apod<char>			fullPathPNG							= {};
+			char						subscriptExpression	[64]			= {};
 			for(uint32_t iFile = 0; iFile < countFilesToLoad; ++iFile) {
-				const uint32_t															lenExpression						= snprintf(subscriptExpression, 62, "['%u']", iFile);
+				const uint32_t				lenExpression						= snprintf(subscriptExpression, 62, "['%u']", iFile);
 				::gpk::jsonExpressionResolve({subscriptExpression, lenExpression}, jsonReader, indexJSONNodeArrayPNGFileNames, fileNamePNG);
 				fullPathPNG.clear();
 				::gpk::pathNameCompose(pathPNGSuite, fileNamePNG, fullPathPNG);
@@ -60,17 +60,17 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 		}
 		{
 			// ---- Test our recently developed RLE algorithm.
-			::gpk::au32												sizesUncompressed;
-			::gpk::au8												rleBuffer;
-			::gpk::au32												sizesRLE;
-			uint32_t												sizeTotalUncompressed				= 0;
-			uint32_t												sizeTotalRLE						= 0;
+			::gpk::au32					sizesUncompressed;
+			::gpk::au8					rleBuffer;
+			::gpk::au32					sizesRLE;
+			uint32_t					sizeTotalUncompressed				= 0;
+			uint32_t					sizeTotalRLE						= 0;
 			for(uint32_t iFile = 0, countFilesToLoad = app.PNGImages.size(); iFile < countFilesToLoad; ++iFile) {
 				::gpk::view<::gpk::bgra>	viewToRLE{app.PNGImages[iFile].View.begin(), app.PNGImages[iFile].View.metrics().x * app.PNGImages[iFile].View.metrics().y};
 				sizesUncompressed.push_back(viewToRLE.size());
 				::gpk::rleEncode(viewToRLE, rleBuffer);
 				sizesRLE.push_back(rleBuffer.size());
-				const uint32_t											sizePNGInBytes			= viewToRLE.size() * sizeof(::gpk::bgra);
+				const uint32_t				sizePNGInBytes					= viewToRLE.size() * sizeof(::gpk::bgra);
 				//info_printf("--- RLE compression stats:"
 				//	"\nsizePNGRLE          : %u"
 				//	"\nsizePNGUncompressed : %u"
@@ -79,8 +79,8 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 				//	, sizePNGInBytes
 				//	, (float)rleBuffer.size() / sizePNGInBytes
 				//	);
-				sizeTotalRLE														+= rleBuffer.size();
-				sizeTotalUncompressed												+= sizePNGInBytes;
+				sizeTotalRLE			+= rleBuffer.size();
+				sizeTotalUncompressed	+= sizePNGInBytes;
 				rleBuffer.clear();
 			}
 			//info_printf("--- RLE compression stats:"

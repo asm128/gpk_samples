@@ -1,8 +1,8 @@
 #include "gpk_array.h"
 #include "gpk_matrix.h"
 
-#ifndef CED_MODEL_H_2983472398
-#define CED_MODEL_H_2983472398
+#ifndef CED_MODEL_H_23627
+#define CED_MODEL_H_23627
 
 namespace ced
 {
@@ -32,4 +32,4 @@ namespace ced
 
 } // namespace
 
-#endif // CED_MODEL_H_2983472398
+#endif // CED_MODEL_H_23627

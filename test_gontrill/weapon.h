@@ -1,7 +1,7 @@
 #include "gpk_view.h"
 
-#ifndef WEAPON_H_298364239
-#define WEAPON_H_298364239
+#ifndef WEAPON_H_23627
+#define WEAPON_H_23627
 
 enum WEAPON_TYPE : int8_t
 	{ WEAPON_TYPE_ARROW					= 0

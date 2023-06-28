@@ -8,8 +8,8 @@
 
 #include "gpk_udp_client.h"
 
-#ifndef CED_DEMO_08_H_298837492837
-#define CED_DEMO_08_H_298837492837
+#ifndef CED_DEMO_08_H_23627
+#define CED_DEMO_08_H_23627
 
 struct SDrawCache {
 	::gpk::array_pod<::gpk::n2i16>	PixelCoords				= {};
@@ -59,4 +59,4 @@ struct SApplication {
 														SApplication				(::gpk::SRuntimeValues& runtimeValues)	: Framework(runtimeValues)		{}
 };
 
-#endif // CED_DEMO_08_H_298837492837
+#endif // CED_DEMO_08_H_23627

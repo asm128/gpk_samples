@@ -4,8 +4,8 @@
 #include "gpk_label.h"
 #include "gpk_array.h"
 
-#ifndef KLIB_TEXT_H_923649827346982746982346298734623
-#define KLIB_TEXT_H_923649827346982746982346298734623
+#ifndef KLIB_TEXT_H_23627
+#define KLIB_TEXT_H_23627
 
 namespace klib
 {
@@ -71,4 +71,4 @@ namespace klib
 	static inline	bool				getMessageSlow			(::klib::SMessageSlow & message, const ::gpk::vcc & textToPrint, double lastFrameSeconds, double limit = 0.025f)	{ return getMessageSlow(message, textToPrint.begin(), textToPrint.size(), lastFrameSeconds, limit); }
 } // namespace
 
-#endif // KLIB_TEXT_H_923649827346982746982346298734623
+#endif // KLIB_TEXT_H_23627

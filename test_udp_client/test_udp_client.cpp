@@ -16,31 +16,32 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	return 0;
 }
 ::gpk::error_t			setup		(::gme::SApplication & app)						{
-	::gpk::SFramework				& framework					= app.Framework;
-	::gpk::SWindow					& mainWindow				= framework.RootWindow;
+	::gpk::SFramework			& framework					= app.Framework;
+	::gpk::SWindow				& mainWindow				= framework.RootWindow;
 	es_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
-	::gpk::SGUI						& gui						= *framework.GUI;
-	app.IdExit															= ::gpk::controlCreate(gui);
-	::gpk::SControlPlacement					& controlExit				= gui.Controls.Placement[app.IdExit];
-	controlExit.Area													= {{0, 0}, {64, 20}};
-	controlExit.Border													= {1, 1, 1, 1};
-	controlExit.Margin													= {1, 1, 1, 1};
-	controlExit.Align													= ::gpk::ALIGN_BOTTOM_RIGHT;
-	::gpk::SControlText				& controlText				= gui.Controls.Text[app.IdExit];
-	controlText.Text													= "Exit";
-	controlText.Align													= ::gpk::ALIGN_CENTER;
-	::gpk::SControlConstraints		& controlConstraints		= gui.Controls.Constraints[app.IdExit];
-	controlConstraints.AttachSizeToText.y								= app.IdExit;
-	controlConstraints.AttachSizeToText.x								= app.IdExit;
+	::gpk::SGUI					& gui						= *framework.GUI;
+	app.IdExit				= ::gpk::controlCreate(gui);
+	::gpk::SControlPlacement	& controlExit				= gui.Controls.Placement[app.IdExit];
+	controlExit.Area		= {{0, 0}, {64, 20}};
+	controlExit.Border		= {1, 1, 1, 1};
+	controlExit.Margin		= {1, 1, 1, 1};
+	controlExit.Align		= ::gpk::ALIGN_BOTTOM_RIGHT;
+	::gpk::SControlText			& controlText				= gui.Controls.Text[app.IdExit];
+	controlText.Text		= "Exit";
+	controlText.Align		= ::gpk::ALIGN_CENTER;
+	::gpk::SControlConstraints	& controlConstraints		= gui.Controls.Constraints[app.IdExit];
+	controlConstraints.AttachSizeToText.y	= app.IdExit;
+	controlConstraints.AttachSizeToText.x	= app.IdExit;
+
 	::gpk::controlSetParent(gui, app.IdExit, -1);
 	gpk_necall(::gpk::tcpipInitialize(), "Failed to initialize network subsystem: '%s'.", "Unknown error");
 
-	app.Client.AddressConnect											= {};
+	app.Client.AddressConnect	= {};
 	::gpk::tcpipAddress(9998, 0, ::gpk::TRANSPORT_PROTOCOL_UDP, app.Client.AddressConnect);	// If loading the remote IP from the json fails, we fall back to the local address.
 	{ // attempt to load address from config file.
-		const ::gpk::SJSONReader												& jsonReader						= framework.JSONConfig.Reader;
+		const ::gpk::SJSONReader		& jsonReader						= framework.JSONConfig.Reader;
 		{ //
-			::gpk::view_const_string												jsonIP								= {};
+			::gpk::vcs						jsonIP								= {};
 			gwarn_if(errored(::gpk::jsonExpressionResolve(::gpk::vcs{"application.test_udp_client.remote_ip"}, jsonReader, 0, jsonIP)), "Failed to load config from json! Last contents found: %s.", jsonIP.begin())
 			else {
 				info_printf("Remote IP: %s.", jsonIP.begin());

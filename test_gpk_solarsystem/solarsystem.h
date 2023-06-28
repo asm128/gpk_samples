@@ -7,8 +7,8 @@
 #include "gpk_ptr_obj.h"
 #include "gpk_img_color.h"
 
-#ifndef SOLARSYSTEM_H_92837423798
-#define SOLARSYSTEM_H_92837423798
+#ifndef SOLARSYSTEM_H_23627
+#define SOLARSYSTEM_H_23627
 
 namespace ssg 
 {
@@ -223,6 +223,6 @@ namespace ssg
 
 } // namespace
 
-#endif // SOLARSYSTEM_H_92837423798
+#endif // SOLARSYSTEM_H_23627
 
 // 08003451058 galicia

@@ -3,8 +3,8 @@
 
 #include <mutex>
 
-#ifndef APPLICATION_H_2078934982734
-#define APPLICATION_H_2078934982734
+#ifndef APPLICATION_H_23627
+#define APPLICATION_H_23627
 
 namespace gme // I'm gonna use a different namespace in order to test a few things about the macros.
 {
@@ -23,4 +23,4 @@ namespace gme // I'm gonna use a different namespace in order to test a few thin
 	};
 } // namespace
 
-#endif // APPLICATION_H_2078934982734
+#endif // APPLICATION_H_23627

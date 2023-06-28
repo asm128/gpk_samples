@@ -2,8 +2,8 @@
 #include "gpk_gui.h"
 #include "gpk_stl.h"
 
-#ifndef APPLICATION_H_098273498237423
-#define APPLICATION_H_098273498237423
+#ifndef APPLICATION_H_23627
+#define APPLICATION_H_23627
 
 struct SApplication {
 	::gpk::SFramework			Framework				;
@@ -18,4 +18,4 @@ struct SApplication {
 								SApplication			(::gpk::SRuntimeValues& runtimeValues)			noexcept	: Framework(runtimeValues) {}
 };
 
-#endif // APPLICATION_H_098273498237423
+#endif // APPLICATION_H_23627

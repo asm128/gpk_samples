@@ -1,7 +1,7 @@
 #include "klib_ascii_target.h"
 
-#ifndef KLIB_ASCII_CONSOLE_H_92384709283749082
-#define KLIB_ASCII_CONSOLE_H_92384709283749082
+#ifndef KLIB_ASCII_CONSOLE_H_23627
+#define KLIB_ASCII_CONSOLE_H_23627
 
 namespace klib
 {
@@ -38,4 +38,4 @@ namespace klib
 	}
 }
 
-#endif // KLIB_ASCII_CONSOLE_H_92384709283749082
+#endif // KLIB_ASCII_CONSOLE_H_23627

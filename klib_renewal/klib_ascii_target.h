@@ -3,8 +3,8 @@
 #include "gpk_color.h"
 #include "klib_ascii_color.h"
 
-#ifndef KLIB_ASCII_TARGET_H_9823740982374
-#define KLIB_ASCII_TARGET_H_9823740982374
+#ifndef KLIB_ASCII_TARGET_H_23627
+#define KLIB_ASCII_TARGET_H_23627
 
 namespace klib
 {
@@ -24,4 +24,4 @@ namespace klib
 	stainli	::gpk::error_t	asciiTargetCreate	(::klib::SASCIITarget& console, const ::gpk::n2<_tUnit>& size)	{ return ::klib::asciiTargetCreate(console, (uint32_t)size.x, (uint32_t)size.y); }
 } // namespace
 
-#endif // KLIB_ASCII_TARGET_H_9823740982374
+#endif // KLIB_ASCII_TARGET_H_23627

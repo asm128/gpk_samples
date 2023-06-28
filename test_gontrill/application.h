@@ -8,8 +8,8 @@
 #include "track.h"
 #include "gpk_line2.h"
 
-#ifndef APPLICATION_H_098273498237423
-#define APPLICATION_H_098273498237423
+#ifndef APPLICATION_H_23627
+#define APPLICATION_H_23627
 
 enum PARTICLE_TYPE : int8_t
 	{	PARTICLE_TYPE_SNOW			= 0
@@ -119,4 +119,4 @@ struct SApplication {
 								SApplication				(::gpk::SRuntimeValues& runtimeValues)			noexcept	: Framework(runtimeValues) {}
 };
 
-#endif // APPLICATION_H_098273498237423
+#endif // APPLICATION_H_23627

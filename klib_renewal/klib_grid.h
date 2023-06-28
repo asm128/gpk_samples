@@ -2,8 +2,8 @@
 
 #include "klib_text.h"
 
-#ifndef KLIB_GRID_H_902837982374
-#define KLIB_GRID_H_902837982374
+#ifndef KLIB_GRID_H_23627
+#define KLIB_GRID_H_23627
 namespace klib
 {
 	template<typename _tCell>

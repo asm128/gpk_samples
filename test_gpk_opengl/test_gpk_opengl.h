@@ -2,8 +2,8 @@
 
 #include "gpk_tri3.h"
 
-#ifndef TEST_GPK_OPENGL_H_284987234
-#define TEST_GPK_OPENGL_H_284987234
+#ifndef TEST_GPK_OPENGL_H_23627
+#define TEST_GPK_OPENGL_H_23627
 
 struct SApplication {
 	::gpk::SFramework	Framework				;

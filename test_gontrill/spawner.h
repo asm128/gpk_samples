@@ -1,7 +1,7 @@
 #include "gpk_array.h"
 
-#ifndef LEVEL_H_2908374982374
-#define LEVEL_H_2908374982374
+#ifndef LEVEL_H_23627
+#define LEVEL_H_23627
 
 struct SSpawnerConfig {
 			::gpk::view_const_string					Name;
@@ -93,4 +93,4 @@ static	const SSpawnerConfig						spawners[]					=
 	,	{"05_11", 0.5f, 10, 10, false, WEAPON_TYPE_INVALID, SHIP_CLASS_INVALID}
 	};
 
-#endif // LEVEL_H_2908374982374
+#endif // LEVEL_H_23627

@@ -1,8 +1,8 @@
 #include "gpk_color.h"
 
 /// Copyright 2016-2017 - asm128
-#ifndef KLIB_ASCII_COLOR_H_1209387102983710923709128370192873
-#define KLIB_ASCII_COLOR_H_1209387102983710923709128370192873
+#ifndef KLIB_ASCII_COLOR_H_23627
+#define KLIB_ASCII_COLOR_H_23627
 
 namespace klib
 {
@@ -60,4 +60,4 @@ namespace klib
 
 #define ascii_color_invert(_col) (((_col & 0xF0)>>4) | ((_col & 0xF)<<4))
 
-#endif // KLIB_ASCII_COLOR_H_1209387102983710923709128370192873
+#endif // KLIB_ASCII_COLOR_H_23627

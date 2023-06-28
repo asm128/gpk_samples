@@ -14,7 +14,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 
 ::gpk::error_t			cleanup		(::gme::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.RootWindow); }
 ::gpk::error_t			setup		(::gme::SApplication & app)						{
-	::gpk::SFramework				& framework							= app.Framework;
+	::gpk::SFramework		& framework			= app.Framework;
 	::gpk::SWindow					& mainWindow						= framework.RootWindow;
 	mainWindow.Size								= {1280, 720};
 	es_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));

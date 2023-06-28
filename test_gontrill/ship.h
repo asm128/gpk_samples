@@ -1,7 +1,7 @@
 #include "gontrill_base.h"
 
-#ifndef SHIP_H_2098379238
-#define SHIP_H_2098379238
+#ifndef SHIP_H_23627
+#define SHIP_H_23627
 
 enum SHIP_CLASS : int8_t
 	{ SHIP_CLASS_ASSAULT
@@ -50,4 +50,4 @@ struct SShip {
 				SHIP_CONTROL_TYPE						ControlType						;
 };
 
-#endif // SHIP_H_2098379238
+#endif // SHIP_H_23627

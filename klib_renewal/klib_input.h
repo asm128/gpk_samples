@@ -1,8 +1,8 @@
 #include "gpk_n3.h"
 #include "gpk_error.h"
 
-#ifndef KLIB_INPUT_H_20937492837423
-#define KLIB_INPUT_H_20937492837423
+#ifndef KLIB_INPUT_H_23627
+#define KLIB_INPUT_H_23627
 
 namespace klib
 {
@@ -31,4 +31,4 @@ namespace klib
 
 } // namespace
 
-#endif // KLIB_INPUT_H_20937492837423
+#endif // KLIB_INPUT_H_23627

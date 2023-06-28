@@ -1,8 +1,8 @@
 /// Copyright 2016-2017 - asm128
 #include "gpk_typeint.h"
 
-#ifndef KLIB_MISC_H_982143092634987160987328097642398
-#define KLIB_MISC_H_982143092634987160987328097642398
+#ifndef KLIB_MISC_H_23627
+#define KLIB_MISC_H_23627
 
 namespace klib
 {
@@ -60,4 +60,4 @@ namespace klib
 #pragma pack(pop)
 }
 
-#endif // KLIB_MISC_H_982143092634987160987328097642398
+#endif // KLIB_MISC_H_23627

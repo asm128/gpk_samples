@@ -2,8 +2,8 @@
 #include "gpk_typeint.h"
 #include "gpk_timer.h"
 
-#ifndef KLIB_TIMER_H_2390847012398470912837409812734
-#define KLIB_TIMER_H_2390847012398470912837409812734
+#ifndef KLIB_TIMER_H_23627
+#define KLIB_TIMER_H_23627
 
 namespace klib
 {
@@ -63,4 +63,4 @@ namespace klib
 };
 
 
-#endif // KLIB_TIMER_H_2390847012398470912837409812734
+#endif // KLIB_TIMER_H_23627

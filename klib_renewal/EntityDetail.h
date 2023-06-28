@@ -1,7 +1,7 @@
 #include "Game.h"
 
-#ifndef ENTITYDETAIL_H_29834729834
-#define ENTITYDETAIL_H_29834729834
+#ifndef ENTITYDETAIL_H_23627
+#define ENTITYDETAIL_H_23627
 
 //
 namespace klib {
@@ -72,4 +72,4 @@ namespace klib {
 	}
 }
 
-#endif // ENTITYDETAIL_H_29834729834
+#endif // ENTITYDETAIL_H_23627
