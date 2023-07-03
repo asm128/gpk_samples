@@ -35,7 +35,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Solar System Test");
 		controlConstraints.AttachSizeToControl	= {app.IdExit, -1};
 		::gpk::controlSetParent(gui, app.IdExit, -1);
 	}
-	gpk_necs(::ssg::solarSystemSetup(app.SolarSystemGame, "solarsystem.json"));
+	gpk_necs(::ssg::solarSystemSetup(app.SolarSystemGame));
 	return 0;
 }
 

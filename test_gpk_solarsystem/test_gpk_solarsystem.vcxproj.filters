@@ -18,9 +18,6 @@
     <ClInclude Include="application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ced_model.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="solarsystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
