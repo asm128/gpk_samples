@@ -7,7 +7,7 @@
 
 bool																	useItems					(const ::klib::SEntityTables & tables, ::klib::SGameMessages & message, ::klib::CCharacter& user, ::klib::CCharacter& target, bool bIsAIControlled);	// While in combat, displays a list of the available items to use.
 
-bool																	escape						(const ::gpk::vcc& escaperName, ::klib::SCharacterScore& escaperScore)									{
+bool																	escape						(const ::gpk::vcc & escaperName, ::klib::SCharacterScore& escaperScore)									{
 	printf("%s tries to escape!\n", escaperName.begin());
 	if ((rand() % 100) < 30) {
 		++escaperScore.EscapesSucceeded;

@@ -1,28 +1,14 @@
-#include "gpk_udp_client.h"
+#include "gpk_udp_client_app.h"
 #include "gpk_framework.h"
-#include "gpk_gui.h"
 
-#include <mutex>
+#ifndef TEST_UDP_CLIENT_H_23627
+#define TEST_UDP_CLIENT_H_23627
 
-#ifndef APPLICATION_H_23627
-#define APPLICATION_H_23627
+struct SApplication {
+	::gpk::SFramework		Framework	;
+	::gpk::SClient			Client			= {};
 
-namespace gme // I'm gonna use a different namespace in order to test a few things about the macros.
-{
-	struct SApplication {
-		::gpk::SFramework				Framework;
-		::gpk::pobj<::gpk::rtbgra8d32>	Offscreen		= {};
+							SApplication	(::gpk::SRuntimeValues & runtimeValues)	noexcept : Framework(runtimeValues) {}
+};
 
-		::gpk::cid_t					IdExit			= -1;
-
-		::std::mutex					LockGUI;
-		::std::mutex					LockRender;
-
-		::gpk::SUDPClient				Client;
-		::gpk::SUDPClient				ClientTest1;
-
-										SApplication	(::gpk::SRuntimeValues& runtimeValues)	: Framework(runtimeValues)		{}
-	};
-} // namespace
-
-#endif // APPLICATION_H_23627
+#endif // TEST_UDP_CLIENT_H_23627

@@ -94,7 +94,7 @@ namespace ssg
 	};
 
 #pragma pack(push, 1)
-	struct SStarDetail {
+	struct SDetailStar {
 		uint32_t					Mass					; // 1988500	// (10^24 kg)		
 		uint32_t					Gm						; // 132712		// (x 106 km3/s2)	
 		uint32_t					Volume					; // 1412000	// (1012 km3)		
@@ -115,7 +115,7 @@ namespace ssg
 		float						CentralDensity			; // 1.622		// x 105	kg/m3
 	};
 
-	struct SPlanetDetail {
+	struct SDetailPlanet {
 		float						Mass					; // 0.330		// (10^24 kg)	
 		uint32_t					Diameter				; // 4879		// (km)
 		uint32_t					Density					; // 5427		// (kg/m3)
@@ -137,6 +137,16 @@ namespace ssg
 		bool						RingSystem				; // false
 		bool						GlobalMagneticField		; // true
 	};
+
+	struct SCelestialBody {
+		union UBody {
+			SDetailPlanet	Planet	;
+			SDetailStar		Star	;
+		}	Body;
+	};
+
+	cnstxpr		size_t	s0 = sizeof(SDetailPlanet);
+	cnstxpr		size_t	s1 = sizeof(SDetailStar);
 #pragma pack(pop)
 
 	struct SStar {
@@ -165,8 +175,8 @@ namespace ssg
 	struct SSolarSystem {
 		::gpk::aobj<::ssg::SStar>			NamesStars						= {};
 		::gpk::aobj<::ssg::SPlanet>			NamesPlanets					= {};
-		::gpk::apod<::ssg::SStarDetail>		DetailStars						= {};
-		::gpk::apod<::ssg::SPlanetDetail>	DetailPlanets					= {};
+		::gpk::apod<::ssg::SDetailStar>		DetailStars						= {};
+		::gpk::apod<::ssg::SDetailPlanet>	DetailPlanets					= {};
 		::gpk::apod<::ssg::SStellarBody>	StellarBodies					= {};
 
 		::gpk::error_t						CreateStellarBody				(STELLAR_BODY type) {

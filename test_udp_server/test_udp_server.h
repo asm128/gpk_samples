@@ -1,31 +1,14 @@
-#include "gpk_udp_server.h"
-
+#include "gpk_udp_server_app.h"
 #include "gpk_framework.h"
-#include "gpk_gui.h"
-#include "gpk_aobj_pobj.h"
 
-#include <mutex>
+#ifndef TEST_UDP_SERVER_H_23627
+#define TEST_UDP_SERVER_H_23627
 
-#ifndef APPLICATION_H_23627
-#define APPLICATION_H_23627
+struct SApplication {
+	::gpk::SFramework			Framework	;
+	::gpk::po<::gpk::SServer>	Server;
 
-namespace gme // I'm gonna use a different namespace in order to test a few things about the macros.
-{
-	struct SApplication {
-		::gpk::SFramework					Framework;
-		::gpk::pobj<::gpk::rtbgra8d32>		Offscreen			= {};
-		::gpk::SUDPServer					Server				= {};
+								SApplication	(::gpk::SRuntimeValues & runtimeValues)	noexcept : Framework(runtimeValues) {}
+};
 
-		::gpk::cid_t						IdExit				= -1;
-
-		::std::mutex						LockGUI;
-		::std::mutex						LockRender;
-
-
-		::gpk::aapobj<::gpk::SUDPMessage>	MessagesToProcess;
-
-											SApplication		(::gpk::SRuntimeValues& runtimeValues)	: Framework(runtimeValues)		{}
-	};
-} // namespace
-
-#endif // APPLICATION_H_23627
+#endif // TEST_UDP_SERVER_H_23627

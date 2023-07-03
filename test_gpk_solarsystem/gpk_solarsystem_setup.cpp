@@ -39,16 +39,16 @@ stacxpr const char*		PLANET_IMAGE				[::ssg::PLANET_COUNT]	=	{	"mercury_color.pn
 //	::gpk::geometryBuildFromSTL();
 
 	SPlanet						planet					= {};
-	SPlanetDetail				planetdetail			= {};
+	SDetailPlanet				planetdetail			= {};
 	SStar						star					= {};
-	SStarDetail					stardetail				= {};
+	SDetailStar					stardetail				= {};
 
 	::gpk::SRigidBodyIntegrator	& bodies				= solarSystem.Bodies;
 	::ssg::SScene				& scene					= solarSystem.Scene;
 	//if constexpr(false && filename.size()) {
 	if (filename.size() && 0 == filename.size()) {
 		::gpk::SJSONFile			solarSystemFile			= {};
-		::gpk::jsonFileRead(solarSystemFile, filename);
+		gpk_necs(::gpk::jsonFileRead(solarSystemFile, filename));
 		::gpk::ai32					stellarBodyIndices;
 		const uint32_t				stellarBodyCount		= ::gpk::jsonObjectKeyList(solarSystemFile.Reader, 0, stellarBodyIndices);
 		::gpk::vcvcc				jsonView				= solarSystemFile.Reader.View;
@@ -121,7 +121,7 @@ stacxpr const char*		PLANET_IMAGE				[::ssg::PLANET_COUNT]	=	{	"mercury_color.pn
 						, planetdetail.DistanceFromSun			
 						, planetdetail.ObliquityToOrbit			
 						, planetdetail.LengthOfDay				
-						, PLANET_DAY							[ssg::PLANET_EARTH]
+						, PLANET_DAY[ssg::PLANET_EARTH]
 						, planetdetail.OrbitalPeriod			
 						, planetdetail.OrbitalInclination		
 						, 1.0// / planetdetail.DistanceFromSun	[ssg::PLANET_COUNT - 1] * 2500
@@ -196,15 +196,15 @@ stacxpr const char*		PLANET_IMAGE				[::ssg::PLANET_COUNT]	=	{	"mercury_color.pn
 			::gpk::pngFileLoad(pngCache, finalPath, solarSystem.Images[iPlanet + 1]);
 		}
 
-		//for(uint32_t iImage = 0; iImage < solarSystem.Image.size(); ++iImage) {
-		//	if(solarSystem.Image[iImage].Texels.size())
+		//for(uint32_t iImage = 0; iImage < solarSystem.Images.size(); ++iImage) {
+		//	if(solarSystem.Images[iImage].Texels.size())
 		//		continue;
-		//	solarSystem.Image[iImage].resize({512, 512});
-		//	for(uint32_t y = 0; y < solarSystem.Image[iImage].metrics().y; ++y) { // Generate noise color for planet texture
-		//		const double															ecuatorialShade			= cos(y * (1.0 / solarSystem.Image[iImage].metrics().y * ::gpk::math_2pi)) + 1.5;
-		//		uint32_t																rowOffset				= y * solarSystem.Image[iImage].metrics().x;
-		//		for(uint32_t x = 0; x < solarSystem.Image[iImage].metrics().x; ++x) {
-		//			solarSystem.Image[iImage].Texels[rowOffset + x]	= (colors[iImage % ::gpk::size(colors)] * ecuatorialShade * (1.0 - (rand() / 3.0 / (double)RAND_MAX))).Clamp();
+		//	solarSystem.Images[iImage].resize(::gpk::n2u16{512, 512});
+		//	for(uint32_t y = 0; y < solarSystem.Images[iImage].metrics().y; ++y) { // Generate noise color for planet texture
+		//		const double															ecuatorialShade			= cos(y * (1.0 / solarSystem.Images[iImage].metrics().y * ::gpk::math_2pi)) + 1.5;
+		//		uint32_t																rowOffset				= y * solarSystem.Images[iImage].metrics().x;
+		//		for(uint32_t x = 0; x < solarSystem.Images[iImage].metrics().x; ++x) {
+		//			solarSystem.Images[iImage].Texels[rowOffset + x]	= (::gpk::SColorFloat(colors[iImage % ::gpk::size(colors)] * ecuatorialShade * (1.0 - (rand() / 3.0 / (double)RAND_MAX)))).Clamp();
 		//		}
 		//	}
 		//}

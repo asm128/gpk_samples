@@ -45,7 +45,7 @@ _ReturnType													displayMenu								(size_t optionCount, const ::gpk::vcc
 }
 
 template <typename _ReturnType>
-_ReturnType													displayMenu								(const ::gpk::vcc& title, const ::gpk::view<const ::klib::SMenuItem<_ReturnType>> menuItems, int32_t maxItems = ~0U)		{
+_ReturnType													displayMenu								(const ::gpk::vcc & title, const ::gpk::view<const ::klib::SMenuItem<_ReturnType>> menuItems, int32_t maxItems = ~0U)		{
 	return displayMenu((menuItems.size() > (uint32_t)maxItems) ? maxItems : menuItems.size(), title, menuItems);
 }
 

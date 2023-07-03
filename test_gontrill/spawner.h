@@ -1,4 +1,6 @@
 #include "gpk_array.h"
+#include "ship.h"
+#include "weapon.h"
 
 #ifndef LEVEL_H_23627
 #define LEVEL_H_23627

@@ -1,144 +1,149 @@
+// Tip: Hold Left ALT + SHIFT while tapping or holding the arrow keys in order to select multiple columns and write on them at once.
+//		Also useful for copy & paste operations in which you need to copy a bunch of variable or function names and you can't afford the time of copying them one by one.
 #include "test_udp_server.h"
-#include "gpk_bitmap_file.h"
-#include "gpk_tcpip.h"
-#include "gpk_parse.h"
+#include "gpk_gui_control_list.h"
 
-//#define GPK_AVOID_LOCAL_APPLICATION_MODULE_MODEL_EXECUTABLE_RUNTIME
+#include "gpk_grid_copy.h"
+#include "gpk_grid_scale.h"
+#include "gpk_view_bit.h"
+#include "gpk_png.h"
+#include "gpk_sun.h"
+
 #include "gpk_app_impl.h"
+#include "gpk_bitmap_target.h"
 
-GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
+#include <DirectXColors.h>
 
-::gpk::error_t			cleanup		(::gme::SApplication & app)						{
-	::gpk::serverStop(app.Server);
-	::gpk::mainWindowDestroy(app.Framework.RootWindow);
-	::gpk::tcpipShutdown();
+GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "UDP Server Test");
+
+static	::gpk::error_t	loadNetworkConfig		(const ::gpk::SJSONReader & jsonConfig, ::gpk::vcc & port, ::gpk::vcc & adapter) {
+	::gpk::error_t				appNodeIndex;
+	gpk_necs(appNodeIndex = ::gpk::jsonExpressionResolve(::gpk::vcs{"application.test_udp_server"}, jsonConfig, 0));
+	return ::gpk::loadServerConfig(jsonConfig, appNodeIndex, port, adapter);
+}
+
+// --- Cleanup application resources.
+::gpk::error_t			cleanup					(::SApplication & app)											{
+	::gpk::SFramework			& framework				= app.Framework;
+	::gpk::SWindow				& mainWindow			= framework.RootWindow;
+
+	ws_if_failed(::gpk::serverStop(app.Server->UDP));
+	ws_if_failed(::gpk::mainWindowDestroy(mainWindow));
+	ws_if_failed(::gpk::tcpipShutdown());
 	return 0;
 }
 
-::gpk::error_t			setup		(::gme::SApplication & app)						{
-	::gpk::SFramework				& framework					= app.Framework;
-	::gpk::SWindow					& mainWindow				= framework.RootWindow;
-	es_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
-	::gpk::SGUI						& gui						= *framework.GUI;
-	app.IdExit															= ::gpk::controlCreate(gui);
-	::gpk::SControlPlacement		& controlExit				= gui.Controls.Placement[app.IdExit];
-	controlExit.Area													= {{0, 0}, {64, 20}};
-	controlExit.Border													= {1, 1, 1, 1};
-	controlExit.Margin													= {1, 1, 1, 1};
-	controlExit.Align													= ::gpk::ALIGN_BOTTOM_RIGHT;
-	::gpk::SControlText				& controlText				= gui.Controls.Text[app.IdExit];
-	controlText.Text													= "Exit";
-	controlText.Align													= ::gpk::ALIGN_CENTER;
-	::gpk::SControlConstraints		& controlConstraints		= gui.Controls.Constraints[app.IdExit];
-	controlConstraints.AttachSizeToText.y								= app.IdExit;
-	controlConstraints.AttachSizeToText.x								= app.IdExit;
-	::gpk::controlSetParent(gui, app.IdExit, -1);
-	::gpk::tcpipInitialize();
-	uint64_t																port						= 9998;
-	uint64_t																adapter						= 0;
-	::gpk::vcc																jsonPort					= {};
-	const ::gpk::SJSONReader												& jsonReader				= framework.JSONConfig.Reader;
-	{ // load port from config file
-		gwarn_if(errored(::gpk::jsonExpressionResolve(::gpk::vcs{"application.test_udp_server.listen_port"}, jsonReader, 0, jsonPort)), "Failed to load config from json! Last contents found: %s.", jsonPort.begin())
-		else {
-			::gpk::parseIntegerDecimal(jsonPort, port);
-			info_printf("Remote port: %u.", (uint32_t)port);
-		}
-		jsonPort															= {};
-		gwarn_if(errored(::gpk::jsonExpressionResolve(::gpk::vcs{"application.test_udp_server.adapter"}, jsonReader, 0, jsonPort)), "Failed to load config from json! Last contents found: %s.", jsonPort.begin())
-		else {
-			::gpk::parseIntegerDecimal(jsonPort, adapter);
-			info_printf("Adapter: %u.", (uint32_t)adapter);
-		}
-	}
-	::gpk::serverStart(app.Server, (uint16_t)port, (uint16_t)adapter);
+static	::gpk::error_t	updateSizeDependentResources(::SApplication & app)											{
+	::gpk::SWindow				& mainWindow			= app.Framework.RootWindow;
+	const ::gpk::n2u16			newSize					= mainWindow.Size;
+	gpk_necs(mainWindow.BackBuffer->resize(newSize, ::gpk::bgra{0, 0, 0, 0}, 0xFFFFFFFF));
+	mainWindow.Resized		= false;
 	return 0;
 }
 
-::gpk::error_t			update		(::gme::SApplication & app, bool exitSignal)	{
-	::gpk::STimer				timer;
-	rvis_if(::gpk::APPLICATION_STATE_EXIT, exitSignal);
-	{
-		::std::lock_guard			lock						(app.LockRender);
-		app.Framework.RootWindow.BackBuffer									= app.Offscreen;
+static	::gpk::error_t	processScreenEvent		(::SApplication & app, const ::gpk::SEventView<::gpk::EVENT_SCREEN> & screenEvent) { 
+	switch(screenEvent.Type) {
+	default: break;
+	case ::gpk::EVENT_SCREEN_Create:
+	case ::gpk::EVENT_SCREEN_Resize: 
+		gpk_necs(::updateSizeDependentResources(app));
+		break;
 	}
-	::gpk::SFramework			& framework					= app.Framework;
-	rvis_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework));
-
-	::gpk::SGUI					& gui			= *framework.GUI;
-	::gpk::acid					toProcess		= {};
-	if(1 == ::gpk::guiProcessControls(gui, [&app](::gpk::cid_t iControl) { return one_if(iControl == app.IdExit); }))
-		return 1;
-
-	static	uint32_t														currentMessage;
-	char																	messageToSend	[256]		= {};
-	{
-		::std::lock_guard														lock						(app.Server.Mutex);
-		app.MessagesToProcess.resize(app.Server.Clients.size());
-		for(uint32_t iClient = 0, countClients = app.Server.Clients.size(); iClient < countClients; ++iClient) {
-			::gpk::pnco<::gpk::SUDPConnection>									client						= app.Server.Clients[iClient];
-			if(client->State != ::gpk::UDP_CONNECTION_STATE_IDLE || 0 == client->KeyPing)
-				continue;
-			{
-				::std::lock_guard														lockRecv					(client->Queue.MutexReceive);
-				for(int32_t iMessage = 0; iMessage < (int32_t)client->Queue.Received.size(); ++iMessage) {
-					if(client->Queue.Received[iMessage]->Command.Type == ::gpk::ENDPOINT_COMMAND_TYPE_RESPONSE)
-						continue;
-					::gpk::pobj<::gpk::SUDPMessage>							messageReceived				= client->Queue.Received[iMessage];
-					gpk_necall(app.MessagesToProcess[iClient].push_back(messageReceived), "%s", "Out of memory?");
-					client->Queue.Received.remove_unordered(iMessage--);
-				}
-			}
-
-		}
-		::gpk::sleep(10);
-	}
-	for(uint32_t iClient = 0; iClient < app.MessagesToProcess.size(); ++iClient) {
-		const ::gpk::apobj<::gpk::SUDPMessage>	& clientQueue				= app.MessagesToProcess[iClient];
-		for(uint32_t iMessage = 0; iMessage < clientQueue.size(); ++iMessage) {
-			::gpk::pobj<::gpk::SUDPMessage>			messageReceived				= clientQueue[iMessage];
-			::gpk::vcu8								viewPayload					= messageReceived->Payload;
-			info_printf("Client %i received: %s.", iClient, viewPayload.begin());
-			sprintf_s(messageToSend, "Message arrived(true, true    ): %u", currentMessage++); 
-			{
-				::std::lock_guard									lock						(app.Server.Mutex);
-				::gpk::pnco<::gpk::SUDPConnection>					client						= app.Server.Clients[iClient];
-				if(client->State != ::gpk::UDP_CONNECTION_STATE_IDLE)
-					continue;
-				::gpk::connectionPushData(*client, client->Queue, ::gpk::vcs{messageToSend}, true, true	, 10);
-				//sprintf_s(messageToSend, "Message arrived(false, true   ): %u", currentMessage++); ::gpk::connectionPushData(*client, client->Queue, ::gpk::vcs{messageToSend}, false, true	, 10);
-				//sprintf_s(messageToSend, "Message arrived(true, false   ): %u", currentMessage++); ::gpk::connectionPushData(*client, client->Queue, ::gpk::vcs{messageToSend}, true, false	, 10);
-				//sprintf_s(messageToSend, "Message arrived(false, false  ): %u", currentMessage++); ::gpk::connectionPushData(*client, client->Queue, ::gpk::vcs{messageToSend}, false, false	, 10);
-				//
-				//sprintf_s(messageToSend, "Message arrived(true, true	) x: %u", currentMessage++); ::gpk::connectionPushData(*client, client->Queue, ::gpk::vcs{messageToSend}, true, true	, 10);
-				//sprintf_s(messageToSend, "Message arrived(false, true	) x: %u", currentMessage++); ::gpk::connectionPushData(*client, client->Queue, ::gpk::vcs{messageToSend}, false, true	, 10);
-				//sprintf_s(messageToSend, "Message arrived(true, false	) x: %u", currentMessage++); ::gpk::connectionPushData(*client, client->Queue, ::gpk::vcs{messageToSend}, true, false	, 10);
-				//sprintf_s(messageToSend, "Message arrived(false, false	) x: %u", currentMessage++); ::gpk::connectionPushData(*client, client->Queue, ::gpk::vcs{messageToSend}, false, false, 10);
-			}
-		}
-	}
-	app.MessagesToProcess.clear();
-
-	//timer.Frame();
-	//warning_printf("Update time: %f.", (float)timer.LastTimeSeconds);
 	return 0;
 }
 
+static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SSystemEvent & sysEvent) { 
+	switch(sysEvent.Type) {
+	default: break;
+	case ::gpk::SYSTEM_EVENT_Screen	: return ::gpk::eventExtractAndHandle<::gpk::EVENT_SCREEN		>(sysEvent, [&app](const ::gpk::SEventView<::gpk::EVENT_SCREEN		> & screenEvent) { return processScreenEvent(app, screenEvent); }); 
+	case ::gpk::SYSTEM_EVENT_GUI	: return ::gpk::eventExtractAndHandle<::gpk::EVENT_GUI_CONTROL	>(sysEvent, [&app](const ::gpk::SEventView<::gpk::EVENT_GUI_CONTROL	> & screenEvent) { return ::gpk::processGUIEvent(*app.Server, *app.Framework.GUI, screenEvent); }); 
+	}
+	return 0;
+}
 
-::gpk::error_t			draw		(::gme::SApplication & app)						{
-	::gpk::STimer															timer;
-	::gpk::pobj<::gpk::rtbgra8d32>	target;
-	target.create();
-	target->resize(app.Framework.RootWindow.Size, {0xFF, 0x40, 0x7F, 0xFF}, (uint32_t)-1);
-	{
-		::std::lock_guard														lock					(app.LockGUI);
-		::gpk::guiDraw(*app.Framework.GUI, target->Color.View);
-	}
-	{
-		::std::lock_guard														lock					(app.LockRender);
-		app.Offscreen														= target;
-	}
-	//timer.Frame();
-	//warning_printf("Draw time: %f.", (float)timer.LastTimeSeconds);
+::gpk::error_t			setup					(::SApplication& app)											{
+	::gpk::SFramework			& framework				= app.Framework;
+	::gpk::SWindow				& mainWindow			= framework.RootWindow;
+	mainWindow.Size			= {1280, 720};
+	gpk_necs(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input));
+
+	gpk_necs(::gpk::setupGUI(app.Server->UI, *framework.GUI));
+
+	gpk_necs(::gpk::tcpipInitialize());
+
+	ws_if_failed(::loadNetworkConfig(framework.JSONConfig.Reader, app.Server->Port, app.Server->Adapter))
+	es_if_failed(::gpk::serverStart(*app.Server, *framework.GUI));
+	return 0;
+}
+
+::gpk::error_t			update					(::SApplication & app, bool systemRequestedExit) {
+	::gpk::SFramework			& framework				= app.Framework;
+	::gpk::SWindow				& mainWindow			= app.Framework.RootWindow;
+	::gpk::SGUI					& gui					= *framework.GUI;
+
+	bool						systemExit				= false;
+
+	::gpk::TQueueSystemEvent	eventsToProcess			= mainWindow.EventQueue;
+	gpk_necs(eventsToProcess.append(gui.Controls.EventQueue));
+	gpk_necs(eventsToProcess.for_each([&app, &systemExit](const ::gpk::pobj<::gpk::SSystemEvent> & sysEvent) { 
+		::gpk::error_t				result; 
+		gpk_necs(result = ::processSystemEvent(app, *sysEvent)); 
+		if(result == 1) 
+			systemExit				= true; 
+		return result;
+	}));
+
+	rvi_if(::gpk::APPLICATION_STATE_EXIT, systemExit || systemRequestedExit, "%s || %s", ::gpk::bool2char(systemExit) || ::gpk::bool2char(systemRequestedExit));
+
+	::gpk::pau8					payloadCache;
+	app.Server->UDP.Clients.enumerate([&app, &eventsToProcess, &payloadCache](uint32_t & iClient, ::gpk::pobj<::gpk::SUDPConnection> & client){
+		eventsToProcess.for_each([&app, &iClient, &client, &payloadCache](::gpk::pobj<::gpk::SSystemEvent> & ev){
+			payloadCache.create();
+			gpk_necs(ev->Save(*payloadCache));
+			gpk_necs(app.Server->QueueToSend[iClient]->push_back(payloadCache));
+ 			return 0;
+		});
+	});
+
+	int32_t						serverResult;
+	es_if_failed(serverResult = ::gpk::serverUpdate(*app.Server, gui));
+	rvi_if(::gpk::APPLICATION_STATE_EXIT, serverResult == 1, "User requested close. Terminating execution.");
+
+	app.Server->QueueReceived.for_each([&app](::gpk::TUDPQueue & messages) {
+		messages.enumerate([&app](uint32_t & index, ::gpk::pobj<::gpk::SUDPMessage> & message) {
+			if(!message)
+				return 0;
+
+			gpk::vcu8						input					= message->Payload;
+			gpk::pobj<gpk::SSystemEvent>	newEvent;
+			gpk_necs(newEvent->Load(input));
+			info_printf("Received '%s' from client %i: %s.", ::gpk::get_enum_namep(newEvent->Type), index, ::gpk::get_value_namep(newEvent->Type));
+			return 0;
+		});
+		messages.clear();
+	});
+
+	//-----------------------------
+	::gpk::STimer				& timer					= app.Framework.Timer;
+	char						buffer	[256]			= {};
+	sprintf_s(buffer, "[%u x %u]. FPS: %g. Last frame seconds: %g.", mainWindow.Size.x, mainWindow.Size.y, 1 / timer.LastTimeSeconds, timer.LastTimeSeconds);
+	::HWND						windowHandle			= mainWindow.PlatformDetail.WindowHandle;
+	SetWindowTextA(windowHandle, buffer);
+	
+	return ::gpk::updateFramework(framework);
+}
+
+::gpk::error_t			draw					(::SApplication & app)	{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
+	const ::gpk::n3f32			sunlightPos				= ::gpk::calcSunPosition();
+	const double				sunlightFactor			= ::gpk::calcSunlightFactor();
+	const ::gpk::rgbaf			clearColor				= ::gpk::interpolate_linear(::gpk::DARKBLUE * .25, ::gpk::LIGHTBLUE * 1.1, sunlightFactor);
+
+	::gpk::SFramework			& framework				= app.Framework;
+	::gpk::prtbgra8d32			backBuffer				= framework.RootWindow.BackBuffer;
+	backBuffer->resize(framework.RootWindow.BackBuffer->Color.metrics(), clearColor, (uint32_t)-1);
+	gpk_necs(::gpk::guiDraw(*framework.GUI, backBuffer->Color));
+	memcpy(framework.RootWindow.BackBuffer->Color.View.begin(), backBuffer->Color.View.begin(), backBuffer->Color.View.byte_count());
+	//::gpk::grid_mirror_y(framework.RootWindow.BackBuffer->Color.View, backBuffer->Color.View);
+	//framework.RootWindow.BackBuffer	= backBuffer;
 	return 0;
 }
