@@ -96,7 +96,7 @@ static	::gpk::error_t	updateEntityTransforms		(uint32_t iEntity, ::gpk::array_ob
 
 int													ssg::solarSystemUpdate			(ssg::SSolarSystemGame & solarSystem, double secondsLastFrame, ::gpk::pobj<::gpk::rtbgra8d32> & target)	{
 	// ------------------------------------------- Handle input
-	::gpk::SRigidBodyIntegrator								& bodies						= solarSystem.Bodies;
+	::gpk::SRigidBodyIntegrator								& bodies						= solarSystem.Engine.Integrator;
 	::ssg::SScene											& scene							= solarSystem.Scene;
 
 	scene.Transform.resize(solarSystem.Entities.size());
@@ -187,7 +187,6 @@ int													ssg::solarSystemUpdate			(ssg::SSolarSystemGame & solarSystem, d
 			::gpk::drawTriangle(targetPixels, entityGeometry, iTriangle, matrixTransform, matrixTransformView, lightVector, iEntity ? ::gpk::BLACK : ::gpk::WHITE, pixelCoords, pixelVertexWeights, entityImage, lightPoints, lightColors, depthBuffer);
 		}
 	}
-	::drawDebris(targetPixels, solarSystem.SunFire, matrixView, depthBuffer);
 
 	return ::drawDebris(targetPixels, solarSystem.SunFire, matrixView, depthBuffer);
 }

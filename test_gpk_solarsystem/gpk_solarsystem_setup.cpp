@@ -40,7 +40,7 @@ stacxpr const char*		PLANET_IMAGE				[::ssg::PLANET_COUNT]	=	{	"mercury_color.pn
 
 	SPlanet						planet					= {};
 	
-	::gpk::SRigidBodyIntegrator	& bodies				= solarSystem.Bodies;
+	::gpk::SRigidBodyIntegrator	& bodies				= solarSystem.Engine.Integrator;
 	::ssg::SScene				& scene					= solarSystem.Scene;
 	solarSystem.Scene.Pivot.resize(::ssg::PLANET_COUNT + 1); //
 	for(uint32_t iModel = 0; iModel < solarSystem.Scene.Pivot.size(); ++iModel) {
@@ -73,8 +73,8 @@ stacxpr const char*		PLANET_IMAGE				[::ssg::PLANET_COUNT]	=	{	"mercury_color.pn
 		int32_t													iEntityPlanet				= solarSystem.Entities.push_back({iEntityOrbit, 0, (int32_t)iPlanet + 1, (int32_t)iPlanet + 1, (int32_t)iBodyPlanet});
 		solarSystem.Entities[iEntityOrbit].Children.push_back(iEntityPlanet);
 	}
-	for(uint32_t iRigidBody = 0; iRigidBody < solarSystem.Bodies.Flags.size(); ++iRigidBody)
-		solarSystem.Bodies.Flags[iRigidBody].Active	= true;
+	for(uint32_t iRigidBody = 0; iRigidBody < solarSystem.Engine.Integrator.Flags.size(); ++iRigidBody)
+		solarSystem.Engine.Integrator.Flags[iRigidBody].Active	= true;
 
 	::gpk::bgra										colors []						=
 		{ ::gpk::YELLOW
@@ -89,7 +89,7 @@ stacxpr const char*		PLANET_IMAGE				[::ssg::PLANET_COUNT]	=	{	"mercury_color.pn
 		, ::gpk::YELLOW
 		};
 
-	::gpk::SSurfaceManager	& surfaces		= solarSystem.Graphics->Surfaces;
+	::gpk::SSurfaceManager	& surfaces		= solarSystem.Engine.Scene->Graphics->Surfaces;
 
 
 	solarSystem.Images.resize(ssg::PLANET_COUNT + 1);
@@ -120,8 +120,8 @@ stacxpr const char*		PLANET_IMAGE				[::ssg::PLANET_COUNT]	=	{	"mercury_color.pn
 
 		surfaces[iSurface]->Data					= loaded.Texels.u8();
 		surfaces[iSurface]->Desc.BitDepth			= 8;
-		surfaces[iSurface]->Desc.ColorType		= ::gpk::COLOR_TYPE_BGRA;
-		surfaces[iSurface]->Desc.Dimensions		= loaded.metrics().u16();
+		surfaces[iSurface]->Desc.ColorType			= ::gpk::COLOR_TYPE_BGRA;
+		surfaces[iSurface]->Desc.Dimensions			= loaded.metrics().u16();
 		surfaces[iSurface]->Desc.MethodFilter		= 0;
 		surfaces[iSurface]->Desc.MethodInterlace	= 0;
 		surfaces[iSurface]->Desc.MethodCompression	= 0;

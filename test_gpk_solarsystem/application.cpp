@@ -39,7 +39,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Solar System Test");
 	return 0;
 }
 
-::gpk::error_t			update		(::gme::SApplication & app, bool exitSignal)	{
+::gpk::error_t			update			(::gme::SApplication & app, bool exitSignal)	{
 	//::gpk::STimer									timer;
 	rvis_if(::gpk::APPLICATION_STATE_EXIT, exitSignal);
 	{
@@ -63,22 +63,44 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Solar System Test");
 	//::gpk::STimer															timer;
 	::gpk::pobj<::gpk::rtbgra8d32>	target;
 	target->resize(app.Framework.RootWindow.Size, {}, (uint32_t)-1);
-	//::gpk::pobj<::gpk::rtbgra8d32>	targetGame;
-	//targetGame->resize(app.Framework.RootWindow.Size / 2, {}, (uint32_t)-1);
+
+	const ::gpk::n3f32	cameraPosition	= app.SolarSystemGame.Scene.Camera.Position;
+	const ::gpk::n3f32	cameraTarget	= app.SolarSystemGame.Scene.Camera.Target;
+	const ::gpk::n3f32	cameraUp		= {0, 1};
+
+	const ::gpk::n2u16			offscreenMetrics	= target->Color.View.metrics16();
+
+	::gpk::n3f32				cameraFront			= (cameraTarget - cameraPosition).Normalized();
+
+	::gpk::SEngineSceneConstants	constants		= {};
+	constants.CameraPosition	= cameraPosition;
+	constants.CameraFront		= cameraFront;
+	constants.LightPosition		= {0, 10, 0};
+	constants.LightDirection	= {0, -1, 0};
+
+	::gpk::minmax				nearFar 			= {.0001f, 10000.0f}; 
+
+	constants.View.LookAt(cameraPosition, cameraTarget, cameraUp);
+	constants.Perspective.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, nearFar.Min, nearFar.Max);
+	constants.Screen.ViewportLH(offscreenMetrics);
+	constants.VP			= constants.View * constants.Perspective;
+	constants.VPS			= constants.VP * constants.Screen;
+
+	::gpk::drawScene(target->Color, target->DepthStencil, app.SolarSystemGame.Engine.Scene->RenderCache, *app.SolarSystemGame.Engine.Scene, constants);
 
 	::ssg::solarSystemUpdate(app.SolarSystemGame, app.Framework.Timer.LastTimeSeconds, target);
 
 	//::gpk::grid_scale(target->Color.View, targetGame->Color.View);
 
 	{
-		::std::lock_guard														lock					(app.LockGUI);
+		::std::lock_guard			lock					(app.LockGUI);
 		::gpk::guiDraw(*app.Framework.GUI, target->Color.View);
 	}
 	{
-		::std::lock_guard														lock					(app.LockRender);
-		app.Offscreen														= target;
+		::std::lock_guard			lock					(app.LockRender);
+		app.Offscreen			= target;
 	}
-	app.Framework.RootWindow.Repaint									= true;
+	app.Framework.RootWindow.Repaint	= true;
 	//timer.Frame();
 	//warning_printf("Draw time: %f.", (float)timer.LastTimeSeconds);
 	return 0;

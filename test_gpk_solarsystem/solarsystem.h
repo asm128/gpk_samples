@@ -1,13 +1,11 @@
-#include "gpk_geometry.h"
+#include "gpk_engine.h"
+
 #include "gpk_model.h"
-#include "gpk_camera.h"
-#include "gpk_rigidbody.h"
 #include "gpk_particle.h"
 
-#include "gpk_ptr_obj.h"
-#include "gpk_img_color.h"
-#include "gpk_engine.h"
 #include "gpk_view_color.h"
+
+#include "gpk_camera.h"
 
 #ifndef SOLARSYSTEM_H_23627
 #define SOLARSYSTEM_H_23627
@@ -93,8 +91,7 @@ namespace ssg
 	};
 
 	struct SSolarSystemGame {
-		::gpk::SRigidBodyIntegrator				Bodies							= {};
-		::gpk::pobj<::gpk::SEngineGraphics>		Graphics;
+		::gpk::SEngine							Engine;
 
 		::ssg::SDebris							SunFire							= {};
 		::ssg::SScene							Scene							= {};
@@ -103,8 +100,8 @@ namespace ssg
 		::gpk::aobj<::gpk::SGeometryBuffers>	Geometries						= {};
 	};
 
-	::gpk::error_t									solarSystemSetup				(::ssg::SSolarSystemGame & sunsystem);
-	::gpk::error_t									solarSystemUpdate				(::ssg::SSolarSystemGame & sunsystem, double secondsLastFrame, ::gpk::pobj<::gpk::rtbgra8d32> & target);
+	::gpk::error_t		solarSystemSetup				(::ssg::SSolarSystemGame & sunsystem);
+	::gpk::error_t		solarSystemUpdate				(::ssg::SSolarSystemGame & sunsystem, double secondsLastFrame, ::gpk::pobj<::gpk::rtbgra8d32> & target);
 
 } // namespace
 
