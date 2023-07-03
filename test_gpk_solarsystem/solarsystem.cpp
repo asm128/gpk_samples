@@ -177,7 +177,7 @@ int													ssg::solarSystemUpdate			(ssg::SSolarSystemGame & solarSystem, d
 
 		matrices.Scale		.Scale			(scene.Pivot[entity.Model].Scale		, true);
 		matrices.Position	.SetTranslation	(scene.Pivot[entity.Model].Position	, true);
-		::gpk::g8bgra						entityImage					= solarSystem.Images[entity.Images];
+		::gpk::gc8bgra						entityImage					= solarSystem.Images[entity.Images];
 		::gpk::SGeometryBuffers				& entityGeometry			= solarSystem.Geometries[entity.Geometry];
 		matrixTransform										= matrices.Scale * matrices.Position * matrixTransform;
 		::gpk::m4<float>									matrixTransformView			= matrixTransform * matrixView;

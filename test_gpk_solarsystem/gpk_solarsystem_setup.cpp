@@ -89,13 +89,43 @@ stacxpr const char*		PLANET_IMAGE				[::ssg::PLANET_COUNT]	=	{	"mercury_color.pn
 		, ::gpk::YELLOW
 		};
 
+	::gpk::SSurfaceManager	& surfaces		= solarSystem.Graphics->Surfaces;
+
+
 	solarSystem.Images.resize(ssg::PLANET_COUNT + 1);
+
+
 	::gpk::SPNGData		pngCache;
-	::gpk::pngFileLoad(pngCache, "../gpk_data/images/sun_color.png", solarSystem.Images[0]);
+	::gpk::img8bgra		loaded;
+
+	::gpk::pngFileLoad(pngCache, "../gpk_data/images/sun_color.png", loaded);
+
+	int32_t					iSurface		= surfaces.Create(::gpk::vcs{"sun_color.png"});
+
+	surfaces[iSurface]->Data					= loaded.Texels.u8();
+	surfaces[iSurface]->Desc.BitDepth			= 8;
+	surfaces[iSurface]->Desc.ColorType			= ::gpk::COLOR_TYPE_BGRA;
+	surfaces[iSurface]->Desc.Dimensions			= loaded.metrics().u16();
+	surfaces[iSurface]->Desc.MethodFilter		= 0;
+	surfaces[iSurface]->Desc.MethodInterlace	= 0;
+	surfaces[iSurface]->Desc.MethodCompression	= 0;
+	solarSystem.Images[0] = ::gpk::gc8bgra{(const gpk::bgra*)surfaces[iSurface]->Data.begin(), surfaces[iSurface]->Desc.Dimensions.u32()};
+
 	for(uint32_t iPlanet = 0; iPlanet < ::ssg::PLANET_COUNT; ++iPlanet) {
-		char														finalPath[256] = {};
+		iSurface			= surfaces.Create(::gpk::vcs{PLANET_IMAGE[iPlanet], (uint32_t)-1});
+
+		char					finalPath[256]	= {};
 		sprintf_s(finalPath, "../gpk_data/images/%s", PLANET_IMAGE[iPlanet]);
-		::gpk::pngFileLoad(pngCache, finalPath, solarSystem.Images[iPlanet + 1]);
+		::gpk::pngFileLoad(pngCache, finalPath, loaded);
+
+		surfaces[iSurface]->Data					= loaded.Texels.u8();
+		surfaces[iSurface]->Desc.BitDepth			= 8;
+		surfaces[iSurface]->Desc.ColorType		= ::gpk::COLOR_TYPE_BGRA;
+		surfaces[iSurface]->Desc.Dimensions		= loaded.metrics().u16();
+		surfaces[iSurface]->Desc.MethodFilter		= 0;
+		surfaces[iSurface]->Desc.MethodInterlace	= 0;
+		surfaces[iSurface]->Desc.MethodCompression	= 0;
+		solarSystem.Images[iPlanet + 1] = ::gpk::gc8bgra{(const gpk::bgra*)surfaces[iSurface]->Data.begin(), surfaces[iSurface]->Desc.Dimensions.u32()};
 	}
 
 	//for(uint32_t iImage = 0; iImage < solarSystem.Images.size(); ++iImage) {

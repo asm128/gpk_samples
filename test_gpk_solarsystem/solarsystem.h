@@ -6,6 +6,8 @@
 
 #include "gpk_ptr_obj.h"
 #include "gpk_img_color.h"
+#include "gpk_engine.h"
+#include "gpk_view_color.h"
 
 #ifndef SOLARSYSTEM_H_23627
 #define SOLARSYSTEM_H_23627
@@ -91,12 +93,13 @@ namespace ssg
 	};
 
 	struct SSolarSystemGame {
+		::gpk::SRigidBodyIntegrator				Bodies							= {};
+		::gpk::pobj<::gpk::SEngineGraphics>		Graphics;
+
 		::ssg::SDebris							SunFire							= {};
 		::ssg::SScene							Scene							= {};
-		::gpk::SRigidBodyIntegrator				Bodies							= {};
-
 		::gpk::aobj<::ssg::SEntity>				Entities						= {};
-		::gpk::aobj<::gpk::img<::gpk::bgra>>	Images							= {};
+		::gpk::aobj<::gpk::gc8bgra>				Images							= {};
 		::gpk::aobj<::gpk::SGeometryBuffers>	Geometries						= {};
 	};
 
