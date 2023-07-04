@@ -16,8 +16,8 @@ using namespace gpk;
 			uint32_t oldTokenStart		= index + tokenTarget.size();
 			uint32_t trailingPathStart	= oldTokenStart + tokenToReplace.size();
 			uint32_t trailingPathSize	= modified.size() - trailingPathStart;
-
-			memcpy(&modified[oldTokenStart], &modified[trailingPathStart], trailingPathSize);
+			if(trailingPathSize)
+				memcpy(&modified[oldTokenStart], &modified[trailingPathStart], trailingPathSize);
 
 			modified.resize(modified.size() - tokenToReplace.size());
 			always_printf("\nModified: '%s'.", modified.begin());
@@ -32,8 +32,10 @@ using namespace gpk;
 
 
 int main() {
-	stacxpr vcc				tokensToReplace[2]	= {vcc{5, "campp"}, vcc{10, "c\0a\0m\0p\0p"}};
-	stacxpr vcc				tokensTarget	[2]	= {vcc{6, "ssiege"}, vcc{11, "s\0s\0i\0e\0g\0e"}};
+	const ::gpk::vcc		skip[]			= {::gpk::vcs{".git"}, ::gpk::vcs{".vs"}};
+
+	const vcc				tokensToReplace	[3]	= {::gpk::vcs{"d1"			}, "d\01"								, "D\01"							};
+	const vcc				tokensTarget	[3]	= {::gpk::vcs{"test_engine" }, "t\0e\0s\0t\0_\0e\0n\0g\0i\0n\0e"	, "T\0E\0S\0T\0_\0E\0N\0G\0I\0N\0E"	};
 
 	::gpk::SPathContents	pathContents;
 	gpk_necs(::gpk::pathList("../", pathContents));
@@ -43,22 +45,34 @@ int main() {
 
 	::gpk::aachar			pathsModified;
 
-
 	for(uint32_t iPath = 0; iPath < pathsOriginal.size(); ++iPath) {
 		achar					modified		= pathsOriginal[iPath];
-		::replace(tokensToReplace[0], tokensTarget[0], modified);
+		bool process = false;
+		for(auto sskip : skip) {
+			if(-1 == ::gpk::find_sequence_pod(sskip, {modified})) {
+				process = true;
+				break;
+			}
+		}
+		if(process)
+			::replace(tokensToReplace[0], tokensTarget[0], modified);
 		pathsModified.push_back(modified);
 	}
 
-	const ::gpk::vcc		skip			= ::gpk::vcs{".git"};
 	for(uint32_t iPath = 0; iPath < pathsOriginal.size(); ++iPath) {
 		const ::gpk::vcc		modified		= pathsModified[iPath];
 		if(-1 == ::gpk::find_sequence_pod(tokensTarget[0], {modified}))
 			continue;
 
-		if(-1 != ::gpk::find_sequence_pod(skip, {modified}))
+		bool noprocess = false;
+		for(auto sskip : skip) {
+			if(-1 != ::gpk::find_sequence_pod(sskip, {modified})) {
+				noprocess = true;
+				break;
+			}
+		}
+		if(noprocess)
 			continue;
-
 		const int32_t			iLastSlash		= ::gpk::findLastSlash(modified);
 		if(-1 != iLastSlash) {
 			::gpk::vcc				folderName;
