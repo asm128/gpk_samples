@@ -1,7 +1,5 @@
 #include "solarsystem.h"
-#include "gpk_json.h"
-#include "gpk_stdstring.h"
-#include "gpk_label.h"
+
 #include "gpk_png.h"
 
 struct SPlanet {
@@ -44,10 +42,10 @@ stacxpr const char*		PLANET_IMAGE				[::ssg::PLANET_COUNT]	=	{	"mercury_color.pn
 	::ssg::SScene				& scene					= solarSystem.Scene;
 	solarSystem.Scene.Pivot.resize(::ssg::PLANET_COUNT + 1); //
 	for(uint32_t iModel = 0; iModel < solarSystem.Scene.Pivot.size(); ++iModel) {
-		int32_t						iPlanet							= iModel - 1;
+		int32_t						iPlanet					= iModel - 1;
 		{ // Set up rigid body
-			::ssg::SModelPivot			& model							= scene.Pivot[iModel];
-			const float					scale							= (0 == iModel) ? 10.0f : float(1.0 / PLANET_SCALES[ssg::PLANET_EARTH] * PLANET_SCALES[iPlanet]);
+			::ssg::SModelPivot			& model					= scene.Pivot[iModel];
+			const float					scale					= (0 == iModel) ? 10.0f : float(1.0 / PLANET_SCALES[ssg::PLANET_EARTH] * PLANET_SCALES[iPlanet]);
 			model.Scale				= {scale, scale, scale};
 			model.Position			= {0, 0.5f};
 		}
@@ -66,17 +64,17 @@ stacxpr const char*		PLANET_IMAGE				[::ssg::PLANET_COUNT]	=	{	"mercury_color.pn
 	}
 	solarSystem.Entities.push_back({-1, 0, 0, 0, -1});
 	for(uint32_t iPlanet = 0; iPlanet < ssg::PLANET_COUNT; ++iPlanet) {
-		const uint32_t											iBodyOrbit					= iPlanet * 2;
-		const uint32_t											iBodyPlanet					= iBodyOrbit + 1;
-		int32_t													iEntityOrbit				= solarSystem.Entities.push_back({0, -1, -1, -1, (int32_t)iBodyOrbit});
+		const uint32_t				iBodyOrbit				= iPlanet * 2;
+		const uint32_t				iBodyPlanet				= iBodyOrbit + 1;
+		int32_t						iEntityOrbit			= solarSystem.Entities.push_back({0, -1, -1, -1, (int32_t)iBodyOrbit});
 		solarSystem.Entities[0].Children.push_back(iEntityOrbit);
-		int32_t													iEntityPlanet				= solarSystem.Entities.push_back({iEntityOrbit, 0, (int32_t)iPlanet + 1, (int32_t)iPlanet + 1, (int32_t)iBodyPlanet});
+		int32_t						iEntityPlanet			= solarSystem.Entities.push_back({iEntityOrbit, 0, (int32_t)iPlanet + 1, (int32_t)iPlanet + 1, (int32_t)iBodyPlanet});
 		solarSystem.Entities[iEntityOrbit].Children.push_back(iEntityPlanet);
 	}
 	for(uint32_t iRigidBody = 0; iRigidBody < solarSystem.Engine.Integrator.Flags.size(); ++iRigidBody)
 		solarSystem.Engine.Integrator.Flags[iRigidBody].Active	= true;
 
-	::gpk::bgra										colors []						=
+	::gpk::bgra					colors []				=
 		{ ::gpk::YELLOW
 		, ::gpk::DARKRED
 		, ::gpk::ORANGE
@@ -89,18 +87,18 @@ stacxpr const char*		PLANET_IMAGE				[::ssg::PLANET_COUNT]	=	{	"mercury_color.pn
 		, ::gpk::YELLOW
 		};
 
-	::gpk::SSurfaceManager	& surfaces		= solarSystem.Engine.Scene->Graphics->Surfaces;
+	::gpk::SSurfaceManager		& surfaces				= solarSystem.Engine.Scene->Graphics->Surfaces;
 
 
 	solarSystem.Images.resize(ssg::PLANET_COUNT + 1);
 
 
-	::gpk::SPNGData		pngCache;
-	::gpk::img8bgra		loaded;
+	::gpk::SPNGData				pngCache;
+	::gpk::img8bgra				loaded;
 
-	::gpk::pngFileLoad(pngCache, "../gpk_data/images/sun_color.png", loaded);
+	es_if_failed(::gpk::pngFileLoad(pngCache, "../gpk_data/images/sun_color.png", loaded));
 
-	int32_t					iSurface		= surfaces.Create(::gpk::vcs{"sun_color.png"});
+	int32_t						iSurface				= surfaces.Create(::gpk::vcs{"sun_color.png"});
 
 	surfaces[iSurface]->Data					= loaded.Texels.u8();
 	surfaces[iSurface]->Desc.BitDepth			= 8;
@@ -112,9 +110,9 @@ stacxpr const char*		PLANET_IMAGE				[::ssg::PLANET_COUNT]	=	{	"mercury_color.pn
 	solarSystem.Images[0] = ::gpk::gc8bgra{(const gpk::bgra*)surfaces[iSurface]->Data.begin(), surfaces[iSurface]->Desc.Dimensions.u32()};
 
 	for(uint32_t iPlanet = 0; iPlanet < ::ssg::PLANET_COUNT; ++iPlanet) {
-		iSurface			= surfaces.Create(::gpk::vcs{PLANET_IMAGE[iPlanet], (uint32_t)-1});
+		iSurface				= surfaces.Create(::gpk::vcs{PLANET_IMAGE[iPlanet], (uint32_t)-1});
 
-		char					finalPath[256]	= {};
+		char						finalPath[256]		= {};
 		sprintf_s(finalPath, "../gpk_data/images/%s", PLANET_IMAGE[iPlanet]);
 		::gpk::pngFileLoad(pngCache, finalPath, loaded);
 
