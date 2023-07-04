@@ -10,7 +10,6 @@ using namespace gpk;
 	int32_t					index;
 	while(-1 != (index = ::gpk::find_sequence_pod(tokenToReplace, {modified})))
 		if(index >= 0 && index < (int32_t)modified.size()) {
-			always_printf("\nFound '%s'.", modified.begin());
 			modified.insert(index, tokenTarget);
 			
 			uint32_t oldTokenStart		= index + tokenTarget.size();
@@ -20,7 +19,6 @@ using namespace gpk;
 				memcpy(&modified[oldTokenStart], &modified[trailingPathStart], trailingPathSize);
 
 			modified.resize(modified.size() - tokenToReplace.size());
-			always_printf("\nModified: '%s'.", modified.begin());
 		}
 
 	return 0;
@@ -32,9 +30,9 @@ using namespace gpk;
 
 
 int main() {
-	const ::gpk::vcc		skip[]			= {::gpk::vcs{".git"}, ::gpk::vcs{".vs"}};
+	const ::gpk::vcc		skip[]			= {::gpk::vcs{".git"}, ::gpk::vcs{".vs"}, ::gpk::vcs{".obj"}, ::gpk::vcs{".pdb"}, ::gpk::vcs{".idb"}, ::gpk::vcs{"/obj"}, ::gpk::vcs{"obj/"}, ::gpk::vcs{"intermediate"}, ::gpk::vcs{"resfiles"}, ::gpk::vcs{"x64"}, ::gpk::vcs{"Debug"}, ::gpk::vcs{"Release"}, ::gpk::vcs{"pch"}};
 
-	const vcc				tokensToReplace	[3]	= {::gpk::vcs{"d1"			}, "d\01"								, "D\01"							};
+	const vcc				tokensToReplace	[3]	= {::gpk::vcs{"d1"			}, "d\x0\x31"							, "D\x0\x31"						};
 	const vcc				tokensTarget	[3]	= {::gpk::vcs{"test_engine" }, "t\0e\0s\0t\0_\0e\0n\0g\0i\0n\0e"	, "T\0E\0S\0T\0_\0E\0N\0G\0I\0N\0E"	};
 
 	::gpk::SPathContents	pathContents;
@@ -44,7 +42,6 @@ int main() {
 	gpk_necs(::gpk::pathList(pathContents, pathsOriginal));
 
 	::gpk::aachar			pathsModified;
-
 	for(uint32_t iPath = 0; iPath < pathsOriginal.size(); ++iPath) {
 		achar					modified		= pathsOriginal[iPath];
 		bool process = false;
@@ -90,6 +87,7 @@ int main() {
 				::replace(tokensToReplace[iToken], tokensTarget[iToken], fileContents);
 
 			ce_if_failed(::gpk::fileFromMemory(modified.cc(), fileContents), "Failed to write file: '%s'.", modified.begin());
+			always_printf("\n'%s' -> '%s'.", original.begin(), modified.begin());
 		}
 	}
 	return 0;
