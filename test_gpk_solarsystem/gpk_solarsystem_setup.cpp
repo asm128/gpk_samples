@@ -34,7 +34,6 @@ stacxpr const char*		PLANET_IMAGE				[::ssg::PLANET_COUNT]	=	{	"mercury_color.pn
 	params.Radius			= 1;
 	::gpk::geometryBuildSphere(solarSystem.Geometries[0], params);
 
-
 	const ::gpk::vcs			ssFileFolder			= ".";
 	const ::gpk::vcs			ssFileName				= "gpk_solar_system.json";
 	::gpk::astchar<4096>		filePath				= {};
