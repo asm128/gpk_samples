@@ -14,7 +14,6 @@ struct SPlanet {
 	float	OrbitalEccentricity	;
 	float	Images				;
 };
-
 																				//	- Mercury			- Venus				- Earth				- Mars				- Jupiter				- Saturn				- Uranus				- Neptune				- Pluto
 stacxpr double			PLANET_MASSES				[::ssg::PLANET_COUNT]	=	{	0.330f				, 4.87f				, 5.97f				, 0.642f			, 1899					, 568					, 86.8f					, 102					, 0.0125f			};
 stacxpr double			PLANET_SCALES				[::ssg::PLANET_COUNT]	=	{	4879				, 12104				, 12756				, 6792				, 142984				, 120536				, 51118					, 49528					, 2390				};
@@ -34,6 +33,15 @@ stacxpr const char*		PLANET_IMAGE				[::ssg::PLANET_COUNT]	=	{	"mercury_color.pn
 	params.CellCount		= {16, 16};
 	params.Radius			= 1;
 	::gpk::geometryBuildSphere(solarSystem.Geometries[0], params);
+
+
+	const ::gpk::vcs			ssFileFolder			= ".";
+	const ::gpk::vcs			ssFileName				= "gpk_solar_system.json";
+	::gpk::astchar<4096>		filePath				= {};
+	sprintf_s(filePath.Storage, "%s/%s", ssFileFolder.begin(), ssFileName.begin());
+
+	gpk_necs(::gpk::planetarySystemSetup(solarSystem, filePath));
+
 //	::gpk::geometryBuildFromSTL();
 
 	SPlanet						planet					= {};
@@ -51,14 +59,14 @@ stacxpr const char*		PLANET_IMAGE				[::ssg::PLANET_COUNT]	=	{	"mercury_color.pn
 		}
 		if(iModel) { // Set up rigid body
 			/*int32_t iBody = */::gpk::createOrbiter(bodies
+				, PLANET_ORBITALINCLINATION	[iPlanet]
+				, PLANET_ORBITALPERIOD		[iPlanet]
 				, PLANET_MASSES				[iPlanet]
-				, PLANET_DISTANCE			[iPlanet]
 				, PLANET_AXIALTILT			[iPlanet]
+				, PLANET_DISTANCE			[iPlanet]
+				, 1.0 / PLANET_DISTANCE		[ssg::PLANET_COUNT - 1] * 2500
 				, PLANET_DAY				[iPlanet]
 				, PLANET_DAY				[ssg::PLANET_EARTH]
-				, PLANET_ORBITALPERIOD		[iPlanet]
-				, PLANET_ORBITALINCLINATION	[iPlanet]
-				, 1.0 / PLANET_DISTANCE		[ssg::PLANET_COUNT - 1] * 2500
 				);
 		}
 	}

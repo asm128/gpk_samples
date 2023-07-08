@@ -30,33 +30,36 @@ using namespace gpk;
 
 
 int main() {
-	const ::gpk::vcc		skip[]			= {::gpk::vcs{".git"}, ::gpk::vcs{".vs"}, ::gpk::vcs{".obj"}, ::gpk::vcs{".pdb"}, ::gpk::vcs{".idb"}, ::gpk::vcs{"/obj"}, ::gpk::vcs{"obj/"}, ::gpk::vcs{"intermediate"}, ::gpk::vcs{"resfiles"}, ::gpk::vcs{"x64"}, ::gpk::vcs{"Debug"}, ::gpk::vcs{"Release"}, ::gpk::vcs{"pch"}};
+	const ::gpk::vcc		skip[]			= {".git", ".vs", ".obj", ".pdb", ".idb", "/obj", "obj/", "intermediate", "resfiles", "x64", "Win32", "Debug", "Release", "pch"};
 
-	const vcc				tokensToReplace	[3]	= {::gpk::vcs{"d1"			}, "d\x0\x31"							, "D\x0\x31"						};
-	const vcc				tokensTarget	[3]	= {::gpk::vcs{"test_engine" }, "t\0e\0s\0t\0_\0e\0n\0g\0i\0n\0e"	, "T\0E\0S\0T\0_\0E\0N\0G\0I\0N\0E"	};
+	const ::gpk::vcc		tokensToReplace	[]	= {"d1", "d1p", "pool_game", "pool_shader", "p\0o\0o\0l\0_\0s\0h\0a\0d\0e\0r", "P\0O\0O\0L\0_\0S\0H\0A\0D\0E\0R", "P\0o\0o\0l\0S\0h\0a\0d\0e\0r", "p\0o\0o\0l\0_\0g\0a\0m\0e", "P\0O\0O\0L\0_\0G\0A\0M\0E", "P\0o\0o\0l\0G\0a\0m\0e"};
+	const ::gpk::vcc		tokensTarget	[]	= {"test_engine", "test_engine", "test_game", "test_shader", "t\0e\0s\0t\0_\0s\0h\0a\0d\0e\0r", "T\0E\0S\0T\0_\0S\0H\0A\0D\0E\0R", "T\0e\0s\0t\0S\0h\0a\0d\0e\0r", "t\0e\0s\0t\0_\0g\0a\0m\0e", "T\0E\0S\0T\0_\0G\0A\0M\0E", "T\0e\0s\0t\0G\0a\0m\0e"};
 
 	::gpk::SPathContents	pathContents;
-	gpk_necs(::gpk::pathList("../", pathContents));
+	gpk_necs(::gpk::pathList("../gpk_games/test_engine", pathContents));
 
 	::gpk::aachar			pathsOriginal;
 	gpk_necs(::gpk::pathList(pathContents, pathsOriginal));
-
+	::gpk::ai32				indicesToSource;
 	::gpk::aachar			pathsModified;
-	for(uint32_t iPath = 0; iPath < pathsOriginal.size(); ++iPath) {
-		achar					modified		= pathsOriginal[iPath];
-		bool process = false;
-		for(auto sskip : skip) {
-			if(-1 == ::gpk::find_sequence_pod(sskip, {modified})) {
-				process = true;
-				break;
+	for(uint32_t i = 0; i < 4; ++i) {
+		for(uint32_t iPath = 0; iPath < pathsOriginal.size(); ++iPath) {
+			achar					modified		= pathsOriginal[iPath];
+			bool process = false;
+			for(auto sskip : skip) {
+				if(-1 == ::gpk::find_sequence_pod(sskip, {modified})) {
+					process = true;
+					break;
+				}
+			}
+			if(process) {
+				::replace(tokensToReplace[i], tokensTarget[i], modified);
+				pathsModified.push_back(modified);
+				indicesToSource.push_back(iPath);
 			}
 		}
-		if(process)
-			::replace(tokensToReplace[0], tokensTarget[0], modified);
-		pathsModified.push_back(modified);
 	}
-
-	for(uint32_t iPath = 0; iPath < pathsOriginal.size(); ++iPath) {
+	for(uint32_t iPath = 0; iPath < indicesToSource.size(); ++iPath) {
 		const ::gpk::vcc		modified		= pathsModified[iPath];
 		if(-1 == ::gpk::find_sequence_pod(tokensTarget[0], {modified}))
 			continue;
@@ -70,6 +73,7 @@ int main() {
 		}
 		if(noprocess)
 			continue;
+
 		const int32_t			iLastSlash		= ::gpk::findLastSlash(modified);
 		if(-1 != iLastSlash) {
 			::gpk::vcc				folderName;
@@ -77,7 +81,7 @@ int main() {
 				w_if(::gpk::pathCreate(folderName), "Failed to create path: '%s'.", folderName.begin());
 		}
 
-		const ::gpk::vcc		original		= pathsOriginal[iPath];
+		const ::gpk::vcc		original		= pathsOriginal[indicesToSource[iPath]];
 
 		{
 			::gpk::au8				fileContents;

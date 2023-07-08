@@ -108,7 +108,7 @@ int													ssg::solarSystemUpdate			(ssg::SSolarSystemGame & solarSystem, d
 			solarSystem.Scene.Transform[iEntity].Identity();
 	}
 
-
+	static float timeScale = 1;
 	// ------------------------------------------- Handle input
 	::gpk::SCameraPoints									& camera					= solarSystem.Scene.Camera;
 #if defined(GPK_WINDOWS)
@@ -128,12 +128,14 @@ int													ssg::solarSystemUpdate			(ssg::SSolarSystemGame & solarSystem, d
 	if(GetAsyncKeyState('7')) { ; camera.Target = scene.Transform[7 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::n3f32{scene.Pivot[solarSystem.Entities[7 * 2].Model].Scale.x * 10, 0, 0}; }
 	if(GetAsyncKeyState('8')) { ; camera.Target = scene.Transform[8 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::n3f32{scene.Pivot[solarSystem.Entities[8 * 2].Model].Scale.x * 10, 0, 0}; }
 	if(GetAsyncKeyState('9')) { ; camera.Target = scene.Transform[9 * 2].GetTranslation(); camera.Position = camera.Target + ::gpk::n3f32{scene.Pivot[solarSystem.Entities[9 * 2].Model].Scale.x * 10, 0, 0}; }
+	if(GetAsyncKeyState(VK_SUBTRACT))	{ timeScale *= .5f * (float)secondsLastFrame; }
+	if(GetAsyncKeyState(VK_ADD))		{ timeScale += .1f * (float)secondsLastFrame + timeScale * .25f; }
 #endif
 	solarSystem.SunFire.SpawnSpherical(100, {}, 5, 1, 10);
 
 	// Update physics
 	solarSystem.SunFire.Update(secondsLastFrame * 2);
-	bodies.Integrate(secondsLastFrame);
+	bodies.Integrate(secondsLastFrame * timeScale);
 
 	//------------------------------------------- Transform and Draw
 	::gpk::g8bgra		targetPixels				= target->Color.View;
@@ -175,7 +177,7 @@ int													ssg::solarSystemUpdate			(ssg::SSolarSystemGame & solarSystem, d
 		if(-1 == entity.Images)
 			continue;
 
-		matrices.Scale		.Scale			(scene.Pivot[entity.Model].Scale		, true);
+		matrices.Scale		.Scale			(scene.Pivot[entity.Model].Scale	, true);
 		matrices.Position	.SetTranslation	(scene.Pivot[entity.Model].Position	, true);
 		::gpk::gc8bgra						entityImage					= solarSystem.Images[entity.Images];
 		::gpk::SGeometryBuffers				& entityGeometry			= solarSystem.Geometries[entity.Geometry];
@@ -187,6 +189,7 @@ int													ssg::solarSystemUpdate			(ssg::SSolarSystemGame & solarSystem, d
 			::gpk::drawTriangle(targetPixels, entityGeometry, iTriangle, matrixTransform, matrixTransformView, lightVector, iEntity ? ::gpk::BLACK : ::gpk::WHITE, pixelCoords, pixelVertexWeights, entityImage, lightPoints, lightColors, depthBuffer);
 		}
 	}
+
 
 	return ::drawDebris(targetPixels, solarSystem.SunFire, matrixView, depthBuffer);
 }

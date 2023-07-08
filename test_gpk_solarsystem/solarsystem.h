@@ -1,9 +1,9 @@
+#include "gpk_engine_planetary_system.h"
+
 #include "gpk_engine.h"
 
 #include "gpk_model.h"
 #include "gpk_particle.h"
-
-#include "gpk_view_color.h"
 
 #include "gpk_camera.h"
 
@@ -90,7 +90,7 @@ namespace ssg
 		}
 	};
 
-	struct SSolarSystemGame {
+	struct SSolarSystemGame : ::gpk::SPlanetarySystem {
 		::gpk::SEngine							Engine;
 
 		::ssg::SDebris							SunFire							= {};
