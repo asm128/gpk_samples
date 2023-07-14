@@ -1,4 +1,5 @@
 #include "solarsystem.h"
+#include "gpk_engine_orbit.h"
 
 #include "gpk_png.h"
 
@@ -31,7 +32,7 @@ stacxpr const char*		PLANET_IMAGE				[::ssg::PLANET_COUNT]	=	{	"mercury_color.pn
 	solarSystem.Geometries.resize(1);
 	::gpk::SParamsSphere		params					= {};
 	params.CellCount		= {16, 16};
-	params.Radius			= 1;
+	params.Radius			= .5f;
 	::gpk::geometryBuildSphere(solarSystem.Geometries[0], params);
 
 	const ::gpk::vcs			ssFileFolder			= ".";
@@ -54,13 +55,15 @@ stacxpr const char*		PLANET_IMAGE				[::ssg::PLANET_COUNT]	=	{	"mercury_color.pn
 			::ssg::SModelPivot			& model					= scene.Pivot[iModel];
 			const float					scale					= (0 == iModel) ? 10.0f : float(1.0 / PLANET_SCALES[ssg::PLANET_EARTH] * PLANET_SCALES[iPlanet]);
 			model.Scale				= {scale, scale, scale};
-			model.Position			= {0, 0.5f};
+			model.Position			= {0, 0};
 		}
 		if(iModel) { // Set up rigid body
 			/*int32_t iBody = */::gpk::createOrbiter(bodies
+				, ::gpk::AXIS_X_POSITIVE
+				, ::gpk::AXIS_Y_NEGATIVE
 				, PLANET_ORBITALINCLINATION	[iPlanet]
 				, PLANET_ORBITALPERIOD		[iPlanet]
-				, PLANET_MASSES				[iPlanet]
+				, PLANET_DAY				[ssg::PLANET_EARTH]
 				, PLANET_AXIALTILT			[iPlanet]
 				, PLANET_DISTANCE			[iPlanet]
 				, 1.0 / PLANET_DISTANCE		[ssg::PLANET_COUNT - 1] * 2500
