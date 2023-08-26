@@ -311,7 +311,7 @@ static	::gpk::error_t	drawVoxelModel
 						;
 
 					::gpk::n3f32					lightDistance				= lightPosition - pixelPosIn3DSpace;
-					const double					lightFactorDistance			= ::gpk::clamp(1.0 - lightDistance.Length() * .001, 0.0, 1.0);
+					const double					lightFactorDistance			= ::gpk::clamped(1.0 - lightDistance.Length() * .001, 0.0, 1.0);
 					::gpk::rgbaf					faceColor					= colorAmbient * lightFactorDistance;
 					if(lightFactorDistance > 0 && lightFactorDistance < 0) {
 						const double					lightFactorDirectional		= ::gpk::max(0.0, lightDistance.Normalize().Dot(::gpk::VOXEL_NORMALS[iFace]));	
@@ -391,7 +391,7 @@ static	::gpk::error_t	drawVoxelModel
 			continue;
 
 		::gpk::n3f32				voxelCenter			= voxelPos + ::gpk::n3f32{.5f, .5f, .5f};
-		const double				lightFactorDistance	= ::gpk::clamp(1.0 - (lightPosition - voxelCenter).Length() * .001, 0.0, 1.0);
+		const double				lightFactorDistance	= ::gpk::clamped(1.0 - (lightPosition - voxelCenter).Length() * .001, 0.0, 1.0);
 		const double				lightFactorAmbient	= .075;
 		const ::gpk::rgbaf			colorAmbient		= cellColor * lightFactorAmbient;
 
@@ -425,7 +425,7 @@ struct SCamera {
 	projection.Identity();
 	::gpk::SFrameInfo										& frameInfo									= framework.FrameInfo;
 	const ::gpk::n3f32								tilt										= {10, };	// ? cam't remember what is this. Radians? Eulers?
-	const ::gpk::n3f32								rotation									= {0, (float)frameInfo.FrameNumber / 100, 0};
+	const ::gpk::n3f32								rotation									= {0, (float)frameInfo.FrameMeter.FrameNumber / 100, 0};
 
 	::gpk::minmaxf32											nearFar										= {0.1f , 1000.0f};
 

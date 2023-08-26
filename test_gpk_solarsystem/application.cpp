@@ -72,21 +72,21 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Solar System Test");
 
 	::gpk::n3f32				cameraFront			= (cameraTarget - cameraPosition).Normalized();
 
-	::gpk::SEngineSceneConstants	constants		= {};
-	constants.CameraPosition	= cameraPosition;
-	constants.CameraFront		= cameraFront;
-	constants.LightPosition		= {0, 10, 0};
-	constants.LightDirection	= {0, -1, 0};
+	//::gpk::SEngineSceneConstants	constants		= {};
+	//constants.CameraPosition	= cameraPosition;
+	//constants.CameraFront		= cameraFront;
+	//constants.LightPosition		= {0, 10, 0};
+	//constants.LightDirection	= {0, -1, 0};
 
 	::gpk::minmax				nearFar 			= {.0001f, 10000.0f}; 
 
-	constants.View.LookAt(cameraPosition, cameraTarget, cameraUp);
-	constants.Perspective.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, nearFar.Min, nearFar.Max);
-	constants.Screen.ViewportLH(offscreenMetrics);
-	constants.VP			= constants.View * constants.Perspective;
-	constants.VPS			= constants.VP * constants.Screen;
+	//constants.View.LookAt(cameraPosition, cameraTarget, cameraUp);
+	//constants.Perspective.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, nearFar.Min, nearFar.Max);
+	//constants.Screen.ViewportLH(offscreenMetrics);
+	//constants.VP			= constants.View * constants.Perspective;
+	//constants.VPS			= constants.VP * constants.Screen;
 
-	::gpk::drawScene(target->Color, target->DepthStencil, app.SolarSystemGame.Engine.Scene->RenderCache, *app.SolarSystemGame.Engine.Scene, constants);
+	::gpk::drawScene(target->Color, target->DepthStencil, app.SolarSystemGame.Engine.Scene->RenderCache, *app.SolarSystemGame.Engine.Scene, cameraPosition, cameraTarget, cameraUp, nearFar);
 
 	::ssg::solarSystemUpdate(app.SolarSystemGame, app.Framework.Timer.LastTimeSeconds, target);
 

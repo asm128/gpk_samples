@@ -115,8 +115,8 @@ template <size_t _sizeAlive>
 		const ::SShipState															& shipState									= gameInstance.Ships.States[iShip];
 		shipPosition															+= gameInstance.Ships.Direction[iShip] * (float)(framework.FrameInfo.Seconds.LastFrame * 100) *
 			(shipState.Brakes ? .25f : (shipState.Thrust ? 2 : 1));
-		shipPosition.x															= ::gpk::clamp(shipPosition.x, .1f, (float)offscreenMetrics.x - 1);
-		shipPosition.y															= ::gpk::clamp(shipPosition.y, .1f, (float)offscreenMetrics.y - 1);
+		shipPosition.x															= ::gpk::clamped(shipPosition.x, .1f, (float)offscreenMetrics.x - 1);
+		shipPosition.y															= ::gpk::clamped(shipPosition.y, .1f, (float)offscreenMetrics.y - 1);
 
 		::gpk::n2<float>														& crosshairPosition							= gameInstance.PositionCrosshair[iShip];
 		crosshairPosition														= shipPosition + ::gpk::n2<float>{96,};

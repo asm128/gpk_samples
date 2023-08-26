@@ -200,7 +200,6 @@
     <ClInclude Include="Item.h" />
     <ClInclude Include="klib_ascii_display.h" />
     <ClInclude Include="klib_ascii_target.h" />
-    <ClInclude Include="klib_character.h" />
     <ClInclude Include="klib_grid.h" />
     <ClInclude Include="klib_input.h" />
     <ClInclude Include="klib_draw_misc.h" />

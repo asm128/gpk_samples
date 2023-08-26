@@ -168,9 +168,6 @@
     <ClInclude Include="projects.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="klib_character.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Character.cpp">

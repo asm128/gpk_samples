@@ -8,6 +8,8 @@
 #include "gpk_view_bit.h"
 #include "gpk_matrix.h"
 #include "gpk_png.h"
+#include "gpk_apod_tri3.h"
+#include "gpk_apod_color.h"
 
 #include "gpk_app_impl.h"
 
@@ -93,29 +95,29 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 
 
 struct SCamera {
-						::gpk::n3f32								Position, Target;
+	::gpk::n3f32		Position, Target;
 };
 
 ::gpk::error_t			draw		(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
-	::gpk::SFramework				& framework									= app.Framework;
-	::gpk::SWindow					& mainWindow								= framework.RootWindow;
+	::gpk::SFramework			& framework									= app.Framework;
+	::gpk::SWindow				& mainWindow								= framework.RootWindow;
 
 	::gpk::pobj<::gpk::rt<::gpk::bgra, uint32_t>>			backBuffer;
 	backBuffer->resize(mainWindow.BackBuffer->Color.metrics(), 0xFF000080, (uint32_t)-1);
 
-	::gpk::SSTLFile											& stlFile									= app.STLFile;
+	::gpk::SSTLFile				& stlFile									= app.STLFile;
 
 	//------------------------------------------------
-	::gpk::array_pod<::gpk::tri3<float>>				triangle3dList								= {};
-	::gpk::array_pod<::gpk::bgra>						triangle3dColorList							= {};
+	::gpk::atri3f32				triangle3dList								= {};
+	::gpk::a8bgra				triangle3dColorList							= {};
 	triangle3dList.resize(app.CubePositions.size());
 	triangle3dColorList.resize(app.CubePositions.size());
-	::gpk::m4<float>									projection									= {};
-	::gpk::m4<float>									viewMatrix									= {};
+	::gpk::m4<float>			projection									= {};
+	::gpk::m4<float>			viewMatrix									= {};
 	projection.Identity();
-	::gpk::SFrameInfo										& frameInfo									= framework.FrameInfo;
-	const ::gpk::n3f32								tilt										= {10, };	// ? cam't remember what is this. Radians? Eulers?
-	const ::gpk::n3f32								rotation									= {0, (float)frameInfo.FrameNumber / 100, 0};
+	::gpk::SFrameInfo			& frameInfo									= framework.FrameInfo;
+	const ::gpk::n3f32			tilt										= {10, };	// ? cam't remember what is this. Radians? Eulers?
+	const ::gpk::n3f32			rotation									= {0, (float)frameInfo.FrameMeter.FrameNumber / 100, 0};
 
 	::gpk::minmaxf32											nearFar										= {0.01f , 1000.0f};
 

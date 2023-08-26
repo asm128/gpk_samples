@@ -128,7 +128,7 @@ struct SCamera {
 	projection.Identity();
 	::gpk::SFrameInfo															& frameInfo									= framework.FrameInfo;
 	const ::gpk::n3f32													tilt										= {10, };	// ? cam't remember what is this. Radians? Eulers?
-	const ::gpk::n3f32													rotation									= {0, (float)frameInfo.FrameNumber / 100, 0};
+	const ::gpk::n3f32													rotation									= {0, (float)frameInfo.FrameMeter.FrameNumber / 100, 0};
 
 	::gpk::minmaxf32													nearFar										= {0.01f , 1000.0f};
 

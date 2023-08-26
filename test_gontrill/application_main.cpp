@@ -167,10 +167,10 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	::gpk::SFramework				& framework									= app.Framework;
 	::gpk::g8bgra						& fontAtlasView								= app.Processed[GAME_TEXTURE_FONT_ATLAS].View;
 	const ::gpk::n2u16							& offscreenMetrics							= target.metrics().Cast<uint16_t>();
-	::gpk::textLineDrawAlignedFixedSizeLit(target, app.TextureFontMonochrome.View, fontAtlasView.metrics(), lineOffset++, offscreenMetrics, sizeCharCell, textLine0, ::gpk::bgra{0, app.Framework.FrameInfo.FrameNumber % 0xFF, 0xFFU, 0xFFU});
-	::gpk::textLineDrawAlignedFixedSizeLit(target, app.TextureFontMonochrome.View, fontAtlasView.metrics(), lineOffset++, offscreenMetrics, sizeCharCell, textLine1, ::gpk::bgra{app.Framework.FrameInfo.FrameNumber % 0xFFU, 0xFFU, 0, 0xFFU});
+	::gpk::textLineDrawAlignedFixedSizeLit(target, app.TextureFontMonochrome.View, fontAtlasView.metrics(), lineOffset++, offscreenMetrics, sizeCharCell, textLine0, ::gpk::bgra{0, app.Framework.FrameInfo.FrameMeter.FrameNumber % 0xFF, 0xFFU, 0xFFU});
+	::gpk::textLineDrawAlignedFixedSizeLit(target, app.TextureFontMonochrome.View, fontAtlasView.metrics(), lineOffset++, offscreenMetrics, sizeCharCell, textLine1, ::gpk::bgra{app.Framework.FrameInfo.FrameMeter.FrameNumber % 0xFFU, 0xFFU, 0, 0xFFU});
 	::gpk::textLineDrawAlignedFixedSize(target, fontAtlasView, lineOffset = offscreenMetrics.y / 16 - 1, offscreenMetrics, sizeCharCell, textLine2);
-	::gpk::textLineDrawAlignedFixedSizeLit(target, app.TextureFontMonochrome.View, fontAtlasView.metrics(), --lineOffset, offscreenMetrics, sizeCharCell, weaponProperties[app.Game.Ships.Weapon[0].IndexProperties].Name, ::gpk::bgra{app.Framework.FrameInfo.FrameNumber % 0xFFU, 0xFFU, 0, 0xFFU});
+	::gpk::textLineDrawAlignedFixedSizeLit(target, app.TextureFontMonochrome.View, fontAtlasView.metrics(), --lineOffset, offscreenMetrics, sizeCharCell, weaponProperties[app.Game.Ships.Weapon[0].IndexProperties].Name, ::gpk::bgra{app.Framework.FrameInfo.FrameMeter.FrameNumber % 0xFFU, 0xFFU, 0, 0xFFU});
 	if(app.Debugging) {
 		::gpk::STimer							& timer										= framework.Timer;
 		char									buffer		[512]							= {};
