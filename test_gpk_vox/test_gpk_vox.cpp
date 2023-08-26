@@ -7,7 +7,7 @@
 #include "gpk_view_bit.h"
 #include "gpk_matrix.h"
 #include "gpk_png.h"
-#include "gpk_apod_color.h"
+#include "gpk_view_color.h"
 
 #include "gpk_app_impl.h"
 #include "gpk_raster_lh.h"
