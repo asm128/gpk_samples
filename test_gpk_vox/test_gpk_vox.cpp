@@ -7,6 +7,7 @@
 #include "gpk_view_bit.h"
 #include "gpk_matrix.h"
 #include "gpk_png.h"
+#include "gpk_apod_color.h"
 
 #include "gpk_app_impl.h"
 #include "gpk_raster_lh.h"
@@ -132,14 +133,14 @@ namespace gpk
 		, ::gpk::apod<::gpk::n2i16>		& out_Points
 		) {
 		int32_t																		pixelsDrawn									= 0;
-		const ::gpk::n2<uint32_t>												& _targetMetrics							= targetDepth.metrics();
-		::gpk::n2	<float>														areaMin										= {(float)::gpk::min(::gpk::min(triangle.A.x, triangle.B.x), triangle.C.x), (float)::gpk::min(::gpk::min(triangle.A.y, triangle.B.y), triangle.C.y)};
-		::gpk::n2	<float>														areaMax										= {(float)::gpk::max(::gpk::max(triangle.A.x, triangle.B.x), triangle.C.x), (float)::gpk::max(::gpk::max(triangle.A.y, triangle.B.y), triangle.C.y)};
+		const ::gpk::n2<uint32_t>							& _targetMetrics							= targetDepth.metrics();
+		::gpk::n2	<float>									areaMin										= {(float)::gpk::min(::gpk::min(triangle.A.x, triangle.B.x), triangle.C.x), (float)::gpk::min(::gpk::min(triangle.A.y, triangle.B.y), triangle.C.y)};
+		::gpk::n2	<float>									areaMax										= {(float)::gpk::max(::gpk::max(triangle.A.x, triangle.B.x), triangle.C.x), (float)::gpk::max(::gpk::max(triangle.A.y, triangle.B.y), triangle.C.y)};
 		const float																	xStop										= ::gpk::min(areaMax.x, (float)_targetMetrics.x);
 		for(float y = ::gpk::max(areaMin.y, 0.f), yStop = ::gpk::min(areaMax.y, (float)_targetMetrics.y); y < yStop; ++y)
 		for(float x = ::gpk::max(areaMin.x, 0.f); x < xStop; ++x) {
-			const ::gpk::n2<int32_t>												cellCurrent									= {(int32_t)x, (int32_t)y};
-			const ::gpk::tri2<int32_t>											triangle2D									=
+			const ::gpk::n2<int32_t>							cellCurrent									= {(int32_t)x, (int32_t)y};
+			const ::gpk::tri2<int32_t>						triangle2D									=
 				{ {(int32_t)triangle.A.x, (int32_t)triangle.A.y}
 				, {(int32_t)triangle.B.x, (int32_t)triangle.B.y}
 				, {(int32_t)triangle.C.x, (int32_t)triangle.C.y}
@@ -152,7 +153,7 @@ namespace gpk
 					continue;
 			}
 			const ::gpk::n2f64												cellCurrentF								= {x, y};
-			::gpk::tri<double>												proportions									=
+			::gpk::tri<double>							proportions									=
 				{ ::gpk::orient2d3d({triangle.C.f64(), triangle.B.f64()}, cellCurrentF)	// notice how having to type "template" every time before "Cast" totally defeats the purpose of the template. I really find this rule very stupid and there is no situation in which the compiler is unable to resolve it from the code it already has.
 				, ::gpk::orient2d3d({triangle.A.f64(), triangle.C.f64()}, cellCurrentF)
 				, ::gpk::orient2d3d({triangle.B.f64(), triangle.A.f64()}, cellCurrentF)	// Determine barycentric coordinates
@@ -339,7 +340,7 @@ static	::gpk::error_t	drawVoxelModel
 	, ::SFragmentCache					& pixelCache
 	) {	
 	const ::gpk::view<const ::gpk::SVoxel<uint8_t>>	voxels	= voxelMap.Voxels;
-	::gpk::view<const ::gpk::bgra>	rgba		= voxelMap.Palette;
+	::gpk::vc8bgra				rgba			= voxelMap.Palette;
 	const ::gpk::n3u8			dimensions		= voxelMap.Dimensions;
 	if(0 == rgba.size())
 		rgba					= ::gpk::VOX_PALETTE_DEFAULT;
@@ -420,21 +421,21 @@ struct SCamera {
 	backBuffer->Color.View.fill(0x3060C0);
 	memset(backBuffer->DepthStencil.begin(), (uint32_t)-1, backBuffer->DepthStencil.View.byte_count());
 
-	::gpk::m4<float>									projection									= {};
-	::gpk::m4<float>									viewMatrix									= {};
+	::gpk::m4f32					projection									= {};
+	::gpk::m4f32					viewMatrix									= {};
 	projection.Identity();
-	::gpk::SFrameInfo										& frameInfo									= framework.FrameInfo;
-	const ::gpk::n3f32								tilt										= {10, };	// ? cam't remember what is this. Radians? Eulers?
-	const ::gpk::n3f32								rotation									= {0, (float)frameInfo.FrameMeter.FrameNumber / 100, 0};
+	::gpk::SFrameInfo				& frameInfo									= framework.FrameInfo;
+	const ::gpk::n3f32				tilt										= {10, };	// ? cam't remember what is this. Radians? Eulers?
+	const ::gpk::n3f32				rotation									= {0, (float)frameInfo.FrameMeter.FrameNumber / 100, 0};
 
-	::gpk::minmaxf32											nearFar										= {0.1f , 1000.0f};
+	::gpk::minmaxf32				nearFar										= {0.1f , 1000.0f};
 
-	stacxpr const ::gpk::n3f32			cameraUp									= {0, 1, 0};	// ? cam't remember what is this. Radians? Eulers?
-	::SCamera												camera										= {{100, 50, 0}, {25, 0, 25}};
+	stacxpr const ::gpk::n3f32		cameraUp									= {0, 1, 0};	// ? cam't remember what is this. Radians? Eulers?
+	::SCamera						camera										= {{100, 50, 0}, {25, 0, 25}};
 	//camera.Position *= 2.0f;
-	::gpk::n3f32									lightPos									= {150, 50, 0};
-	static float											cameraRotation								= 0;
-	cameraRotation										+= (float)framework.RootWindow.Input->MouseCurrent.Deltas.x / 5.0f;
+	::gpk::n3f32					lightPos									= {150, 50, 0};
+	static float					cameraRotation								= 0;
+	cameraRotation				+= (float)framework.RootWindow.Input->MouseCurrent.Deltas.x / 5.0f;
 	//camera.Position	.RotateY(cameraRotation);
 	camera.Position	.RotateY(frameInfo.Seconds.Total * 0.1f);
 	camera.Position.y *= (float)fabs(sin(frameInfo.Seconds.Total * .1f));
@@ -442,41 +443,41 @@ struct SCamera {
 	lightPos		.RotateY(frameInfo.Seconds.Total * 1.f);
 
 	viewMatrix.LookAt(camera.Position, camera.Target, cameraUp);
-	const ::gpk::n2<uint32_t>							& offscreenMetrics							= backBuffer->metrics();
+	const ::gpk::n2u32				& offscreenMetrics							= backBuffer->metrics();
 	projection.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, nearFar);
-	projection											= viewMatrix * projection;
-	lightPos.x += 100;
-	lightPos.y *= (float)fabs(sin(frameInfo.Seconds.Total * .1f));
+	projection					= viewMatrix * projection;
+	lightPos.x					+= 100;
+	lightPos.y					*= (float)fabs(sin(frameInfo.Seconds.Total * .1f));
 
-	const ::gpk::n2<uint16_t>							screenCenter				= {(uint16_t)(offscreenMetrics.x / 2), (uint16_t)(offscreenMetrics.y / 2)};
-	::gpk::m4<float>									viewport									= {};
+	const ::gpk::n2u16				screenCenter				= {(uint16_t)(offscreenMetrics.x / 2), (uint16_t)(offscreenMetrics.y / 2)};
+	::gpk::m4f32					viewport									= {};
 	viewport.ViewportLH(offscreenMetrics.Cast<uint16_t>());
-	projection											= projection * viewport;
+	projection					= projection * viewport;
 
-	::gpk::n3f32									cameraFront					= (camera.Target - camera.Position).Normalize();
+	::gpk::n3f32					cameraFront					= (camera.Target - camera.Position).Normalize();
 
-	int32_t													zOffset						= 0;
-	int32_t													xOffset						= 0;
+	int32_t							zOffset						= 0;
+	int32_t							xOffset						= 0;
 
-	::SFragmentCache										pixelCache;
-	pixelCache.TargetPixels								= backBuffer->Color;
-	pixelCache.TargetDepth								= backBuffer->DepthStencil;
-	bool													drawFromSource				= true;
+	::SFragmentCache				pixelCache;
+	pixelCache.TargetPixels		= backBuffer->Color;
+	pixelCache.TargetDepth		= backBuffer->DepthStencil;
+	bool							drawFromSource				= true;
 	for(uint32_t iModel = 0; iModel < app.VOXModelMaps.size(); ++iModel) {
-		const ::gpk::SVoxelMap<uint8_t>							& voxelMap					= app.VOXModelMaps[iModel];
-		const ::gpk::n3f32								position					= {(float)xOffset, 0.0f, (float)zOffset};
+		const ::gpk::SVoxelMap<uint8_t>	& voxelMap					= app.VOXModelMaps[iModel];
+		const ::gpk::n3f32				position					= {(float)xOffset, 0.0f, (float)zOffset};
 		if(drawFromSource) 
 			::drawVoxelModel(voxelMap, position, projection, nearFar, camera.Position, cameraFront, lightPos, pixelCache);
 		else {
-			const ::gpk::SVoxelGeometry								& voxelModel					= app.VOXModels[iModel];
+			const ::gpk::SVoxelGeometry		& voxelModel					= app.VOXModels[iModel];
 			::drawVoxelModel(voxelModel, position, projection, lightPos, pixelCache);
 		}
 
 		if(zOffset < 300) 
-			zOffset												+= voxelMap.Dimensions.z + 4;
+			zOffset						+= voxelMap.Dimensions.z + 4;
 		else {
-			xOffset												+= ::gpk::max(uint16_t(voxelMap.Dimensions.x), uint16_t(30));
-			zOffset												= 0;
+			xOffset						+= ::gpk::max(uint16_t(voxelMap.Dimensions.x), uint16_t(30));
+			zOffset						= 0;
 		}
 	}
 
