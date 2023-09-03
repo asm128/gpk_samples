@@ -51,7 +51,7 @@ static	::gpk::error_t			httpRequestChunkedJoin			(const ::gpk::vcc & body, ::gpk
 void *							get_in_addr						(sockaddr *sa)			{ return (sa->sa_family == AF_INET) ? &(((struct sockaddr_in*)sa)->sin_addr) : (void*)&(((struct sockaddr_in6*)sa)->sin6_addr); }
 int								main							()						{
 	::gpk::tcpipInitialize();
-	::gpk::SIPv4						address							= {{192,168,0,2}, 80};
+	::gpk::SIPv4Endpoint						address							= {{192,168,0,2}, 80};
 	addrinfo							hints							= {};
     hints.ai_family					= AF_UNSPEC;
     hints.ai_socktype				= SOCK_STREAM;
