@@ -52,7 +52,7 @@ static	::gpk::error_t	processScreenEvent	(::SApplication & app, const ::gpk::SEv
 	return 0;
 }
 
-static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SSystemEvent & sysEvent) { 
+static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SEventSystem & sysEvent) { 
 	switch(sysEvent.Type) {
 	default: break;
 	case ::gpk::SYSTEM_EVENT_Screen	: return ::gpk::eventExtractAndHandle<::gpk::EVENT_SCREEN		>(sysEvent, [&app](const ::gpk::SEventView<::gpk::EVENT_SCREEN		> & screenEvent) { return processScreenEvent(app, screenEvent); });
@@ -86,7 +86,7 @@ static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SSy
 
 	gpk::TQueueSystemEvent		eventsToProcess		= mainWindow.EventQueue;
 	gpk_necs(eventsToProcess.append(gui.Controls.EventQueue));
-	gpk_necs(eventsToProcess.for_each([&app, &systemExit](const ::gpk::pobj<::gpk::SSystemEvent> & sysEvent) { 
+	gpk_necs(eventsToProcess.for_each([&app, &systemExit](const ::gpk::pobj<::gpk::SEventSystem> & sysEvent) { 
 		::gpk::error_t				result; 
 		gpk_necs(result = ::processSystemEvent(app, *sysEvent)); 
 		if(result == 1) 
@@ -97,7 +97,7 @@ static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SSy
 	rvi_if(::gpk::APPLICATION_STATE_EXIT, systemExit || systemRequestedExit, "%s || %s", ::gpk::bool2char(systemExit) || ::gpk::bool2char(systemRequestedExit));
 
 	::gpk::pau8					payloadCache;
-	eventsToProcess.for_each([&app, &payloadCache](::gpk::pobj<::gpk::SSystemEvent> & ev){
+	eventsToProcess.for_each([&app, &payloadCache](::gpk::pobj<::gpk::SEventSystem> & ev){
 		payloadCache.create();
 		gpk_necs(ev->Save(*payloadCache));
 		app.Client.QueueToSend.push_back(payloadCache);
@@ -110,7 +110,7 @@ static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SSy
 
 	app.Client.QueueReceived.for_each([&app](::gpk::pobj<::gpk::SUDPMessage> & udp){ 
 		if(udp && udp->Payload.size()) {
-			::gpk::pobj<::gpk::SSystemEvent>	eventReceived;
+			::gpk::pobj<::gpk::SEventSystem>	eventReceived;
 			::gpk::vcu8							inputBytes			= udp->Payload;
 			es_if_failed(eventReceived->Load(inputBytes)); 
 		}

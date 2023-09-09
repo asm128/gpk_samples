@@ -52,7 +52,7 @@ static	::gpk::error_t	processScreenEvent		(::SApplication & app, const ::gpk::SE
 	return 0;
 }
 
-static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SSystemEvent & sysEvent) { 
+static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SEventSystem & sysEvent) { 
 	switch(sysEvent.Type) {
 	default: break;
 	case ::gpk::SYSTEM_EVENT_Screen	: return ::gpk::eventExtractAndHandle<::gpk::EVENT_SCREEN		>(sysEvent, [&app](const ::gpk::SEventView<::gpk::EVENT_SCREEN		> & screenEvent) { return processScreenEvent(app, screenEvent); }); 
@@ -85,7 +85,7 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SS
 
 	::gpk::TQueueSystemEvent	eventsToProcess			= mainWindow.EventQueue;
 	gpk_necs(eventsToProcess.append(gui.Controls.EventQueue));
-	gpk_necs(eventsToProcess.for_each([&app, &systemExit](const ::gpk::pobj<::gpk::SSystemEvent> & sysEvent) { 
+	gpk_necs(eventsToProcess.for_each([&app, &systemExit](const ::gpk::pobj<::gpk::SEventSystem> & sysEvent) { 
 		::gpk::error_t				result; 
 		gpk_necs(result = ::processSystemEvent(app, *sysEvent)); 
 		if(result == 1) 
@@ -97,7 +97,7 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SS
 
 	::gpk::pau8					payloadCache;
 	app.Server->UDP.Clients.enumerate([&app, &eventsToProcess, &payloadCache](uint32_t & iClient, ::gpk::pobj<::gpk::SUDPConnection> & client){
-		eventsToProcess.for_each([&app, &iClient, &client, &payloadCache](::gpk::pobj<::gpk::SSystemEvent> & ev){
+		eventsToProcess.for_each([&app, &iClient, &client, &payloadCache](::gpk::pobj<::gpk::SEventSystem> & ev){
 			payloadCache.create();
 			gpk_necs(ev->Save(*payloadCache));
 			gpk_necs(app.Server->QueueToSend[iClient]->push_back(payloadCache));
@@ -115,7 +115,7 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SS
 				return 0;
 
 			gpk::vcu8						input					= message->Payload;
-			gpk::pobj<gpk::SSystemEvent>	newEvent;
+			gpk::pobj<gpk::SEventSystem>	newEvent;
 			gpk_necs(newEvent->Load(input));
 			info_printf("Received '%s' from client %i: %s.", ::gpk::get_enum_namep(newEvent->Type), index, ::gpk::get_value_namep(newEvent->Type));
 			return 0;

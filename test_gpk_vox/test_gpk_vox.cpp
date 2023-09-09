@@ -96,7 +96,7 @@ static	::gpk::error_t	processKeyboardEvent	(::SApplication & app, const ::gpk::S
 	return 0;
 }
 
-static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SSystemEvent & sysEvent) { 
+static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SEventSystem & sysEvent) { 
 	switch(sysEvent.Type) {
 	default: break;
 	case ::gpk::SYSTEM_EVENT_Keyboard	: es_if(errored(::gpk::eventExtractAndHandle<::gpk::EVENT_KEYBOARD>(sysEvent, [&app](const ::gpk::SEventView<::gpk::EVENT_KEYBOARD> & screenEvent) { return ::processKeyboardEvent(app, screenEvent); }))); break;
@@ -107,7 +107,7 @@ static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SSy
 ::gpk::error_t			update		(::SApplication& app, bool systemRequestedExit)					{
 	retval_ginfo_if(1, systemRequestedExit, "Exiting because the runtime asked for close. We could also ignore this value and just continue execution if we don't want to exit.");
 	::gpk::SWindow					& mainWindow								= app.Framework.RootWindow;
-	gpk_necs(mainWindow.EventQueue.for_each([&app](const ::gpk::pobj<::gpk::SSystemEvent> & sysEvent) { return ::processSystemEvent(app, *sysEvent); }));
+	gpk_necs(mainWindow.EventQueue.for_each([&app](const ::gpk::pobj<::gpk::SEventSystem> & sysEvent) { return ::processSystemEvent(app, *sysEvent); }));
 
 	::gpk::error_t																frameworkResult								= ::gpk::updateFramework(app.Framework);
 	ree_if(errored(frameworkResult), "Unknown error.");
