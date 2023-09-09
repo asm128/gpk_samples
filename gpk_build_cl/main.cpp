@@ -58,7 +58,7 @@ static	::gpk::error_t					buildProjects					(const ::SBuildConfig & app, int32_t
 				if(offsetExtensionExpected == offsetExtensionFound)
 					listOfSourceFileNames.push_back(fileName);
 			}
-			e_if(::buildSources(app, listOfSourceFileNames), "%s", "");
+			e_if(::buildSources(app, listOfSourceFileNames));
 		}
 	}
 	return 0;
@@ -69,9 +69,9 @@ static	::gpk::error_t	buildConfig						(const SBuildConfig & app) {
 	::gpk::pnco<::gpk::SJSONNode>	rootJSONArray				= app.TreeConfigOfBuild[0];
 	for(uint32_t iBuild = 0, countBuilds = ::gpk::jsonArraySize(*rootJSONArray); iBuild < countBuilds; ++iBuild) {
 		const int32_t				indexOfBuildObject				= ::gpk::jsonArrayValueGet(*rootJSONArray, iBuild);
-		e_if(::gpk::failed(::buildProjects(app, indexOfBuildObject, "libs", extension)), "%s", "");
-		e_if(::gpk::failed(::buildProjects(app, indexOfBuildObject, "dlls", extension)), "%s", "");
-		e_if(::gpk::failed(::buildProjects(app, indexOfBuildObject, "exes", extension)), "%s", "");
+		e_if(::gpk::failed(::buildProjects(app, indexOfBuildObject, "libs", extension)));
+		e_if(::gpk::failed(::buildProjects(app, indexOfBuildObject, "dlls", extension)));
+		e_if(::gpk::failed(::buildProjects(app, indexOfBuildObject, "exes", extension)));
 	}
 	return 0;
 }

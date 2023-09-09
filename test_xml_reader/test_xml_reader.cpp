@@ -10,7 +10,7 @@ int xmlTestDoc(::gpk::vcc xmlDoc) {
 	printf("-------------------\n");
 
 	::gpk::SXMLReader reader;
-	gerror_if(xmlParse(reader, xmlDoc), "%s", "Failed to parse %s.", ::gpk::toString(xmlDoc).begin());
+	ef_if(xmlParse(reader, xmlDoc), "%s", "Failed to parse %s.", ::gpk::toString(xmlDoc).begin());
 	printf("\nNest level: %i", reader.StateRead.NestLevel);
 	printf("\nToken count: %i", reader.Token.size());
 	printf("\nTokens:");

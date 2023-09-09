@@ -319,7 +319,7 @@ int											main						()	{
 	info_printf("Input JSON:\n%s", inputJson.begin());
 	gpk_necall(::gpk::jsonParse(jsonReader, inputJson), "Failed to parse json: '%s'.", inputJson.begin());
 	for(uint32_t iTest = 0; iTest < ::gpk::size(resultExpression); ++iTest) {
-		gerror_if(::gpk::failed(testJSONExpression(jsonReader, resultExpression[iTest].Val, resultExpression[iTest].Key)), "Failed to resolve expression: %s", ::gpk::toString(resultExpression[iTest].Val).begin())
+		ef_if(::gpk::failed(testJSONExpression(jsonReader, resultExpression[iTest].Val, resultExpression[iTest].Key)), "Failed to resolve expression: %s", ::gpk::toString(resultExpression[iTest].Val).begin())
 		else
 			++testsSucceeded;
 	}
@@ -332,7 +332,7 @@ int											main						()	{
 	//	const uint32_t			indexScript		= ::gpk::jsonArrayValueGet(*fileCases.Reader[indexMain], 1);
 	//	const ::gpk::SJSONNode	& nodeResult	= *fileCases.Reader[indexResult];
 	//	const ::gpk::SJSONNode	& nodeScript	= *fileCases.Reader[indexScript];
-	//	gerror_if(::gpk::failed(testJSONExpression(jsonReader, fileCases.Reader.View[nodeScript.ObjectIndex], fileCases.Reader.View[nodeResult.ObjectIndex])), "Failed to resolve expression: %s", ::gpk::toString(fileCases.Reader.View[nodeScript.ObjectIndex]).begin())
+	//	ef_if(::gpk::failed(testJSONExpression(jsonReader, fileCases.Reader.View[nodeScript.ObjectIndex], fileCases.Reader.View[nodeResult.ObjectIndex])), "Failed to resolve expression: %s", ::gpk::toString(fileCases.Reader.View[nodeScript.ObjectIndex]).begin())
 	//	else
 	//		++testsSucceeded;
 	//}
@@ -342,7 +342,7 @@ int											main						()	{
 		"\n{parents['1'].property.(properties[selection.active ? selection.index : '1'].name // this comment should not appear here"
 		"\n)}."
 		;
-	gerror_if(::testJSONFormatter(jsonReader, format, inputJson), "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", format.begin(), inputJson.begin())
+	ef_if(::testJSONFormatter(jsonReader, format, inputJson), "Failed to format string!""\nFormat: \n%s""\nInput JSON: \n%s", format.begin(), inputJson.begin())
 	else
 		++testsSucceeded;
 	info_printf("%u tests executed successfully", testsSucceeded);

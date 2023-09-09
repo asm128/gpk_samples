@@ -40,13 +40,13 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	::gpk::vcs						jsonPort					= {};
 	const ::gpk::SJSONReader		& jsonReader				= framework.JSONConfig.Reader;
 	{ // load port from config file
-		gwarn_if(errored(::gpk::jsonExpressionResolve(::gpk::vcs{"application.gpk_lobby.listen_port"}, jsonReader, 0, jsonPort)), "Failed to load config from json! Last contents found: %s.", jsonPort.begin())
+		wf_if(errored(::gpk::jsonExpressionResolve(::gpk::vcs{"application.gpk_lobby.listen_port"}, jsonReader, 0, jsonPort)), "Failed to load config from json! Last contents found: %s.", jsonPort.begin())
 		else {
 			::gpk::parseIntegerDecimal(jsonPort, port);
 			info_printf("Remote port: %u.", (uint32_t)port);
 		}
 		jsonPort															= {};
-		gwarn_if(errored(::gpk::jsonExpressionResolve(::gpk::vcs{"application.gpk_lobby.adapter"}, jsonReader, 0, jsonPort)), "Failed to load config from json! Last contents found: %s.", jsonPort.begin())
+		wf_if(errored(::gpk::jsonExpressionResolve(::gpk::vcs{"application.gpk_lobby.adapter"}, jsonReader, 0, jsonPort)), "Failed to load config from json! Last contents found: %s.", jsonPort.begin())
 		else {
 			::gpk::parseIntegerDecimal(jsonPort, adapter);
 			info_printf("Adapter: %u.", (uint32_t)adapter);

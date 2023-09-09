@@ -42,15 +42,15 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 		const ::gpk::SJSONReader		& jsonReader				= framework.JSONConfig.Reader;
 		{ //
 			::gpk::vcs						jsonIP						= {};
-			gwarn_if(errored(::gpk::jsonExpressionResolve(::gpk::vcs{"application.test_udp_client.remote_ip"}, jsonReader, 0, jsonIP)), "Failed to load config from json! Last contents found: %s.", jsonIP.begin())
+			wf_if(errored(::gpk::jsonExpressionResolve(::gpk::vcs{"application.test_udp_client.remote_ip"}, jsonReader, 0, jsonIP)), "Failed to load config from json! Last contents found: %s.", jsonIP.begin())
 			else {
 				info_printf("Remote IP: %s.", jsonIP.begin());
-				e_if(errored(::gpk::tcpipAddress(jsonIP, {}, app.LobbyClient.Client.AddressConnect)), "Failed to read IP address from JSON config file: %s.", jsonIP.begin());	// turn the string into a SIPv4Endpoint struct.
+				e_if(errored(::gpk::tcpipAddress(jsonIP, {}, app.LobbyClient.Client.AddressConnect)));	// turn the string into a SIPv4Endpoint struct.
 			}
 		}
 		{ // load port from config file
 			::gpk::vcs						jsonPort					= {};
-			gwarn_if(errored(::gpk::jsonExpressionResolve(::gpk::vcs{"application.test_udp_client.remote_port"}, jsonReader, 0, jsonPort)), "Failed to load config from json! Last contents found: %s.", jsonPort.begin())
+			wf_if(errored(::gpk::jsonExpressionResolve(::gpk::vcs{"application.test_udp_client.remote_port"}, jsonReader, 0, jsonPort)), "Failed to load config from json! Last contents found: %s.", jsonPort.begin())
 			else {
 				uint64_t						port;
 				::gpk::parseIntegerDecimal(jsonPort, port);

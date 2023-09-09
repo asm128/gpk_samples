@@ -94,7 +94,7 @@
 	for(uint32_t iRSM = 0; iRSM < (uint32_t)rswData.RSWModels.size(); ++iRSM){
 		::gpk::SRSMFileContents														& rsmData									= app.RSMData[iRSM];
 		sprintf_s(temp, "%s%s%s", ragnaPath, "model\\", &rswData.RSWModels[iRSM].Filename[0]);
-		e_if(errored(::gpk::rsmFileLoad(rsmData, ::gpk::vcs(temp))), "Failed to load file: %s.", temp);
+		ef_if(errored(::gpk::rsmFileLoad(rsmData, ::gpk::vcs(temp))), "Failed to load file: %s.", temp);
 	}
 	for(uint32_t iLight = 0; iLight < rswData.RSWLights.size(); ++iLight) {
 		rswData.RSWLights[iLight].Position										*= 1.0 / app.GNDData.Metrics.TileScale;
@@ -105,7 +105,7 @@
 	app.TexturesGND.resize(app.GNDData.TextureNames.size());
 	for(uint32_t iTex = 0; iTex < app.GNDData.TextureNames.size(); ++ iTex) {
 		sprintf_s(temp, "%s%s%s", ragnaPath, "texture\\", &app.GNDData.TextureNames[iTex][0]);
-		e_if(errored(::gpk::bmpFileLoad(::gpk::view_const_string(temp), app.TexturesGND[iTex])), "Not found? %s.", temp);
+		ef_if(errored(::gpk::bmpFileLoad(::gpk::view_const_string(temp), app.TexturesGND[iTex])), "Not found? %s.", temp);
 	}
 
 	app.GNDModel.Nodes.resize(app.GNDData.TextureNames.size() * 6);

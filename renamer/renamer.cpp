@@ -78,7 +78,7 @@ int main() {
 		if(-1 != iLastSlash) {
 			::gpk::vcc				folderName;
 			if(-1 != modified.slice(folderName, 0, iLastSlash) && folderName.size())
-				w_if(::gpk::pathCreate(folderName), "Failed to create path: '%s'.", folderName.begin());
+				wf_if(::gpk::pathCreate(folderName), "'%s'.", folderName.begin());
 		}
 
 		const ::gpk::vcc		original		= pathsOriginal[indicesToSource[iPath]];

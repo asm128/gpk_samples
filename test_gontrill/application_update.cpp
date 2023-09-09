@@ -361,9 +361,9 @@ static				::gpk::error_t										updateSpawnShots
 				const ::gpk::n2<float>														shotDirection								= (playerType == PLAYER_TYPE_PLAYER) ? ::gpk::n2<float>{1.0f, 0.0f} :
 					(gameInstance.Ships.Position[rand() % gameInstance.ShipsPlaying] - gameInstance.Enemies.Position[iShip]).InPlaceNormalize();
 				int32_t																		projectileIndex								= ::addProjectile(gameInstance, iShip, gameParticle.TypePlayer, gameParticle.TypeWeapon, weaponProp.Speed);
-				ce_if(errored(projectileIndex), "Projectile storage is full. Cannot add projectile.");
+				cef_if(errored(projectileIndex), "Projectile storage is full. Cannot add projectile.");
 				int32_t																		particleIndex								= ::addParticle(gameParticle, particleInstances, particleIntegrator, positions[iShip] + weaponParticleOffset, shotDirection, weaponProp.Speed, particleDefinitions);
-				e_if(errored(particleIndex), "Particle storage is full. Cannot add projectile particle.");
+				ef_if(errored(particleIndex), "Particle storage is full. Cannot add projectile particle.");
 			}
 		}
 	}
