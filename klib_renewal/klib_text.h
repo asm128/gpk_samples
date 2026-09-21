@@ -68,7 +68,7 @@ namespace klib
 	static inline	void				resetCursorString		(::klib::SMessageSlow & message)	{ return resetCursorString(message.Message); }
 
 	bool								getMessageSlow			(::klib::SMessageSlow & message, const char* textToPrint, uint32_t sizeToPrint, double lastFrameSeconds, double limit = 0.025f);
-	static inline	bool				getMessageSlow			(::klib::SMessageSlow & message, const ::gpk::vcc & textToPrint, double lastFrameSeconds, double limit = 0.025f)	{ return getMessageSlow(message, textToPrint.begin(), textToPrint.size(), lastFrameSeconds, limit); }
+	static inline	bool				getMessageSlow			(::klib::SMessageSlow & message, const ::gpk::vcsc_t & textToPrint, double lastFrameSeconds, double limit = 0.025f)	{ return getMessageSlow(message, textToPrint.begin(), textToPrint.size(), lastFrameSeconds, limit); }
 } // namespace
 
 #endif // KLIB_TEXT_H_23627

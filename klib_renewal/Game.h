@@ -41,7 +41,7 @@ namespace klib
 		::gpk::imgf32				Speed					= {};
 		::gpk::imgf32				SpeedTarget				= {};
 
-		inline	::gpk::error_t		Resize					(::gpk::n2u32 newSize) {
+		inline	::gpk::error_t		Resize					(::gpk::n2u2_t newSize) {
 			Screen			.resize(newSize, ' ', (uint16_t)::klib::ASCII_COLOR_INDEX_WHITE);
 			DisplayWeights	.resize(newSize, 0.0f);
 			Speed			.resize(newSize, 0.0f);

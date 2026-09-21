@@ -10,7 +10,7 @@
 #include "gpk_file.h"
 
 struct SConfigBuild {
-	::gpk::avcc							LibFile;
+	::gpk::avcsc_t							LibFile;
 };
 
 struct SBuildConfig {
@@ -98,7 +98,7 @@ static	int				appMain			(::gpk::vcs filenameConfig)			{
 				, ::gpk::toString(configBuild.JsonConfigOfBuild	).begin()
 			);
 			int32_t						indexOfLastSlash			= ::gpk::findLastSlash(configBuild.FilenameConfig);
-			configBuild.PathConfig	= (-1 == indexOfLastSlash) ? "./" : ::gpk::view_const_string{configBuild.FilenameConfig.begin(), (uint32_t)indexOfLastSlash};
+			configBuild.PathConfig	= (-1 == indexOfLastSlash) ? ::gpk::vcst_t{"./"} : ::gpk::vcst_t{configBuild.FilenameConfig.begin(), (uint32_t)indexOfLastSlash};
 			gpk_necall	(::buildConfig(configBuild)
 				, "Build failed. Configuration file: %s. Path: %s. Contents:\n%s"
 				, ::gpk::toString(configBuild.FilenameConfig	).begin()

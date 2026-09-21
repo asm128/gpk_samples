@@ -17,7 +17,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Solar System Test");
 	::gpk::SFramework			& framework		= app.Framework;
 	::gpk::SWindow				& mainWindow	= framework.RootWindow;
 	mainWindow.Size			= {1280, 720};
-	es_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
+	es_if(::gpk::failed(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
 	{ // Build the exit button
 		::gpk::SGUI					& gui			= *framework.GUI;
 		gui.ColorModeDefault	= ::gpk::GUI_COLOR_MODE_3D;
@@ -64,13 +64,13 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Solar System Test");
 	::gpk::pobj<::gpk::rtbgra8d32>	target;
 	target->resize(app.Framework.RootWindow.Size, {}, (uint32_t)-1);
 
-	const ::gpk::n3f32	cameraPosition	= app.SolarSystemGame.Scene.Camera.Position;
-	const ::gpk::n3f32	cameraTarget	= app.SolarSystemGame.Scene.Camera.Target;
-	const ::gpk::n3f32	cameraUp		= {0, 1};
+	const ::gpk::n3f2_t	cameraPosition	= app.SolarSystemGame.Scene.Camera.Position;
+	const ::gpk::n3f2_t	cameraTarget	= app.SolarSystemGame.Scene.Camera.Target;
+	const ::gpk::n3f2_t	cameraUp		= {0, 1};
 
-	const ::gpk::n2u16			offscreenMetrics	= target->Color.View.metrics16();
+	const ::gpk::n2u1_t			offscreenMetrics	= target->Color.View.metrics16();
 
-	::gpk::n3f32				cameraFront			= (cameraTarget - cameraPosition).Normalized();
+	::gpk::n3f2_t				cameraFront			= (cameraTarget - cameraPosition).Normalized();
 
 	//::gpk::SEngineSceneConstants	constants		= {};
 	//constants.CameraPosition	= cameraPosition;

@@ -40,7 +40,7 @@ static				void												setupParticles								()																				{
 					::SApplication										* g_ApplicationInstance						= 0;
 
 static				::gpk::error_t										updateSizeDependentResources				(::SApplication& app)											{
-	//stacxpr	const ::gpk::n2u32										GAME_SCREEN_SIZE							= {640, 360};
+	//stacxpr	const ::gpk::n2u2_t										GAME_SCREEN_SIZE							= {640, 360};
 	::gpk::updateSizeDependentTarget(app.Framework.RootWindow.BackBuffer->Color, app.Framework.RootWindow.Size);
 	::gpk::updateSizeDependentTarget(app.Framework.RootWindow.BackBuffer->DepthStencil, app.Framework.RootWindow.Size);
 	return 0;
@@ -106,10 +106,10 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	g_ApplicationInstance													= &app;
 	::gpk::SFramework				& framework									= app.Framework;
 	framework.RootWindow.Size												= {1280, 720};
-	es_if(errored(::gpk::mainWindowCreate(framework.RootWindow, framework.RuntimeValues.PlatformDetail, framework.RootWindow.Input)));
+	es_if(::gpk::failed(::gpk::mainWindowCreate(framework.RootWindow, framework.RuntimeValues.PlatformDetail, framework.RootWindow.Input)));
 	::setupParticles();
-	ree_if	(errored(::updateSizeDependentResources	(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
-	ree_if	(errored(::setupSprites					(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
+	ree_if	(::gpk::failed(::updateSizeDependentResources	(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
+	ree_if	(::gpk::failed(::setupSprites					(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
 	::gpk::g8bgra											& fontAtlasView								= app.Processed[GAME_TEXTURE_FONT_ATLAS].View;
 	const ::gpk::n2<uint32_t>													& fontAtlasMetrics							= fontAtlasView.metrics();
 	for(uint32_t y = 0, yMax = fontAtlasMetrics.y; y < yMax; ++y)
@@ -151,22 +151,22 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 ::gpk::error_t							drawCollisions								(::gpk::g8bgra target, ::SApplication & app);
 ::gpk::error_t			draw		(::SApplication & app)											{
 	::gpk::g8bgra						target										= app.Framework.RootWindow.BackBuffer->Color;
-	es_if(errored(::drawBackground	(target, app)));	// --- Draw stars
-	es_if(errored(::drawPowerups	(target, app)));	// --- Draw powerups
-	es_if(errored(::drawShips		(target, app)));	// --- Draw ship
-	es_if(errored(::drawCrosshair	(target, app)));	// --- Draw crosshair
-	es_if(errored(::drawThrust		(target, app)));	// --- Draw propulsion engine
-	es_if(errored(::drawShots		(target, app)));	// --- Draw lasers
-	es_if(errored(::drawCollisions	(target, app)));	// --- Draw debris particles
+	es_if(::gpk::failed(::drawBackground	(target, app)));	// --- Draw stars
+	es_if(::gpk::failed(::drawPowerups	(target, app)));	// --- Draw powerups
+	es_if(::gpk::failed(::drawShips		(target, app)));	// --- Draw ship
+	es_if(::gpk::failed(::drawCrosshair	(target, app)));	// --- Draw crosshair
+	es_if(::gpk::failed(::drawThrust		(target, app)));	// --- Draw propulsion engine
+	es_if(::gpk::failed(::drawShots		(target, app)));	// --- Draw lasers
+	es_if(::gpk::failed(::drawCollisions	(target, app)));	// --- Draw debris particles
 
-	stacxpr	const ::gpk::n2u8					sizeCharCell								= {9, 16};
+	stacxpr	const ::gpk::n2u0_t					sizeCharCell								= {9, 16};
 	uint16_t									lineOffset									= 0;
 	static	const ::gpk::vcs					textLine0									= "W: Up, S: Down, A: Left, D: Right";
 	static	const ::gpk::vcs					textLine1									= "T: Shoot. Y: Thrust. U: Handbrake.";
 	static	const ::gpk::vcs					textLine2									= "Press ESC to exit or P to (un)pause.";
 	::gpk::SFramework				& framework									= app.Framework;
 	::gpk::g8bgra						& fontAtlasView								= app.Processed[GAME_TEXTURE_FONT_ATLAS].View;
-	const ::gpk::n2u16							& offscreenMetrics							= target.metrics().Cast<uint16_t>();
+	const ::gpk::n2u1_t						& offscreenMetrics							= target.metrics().Cast<uint16_t>();
 	::gpk::textLineDrawAlignedFixedSizeLit(target, app.TextureFontMonochrome.View, fontAtlasView.metrics(), lineOffset++, offscreenMetrics, sizeCharCell, textLine0, ::gpk::bgra{0, app.Framework.FrameInfo.FrameMeter.FrameNumber % 0xFF, 0xFFU, 0xFFU});
 	::gpk::textLineDrawAlignedFixedSizeLit(target, app.TextureFontMonochrome.View, fontAtlasView.metrics(), lineOffset++, offscreenMetrics, sizeCharCell, textLine1, ::gpk::bgra{app.Framework.FrameInfo.FrameMeter.FrameNumber % 0xFFU, 0xFFU, 0, 0xFFU});
 	::gpk::textLineDrawAlignedFixedSize(target, fontAtlasView, lineOffset = offscreenMetrics.y / 16 - 1, offscreenMetrics, sizeCharCell, textLine2);
@@ -210,11 +210,11 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	retval_ginfo_if(1, systemRequestedExit, "Exiting because the runtime asked for close. We could also ignore this value and just continue execution if we don't want to exit.");
 	::gpk::SFramework				& framework		= app.Framework;
 	::gpk::error_t					frameworkResult	= ::gpk::updateFramework(framework);
-	rees_if(errored(frameworkResult));
+	rees_if(::gpk::failed(frameworkResult));
 	rvis_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == frameworkResult);
 
-	ree_if(errored(::updateSizeDependentResources(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
-	es_if(errored(::updateInput(app)));
+	ree_if(::gpk::failed(::updateSizeDependentResources(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
+	es_if(::gpk::failed(::updateInput(app)));
 	if(app.Paused)
 		return 0;
 
@@ -223,12 +223,12 @@ static				::gpk::error_t										setupSprites								(::SApplication& app)					
 	app.ColorBackground.g		= (uint8_t)(windDirection * (app.ColorBackground.b / 3.0));
 	app.ColorBackground.r		= (uint8_t)(windDirection * (app.ColorBackground.b / 3.0));
 
-	es_if(errored(::removeDeadStuff	(app)));
-	es_if(errored(::updateParticles	(app)));
-	es_if(errored(::updateSpawn		(app, particleDefinitions)));
-	es_if(errored(::updateShips		(app)));
-	es_if(errored(::updateEnemies	(app)));
-	es_if(errored(::updateShots		(app, particleDefinitions)));
-	es_if(errored(::updateGUI		(app)));
+	es_if(::gpk::failed(::removeDeadStuff	(app)));
+	es_if(::gpk::failed(::updateParticles	(app)));
+	es_if(::gpk::failed(::updateSpawn		(app, particleDefinitions)));
+	es_if(::gpk::failed(::updateShips		(app)));
+	es_if(::gpk::failed(::updateEnemies	(app)));
+	es_if(::gpk::failed(::updateShots		(app, particleDefinitions)));
+	es_if(::gpk::failed(::updateGUI		(app)));
 	return 0;
 }

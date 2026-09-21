@@ -30,7 +30,7 @@ namespace klib
 					continue;
 
 				const ::gpk::n3<int32_t>									& coordAgent										= agent.Position;
-				const ::gpk::n3f32										distance											= (coordAgent-origin).Cast<float>();
+				const ::gpk::n3f2_t										distance											= (coordAgent-origin).Cast<float>();
 				if(distance.Length() > range)
 					continue;
 

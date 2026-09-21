@@ -19,7 +19,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 	::gpk::SFramework				& framework						= app.Framework;
 	::gpk::SWindow					& mainWindow					= framework.RootWindow;
 	mainWindow.Size														= {1280, 720};
-	es_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
+	es_if(::gpk::failed(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
 	{ // Build the exit button
 		::gpk::SGUI						& gui								= *framework.GUI;
 		gui.ColorModeDefault		= ::gpk::GUI_COLOR_MODE_3D;
@@ -43,8 +43,8 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 	}
 	srand((uint32_t)time(0));
 
-	const ::gpk::n2u32							metricsMap						= app.TextOverlay.MetricsMap;
-	const ::gpk::n2u32							metricsLetter					= app.TextOverlay.MetricsLetter;
+	const ::gpk::n2u2_t							metricsMap						= app.TextOverlay.MetricsMap;
+	const ::gpk::n2u2_t							metricsLetter					= app.TextOverlay.MetricsLetter;
 	::gpk::img8bgra								fontImage;
 	::gpk::pngFileLoad(::gpk::vcs{"../gpk_data/images/Codepage_437_24_12x12.png"}, fontImage);
 	::gpk::grid<::gpk::SGeometryQuads>		viewGeometries					= {app.TextOverlay.GeometryLetters, {16, 16}};
@@ -55,7 +55,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 	for(uint32_t x = 0; x < metricsMap.x; ++x) {
 		tiles.clear();
 		const uint32_t								asciiCode			= y * app.TextOverlay.MetricsMap.x + x;
-		const ::gpk::n2u32							asciiCoords			= {asciiCode %		metricsMap.x, asciiCode / app.TextOverlay.MetricsMap.x};
+		const ::gpk::n2u2_t							asciiCoords			= {asciiCode %		metricsMap.x, asciiCode / app.TextOverlay.MetricsMap.x};
 		const uint32_t								offsetPixelCoord	= (asciiCoords.y *	metricsLetter.y) * imagePitch + (asciiCoords.x * app.TextOverlay.MetricsLetter.x);
 		::gpk::geometryBuildTileListFromImage({&fontImage.Texels[offsetPixelCoord], app.TextOverlay.MetricsLetter}, tiles, app.TextOverlay.MetricsLetter.x * app.TextOverlay.MetricsMap.x);
 		::gpk::geometryBuildGridFromTileList(app.TextOverlay.GeometryLetters[asciiCode], {tiles.begin(), app.TextOverlay.MetricsLetter}, {}, {1, 6.0f, 1});
@@ -137,7 +137,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "VDoP Server");
 		const ::gpk::apobj<::gpk::SUDPMessage>		& clientQueue				= app.MessagesToProcess[iClient];
 		for(uint32_t iMessage = 0; iMessage < clientQueue.size(); ++iMessage) {
 			::gpk::pobj<::gpk::SUDPMessage>				messageReceived				= clientQueue[iMessage];
-			::gpk::vcu8									viewPayload					= messageReceived->Payload;
+			::gpk::vcu0_t									viewPayload					= messageReceived->Payload;
 			info_printf("Server connection %i received: %s.", iClient, viewPayload.begin());
 			{
 				::std::lock_guard							lock						(app.TacticalServer.Mutex);

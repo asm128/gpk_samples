@@ -37,12 +37,12 @@ namespace klib
 	struct S##_name : public ::klib::SEntity { 											\
 		using					::klib::SEntity					::SEntity; 				\
 																						\
-		inline constexpr										S##_name		()	{}	\
-		inline constexpr										S##_name		(const SEntity& other)	: SEntity(other) {}	\
+		inxp													S##_name		()	{}	\
+		inxp													S##_name		(const SEntity& other)	: SEntity(other) {}	\
 																												\
-		static inline constexpr	::klib::ENTITY_TYPE				getType			()	{ return _type; }			\
-		static inline constexpr	::klib::SEntityPointsMultiplier	getMultipliers	()	{ return _multipliers; }	\
-		static					const ::gpk::vcc &				getName			()	{ static const ::gpk::vcc & name = ::gpk::vcs{#_name}; return name; }	\
+		sinx					::klib::ENTITY_TYPE				getType			()	{ return _type; }			\
+		sinx					::klib::SEntityPointsMultiplier	getMultipliers	()	{ return _multipliers; }	\
+		static					::gpk::vcsc_c &					getName			()	{ static ::gpk::vcsc_c & name = ::gpk::vcs{#_name}; return name; }	\
 	};
 
 	DECLARE_ENTITY(g_MultipliersProfession	, ENTITY_TYPE_PROFESSION	, Profession	);

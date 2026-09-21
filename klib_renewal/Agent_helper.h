@@ -9,7 +9,7 @@
 namespace klib
 {
 	template <typename _BitfieldType>
-	int32_t									displayFlag						(::gpk::gchar display, ::gpk::gu16 textAttributes, ::gpk::n2<int32_t> offset, _BitfieldType characterBits, uint32_t statusCount, uint16_t colorTitle, uint16_t colorField, const ::gpk::vcc& textFormat)	{
+	int32_t									displayFlag						(::gpk::gchar display, ::gpk::gu16 textAttributes, ::gpk::n2<int32_t> offset, _BitfieldType characterBits, uint32_t statusCount, uint16_t colorTitle, uint16_t colorField, const ::gpk::vcsc_t& textFormat)	{
 		uint16_t									color							= ::klib::ASCII_COLOR_INDEX_GREEN;
 		int32_t										iLine							= 0;
 		for(uint32_t iStatus=0; iStatus<statusCount; ++iStatus) {
@@ -17,7 +17,7 @@ namespace klib
 			if(0 == (statusBit & characterBits))
 				continue;
 
-			::gpk::vcc						valueLabel						= ::gpk::get_value_label(statusBit);
+			::gpk::vcsc_t						valueLabel						= ::gpk::get_value_label(statusBit);
 			int32_t										actualX							= printfToGridColored(display, textAttributes, (color = colorTitle), offset.y+iLine, offset.x, ::klib::SCREEN_LEFT, textFormat.begin(), valueLabel.begin());
 			valueToGrid(textAttributes, offset.y+iLine, (int32_t)(actualX+textFormat.size()-8), ::klib::SCREEN_LEFT, &(color = colorField), 1, (int32_t)(textFormat.size()+valueLabel.size()-8));
 			++iLine;

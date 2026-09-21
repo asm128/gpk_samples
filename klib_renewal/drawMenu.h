@@ -28,7 +28,7 @@ namespace klib
 	void				printMultipageHelp		(char * targetASCII, uint32_t targetWidth, uint32_t targetHeight, uint32_t currentPage, uint32_t pageCount, uint32_t posXOffset);
 
 	template <size_t _FormatLen>
-	static	int32_t		drawExitOption			(char * targetASCII, uint16_t * targetAttributes, uint32_t targetWidth, uint32_t targetHeight, uint32_t posXOffset, ::klib::ALIGN_SCREEN align, const char (&formatString)[_FormatLen], const ::gpk::vcc& exitText, bool bSelected )		{
+	static	int32_t		drawExitOption			(char * targetASCII, uint16_t * targetAttributes, uint32_t targetWidth, uint32_t targetHeight, uint32_t posXOffset, ::klib::ALIGN_SCREEN align, const char (&formatString)[_FormatLen], const ::gpk::vcsc_t& exitText, bool bSelected )		{
 		int32_t					offsetY					= (int32_t)targetHeight-MENU_ROFFSET-1;
 		int32_t					actualOffsetX			= ::klib::printfToRect(targetASCII, targetWidth, targetHeight, offsetY, posXOffset, align, formatString, "0", exitText.begin());
 
@@ -36,20 +36,20 @@ namespace klib
 		return ::klib::valueToRect(targetAttributes, targetWidth, targetHeight,  offsetY, actualOffsetX, ::klib::SCREEN_LEFT, &colorBkg, 1, (int32_t)exitText.size()+3);
 	}
 
-	int32_t				drawMenu				(SDrawMenuState	& localPersistentState, ::gpk::gchar display, uint16_t * targetAttributes, const ::gpk::vcc & title, const ::gpk::view<const ::gpk::vcc> & menuItems, const ::klib::SInput& frameInput, const int32_t noActionValue=-1, uint32_t rowWidth=20, bool disableEscKeyClose=false, const ::gpk::vcc& exitText=::gpk::vcs{"Exit this menu"});
+	int32_t				drawMenu				(SDrawMenuState	& localPersistentState, ::gpk::gchar display, uint16_t * targetAttributes, const ::gpk::vcsc_t & title, const ::gpk::view<const ::gpk::vcsc_t> & menuItems, const ::klib::SInput& frameInput, const int32_t noActionValue=-1, uint32_t rowWidth=20, bool disableEscKeyClose=false, const ::gpk::vcsc_t& exitText=::gpk::vcs{"Exit this menu"});
 	template <typename _ReturnType>
-	const _ReturnType&	drawMenu				(SDrawMenuState	& localPersistentState, ::gpk::gchar display, uint16_t * targetAttributes, const ::gpk::vcc & title, const ::gpk::view<const _ReturnType> & menuItems, const ::gpk::view<const ::gpk::vcc>& menuItemsText, const ::klib::SInput& frameInput, const _ReturnType& exitValue, const _ReturnType& noActionValue=-1, uint32_t rowWidth=20, bool disableEscKeyClose=false, const ::gpk::vcc& exitText=::gpk::vcs{"Exit this menu"}) {
+	const _ReturnType&	drawMenu				(SDrawMenuState	& localPersistentState, ::gpk::gchar display, uint16_t * targetAttributes, const ::gpk::vcsc_t & title, const ::gpk::view<const _ReturnType> & menuItems, const ::gpk::view<const ::gpk::vcsc_t>& menuItemsText, const ::klib::SInput& frameInput, const _ReturnType& exitValue, const _ReturnType& noActionValue=-1, uint32_t rowWidth=20, bool disableEscKeyClose=false, const ::gpk::vcsc_t& exitText=::gpk::vcs{"Exit this menu"}) {
 		const int32_t			exitValueInt			= ::klib::drawMenu(localPersistentState, display, targetAttributes, title, menuItemsText, frameInput, -1, rowWidth, disableEscKeyClose, exitText);
 			 if(exitValueInt == (int32_t)menuItemsText.size())	return exitValue;
 		else if(exitValueInt == -1)								return noActionValue;
 		else 													return menuItems[exitValueInt];
 	}
 	template <typename _ReturnType>
-	const _ReturnType	&									drawMenu						(SDrawMenuState	& localPersistentState, ::gpk::gchar display, uint16_t * targetAttributes, const ::gpk::vcc & title, const ::gpk::view<const ::klib::SMenuItem<_ReturnType>> & menuItems, const ::klib::SInput& frameInput, const _ReturnType& exitValue, const _ReturnType& noActionValue=-1, uint32_t rowWidth=20, bool disableEscKeyClose=false, const ::gpk::vcc& exitText=::gpk::vcs{"Exit this menu"}) {
-		::gpk::array_obj<::gpk::vcc>					items;
+	const _ReturnType	&									drawMenu						(SDrawMenuState	& localPersistentState, ::gpk::gchar display, uint16_t * targetAttributes, const ::gpk::vcsc_t & title, const ::gpk::view<const ::klib::SMenuItem<_ReturnType>> & menuItems, const ::klib::SInput& frameInput, const _ReturnType& exitValue, const _ReturnType& noActionValue=-1, uint32_t rowWidth=20, bool disableEscKeyClose=false, const ::gpk::vcsc_t& exitText=::gpk::vcs{"Exit this menu"}) {
+		::gpk::array_obj<::gpk::vcsc_t>					items;
 		items.reserve(menuItems.size());
 		for(uint32_t iItem = 0; iItem < menuItems.size(); ++iItem) {
-			const ::gpk::vcc								menuText						= menuItems[iItem].Text;
+			const ::gpk::vcsc_t								menuText						= menuItems[iItem].Text;
 			if(0 == menuText.size())
 				break;
 			items.push_back(menuText);
@@ -66,10 +66,10 @@ namespace klib
 		uint32_t		RowWidth;
 		_ReturnType		ValueExit;
 		bool			bDisableEscapeKey;
-		::gpk::vcc		TextExit;
+		::gpk::vcsc_t		TextExit;
 		SDrawMenuState	MenuState;
 
-		constexpr		SMenuHeader				(_ReturnType exitValue, const ::gpk::vcs & title, uint32_t rowWidth=24, bool disableEscapeKey=false, const ::gpk::vcc & exitText = ::gpk::vcs{"Exit this menu"})
+		constexpr		SMenuHeader				(_ReturnType exitValue, const ::gpk::vcs & title, uint32_t rowWidth=24, bool disableEscapeKey=false, const ::gpk::vcsc_t & exitText = ::gpk::vcs{"Exit this menu"})
 			: Title				(title)
 			, RowWidth			(rowWidth)
 			, ValueExit			(exitValue)

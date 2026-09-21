@@ -18,7 +18,7 @@
 	app.Framework.GUI													= app.DialogMain.GUI;
 	app.DialogMain.Input												= mainWindow.Input;
 	mainWindow.Size														= {1024, 768};
-	es_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
+	es_if(::gpk::failed(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
 	::gpk::SGUI						& gui						= *framework.GUI;
 	gui.ColorModeDefault												= ::gpk::GUI_COLOR_MODE_3D;
 	gui.ThemeDefault													= ::gpk::ASCII_COLOR_DARKGREEN * 16 + 7;
@@ -94,18 +94,18 @@
 	for(uint32_t iRSM = 0; iRSM < (uint32_t)rswData.RSWModels.size(); ++iRSM){
 		::gpk::SRSMFileContents														& rsmData									= app.RSMData[iRSM];
 		sprintf_s(temp, "%s%s%s", ragnaPath, "model\\", &rswData.RSWModels[iRSM].Filename[0]);
-		ef_if(errored(::gpk::rsmFileLoad(rsmData, ::gpk::vcs(temp))), "Failed to load file: %s.", temp);
+		ef_if(::gpk::failed(::gpk::rsmFileLoad(rsmData, ::gpk::vcs(temp))), "Failed to load file: %s.", temp);
 	}
 	for(uint32_t iLight = 0; iLight < rswData.RSWLights.size(); ++iLight) {
 		rswData.RSWLights[iLight].Position										*= 1.0 / app.GNDData.Metrics.TileScale;
-		rswData.RSWLights[iLight].Position										+= ::gpk::n3f32{app.GNDData.Metrics.Size.x / 2.0f, 0.0f, (app.GNDData.Metrics.Size.y / 2.0f)};
+		rswData.RSWLights[iLight].Position										+= ::gpk::n3f2_t{app.GNDData.Metrics.Size.x / 2.0f, 0.0f, (app.GNDData.Metrics.Size.y / 2.0f)};
 		rswData.RSWLights[iLight].Position.y									*= -1;
 	}
 
 	app.TexturesGND.resize(app.GNDData.TextureNames.size());
 	for(uint32_t iTex = 0; iTex < app.GNDData.TextureNames.size(); ++ iTex) {
 		sprintf_s(temp, "%s%s%s", ragnaPath, "texture\\", &app.GNDData.TextureNames[iTex][0]);
-		ef_if(errored(::gpk::bmpFileLoad(::gpk::view_const_string(temp), app.TexturesGND[iTex])), "Not found? %s.", temp);
+		ef_if(::gpk::failed(::gpk::bmpFileLoad(::gpk::view_const_string(temp), app.TexturesGND[iTex])), "Not found? %s.", temp);
 	}
 
 	app.GNDModel.Nodes.resize(app.GNDData.TextureNames.size() * 6);
@@ -138,7 +138,7 @@
 		const int32_t					texIndex1				= processTile1 ? app.GNDData.lstTileTextureData[tileGeometry1.SkinMapping.SkinIndexTop].TextureIndex : -1;
 		const int32_t					texIndex2				= processTile2 ? app.GNDData.lstTileTextureData[tileGeometry2.SkinMapping.SkinIndexTop].TextureIndex : -1;
 		const int32_t					texIndex3				= processTile3 ? app.GNDData.lstTileTextureData[tileGeometry3.SkinMapping.SkinIndexTop].TextureIndex : -1;
-		::gpk::n3f32					normal					= {};
+		::gpk::n3f2_t					normal					= {};
 		uint32_t						divisor					= 0;
 		if(processTile0) { ++divisor; ::gpk::SModelNodeGND & gndNode0 = app.GNDModel.Nodes[texIndex0]; normal += gndNode0.Normals[tileMapping0.VerticesTop[3]]; }
 		if(processTile1) { ++divisor; ::gpk::SModelNodeGND & gndNode1 = app.GNDModel.Nodes[texIndex1]; normal += gndNode1.Normals[tileMapping1.VerticesTop[2]]; }
@@ -252,19 +252,19 @@
 	::gpk::SCameraPoints														& camera									= app.Scene.Camera.Points;
 	//camera.Position.RotateY(framework.Input->MouseCurrent.Deltas.x / 20.0f / (framework.Input->KeyboardCurrent.KeyState[VK_CONTROL] ? 2.0 : 1));
 	//if(framework.Input->MouseCurrent.Deltas.z) {
-	//	::gpk::n3f32														zoomVector									= camera.Position;
+	//	::gpk::n3f2_t														zoomVector									= camera.Position;
 	//	zoomVector.Normalize();
 	//	const double																zoomWeight									= framework.Input->MouseCurrent.Deltas.z * (framework.Input->KeyboardCurrent.KeyState[VK_SHIFT] ? 10 : 1) / 240.;
 	//	camera.Position															+= zoomVector * zoomWeight * .5;
 	//}
 	camera.Target																= {app.TextureMinimap.metrics().x / 2.0f, 0, -(int32_t)app.TextureMinimap.metrics().y / 2.0f};
 	//------------------------------------------------ Lights
-	::gpk::n3f32														& lightDir									= app.LightDirection;
+	::gpk::n3f2_t														& lightDir									= app.LightDirection;
 	lightDir.RotateY(frameInfo.Microseconds.LastFrame / 1000000.0f);
 	lightDir.Normalize();
 
 	::gpk::SRSWFileContents														& rswData									= app.RSWData;
-	const ::gpk::n3f32													halfMapDir									= ::gpk::n3f32{app.GNDData.Metrics.Size.x / 2.0f, 0.0f, (app.GNDData.Metrics.Size.y / 2.0f)};
+	const ::gpk::n3f2_t													halfMapDir									= ::gpk::n3f2_t{app.GNDData.Metrics.Size.x / 2.0f, 0.0f, (app.GNDData.Metrics.Size.y / 2.0f)};
 	for(uint32_t iLight = 0; iLight < rswData.RSWLights.size(); ++iLight) {
 		rswData.RSWLights[iLight].Position										-= halfMapDir;
 		rswData.RSWLights[iLight].Position.RotateY(frameInfo.Seconds.LastFrame);
@@ -302,7 +302,7 @@
 	, ::gpk::SSceneCamera						& camera
 	, ::gpk::SWindow::TOffscreen				& target
 	, const ::gpk::SModelPivot<float>			& modelPivot
-	, const ::gpk::n3f32						& lightDir
+	, const ::gpk::n3f2_t						& lightDir
 	, const ::gpk::SModelGND					& modelGND
 	, const ::gpk::SRSWWorldLight				& directionalLight
 	, const ::gpk::view<const ::gpk::img8bgra>	& textures
@@ -324,7 +324,7 @@
 	app.DialogMain.Controls[app.CheckBox].as(checkbox);
 
 	int32_t 																pixelsDrawn0								= drawGND(app.RenderCache, app.Scene.Transforms, app.Scene.Camera, buffer3D, app.GridPivot, app.LightDirection, app.GNDModel, app.RSWData.Light, app.TexturesGND, app.RSWData.RSWLights, checkbox->Checked);
-	es_if(errored(pixelsDrawn0));
+	es_if(::gpk::failed(pixelsDrawn0));
 	::gpk::pobj<::gpk::rtbgra8d32>	target;
 	target.create();
 	target->resize(app.Framework.RootWindow.Size, ::gpk::LIGHTGRAY, 0xFFFFFFFFU);

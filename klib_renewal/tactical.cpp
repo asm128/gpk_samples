@@ -463,7 +463,7 @@ static CHARACTER_TURN_ACTION											characterTurn									(const ::klib::SEnt
 
 				::gpk::n3<int32_t>														coordPlayer										= playerAgent.Position;
 				::gpk::n3<int32_t>														coordTarget										= targetAgent.Position;
-				::gpk::n3f32														distance										= (coordTarget-coordPlayer).Cast<float>();
+				::gpk::n3f2_t														distance										= (coordTarget-coordPlayer).Cast<float>();
 
 				const ::klib::SEntityPoints													& playerAgentPoints								= playerAgent.FinalPoints;
 				const ::klib::SEntityFlags													& playerAgentFlags								= playerAgent.FinalFlags;
@@ -589,7 +589,7 @@ int32_t																	initInventoryMenu								(::klib::CCharacter& adventurer
 	return 0;
 }
 
-int32_t																	drawInventoryMenu								(::klib::SGame& instanceGame, ::klib::CCharacter& adventurer, const ::gpk::vcc& menuTitle)								{
+int32_t																	drawInventoryMenu								(::klib::SGame& instanceGame, ::klib::CCharacter& adventurer, const ::gpk::vcsc_t& menuTitle)								{
 	::klib::SMenuItem<int32_t>													itemOptions[4096]								= {};
 	::gpk::SRenderTarget<char, uint16_t>										& globalDisplay									= instanceGame.GlobalDisplay.Screen;
 	::klib::SCharacterInventory													& characterInventory							= adventurer.Goods.Inventory;
@@ -602,7 +602,7 @@ int32_t																	drawInventoryMenu								(::klib::SGame& instanceGame, :
 
 };
 
-::klib::TURN_ACTION														useItems										(::klib::SGame& instanceGame, ::klib::SGameMessages & messages, ::klib::SGamePlayer& player, ::klib::CCharacter& user, const ::gpk::vcc& menuTitle, bool bIsAIControlled) {
+::klib::TURN_ACTION														useItems										(::klib::SGame& instanceGame, ::klib::SGameMessages & messages, ::klib::SGamePlayer& player, ::klib::CCharacter& user, const ::gpk::vcsc_t& menuTitle, bool bIsAIControlled) {
 	int32_t																		indexInventory									= ~0U;
 	bool																		bUsedItem										= false;
 	if(!bIsAIControlled)  {
@@ -703,7 +703,7 @@ static	void															updateBullets									(::klib::SGame & instanceGame, d
 		if(fActualSpeed >= 0.25)
 			fActualSpeed															= 0.25;
 		::klib::STacticalCoord														& bulletPos										= bullets[iBullet].Position;
-		::gpk::n3f32														& bulletDir										= bullets[iBullet].Direction;
+		::gpk::n3f2_t														& bulletDir										= bullets[iBullet].Direction;
 		bulletPos.Offset.AddScaled(bulletDir, fActualSpeed);
 		::klib::SBullet																newBullet										= bullets[iBullet];
 		::klib::STacticalCoord														& newBulletPos									= newBullet.Position;
@@ -813,7 +813,7 @@ static	void															updateBullets									(::klib::SGame & instanceGame, d
 								continue;
 
 							const ::gpk::n3<int32_t>	currentCoord	= {x, y, z};
-							const ::gpk::n3f32		distance		= (currentCoord-newAOE.Position.Cell).Cast<float>();
+							const ::gpk::n3f2_t		distance		= (currentCoord-newAOE.Position.Cell).Cast<float>();
 							double							length			= distance.Length();
 							if((length + 1.0000000000001) > newAOE.RadiusOrHalfSize)
 								continue;
@@ -830,17 +830,17 @@ static	void															updateBullets									(::klib::SGame & instanceGame, d
 									continue;
 								tileGeometry.fHeight[0]		-= (float)(newAOE.RadiusOrHalfSize/2*(1.0-proportion));
 
-								length						= ::gpk::n3f32{distance.x+1, distance.y, distance.z}.Length();
+								length						= ::gpk::n3f2_t{distance.x+1, distance.y, distance.z}.Length();
 								proportion					= length/newAOE.RadiusOrHalfSize;
 								if(proportion <= 1.0)
 									tileGeometry.fHeight[1]		-= (float)(newAOE.RadiusOrHalfSize/2*(1.0-proportion));
 
-								length						= ::gpk::n3f32{distance.x, distance.y, distance.z+1}.Length();
+								length						= ::gpk::n3f2_t{distance.x, distance.y, distance.z+1}.Length();
 								proportion					= length/newAOE.RadiusOrHalfSize;
 								if(proportion <= 1.0)
 									tileGeometry.fHeight[2]		-= (float)(newAOE.RadiusOrHalfSize/2*(1.0-proportion));
 
-								length						= ::gpk::n3f32{distance.x+1, distance.y, distance.z+1}.Length();
+								length						= ::gpk::n3f2_t{distance.x+1, distance.y, distance.z+1}.Length();
 								proportion					= length/newAOE.RadiusOrHalfSize;
 								if(proportion <= 1.0)
 									tileGeometry.fHeight[3]		-= (float)(newAOE.RadiusOrHalfSize/2*(1.0-proportion));
@@ -866,7 +866,7 @@ static	void															updateBullets									(::klib::SGame & instanceGame, d
 						::klib::CCharacter						& agentVictim			= *playerVictim.Tactical.Army[playerVictim.Tactical.Squad.Agents[agentsInRange.Agents[iAgentInRange].Agent.AgentIndex]];
 						//::gpk::n3<int32_t> distance = agentVictim.Position-newAOE.Position.Cell;
 						const ::gpk::n3<int32_t>			& coordAgent			= agentVictim.Position;
-						const ::gpk::n3f32				distance				= (coordAgent - newAOE.Position.Cell).Cast<float>();
+						const ::gpk::n3f2_t				distance				= (coordAgent - newAOE.Position.Cell).Cast<float>();
 						double									length					= distance.Length();
 						if(length > newAOE.RadiusOrHalfSize)
 							continue;
@@ -977,7 +977,7 @@ bool																	initTacticalGame								(::klib::SGame& instanceGame);
 			selectedAction = ::selectRemoteAction(tacticalInfo, instanceGame.Players);
 	}
 	else {
-		::gpk::n3f32				bulletPos				= {0.0f,0.0f,0.0f};
+		::gpk::n3f2_t				bulletPos				= {0.0f,0.0f,0.0f};
 		const ::klib::SBullet				& bulletToPrint			= tacticalInfo.Board.Shots.Bullet[0];
 		bulletPos.x						= bulletToPrint.Position.Cell.x + bulletToPrint.Position.Offset.x;
 		bulletPos.y						= bulletToPrint.Position.Cell.y + bulletToPrint.Position.Offset.y;

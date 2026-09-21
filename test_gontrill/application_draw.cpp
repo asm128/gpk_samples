@@ -7,7 +7,7 @@
 
 #define Y_PLUS -
 
-static	::gpk::error_t						drawShipHealthBar			(::gpk::g8bgra target, ::SApplication & app, const ::gpk::n2f32 & centerEnemy, const ::gpk::n2<int32_t> & halfMetrics, uint32_t health, int32_t yOffset, const ::gpk::bgra & finalColor)											{
+static	::gpk::error_t						drawShipHealthBar			(::gpk::g8bgra target, ::SApplication & app, const ::gpk::n2f2_t & centerEnemy, const ::gpk::n2<int32_t> & halfMetrics, uint32_t health, int32_t yOffset, const ::gpk::bgra & finalColor)											{
 	::gpk::line2<int32_t>							healthBar					= {};
 	healthBar.A 								= {(int32_t)(centerEnemy.x  + .5f - halfMetrics.x), (int32_t)(centerEnemy.y Y_PLUS yOffset)};
 	healthBar.B									= healthBar.A; //{(int32_t)(centerEnemy.x  + .5f + halfMetrics.x), (int32_t)(centerEnemy.y + yOffset)};
@@ -17,7 +17,7 @@ static	::gpk::error_t						drawShipHealthBar			(::gpk::g8bgra target, ::SApplica
 	app.CacheLinePoints.clear();
 	::gpk::drawLine(target.metrics().Cast<uint16_t>(), healthBar, app.CacheLinePoints);
 	for(uint32_t iLinePoint = 0, pointCount = app.CacheLinePoints.size(); iLinePoint < pointCount; ++iLinePoint) {
-		const ::gpk::n2f32								& pointToDraw								= app.CacheLinePoints[iLinePoint].Cast<float>();
+		const ::gpk::n2f2_t								& pointToDraw								= app.CacheLinePoints[iLinePoint].Cast<float>();
 		::gpk::drawPixelLight(target, pointToDraw, finalColor, .2f, 1.5f);
 	}
 	return 0;
@@ -36,8 +36,8 @@ static	::gpk::error_t						drawShipHealthBar			(::gpk::g8bgra target, ::SApplica
 	for(uint32_t iEnemy = 0, enemyCount = gameInstance.Enemies.Alive.size(); iEnemy < enemyCount; ++iEnemy) {
 		if(0 == gameInstance.Enemies.Alive[iEnemy])
 			continue;
-		stacxpr ::gpk::n2f32						reference								= {1, 0};
-		::gpk::n2f32										vector;
+		stacxpr ::gpk::n2f2_t						reference								= {1, 0};
+		::gpk::n2f2_t										vector;
 		static double									beaconTimer								= 0;
 		beaconTimer									+= framework.FrameInfo.Seconds.LastFrame * 8;
 		int32_t											selectedPos								= ((int32_t)beaconTimer % ::gpk::size(indexPositionsX));
@@ -47,10 +47,10 @@ static	::gpk::error_t						drawShipHealthBar			(::gpk::g8bgra target, ::SApplica
 			::gpk::n2<int32_t>								dstOffset								= (gameInstance.Enemies.Position[iEnemy] + vector).Cast<int32_t>() - app.TextureCenters[GAME_TEXTURE_ENEMY];
 			//if constexpr((Y_PLUS 1) == -1)
 			//	dstOffset.y *= -1;
-			es_if(errored(::gpk::grid_copy_alpha(viewOffscreen, enemyView, dstOffset, {0xFF, 0, 0xFF, 0xFF})));
+			es_if(::gpk::failed(::gpk::grid_copy_alpha(viewOffscreen, enemyView, dstOffset, {0xFF, 0, 0xFF, 0xFF})));
 			{ // Draw ghost light
-				::gpk::n2f32										centerPowerup							= gameInstance.Enemies.Position[iEnemy] + vector;
-				::gpk::n2f32										lightCrosshair							= centerPowerup + ::gpk::n2f32{(float)indexPositionsX[selectedPos], 0.0f};
+				::gpk::n2f2_t										centerPowerup							= gameInstance.Enemies.Position[iEnemy] + vector;
+				::gpk::n2f2_t										lightCrosshair							= centerPowerup + ::gpk::n2f2_t{(float)indexPositionsX[selectedPos], 0.0f};
 				::gpk::drawPixelLight(viewOffscreen, lightCrosshair.Cast<float>(), ::gpk::bgra(::gpk::YELLOW), .2f, 3.0f);
 			}
 		}
@@ -59,9 +59,9 @@ static	::gpk::error_t						drawShipHealthBar			(::gpk::g8bgra target, ::SApplica
 	for(uint32_t iEnemy = 0, enemyCount = gameInstance.Enemies.Alive.size(); iEnemy < enemyCount; ++iEnemy) {
 		if(0 == gameInstance.Enemies.Alive[iEnemy])
 			continue;
-		const ::gpk::n2f32								& centerEnemy								= gameInstance.Enemies.Position[iEnemy];
+		const ::gpk::n2f2_t								& centerEnemy								= gameInstance.Enemies.Position[iEnemy];
 		const ::SHealthPoints							& enemyHealth								= gameInstance.Enemies.Health[iEnemy];
-		es_if(errored(::gpk::grid_copy_alpha(viewOffscreen, enemyView, centerEnemy.Cast<int32_t>() - app.TextureCenters[GAME_TEXTURE_ENEMY], {0xFF, 0, 0xFF, 0xFF})));
+		es_if(::gpk::failed(::gpk::grid_copy_alpha(viewOffscreen, enemyView, centerEnemy.Cast<int32_t>() - app.TextureCenters[GAME_TEXTURE_ENEMY], {0xFF, 0, 0xFF, 0xFF})));
 		::drawShipHealthBar(target, app, centerEnemy, halfMetricsEnemy, enemyHealth.Health, (int32_t)(halfMetricsEnemy2y	), ::gpk::GREEN);
 		::drawShipHealthBar(target, app, centerEnemy, halfMetricsEnemy, enemyHealth.Shield, (int32_t)(halfMetricsEnemy2y - 2), ::gpk::CYAN );
 	}
@@ -70,12 +70,12 @@ static	::gpk::error_t						drawShipHealthBar			(::gpk::g8bgra target, ::SApplica
 		if(0 == gameInstance.Ships.Alive[iShip])
 			continue;
 		const ::gpk::g8bgra											& shipView									= app.Processed[GAME_TEXTURE_SHIP0 + iShip].View;
-		const ::gpk::n2f32														& centerShip								= gameInstance.Ships.Position	[iShip];
+		const ::gpk::n2f2_t														& centerShip								= gameInstance.Ships.Position	[iShip];
 		const ::SHealthPoints														& enemyHealth								= gameInstance.Ships.Health	[iShip];
 		::gpk::n2<int32_t>														halfMetricsShip								= (shipView.metrics() / 2).Cast<int32_t>();
 		int32_t																		halfMetricsShip2y							= halfMetricsShip.y;
 		::gpk::n2<int32_t>														dstOffset									= gameInstance.Ships.Position[iShip].Cast<int32_t>() - app.TextureCenters[GAME_TEXTURE_SHIP0 + iShip];
-		es_if(errored(::gpk::grid_copy_alpha(viewOffscreen, shipView, dstOffset, {0xFF, 0, 0xFF, 0xFF})));
+		es_if(::gpk::failed(::gpk::grid_copy_alpha(viewOffscreen, shipView, dstOffset, {0xFF, 0, 0xFF, 0xFF})));
 		::drawShipHealthBar(target, app, centerShip, halfMetricsShip, enemyHealth.Health, (int32_t)(halfMetricsShip2y		), ::gpk::GREEN);
 		::drawShipHealthBar(target, app, centerShip, halfMetricsShip, enemyHealth.Shield, (int32_t)(halfMetricsShip2y - 2	), ::gpk::CYAN );
 	}
@@ -83,11 +83,11 @@ static	::gpk::error_t						drawShipHealthBar			(::gpk::g8bgra target, ::SApplica
 	for(uint32_t iEnemy = 0, enemyCount = gameInstance.Enemies.Alive.size(); iEnemy < enemyCount; ++iEnemy) {
 		if(0 == gameInstance.Enemies.Alive[iEnemy])
 			continue;
-		const ::gpk::n2f32													& centerEnemy								= gameInstance.Enemies.Position[iEnemy];
+		const ::gpk::n2f2_t													& centerEnemy								= gameInstance.Enemies.Position[iEnemy];
 		static double																beaconTimer									= 0;
 		beaconTimer																+= framework.FrameInfo.Seconds.LastFrame * 8;
 		int32_t																		selectedPos									= ((int32_t)beaconTimer % ::gpk::size(indexPositionsX));
-		::gpk::n2f32														lightCrosshair								= centerEnemy + ::gpk::n2f32{(float)indexPositionsX[selectedPos], 0.0f};
+		::gpk::n2f2_t														lightCrosshair								= centerEnemy + ::gpk::n2f2_t{(float)indexPositionsX[selectedPos], 0.0f};
 		::gpk::drawPixelLight(viewOffscreen, lightCrosshair.Cast<float>(), ::gpk::bgra(::gpk::RED), .2f, 3.0f);
 	}
 	return 0;
@@ -95,12 +95,12 @@ static	::gpk::error_t						drawShipHealthBar			(::gpk::g8bgra target, ::SApplica
 
 					::gpk::error_t										drawCollisions								(::gpk::g8bgra target, ::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	for(uint32_t iRay = 0, rayCount = app.StuffToDraw.CollisionPoints.size(); iRay < rayCount; ++iRay) {
-		const ::gpk::n2f32													& pointToDraw									= app.StuffToDraw.CollisionPoints[iRay];
+		const ::gpk::n2f2_t													& pointToDraw									= app.StuffToDraw.CollisionPoints[iRay];
 		::gpk::drawPixelLight(target, pointToDraw, ::gpk::bgra(::gpk::ORANGE), .15f, 3.0f);
 	}
 	for(uint32_t iRay = 0, rayCount = app.StuffToDraw.Debris.size(); iRay < rayCount; ++iRay) {
 		const ::SParticleToDraw														& particleToDraw								= app.StuffToDraw.Debris[iRay];
-		const ::gpk::n2f32													& pointToDraw									= particleToDraw.Position.Cast<float>();
+		const ::gpk::n2f2_t													& pointToDraw									= particleToDraw.Position.Cast<float>();
 		if(app.ParticleSystemDebris.Instances[particleToDraw.IndexParticleInstance].Binding.Lit) {
 			::gpk::bgra															finalColor
 				= (0 == (particleToDraw.IndexParticlePhysics % 3)) ? ::gpk::bgra(::gpk::YELLOW)
@@ -138,12 +138,12 @@ static	const ::gpk::astatic<::gpk::bgra, WEAPON_TYPE_COUNT>	weaponTypeColorPalet
 		const ::gpk::bgra														finalColor									= weaponTypeColorPalette[gameParticle.Binding.TypeWeapon];
 
 		if(0 == app.CacheLinePoints.size()) {
-			const ::gpk::n2f32													& pointToDraw								= app.StuffToDraw.ProjectilePaths[iRay].Segment.A;
+			const ::gpk::n2f2_t													& pointToDraw								= app.StuffToDraw.ProjectilePaths[iRay].Segment.A;
 			::gpk::drawPixelLight(target, pointToDraw, finalColor, lightValue, lightRange);
 		}
 		else
 			for(uint32_t iLinePoint = 0, pointCount = app.CacheLinePoints.size(); iLinePoint < pointCount; ++iLinePoint) {
-				const ::gpk::n2f32													& pointToDraw								= app.CacheLinePoints[iLinePoint].Cast<float>();
+				const ::gpk::n2f2_t													& pointToDraw								= app.CacheLinePoints[iLinePoint].Cast<float>();
 				::gpk::drawPixelLight(target, pointToDraw, finalColor, lightValue, lightRange);
 			}
 	}
@@ -185,7 +185,7 @@ static	const ::gpk::astatic<::gpk::bgra, WEAPON_TYPE_COUNT>	weaponTypeColorPalet
 			: gameInstance.Enemies	.States[particleInstance.Binding.OwnerIndex]
 			;
 		const int32_t																physicsId									= thrustToDraw.IndexParticlePhysics;
-		const ::gpk::n2f32													& particlePosition							= app.ParticleSystemThrust.Integrator.Particle[physicsId].Position;
+		const ::gpk::n2f2_t													& particlePosition							= app.ParticleSystemThrust.Integrator.Particle[physicsId].Position;
 		if(false == ::gpk::in_range(particlePosition, {{}, target.metrics().Cast<float>()}))
 			continue;
 		target[(uint32_t)particlePosition.y][(uint32_t)particlePosition.x]
@@ -211,10 +211,10 @@ static	const ::gpk::bgra								powerupFamilyColorPalette []				=
 	, ::gpk::RED
 	};
 
-static	::gpk::error_t										drawPowerup						(::gpk::g8bgra target, POWERUP_FAMILY powFamily, const ::gpk::view<::gpk::g8bgra>& texturePowerup, const ::gpk::n2<int32_t>& textureCenterPowerup, const ::gpk::n2f32& powPosition, const ::gpk::view<const ::gpk::n2<int32_t>>& lightPos, double time)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
+static	::gpk::error_t										drawPowerup						(::gpk::g8bgra target, POWERUP_FAMILY powFamily, const ::gpk::view<::gpk::g8bgra>& texturePowerup, const ::gpk::n2<int32_t>& textureCenterPowerup, const ::gpk::n2f2_t& powPosition, const ::gpk::view<const ::gpk::n2<int32_t>>& lightPos, double time)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	::gpk::n2<int32_t>														position									= powPosition.Cast<int32_t>();
 	for(uint32_t iTex = 0, textureCount = texturePowerup.size(); iTex < textureCount; ++iTex)
-		es_if(errored(::gpk::grid_copy_alpha(target, texturePowerup[iTex], position - textureCenterPowerup, {0xFF, 0, 0xFF, 0xFF})));
+		es_if(::gpk::failed(::gpk::grid_copy_alpha(target, texturePowerup[iTex], position - textureCenterPowerup, {0xFF, 0, 0xFF, 0xFF})));
 	::gpk::n2<int32_t>															centerPowerup								= position;
 	uint32_t																	lightIndex									= (uint32_t)time % (lightPos.size() / 2);
 	const ::gpk::n2<int32_t>												& selectedLightPos0							= lightPos[lightIndex + 0]
@@ -332,7 +332,7 @@ static				::gpk::error_t										drawCrosshairAligned						(::gpk::g8bgra targe
 		::gpk::n2<int32_t>														posXHair									= gameInstance.PositionCrosshair[iShip].Cast<int32_t>();
 		if(false == gameInstance.Ships.LineOfFire[iShip])
 			::drawCrosshairDiagonal(target, beaconTimer, posXHair);
-		es_if(errored(::gpk::grid_copy_alpha(framework.RootWindow.BackBuffer->Color.View, app.Processed[GAME_TEXTURE_CROSSHAIR].View, posXHair - app.TextureCenters[GAME_TEXTURE_CROSSHAIR], {0xFF, 0, 0xFF, 0xFF})));
+		es_if(::gpk::failed(::gpk::grid_copy_alpha(framework.RootWindow.BackBuffer->Color.View, app.Processed[GAME_TEXTURE_CROSSHAIR].View, posXHair - app.TextureCenters[GAME_TEXTURE_CROSSHAIR], {0xFF, 0, 0xFF, 0xFF})));
 		if(gameInstance.Ships.LineOfFire[iShip])
 			::drawCrosshairAligned(target, beaconTimer, posXHair);
 	}

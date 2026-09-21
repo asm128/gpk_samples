@@ -7,7 +7,7 @@
 
 bool																	useItems					(const ::klib::SEntityTables & tables, ::klib::SGameMessages & message, ::klib::CCharacter& user, ::klib::CCharacter& target, bool bIsAIControlled);	// While in combat, displays a list of the available items to use.
 
-bool																	escape						(const ::gpk::vcc & escaperName, ::klib::SCharacterScore& escaperScore)									{
+bool																	escape						(const ::gpk::vcsc_t & escaperName, ::klib::SCharacterScore& escaperScore)									{
 	printf("%s tries to escape!\n", escaperName.begin());
 	if ((rand() % 100) < 30) {
 		++escaperScore.EscapesSucceeded;
@@ -50,9 +50,9 @@ void																	assignDrops					(const ::klib::SEntityTables & tables, ::kl
 		winner.Goods.Inventory.Weapon.AddElement(loser.CurrentEquip.Weapon);
 
 		::klib::SWeapon																loserNewWeapon				=
-			{	1 + (rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerWeapon.Definition	)	))
-			,	1 + (rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerWeapon.Modifier		)	))
-			,	1 + (rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerWeapon.Level		)	))
+			{	int16_t(1 + (rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerWeapon.Definition	))	))
+			,	int16_t(1 + (rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerWeapon.Modifier		))	))
+			,	int16_t(1 + (rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerWeapon.Level		))	))
 			};
 
 		if(loserNewWeapon.Definition || loserNewWeapon.Modifier || loserNewWeapon.Level > 1)
@@ -70,9 +70,9 @@ void																	assignDrops					(const ::klib::SEntityTables & tables, ::kl
 		winner.Goods.Inventory.Accessory.AddElement(loser.CurrentEquip.Accessory);
 
 		::klib::SAccessory															loserNewAccessory			=
-			{	1+(rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerAccessory.Definition	)	))
-			,	1+(rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerAccessory.Modifier		)	))
-			,	1+(rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerAccessory.Level			)	))
+			{	int16_t(1+(rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerAccessory.Definition	)	)))
+			,	int16_t(1+(rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerAccessory.Modifier		)	)))
+			,	int16_t(1+(rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerAccessory.Level			)	)))
 			};
 
 		if(loserNewAccessory.Definition || loserNewAccessory.Modifier || loserNewAccessory.Level > 1)
@@ -90,9 +90,9 @@ void																	assignDrops					(const ::klib::SEntityTables & tables, ::kl
 		winner.Goods.Inventory.Armor.AddElement(loser.CurrentEquip.Armor);
 
 		::klib::SArmor																loserNewArmor				=
-			{	1+(rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerArmor.Definition	)))
-			,	1+(rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerArmor.Modifier		)))
-			,	1+(rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerArmor.Level			)))
+			{	int16_t(1+(rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerArmor.Definition	))))
+			,	int16_t(1+(rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerArmor.Modifier		))))
+			,	int16_t(1+(rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerArmor.Level			))))
 			};
 
 		if(loserNewArmor.Definition || loserNewArmor.Modifier || loserNewArmor.Level > 1)
@@ -110,9 +110,9 @@ void																	assignDrops					(const ::klib::SEntityTables & tables, ::kl
 		winner.Goods.Inventory.Vehicle.AddElement(loser.CurrentEquip.Vehicle);
 
 		::klib::SVehicle															loserNewVehicle				=
-			{	1 + (rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerVehicle.Definition	)))
-			,	1 + (rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerVehicle.Modifier	)))
-			,	1 + (rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerVehicle.Level		)))
+			{	int16_t(1 + (rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerVehicle.Definition	))))
+			,	int16_t(1 + (rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerVehicle.Modifier		))))
+			,	int16_t(1 + (rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerVehicle.Level		))))
 			};
 
 		if(loserNewVehicle.Definition || loserNewVehicle.Modifier || loserNewVehicle.Level > 1)
@@ -130,9 +130,9 @@ void																	assignDrops					(const ::klib::SEntityTables & tables, ::kl
 		winner.Goods.Inventory.Facility.AddElement(loser.CurrentEquip.Facility);
 
 		klib::SFacility																loserNewFacility			=
-			{	1+(rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerFacility.Definition	)	))
-			,	1+(rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerFacility.Modifier		)	))
-			,	1+(rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerFacility.Level		)	))
+			{	int16_t(1+(rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerFacility.Definition	)	)))
+			,	int16_t(1+(rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerFacility.Modifier		)	)))
+			,	int16_t(1+(rand() % ::gpk::max((int16_t)2, (int16_t)(oldWinnerFacility.Level		)	)))
 			};
 
 		//if(loserNewFacility.Index || loserNewFacility.Modifier || loserNewFacility.Level > 1)
@@ -280,7 +280,7 @@ static	void															printStatuses				(const ::klib::CCharacter& character,
 		if(0 == (statusBit & character.ActiveBonus.Status.Status))
 			continue;
 
-		const ::gpk::vcc												statusLabel					= ::gpk::get_value_label(statusBit);
+		const ::gpk::vcsc_t												statusLabel					= ::gpk::get_value_label(statusBit);
 		sprintf_s(messages.Aux, "%s is affected by \"%s\" for the next %u turn(s).\n", character.Name.begin(), statusLabel.begin(), character.ActiveBonus.Status.TurnsLeft[iStatus]);
 	}
 }

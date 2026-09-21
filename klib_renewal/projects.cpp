@@ -106,13 +106,13 @@ void									klib::handleResearchStep
 }
 
 template <typename _tEntity>
-static int32_t							setupMenuItem					(::klib::SEntityResearch & menuItemValue, bool bModifier, int32_t index, ::klib::ENTITY_TYPE type, ::gpk::vcc labelEntityType, const ::klib::SEntityContainer<int16_t> & place, const ::gpk::view<const ::klib::SEntityRecord<_tEntity>> & records, ::gpk::vcc text) {
+static int32_t							setupMenuItem					(::klib::SEntityResearch & menuItemValue, bool bModifier, int32_t index, ::klib::ENTITY_TYPE type, ::gpk::vcsc_t labelEntityType, const ::klib::SEntityContainer<int16_t> & place, const ::gpk::view<const ::klib::SEntityRecord<_tEntity>> & records, ::gpk::vcsc_t text) {
 	char										composite	[256]				= {};
 	menuItemValue.ResearchIndex				= index;
 	int64_t										priceUnit						= records[place[index].Entity].Points.PriceBuy / 2;
 	menuItemValue.PriceUnit					= priceUnit;
 	menuItemValue.PricePaid					= 0;
-	menuItemValue.Entity					= {bModifier ? 0 : place[index].Entity, bModifier ? place[index].Entity : 0, 1, -1};
+	menuItemValue.Entity					= {int16_t(bModifier ? 0 : place[index].Entity), int16_t(bModifier ? place[index].Entity : 0), 1, -1};
 	menuItemValue.Type						= type;
 	sprintf_s(composite, "%s: %s", labelEntityType.begin(), text.begin());
 	menuItemValue.Name						= ::gpk::view_const_string{composite};
@@ -180,7 +180,7 @@ int32_t									klib::getResearchableItems
 	menuItemsText	.reserve(MAX_RESEARCH_ITEMS);
 	menuItemsValue	.reserve(MAX_RESEARCH_ITEMS);
 
-	::gpk::vcc						labelEntityType				= {};
+	::gpk::vcsc_t						labelEntityType				= {};
 	char										precompose			[256]	= {};
 
 	::klib::SEntityResearch						menuItemValue				= {};
@@ -275,7 +275,7 @@ int32_t									klib::getResearchableItems
 	menuItemsText	.reserve(MAX_RESEARCH_ITEMS);
 	menuItemsValue	.reserve(MAX_RESEARCH_ITEMS);
 	char										precompose			[256]							= {};
-	::gpk::vcc						labelEntityType										= {};
+	::gpk::vcsc_t						labelEntityType										= {};
 
 	::klib::SEntityResearch						menuItemValue										= {};
 

@@ -13,7 +13,7 @@ namespace klib {
 		, int32_t													offsetX
 		, const SEntity												& entity
 		, const SEntityTable<_TEntity>								& table
-		, const ::gpk::vcc								& entityTypeName
+		, const ::gpk::vcsc_t								& entityTypeName
 		) {
 		::gpk::apod<char>					nameAndLevelText					= ::gpk::view_const_string{"-- "};
 		nameAndLevelText.append(entityTypeName);

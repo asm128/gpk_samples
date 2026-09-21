@@ -39,17 +39,17 @@ int							main						()			{
 		{ "Last Chance! - CGI Interceptor - asm128 (c) 2009-2019",
 		};
 	{
-		::gpk::au8						testBytes;
-		::gpk::au8						loadedBytes;
+		::gpk::au0_t						testBytes;
+		::gpk::au0_t						loadedBytes;
 		::gpk::vcs						fileName					= "test_secure.bin";
-		::gpk::vcu8						key							= {(const uint8_t*)signatureToEncode->begin(), 32};
+		::gpk::vcu0_t						key							= {(const uint8_t*)signatureToEncode->begin(), 32};
 		gpk_necs(::gpk::fileToMemory("klib_renewal.lib", testBytes));
-		es_if(errored(::gpk::fileFromMemorySecure	(fileName, key, true, testBytes)));
-		es_if(errored(::gpk::fileToMemorySecure		(fileName, key, true, loadedBytes)));
-		es_if(loadedBytes != ::gpk::vcu8{testBytes});
+		es_if(::gpk::failed(::gpk::fileFromMemorySecure	(fileName, key, true, testBytes)));
+		es_if(::gpk::failed(::gpk::fileToMemorySecure		(fileName, key, true, loadedBytes)));
+		es_if(loadedBytes != ::gpk::vcu0_t{testBytes});
 	}
 	//const char  a[ ] = "TGFzdCBDaGFuY2UhIC0gQ0dJIEludGVyY2VwdG9yIC0gYXNtMTI4IChjKSAyMDA5LTIwMTkA";
-	::gpk::au8 signaturesEncoded [::gpk::size(signatureToEncode)]	= {};
+	::gpk::au0_t signaturesEncoded [::gpk::size(signatureToEncode)]	= {};
 
 	for(uint32_t iSign = 0; iSign < ::gpk::size(signatureToEncode); ++iSign) {
 		gpk_necs(::gpk::base64Encode(signatureToEncode[iSign], signaturesEncoded[iSign]));
@@ -84,7 +84,7 @@ int							main						()			{
 			"e"
 			;
 
-		::gpk::au8 encoded;
+		::gpk::au0_t encoded;
 		::gpk::rleEncode(::gpk::vcs(textTest), encoded);
 		encoded.push_back(0);
 		encoded.resize(encoded.size() - 1);
@@ -146,14 +146,14 @@ int							main						()			{
 	{
 		::gpk::STimer											timer;
 		double													timeTotal					= 0;
-		::gpk::au8												encoded						;
-		::gpk::au8												decoded						;
+		::gpk::au0_t												encoded						;
+		::gpk::au0_t												decoded						;
 		for(uint32_t iRound=0; iRound < rounds; ++iRound)
 			for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {
 				encoded.clear();
 				decoded.clear();
-				ce_if(errored(::gpk::ardellEncode(encodingCache, testStrings[iTest]	, (int)::gpk::noise1DBase(iTest), false, encoded)));
-				ce_if(errored(::gpk::ardellDecode(encodingCache, encoded						, (int)::gpk::noise1DBase(iTest), false, decoded)));
+				ce_if(::gpk::failed(::gpk::ardellEncode(encodingCache, testStrings[iTest]	, (int)::gpk::noise1DBase(iTest), false, encoded)));
+				ce_if(::gpk::failed(::gpk::ardellDecode(encodingCache, encoded						, (int)::gpk::noise1DBase(iTest), false, decoded)));
 				ef_if(0 == decoded.size() || ::memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
 				timer.Frame();
 				timeTotal											+= timer.LastTimeSeconds;
@@ -163,14 +163,14 @@ int							main						()			{
 	{
 		::gpk::STimer											timer;
 		double													timeTotal					= 0;
-		::gpk::au8												encoded						;
-		::gpk::au8												decoded						;
+		::gpk::au0_t												encoded						;
+		::gpk::au0_t												decoded						;
 		for(uint32_t iRound=0; iRound < rounds; ++iRound)
 			for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {
 				encoded.clear();
 				decoded.clear();
-				ce_if(errored(::gpk::ardellEncode(encodingCache, testStrings[iTest]	, (int)::gpk::noise1DBase(iTest), true, encoded)));
-				ce_if(errored(::gpk::ardellDecode(encodingCache, encoded			, (int)::gpk::noise1DBase(iTest), true, decoded)));
+				ce_if(::gpk::failed(::gpk::ardellEncode(encodingCache, testStrings[iTest]	, (int)::gpk::noise1DBase(iTest), true, encoded)));
+				ce_if(::gpk::failed(::gpk::ardellDecode(encodingCache, encoded			, (int)::gpk::noise1DBase(iTest), true, decoded)));
 				ef_if(0 == decoded.size() || ::memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
 				timer.Frame();
 				timeTotal											+= timer.LastTimeSeconds;
@@ -180,14 +180,14 @@ int							main						()			{
 	{
 		::gpk::STimer											timer;
 		double													timeTotal					= 0;
-		::gpk::au8												encoded;
-		::gpk::au8												decoded;
+		::gpk::au0_t												encoded;
+		::gpk::au0_t												decoded;
 		for(uint32_t iRound=0; iRound < rounds; ++iRound)
 			for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {
 				encoded.clear();
 				decoded.clear();
-				ce_if(errored(::gpk::ardellEncode(testStrings[iTest], (int)::gpk::noise1DBase(iTest), false, encoded)));
-				ce_if(errored(::gpk::ardellDecode(encoded			, (int)::gpk::noise1DBase(iTest), false, decoded)));
+				ce_if(::gpk::failed(::gpk::ardellEncode(testStrings[iTest], (int)::gpk::noise1DBase(iTest), false, encoded)));
+				ce_if(::gpk::failed(::gpk::ardellDecode(encoded			, (int)::gpk::noise1DBase(iTest), false, decoded)));
 				ef_if(::memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
 				timer.Frame();
 				timeTotal											+= timer.LastTimeSeconds;
@@ -196,15 +196,15 @@ int							main						()			{
 	}
 	{
 		double													timeTotal					= 0;
-		::gpk::au8												encoded;
-		::gpk::au8												decoded;
+		::gpk::au0_t												encoded;
+		::gpk::au0_t												decoded;
 		::gpk::STimer											timer;
 		for(uint32_t iRound=0; iRound < rounds; ++iRound)
 			for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {
 				encoded.clear();
 				decoded.clear();
-				ce_if(errored(::gpk::ardellEncode(testStrings[iTest], (int)::gpk::noise1DBase(iTest), true, encoded)));
-				ce_if(errored(::gpk::ardellDecode(encoded			, (int)::gpk::noise1DBase(iTest), true, decoded)));
+				ce_if(::gpk::failed(::gpk::ardellEncode(testStrings[iTest], (int)::gpk::noise1DBase(iTest), true, encoded)));
+				ce_if(::gpk::failed(::gpk::ardellDecode(encoded			, (int)::gpk::noise1DBase(iTest), true, decoded)));
 				ef_if(::memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
 				timer.Frame();
 				timeTotal											+= timer.LastTimeSeconds;
@@ -213,16 +213,16 @@ int							main						()			{
 	}
 	{
 		double													timeTotal					= 0;
-		::gpk::aobj<::gpk::au8>				encodedList;
-		::gpk::aobj<::gpk::au8>				decodedList;
+		::gpk::aobj<::gpk::au0_t>				encodedList;
+		::gpk::aobj<::gpk::au0_t>				decodedList;
 		encodedList.resize(rounds * ::gpk::size(testStrings));
 		decodedList.resize(rounds * ::gpk::size(testStrings));
 		::gpk::STimer											timer;
 		for(uint32_t iRound=0; iRound < rounds; ++iRound)
 			for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {
 				int32_t													indexBuffer					= iRound * ::gpk::size(testStrings) + iTest;
-				::gpk::au8								& encoded					= encodedList[indexBuffer];
-				ce_if(errored(::gpk::base64Encode(testStrings[iTest], encoded)));
+				::gpk::au0_t								& encoded					= encodedList[indexBuffer];
+				ce_if(::gpk::failed(::gpk::base64Encode(testStrings[iTest], encoded)));
 				timer.Frame();
 				timeTotal											+= timer.LastTimeSeconds;
 			}
@@ -231,9 +231,9 @@ int							main						()			{
 		for(uint32_t iRound=0; iRound < rounds; ++iRound)
 			for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {
 				int32_t													indexBuffer					= iRound * ::gpk::size(testStrings) + iTest;
-				::gpk::au8								& encoded					= encodedList[indexBuffer];
-				::gpk::au8								& decoded					= decodedList[indexBuffer];
-				if errored(::gpk::base64Decode(encoded, decoded)) {
+				::gpk::au0_t								& encoded					= encodedList[indexBuffer];
+				::gpk::au0_t								& decoded					= decodedList[indexBuffer];
+				if(::gpk::failed(::gpk::base64Decode(encoded, decoded))) {
 					error_printf( "%s", "Out of memory?");
 					encoded.clear_pointer();
 					continue;
@@ -247,17 +247,17 @@ int							main						()			{
 	}
 
 	{
-		double													timeTotal					= 0;
-		::gpk::aobj<::gpk::ac>				encodedList;
-		::gpk::aobj<::gpk::au8>			decodedList;
+		double								timeTotal					= 0;
+		::gpk::aobj<::gpk::asc_t>			encodedList;
+		::gpk::aobj<::gpk::au0_t>			decodedList;
 		encodedList.resize(rounds * ::gpk::size(testStrings));
 		decodedList.resize(rounds * ::gpk::size(testStrings));
 		::gpk::STimer											timer;
 		for(uint32_t iRound=0; iRound < rounds; ++iRound)
 			for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {
 				int32_t													indexBuffer					= iRound * ::gpk::size(testStrings) + iTest;
-				::gpk::ac												& encoded					= encodedList[indexBuffer];
-				ce_if(errored(::gpk::hexEncode({(const uint8_t*)testStrings[iTest].begin(), testStrings[iTest].size()}, encoded)));
+				::gpk::asc_t												& encoded					= encodedList[indexBuffer];
+				ce_if(::gpk::failed(::gpk::hexEncode({(const uint8_t*)testStrings[iTest].begin(), testStrings[iTest].size()}, encoded)));
 				timer.Frame();
 				timeTotal											+= timer.LastTimeSeconds;
 			}
@@ -266,9 +266,9 @@ int							main						()			{
 		for(uint32_t iRound=0; iRound < rounds; ++iRound)
 			for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {
 				int32_t													indexBuffer					= iRound * ::gpk::size(testStrings) + iTest;
-				::gpk::ac												& encoded					= encodedList[indexBuffer];
-				::gpk::au8												& decoded					= decodedList[indexBuffer];
-				if errored(::gpk::hexDecode(encoded, decoded)) {
+				::gpk::asc_t												& encoded					= encodedList[indexBuffer];
+				::gpk::au0_t												& decoded					= decodedList[indexBuffer];
+				if(::gpk::failed(::gpk::hexDecode(encoded, decoded))) {
 					error_printf( "%s", "Out of memory?");
 					encoded.clear_pointer();
 					continue;
@@ -287,8 +287,8 @@ int							main						()			{
 			double													timeTotal					= 0;
 			for(uint32_t iRound = 0; iRound < rounds; ++iRound)
 				for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {
-					es_if(errored(::test_encrypt_cbc((::gpk::AES_LEVEL)iAESLevel)));
-					es_if(errored(::test_decrypt_cbc((::gpk::AES_LEVEL)iAESLevel)));
+					es_if(::gpk::failed(::test_encrypt_cbc((::gpk::AES_LEVEL)iAESLevel)));
+					es_if(::gpk::failed(::test_decrypt_cbc((::gpk::AES_LEVEL)iAESLevel)));
 					timer.Frame();
 					timeTotal											+= timer.LastTimeSeconds;
 				}
@@ -299,8 +299,8 @@ int							main						()			{
 			double													timeTotal					= 0;
 			for(uint32_t iRound = 0; iRound < rounds; ++iRound)
 				for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {
-					es_if(errored(::test_encrypt_ctr((::gpk::AES_LEVEL)iAESLevel)));
-					es_if(errored(::test_decrypt_ctr((::gpk::AES_LEVEL)iAESLevel)));
+					es_if(::gpk::failed(::test_encrypt_ctr((::gpk::AES_LEVEL)iAESLevel)));
+					es_if(::gpk::failed(::test_decrypt_ctr((::gpk::AES_LEVEL)iAESLevel)));
 					timer.Frame();
 					timeTotal											+= timer.LastTimeSeconds;
 				}
@@ -311,8 +311,8 @@ int							main						()			{
 			double													timeTotal					= 0;
 			for(uint32_t iRound = 0; iRound < rounds; ++iRound)
 				for(uint32_t iTest = 0; iTest < ::gpk::size(testStrings); ++iTest) {
-					es_if(errored(::test_decrypt_ecb((::gpk::AES_LEVEL)iAESLevel)));
-					es_if(errored(::test_encrypt_ecb((::gpk::AES_LEVEL)iAESLevel)));
+					es_if(::gpk::failed(::test_decrypt_ecb((::gpk::AES_LEVEL)iAESLevel)));
+					es_if(::gpk::failed(::test_encrypt_ecb((::gpk::AES_LEVEL)iAESLevel)));
 					timer.Frame();
 					timeTotal											+= timer.LastTimeSeconds;
 				}
@@ -322,8 +322,8 @@ int							main						()			{
 	}
 
 	for(uint32_t iAESLevel = 0; iAESLevel < 3; ++iAESLevel) {
-		::gpk::aobj<::gpk::au8>			encodedList;
-		::gpk::aobj<::gpk::au8>			decodedList;
+		::gpk::aobj<::gpk::au0_t>			encodedList;
+		::gpk::aobj<::gpk::au0_t>			decodedList;
 		gpk_necs(encodedList.resize(rounds * ::gpk::size(testStrings)));
 		gpk_necs(decodedList.resize(rounds * ::gpk::size(testStrings)));
 		{
@@ -332,8 +332,8 @@ int							main						()			{
 			for(uint32_t iRound=0; iRound < rounds; ++iRound)
 				for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {
 					int32_t													indexBuffer					= iRound * ::gpk::size(testStrings) + iTest;
-					::gpk::au8												& encoded					= encodedList[indexBuffer];
-					ce_if(errored(::gpk::aesEncode(testStrings[iTest], ::gpk::vcc{"RandomnessAtLargeQuantities1234", 32}, (::gpk::AES_LEVEL)iAESLevel, encoded)));
+					::gpk::au0_t												& encoded					= encodedList[indexBuffer];
+					ce_if(::gpk::failed(::gpk::aesEncode(testStrings[iTest], ::gpk::vcsc_t{"RandomnessAtLargeQuantities1234", 32}, (::gpk::AES_LEVEL)iAESLevel, encoded)));
 					timer.Frame();
 					timeTotal											+= timer.LastTimeSeconds;
 				}
@@ -345,9 +345,9 @@ int							main						()			{
 			for(uint32_t iRound=0; iRound < rounds; ++iRound)
 				for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {
 					int32_t													indexBuffer					= iRound * ::gpk::size(testStrings) + iTest;
-					::gpk::au8												& encoded					= encodedList[indexBuffer];
-					::gpk::au8												& decoded					= decodedList[indexBuffer];
-					if errored(::gpk::aesDecode(encoded, ::gpk::vcs{"RandomnessAtLargeQuantities1234", 32}, (::gpk::AES_LEVEL)iAESLevel, decoded)) {
+					::gpk::au0_t												& encoded					= encodedList[indexBuffer];
+					::gpk::au0_t												& decoded					= decodedList[indexBuffer];
+					if(::gpk::failed(::gpk::aesDecode(encoded, ::gpk::vcs{"RandomnessAtLargeQuantities1234", 32}, (::gpk::AES_LEVEL)iAESLevel, decoded))) {
 						error_printf("%s", "Out of memory?");
 						encoded.clear_pointer();
 						continue;
@@ -385,8 +385,8 @@ int							main						()			{
 	const uint32_t											rsaRounds					= (rsaKeys[rsaKeys.size() - 1].Public == rsaKeys[rsaKeys.size() - 1].Private) ? rsaKeys.size() - 1 : rsaKeys.size();
 	{
 		double													timeTotal					= 0;
-		::gpk::au64												encoded;
-		::gpk::au8												decoded;
+		::gpk::au3_t												encoded;
+		::gpk::au0_t												decoded;
 		::gpk::STimer											timer;
 		for(uint32_t iRound=0; iRound < rsaRounds; ++iRound) {
 			double													timeRoundStart				= timeTotal;
@@ -397,10 +397,10 @@ int							main						()			{
 				decoded.clear();
 				::gpk::STimer											timerEncode;
 				timerEncode.Frame();
-				ce_if(errored(::gpk::rsaEncode(testStrings[iTest], rsa_n, rsaKeys[pair].Public	, 0, encoded)));
+				ce_if(::gpk::failed(::gpk::rsaEncode(testStrings[iTest], rsa_n, rsaKeys[pair].Public	, 0, encoded)));
 				timerEncode.Frame();
 				always_printf("------ RSA (cacheless)\nEncoding time for this step of %u size: %llu microseconds.", testStrings[iTest].size(), timerEncode.LastTimeMicroseconds);
-				ce_if(errored(::gpk::rsaDecode(encoded			, rsa_n, rsaKeys[pair].Private	, decoded)));
+				ce_if(::gpk::failed(::gpk::rsaDecode(encoded			, rsa_n, rsaKeys[pair].Private	, decoded)));
 				timerEncode.Frame();
 				always_printf("------ RSA (cacheless)\nDecoding time for this step of %u size: %g milliseconds.", testStrings[iTest].size(), timerEncode.LastTimeMicroseconds / 1000.0);
 				//always_printf("RSA:"
@@ -420,16 +420,16 @@ int							main						()			{
 	}
 	{
 		double													timeTotal					= 0;
-		::gpk::au64												encoded;
-		::gpk::au8												decoded;
+		::gpk::au3_t												encoded;
+		::gpk::au0_t												decoded;
 		::gpk::STimer											timer;
 		for(uint32_t iRound=0; iRound < rsaRounds; ++iRound)
 			for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {
 				encoded.clear();
 				decoded.clear();
 				const uint32_t											pair						= iRound; //rand() % rsaKeys.size();
-				ce_if(errored(::gpk::rsaEncode(testStrings[iTest]	, rsa_n, rsaKeys[pair].Public	, 0, encoded)));
-				ce_if(errored(::gpk::rsaDecode(encoded				, rsa_n, rsaKeys[pair].Private	, decoded)));
+				ce_if(::gpk::failed(::gpk::rsaEncode(testStrings[iTest]	, rsa_n, rsaKeys[pair].Public	, 0, encoded)));
+				ce_if(::gpk::failed(::gpk::rsaDecode(encoded				, rsa_n, rsaKeys[pair].Private	, decoded)));
 				ef_if(::memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
 				timer.Frame();
 				timeTotal											+= timer.LastTimeSeconds;
@@ -446,8 +446,8 @@ int							main						()			{
 				encoded.clear();
 				decoded.clear();
 				const int32_t											pair						= iRound; //rand() % ::gpk::max(0, ((int32_t)rsaKeys.size() - 1));
-				ce_if(errored(::gpk::gpcEncode(testStrings[iTest]	, rsa_n, rsaKeys[pair].Public	, 0, false, encoded)));
-				ce_if(errored(::gpk::gpcDecode(encoded				, rsa_n, rsaKeys[pair].Private	, false, decoded)));
+				ce_if(::gpk::failed(::gpk::gpcEncode(testStrings[iTest]	, rsa_n, rsaKeys[pair].Public	, 0, false, encoded)));
+				ce_if(::gpk::failed(::gpk::gpcDecode(encoded				, rsa_n, rsaKeys[pair].Private	, false, decoded)));
 				//always_printf("RSA:"
 				//	"\nEncoded: %s."
 				//	"\nDecoded: %s."
@@ -470,8 +470,8 @@ int							main						()			{
 				encoded.clear();
 				decoded.clear();
 				const int32_t											pair						= 0; //rand() % rsaKeys.size();
-				ce_if(errored(::gpk::gpcEncode(testStrings[iTest]	, rsa_n, rsaKeys[pair].Public	, 0, true, encoded)));
-				ce_if(errored(::gpk::gpcDecode(encoded				, rsa_n, rsaKeys[pair].Private	, true, decoded)));
+				ce_if(::gpk::failed(::gpk::gpcEncode(testStrings[iTest]	, rsa_n, rsaKeys[pair].Public	, 0, true, encoded)));
+				ce_if(::gpk::failed(::gpk::gpcDecode(encoded				, rsa_n, rsaKeys[pair].Private	, true, decoded)));
 				ef_if(::memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
 				timer.Frame();
 				timeTotal											+= timer.LastTimeSeconds;
@@ -480,16 +480,16 @@ int							main						()			{
 	}
 	{
 		double													timeTotal					= 0;
-		::gpk::au64												encoded;
-		::gpk::au8												decoded;
+		::gpk::au3_t												encoded;
+		::gpk::au0_t												decoded;
 		::gpk::STimer											timer;
 		for(uint32_t iRound=0; iRound < rsaRounds; ++iRound)
 			for(uint32_t iTest=0; iTest < ::gpk::size(testStrings); ++iTest) {
 				encoded.clear();
 				decoded.clear();
 				const int32_t											pair						= iRound; //rand() % rsaKeys.size();
-				ce_if(errored(::gpk::gpcEncodeWithHash(testStrings[iTest]	, rsa_n, rsaKeys[pair].Public	, 0, false, encoded)));
-				e_if(errored(::gpk::gpcDecodeWithHash(encoded				, rsa_n, rsaKeys[pair].Private	, false, decoded)));
+				ce_if(::gpk::failed(::gpk::gpcEncodeWithHash(testStrings[iTest]	, rsa_n, rsaKeys[pair].Public	, 0, false, encoded)));
+				e_if(::gpk::failed(::gpk::gpcDecodeWithHash(encoded				, rsa_n, rsaKeys[pair].Private	, false, decoded)));
 				ef_if(::memcmp(testStrings[iTest].begin(), decoded.begin(), decoded.size()), "Failed to encode/decode! \nOriginal: %s\nDecoded: %s.", testStrings[iTest].begin(), decoded.begin());
 				timer.Frame();
 				timeTotal											+= timer.LastTimeSeconds;

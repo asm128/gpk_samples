@@ -1,6 +1,7 @@
 #define GPK_STDOUT_LOG_ENABLED
 #include "gpk_vox.h"
 #include "gpk_array_ptr.h"
+#include "gpk_chrono.h"
 
 static const ::gpk::vcs								fileNames []								=
 	{ "alien_bot1.vox"
@@ -493,18 +494,18 @@ static const ::gpk::vcs								fileNames []								=
 	};
 
 int main() {
-	::gpk::au8						fileBytes;
+	::gpk::au0_t						fileBytes;
 	::gpk::astatic<char, 256>		pathNameData		= {"../gpk_data"};
 	::gpk::astatic<char, 256>		folderNameVox		= {"vox"};
 	char							pathToLoad[4096]	= {};
 	uint64_t						timeStart			= ::gpk::timeCurrentInMs();
 	::gpk::apobj<::gpk::SVOXData>	voxModels;
 	for(uint32_t iModel = 0; iModel < ::gpk::size(fileNames); ++iModel) { 
-		const gpk::vcc					fileName			= fileNames[iModel];
+		const gpk::vcsc_t					fileName			= fileNames[iModel];
 		sprintf_s(pathToLoad, "%s/%s/%s", pathNameData.Storage, folderNameVox.Storage, fileName.begin());
 		gpk_necs(::gpk::fileToMemory(pathToLoad, fileBytes));
 		gpk_vox_info_printf("Loaded %s.", pathToLoad);
-		::gpk::vcu8						viewBytes			= fileBytes;
+		::gpk::vcu0_t						viewBytes			= fileBytes;
 		::gpk::pobj<::gpk::SVOXData>	& voxFile			= voxModels[voxModels.push_back({})];
 		gpk_necs(voxFile->Load(viewBytes));
 		gpk_vox_info_printf("-------- %s Parsed successfully.", pathToLoad);

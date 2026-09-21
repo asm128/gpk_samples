@@ -19,7 +19,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 ::gpk::error_t			setup		(::gme::SApplication & app)						{
 	::gpk::SFramework				& framework					= app.Framework;
 	::gpk::SWindow					& mainWindow				= framework.RootWindow;
-	es_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
+	es_if(::gpk::failed(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
 	::gpk::SGUI						& gui						= *framework.GUI;
 	app.IdExit					= ::gpk::controlCreate(gui);
 	::gpk::SControlPlacement					& controlExit				= gui.Controls.Placement[app.IdExit];
@@ -42,15 +42,15 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 		const ::gpk::SJSONReader		& jsonReader				= framework.JSONConfig.Reader;
 		{ //
 			::gpk::vcs						jsonIP						= {};
-			wf_if(errored(::gpk::jsonExpressionResolve(::gpk::vcs{"application.test_udp_client.remote_ip"}, jsonReader, 0, jsonIP)), "Failed to load config from json! Last contents found: %s.", jsonIP.begin())
+			wf_if(::gpk::failed(::gpk::jsonExpressionResolve(::gpk::vcs{"application.test_udp_client.remote_ip"}, jsonReader, 0, jsonIP)), "Failed to load config from json! Last contents found: %s.", jsonIP.begin())
 			else {
 				info_printf("Remote IP: %s.", jsonIP.begin());
-				e_if(errored(::gpk::tcpipAddress(jsonIP, {}, app.LobbyClient.Client.AddressConnect)));	// turn the string into a SIPv4Endpoint struct.
+				e_if(::gpk::failed(::gpk::tcpipAddress(jsonIP, {}, app.LobbyClient.Client.AddressConnect)));	// turn the string into a SIPv4Endpoint struct.
 			}
 		}
 		{ // load port from config file
 			::gpk::vcs						jsonPort					= {};
-			wf_if(errored(::gpk::jsonExpressionResolve(::gpk::vcs{"application.test_udp_client.remote_port"}, jsonReader, 0, jsonPort)), "Failed to load config from json! Last contents found: %s.", jsonPort.begin())
+			wf_if(::gpk::failed(::gpk::jsonExpressionResolve(::gpk::vcs{"application.test_udp_client.remote_port"}, jsonReader, 0, jsonPort)), "Failed to load config from json! Last contents found: %s.", jsonPort.begin())
 			else {
 				uint64_t						port;
 				::gpk::parseIntegerDecimal(jsonPort, port);

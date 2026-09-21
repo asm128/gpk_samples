@@ -27,8 +27,8 @@ namespace ssg
 		};
 
 	struct SModelPivot {
-		::gpk::n3f32						Scale							= {1, 1, 1};
-		::gpk::n3f32						Position						= {};
+		::gpk::n3f2_t						Scale							= {1, 1, 1};
+		::gpk::n3f2_t						Position						= {};
 	};
 
 	struct SScene {
@@ -44,7 +44,7 @@ namespace ssg
 		int32_t								Model						;
 		int32_t								Images						;
 		int32_t								Body						;
-		::gpk::au32							Children					;
+		::gpk::au2_t							Children					;
 	};
 
 	struct SDebris	{
@@ -54,20 +54,20 @@ namespace ssg
 			, {0x80, 0xCF, 0xFF, }
 			//, {0x00, 0x00, 0xFF, }
 			};
-		::gpk::af32					Brightness			= {};
+		::gpk::af2_t					Brightness			= {};
 		::gpk::SParticles3			Particles			= {};
 
-		int							Create				(const ::gpk::n3f32 & position, const ::gpk::n3f32 & direction, float speed, float brightness)	{
+		int							Create				(const ::gpk::n3f2_t & position, const ::gpk::n3f2_t & direction, float speed, float brightness)	{
 			Particles.Create(position, direction, speed);
 			return Brightness.push_back(brightness);
 		}
-		int							SpawnSpherical		(uint32_t countDebris, const ::gpk::n3f32 & position, float speedDebris, float brightness, float offset)	{
+		int							SpawnSpherical		(uint32_t countDebris, const ::gpk::n3f2_t & position, float speedDebris, float brightness, float offset)	{
 			for(uint32_t iDebris = 0; iDebris < countDebris; ++iDebris) {
-				::gpk::n3f32										direction				= {0, 1 * offset, 0};
+				::gpk::n3f2_t										direction				= {0, 1 * offset, 0};
 				direction.RotateX(rand() * (::gpk::math_2pi / RAND_MAX));
 				direction.RotateY(rand() * (::gpk::math_2pi / RAND_MAX));
 				direction.RotateZ(rand() * (::gpk::math_2pi / RAND_MAX));
-				const ::gpk::n3f32	newPosition		= position + direction;
+				const ::gpk::n3f2_t	newPosition		= position + direction;
 				direction.Normalize();
 				Create(newPosition, direction, speedDebris, brightness);
 			}

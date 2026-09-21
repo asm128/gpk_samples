@@ -5,7 +5,7 @@
 
 #include <cstdio>
 
-int xmlTestDoc(::gpk::vcc xmlDoc) {
+int xmlTestDoc(::gpk::vcsc_t xmlDoc) {
 	printf("\nTest XML: %s\n", xmlDoc.begin());
 	printf("-------------------\n");
 

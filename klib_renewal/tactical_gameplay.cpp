@@ -32,7 +32,7 @@ static int32_t												getAgentsInRange									(::klib::STacticalInfo & tact
 			const ::klib::SEntityFlags										& playerAgentFlags									= agent.FinalFlags;
 
 			const ::gpk::n3<int32_t>									& coordAgent										= agent.Position;
-			const ::gpk::n3f32										distance											= (coordAgent-origin).Cast<float>();
+			const ::gpk::n3f2_t										distance											= (coordAgent-origin).Cast<float>();
 			if(distance.Length() > range && ::gpk::bit_false(playerAgentFlags.Tech.AttackType, ::klib::ATTACK_TYPE_RANGED))
 				continue;
 
@@ -135,11 +135,11 @@ bool														klib::moveStep										(const ::klib::SEntityTables & entityT
 		for(uint32_t iAOE = 0, countAOE = board.AreaOfEffect.AOE.size(); iAOE < countAOE; ++iAOE) {
 			const ::klib::SAOE												& aoeInstance										= board.AreaOfEffect.AOE[iAOE];
 			const ::gpk::n3<int32_t>									aoeCell												= aoeInstance.Position.Cell;
-			::gpk::n3f32											aoePos												= aoeCell.Cast<float>();
+			::gpk::n3f2_t											aoePos												= aoeCell.Cast<float>();
 			aoePos.x													+= aoeInstance.Position.Offset.x;
 			aoePos.y													+= aoeInstance.Position.Offset.y;
 			aoePos.z													+= aoeInstance.Position.Offset.z;
-			::gpk::n3f32											currentTilePos										= playerAgent.Position.Cast<float>();
+			::gpk::n3f2_t											currentTilePos										= playerAgent.Position.Cast<float>();
 			if((aoePos - currentTilePos).Length() <= aoeInstance.RadiusOrHalfSize && aoeInstance.StatusInflict)
 				::klib::applyAttackStatus(entityTables, messages, playerAgent, aoeInstance.StatusInflict, aoeInstance.Level, ::gpk::view_const_string{"Area of effect"});
 		}

@@ -19,7 +19,7 @@ static struct SASCIIDisplayBuffered {
 ::gpk::error_t				klib::clearASCIIBackBuffer		(char value, uint16_t colorValue)	{ return ::klib::asciiTargetClear(__g_ASCIIScreen.BackBuffer, value, colorValue); }
 ::gpk::error_t				klib::presentASCIIFrontBuffer	()									{ return ::klib::asciiDisplayPresent(__g_ASCIIScreen.FrontBuffer); }
 ::gpk::error_t				klib::presentASCIIBackBuffer	()									{
-	es_if(errored(::klib::swapASCIIBuffers()));
+	es_if(::gpk::failed(::klib::swapASCIIBuffers()));
 	return ::klib::asciiDisplayPresent(__g_ASCIIScreen.FrontBuffer);
 }
 
@@ -33,9 +33,9 @@ static struct SASCIIDisplayBuffered {
 ::gpk::error_t				klib::shutdownASCIIScreen		() {
 	if(false == __g_ASCIIScreen.bCreated)
 		return 1;
-	es_if(errored(::klib::asciiDisplayDestroy()								));
-	es_if(errored(::klib::asciiTargetDestroy(__g_ASCIIScreen.BackBuffer		)));
-	es_if(errored(::klib::asciiTargetDestroy(__g_ASCIIScreen.FrontBuffer	)));
+	es_if(::gpk::failed(::klib::asciiDisplayDestroy()								));
+	es_if(::gpk::failed(::klib::asciiTargetDestroy(__g_ASCIIScreen.BackBuffer		)));
+	es_if(::gpk::failed(::klib::asciiTargetDestroy(__g_ASCIIScreen.FrontBuffer	)));
 	__g_ASCIIScreen.bCreated	= false;
 	return 0;
 }

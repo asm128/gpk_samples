@@ -19,7 +19,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 ::gpk::error_t			setup		(::gme::SApplication & app)						{
 	::gpk::SFramework				& framework					= app.Framework;
 	::gpk::SWindow					& mainWindow				= framework.RootWindow;
-	es_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
+	es_if(::gpk::failed(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
 	::gpk::SGUI						& gui						= *framework.GUI;
 	app.IdExit															= ::gpk::controlCreate(gui);
 	::gpk::SControlPlacement					& controlExit				= gui.Controls.Placement[app.IdExit];
@@ -40,13 +40,13 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	::gpk::vcs						jsonPort					= {};
 	const ::gpk::SJSONReader		& jsonReader				= framework.JSONConfig.Reader;
 	{ // load port from config file
-		wf_if(errored(::gpk::jsonExpressionResolve(::gpk::vcs{"application.gpk_lobby.listen_port"}, jsonReader, 0, jsonPort)), "Failed to load config from json! Last contents found: %s.", jsonPort.begin())
+		wf_if(::gpk::failed(::gpk::jsonExpressionResolve(::gpk::vcs{"application.gpk_lobby.listen_port"}, jsonReader, 0, jsonPort)), "Failed to load config from json! Last contents found: %s.", jsonPort.begin())
 		else {
 			::gpk::parseIntegerDecimal(jsonPort, port);
 			info_printf("Remote port: %u.", (uint32_t)port);
 		}
 		jsonPort															= {};
-		wf_if(errored(::gpk::jsonExpressionResolve(::gpk::vcs{"application.gpk_lobby.adapter"}, jsonReader, 0, jsonPort)), "Failed to load config from json! Last contents found: %s.", jsonPort.begin())
+		wf_if(::gpk::failed(::gpk::jsonExpressionResolve(::gpk::vcs{"application.gpk_lobby.adapter"}, jsonReader, 0, jsonPort)), "Failed to load config from json! Last contents found: %s.", jsonPort.begin())
 		else {
 			::gpk::parseIntegerDecimal(jsonPort, adapter);
 			info_printf("Adapter: %u.", (uint32_t)adapter);
@@ -97,7 +97,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 		const ::gpk::aobj<::gpk::pobj<::gpk::SUDPMessage>>	& clientQueue				= app.LobbyServer.MessagesToProcess[iClient];
 		for(uint32_t iMessage = 0; iMessage < clientQueue.size(); ++iMessage) {
 			::gpk::pobj<::gpk::SUDPMessage>	messageReceived				= clientQueue[iMessage];
-			::gpk::vcu8						viewPayload					= messageReceived->Payload;
+			::gpk::vcu0_t						viewPayload					= messageReceived->Payload;
 			info_printf("Client %i received: %s.", iClient, viewPayload.begin());
 			{
 				::std::lock_guard				lock						(app.LobbyServer.Server.Mutex);

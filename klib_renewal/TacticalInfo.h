@@ -17,7 +17,7 @@ namespace klib
 	// while improving the precision of the floating point values by only requiring them to represent a value between 0 and 1 for a very small distance.
 	struct STacticalCoord {
 		::gpk::n3<int32_t>									Cell											;	// Position in tile map.
-		::gpk::n3f32									Offset											;	// Position between 0 and 1 relative to the tile.
+		::gpk::n3f2_t									Offset											;	// Position between 0 and 1 relative to the tile.
 
 		bool													operator==										(const STacticalCoord& other)			const	noexcept	{
 			return	(Cell.x		== other.Cell.x	)
@@ -50,7 +50,7 @@ namespace klib
 
 	struct SBullet {
 		STacticalCoord											Position										;
-		::gpk::n3f32									Direction										;
+		::gpk::n3f2_t									Direction										;
 		STileCharacter											Shooter											;
 		SBulletPoints											Points											;
 
@@ -149,7 +149,7 @@ namespace klib
 
 	struct SMapAOE {
 		::gpk::apod<SAOE>			AOE						= {};
-		::gpk::apod<::gpk::n3i32>	Coords					= {};
+		::gpk::apod<::gpk::n3s2_t>	Coords					= {};
 	};
 
 	struct STacticalBoard {
@@ -178,7 +178,7 @@ namespace klib
 		STacticalBoard			Board											= {};
 		SMapInventory			Drops											= {};
 
-		inline	int32_t			ResizeBoard		(::gpk::n2u32 newSize)							{ Board.Resize(newSize); }
+		inline	int32_t			ResizeBoard		(::gpk::n2u2_t newSize)							{ Board.Resize(newSize); }
 		bool					AddBullet		(const SBullet & newBullet)									{
 			Board.Shots.Bullet.push_back(newBullet);
 			Board.Shots.Coords.push_back(newBullet.Position.Cell);
@@ -201,7 +201,7 @@ namespace klib
 			Board.Clear();
 		}
 
-		bool					HasDrops		(const ::gpk::n3i32 & coord)	const	noexcept	{
+		bool					HasDrops		(const ::gpk::n3s2_t & coord)	const	noexcept	{
 			return ( (Board.Tiles.Entities.Coins[coord.z][coord.x] != 0)
 				|| (-1) != Drops.CoordsProfession	.find(coord)
 				|| (-1) != Drops.CoordsWeapon		.find(coord)

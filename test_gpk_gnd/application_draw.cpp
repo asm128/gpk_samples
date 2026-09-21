@@ -11,19 +11,19 @@ namespace gpk
 	template<typename _tCoord>
 	static	::gpk::error_t	drawTriangle
 		( ::gpk::gu32					& targetDepth
-		, const ::gpk::minmaxf32		& fNearFar
+		, const ::gpk::minmaxf2_t		& fNearFar
 		, const ::gpk::tri3<_tCoord>	& triangle
-		, ::gpk::apod<::gpk::n2i16>		& out_Points
+		, ::gpk::apod<::gpk::n2s1_t>		& out_Points
 		, ::gpk::apod<::gpk::trif32>	& triangleWeights
 		) {
 		int32_t						pixelsDrawn			= 0;
-		const ::gpk::n2u32			& _targetMetrics	= targetDepth.metrics();
-		::gpk::n2f32				areaMin				= {(float)::gpk::min(::gpk::min(triangle.A.x, triangle.B.x), triangle.C.x), (float)::gpk::min(::gpk::min(triangle.A.y, triangle.B.y), triangle.C.y)};
-		::gpk::n2f32				areaMax				= {(float)::gpk::max(::gpk::max(triangle.A.x, triangle.B.x), triangle.C.x), (float)::gpk::max(::gpk::max(triangle.A.y, triangle.B.y), triangle.C.y)};
+		const ::gpk::n2u2_t			& _targetMetrics	= targetDepth.metrics();
+		::gpk::n2f2_t				areaMin				= {(float)::gpk::min(::gpk::min(triangle.A.x, triangle.B.x), triangle.C.x), (float)::gpk::min(::gpk::min(triangle.A.y, triangle.B.y), triangle.C.y)};
+		::gpk::n2f2_t				areaMax				= {(float)::gpk::max(::gpk::max(triangle.A.x, triangle.B.x), triangle.C.x), (float)::gpk::max(::gpk::max(triangle.A.y, triangle.B.y), triangle.C.y)};
 		const float					xStop				= ::gpk::min(areaMax.x, (float)_targetMetrics.x);
 		for(float y = ::gpk::max(areaMin.y, 0.f), yStop = ::gpk::min(areaMax.y, (float)_targetMetrics.y); y < yStop; ++y)
 		for(float x = ::gpk::max(areaMin.x, 0.f); x < xStop; ++x) {
-			const ::gpk::n2i32			cellCurrent			= {(int32_t)x, (int32_t)y};
+			const ::gpk::n2s2_t			cellCurrent			= {(int32_t)x, (int32_t)y};
 			const ::gpk::tri2i32		triangle2D			=
 				{ {(int32_t)triangle.A.x, (int32_t)triangle.A.y}
 				, {(int32_t)triangle.B.x, (int32_t)triangle.B.y}
@@ -75,7 +75,7 @@ namespace gpk
 	, const ::gpk::tri2f32		& uvs
 	, const ::gpk::g8bgra		& textureColors
 	, int32_t					iTriangle
-	, const ::gpk::n3f64		& lightDir
+	, const ::gpk::n3f3_t		& lightDir
 	, const ::gpk::rgbaf		& diffuseColor
 	, const ::gpk::rgbaf		& ambientColor
 	, const ::gpk::view<const ::gpk::SLightInfoRSW>	& lights
@@ -107,7 +107,7 @@ namespace gpk
 	 ) {
 		for(uint32_t iLight = 0; iLight < lights.size(); ++iLight) {
 			const ::gpk::SLightInfoRSW													& rswLight									= lights[iLight];
-			::gpk::n3f32														rswColor									= rswLight.Color * (1.0 - (rswLight.Position.Cast<double>() - interpolatedPosition).Length() / 10.0);
+			::gpk::n3f2_t														rswColor									= rswLight.Color * (1.0 - (rswLight.Position.Cast<double>() - interpolatedPosition).Length() / 10.0);
 			lightColor																+= ::gpk::rgbaf(rswColor.x, rswColor.y, rswColor.z, 1.0f) / 2.0;
 		}
 		interpolatedBGRA														= (directionalColor + lightColor + (ambientColor / 2.0)).Clamp();
@@ -124,7 +124,7 @@ namespace gpk
 			const ::gpk::SLightInfoRSW													& rswLight									= lights[rand() % lights.size()];
 			double																		distFactor									= 1.0 - (rswLight.Position.Cast<double>() - interpolatedPosition).Length() / 10.0;
 			if(distFactor > 0) {
-				::gpk::n3f32														rswColor									= rswLight.Color * distFactor;
+				::gpk::n3f2_t														rswColor									= rswLight.Color * distFactor;
 				lightColor																+= srcTexel * ::gpk::rgbaf(rswColor.x, rswColor.y, rswColor.z, 1.0f) / 2.0;
 			}
 		}
@@ -139,8 +139,8 @@ namespace gpk
 
 static				::gpk::error_t										transformTriangles
 	( const ::gpk::view<::gpk::tri<uint32_t>>	& vertexIndexList
-	, const ::gpk::view<::gpk::n3f32>				& vertices
-	, const ::gpk::minmaxf32									& nearFar
+	, const ::gpk::view<::gpk::n3f2_t>				& vertices
+	, const ::gpk::minmaxf2_t									& nearFar
 	, const ::gpk::m4<float>									& xWorld
 	, const ::gpk::m4<float>									& xWV
 	, const ::gpk::m4<float>									& xProjection
@@ -180,7 +180,7 @@ static				::gpk::error_t										transformTriangles
 
 static				::gpk::error_t										transformNormals
 	( const ::gpk::view<::gpk::tri<uint32_t>>	& vertexIndexList
-	, const ::gpk::view<::gpk::n3f32>				& normals
+	, const ::gpk::view<::gpk::n3f2_t>				& normals
 	, const ::gpk::m4<float>									& xWorld
 	, ::gpk::SRenderCache											& renderCache
 	) {	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
@@ -205,11 +205,11 @@ static				::gpk::error_t										transformNormals
 
 static	::gpk::error_t		drawTriangles
 	( const ::gpk::view<::gpk::triu32>				& vertexIndexList
-	, const ::gpk::view<::gpk::n3f32>				& vertices
-	, const ::gpk::view<::gpk::n2f32>				& uvs
+	, const ::gpk::view<::gpk::n3f2_t>				& vertices
+	, const ::gpk::view<::gpk::n2f2_t>				& uvs
 	, const ::gpk::g8bgra							& textureView
-	, const ::gpk::minmaxf32						& nearFar
-	, const ::gpk::n3f32							& lightDir
+	, const ::gpk::minmaxf2_t						& nearFar
+	, const ::gpk::n3f2_t							& lightDir
 	, ::gpk::SRenderCache							& renderCache
 	, ::gpk::gu32									& targetDepthView
 	, ::gpk::g8bgra									& targetView
@@ -220,12 +220,12 @@ static	::gpk::error_t		drawTriangles
 	, uint32_t										* pixelsSkipped
 	, bool											wireframe
 	) {	// ---
-		//const ::gpk::n3f32			& lightDir									= app.LightDirection;
+		//const ::gpk::n3f2_t			& lightDir									= app.LightDirection;
 		for(uint32_t iTriangle = 0, triCount = renderCache.Triangle3dIndices.size(); iTriangle < triCount; ++iTriangle) { //
 			renderCache.TrianglePixelCoords.clear();
 			renderCache.TrianglePixelWeights.clear();
 			const ::gpk::tri3<float>												& tri3DToDraw								= renderCache.Triangle3dToDraw[iTriangle];
-			es_if(errored(::gpk::drawTriangle(targetDepthView, nearFar, tri3DToDraw, renderCache.TrianglePixelCoords, renderCache.TrianglePixelWeights)));
+			es_if(::gpk::failed(::gpk::drawTriangle(targetDepthView, nearFar, tri3DToDraw, renderCache.TrianglePixelCoords, renderCache.TrianglePixelWeights)));
 			++renderCache.TrianglesDrawn;
 			const ::gpk::tri<uint32_t>										& vertexIndices								= vertexIndexList[renderCache.Triangle3dIndices[iTriangle]];
 			const ::gpk::tri3<float>												triangle3DPositions							=
@@ -250,9 +250,9 @@ static	::gpk::error_t		drawTriangles
 				}
 			}
 			if(wireframe) {
-				es_if(errored(::gpk::drawLine(targetView.metrics().Cast<uint16_t>(), ::gpk::line3<float>{renderCache.Triangle3dToDraw[iTriangle].A, renderCache.Triangle3dToDraw[iTriangle].B}, renderCache.WireframePixelCoords)));
-				es_if(errored(::gpk::drawLine(targetView.metrics().Cast<uint16_t>(), ::gpk::line3<float>{renderCache.Triangle3dToDraw[iTriangle].B, renderCache.Triangle3dToDraw[iTriangle].C}, renderCache.WireframePixelCoords)));
-				es_if(errored(::gpk::drawLine(targetView.metrics().Cast<uint16_t>(), ::gpk::line3<float>{renderCache.Triangle3dToDraw[iTriangle].C, renderCache.Triangle3dToDraw[iTriangle].A}, renderCache.WireframePixelCoords)));
+				es_if(::gpk::failed(::gpk::drawLine(targetView.metrics().Cast<uint16_t>(), ::gpk::line3<float>{renderCache.Triangle3dToDraw[iTriangle].A, renderCache.Triangle3dToDraw[iTriangle].B}, renderCache.WireframePixelCoords)));
+				es_if(::gpk::failed(::gpk::drawLine(targetView.metrics().Cast<uint16_t>(), ::gpk::line3<float>{renderCache.Triangle3dToDraw[iTriangle].B, renderCache.Triangle3dToDraw[iTriangle].C}, renderCache.WireframePixelCoords)));
+				es_if(::gpk::failed(::gpk::drawLine(targetView.metrics().Cast<uint16_t>(), ::gpk::line3<float>{renderCache.Triangle3dToDraw[iTriangle].C, renderCache.Triangle3dToDraw[iTriangle].A}, renderCache.WireframePixelCoords)));
 			}
 		}
 	return 0;
@@ -285,7 +285,7 @@ static	::gpk::error_t		drawTriangles
 	, ::gpk::SSceneCamera							& camera
 	, ::gpk::rtbgra8d32								& target
 	, const ::gpk::SModelPivot<float>				& modelPivot
-	, const ::gpk::n3f32							& lightDir
+	, const ::gpk::n3f2_t							& lightDir
 	, const ::gpk::SModelGND						& modelGND
 	, const ::gpk::SRSWWorldLight					& directionalLight
 	, const ::gpk::view<const ::gpk::img8bgra>		& textures
@@ -303,7 +303,7 @@ static	::gpk::error_t		drawTriangles
 	xRotation.Identity();
 	::gpk::m4<float>														xWorld										= {};
 	xWorld.Identity();
-	const ::gpk::minmaxf32														& nearFar									= camera.NearFar;
+	const ::gpk::minmaxf2_t														& nearFar									= camera.NearFar;
 	uint32_t																	& pixelsDrawn								= renderCache.PixelsDrawn	= 0;
 	uint32_t																	& pixelsSkipped								= renderCache.PixelsSkipped	= 0;
 	renderCache.WireframePixelCoords.clear();

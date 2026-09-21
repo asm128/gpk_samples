@@ -17,7 +17,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 	::gpk::SFramework			& framework		= app.Framework;
 	::gpk::SWindow				& mainWindow	= framework.RootWindow;
 	mainWindow.Size			= {1280, 720};
-	es_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
+	es_if(::gpk::failed(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
 	{ // Build the exit button
 		::gpk::SGUI					& gui			= *framework.GUI;
 		gui.ColorModeDefault	= ::gpk::GUI_COLOR_MODE_3D;
@@ -55,14 +55,14 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 				::gpk::jsonExpressionResolve({subscriptExpression, lenExpression}, jsonReader, indexJSONNodeArrayPNGFileNames, fileNamePNG);
 				fullPathPNG.clear();
 				::gpk::pathNameCompose(pathPNGSuite, fileNamePNG, fullPathPNG);
-				ef_if(errored(::gpk::pngFileLoad(pngDataCacheForFasterLoad, {fullPathPNG.begin(), fullPathPNG.size()}, app.PNGImages[iFile])), "Failed to load file: %s.", fullPathPNG.begin());
+				ef_if(::gpk::failed(::gpk::pngFileLoad(pngDataCacheForFasterLoad, {fullPathPNG.begin(), fullPathPNG.size()}, app.PNGImages[iFile])), "Failed to load file: %s.", fullPathPNG.begin());
 			}
 		}
 		{
 			// ---- Test our recently developed RLE algorithm.
-			::gpk::au32					sizesUncompressed;
-			::gpk::au8					rleBuffer;
-			::gpk::au32					sizesRLE;
+			::gpk::au2_t				sizesUncompressed;
+			::gpk::au0_t					rleBuffer;
+			::gpk::au2_t				sizesRLE;
 			uint32_t					sizeTotalUncompressed				= 0;
 			uint32_t					sizeTotalRLE						= 0;
 			for(uint32_t iFile = 0, countFilesToLoad = app.PNGImages.size(); iFile < countFilesToLoad; ++iFile) {
@@ -129,7 +129,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 
 	for(uint32_t iFile = 0; iFile < app.PNGImages.size(); ++iFile) {
 		const uint32_t		offsetX			= (iFile * 64);
-		::gpk::n2u32		position		= {offsetX % (target->Color.View.metrics().x - 64), offsetX / (target->Color.View.metrics().x - 64) * 64};
+		::gpk::n2u2_t		position		= {offsetX % (target->Color.View.metrics().x - 64), offsetX / (target->Color.View.metrics().x - 64) * 64};
 		::gpk::grid_copy_blend(target->Color.View, app.PNGImages[iFile].View, position);
 		//::gpk::grid_scale_alpha(target->Color.View, app.PNGImages[iFile].View, position.Cast<int32_t>(), app.PNGImages[iFile].View.metrics().Cast<int32_t>() * (1 + (.01 * iFile)));
 	}

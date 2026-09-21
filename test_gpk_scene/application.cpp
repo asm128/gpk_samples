@@ -17,7 +17,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 	::gpk::SFramework		& framework			= app.Framework;
 	::gpk::SWindow					& mainWindow						= framework.RootWindow;
 	mainWindow.Size								= {1280, 720};
-	es_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
+	es_if(::gpk::failed(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
 	{ // Build the exit button
 		::gpk::SGUI										& gui								= *framework.GUI;
 		gui.ColorModeDefault						= ::gpk::GUI_COLOR_MODE_3D;
@@ -96,7 +96,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "PNG Test");
 		//target->Color.View[y * 3][x * 3]									= uint32_t(::gpk::noise1DBase(y * target->Color.View.metrics().x + x + app.Framework.FrameInfo.Microseconds.Total) + app.Framework.FrameInfo.Seconds.Total) | 0xFF000000;
 	}
 
-	es_if(errored(::gpk::nodeRendererDraw(app.Scene.Renderer, 0, target->Color, target->DepthStencil)));
+	es_if(::gpk::failed(::gpk::nodeRendererDraw(app.Scene.Renderer, 0, target->Color, target->DepthStencil)));
 
 	//::gpk::array_pod<ubyte_t>												bytesPNG				= 0;
 	//::gpk::pngFileWrite(target->Color.View, bytesPNG);

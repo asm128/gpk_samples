@@ -40,13 +40,13 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	::gpk::SFramework				& framework									= app.Framework;
 	::gpk::SWindow					& mainWindow								= framework.RootWindow;
 	mainWindow.Size														= {640, 480};
-	es_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
+	es_if(::gpk::failed(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
 
 	::gpk::SSTLFile																& stlFile									= app.STLFile;
 	::gpk::stlFileLoad("Base Flat v5.stl", stlFile);
 	app.CubePositions.resize(stlFile.Triangles.size());
 
-	stacxpr const ::gpk::n3f32								cubeCenter									= {0.5f, 0.5f, 0.5f};
+	stacxpr const ::gpk::n3f2_t								cubeCenter									= {0.5f, 0.5f, 0.5f};
 	for(uint32_t iTriangle = 0; iTriangle < app.CubePositions.size(); ++iTriangle) {
 		::gpk::tri3<float>													& transformedTriangle						= app.CubePositions[iTriangle];
 		transformedTriangle														= stlFile.Triangles[iTriangle].Triangle;
@@ -62,7 +62,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 		transformedTriangle.B.y = b;
 		transformedTriangle.C.y = c;
 
-		::gpk::n3f32	triangleSwap = transformedTriangle.B;
+		::gpk::n3f2_t	triangleSwap = transformedTriangle.B;
 		transformedTriangle.B = transformedTriangle.C;
 		transformedTriangle.C = triangleSwap;
 
@@ -73,16 +73,16 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 		//transformedTriangle.B.Scale(.05);
 		//transformedTriangle.C.Scale(.05);
 	}
-	ree_if	(errored(::updateSizeDependentResources	(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
+	ree_if	(::gpk::failed(::updateSizeDependentResources	(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
 	return 0;
 }
 
 ::gpk::error_t			update		(::SApplication& app, bool systemRequestedExit)					{
 	retval_ginfo_if(1, systemRequestedExit, "Exiting because the runtime asked for close. We could also ignore this value and just continue execution if we don't want to exit.");
 	::gpk::error_t																frameworkResult								= ::gpk::updateFramework(app.Framework);
-	ree_if(errored(frameworkResult), "Unknown error.");
+	ree_if(::gpk::failed(frameworkResult), "Unknown error.");
 	rvi_if(1, frameworkResult == 1, "Framework requested close. Terminating execution.");
-	ree_if(errored(::updateSizeDependentResources(app)), "Cannot update offscreen and this could cause an invalid memory access later on.");
+	ree_if(::gpk::failed(::updateSizeDependentResources(app)), "Cannot update offscreen and this could cause an invalid memory access later on.");
 	//-----------------------------
 	::gpk::STimer																& timer										= app.Framework.Timer;
 	::gpk::SWindow					& mainWindow								= app.Framework.RootWindow;
@@ -95,7 +95,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 
 
 struct SCamera {
-	::gpk::n3f32		Position, Target;
+	::gpk::n3f2_t		Position, Target;
 };
 
 ::gpk::error_t			draw		(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
@@ -116,14 +116,14 @@ struct SCamera {
 	::gpk::m4<float>			viewMatrix									= {};
 	projection.Identity();
 	::gpk::SFrameInfo			& frameInfo									= framework.FrameInfo;
-	const ::gpk::n3f32			tilt										= {10, };	// ? cam't remember what is this. Radians? Eulers?
-	const ::gpk::n3f32			rotation									= {0, (float)frameInfo.FrameMeter.FrameNumber / 100, 0};
+	const ::gpk::n3f2_t			tilt										= {10, };	// ? cam't remember what is this. Radians? Eulers?
+	const ::gpk::n3f2_t			rotation									= {0, (float)frameInfo.FrameMeter.FrameNumber / 100, 0};
 
-	::gpk::minmaxf32											nearFar										= {0.01f , 1000.0f};
+	::gpk::minmaxf2_t											nearFar										= {0.01f , 1000.0f};
 
-	stacxpr const ::gpk::n3f32			cameraUp									= {0, 1, 0};	// ? cam't remember what is this. Radians? Eulers?
+	stacxpr const ::gpk::n3f2_t			cameraUp									= {0, 1, 0};	// ? cam't remember what is this. Radians? Eulers?
 	::SCamera												camera										= {{150, 75, 0}, {}};
-	::gpk::n3f32									lightPos									= {150, 75, 0};
+	::gpk::n3f2_t									lightPos									= {150, 75, 0};
 	static float											cameraRotation								= 0;
 	cameraRotation										+= (float)mainWindow.Input->MouseCurrent.Deltas.x / 5.0f;
 	//camera.Position	.RotateY(cameraRotation);
@@ -163,14 +163,14 @@ struct SCamera {
 		double																		lightFactor									= stlFile.Triangles[iTriangle].Normal.Dot(lightPos);
 		triangle3dColorList[iTriangle]											= (::gpk::RED * lightFactor).Clamp();
 	}
-	::gpk::array_pod<::gpk::n3i32>									trianglePixelCoords;
-	::gpk::array_pod<::gpk::n3i32>									wireframePixelCoords;
-	::gpk::n3f32 cameraFront = (camera.Target - camera.Position).Normalize();
+	::gpk::array_pod<::gpk::n3s2_t>									trianglePixelCoords;
+	::gpk::array_pod<::gpk::n3s2_t>									wireframePixelCoords;
+	::gpk::n3f2_t cameraFront = (camera.Target - camera.Position).Normalize();
 	for(uint32_t iTriangle = 0; iTriangle < app.CubePositions.size(); ++iTriangle) {
 		//double																		lightFactor									= stlFile.Triangles[iTriangle].Normal.Dot(cameraFront);
 		//if(lightFactor > 0)
 		//	continue;
-		es_if(errored(::gpk::drawTriangle(backBuffer->Color.View, triangle3dColorList[iTriangle], triangle2dList[iTriangle])));
+		es_if(::gpk::failed(::gpk::drawTriangle(backBuffer->Color.View, triangle3dColorList[iTriangle], triangle2dList[iTriangle])));
 		//::gpk::drawLine(backBuffer->Color.View, (::gpk::bgra)::gpk::GREEN	, ::gpk::line2<int32_t>{triangle2dList[iTriangle].A, triangle2dList[iTriangle].B});
 		//::gpk::drawLine(backBuffer->Color.View, (::gpk::bgra)::gpk::BLUE	, ::gpk::line2<int32_t>{triangle2dList[iTriangle].B, triangle2dList[iTriangle].C});
 		//::gpk::drawLine(backBuffer->Color.View, (::gpk::bgra)::gpk::RED	, ::gpk::line2<int32_t>{triangle2dList[iTriangle].C, triangle2dList[iTriangle].A});

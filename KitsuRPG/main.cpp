@@ -22,7 +22,7 @@
 #include <Windows.h>
 
 // Sets up initial equipment and items for the player to carry or wear.
-void											initPlayerCharacter								(const ::klib::SEntityTables & tables, klib::CCharacter& adventurer, const ::gpk::vcc& name);
+void											initPlayerCharacter								(const ::klib::SEntityTables & tables, klib::CCharacter& adventurer, const ::gpk::vcsc_t& name);
 
 // This function seeds the rand() and enters the tavern() after initializing the player.
 // If the player leaves the tavern() it means the game was requested to close.
@@ -85,7 +85,7 @@ int												main											(int argc, char **argv)											{
 }
 
 //
-void											createPlayerCharacter							(klib::CCharacter& adventurer, const ::gpk::vcc& name)			{
+void											createPlayerCharacter							(klib::CCharacter& adventurer, const ::gpk::vcsc_t& name)			{
 	::klib::CCharacter									* tempadventurer								= new klib::CCharacter(4, 50, 1, 100, {1,4}, {}, {klib::COMBAT_STATUS_NONE, klib::COMBAT_STATUS_STUN}, name);
 	adventurer										= *tempadventurer;
 	delete(tempadventurer);
@@ -102,7 +102,7 @@ void											researchEquipped								(klib::CCharacter& agent)										{
 }
 
 //
-void											initPlayerCharacter								(const ::klib::SEntityTables & tables, ::klib::CCharacter& adventurer, const ::gpk::vcc& name)			{
+void											initPlayerCharacter								(const ::klib::SEntityTables & tables, ::klib::CCharacter& adventurer, const ::gpk::vcsc_t& name)			{
 	::createPlayerCharacter(adventurer, name);
 	::klib::SCharacterEquip								& currentEquip									= adventurer.CurrentEquip;
 	adventurer.Goods.CompletedResearch				= klib::SCharacterResearch();
@@ -139,16 +139,16 @@ void											initPlayerCharacter								(const ::klib::SEntityTables & tables,
 	adventurer.Goods.Inventory.Facility		.AddElement({1,1,1});
 
 	int16_t i = 5;
-	adventurer.Goods.Inventory.Weapon		.AddElement({rand() % (int16_t)tables.Weapon		.Definitions.size(), rand()%(int16_t)tables.Weapon		.Modifiers.size(), ++i});
-	adventurer.Goods.Inventory.Accessory	.AddElement({rand() % (int16_t)tables.Accessory		.Definitions.size(), rand()%(int16_t)tables.Accessory	.Modifiers.size(), ++i});
-	adventurer.Goods.Inventory.Armor		.AddElement({rand() % (int16_t)tables.Armor			.Definitions.size(), rand()%(int16_t)tables.Armor		.Modifiers.size(), ++i});
-	adventurer.Goods.Inventory.Profession	.AddElement({rand() % (int16_t)tables.Profession	.Definitions.size(), rand()%(int16_t)tables.Profession	.Modifiers.size(), ++i});
-	adventurer.Goods.Inventory.Vehicle		.AddElement({rand() % (int16_t)tables.Vehicle		.Definitions.size(), rand()%(int16_t)tables.Vehicle		.Modifiers.size(), ++i});
-	adventurer.Goods.Inventory.Facility		.AddElement({rand() % (int16_t)tables.Facility		.Definitions.size(), rand()%(int16_t)tables.Facility	.Modifiers.size(), ++i});
+	adventurer.Goods.Inventory.Weapon		.AddElement({int16_t(rand() % (int16_t)tables.Weapon		.Definitions.size()), int16_t(rand()%(int16_t)tables.Weapon		.Modifiers.size()), ++i});
+	adventurer.Goods.Inventory.Accessory	.AddElement({int16_t(rand() % (int16_t)tables.Accessory		.Definitions.size()), int16_t(rand()%(int16_t)tables.Accessory	.Modifiers.size()), ++i});
+	adventurer.Goods.Inventory.Armor		.AddElement({int16_t(rand() % (int16_t)tables.Armor			.Definitions.size()), int16_t(rand()%(int16_t)tables.Armor		.Modifiers.size()), ++i});
+	adventurer.Goods.Inventory.Profession	.AddElement({int16_t(rand() % (int16_t)tables.Profession	.Definitions.size()), int16_t(rand()%(int16_t)tables.Profession	.Modifiers.size()), ++i});
+	adventurer.Goods.Inventory.Vehicle		.AddElement({int16_t(rand() % (int16_t)tables.Vehicle		.Definitions.size()), int16_t(rand()%(int16_t)tables.Vehicle		.Modifiers.size()), ++i});
+	adventurer.Goods.Inventory.Facility		.AddElement({int16_t(rand() % (int16_t)tables.Facility		.Definitions.size()), int16_t(rand()%(int16_t)tables.Facility	.Modifiers.size()), ++i});
 
 	adventurer.Goods.Inventory.Items		.AddElement({1,1,1});
 	for(int32_t j = 1;  j < 3; ++j)
-		adventurer.Goods.Inventory.Items		.AddElement({ 1+int16_t(rand()%(::gpk::size(klib::itemDescriptions)-1)), int16_t(1+rand() % ::gpk::size(klib::itemModifiers)), int16_t(rand() % ::klib::itemGrades.size()) });
+		adventurer.Goods.Inventory.Items		.AddElement({ int16_t(1+rand()%(::gpk::size(klib::itemDescriptions)-1)), int16_t(1+rand() % ::gpk::size(klib::itemModifiers)), int16_t(rand() % ::klib::itemGrades.size()) });
 
 	::researchEquipped(adventurer);
 	adventurer.Recalculate(tables);

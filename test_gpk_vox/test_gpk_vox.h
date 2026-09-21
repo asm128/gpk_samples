@@ -10,7 +10,7 @@ struct SApplication {
 
 	::gpk::array_obj<::gpk::SVoxelGeometry>								VOXModels									= {};
 	::gpk::array_obj<::gpk::SVoxelMap<uint8_t>>							VOXModelMaps								= {};
-	::gpk::array_obj<::gpk::vcc>										VOXModelNames								= {};
+	::gpk::array_obj<::gpk::vcsc_t>										VOXModelNames								= {};
 
 	int32_t																IdViewport									= -1;
 	::gpk::pobj<::gpk::rtbgra8d32>	BackBuffer;

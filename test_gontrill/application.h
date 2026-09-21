@@ -38,7 +38,7 @@ struct SParticleToDraw {
 	int32_t				IndexParticlePhysics;
 	int32_t				IndexParticleInstance;
 	float				TimeLived;
-	::gpk::n2i32		Position;
+	::gpk::n2s2_t		Position;
 };
 
 struct SLaserToDraw {
@@ -53,7 +53,7 @@ struct SStuffToDraw {
 	::gpk::apod<::SParticleToDraw>	Stars				= {};
 	::gpk::apod<::SParticleToDraw>	Thrust				= {};
 	::gpk::apod<::SParticleToDraw>	Debris				= {};
-	::gpk::apod<::gpk::n2f32>		CollisionPoints		= {};
+	::gpk::apod<::gpk::n2f2_t>		CollisionPoints		= {};
 
 	::gpk::aobj<::gpk::g8bgra>		TexturesPowerup0	= {};
 	::gpk::aobj<::gpk::g8bgra>		TexturesPowerup1	= {};
@@ -77,7 +77,7 @@ struct SEffectsDelay {
 	double							Star;
 };
 
-stacxpr	const ::gpk::n2u16		GAME_SCREEN_SIZE	= {640 / 2 * 3, 360 / 2 * 3};
+stacxpr	const ::gpk::n2u1_t		GAME_SCREEN_SIZE	= {640 / 2 * 3, 360 / 2 * 3};
 
 struct SLevelState {
 	int32_t							Number;
@@ -107,13 +107,13 @@ struct SApplication {
 
 	::gpk::astatic<::gpk::img8bgra, GAME_TEXTURE_COUNT>		Original		= {};
 	::gpk::astatic<::gpk::img8bgra, GAME_TEXTURE_COUNT>		Processed		= {};
-	::gpk::astatic<::gpk::n2i32, GAME_TEXTURE_COUNT>		TextureCenters	= {};
+	::gpk::astatic<::gpk::n2s2_t, GAME_TEXTURE_COUNT>		TextureCenters	= {};
 
-	::gpk::n2i32				PSOffsetFromShipCenter		= {};
+	::gpk::n2s2_t				PSOffsetFromShipCenter		= {};
 	::gpk::imgmonou64			TextureFontMonochrome		= {};
 
 	::SStuffToDraw				StuffToDraw					= {};
-	::gpk::apod<::gpk::n2i16>	CacheLinePoints				= {};
+	::gpk::apod<::gpk::n2s1_t>	CacheLinePoints				= {};
 	::SEffectsDelay				EffectsDelay				= {};
 
 								SApplication				(::gpk::SRuntimeValues& runtimeValues)			noexcept	: Framework(runtimeValues) {}

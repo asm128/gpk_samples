@@ -113,11 +113,11 @@ stacxpr const char*		PLANET_IMAGE				[::ssg::PLANET_COUNT]	=	{	"mercury_color.pn
 	surfaces[iSurface]->Data					= loaded.Texels.u8();
 	surfaces[iSurface]->Desc.BitDepth			= 8;
 	surfaces[iSurface]->Desc.ColorType			= ::gpk::COLOR_TYPE_BGRA;
-	surfaces[iSurface]->Desc.Dimensions			= loaded.metrics().u16();
+	surfaces[iSurface]->Desc.Dimensions			= loaded.metrics().u1_t();
 	surfaces[iSurface]->Desc.MethodFilter		= 0;
 	surfaces[iSurface]->Desc.MethodInterlace	= 0;
 	surfaces[iSurface]->Desc.MethodCompression	= 0;
-	solarSystem.Images[0] = ::gpk::gc8bgra{(const gpk::bgra*)surfaces[iSurface]->Data.begin(), surfaces[iSurface]->Desc.Dimensions.u32()};
+	solarSystem.Images[0] = ::gpk::gc8bgra{(const gpk::bgra*)surfaces[iSurface]->Data.begin(), surfaces[iSurface]->Desc.Dimensions.u2_t()};
 
 	for(uint32_t iPlanet = 0; iPlanet < ::ssg::PLANET_COUNT; ++iPlanet) {
 		iSurface				= surfaces.Create(::gpk::vcs{PLANET_IMAGE[iPlanet], (uint32_t)-1});
@@ -129,17 +129,17 @@ stacxpr const char*		PLANET_IMAGE				[::ssg::PLANET_COUNT]	=	{	"mercury_color.pn
 		surfaces[iSurface]->Data					= loaded.Texels.u8();
 		surfaces[iSurface]->Desc.BitDepth			= 8;
 		surfaces[iSurface]->Desc.ColorType			= ::gpk::COLOR_TYPE_BGRA;
-		surfaces[iSurface]->Desc.Dimensions			= loaded.metrics().u16();
+		surfaces[iSurface]->Desc.Dimensions			= loaded.metrics().u1_t();
 		surfaces[iSurface]->Desc.MethodFilter		= 0;
 		surfaces[iSurface]->Desc.MethodInterlace	= 0;
 		surfaces[iSurface]->Desc.MethodCompression	= 0;
-		solarSystem.Images[iPlanet + 1] = ::gpk::gc8bgra{(const gpk::bgra*)surfaces[iSurface]->Data.begin(), surfaces[iSurface]->Desc.Dimensions.u32()};
+		solarSystem.Images[iPlanet + 1] = ::gpk::gc8bgra{(const gpk::bgra*)surfaces[iSurface]->Data.begin(), surfaces[iSurface]->Desc.Dimensions.u2_t()};
 	}
 
 	//for(uint32_t iImage = 0; iImage < solarSystem.Images.size(); ++iImage) {
 	//	if(solarSystem.Images[iImage].Texels.size())
 	//		continue;
-	//	solarSystem.Images[iImage].resize(::gpk::n2u16{512, 512});
+	//	solarSystem.Images[iImage].resize(::gpk::n2u1_t{512, 512});
 	//	for(uint32_t y = 0; y < solarSystem.Images[iImage].metrics().y; ++y) { // Generate noise color for planet texture
 	//		const double															ecuatorialShade			= cos(y * (1.0 / solarSystem.Images[iImage].metrics().y * ::gpk::math_2pi)) + 1.5;
 	//		uint32_t																rowOffset				= y * solarSystem.Images[iImage].metrics().x;

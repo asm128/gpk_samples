@@ -22,7 +22,7 @@ namespace klib
 
 	struct SAgentReference {
 		::klib::STileCharacter	Agent;
-		::gpk::n3i32			Position;
+		::gpk::n3s2_t			Position;
 	};
 
 	stacxpr const uint32_t					MAX_AGENT_SQUAD_SLOTS	= 3;
@@ -44,7 +44,7 @@ namespace klib
 
 		::gpk::astatic<int16_t						, MAX_AGENT_SQUAD_SLOTS>	Agents			= {-1, -1, -1};//, -1, -1, -1, -1, -1,};
 		::gpk::astatic<::klib::STileCharacter		, MAX_AGENT_SQUAD_SLOTS>	TargetAgents	= {};
-		::gpk::astatic<::gpk::n3i32			, MAX_AGENT_SQUAD_SLOTS>	TargetPositions	= {};
+		::gpk::astatic<::gpk::n3s2_t				, MAX_AGENT_SQUAD_SLOTS>	TargetPositions	= {};
 		::gpk::astatic<::klib::AGENT_STATE			, MAX_AGENT_SQUAD_SLOTS>	AgentStates		= {};
 		::gpk::astatic<::klib::SAgentActions		, MAX_AGENT_SQUAD_SLOTS>	ActionsLeft		= {};
 		::gpk::astatic<::klib::SAgentsReference		, MAX_AGENT_SQUAD_SLOTS>	AgentsInRange	= {};
@@ -67,7 +67,7 @@ namespace klib
 			if(index == -1) {
 				::memset(Agents				.begin(), -1, sizeof(int16_t					) * Agents			.size());
 				::memset(TargetAgents		.begin(), -1, sizeof(::klib::STileCharacter		) * TargetAgents	.size());
-				::memset(TargetPositions	.begin(), -1, sizeof(::gpk::n3i32	) * TargetPositions	.size());
+				::memset(TargetPositions	.begin(), -1, sizeof(::gpk::n3s2_t	) * TargetPositions	.size());
 				::memset(AgentStates		.begin(),  0, sizeof(::klib::AGENT_STATE		) * AgentStates		.size());
 				::memset(ActionsLeft		.begin(), -1, sizeof(::klib::SAgentActions		) * ActionsLeft		.size());
 				::memset(AgentsInRange		.begin(),  0, sizeof(::klib::SAgentsReference	) * AgentsInRange	.size());
@@ -102,7 +102,7 @@ namespace klib
 
 		::gpk::view<int16_t						>	Agents				(int32_t idSquad)						{ ::klib::SSquad & squad = Squads[idSquad]; return {squad.Agents			.begin(), squad.Size}; }
 		::gpk::view<::klib::STileCharacter		>	TargetAgents		(int32_t idSquad)						{ ::klib::SSquad & squad = Squads[idSquad]; return {squad.TargetAgents		.begin(), squad.Size}; }
-		::gpk::view<::gpk::n3i32				>	TargetPositions		(int32_t idSquad)						{ ::klib::SSquad & squad = Squads[idSquad]; return {squad.TargetPositions	.begin(), squad.Size}; }
+		::gpk::view<::gpk::n3s2_t				>	TargetPositions		(int32_t idSquad)						{ ::klib::SSquad & squad = Squads[idSquad]; return {squad.TargetPositions	.begin(), squad.Size}; }
 		::gpk::view<::klib::AGENT_STATE			>	AgentStates			(int32_t idSquad)						{ ::klib::SSquad & squad = Squads[idSquad]; return {squad.AgentStates		.begin(), squad.Size}; }
 		::gpk::view<::klib::SAgentActions		>	ActionsLeft			(int32_t idSquad)						{ ::klib::SSquad & squad = Squads[idSquad]; return {squad.ActionsLeft		.begin(), squad.Size}; }
 		::gpk::view<::klib::SAgentsReference	>	AgentsInRange		(int32_t idSquad)						{ ::klib::SSquad & squad = Squads[idSquad]; return {squad.AgentsInRange		.begin(), squad.Size}; }

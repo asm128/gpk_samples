@@ -207,7 +207,7 @@ template <size_t _sizeAlive>
 			;
 		if((currentPosOutOfRange && nextPosOutOfRange) || instanceTimeout) { // Remove the particle instance and related information.
 			particleIntegrator.ParticleState[particleInstance.IndexParticlePhysics].Unused	= true;
-			ree_if(errored(particleInstances.remove(iParticle)), "Not sure why would this fail.");
+			ree_if(::gpk::failed(particleInstances.remove(iParticle)), "Not sure why would this fail.");
 			--iParticle;
 		}
 	}
@@ -229,10 +229,10 @@ static				::gpk::error_t										updateEffectParticles						(float lastFrameSec
 static				::gpk::error_t										integrateParticleVelocity					(::SApplication& app)											{
 	::gpk::SFramework				& framework									= app.Framework;
 	const float																	lastFrameSeconds							= (float)framework.FrameInfo.Seconds.LastFrame;
-	ree_if(errored(app.ParticleSystemThrust			.Integrator.Integrate(lastFrameSeconds, framework.FrameInfo.Seconds.LastFrameHalfSquared)), "Not sure why would this fail.");
-	ree_if(errored(app.ParticleSystemDebris			.Integrator.Integrate(lastFrameSeconds, framework.FrameInfo.Seconds.LastFrameHalfSquared)), "Not sure why would this fail.");
-	ree_if(errored(app.ParticleSystemProjectiles	.Integrator.Integrate(lastFrameSeconds, framework.FrameInfo.Seconds.LastFrameHalfSquared)), "Not sure why would this fail.");
-	ree_if(errored(app.ParticleSystemStars			.Integrator.Integrate(lastFrameSeconds, framework.FrameInfo.Seconds.LastFrameHalfSquared)), "Not sure why would this fail.");
+	ree_if(::gpk::failed(app.ParticleSystemThrust			.Integrator.Integrate(lastFrameSeconds, framework.FrameInfo.Seconds.LastFrameHalfSquared)), "Not sure why would this fail.");
+	ree_if(::gpk::failed(app.ParticleSystemDebris			.Integrator.Integrate(lastFrameSeconds, framework.FrameInfo.Seconds.LastFrameHalfSquared)), "Not sure why would this fail.");
+	ree_if(::gpk::failed(app.ParticleSystemProjectiles	.Integrator.Integrate(lastFrameSeconds, framework.FrameInfo.Seconds.LastFrameHalfSquared)), "Not sure why would this fail.");
+	ree_if(::gpk::failed(app.ParticleSystemStars			.Integrator.Integrate(lastFrameSeconds, framework.FrameInfo.Seconds.LastFrameHalfSquared)), "Not sure why would this fail.");
 	return 0;
 }
 
@@ -289,7 +289,7 @@ static				::gpk::error_t										addParticle
 	)
 {
 	int32_t																		indexParticleInstance						= ::gpk::addParticle(particleType, particleInstances, particleIntegrator, particleDefinitions[particleType.Type]);
-	ree_if(errored(indexParticleInstance), "Cannot create particle instance.");
+	ree_if(::gpk::failed(indexParticleInstance), "Cannot create particle instance.");
 	::gpk::SParticleBinding<_tParticleType>										& newInstance								= particleInstances[indexParticleInstance];
 	::SApplication::TParticle													& newParticle								= particleIntegrator.Particle[newInstance.IndexParticlePhysics];
 	newParticle.Position													= particlePosition;
@@ -361,9 +361,9 @@ static				::gpk::error_t										updateSpawnShots
 				const ::gpk::n2<float>														shotDirection								= (playerType == PLAYER_TYPE_PLAYER) ? ::gpk::n2<float>{1.0f, 0.0f} :
 					(gameInstance.Ships.Position[rand() % gameInstance.ShipsPlaying] - gameInstance.Enemies.Position[iShip]).InPlaceNormalize();
 				int32_t																		projectileIndex								= ::addProjectile(gameInstance, iShip, gameParticle.TypePlayer, gameParticle.TypeWeapon, weaponProp.Speed);
-				cef_if(errored(projectileIndex), "Projectile storage is full. Cannot add projectile.");
+				cef_if(::gpk::failed(projectileIndex), "Projectile storage is full. Cannot add projectile.");
 				int32_t																		particleIndex								= ::addParticle(gameParticle, particleInstances, particleIntegrator, positions[iShip] + weaponParticleOffset, shotDirection, weaponProp.Speed, particleDefinitions);
-				ef_if(errored(particleIndex), "Particle storage is full. Cannot add projectile particle.");
+				ef_if(::gpk::failed(particleIndex), "Particle storage is full. Cannot add projectile particle.");
 			}
 		}
 	}

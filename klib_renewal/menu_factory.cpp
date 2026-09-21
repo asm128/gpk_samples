@@ -9,7 +9,7 @@ static	::klib::SGameState				drawFactoryMenu				(::klib::SGame& instanceGame, co
 	::gpk::array_obj<::klib::SEntityResearch>	& menuItemsValue			= player.ResearchedValue;
 	::gpk::array_obj<::gpk::array_pod<char>>	& menuItemsText				= player.ResearchedText;
 
-	::gpk::array_obj<::gpk::vcc>	menuItemsView				= {};
+	::gpk::array_obj<::gpk::vcsc_t>	menuItemsView				= {};
 	menuItemsView.resize(menuItemsText.size());
 	for(uint32_t i = 0, count = menuItemsText.size(); i < count; ++i)
 		menuItemsView[i]						= menuItemsText[i];

@@ -14,7 +14,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	::gpk::SFramework			& framework				= app.Framework;
 	::gpk::SWindow				& mainWindow			= framework.RootWindow;
 	mainWindow.Size			= {1280, 720};
-	es_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
+	es_if(::gpk::failed(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
 	::gpk::SGUI					& gui					= *framework.GUI;
 
 	const int32_t				iShades					= 16;
@@ -189,7 +189,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::gme::SApplication, "Module Explorer");
 	//}
 
 	//char															bmpFileName2	[]							= "Codepage-437-24.bmp";
-	//es_if(errored(::gpk::bmpOrBmgLoad(bmpFileName2, app.TextureFont)), "");
+	//es_if(::gpk::failed(::gpk::bmpOrBmgLoad(bmpFileName2, app.TextureFont)), "");
 	//::gpk::SImage<::gpk::bgra>								& verticalAtlas								= app.VerticalAtlas;
 	//const ::gpk::n2<uint32_t>									fontCharSize								= {9, 16};
 	//verticalAtlas.resize(fontCharSize.x, fontCharSize.y * 256);
