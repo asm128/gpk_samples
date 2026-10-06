@@ -41,7 +41,7 @@ static	::klib::SGameState					drawEquipMenu						(::klib::SGame& instanceGame, c
 	::klib::SCharacterInventory						& playerInventory					= instanceGame.Players[::klib::PLAYER_INDEX_USER].Inventory;
 	::gpk::SRenderTarget<char, uint16_t>			& display							= instanceGame.GlobalDisplay.Screen;
 	int16_t											selectedChoice						= 0;
-	::gpk::apod<char>						menuTitle							= ::gpk::view_const_string{"Equip "};
+	::gpk::string									menuTitle							= ::gpk::view_const_string{"Equip "};
 
 	char 											playerUnitPlusOne [32]	;
 	if( player.Tactical.Selection.PlayerUnit != -1 && player.Tactical.Squad.Agents[player.Tactical.Selection.PlayerUnit] != -1 && ::klib::GAME_SUBSTATE_CHARACTER != instanceGame.State.Substate) {
@@ -95,7 +95,7 @@ static	::klib::SGameState					drawEquipMenu						(::klib::SGame& instanceGame, c
 	::klib::SGameState							retVal								= returnState;
 	::klib::SEntity								selectedItem						= {0,0,0};
 	instanceGame.Messages.ClearMessages();
-	::gpk::apod<char>					itemName							= "Invalid item?";
+	::gpk::string								itemName							= "Invalid item?";
 	const int32_t								iAgent								= (-1 == player.Tactical.Selection.PlayerUnit) ? -1 : player.Tactical.Squad.Agents[player.Tactical.Selection.PlayerUnit];
 	switch(instanceGame.State.Substate) {
 	case ::klib::GAME_SUBSTATE_PROFESSION	:	if(0 == ::klib::restrictedProfession	(instanceGame.Messages, player, instanceGame.EntityTables, iAgent, selectedChoice)) { instanceGame.Events.push_back({::klib::GAME_EVENT_CONFIRM, instanceGame.State, (uint64_t)iAgent | (((uint64_t)selectedChoice) << 32)}); retVal = { ::klib::GAME_STATE_MENU_EQUIPMENT }; } else { } break;
@@ -161,14 +161,14 @@ static void								drawScore						(::gpk::gchar display, int32_t offsetY, int32_
 	sprintf_s(bufferValues, "%lli", (int64_t)score.CompletedUpgrade		); ::klib::printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, format, "Completed Upgrades"		, bufferValues);
 }
 
-::klib::SGameState						drawEquip				(::klib::SGame& instanceGame, const ::klib::SGameState& returnState) {
-	stacxpr	const uint32_t		MAX_ENTITY_COLUMNS		= 4;
+::klib::SGameState					drawEquip				(::klib::SGame& instanceGame, const ::klib::SGameState& returnState) {
+	stacxpr	const uint32_t					MAX_ENTITY_COLUMNS		= 4;
 	::klib::SGamePlayer						& player				= instanceGame.Players[::klib::PLAYER_INDEX_USER];
-	::gpk::gchar					display					= instanceGame.GlobalDisplay.Screen.Color;
-	::gpk::gu16				textAttributes			= instanceGame.GlobalDisplay.Screen.DepthStencil;
+	::gpk::gchar							display					= instanceGame.GlobalDisplay.Screen.Color;
+	::gpk::gu16								textAttributes			= instanceGame.GlobalDisplay.Screen.DepthStencil;
 
 	::klib::SGameState						actualReturnState		= returnState;
-	::gpk::apod<char>				menuTitle				= ::gpk::view_const_string{"Agent Setup"};
+	::gpk::string							menuTitle				= ::gpk::view_const_string{"Agent Setup"};
 	char 									playerUnitPlusOne[32];
 	sprintf_s(playerUnitPlusOne, "%i", player.Tactical.Selection.PlayerUnit+1);
 	if( player.Tactical.Selection.PlayerUnit != -1 && player.Tactical.Squad.Agents[player.Tactical.Selection.PlayerUnit] != -1) {

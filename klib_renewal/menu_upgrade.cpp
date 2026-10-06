@@ -9,7 +9,7 @@ static	::klib::SGameState					drawUpgradeMenu				(::klib::SGame& instanceGame, c
 	::klib::playerUpdateResearchLists(instanceGame.EntityTables, player);
 
 	::gpk::array_obj<::klib::SEntityResearch>	& menuItemsValue			= player.ResearchablesValue;
-	::gpk::array_obj<::gpk::apod<char>>	& menuItemsText				= player.ResearchablesText;
+	::gpk::array_obj<::gpk::string>				& menuItemsText				= player.ResearchablesText;
 
 	::gpk::array_obj<::gpk::vcsc_t>	menuItemsView				= {};
 	menuItemsView.resize(menuItemsText.size());

@@ -1,16 +1,16 @@
-#include "gpk_label.h"
+#include "gpk_string.h"
 
-#ifndef __MENU_H__926349827164392740982169862598423__
-#define __MENU_H__926349827164392740982169862598423__
+#ifndef KLIB_MENU_H_92634982716439274098216986259842
+#define KLIB_MENU_H_92634982716439274098216986259842
 
 namespace klib
 {
 	template <typename _ReturnType>
 	class SMenuItem {
 	public:
-		_ReturnType								ReturnValue;
-		::gpk::array_pod<char>				Text;
+		_ReturnType			ReturnValue;
+		::gpk::string		Text;
 	};
 };
 
-#endif // __MENU_H__926349827164392740982169862598423__
+#endif // KLIB_MENU_H_92634982716439274098216986259842

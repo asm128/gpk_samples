@@ -1,7 +1,8 @@
 #include "EntityPoints.h"
 
 #include "klib_draw_misc.h"
-#include <cstring>
+
+#include "gpk_string.h"
 
 #ifndef KLIB_ENTITY_H__38924092634721346098170219783096__
 #define KLIB_ENTITY_H__38924092634721346098170219783096__
@@ -134,7 +135,7 @@ namespace klib
 	SEntityFlags						getEntityFlags					(const SEntityTable<_EntityType> & table, const SEntity & entity) { return (table.Definitions[entity.Definition].Flags | table.Modifiers[entity.Modifier].Flags); }
 	// Combines two record tables to get the names and combine them as one for display purposes.
 	template<typename _EntityType>
-	::gpk::apod<char>			getEntityName					(const SEntityTable<_EntityType> & table, const SEntity & entity) {
+	::gpk::string						getEntityName					(const SEntityTable<_EntityType> & table, const SEntity & entity) {
 		char									formattedName	[128]			= {};
 		sprintf_s(formattedName, table.Modifiers[entity.Modifier].Name.begin(), table.Definitions[entity.Definition].Name.begin());
 		return ::gpk::view_const_string{formattedName};

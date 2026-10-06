@@ -7,7 +7,7 @@
 static	::klib::SGameState				drawFactoryMenu				(::klib::SGame& instanceGame, const ::klib::SGameState& returnState)										{
 	::klib::SGamePlayer							& player					= instanceGame.Players[::klib::PLAYER_INDEX_USER];
 	::gpk::array_obj<::klib::SEntityResearch>	& menuItemsValue			= player.ResearchedValue;
-	::gpk::array_obj<::gpk::array_pod<char>>	& menuItemsText				= player.ResearchedText;
+	::gpk::array_obj<::gpk::string>				& menuItemsText				= player.ResearchedText;
 
 	::gpk::array_obj<::gpk::vcsc_t>	menuItemsView				= {};
 	menuItemsView.resize(menuItemsText.size());

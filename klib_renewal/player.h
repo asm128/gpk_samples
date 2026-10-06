@@ -27,13 +27,13 @@ namespace klib
 	DECLARE_EQUIP_TYPE(Tile			);
 
 	struct STacticalPlayer { // can be AI or human.
-		int64_t													Money						= 2500000;
-		::klib::SPlayerControl									Control						= {};
-		::klib::SPlayerSelection								Selection					= {0, 0, -1, -1, -1};
-		::klib::SSquad											Squad						= {};
-		::klib::SCharacterResearch								Research					= {};
-		::klib::SCharacterScore									Score						= {};
-		::gpk::apod<char>								Name						= ::gpk::view_const_string{"Kasparov"};
+		int64_t												Money						= 2500000;
+		::klib::SPlayerControl								Control						= {};
+		::klib::SPlayerSelection							Selection					= {0, 0, -1, -1, -1};
+		::klib::SSquad										Squad						= {};
+		::klib::SCharacterResearch							Research					= {};
+		::klib::SCharacterScore								Score						= {};
+		::gpk::string										Name						= ::gpk::view_const_string{"Kasparov"};
 		::gpk::array_obj<::gpk::pobj<::klib::CCharacter>>	Army						= {};
 		//---------------
 		bool													SelectNextAgent				()													{
@@ -94,30 +94,30 @@ namespace klib
 	};
 
 	struct SGamePlayer { // can be AI or human.
-		::klib::STacticalPlayer									Tactical					= {};
-		::klib::SCharacterInventory								Inventory					= {};
-		::klib::SPlayerProjects									Projects					= {};
+		::klib::STacticalPlayer						Tactical					= {};
+		::klib::SCharacterInventory					Inventory					= {};
+		::klib::SPlayerProjects						Projects					= {};
 
 
-		::gpk::array_obj<::klib::SEntityResearch>				ResearchablesValue			= {};	// These allow menus to select researchables by index. They're dynamically built every time a research is completed or a new item is acquired.
-		::gpk::array_obj<::gpk::apod<char>>				ResearchablesText			= {};	// These allow menus to select researchables by index. They're dynamically built every time a research is completed or a new item is acquired.
-		::gpk::array_obj<::klib::SEntityResearch>				ResearchedValue				= {};	// These allow menus to select researchables by index. They're dynamically built every time a research is completed or a new item is acquired.
-		::gpk::array_obj<::gpk::apod<char>>				ResearchedText				= {};	// These allow menus to select researchables by index. They're dynamically built every time a research is completed or a new item is acquired.
+		::gpk::array_obj<::klib::SEntityResearch>	ResearchablesValue			= {};	// These allow menus to select researchables by index. They're dynamically built every time a research is completed or a new item is acquired.
+		::gpk::array_obj<::gpk::string>				ResearchablesText			= {};	// These allow menus to select researchables by index. They're dynamically built every time a research is completed or a new item is acquired.
+		::gpk::array_obj<::klib::SEntityResearch>	ResearchedValue				= {};	// These allow menus to select researchables by index. They're dynamically built every time a research is completed or a new item is acquired.
+		::gpk::array_obj<::gpk::string>				ResearchedText				= {};	// These allow menus to select researchables by index. They're dynamically built every time a research is completed or a new item is acquired.
 
-		::gpk::array_obj<::klib::CDeadCharacter>				Memorial					= {};	// The memorial doesn't have any use during gameplay so I've left it as part of the player.
+		::gpk::array_obj<::klib::CDeadCharacter>	Memorial					= {};	// The memorial doesn't have any use during gameplay so I've left it as part of the player.
 	};
 
-	void											playerUpdateResearchLists			(const ::klib::SEntityTables & entityTables, ::klib::SGamePlayer & player);
+	void	playerUpdateResearchLists			(const ::klib::SEntityTables & entityTables, ::klib::SGamePlayer & player);
 
-	bool											equipIfResearchedProfession			(::klib::SGameMessages& messages, ::klib::SGamePlayer& player, const ::klib::SEntityTables & entityTables, int32_t indexAgent, int16_t selectedChoice);
-	bool											equipIfResearchedWeapon				(::klib::SGameMessages& messages, ::klib::SGamePlayer& player, const ::klib::SEntityTables & entityTables, int32_t indexAgent, int16_t selectedChoice);
-	bool											equipIfResearchedArmor				(::klib::SGameMessages& messages, ::klib::SGamePlayer& player, const ::klib::SEntityTables & entityTables, int32_t indexAgent, int16_t selectedChoice);
-	bool											equipIfResearchedAccessory			(::klib::SGameMessages& messages, ::klib::SGamePlayer& player, const ::klib::SEntityTables & entityTables, int32_t indexAgent, int16_t selectedChoice);
+	bool	equipIfResearchedProfession			(::klib::SGameMessages& messages, ::klib::SGamePlayer& player, const ::klib::SEntityTables & entityTables, int32_t indexAgent, int16_t selectedChoice);
+	bool	equipIfResearchedWeapon				(::klib::SGameMessages& messages, ::klib::SGamePlayer& player, const ::klib::SEntityTables & entityTables, int32_t indexAgent, int16_t selectedChoice);
+	bool	equipIfResearchedArmor				(::klib::SGameMessages& messages, ::klib::SGamePlayer& player, const ::klib::SEntityTables & entityTables, int32_t indexAgent, int16_t selectedChoice);
+	bool	equipIfResearchedAccessory			(::klib::SGameMessages& messages, ::klib::SGamePlayer& player, const ::klib::SEntityTables & entityTables, int32_t indexAgent, int16_t selectedChoice);
 
-	bool											restrictedProfession				(::klib::SGameMessages& messages, ::klib::SGamePlayer& player, const ::klib::SEntityTables & tables, int32_t indexAgent, int16_t selectedChoice);
-	bool											restrictedWeapon					(::klib::SGameMessages& messages, ::klib::SGamePlayer& player, const ::klib::SEntityTables & tables, int32_t indexAgent, int16_t selectedChoice);
-	bool											restrictedArmor						(::klib::SGameMessages& messages, ::klib::SGamePlayer& player, const ::klib::SEntityTables & tables, int32_t indexAgent, int16_t selectedChoice);
-	bool											restrictedAccessory					(::klib::SGameMessages& messages, ::klib::SGamePlayer& player, const ::klib::SEntityTables & tables, int32_t indexAgent, int16_t selectedChoice);
+	bool	restrictedProfession				(::klib::SGameMessages& messages, ::klib::SGamePlayer& player, const ::klib::SEntityTables & tables, int32_t indexAgent, int16_t selectedChoice);
+	bool	restrictedWeapon					(::klib::SGameMessages& messages, ::klib::SGamePlayer& player, const ::klib::SEntityTables & tables, int32_t indexAgent, int16_t selectedChoice);
+	bool	restrictedArmor						(::klib::SGameMessages& messages, ::klib::SGamePlayer& player, const ::klib::SEntityTables & tables, int32_t indexAgent, int16_t selectedChoice);
+	bool	restrictedAccessory					(::klib::SGameMessages& messages, ::klib::SGamePlayer& player, const ::klib::SEntityTables & tables, int32_t indexAgent, int16_t selectedChoice);
 } // namespace
 
 #endif // __PLAYER_H__98213640926348273649827364987234698234__

@@ -130,7 +130,7 @@ void													klib::drawFireBackground					( ::klib::SWeightedDisplay& displa
 				continue;
 
 			if(display.DisplayWeights[z][x] > 1.0) {
-				int randX = ((::gpk::noise1D(randBase + x + z * displayWidth), seed+544) > 0.0) ? rand()%(1+disturbance*2)-disturbance : 0;
+				int randX = (::gpk::noise1D(randBase + x + z * displayWidth, seed+544) > 0.0) ? rand() % (1 + disturbance * 2) - disturbance : 0;
 				int32_t xpos = ::gpk::min(x + randX, displayWidth - 1);
 				int32_t zpos = bReverse ? z+1 : z-1;
 
@@ -423,7 +423,7 @@ void										klib::drawAndPresentGame		(SGame& instanceGame, ::klib::SASCIITarg
 	char											send_buffer[64]					= {};
 	ctime_s(send_buffer, sizeof(send_buffer), &curTimeWithUnreliableSize);
 
-	::gpk::apod<char>						serverTime						= ::gpk::vcs{"Server time: "};
+	::gpk::string								serverTime						= ::gpk::vcs{"Server time: "};
 	serverTime.append_string({send_buffer, (uint32_t)strlen(send_buffer) - 1});
 	serverTime									= ::gpk::vcsc_t{serverTime.begin(), serverTime.size() - 2};
 	::klib::printfToRectColored(target, ::klib::ASCII_COLOR_INDEX_CYAN		, bbHeight-2, 0, ::klib::SCREEN_CENTER, "%s.", serverTime.begin());
@@ -634,7 +634,7 @@ static void								displayResumedAgentSlot			(const ::klib::SEntityTables & tabl
 	::klib::valueToGrid(textAttributes, offsetY, offsetX+13, ::klib::SCREEN_LEFT, &color, 1, LINE_SIZE-14);
 	offsetY									+= 2;
 
-	::gpk::apod<char>					equipName;
+	::gpk::string								equipName;
 	equipName	 = getEntityName	(tables.Profession	, character.CurrentEquip.Profession	); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, "Class"		, equipName.begin(), character.CurrentEquip.Profession	.Level);
 	equipName	 = getEntityName	(tables.Weapon		, character.CurrentEquip.Weapon		); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, "Weapon"	, equipName.begin(), character.CurrentEquip.Weapon		.Level);
 	equipName	 = getEntityName	(tables.Armor		, character.CurrentEquip.Armor		); printfToGrid(display, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, "Armor"		, equipName.begin(), character.CurrentEquip.Armor		.Level);
@@ -682,7 +682,7 @@ void									klib::displayDetailedAgentSlot		(const ::klib::SEntityTables & tabl
 	printfToGridColored(display, textAttributes, color, offsetY++, offsetX, ::klib::SCREEN_LEFT, formatAgentTitle, character.Name.begin());
 	offsetY									+=1;
 
-	::gpk::apod<char>					equipName;
+	::gpk::string							equipName;
 	equipName	= ::klib::getEntityName(tables.Profession	, character.CurrentEquip.Profession	); ::klib::printfToGrid(display, offsetY++	, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, equipName.begin(), character.CurrentEquip.Profession	.Level);
 	equipName	= ::klib::getEntityName(tables.Weapon		, character.CurrentEquip.Weapon		); ::klib::printfToGrid(display, offsetY++	, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, equipName.begin(), character.CurrentEquip.Weapon		.Level);
 	equipName	= ::klib::getEntityName(tables.Armor		, character.CurrentEquip.Armor		); ::klib::printfToGrid(display, offsetY++	, offsetX, ::klib::SCREEN_LEFT, formatAgentEquip, equipName.begin(), character.CurrentEquip.Armor		.Level);
@@ -851,7 +851,7 @@ static	int32_t		drawMenu
 	const uint32_t			targetHeight										= targetASCII.metrics().y;
 	const int32_t			clearOffset											= (int32_t)(targetHeight - MENU_ROFFSET - 2 - 9);
 
-	::gpk::apod<char>		clearString											;
+	::gpk::string			clearString											;
 	clearString.resize(::gpk::max(rowWidth, 64U), ' ');
 	for(int32_t i = -2, count = (int32_t)targetHeight-clearOffset; i<count; ++i)
 		::klib::printfToRectColored(targetASCII.begin(), targetWidth, targetHeight, targetAttributes, (::klib::ASCII_COLOR_INDEX_BLACK << 4) | ::klib::ASCII_COLOR_INDEX_YELLOW, clearOffset+i, 0, ::klib::SCREEN_CENTER, "%s", clearString.begin()); // clear all lines where we're going to draw

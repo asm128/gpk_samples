@@ -50,13 +50,13 @@ namespace klib
 		};
 
 	struct CItem {
-		ITEM_TYPE											Type;
-		PROPERTY_TYPE										Property;
-		int64_t												Price;
-		::gpk::vcsc_t								Name;
+		ITEM_TYPE				Type;
+		PROPERTY_TYPE			Property;
+		int64_t					Price;
+		::gpk::vcst_t			Name;
 	};
 
-	static	const CItem									itemDescriptions[]			=
+	static	const CItem		itemDescriptions[]			=
 		// Type					// Property														// Price// Name
 	{	CItem{ITEM_TYPE_GRENADE	,	PROPERTY_TYPE_NONE											,	 0, ::gpk::view_const_string{"Rock"						}}
 	,	CItem{ITEM_TYPE_POTION	,	PROPERTY_TYPE_HEALTH										,	10, ::gpk::view_const_string{"Potion of Healing"		}}
@@ -100,11 +100,11 @@ namespace klib
 
 	static inline constexpr	int32_t						getFinalItemCount					()													{ return (int32_t)((::gpk::size(itemDescriptions) - 1) * itemGrades.size()); }
 	static inline			int32_t						getItemPrice						(const SItem& item, bool bSellPrice=false)			{ return (int32_t)( bSellPrice ? (itemDescriptions[item.Definition].Price*item.Level)*.5 : itemDescriptions[item.Definition].Price*item.Level ); }
-							::gpk::array_pod<char>	getItemName							(const SItem& item);
+							::gpk::string				getItemName							(const SItem& item);
 	struct CItemV2 {
-		ITEM_TYPE											Type;
-		int64_t												Price;
-		::gpk::vcsc_t								Name;
+		ITEM_TYPE		Type;
+		int64_t			Price;
+		::gpk::vcsc_t	Name;
 	};
 
 

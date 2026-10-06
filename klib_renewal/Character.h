@@ -4,9 +4,10 @@
 #include "CharacterPoints.h"
 
 #include "gpk_n3.h"
+#include "gpk_string.h"
 
-#ifndef __GAMEBASE_H__98236498027346892734689273__
-#define __GAMEBASE_H__98236498027346892734689273__
+#ifndef CHARACTER_H_9823649802734689273468927
+#define CHARACTER_H_9823649802734689273468927
 
 namespace klib
 {
@@ -111,11 +112,11 @@ namespace klib
 	}
 	class CCharacter : public SCharacter {
 	public:
-						::gpk::n3<int32_t>			Position				= {};
-						::gpk::apod<char>		Name					= ::gpk::view_const_string{"Unnamed"};
+		::gpk::n3<int32_t>		Position				= {};
+		::gpk::string			Name					= ::gpk::view_const_string{"Unnamed"};
 
-														CCharacter				()						= default;
-														CCharacter				(int maxHP, int hitChance, int attack, int coins, SFitnessPoints speed, SEntityEffect characterEffect, SEntityStatus characterStatus, const ::gpk::vcsc_t& name)
+								CCharacter				()						= default;
+								CCharacter				(int maxHP, int hitChance, int attack, int coins, SFitnessPoints speed, SEntityEffect characterEffect, SEntityStatus characterStatus, const ::gpk::vcsc_t& name)
 		: SCharacter	(maxHP, hitChance, attack, coins, speed, characterEffect, characterStatus)
 		, Position		({})
 		, Name			(name)
@@ -124,7 +125,7 @@ namespace klib
 	class CDeadCharacter {
 	public:
 						::klib::SCharacterScore			Score					= {};
-						::gpk::apod<char>		Name					= "Unnamed";
+						::gpk::string					Name					= "Unnamed";
 
 		inline											CDeadCharacter			()									= default;
 		inline											CDeadCharacter			(const CCharacter& deadCharacter)
@@ -227,4 +228,4 @@ namespace klib
 
 } // namespace
 
-#endif // __GAMEBASE_H__98236498027346892734689273__
+#endif // CHARACTER_H_9823649802734689273468927

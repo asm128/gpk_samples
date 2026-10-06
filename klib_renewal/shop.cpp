@@ -10,18 +10,18 @@ static int32_t										reinitBuyMenuItem			(::klib::SMenuItem<::klib::SBuyable>
 	int32_t													indexElement				= inventory.FindElement({menuItem.ReturnValue.Definition, 0, menuItem.ReturnValue.Grade, -1});
 	char													strCount		[32];
 	sprintf_s(strCount, "%i", (indexElement != -1) ? inventory[indexElement].Count : 0);
-	::sprintf_s(preformatted, "x%3.3s: %s", strCount, nameItem.begin() ); menuItem.Text = preformatted;
+	::sprintf_s(preformatted, "x%3.3s: %s", strCount, nameItem.begin() ); menuItem.Text = ::gpk::vcst_t{preformatted};
 	return 0;
 }
 
 template <typename _tEntity>
-static int32_t										initBuyMenuItem				(const int32_t itemIndex, const ::klib::SEntityRecord<_tEntity> & definition, ::klib::SMenuItem<::klib::SBuyable> & menuItem, ::gpk::apod<char> & nameItem) {
+static int32_t										initBuyMenuItem				(const int32_t itemIndex, const ::klib::SEntityRecord<_tEntity> & definition, ::klib::SMenuItem<::klib::SBuyable> & menuItem, ::gpk::string & nameItem) {
 	char													preformatted	[256]		= {};
 	char													strPrice		[64];
 	::sprintf_s(strPrice, "%lli", definition.Points.PriceBuy);
 	::sprintf_s(preformatted, "%-28.28s $%8.8s", definition.Name.begin(), strPrice);
 	menuItem											= { { (int16_t)itemIndex, 1, definition.Points.PriceBuy, definition.Points.CostMaintenance, definition.Name}, ""};
-	nameItem											= preformatted;
+	nameItem											= ::gpk::vcst_t{preformatted};
 	return 0;
 }
 
@@ -34,8 +34,22 @@ int32_t												klib::initBuyMenus			(const ::klib::SEntityTables & entityTab
 	for(uint32_t i = 0, itemCount = entityTables.Profession	.Definitions.size(); i<itemCount; ++i){ ::initBuyMenuItem(i, entityTables.Profession	.Definitions[i], menus.MenuItemsProfession	[i], menus.NamesProfession	[i]); };
 	for(uint32_t i = 0, itemCount = entityTables.Weapon		.Definitions.size(); i<itemCount; ++i){ ::initBuyMenuItem(i, entityTables.Weapon		.Definitions[i], menus.MenuItemsWeapon		[i], menus.NamesWeapon		[i]); };
 	for(uint32_t i = 0, itemCount = entityTables.Armor		.Definitions.size(); i<itemCount; ++i){ ::initBuyMenuItem(i, entityTables.Armor			.Definitions[i], menus.MenuItemsArmor		[i], menus.NamesArmor		[i]); };
-	for(uint32_t i = 0, itemCount = (uint32_t)::gpk::size(::klib::itemDescriptions); i<itemCount; ++i){ char strPrice [64]; sprintf_s(strPrice, "%lli", ::klib::itemDescriptions[i].Price			); ::sprintf_s(preformatted, "%-28.28s $%8.8s", ::klib::itemDescriptions[i].Name.begin(), strPrice); menus.MenuItemsItem	[i] = { { (int16_t)i, 1, ::klib::itemDescriptions[i].Price			, 0													, ::klib::itemDescriptions	[i].Name}, ""};	menus.NamesItem	[i] = preformatted; };
-	for(uint32_t i = 0, itemCount = (uint32_t)::gpk::size(::klib::enemyDefinitions); i<itemCount; ++i){ char strPrice [64]; sprintf_s(strPrice, "%lli", ::klib::enemyDefinitions[i].Points.PriceBuy	); ::sprintf_s(preformatted, "%-28.28s $%8.8s", ::klib::enemyDefinitions[i].Name.begin(), strPrice); menus.MenuItemsAgent	[i] = { { (int16_t)i, 1, ::klib::enemyDefinitions[i].Points.PriceBuy, ::klib::enemyDefinitions[i].Points.CostMaintenance, ::klib::enemyDefinitions	[i].Name}, ""};	menus.NamesAgent[i] = preformatted; };
+	for(uint32_t i = 0, itemCount = (uint32_t)::gpk::size(::klib::itemDescriptions); i<itemCount; ++i){ 
+		char strPrice [64]; 
+		sprintf_s(strPrice, "%lli", ::klib::itemDescriptions[i].Price			); 
+		::sprintf_s(preformatted, "%-28.28s $%8.8s", ::klib::itemDescriptions[i].Name.begin(), 
+		strPrice); 
+		menus.MenuItemsItem		[(uint8_t)i] = { { (int16_t)i, (int16_t)1, ::klib::itemDescriptions[i].Price			, 0													, ::klib::itemDescriptions	[i].Name}, ""};	
+		menus.NamesItem			[(uint8_t)i] = ::gpk::vcst_t{preformatted}; 
+	};
+	for(uint32_t i = 0, itemCount = (uint32_t)::gpk::size(::klib::enemyDefinitions); i<itemCount; ++i){ 
+		char strPrice [64]; 
+		sprintf_s(strPrice, "%lli", ::klib::enemyDefinitions[i].Points.PriceBuy	); 
+		::sprintf_s(preformatted, "%-28.28s $%8.8s", ::klib::enemyDefinitions[i].Name.begin(), 
+		strPrice); 
+		menus.MenuItemsAgent	[(uint8_t)i] = { { (int16_t)i, (int16_t)1, ::klib::enemyDefinitions[i].Points.PriceBuy, ::klib::enemyDefinitions[i].Points.CostMaintenance, ::klib::enemyDefinitions	[i].Name}, ""};	
+		menus.NamesAgent		[(uint8_t)i] = ::gpk::vcst_t{preformatted}; 
+	};
 	return 0;
 }
 
@@ -48,7 +62,7 @@ int32_t												klib::reinitBuyMenus		(const ::klib::SEntityTables & entityTa
 	for(uint32_t i = 0, itemCount = entityTables.Profession	.Definitions.size(); i<itemCount; ++i){	::reinitBuyMenuItem(menus.MenuItemsProfession	[i], menus.NamesProfession	[i], playerInventory.Profession	);  }
 	for(uint32_t i = 0, itemCount = entityTables.Weapon		.Definitions.size(); i<itemCount; ++i){	::reinitBuyMenuItem(menus.MenuItemsWeapon		[i], menus.NamesWeapon		[i], playerInventory.Weapon		);  }
 	for(uint32_t i = 0, itemCount = entityTables.Armor		.Definitions.size(); i<itemCount; ++i){	::reinitBuyMenuItem(menus.MenuItemsArmor		[i], menus.NamesArmor		[i], playerInventory.Armor		);  }
-	for(uint32_t i = 0, itemCount = ::gpk::size(::klib::itemDescriptions); i<itemCount; ++i){	int32_t indexElement = playerInventory.Items.FindElement({ menus.MenuItemsItem[i].ReturnValue.Definition, 0, menus.MenuItemsItem[i].ReturnValue.Grade, -1}); char strCount [32]; sprintf_s(strCount, "%i", (indexElement != -1) ? playerInventory.Items[indexElement].Count : 0); ::sprintf_s(preformatted, "x%3.3s: %s", strCount, menus.NamesItem[i].begin() ); menus.MenuItemsItem[i].Text = preformatted; }
+	for(uint32_t i = 0, itemCount = ::gpk::size(::klib::itemDescriptions); i<itemCount; ++i){	int32_t indexElement = playerInventory.Items.FindElement({ menus.MenuItemsItem[i].ReturnValue.Definition, 0, menus.MenuItemsItem[i].ReturnValue.Grade, -1}); char strCount [32]; sprintf_s(strCount, "%i", (indexElement != -1) ? playerInventory.Items[indexElement].Count : 0); ::sprintf_s(preformatted, "x%3.3s: %s", strCount, menus.NamesItem[i].begin() ); menus.MenuItemsItem[i].Text = ::gpk::vcst_t{preformatted}; }
 	for(uint32_t i = 0, itemCount = ::gpk::size(::klib::enemyDefinitions); i<itemCount; ++i){	menus.MenuItemsAgent[i].Text = menus.NamesAgent[i]; }
 	return 0;
 }

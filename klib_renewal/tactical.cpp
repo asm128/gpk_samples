@@ -111,7 +111,7 @@ void																	drawTileInfo
 	,	::gpk::SRenderTarget<char, uint16_t>	& tacticalDisplay
 	)
 {
-	static	::gpk::apod<char>											selectedTile									= "";
+	static	::gpk::string											selectedTile									= "";
 	static	::klib::SMessageSlow												messageSlow										= {};
 	static	uint16_t															messageColor									= ::klib::ASCII_COLOR_INDEX_DARKGREEN;
 
@@ -156,7 +156,7 @@ void																	drawTileInfo
 			bDrawText																= true;
 		}
 		else if(tacticalInfo.Board.Tiles.Entities.Props[boardZ][boardX].Definition != -1) {
-			::gpk::apod<char>													stagePropName									= ::klib::getEntityName(instanceGame.EntityTables.StageProp,
+			::gpk::string													stagePropName									= ::klib::getEntityName(instanceGame.EntityTables.StageProp,
 				{	tacticalInfo.Board.Tiles.Entities.Props[boardZ][boardX].Definition
 				,	tacticalInfo.Board.Tiles.Entities.Props[boardZ][boardX].Modifier
 				,	tacticalInfo.Board.Tiles.Entities.Props[boardZ][boardX].Level
@@ -246,7 +246,7 @@ void																drawPlayerInfo									(::klib::SGame& instanceGame)								
 #define PLAYER_INFO_POSY 1
 
 	uint16_t																	messageColor									= ::klib::ASCII_COLOR_INDEX_DARKGREEN;
-	::gpk::apod<char>													selectionText									= {};
+	::gpk::string													selectionText									= {};
 	::klib::STacticalPlayer														& currentPlayer									= instanceGame.Players[currentPlayerIndex].Tactical;
 	const int32_t																selectionPlayerUnit								= currentPlayer.Selection.PlayerUnit;
 	if( selectionPlayerUnit != -1
@@ -482,7 +482,7 @@ static CHARACTER_TURN_ACTION											characterTurn									(const ::klib::SEnt
 				else {
 					char																		formatCoords[256]								= {};
 					sprintf_s(formatCoords, "{x=%i, y=%i, z=%i}", coordTarget.x, coordTarget.y, coordTarget.z);
-					::gpk::apod<char>													targetType										= ::gpk::view_const_string{"Target Coords: "};
+					::gpk::string													targetType										= ::gpk::view_const_string{"Target Coords: "};
 					targetType.append_string(formatCoords);
 					targetType.append_string(". Target player index: ");
 					sprintf_s(formatCoords, "%i", currentPlayer.Tactical.Selection.TargetPlayer);
@@ -493,7 +493,7 @@ static CHARACTER_TURN_ACTION											characterTurn									(const ::klib::SEnt
 					targetType.append_string(". Target player name: ");
 					targetType.append(targetPlayer.Tactical.Name);
 					sprintf_s(formatCoords, "{x=%i, y=%i, z=%i}", coordPlayer.x, coordPlayer.y, coordPlayer.z);
-					::gpk::apod<char>													userType										= ::gpk::view_const_string{"Origin Coords: "};
+					::gpk::string													userType										= ::gpk::view_const_string{"Origin Coords: "};
 					userType.append_string(formatCoords);
 					sprintf_s(formatCoords, ". Current player index: %i", tacticalInfo.CurrentPlayer);
 					userType.append_string(formatCoords);
@@ -573,7 +573,7 @@ int32_t																	initInventoryMenu								(::klib::CCharacter& adventurer
 
 	for(uint32_t i=0; i<adventurer.Goods.Inventory.Items.Slots.size(); ++i) {
 		const ::klib::SItem															& itemEntity									= adventurer.Goods.Inventory.Items[i].Entity;
-		::gpk::apod<char>													itemName										= ::klib::getItemName(itemEntity);
+		::gpk::string													itemName										= ::klib::getItemName(itemEntity);
 
 		if(bPrintPrice) {
 			int32_t																		finalPrice										= ::klib::getItemPrice(itemEntity, bSellPrice);
@@ -662,7 +662,7 @@ int32_t																	drawInventoryMenu								(::klib::SGame& instanceGame, :
 				}
 				else {
 					bUsedItem																= false;
-					::gpk::apod<char>													itemName										= ::klib::getItemName(entityItem);
+					::gpk::string													itemName										= ::klib::getItemName(entityItem);
 					instanceGame.Messages.UserMessage												= ::gpk::view_const_string{"You need to select a valid target in order to use "};
 					instanceGame.Messages.UserMessage.append(itemName);
 					instanceGame.Messages.UserMessage.append_string("!");
@@ -671,7 +671,7 @@ int32_t																	drawInventoryMenu								(::klib::SGame& instanceGame, :
 			}
 			else {
 				bUsedItem																= false;
-				::gpk::apod<char>													itemName										= ::klib::getItemName(entityItem);
+				::gpk::string													itemName										= ::klib::getItemName(entityItem);
 				instanceGame.Messages.UserMessage												= ::gpk::view_const_string{"You need to select a valid target in order to use "};
 				instanceGame.Messages.UserMessage.append(itemName);
 				instanceGame.Messages.UserMessage.append_string("!");
@@ -874,7 +874,7 @@ static	void															updateBullets									(::klib::SGame & instanceGame, d
 						double proportion = length/newAOE.RadiusOrHalfSize;
 						if(proportion >= 1.0)
 							continue;
-						const ::gpk::apod<char>			weaponName				= ::klib::getEntityName(instanceGame.EntityTables.Weapon, shooter.CurrentEquip.Weapon);
+						const ::gpk::string			weaponName				= ::klib::getEntityName(instanceGame.EntityTables.Weapon, shooter.CurrentEquip.Weapon);
 						::klib::applySuccessfulWeaponHit(instanceGame.EntityTables, instanceGame.Messages, shooter, agentVictim, (int32_t)(newBullet.Points.Damage * (1.0 - proportion)), weaponName);
 						if(false == agentVictim.IsAlive())
 							::klib::handleAgentDeath(tacticalInfo, instanceGame.Players, agentVictim, shooter, teamVictim, instanceGame.Messages);
@@ -930,7 +930,7 @@ bool																	initTacticalGame								(::klib::SGame& instanceGame);
 
 	if(tacticalInfo.Board.Shots.Bullet.size() <= 0) {
 		// Need to construct menu title
-		::gpk::apod<char>			menuTitle					= ::gpk::view_const_string{"Mission Over"};
+		::gpk::string			menuTitle					= ::gpk::view_const_string{"Mission Over"};
 		const int32_t						selectionPlayerUnit			= currentPlayer.Tactical.Selection.PlayerUnit;
 		char								playerUnitPlusOne	[64]	= {};
 		sprintf_s(playerUnitPlusOne, "%i", selectionPlayerUnit + 1);

@@ -5,6 +5,7 @@
 #include "klib_timer.h"
 
 #include "gpk_sync.h"
+#include "gpk_string.h"
 
 #include <time.h>
 #include <mutex>
@@ -128,7 +129,7 @@ namespace klib
 		int16_t					Grade;
 		int64_t					Price;
 		int64_t					MaintenanceCost;
-		::gpk::apod<char>		Name;
+		::gpk::string			Name;
 	};
 
 	struct SShopMenus {
@@ -152,15 +153,15 @@ namespace klib
 		::klib::SMenuHeader<::klib::SBuyable>	MenuItem					= {{::klib::SHOP_EXIT_VALUE},	::gpk::view_const_string{"Item"			" a la carte"}, 48};
 		::klib::SMenuHeader<::klib::SBuyable>	MenuAgent					= {{::klib::SHOP_EXIT_VALUE},	::gpk::view_const_string{"Agent"		" a la carte"}, 48};
 
-		::gpk::apod<char>				NamesAccessory		[256]	= {};
-		::gpk::apod<char>				NamesStageProp		[256]	= {};
-		::gpk::apod<char>				NamesFacility		[256]	= {};
-		::gpk::apod<char>				NamesVehicle		[256]	= {};
-		::gpk::apod<char>				NamesProfession		[256]	= {};
-		::gpk::apod<char>				NamesWeapon			[256]	= {};
-		::gpk::apod<char>				NamesArmor			[256]	= {};
-		::gpk::apod<char>				NamesItem			[256]	= {};
-		::gpk::apod<char>				NamesAgent			[256]	= {};
+		::gpk::string				NamesAccessory		[256]	= {};
+		::gpk::string				NamesStageProp		[256]	= {};
+		::gpk::string				NamesFacility		[256]	= {};
+		::gpk::string				NamesVehicle		[256]	= {};
+		::gpk::string				NamesProfession		[256]	= {};
+		::gpk::string				NamesWeapon			[256]	= {};
+		::gpk::string				NamesArmor			[256]	= {};
+		::gpk::string				NamesItem			[256]	= {};
+		::gpk::string				NamesAgent			[256]	= {};
 	};
 
 	::gpk::error_t					initBuyMenus		(const ::klib::SEntityTables & entityTables, ::klib::SShopMenus& menus);
