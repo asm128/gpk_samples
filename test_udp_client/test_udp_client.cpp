@@ -18,7 +18,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "UDP Client Test");
 
 static	::gpk::error_t	loadNetworkConfig	(const ::gpk::SJSONReader & jsonConfig, ::gpk::vcsc_t & remote_ip, ::gpk::vcsc_t & remote_port) {
 	::gpk::error_t				appNodeIndex;
-	gpk_necs(appNodeIndex = ::gpk::jsonExpressionResolve(::gpk::vcs{"application.test_udp_client"}, jsonConfig, 0));
+	if_fail_fe(appNodeIndex = ::gpk::jsonExpressionResolve(::gpk::vcs{"application.test_udp_client"}, jsonConfig, 0));
 	return ::gpk::loadClientConfig(jsonConfig, appNodeIndex, remote_ip, remote_port);
 }
 
@@ -27,16 +27,16 @@ static	::gpk::error_t	loadNetworkConfig	(const ::gpk::SJSONReader & jsonConfig, 
 	::gpk::SFramework			& framework			= app.Framework;
 	::gpk::SWindow				& mainWindow		= framework.RootWindow;
 
-	ws_if_failed(::gpk::clientDisconnect(app.Client.UDP));
-	ws_if_failed(::gpk::mainWindowDestroy(mainWindow));
-	ws_if_failed(::gpk::tcpipShutdown());
+	if_fail_w(::gpk::clientDisconnect(app.Client.UDP));
+	if_fail_w(::gpk::mainWindowDestroy(mainWindow));
+	if_fail_w(::gpk::tcpipShutdown());
 	return 0;
 }
 
 static	::gpk::error_t	updateSizeDependentResources(::SApplication & app)											{
 	::gpk::SWindow				& mainWindow		= app.Framework.RootWindow;
 	const ::gpk::n2u1_t			newSize				= mainWindow.Size;
-	gpk_necs(mainWindow.BackBuffer->resize(newSize, ::gpk::bgra{0, 0, 0, 0}, 0xFFFFFFFF));
+	if_fail_fe(mainWindow.BackBuffer->resize(newSize, ::gpk::bgra{0, 0, 0, 0}, 0xFFFFFFFF));
 	mainWindow.Resized		= false;
 	return 0;
 }
@@ -46,7 +46,7 @@ static	::gpk::error_t	processScreenEvent	(::SApplication & app, const ::gpk::SEv
 	default: break;
 	case ::gpk::EVENT_SCREEN_Create:
 	case ::gpk::EVENT_SCREEN_Resize: 
-		gpk_necs(::updateSizeDependentResources(app));
+		if_fail_fe(::updateSizeDependentResources(app));
 		break;
 	}
 	return 0;
@@ -65,14 +65,14 @@ static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SEv
 	::gpk::SFramework			& framework			= app.Framework;
 	::gpk::SWindow				& mainWindow		= framework.RootWindow;
 	mainWindow.Size			= {1280, 720};
-	gpk_necs(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input));	// create platform widnow
+	if_fail_fe(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input));	// create platform widnow
 
 	::gpk::SGUI					& gui				= *framework.GUI;
-	gpk_necs(::gpk::setupGUI(app.Client.UI, gui));
+	if_fail_fe(::gpk::setupGUI(app.Client.UI, gui));
 
-	gpk_necs(::gpk::tcpipInitialize());
-	ws_if_failed(::loadNetworkConfig(framework.JSONConfig.Reader, app.Client.RemoteIp, app.Client.RemotePort));
-	es_if_failed(::gpk::clientConnect(app.Client, *framework.GUI));	// Preemptively try to connect to the gate server. 
+	if_fail_fe(::gpk::tcpipInitialize());
+	if_fail_w(::loadNetworkConfig(framework.JSONConfig.Reader, app.Client.RemoteIp, app.Client.RemotePort));
+	if_fail_e(::gpk::clientConnect(app.Client, *framework.GUI));	// Preemptively try to connect to the gate server. 
 
 	return 0;
 }
@@ -85,36 +85,37 @@ static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SEv
 	bool						systemExit			= false;
 
 	gpk::TQueueSystemEvent		eventsToProcess		= mainWindow.EventQueue;
-	gpk_necs(eventsToProcess.append(gui.Controls.EventQueue));
-	gpk_necs(eventsToProcess.for_each([&app, &systemExit](const ::gpk::pobj<::gpk::SEventSystem> & sysEvent) { 
+	if_fail_fe(eventsToProcess.append(gui.Controls.EventQueue));
+	if_fail_fe(eventsToProcess.for_each([&app, &systemExit](const ::gpk::pobj<::gpk::SEventSystem> & sysEvent) { 
 		::gpk::error_t				result; 
-		gpk_necs(result = ::processSystemEvent(app, *sysEvent)); 
+		if_fail_fe(result = ::processSystemEvent(app, *sysEvent)); 
 		if(result == 1) 
 			systemExit				= true; 
 		return result;
 	}));
 
-	rvi_if(::gpk::APPLICATION_STATE_EXIT, systemExit || systemRequestedExit, "%s || %s", ::gpk::bool2char(systemExit) || ::gpk::bool2char(systemRequestedExit));
+	if_true_vif(::gpk::APPLICATION_STATE_EXIT, systemExit || systemRequestedExit, "%s || %s", ::gpk::bool2char(systemExit) || ::gpk::bool2char(systemRequestedExit));
 
 	::gpk::pau8					payloadCache;
-	eventsToProcess.for_each([&app, &payloadCache](::gpk::pobj<::gpk::SEventSystem> & ev){
+	if_fail_e(eventsToProcess.for_each([&app, &payloadCache](::gpk::pobj<::gpk::SEventSystem> & ev){
 		payloadCache.create();
-		gpk_necs(ev->Save(*payloadCache));
+		if_fail_fe(ev->Save(*payloadCache));
 		app.Client.QueueToSend.push_back(payloadCache);
  		return 0;
-	});
+	}));
 
 	int32_t						clientResult;
-	gpk_necs(clientResult = ::gpk::clientUpdate(app.Client, gui));
+	if_fail_fe(clientResult = ::gpk::clientUpdate(app.Client, gui));
 	rvi_if(::gpk::APPLICATION_STATE_EXIT, clientResult > 0, "User requested close (%i). Terminating execution.", clientResult);
 
-	app.Client.QueueReceived.for_each([&app](::gpk::pobj<::gpk::SUDPMessage> & udp){ 
+	if_fail_e(app.Client.QueueReceived.for_each([&app](::gpk::pobj<::gpk::SUDPMessage> & udp){ 
 		if(udp && udp->Payload.size()) {
 			::gpk::pobj<::gpk::SEventSystem>	eventReceived;
 			::gpk::vcu0_t							inputBytes			= udp->Payload;
-			es_if_failed(eventReceived->Load(inputBytes)); 
+			if_fail_fe(eventReceived->Load(inputBytes)); 
 		}
-	});
+		return 0;
+	}));
 
 	//-----------------------------
 	::gpk::STimer				& timer					= app.Framework.Timer;
@@ -133,8 +134,8 @@ static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SEv
 
 	::gpk::SFramework			& framework				= app.Framework;
 	::gpk::prtbgra8d32			backBuffer				= framework.RootWindow.BackBuffer;
-	backBuffer->resize(framework.RootWindow.BackBuffer->Color.metrics(), clearColor, (uint32_t)-1);
-	gpk_necs(::gpk::guiDraw(*framework.GUI, backBuffer->Color));
+	if_fail_fe(backBuffer->resize(framework.RootWindow.BackBuffer->Color.metrics(), clearColor, (uint32_t)-1));
+	if_fail_fe(::gpk::guiDraw(*framework.GUI, backBuffer->Color));
 	memcpy(framework.RootWindow.BackBuffer->Color.View.begin(), backBuffer->Color.View.begin(), backBuffer->Color.View.byte_count());
 	//::gpk::grid_mirror_y(framework.RootWindow.BackBuffer->Color.View, backBuffer->Color.View);
 	//framework.RootWindow.BackBuffer	= backBuffer;

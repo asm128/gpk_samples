@@ -96,32 +96,33 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SE
 	rvi_if(::gpk::APPLICATION_STATE_EXIT, systemExit || systemRequestedExit, "%s || %s", ::gpk::bool2char(systemExit) || ::gpk::bool2char(systemRequestedExit));
 
 	::gpk::pau8					payloadCache;
-	app.Server->UDP.Clients.enumerate([&app, &eventsToProcess, &payloadCache](uint32_t & iClient, ::gpk::pobj<::gpk::SUDPConnection> & client){
-		eventsToProcess.for_each([&app, &iClient, &client, &payloadCache](::gpk::pobj<::gpk::SEventSystem> & ev){
+	if_fail_e(app.Server->UDP.Clients.enumerate([&app, &eventsToProcess, &payloadCache](uint32_t & iClient, ::gpk::pobj<::gpk::SUDPConnection> & client){
+		if_fail_e(eventsToProcess.for_each([&app, &iClient, &client, &payloadCache](::gpk::pobj<::gpk::SEventSystem> & ev){
 			payloadCache.create();
 			gpk_necs(ev->Save(*payloadCache));
 			gpk_necs(app.Server->QueueToSend[iClient]->push_back(payloadCache));
  			return 0;
-		});
-	});
+		}));
+		return 0;
+	}));
 
 	int32_t						serverResult;
 	es_if_failed(serverResult = ::gpk::serverUpdate(*app.Server, gui));
 	rvi_if(::gpk::APPLICATION_STATE_EXIT, serverResult == 1, "User requested close. Terminating execution.");
 
-	app.Server->QueueReceived.for_each([&app](::gpk::TUDPQueue & messages) {
-		messages.enumerate([&app](uint32_t & index, ::gpk::pobj<::gpk::SUDPMessage> & message) {
+	if_fail_e(app.Server->QueueReceived.for_each([&app](::gpk::TUDPQueue & messages) {
+		if_fail_e(messages.enumerate([&app](uint32_t & index, ::gpk::pobj<::gpk::SUDPMessage> & message) {
 			if(!message)
 				return 0;
 
 			gpk::vcu0_t						input					= message->Payload;
 			gpk::pobj<gpk::SEventSystem>	newEvent;
-			gpk_necs(newEvent->Load(input));
+			if_fail_fe(newEvent->Load(input));
 			info_printf("Received '%s' from client %i: %s.", ::gpk::get_enum_namep(newEvent->Type), index, ::gpk::get_value_namep(newEvent->Type));
 			return 0;
-		});
-		messages.clear();
-	});
+		}));
+		return messages.clear();
+	}));
 
 	//-----------------------------
 	::gpk::STimer				& timer					= app.Framework.Timer;
@@ -141,7 +142,7 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SE
 	::gpk::SFramework			& framework				= app.Framework;
 	::gpk::prtbgra8d32			backBuffer				= framework.RootWindow.BackBuffer;
 	backBuffer->resize(framework.RootWindow.BackBuffer->Color.metrics(), clearColor, (uint32_t)-1);
-	gpk_necs(::gpk::guiDraw(*framework.GUI, backBuffer->Color));
+	if_fail_fe(::gpk::guiDraw(*framework.GUI, backBuffer->Color));
 	memcpy(framework.RootWindow.BackBuffer->Color.View.begin(), backBuffer->Color.View.begin(), backBuffer->Color.View.byte_count());
 	//::gpk::grid_mirror_y(framework.RootWindow.BackBuffer->Color.View, backBuffer->Color.View);
 	//framework.RootWindow.BackBuffer	= backBuffer;
