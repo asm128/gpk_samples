@@ -17,6 +17,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommand>$(OutDir)grt.exe</LocalDebuggerCommand>
     <LocalDebuggerCommandArguments>$(ProjectName)</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArgumentsHistory>vdop_server_tactical|</LocalDebuggerCommandArgumentsHistory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
