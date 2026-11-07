@@ -93,7 +93,7 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SE
 		return result;
 	}));
 
-	rvi_if(::gpk::APPLICATION_STATE_EXIT, systemExit || systemRequestedExit, "%s || %s", ::gpk::bool2char(systemExit) || ::gpk::bool2char(systemRequestedExit));
+	rvi_if(::gpk::APPLICATION_STATE_EXIT, systemExit || systemRequestedExit, "%s || %s", ::gpk::bool2char(systemExit), ::gpk::bool2char(systemRequestedExit));
 
 	::gpk::pau8					payloadCache;
 	if_fail_e(app.Server->UDP.Clients.enumerate([&app, &eventsToProcess, &payloadCache](uint32_t & iClient, ::gpk::pobj<::gpk::SUDPConnection> & client){
